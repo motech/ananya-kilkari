@@ -7,6 +7,7 @@
         <groupId>ananya-kilkari</groupId>
         <version>0.1-SNAPSHOT</version>
     </parent>
+    <name>Ananya Kilkari Message Campaign</name>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ananya-kilkari-message-campaign</artifactId>

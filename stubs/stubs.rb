@@ -87,5 +87,5 @@ get "/requests/:count" do
   end_index = user_requests.count
   range = start_index..end_index
 
-  user_requests[range].collect(&:to_s).reverse
+  erb :requests, :locals => {:user_requests => user_requests[range].reverse}
 end

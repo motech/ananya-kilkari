@@ -1,0 +1,5 @@
+<% user_requests.each do |request| %>
+  <%= "<b>Method:</b> #{request.method} <b>Status:</b> #{request.response_status_code} <b>URL:</b> #{request.url}" %></br>
+  <%= request.body %>
+  <hr/>
+<% end %>

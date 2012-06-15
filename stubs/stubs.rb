@@ -51,11 +51,12 @@ request_mappings = ProfileLoader.load
 user_requests = []
 
 request_mappings.each do |request_mapping|
-  block = Proc.new {eval("content_type \"#{request_mapping.content_type}\"
-                          status #{request_mapping.status_code}
-                          user_requests << UserRequest.new(request.request_method, request.url, request.body, #{request_mapping.status_code})
-                          erb \"#{request_mapping.response_file}\".to_sym, params
-                          ")}
+  block = Proc.new {
+    content_type request_mapping.content_type
+    status request_mapping.status_code
+    user_requests << UserRequest.new(request.request_method, request.url, request.body, request_mapping.status_code)
+    erb request_mapping.response_file.to_sym, params
+  }
 
   send request_mapping.method, request_mapping.path, &block
 end

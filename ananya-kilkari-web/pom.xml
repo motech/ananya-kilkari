@@ -49,10 +49,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.ektorp</groupId>
-            <artifactId>org.ektorp</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

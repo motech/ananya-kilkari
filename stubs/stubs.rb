@@ -82,16 +82,9 @@ get "/requests/:count" do
   erb :requests, :locals => {:user_requests => user_requests[range].reverse}
 end
 
-get "/reload-config" do
-  user_requests = ProfileLoader.user_requests
-  ProfileLoader.load(profile_file_path, user_requests)
-  erb "Profile Reloaded."
-end
 
 get "/" do
-  url = request.url
-  path = request.path
-  url.sub!(path, "") if path != "/"
-  erb "<a href='#{url}reload-config'>Reload Profile</a>"
+  erb :home, :locals => {:current_profile => profile_file_path}
 end
+
 

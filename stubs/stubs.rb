@@ -2,6 +2,7 @@ require 'rubygems'
 require 'sinatra'
 
 set :port, 1111
+set :public_folder, File.dirname(__FILE__) + '/uploads'
 
 class RequestMapping
   attr_reader :status_code, :response_file, :content_type, :method, :path
@@ -15,12 +16,14 @@ class RequestMapping
 end
 
 class UserRequest
-  attr_reader :response_status_code, :url, :body, :method
-  def initialize(method, url, body, response_status_code)
+  attr_reader :response_status_code, :url, :body, :method, :request_file_path, :request_file_type
+  def initialize(method, url, body, response_status_code, request_file_path = "", request_file_type = "")
     @method = method
     @url = url
-    @body = body.read
+    @body = body
     @response_status_code = response_status_code
+    @request_file_path = request_file_path
+    @request_file_type = request_file_type
   end
 
   def to_s
@@ -49,14 +52,35 @@ class ProfileLoader
   def self.configure_requests(request_mappings)
     request_mappings.each do |request_mapping|
       block = Proc.new {
+        request_file_path, request_file_type = ProfileLoader.upload_file(params['file']) if(params[:file] != nil)
+
         content_type request_mapping.content_type
         status request_mapping.status_code
-        @@user_requests << UserRequest.new(request.request_method, request.url, request.body, request_mapping.status_code)
+        request_body = ProfileLoader.generate_request_body(params)
+        
+        @@user_requests << UserRequest.new(request.request_method, request.url, request_body, request_mapping.status_code, request_file_path, request_file_type)
         erb request_mapping.response_file.to_sym, params
       }
 
       send request_mapping.method, request_mapping.path, &block
     end
+  end
+
+  def self.upload_file(file_params)
+    file_name = file_params[:filename] + Time.now.strftime("%Y%m%d%H%M%S")
+    File.open("uploads/" + file_name, "w") do |f|
+      f.write(file_params[:tempfile].read)
+    end
+    [file_name, file_params[:type]]
+  end
+  
+  def self.generate_request_body(params)
+    request_body = ""
+    params.each do |key, value|
+      next if key == 'file'
+      request_body += value != nil ? (key + "=" + value + ",") : (key + ",")
+    end
+    request_body
   end
 
   def self.user_requests
@@ -81,7 +105,6 @@ get "/requests/:count" do
 
   erb :requests, :locals => {:user_requests => user_requests[range].reverse}
 end
-
 
 get "/" do
   erb :home, :locals => {:current_profile => profile_file_path}

@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="http://github.com/DmitryBaranovskiy/raphael/raw/master/raphael-min.js"></script>
+    <script src="js/message_campaign.js"></script>
+    <script type="text/javascript">
+      window.onload = function () {
+
+      	var campaign = {
+      		"externalId" : "9740",
+      		"schedules" : [
+      			{
+      				"mid" : "1",
+      				"messages":[1340035171677,1340899401512]
+      			},
+      			{
+      				"mid" : "2",
+      				"messages":[1340035171677,1340899401512]
+      			}, 
+      			{
+      				"mid" : "3",
+      				"messages":[1340899401512]
+      			}
+      		]
+      	};
+
+        new Schedule(new Date("Jun 18, 2012"), 3).draw(campaign);
+
+      };
+    </script>
+  </head>
+
+	<body>
+		<center>Schedule</center>
+	</body>
+</html>

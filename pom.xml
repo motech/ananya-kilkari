@@ -8,6 +8,7 @@
     <modules>
         <module>ananya-kilkari-web</module>
         <module>ananya-kilkari-message-campaign</module>
+        <module>ananya-kilkari-subscription</module>
     </modules>
     <name>Ananya Kilkari</name>
     <url>http://maven.apache.org</url>
@@ -97,10 +98,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>2.5.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -237,6 +238,21 @@
                 <groupId>org.motechproject</groupId>
                 <artifactId>motech-platform-server-api</artifactId>
                 <version>${motech-platform.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ektorp</groupId>
+                <artifactId>org.ektorp</artifactId>
+                <version>1.2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ektorp</groupId>
+                <artifactId>org.ektorp.spring</artifactId>
+                <version>1.2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.motechproject</groupId>
+                <artifactId>motech-platform-common-api</artifactId>
+                <version>0.11-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

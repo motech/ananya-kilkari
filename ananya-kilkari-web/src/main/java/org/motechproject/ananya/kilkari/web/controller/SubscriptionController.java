@@ -34,8 +34,10 @@ public class SubscriptionController {
         List<Subscription> subscriptions = kilkariSubscriptionService.findByMsisdn(msisdn);
 
         SubscriptionResponse subscriptionResponse = new SubscriptionResponse();
-        for(Subscription subscription : subscriptions)
-            subscriptionResponse.addSubscriptionDetail(SubscriptionDetailsMapper.mapFrom(subscription));
+        if(subscriptions != null) {
+            for(Subscription subscription : subscriptions)
+                subscriptionResponse.addSubscriptionDetail(SubscriptionDetailsMapper.mapFrom(subscription));
+        }
 
         return subscriptionResponse;
     }

@@ -68,6 +68,20 @@ public class SubscriptionControllerTest {
                 .andExpect(content().string("{\"subscriptionDetails\":[{\"pack\":\"FIFTEEN_MONTHS\",\"status\":\"NEW\",\"subscriptionId\":\"subscription-id\"}]}"));
     }
 
+    @Test
+    public void shouldGetEmptySubscriptionResponseIfThereAreNoSubscriptionsForAGivenMsisdn() throws Exception {
+        String msisdn = "1234";
+        String channel = "not-ivr";
+
+        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(null);
+
+        MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
+                .perform(get("/subscription").param("msisdn", msisdn).param("channel", channel))
+                .andExpect(status().isOk())
+                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().string("{\"subscriptionDetails\":[]}"));
+    }
+
     private void mockSubscription(String msisdn) {
         when(mockedSubscription.getMsisdn()).thenReturn(msisdn);
         when(mockedSubscription.getPack()).thenReturn(SubscriptionPack.FIFTEEN_MONTHS);

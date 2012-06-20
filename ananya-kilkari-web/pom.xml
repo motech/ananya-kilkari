@@ -67,6 +67,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>ananya-kilkari</groupId>
+            <artifactId>ananya-kilkari-subscription</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>

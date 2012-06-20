@@ -22,6 +22,10 @@
     -->
     <mvc:resources location="/" mapping="/**"/>
 
+    <mvc:interceptors>
+        <bean class="org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor" />
+    </mvc:interceptors>
+
     <bean id="messageAdapter" class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
         <property name="messageConverters">
             <util:list>

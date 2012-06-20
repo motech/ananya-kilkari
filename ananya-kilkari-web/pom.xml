@@ -31,7 +31,7 @@
                         </systemProperty>
                     </systemProperties>
                     <webAppConfig>
-                        <contextPath>/kilkari</contextPath>
+                        <contextPath>/ananya/kilkari</contextPath>
                     </webAppConfig>
                     <stopKey>secret</stopKey>
                     <stopPort>6669</stopPort>

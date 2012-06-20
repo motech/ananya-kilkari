@@ -1,5 +1,5 @@
 package org.motechproject.ananya.kilkari.domain;
 
 public enum SubscriptionPack {
-    TWELVE_MONTHS
+    FIFTEEN_MONTHS, TWELVE_MONTHS
 }

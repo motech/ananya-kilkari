@@ -27,7 +27,7 @@ public class Subscription extends MotechBaseDataObject {
     public Subscription() {
     }
 
-    public Subscription(SubscriptionPack pack, String msisdn) {
+    public Subscription(String msisdn, SubscriptionPack pack) {
         this.pack = pack;
         this.msisdn = msisdn;
         this.subscriptionDate = DateTime.now();

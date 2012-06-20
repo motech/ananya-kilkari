@@ -16,7 +16,10 @@
         <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-message-campaign</artifactId>
-            <version>${motech-platform.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.motechproject</groupId>
+            <artifactId>motech-platform-server-api</artifactId>
         </dependency>
     </dependencies>
 

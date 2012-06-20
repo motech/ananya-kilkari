@@ -68,6 +68,11 @@
             <name>Repository for javax transaction API</name>
             <url>http://mvnrepository.com/artifact/javax.transaction/jta/1.1</url>
         </repository>
+        <repository>
+            <id>spring-test-mvc</id>
+            <name>Repository for Spring Test MVC framework</name>
+            <url>http://maven.springframework.org/snapshot</url>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -107,6 +112,11 @@
                     <encoding>UTF-8</encoding>
                     <outputDirectory/>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
             </plugin>
         </plugins>
     </build>
@@ -213,21 +223,25 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test-mvc</artifactId>
+                <version>1.0.0.BUILD-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.motechproject</groupId>
+                <artifactId>motech-message-campaign</artifactId>
+                <version>${motech-platform.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.motechproject</groupId>
+                <artifactId>motech-platform-server-api</artifactId>
+                <version>${motech-platform.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>org.motechproject</groupId>
-            <artifactId>motech-platform-common</artifactId>
-            <version>0.11-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject</groupId>
-            <artifactId>motech-platform-server-api</artifactId>
-            <version>0.11-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>

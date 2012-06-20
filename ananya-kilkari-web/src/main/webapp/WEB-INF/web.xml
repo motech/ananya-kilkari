@@ -62,7 +62,7 @@
     </filter-mapping>
 
     <servlet>
-        <servlet-name>kilkari-web</servlet-name>
+        <servlet-name>kilkari</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
@@ -72,7 +72,7 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>kilkari-web</servlet-name>
+        <servlet-name>kilkari</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 

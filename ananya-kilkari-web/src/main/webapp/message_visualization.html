@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Message Campaign Visualization</title>
+    <script type="text/javascript" src="js/jquery/jquery.js"></script>
+    <script src="http://github.com/DmitryBaranovskiy/raphael/raw/master/raphael-min.js"></script>
+    <script src="js/message_campaign.js"></script>
+    <script type="text/javascript">
+        function doAjax() {
+            $.ajax({
+                url: '/kilkari/messagecampaign/visualize?msisdn=' + $("#msisdn").val(),
+                success: function(data) {
+                    new Schedule(new Date("Jun 18, 2012"), 3).draw(data);
+                    return;
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<input type="text" name="msisdn" id="msisdn"/>
+<button id="visualize" name="visualize" onclick="doAjax()" title="Visualize">Get Message Timings!</button>
+<div id="time">
+</div>
+</body>
+</html>

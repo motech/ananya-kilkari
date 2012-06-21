@@ -45,7 +45,7 @@ public class SubscriptionControllerTest {
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
-                .perform(get("/subscription").param("msisdn", msisdn).param("channel", channel))
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/json;charset=UTF-8"))
                 .andExpect(content().string("var response = {\"subscriptionDetails\":[{\"pack\":\"FIFTEEN_MONTHS\",\"status\":\"NEW\",\"subscriptionId\":\"subscription-id\"}]}"));
@@ -62,7 +62,7 @@ public class SubscriptionControllerTest {
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
-                .perform(get("/subscription").param("msisdn", msisdn).param("channel", channel))
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/json;charset=UTF-8"))
                 .andExpect(content().string("{\"subscriptionDetails\":[{\"pack\":\"FIFTEEN_MONTHS\",\"status\":\"NEW\",\"subscriptionId\":\"subscription-id\"}]}"));
@@ -76,7 +76,7 @@ public class SubscriptionControllerTest {
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(null);
 
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
-                .perform(get("/subscription").param("msisdn", msisdn).param("channel", channel))
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/json;charset=UTF-8"))
                 .andExpect(content().string("{\"subscriptionDetails\":[]}"));

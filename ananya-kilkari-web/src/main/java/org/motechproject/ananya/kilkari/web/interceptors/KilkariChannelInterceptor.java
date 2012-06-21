@@ -10,7 +10,7 @@ public class KilkariChannelInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, java.lang.Object handler) throws java.lang.Exception {
         String channelValue = request.getParameter("channel");
-        if (channelValue != null && channelValue == IVR_CHANNEL) {
+        if (channelValue != null && channelValue.equals(IVR_CHANNEL)) {
             response.getOutputStream().print(IVR_RESPONSE_FORMAT);
         }
         return true;

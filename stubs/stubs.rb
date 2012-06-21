@@ -76,8 +76,9 @@ class ProfileLoader
   
   def self.generate_request_body(params)
     request_body = ""
+    puts params
     params.each do |key, value|
-      next if key == 'file'
+      next if key == 'file' or key == 'splat' or key == 'captures'
       request_body += value != nil ? (key + "=" + value + ",") : (key + ",")
     end
     request_body

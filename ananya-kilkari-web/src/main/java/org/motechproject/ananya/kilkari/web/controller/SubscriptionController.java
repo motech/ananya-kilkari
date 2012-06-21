@@ -35,14 +35,6 @@ public class SubscriptionController {
         return new BaseResponse("SUCCESS", "Subscription request submitted successfully");
     }
 
-//    @RequestMapping(value = "/subscription", method = RequestMethod.POST)
-//    @ResponseBody
-//    public BaseResponse createSubscription(@RequestParam String channel, @RequestParam String data) {
-//
-//        publishService.createSubscription(msisdn, pack);
-//        return new BaseResponse("SUCCESS", "Subscription request submitted successfully");
-//    }
-
     @RequestMapping(value = "/subscriber", method = RequestMethod.GET)
     @ResponseBody
     public SubscriberResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {

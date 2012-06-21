@@ -31,7 +31,7 @@
                         </systemProperty>
                     </systemProperties>
                     <webAppConfig>
-                        <contextPath>/ananya/kilkari</contextPath>
+                        <contextPath>/ananya-kilkari</contextPath>
                     </webAppConfig>
                     <stopKey>secret</stopKey>
                     <stopPort>6669</stopPort>
@@ -58,10 +58,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

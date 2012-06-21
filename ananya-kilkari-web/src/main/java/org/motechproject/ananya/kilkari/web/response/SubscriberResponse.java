@@ -5,28 +5,26 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubscriberResponse {
+public class SubscriberResponse extends BaseResponse {
     @JsonProperty
     private List<SubscriptionDetails> subscriptionDetails;
 
-    @JsonProperty
-    private String status;
-
-    @JsonProperty
-    private String description;
-
     public SubscriberResponse() {
+        super("SUCCESS", "Subscriber details successfully fetched");
         this.subscriptionDetails = new ArrayList<SubscriptionDetails>();
-        this.status = "SUCCESS";
-        this.description = "Subscriber details successfully fetched";
     }
 
     public void addSubscriptionDetail(SubscriptionDetails subscriptionDetail) {
         subscriptionDetails.add(subscriptionDetail);
     }
 
-    public void forInvalidMsisdn() {
+    public SubscriberResponse forInvalidMsisdn() {
         status = "ERROR";
         description = "Invalid Msisdn";
+        return this;
+    }
+
+    public List<SubscriptionDetails> getSubscriptionDetails() {
+        return subscriptionDetails;
     }
 }

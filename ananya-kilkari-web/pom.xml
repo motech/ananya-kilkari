@@ -71,6 +71,10 @@
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.motechproject</groupId>
+            <artifactId>motech-platform-common</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

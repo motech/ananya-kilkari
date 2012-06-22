@@ -7,10 +7,13 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.handlers.ProcessSubscriptionHandler;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -23,20 +26,27 @@ public class SubscriptionServiceTest {
 
     @Mock
     private AllSubscriptions allSubscriptions;
+    @Mock
+    private Publisher publisher;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions);
+        subscriptionService = new SubscriptionService(allSubscriptions, publisher);
     }
 
     @Test
     public void shouldCreateNewSubscription() throws ValidationException {
         String msisdn = "1234567890";
+        Map<String, String> subscriptionDetails = new HashMap<String, String>();
+        subscriptionDetails.put(ProcessSubscriptionHandler.MSISDN, msisdn);
+        subscriptionDetails.put(ProcessSubscriptionHandler.PACK, SubscriptionPack.TWELVE_MONTHS.name());
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
+
         subscriptionService.createSubscription(msisdn, "TWELVE_MONTHS");
 
-        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
+        verify(publisher).processSubscription(subscriptionDetails);
 
         Subscription subscription = subscriptionArgumentCaptor.getValue();
         assertEquals(msisdn, subscription.getMsisdn());

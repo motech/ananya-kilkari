@@ -10,6 +10,7 @@
     <util:properties id="couchdbProperties" location="classpath:/couchdb.properties"/>
 
     <context:component-scan base-package="org.motechproject.ananya.kilkari"/>
+    <import resource="classpath*:applicationPlatformServerAPI.xml"/>
 
     <bean id="kilkariDbInstance" class="org.ektorp.impl.StdCouchDbInstance">
         <constructor-arg>

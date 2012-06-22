@@ -4,10 +4,12 @@ import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.handlers.ProcessSubscriptionHandler;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -16,8 +18,12 @@ public class SubscriptionService {
     private AllSubscriptions allSubscriptions;
 
     @Autowired
-    public SubscriptionService(AllSubscriptions allSubscriptions) {
+    private Publisher publisher;
+
+    @Autowired
+    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher) {
         this.allSubscriptions = allSubscriptions;
+        this.publisher = publisher;
     }
 
     public void createSubscription(String msisdn, String subscriptionPack) throws ValidationException {
@@ -25,14 +31,19 @@ public class SubscriptionService {
         validatePack(subscriptionPack);
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.getFor(subscriptionPack));
         allSubscriptions.add(subscription);
-
-        // event for report
-        // event for OMSM
+        sendProcessSubscriptionEvent(subscription);
     }
 
     public List<Subscription> findByMsisdn(String msisdn) throws ValidationException {
         validateMsisdn(msisdn);
         return allSubscriptions.findByMsisdn(msisdn);
+    }
+
+    private void sendProcessSubscriptionEvent(Subscription subscription) {
+        HashMap<String, String> subscriptionDetails = new HashMap<>();
+        subscriptionDetails.put(ProcessSubscriptionHandler.MSISDN, subscription.getMsisdn());
+        subscriptionDetails.put(ProcessSubscriptionHandler.PACK, subscription.getPack().name());
+        publisher.processSubscription(subscriptionDetails);
     }
 
     private void validatePack(String subscriptionPack) throws ValidationException {

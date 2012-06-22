@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
@@ -9,17 +9,17 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
-import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
+import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
-import org.motechproject.ananya.kilkari.web.services.PublishService;
+import org.motechproject.ananya.kilkari.web.services.SubscriptionPublisher;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -32,18 +32,18 @@ public class SubscriptionControllerTest {
 
 
     @Mock
-    private KilkariSubscriptionService kilkariSubscriptionService;
+    private SubscriptionService subscriptionService;
 
     @Mock
     private Subscription mockedSubscription;
 
     @Mock
-    private PublishService publishService;
+    private SubscriptionPublisher subscriptionPublisher;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, publishService);
+        subscriptionController = new SubscriptionController(subscriptionService, subscriptionPublisher);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class SubscriptionControllerTest {
         mockSubscription(msisdn);
         ArrayList<Subscription> subscriptions = new ArrayList<>();
         subscriptions.add(mockedSubscription);
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
+        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -71,7 +71,7 @@ public class SubscriptionControllerTest {
         mockSubscription(msisdn);
         ArrayList<Subscription> subscriptions = new ArrayList<>();
         subscriptions.add(mockedSubscription);
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
+        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -85,7 +85,7 @@ public class SubscriptionControllerTest {
         String msisdn = "1234567890";
         String channel = "not-ivr";
 
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(null);
+        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(null);
 
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -99,10 +99,7 @@ public class SubscriptionControllerTest {
         String msisdn = "12345";
         String channel = "ivr";
 
-        mockSubscription(msisdn);
-        ArrayList<Subscription> subscriptions = new ArrayList<>();
-        subscriptions.add(mockedSubscription);
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
+        when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
 
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -116,10 +113,7 @@ public class SubscriptionControllerTest {
         String msisdn = "123456789a";
         String channel = "ivr";
 
-        mockSubscription(msisdn);
-        ArrayList<Subscription> subscriptions = new ArrayList<>();
-        subscriptions.add(mockedSubscription);
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
+        when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
 
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -140,7 +134,7 @@ public class SubscriptionControllerTest {
                 .andExpect(content().type("application/json;charset=UTF-8"))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
 
-        verify(publishService).createSubscription(msisdn, pack);
+        verify(subscriptionPublisher).createSubscription(msisdn, pack);
     }
 
     private void mockSubscription(String msisdn) {

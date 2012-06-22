@@ -54,4 +54,29 @@ public class Subscription extends MotechBaseDataObject {
     public SubscriptionPack getPack() {
         return pack;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Subscription that = (Subscription) o;
+
+        if (msisdn != null ? !msisdn.equals(that.msisdn) : that.msisdn != null) return false;
+        if (pack != that.pack) return false;
+        if (status != that.status) return false;
+        if (subscriptionId != null ? !subscriptionId.equals(that.subscriptionId) : that.subscriptionId != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = msisdn != null ? msisdn.hashCode() : 0;
+        result = 31 * result + (subscriptionId != null ? subscriptionId.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (pack != null ? pack.hashCode() : 0);
+        return result;
+    }
 }

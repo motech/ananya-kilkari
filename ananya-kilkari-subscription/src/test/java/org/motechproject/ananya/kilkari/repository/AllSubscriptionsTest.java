@@ -7,6 +7,7 @@ import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -59,5 +60,40 @@ public class AllSubscriptionsTest extends SubscriptionBaseIT {
         assertEquals(msisdn, filteredSubscriptions.get(1).getMsisdn());
         assertTrue(Arrays.asList(new SubscriptionPack[]{SubscriptionPack.TWELVE_MONTHS, SubscriptionPack.FIFTEEN_MONTHS}).contains(filteredSubscriptions.get(0).getPack()));
         assertTrue(Arrays.asList(new SubscriptionPack[]{SubscriptionPack.TWELVE_MONTHS, SubscriptionPack.FIFTEEN_MONTHS}).contains(filteredSubscriptions.get(1).getPack()));
+    }
+
+    @Test
+    public void shouldFindSubscriptionByMsisdnAndPack() {
+        String msisdn = "123456";
+
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        allSubscriptions.add(subscription1);
+
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS);
+        allSubscriptions.add(subscription2);
+
+        markForDeletion(subscription1);
+        markForDeletion(subscription2);
+        Subscription filteredSubscription = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.TWELVE_MONTHS);
+
+        assertNotNull(filteredSubscription);
+        assertEquals(subscription1, filteredSubscription);
+    }
+
+    @Test
+    public void shouldAddSubscriptionOnlyIfItsNotPresent() {
+        String msisdn = "123456";
+
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        allSubscriptions.add(subscription1);
+
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        allSubscriptions.add(subscription2);
+
+        markForDeletion(subscription1);
+
+        List<Subscription> filteredSubscriptions = allSubscriptions.findByMsisdn(msisdn);
+        assertNotNull(filteredSubscriptions);
+        assertEquals(1, filteredSubscriptions.size());
     }
 }

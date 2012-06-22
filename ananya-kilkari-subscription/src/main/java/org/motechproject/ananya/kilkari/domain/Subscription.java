@@ -16,7 +16,7 @@ public class Subscription extends MotechBaseDataObject {
     private String subscriptionId;
 
     @JsonProperty
-    private DateTime subscriptionDate;
+    private DateTime creationDate;
 
     @JsonProperty
     private SubscriptionStatus status;
@@ -30,7 +30,7 @@ public class Subscription extends MotechBaseDataObject {
     public Subscription(String msisdn, SubscriptionPack pack) {
         this.pack = pack;
         this.msisdn = msisdn;
-        this.subscriptionDate = DateTime.now();
+        this.creationDate = DateTime.now();
         this.status = SubscriptionStatus.NEW;
         this.subscriptionId = UUID.randomUUID().toString();
     }
@@ -43,8 +43,8 @@ public class Subscription extends MotechBaseDataObject {
         return subscriptionId;
     }
 
-    public DateTime getSubscriptionDate() {
-        return subscriptionDate;
+    public DateTime getCreationDate() {
+        return creationDate;
     }
 
     public SubscriptionStatus getStatus() {

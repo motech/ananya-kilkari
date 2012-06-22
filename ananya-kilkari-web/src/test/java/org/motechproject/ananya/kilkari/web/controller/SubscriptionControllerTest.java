@@ -5,9 +5,11 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
@@ -20,6 +22,7 @@ import org.springframework.test.web.server.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -134,7 +137,13 @@ public class SubscriptionControllerTest {
                 .andExpect(content().type("application/json;charset=UTF-8"))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
 
-        verify(subscriptionPublisher).createSubscription(msisdn, pack);
+        ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
+        verify(subscriptionPublisher).createSubscription(subscriptionRequestArgumentCaptor.capture());
+        SubscriptionRequest subscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
+
+        assertEquals(msisdn, subscriptionRequest.getMsisdn());
+        assertEquals(pack, subscriptionRequest.getPack());
+        assertEquals(channel, subscriptionRequest.getChannel());
     }
 
     private void mockSubscription(String msisdn) {

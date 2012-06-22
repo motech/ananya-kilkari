@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.handlers;
 
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
+import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -22,9 +23,9 @@ public class CreateSubscriptionHandler {
 
     @MotechListener(subjects = {SubscriptionEventKeys.CREATE_SUBSCRIPTION})
     public void handleCreateSubscription(MotechEvent event) throws ValidationException {
-        Map<String,Object> parameters = event.getParameters();
+        SubscriptionRequest subscriptionRequest = (SubscriptionRequest) event.getParameters().get("0");
         try {
-            subscriptionService.createSubscription((String) parameters.get("msisdn"),(String) parameters.get("pack"));
+            subscriptionService.createSubscription(subscriptionRequest);
         } catch (ValidationException e) {
             // log here
             throw e;

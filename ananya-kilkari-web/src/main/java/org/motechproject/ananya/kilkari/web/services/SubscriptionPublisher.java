@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.web.services;
 
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
+import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.scheduler.context.EventContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,7 +16,7 @@ public class SubscriptionPublisher {
         this.eventContext = eventContext;
     }
 
-    public void createSubscription(String msisdn, String pack) {
-        eventContext.send(SubscriptionEventKeys.CREATE_SUBSCRIPTION, msisdn, pack);
+    public void createSubscription(SubscriptionRequest subscriptionRequest) {
+        eventContext.send(SubscriptionEventKeys.CREATE_SUBSCRIPTION, subscriptionRequest);
     }
 }

@@ -7,7 +7,6 @@ import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -32,7 +31,7 @@ public class AllSubscriptionsTest extends SubscriptionBaseIT {
         assertEquals(1, allSubscriptionsList.size());
         Subscription subscriptionFromDb = allSubscriptionsList.get(0);
         assertEquals(msisdn, subscriptionFromDb.getMsisdn());
-        assertNotNull(subscriptionFromDb.getSubscriptionDate());
+        assertNotNull(subscriptionFromDb.getCreationDate());
         assertNotNull(subscriptionFromDb.getSubscriptionId());
         assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptionFromDb.getPack());
         assertEquals(SubscriptionStatus.NEW, subscriptionFromDb.getStatus());

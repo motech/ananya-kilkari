@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
 import org.motechproject.ananya.kilkari.domain.Subscription;
+import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
@@ -31,7 +32,8 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
     @ResponseBody
     public BaseResponse createSubscription(@RequestParam String msisdn, @RequestParam String pack, @RequestParam String channel) {
-        subscriptionPublisher.createSubscription(msisdn, pack);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, pack, channel);
+        subscriptionPublisher.createSubscription(subscriptionRequest);
         return new BaseResponse("SUCCESS", "Subscription request submitted successfully");
     }
 

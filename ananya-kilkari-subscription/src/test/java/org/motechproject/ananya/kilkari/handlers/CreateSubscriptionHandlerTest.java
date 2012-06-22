@@ -2,14 +2,17 @@ package org.motechproject.ananya.kilkari.handlers;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
+import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -28,18 +31,24 @@ public class CreateSubscriptionHandlerTest {
         HashMap<String, Object> parameters = new HashMap<>();
         String msisdn = "1234567890";
         String pack = "twelve-months";
-
-        parameters.put("msisdn", msisdn);
-        parameters.put("pack", pack);
+        String channel = "ivr";
+        parameters.put("0", new SubscriptionRequest(msisdn, pack, channel));
 
         new CreateSubscriptionHandler(subscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, parameters));
 
-        verify(subscriptionService).createSubscription(msisdn, "twelve-months");
+        ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
+        verify(subscriptionService).createSubscription(subscriptionRequestArgumentCaptor.capture());
+        SubscriptionRequest subscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
+
+        assertEquals(msisdn, subscriptionRequest.getMsisdn());
+        assertEquals(pack, subscriptionRequest.getPack());
+        assertEquals(channel, subscriptionRequest.getChannel());
+
     }
 
     @Test(expected = ValidationException.class)
     public void shouldThrowExceptionIfDetailsAreInvalidWhileHandlingCreateSubscriptionEvent() throws ValidationException {
-        doThrow(new ValidationException("Invalid")).when(subscriptionService).createSubscription(any(String.class), any(String.class));
+        doThrow(new ValidationException("Invalid")).when(subscriptionService).createSubscription(any(SubscriptionRequest.class));
         new CreateSubscriptionHandler(subscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, new HashMap<String, Object>()));
     }
 }

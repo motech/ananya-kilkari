@@ -4,8 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
 
@@ -29,26 +28,26 @@ public class ProcessSubscriptionHandlerTest {
     @Test
     public void shouldInvokeOnMobileSubscriptionServiceToCreateAnActivationRequest() {
         final String msisdn = "msisdn";
-        final String pack = "twelve_months";
-        final String channel = "ivr";
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new SubscriptionRequest(msisdn, pack, channel));}};
+        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        final Channel channel = Channel.IVR;
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new SubscriptionActivationRequest(msisdn, pack, channel));}};
 
         new ProcessSubscriptionHandler(onMobileSubscriptionService).handleProcessSubscription(new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, parameters));
 
-        ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
-        verify(onMobileSubscriptionService).activateSubscription(subscriptionRequestArgumentCaptor.capture());
-        SubscriptionRequest subscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
+        ArgumentCaptor<SubscriptionActivationRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionActivationRequest.class);
+        verify(onMobileSubscriptionService).activateSubscription(subscriptionActivationRequestArgumentCaptor.capture());
+        SubscriptionActivationRequest subscriptionActivationRequest = subscriptionActivationRequestArgumentCaptor.getValue();
 
-        assertEquals(msisdn, subscriptionRequest.getMsisdn());
-        assertEquals(channel, subscriptionRequest.getChannel());
-        assertEquals(pack, subscriptionRequest.getPack());
+        assertEquals(msisdn, subscriptionActivationRequest.getMsisdn());
+        assertEquals(channel, subscriptionActivationRequest.getChannel());
+        assertEquals(pack, subscriptionActivationRequest.getPack());
     }
 
     @Test(expected = RuntimeException.class)
     public void shouldThrowExceptionsRaisedByOnMobileSubscriptionServiceToCreateAnActivationRequest() {
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", null);}};
 
-        doThrow(new RuntimeException()).when(onMobileSubscriptionService).activateSubscription(any(SubscriptionRequest.class));
+        doThrow(new RuntimeException()).when(onMobileSubscriptionService).activateSubscription(any(SubscriptionActivationRequest.class));
 
         new ProcessSubscriptionHandler(onMobileSubscriptionService).handleProcessSubscription(new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, parameters));
     }

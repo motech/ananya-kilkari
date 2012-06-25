@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.scheduler.context.EventContext;
@@ -17,7 +18,7 @@ public class Publisher {
         this.eventContext = eventContext;
     }
 
-    public void processSubscription(SubscriptionRequest subscriptionRequest) {
-        eventContext.send(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, subscriptionRequest);
+    public void processSubscription(SubscriptionActivationRequest subscriptionActivationRequest) {
+        eventContext.send(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, subscriptionActivationRequest);
     }
 }

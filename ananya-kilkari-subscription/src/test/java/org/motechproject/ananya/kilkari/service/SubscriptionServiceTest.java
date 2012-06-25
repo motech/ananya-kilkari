@@ -4,10 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.Channel;
-import org.motechproject.ananya.kilkari.domain.Subscription;
-import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.handlers.ProcessSubscriptionHandler;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
@@ -43,26 +40,26 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldCreateNewSubscription() throws ValidationException {
         String msisdn = "1234567890";
-        String channel = "ivr";
+        Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
-        ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
+        ArgumentCaptor<SubscriptionActivationRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionActivationRequest.class);
 
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, subscriptionPack.name(), channel);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, subscriptionPack.name(), channel.name());
         subscriptionService.createSubscription(subscriptionRequest);
 
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        verify(publisher).processSubscription(subscriptionRequestArgumentCaptor.capture());
+        verify(publisher).processSubscription(subscriptionActivationRequestArgumentCaptor.capture());
 
         Subscription subscription = subscriptionArgumentCaptor.getValue();
         assertEquals(msisdn, subscription.getMsisdn());
         assertEquals(subscriptionPack, subscription.getPack());
 
-        SubscriptionRequest actualSubscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
-        assertEquals(msisdn, actualSubscriptionRequest.getMsisdn());
-        assertEquals(subscriptionPack.name(), actualSubscriptionRequest.getPack());
-        assertEquals(channel, actualSubscriptionRequest.getChannel());
+        SubscriptionActivationRequest actualSubscriptionActivationRequest = subscriptionActivationRequestArgumentCaptor.getValue();
+        assertEquals(msisdn, actualSubscriptionActivationRequest.getMsisdn());
+        assertEquals(subscriptionPack, actualSubscriptionActivationRequest.getPack());
+        assertEquals(channel, actualSubscriptionActivationRequest.getChannel());
     }
 
     @Test(expected = ValidationException.class)

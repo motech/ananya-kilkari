@@ -54,4 +54,8 @@ public class SubscriptionRequest {
     private boolean isValidMsisdn(String msisdn) {
         return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
     }
+
+    public SubscriptionActivationRequest getSubscriptionActivationRequest() {
+        return new SubscriptionActivationRequest(msisdn, SubscriptionPack.getFor(pack), Channel.getFor(channel));
+    }
 }

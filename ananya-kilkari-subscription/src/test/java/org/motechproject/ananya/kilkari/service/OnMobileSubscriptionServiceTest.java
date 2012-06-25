@@ -3,6 +3,9 @@ package org.motechproject.ananya.kilkari.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.domain.Channel;
+import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
+import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,8 +30,8 @@ public class OnMobileSubscriptionServiceTest {
     @Test
     public void shouldInvokeSubscriptionManagerWithSubscriptionDetails() {
         String msisdn = "msisdn";
-        String pack = "twelve_months";
-        String channel = "ivr";
+        SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        Channel channel = Channel.IVR;
         String referenceId = "refId";
         String username = "thoughtworks";
         String password = "password123";
@@ -36,12 +39,12 @@ public class OnMobileSubscriptionServiceTest {
         when(kilkariProperties.getProperty("omsm.username")).thenReturn("thoughtworks");
         when(kilkariProperties.getProperty("omsm.password")).thenReturn("password123");
         when(kilkariProperties.getProperty("omsm.reference.id")).thenReturn("refId");
-        new OnMobileSubscriptionService(restTemplate, kilkariProperties).activateSubscription(new SubscriptionRequest(msisdn, pack, channel));
+        new OnMobileSubscriptionService(restTemplate, kilkariProperties).activateSubscription(new SubscriptionActivationRequest(msisdn, pack, channel));
 
         HashMap<String, String> urlVariables = new HashMap<>();
         urlVariables.put("msisdn", msisdn);
-        urlVariables.put("srvkey", pack);
-        urlVariables.put("mode", channel);
+        urlVariables.put("srvkey", pack.name());
+        urlVariables.put("mode", channel.name());
         urlVariables.put("refid", referenceId);
         urlVariables.put("user", username);
         urlVariables.put("pass", password);

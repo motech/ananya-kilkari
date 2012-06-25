@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.domain.Subscription;
+import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
@@ -28,7 +29,9 @@ public class SubscriptionService {
         subscriptionRequest.validate();
         Subscription subscription = subscriptionRequest.getSubscription();
         allSubscriptions.add(subscription);
-        sendProcessSubscriptionEvent(subscriptionRequest);
+
+        SubscriptionActivationRequest subscriptionActivationRequest = subscriptionRequest.getSubscriptionActivationRequest();
+        sendProcessSubscriptionEvent(subscriptionActivationRequest);
     }
 
     public List<Subscription> findByMsisdn(String msisdn) throws ValidationException {
@@ -36,8 +39,8 @@ public class SubscriptionService {
         return allSubscriptions.findByMsisdn(msisdn);
     }
 
-    private void sendProcessSubscriptionEvent(SubscriptionRequest subscriptionRequest) {
-        publisher.processSubscription(subscriptionRequest);
+    private void sendProcessSubscriptionEvent(SubscriptionActivationRequest subscriptionActivationRequest) {
+        publisher.processSubscription(subscriptionActivationRequest);
     }
 
     private void validateMsisdn(String msisdn) throws ValidationException {

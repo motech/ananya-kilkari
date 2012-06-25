@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,7 +23,7 @@ public class OnMobileSubscriptionService {
         this.kilkariProperties = kilkariProperties;
     }
 
-    public void activateSubscription(SubscriptionRequest subscriptionRequest) {
+    public void activateSubscription(SubscriptionActivationRequest subscriptionActivationRequest) {
         String baseUrl = kilkariProperties.getProperty("omsm.base.url");
         String url = (baseUrl.endsWith("/")) ? String.format("%s%s", baseUrl, ACTIVATE_SUBSCRIPTION_PATH) : String.format("%s/%s", baseUrl, ACTIVATE_SUBSCRIPTION_PATH);
         String referenceId = kilkariProperties.getProperty("omsm.reference.id");
@@ -30,9 +31,9 @@ public class OnMobileSubscriptionService {
         String password = kilkariProperties.getProperty("omsm.password");
 
         HashMap<String, String> urlVariables = new HashMap<>();
-        urlVariables.put("msisdn", subscriptionRequest.getMsisdn());
-        urlVariables.put("srvkey", subscriptionRequest.getPack());
-        urlVariables.put("mode", subscriptionRequest.getChannel());
+        urlVariables.put("msisdn", subscriptionActivationRequest.getMsisdn());
+        urlVariables.put("srvkey", subscriptionActivationRequest.getPack().name());
+        urlVariables.put("mode", subscriptionActivationRequest.getChannel().name());
         urlVariables.put("refid", referenceId);
         urlVariables.put("user", username);
         urlVariables.put("pass", password);

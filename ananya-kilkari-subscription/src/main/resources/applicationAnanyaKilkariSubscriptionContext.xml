@@ -10,8 +10,9 @@
     <util:properties id="couchdbProperties" location="classpath:/couchdb.properties"/>
     <util:properties id="kilkariProperties" location="classpath:/kilkari.properties"/>
 
-    <context:component-scan base-package="org.motechproject.ananya.kilkari"/>
     <import resource="classpath*:applicationPlatformServerAPI.xml"/>
+
+    <context:component-scan base-package="org.motechproject.ananya.kilkari"/>
 
     <bean id="kilkariRestTemplate" class="org.springframework.web.client.RestTemplate"/>
 

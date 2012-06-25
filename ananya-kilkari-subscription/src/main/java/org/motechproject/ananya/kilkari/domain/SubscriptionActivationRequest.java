@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.domain;
 
-public class SubscriptionActivationRequest {
+import java.io.Serializable;
+
+public class SubscriptionActivationRequest implements Serializable {
     private final String msisdn;
     private final SubscriptionPack pack;
     private final Channel channel;

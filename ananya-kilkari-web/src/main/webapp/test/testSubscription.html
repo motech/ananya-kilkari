@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Testing Subscription</title>
+    <script type="text/javascript" src="../js/jquery/jquery.js"></script>
+</head>
+
+<body>
+    <script type="text/javascript">
+
+        var machines = {
+            "qa1" : "192.168.42.51:8080",
+            "qa2" : "192.168.42.52:8080",
+            "showcase" : "192.168.42.53:8080",
+            "local" : "localhost:9979"
+        }
+
+
+        function getMachine() {
+            return machines[$('#select_machine > form > input[name=machine]:checked').val()];
+        }
+
+        $(document).ready(function() {
+
+            // Get subscriber
+            $("#get_subscriber > button").click(function() {
+                var msisdn = $('#get_subscriber > input[name=msisdn]').val();
+                var channel = $('#get_subscriber > input[name=channel]').val();
+                var url = 'http://' + getMachine() + '/ananya-kilkari/' + 'subscriber' + '?msisdn=' + msisdn + '&channel=' + channel;
+
+                $.ajax({
+                    'url' : url,
+                    'type' : 'get',
+                    success: function(data){
+                        $("#get_subscriber > textarea").val(JSON.stringify(data));
+                    }
+                });
+            });
+
+            $("#create_subscription > button").click(function() {
+                var msisdn = $('#create_subscription > input[name=msisdn]').val();
+                var pack = $('#create_subscription > input[name=pack]').val();
+                var url = 'http://' + getMachine() + '/ananya-kilkari/' + 'subscription' + '?msisdn=' + msisdn + '&pack=' + pack + '&channel=IVR';
+
+                $.ajax({
+                    'url' : url,
+                    'type' : 'get',
+                    success: function(data){
+                        $("#create_subscription > textarea").val(JSON.stringify(data));
+                    }
+                });
+            });
+
+        });
+
+    </script>
+
+    <div id="select_machine" >
+        <form>
+            <input type="radio" name="machine" value="qa1" /> QA-1
+            <input type="radio" name="machine" value="qa2" /> QA-2
+            <input type="radio" name="machine" value="showcase" /> Showcase
+            <input type="radio" name="machine" value="local" checked /> Local
+        </form>
+    </div>
+
+    <p>Query Subcription details for Subcriber</p>
+    <div id="get_subscriber">
+        Msisdn: <input type="text" name="msisdn" /> <br/>
+        Channel: <input type="text" name="channel" id="channel" /> <br/>
+        <button name="submit">Call</button> <br />
+        Response : <textarea rows="5" cols="50" name="response" ></textarea> <br />
+    </div>
+
+    <br />
+
+    <p>Create subscription from IVR</p>
+    <div id="create_subscription">
+        Msisdn: <input type="text" name="msisdn" /> <br/>
+        Pack: <input type="text" name="pack" /> <br/>
+        <button name="submit">Call</button> <br />
+        Response : <textarea rows="5" cols="50" name="response" ></textarea> <br />
+    </div>
+
+</body>
+</html>

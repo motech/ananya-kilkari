@@ -3,7 +3,9 @@ package org.motechproject.ananya.kilkari.domain;
 import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 
-public class SubscriptionRequest {
+import java.io.Serializable;
+
+public class SubscriptionRequest implements Serializable {
     private final String msisdn;
     private final String pack;
     private final String channel;

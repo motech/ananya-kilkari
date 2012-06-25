@@ -3,8 +3,6 @@ package org.motechproject.ananya.kilkari.handlers;
 import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;

@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.handlers;
 
+import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
@@ -16,6 +17,8 @@ public class CreateSubscriptionHandler {
     @Autowired
     private SubscriptionService subscriptionService;
 
+    Logger logger = Logger.getLogger(CreateSubscriptionHandler.class);
+
     @Autowired
     public CreateSubscriptionHandler(SubscriptionService subscriptionService) {
         this.subscriptionService = subscriptionService;
@@ -27,7 +30,7 @@ public class CreateSubscriptionHandler {
         try {
             subscriptionService.createSubscription(subscriptionRequest);
         } catch (ValidationException e) {
-            // log here
+            logger.error("Exception occurred while handling creating subscription", e);
             throw e;
         }
     }

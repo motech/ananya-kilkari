@@ -162,7 +162,6 @@ public class SubscriptionControllerTest {
 
             @Override
             public void describeTo(Description matcherDescription) {
-                //To change body of implemented methods use File | Settings | File Templates.
             }
         };
     }
@@ -190,7 +189,6 @@ public class SubscriptionControllerTest {
 
             @Override
             public void describeTo(Description description) {
-                //To change body of implemented methods use File | Settings | File Templates.
             }
         };
     }

@@ -49,6 +49,6 @@ public class CreateSubscriptionHandlerTest {
     @Test(expected = ValidationException.class)
     public void shouldThrowExceptionIfDetailsAreInvalidWhileHandlingCreateSubscriptionEvent() throws ValidationException {
         doThrow(new ValidationException("Invalid")).when(subscriptionService).createSubscription(any(SubscriptionRequest.class));
-        new CreateSubscriptionHandler(subscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, new HashMap<String, Object>()));
+        new CreateSubscriptionHandler(subscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, new HashMap<String, Object>(){{put("0", new SubscriptionRequest("msisdn", "pack", "channel"));}}));
     }
 }

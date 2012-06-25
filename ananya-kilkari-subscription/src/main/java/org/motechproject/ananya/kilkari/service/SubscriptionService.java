@@ -1,9 +1,7 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.apache.commons.lang.StringUtils;
-import org.motechproject.ananya.kilkari.domain.Subscription;
-import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
-import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +48,19 @@ public class SubscriptionService {
 
     private boolean isValidMsisdn(String msisdn) {
         return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
+    }
+
+    public Subscription findByMsisdnAndPack(String msisdn, String pack) {
+        return allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.getFor(pack));
+    }
+
+    public void update(Subscription subscription) {
+        allSubscriptions.update(subscription);
+    }
+
+    public void updateSubsciptionStatus(String msisdn, String pack, SubscriptionStatus status) {
+        Subscription subscription = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.getFor(pack));
+        subscription.setStatus(status);
+        allSubscriptions.update(subscription);
     }
 }

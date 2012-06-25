@@ -55,6 +55,10 @@ public class Subscription extends MotechBaseDataObject {
         return pack;
     }
 
+    public void setStatus(SubscriptionStatus status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

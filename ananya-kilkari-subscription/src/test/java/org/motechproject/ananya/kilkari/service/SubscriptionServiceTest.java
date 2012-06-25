@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
@@ -15,9 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SubscriptionServiceTest {
@@ -93,5 +92,44 @@ public class SubscriptionServiceTest {
     @Test(expected = ValidationException.class)
     public void shouldThrowAnExceptionForNonNumericMsisdn() throws ValidationException {
         subscriptionService.findByMsisdn("123456789a");
+    }
+
+    @Test
+    public void shouldFindTheGivenSubscriptionByMsisdnAndPack() {
+        String pack = "twelve_months";
+        String msisdn = "123456890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        when(allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.TWELVE_MONTHS)).thenReturn(subscription);
+
+        Subscription actualSubscription = subscriptionService.findByMsisdnAndPack(msisdn, pack);
+
+        verify(allSubscriptions).findByMsisdnAndPack(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        assertEquals(subscription, actualSubscription);
+    }
+
+    @Test
+    public void shouldUpdateTheSubscriptionDetails() {
+        Subscription subscription = new Subscription("123456890", SubscriptionPack.TWELVE_MONTHS);
+
+        subscriptionService.update(subscription);
+
+        verify(allSubscriptions).update(subscription);
+    }
+
+    @Test
+    public void shouldUpdateTheSubscriptionStatus() {
+        SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        String msisdn = "123456890";
+        SubscriptionStatus status = SubscriptionStatus.ACTIVE;
+        Subscription mockedSubscription = mock(Subscription.class);
+
+        when(allSubscriptions.findByMsisdnAndPack(msisdn, pack)).thenReturn(mockedSubscription);
+
+        subscriptionService.updateSubsciptionStatus(msisdn, pack.name(), status);
+
+        InOrder order = inOrder(allSubscriptions, mockedSubscription);
+        order.verify(allSubscriptions).findByMsisdnAndPack(msisdn, pack);
+        order.verify(mockedSubscription).setStatus(SubscriptionStatus.ACTIVE);
+        order.verify(allSubscriptions).update(mockedSubscription);
     }
 }

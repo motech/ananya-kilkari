@@ -13,6 +13,8 @@ import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.web.domain.CallBackAction;
+import org.motechproject.ananya.kilkari.web.domain.CallBackStatus;
 import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
@@ -144,6 +147,64 @@ public class SubscriptionControllerTest {
         assertEquals(msisdn, subscriptionRequest.getMsisdn());
         assertEquals(pack, subscriptionRequest.getPack());
         assertEquals(channel, subscriptionRequest.getChannel());
+    }
+
+    @Test
+    public void shouldActivateTheSubscriptionWhenCallBackUrlIsInvokedWithSuccessStatusForActivationRequest() throws Exception {
+        String msisdn = "msisdn";
+        String srvKey = "TWELVE_MONTHS";
+        String refId = "refId";
+        String reason = "reason";
+        String operator = "operator";
+        String graceCount = "graceCount";
+        String action = CallBackAction.ACT.name();
+        String status = CallBackStatus.SUCCESS.name();
+
+
+        MockMvcBuilders.standaloneSetup(subscriptionController).build()
+                .perform(get("/activate-subscription-callback")
+                .param("msisdn", msisdn)
+                .param("srvKey", srvKey)
+                .param("refId", refId)
+                .param("reason", reason)
+                .param("operator", operator)
+                .param("graceCount", graceCount)
+                .param("action", action)
+                .param("status", status))
+                .andExpect(status().isOk())
+                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
+
+        verify(subscriptionService).updateSubsciptionStatus(msisdn, srvKey, SubscriptionStatus.ACTIVE);
+    }
+
+    @Test
+    public void shouldNotActivateTheSubscriptionWhenCallBackUrlIsInvokedWithNonSuccessStatusForActivationRequest() throws Exception {
+        String msisdn = "msisdn";
+        String srvKey = "TWELVE_MONTHS";
+        String refId = "refId";
+        String reason = "reason";
+        String operator = "operator";
+        String graceCount = "graceCount";
+        String action = CallBackAction.ACT.name();
+        String status = CallBackStatus.FAILURE.name();
+
+
+        MockMvcBuilders.standaloneSetup(subscriptionController).build()
+                .perform(get("/activate-subscription-callback")
+                        .param("msisdn", msisdn)
+                        .param("srvKey", srvKey)
+                        .param("refId", refId)
+                        .param("reason", reason)
+                        .param("operator", operator)
+                        .param("graceCount", graceCount)
+                        .param("action", action)
+                        .param("status", status))
+                .andExpect(status().isOk())
+                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
+
+        verifyZeroInteractions(subscriptionService);
     }
 
     private void mockSubscription(String msisdn) {

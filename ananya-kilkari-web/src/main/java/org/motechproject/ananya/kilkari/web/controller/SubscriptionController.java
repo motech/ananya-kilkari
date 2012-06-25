@@ -1,19 +1,21 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
+import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.web.controller.requests.CallbackRequest;
+import org.motechproject.ananya.kilkari.web.domain.CallBackAction;
+import org.motechproject.ananya.kilkari.web.domain.CallBackStatus;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.services.SubscriptionPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,6 +24,8 @@ public class SubscriptionController {
 
     private SubscriptionService subscriptionService;
     private SubscriptionPublisher subscriptionPublisher;
+
+    Logger logger = Logger.getLogger(SubscriptionController.class);
 
     @Autowired
     public SubscriptionController(SubscriptionService subscriptionService, SubscriptionPublisher subscriptionPublisher) {
@@ -35,6 +39,17 @@ public class SubscriptionController {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, pack, channel);
         subscriptionPublisher.createSubscription(subscriptionRequest);
         return new BaseResponse("SUCCESS", "Subscription request submitted successfully");
+    }
+
+    @RequestMapping(value = "/activate-subscription-callback", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResponse activateSubscriptionCallback(@ModelAttribute CallbackRequest callbackRequest) {
+        logger.info(String.format("Processing request: %s", callbackRequest.toString()));
+        if(callbackRequest.getStatus() == CallBackStatus.SUCCESS && callbackRequest.getAction() == CallBackAction.ACT) {
+            logger.info(String.format("Changing subscription status to ACTIVE for msisdn: %s, pack: %s", callbackRequest.getMsisdn(), callbackRequest.getSrvKey()));
+            subscriptionService.updateSubsciptionStatus(callbackRequest.getMsisdn(), callbackRequest.getSrvKey().name(), SubscriptionStatus.ACTIVE);
+        }
+        return new BaseResponse("SUCCESS", "Callback request processed successfully");
     }
 
     @RequestMapping(value = "/subscriber", method = RequestMethod.GET)

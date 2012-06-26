@@ -2,7 +2,8 @@ package org.motechproject.ananya.kilkari.web.response;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class BaseResponse {
+public class BaseResponse extends BaseObject {
+
     @JsonProperty
     protected String status;
     @JsonProperty

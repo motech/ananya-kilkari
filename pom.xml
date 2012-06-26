@@ -18,6 +18,9 @@
         <motech-platform.version>0.11-SNAPSHOT</motech-platform.version>
         <slf4j.version>1.6.1</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <db.server>localhost</db.server>
+        <db.name>kilkari</db.name>
+        <db.port>5984</db.port>
     </properties>
 
     <distributionManagement>
@@ -94,6 +97,37 @@
     </pluginRepositories>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.6</version>
+                    <executions>
+                        <execution>
+                            <id>Drop DB Before Unit Tests</id>
+                            <phase>process-test-classes</phase>
+                            <configuration>
+                                <target>
+                                    <echo message="Dropping DB: START"/>
+                                    <exec executable="curl">
+                                        <arg value="-s"/>
+                                        <arg value="-S"/>
+                                        <arg value="-X"/>
+                                        <arg value="DELETE"/>
+                                        <arg value="http://${db.server}:${db.port}/${db.name}"/>
+                                    </exec>
+                                    <echo message="Dropping DB: END"/>
+                                </target>
+                            </configuration>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

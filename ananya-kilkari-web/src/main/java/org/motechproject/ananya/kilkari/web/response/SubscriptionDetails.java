@@ -29,4 +29,28 @@ public class SubscriptionDetails {
     public String getStatus() {
         return status;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SubscriptionDetails)) return false;
+
+        SubscriptionDetails that = (SubscriptionDetails) o;
+
+        if (pack != null ? !pack.equals(that.pack) : that.pack != null) return false;
+        if (status != null ? !status.equals(that.status) : that.status != null) return false;
+        if (subscriptionId != null ? !subscriptionId.equals(that.subscriptionId) : that.subscriptionId != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = subscriptionId != null ? subscriptionId.hashCode() : 0;
+        result = 31 * result + (pack != null ? pack.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        return result;
+    }
+
 }

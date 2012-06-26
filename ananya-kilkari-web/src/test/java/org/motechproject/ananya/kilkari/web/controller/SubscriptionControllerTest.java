@@ -13,6 +13,7 @@ import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.web.controller.requests.CallbackRequest;
 import org.motechproject.ananya.kilkari.web.domain.CallBackAction;
 import org.motechproject.ananya.kilkari.web.domain.CallBackStatus;
 import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
@@ -20,22 +21,21 @@ import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.services.SubscriptionPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.server.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 
 public class SubscriptionControllerTest {
     private SubscriptionController subscriptionController;
-
 
     @Mock
     private SubscriptionService subscriptionService;
@@ -151,55 +151,41 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldActivateTheSubscriptionWhenCallBackUrlIsInvokedWithSuccessStatusForActivationRequest() throws Exception {
-        String msisdn = "msisdn";
-        String srvKey = "TWELVE_MONTHS";
-        String refId = "refId";
-        String reason = "reason";
-        String operator = "operator";
-        String graceCount = "graceCount";
-        String action = CallBackAction.ACT.name();
-        String status = CallBackStatus.SUCCESS.name();
-
+        String subscriptionId = "abcd1234";
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setMsisdn("msisdn");
+        callbackRequest.setAction(CallBackAction.ACT);
+        callbackRequest.setStatus(CallBackStatus.SUCCESS);
+        callbackRequest.setReason("reason");
+        callbackRequest.setOperator("operator");
+        callbackRequest.setRenewalAttempt("2");
+        byte[] requestBody = toJson(callbackRequest).getBytes();
 
         MockMvcBuilders.standaloneSetup(subscriptionController).build()
-                .perform(get("/activate-subscription-callback")
-                .param("msisdn", msisdn)
-                .param("srvKey", srvKey)
-                .param("refId", refId)
-                .param("reason", reason)
-                .param("operator", operator)
-                .param("graceCount", graceCount)
-                .param("action", action)
-                .param("status", status))
+                .perform(put("/subscription/" + subscriptionId)
+                .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/json;charset=UTF-8"))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
 
-        verify(subscriptionService).updateSubsciptionStatus(msisdn, srvKey, SubscriptionStatus.ACTIVE);
+        verify(subscriptionService).updateSubscriptionStatus(subscriptionId, SubscriptionStatus.ACTIVE);
     }
 
     @Test
     public void shouldNotActivateTheSubscriptionWhenCallBackUrlIsInvokedWithNonSuccessStatusForActivationRequest() throws Exception {
-        String msisdn = "msisdn";
-        String srvKey = "TWELVE_MONTHS";
-        String refId = "refId";
-        String reason = "reason";
-        String operator = "operator";
-        String graceCount = "graceCount";
-        String action = CallBackAction.ACT.name();
-        String status = CallBackStatus.FAILURE.name();
-
+        String subscriptionId = "abcd1234";
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setMsisdn("msisdn");
+        callbackRequest.setAction(CallBackAction.ACT);
+        callbackRequest.setStatus(CallBackStatus.FAILURE);
+        callbackRequest.setReason("reason");
+        callbackRequest.setOperator("operator");
+        callbackRequest.setRenewalAttempt("2");
+        byte[] requestBody = toJson(callbackRequest).getBytes();
 
         MockMvcBuilders.standaloneSetup(subscriptionController).build()
-                .perform(get("/activate-subscription-callback")
-                        .param("msisdn", msisdn)
-                        .param("srvKey", srvKey)
-                        .param("refId", refId)
-                        .param("reason", reason)
-                        .param("operator", operator)
-                        .param("graceCount", graceCount)
-                        .param("action", action)
-                        .param("status", status))
+                .perform(put("/subscription/" + subscriptionId)
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/json;charset=UTF-8"))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
@@ -278,6 +264,11 @@ public class SubscriptionControllerTest {
         return subscriberResponse.getStatus().equals(status)
                 && subscriberResponse.getDescription().equals(description)
                 && subscriberResponse.getSubscriptionDetails().size() == 0;
+    }
+
+    private String toJson(Object objectToSerialize) {
+        Gson gson = new Gson();
+        return gson.toJson(objectToSerialize);
     }
 
     private <T> T fromJson(String jsonString, Class<T> subscriberResponseClass) {

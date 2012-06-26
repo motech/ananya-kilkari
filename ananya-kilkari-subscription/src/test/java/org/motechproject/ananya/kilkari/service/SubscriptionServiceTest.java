@@ -7,13 +7,10 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.handlers.ProcessSubscriptionHandler;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -117,7 +114,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldUpdateTheSubscriptionStatus() {
+    public void shouldUpdateTheSubscriptionStatusGivenTheMsisdnAndPack() {
         SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         String msisdn = "123456890";
         SubscriptionStatus status = SubscriptionStatus.ACTIVE;
@@ -125,10 +122,26 @@ public class SubscriptionServiceTest {
 
         when(allSubscriptions.findByMsisdnAndPack(msisdn, pack)).thenReturn(mockedSubscription);
 
-        subscriptionService.updateSubsciptionStatus(msisdn, pack.name(), status);
+        subscriptionService.updateSubscriptionStatus(msisdn, pack.name(), status);
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription);
         order.verify(allSubscriptions).findByMsisdnAndPack(msisdn, pack);
+        order.verify(mockedSubscription).setStatus(SubscriptionStatus.ACTIVE);
+        order.verify(allSubscriptions).update(mockedSubscription);
+    }
+
+    @Test
+    public void shouldUpdateTheSubscriptionStatusGivenTheSubscriptionId() {
+        SubscriptionStatus status = SubscriptionStatus.ACTIVE;
+        Subscription mockedSubscription = mock(Subscription.class);
+        String subscriptionId = "abcd1234";
+
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
+
+        subscriptionService.updateSubscriptionStatus(subscriptionId, status);
+
+        InOrder order = inOrder(allSubscriptions, mockedSubscription);
+        order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
         order.verify(mockedSubscription).setStatus(SubscriptionStatus.ACTIVE);
         order.verify(allSubscriptions).update(mockedSubscription);
     }

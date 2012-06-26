@@ -1,9 +1,11 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -15,6 +17,7 @@ public class OnMobileSubscriptionService {
     public static final String ACTIVATE_SUBSCRIPTION_PATH = "ActivateSubscription";
     private RestTemplate restTemplate;
     private Properties kilkariProperties;
+    private Logger logger = Logger.getLogger(OnMobileSubscriptionService.class);
 
     @Autowired
     public OnMobileSubscriptionService(@Qualifier("kilkariRestTemplate") RestTemplate restTemplate, @Qualifier("kilkariProperties") Properties kilkariProperties) {
@@ -36,6 +39,12 @@ public class OnMobileSubscriptionService {
         urlVariables.put("refid", referenceId);
         urlVariables.put("user", username);
         urlVariables.put("pass", password);
-        restTemplate.getForEntity(url, String.class, urlVariables);
+
+        try {
+            restTemplate.getForEntity(url, String.class, urlVariables);
+        } catch  (HttpClientErrorException ex) {
+            logger.error(String.format("OnMobile subscription request failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
+            throw ex;
+        }
     }
 }

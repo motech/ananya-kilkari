@@ -41,13 +41,13 @@ public class SubscriptionController {
         return new BaseResponse("SUCCESS", "Subscription request submitted successfully");
     }
 
-    @RequestMapping(value = "/activate-subscription-callback", method = RequestMethod.GET)
+    @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.PUT)
     @ResponseBody
-    public BaseResponse activateSubscriptionCallback(@ModelAttribute CallbackRequest callbackRequest) {
+    public BaseResponse activateSubscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
         logger.info(String.format("Processing request: %s", callbackRequest.toString()));
         if(callbackRequest.getStatus() == CallBackStatus.SUCCESS && callbackRequest.getAction() == CallBackAction.ACT) {
-            logger.info(String.format("Changing subscription status to ACTIVE for msisdn: %s, pack: %s", callbackRequest.getMsisdn(), callbackRequest.getSrvKey()));
-            subscriptionService.updateSubsciptionStatus(callbackRequest.getMsisdn(), callbackRequest.getSrvKey().name(), SubscriptionStatus.ACTIVE);
+            logger.info(String.format("Changing subscription status to ACTIVE for msisdn: %s, subscriptionId: %s", callbackRequest.getMsisdn(), subscriptionId));
+            subscriptionService.updateSubscriptionStatus(subscriptionId , SubscriptionStatus.ACTIVE);
         }
         return new BaseResponse("SUCCESS", "Callback request processed successfully");
     }

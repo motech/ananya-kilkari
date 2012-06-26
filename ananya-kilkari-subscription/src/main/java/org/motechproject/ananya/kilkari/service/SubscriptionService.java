@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class SubscriptionService {
+public class    SubscriptionService {
     @Autowired
     private AllSubscriptions allSubscriptions;
 
@@ -58,9 +58,15 @@ public class SubscriptionService {
         allSubscriptions.update(subscription);
     }
 
-    public void updateSubsciptionStatus(String msisdn, String pack, SubscriptionStatus status) {
+    public void updateSubscriptionStatus(String msisdn, String pack, SubscriptionStatus status) {
         Subscription subscription = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.getFor(pack));
         subscription.setStatus(status);
-        allSubscriptions.update(subscription);
+        update(subscription);
+    }
+
+    public void updateSubscriptionStatus(String subscriptionId, SubscriptionStatus status) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        subscription.setStatus(status);
+        update(subscription);
     }
 }

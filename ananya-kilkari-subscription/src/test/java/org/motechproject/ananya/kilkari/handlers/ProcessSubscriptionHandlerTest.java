@@ -3,7 +3,6 @@ package org.motechproject.ananya.kilkari.handlers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
@@ -41,7 +40,7 @@ public class ProcessSubscriptionHandlerTest {
         verify(onMobileSubscriptionService).activateSubscription(subscriptionActivationRequestArgumentCaptor.capture());
         SubscriptionActivationRequest subscriptionActivationRequest = subscriptionActivationRequestArgumentCaptor.getValue();
 
-        verify(subscriptionService).updateSubsciptionStatus(msisdn, pack.name(), SubscriptionStatus.PENDING_ACTIVATION);
+        verify(subscriptionService).updateSubscriptionStatus(msisdn, pack.name(), SubscriptionStatus.PENDING_ACTIVATION);
 
         assertEquals(msisdn, subscriptionActivationRequest.getMsisdn());
         assertEquals(channel, subscriptionActivationRequest.getChannel());

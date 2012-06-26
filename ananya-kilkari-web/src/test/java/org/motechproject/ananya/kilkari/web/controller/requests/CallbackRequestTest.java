@@ -13,15 +13,13 @@ public class CallbackRequestTest {
    public void shouldReturnStringWithAllProperties() {
        CallbackRequest callbackRequest = new CallbackRequest();
        callbackRequest.setMsisdn("mymsisdn");
-       callbackRequest.setSrvKey(SubscriptionPack.TWELVE_MONTHS);
-       callbackRequest.setRefId("myrefId");
        callbackRequest.setReason("myreason");
        callbackRequest.setOperator("myoperator");
-       callbackRequest.setGraceCount("10");
+       callbackRequest.setRenewalAttempt("10");
        callbackRequest.setAction(CallBackAction.ACT);
        callbackRequest.setStatus(CallBackStatus.SUCCESS);
 
-       assertEquals("msisdn: mymsisdn; pack: TWELVE_MONTHS; refid: myrefId; reason: myreason; operator: myoperator; graceCount: 10; action: ACT; status: SUCCESS", callbackRequest.toString());
+       assertEquals("msisdn: mymsisdn; reason: myreason; operator: myoperator; renewalAttempt: 10; action: ACT; status: SUCCESS", callbackRequest.toString());
 
    }
 }

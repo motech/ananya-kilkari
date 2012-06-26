@@ -78,6 +78,23 @@ public class AllSubscriptionsTest extends SubscriptionBaseIT {
     }
 
     @Test
+    public void shouldFindSubscriptionBySubscriptionId() {
+        String msisdn = "123456";
+
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS);
+        allSubscriptions.add(subscription1);
+        allSubscriptions.add(subscription2);
+
+        markForDeletion(subscription1);
+        markForDeletion(subscription2);
+        Subscription filteredSubscription = allSubscriptions.findBySubscriptionId(subscription1.getSubscriptionId());
+
+        assertNotNull(filteredSubscription);
+        assertEquals(subscription1, filteredSubscription);
+    }
+
+    @Test
     public void shouldAddSubscriptionOnlyIfItsNotPresent() {
         String msisdn = "123456";
 

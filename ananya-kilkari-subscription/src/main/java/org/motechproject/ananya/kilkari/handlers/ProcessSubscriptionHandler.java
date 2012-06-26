@@ -28,10 +28,10 @@ public class ProcessSubscriptionHandler {
     @MotechListener(subjects = {SubscriptionEventKeys.PROCESS_SUBSCRIPTION})
     public void handleProcessSubscription(MotechEvent event) {
         SubscriptionActivationRequest subscriptionActivationRequest = (SubscriptionActivationRequest) event.getParameters().get("0");
-
+        logger.info(String.format("Handling process subscription event for msisdn: %s, pack: %s, channel: %s", subscriptionActivationRequest.getMsisdn(), subscriptionActivationRequest.getPack(), subscriptionActivationRequest.getChannel()));
         try {
             onMobileSubscriptionService.activateSubscription(subscriptionActivationRequest);
-            subscriptionService.updateSubsciptionStatus(subscriptionActivationRequest.getMsisdn(), subscriptionActivationRequest.getPack().name(), SubscriptionStatus.PENDING_ACTIVATION);
+            subscriptionService.updateSubscriptionStatus(subscriptionActivationRequest.getMsisdn(), subscriptionActivationRequest.getPack().name(), SubscriptionStatus.PENDING_ACTIVATION);
         }
         catch (RuntimeException e) {
             logger.error("Exception Occurred while sending subscription activation request", e);

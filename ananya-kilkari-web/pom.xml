@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>ananya-kilkari</artifactId>
-        <groupId>ananya-kilkari</groupId>
+        <groupId>org.motechproject.ananya.kilkari</groupId>
         <version>0.1-SNAPSHOT</version>
     </parent>
 
@@ -31,23 +31,32 @@
                         </systemProperty>
                     </systemProperties>
                     <webAppConfig>
+                        <!--<extraClasspath>~/proj/motech/codebase/ananya-kilkari/ananya-kilkari-config/target/ananya-kilkari-config.jar</extraClasspath>-->
                         <contextPath>/ananya-kilkari</contextPath>
                     </webAppConfig>
                     <stopKey>secret</stopKey>
                     <stopPort>6669</stopPort>
                 </configuration>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>org.motechproject.ananya.kilkari</groupId>
+                        <artifactId>ananya-kilkari-config</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
 
     <dependencies>
         <dependency>
-            <groupId>ananya-kilkari</groupId>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
             <artifactId>ananya-kilkari-message-campaign</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>ananya-kilkari</groupId>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
             <artifactId>ananya-kilkari-subscription</artifactId>
             <version>${project.version}</version>
         </dependency>

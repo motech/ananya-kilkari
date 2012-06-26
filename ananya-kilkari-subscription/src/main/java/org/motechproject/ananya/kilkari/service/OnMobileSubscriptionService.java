@@ -1,7 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
-import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

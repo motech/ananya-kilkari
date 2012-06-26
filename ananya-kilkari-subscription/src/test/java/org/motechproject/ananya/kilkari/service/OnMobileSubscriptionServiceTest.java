@@ -6,7 +6,6 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;

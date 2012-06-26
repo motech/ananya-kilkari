@@ -10,18 +10,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Ananya Kilkari Message Campaign</name>
-    <artifactId>ananya-kilkari-message-campaign</artifactId>
+    <name>Ananya Kilkari Config</name>
+    <artifactId>ananya-kilkari-config</artifactId>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.motechproject</groupId>
-            <artifactId>motech-message-campaign</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject</groupId>
-            <artifactId>motech-platform-server-api</artifactId>
-        </dependency>
-    </dependencies>
+    <build>
+        <finalName>ananya-kilkari-config</finalName>
+    </build>
+
 
 </project>

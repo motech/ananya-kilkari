@@ -21,6 +21,7 @@
             <bean id="httpClient" class="org.ektorp.spring.HttpClientFactoryBean"/>
         </constructor-arg>
     </bean>
+
     <bean id="kilkariDbConnector" class="org.ektorp.impl.StdCouchDbConnector">
         <constructor-arg value="kilkari"/>
         <constructor-arg ref="kilkariDbInstance"/>

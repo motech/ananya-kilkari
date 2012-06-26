@@ -6,11 +6,13 @@ public class SubscriptionActivationRequest implements Serializable {
     private final String msisdn;
     private final SubscriptionPack pack;
     private final Channel channel;
+    private String subscriptionId;
 
-    public SubscriptionActivationRequest(String msisdn, SubscriptionPack pack, Channel channel) {
+    public SubscriptionActivationRequest(String msisdn, SubscriptionPack pack, Channel channel, String subscriptionId) {
         this.msisdn = msisdn;
         this.pack = pack;
         this.channel = channel;
+        this.subscriptionId = subscriptionId;
     }
 
     public String getMsisdn() {
@@ -23,5 +25,9 @@ public class SubscriptionActivationRequest implements Serializable {
 
     public Channel getChannel() {
         return channel;
+    }
+
+    public String getSubscriptionId() {
+        return subscriptionId;
     }
 }

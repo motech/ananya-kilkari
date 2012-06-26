@@ -32,8 +32,10 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
 
     @GenerateView
     public Subscription findBySubscriptionId(String subscriptionId) {
-        List<Subscription> subscriptions = queryView("find_by_subscription_id", subscriptionId);
-        return subscriptions.isEmpty() ? null : subscriptions.get(0);
+        ViewQuery viewQuery = createQuery("by_subscriptionId").key(subscriptionId).includeDocs(true);
+        List<Subscription> subscriptions = db.queryView(viewQuery, Subscription.class);
+        if (subscriptions == null || subscriptions.isEmpty()) return null;
+        return subscriptions.get(0);
     }
 
     @View(name = "find_by_msisdn_and_pack", map = "function(doc) {if(doc.type === 'Subscription') emit([doc.msisdn, doc.pack]);}")

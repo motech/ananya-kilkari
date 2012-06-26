@@ -28,7 +28,6 @@ public class OnMobileSubscriptionService {
     public void activateSubscription(SubscriptionActivationRequest subscriptionActivationRequest) {
         String baseUrl = kilkariProperties.getProperty("omsm.base.url");
         String url = (baseUrl.endsWith("/")) ? String.format("%s%s", baseUrl, ACTIVATE_SUBSCRIPTION_PATH) : String.format("%s/%s", baseUrl, ACTIVATE_SUBSCRIPTION_PATH);
-        String referenceId = kilkariProperties.getProperty("omsm.reference.id");
         String username = kilkariProperties.getProperty("omsm.username");
         String password = kilkariProperties.getProperty("omsm.password");
 
@@ -36,7 +35,7 @@ public class OnMobileSubscriptionService {
         urlVariables.put("msisdn", subscriptionActivationRequest.getMsisdn());
         urlVariables.put("srvkey", subscriptionActivationRequest.getPack().name());
         urlVariables.put("mode", subscriptionActivationRequest.getChannel().name());
-        urlVariables.put("refid", referenceId);
+        urlVariables.put("refid", subscriptionActivationRequest.getSubscriptionId());
         urlVariables.put("user", username);
         urlVariables.put("pass", password);
 

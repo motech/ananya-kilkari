@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.service;
 import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,11 +26,11 @@ public class    SubscriptionService {
 
     public void createSubscription(SubscriptionRequest subscriptionRequest) throws ValidationException {
         subscriptionRequest.validate();
-        Subscription subscription = subscriptionRequest.getSubscription();
+        SubscriptionMapper subscriptionMapper = new SubscriptionMapper(subscriptionRequest);
+        Subscription subscription = subscriptionMapper.getSubscription();
         allSubscriptions.add(subscription);
 
-        SubscriptionActivationRequest subscriptionActivationRequest = subscriptionRequest.getSubscriptionActivationRequest();
-        sendProcessSubscriptionEvent(subscriptionActivationRequest);
+        sendProcessSubscriptionEvent(subscriptionMapper.getSubscriptionActivationRequest());
     }
 
     public List<Subscription> findByMsisdn(String msisdn) throws ValidationException {

@@ -32,7 +32,8 @@ public class ProcessSubscriptionHandlerTest {
         final String msisdn = "msisdn";
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         final Channel channel = Channel.IVR;
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new SubscriptionActivationRequest(msisdn, pack, channel));}};
+        final String subscriptionId = "abcd1234";
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new SubscriptionActivationRequest(msisdn, pack, channel, subscriptionId));}};
 
         new ProcessSubscriptionHandler(onMobileSubscriptionService, subscriptionService).handleProcessSubscription(new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, parameters));
 
@@ -45,6 +46,7 @@ public class ProcessSubscriptionHandlerTest {
         assertEquals(msisdn, subscriptionActivationRequest.getMsisdn());
         assertEquals(channel, subscriptionActivationRequest.getChannel());
         assertEquals(pack, subscriptionActivationRequest.getPack());
+        assertEquals(subscriptionId, subscriptionActivationRequest.getSubscriptionId());
     }
 
     @Test(expected = RuntimeException.class)

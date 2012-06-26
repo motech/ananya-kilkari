@@ -16,10 +16,6 @@ public class SubscriptionRequest implements Serializable {
         this.channel = channel;
     }
 
-    public Subscription getSubscription() {
-        return new Subscription(msisdn, SubscriptionPack.getFor(pack));
-    }
-
     public String getMsisdn() {
         return msisdn;
     }
@@ -55,9 +51,5 @@ public class SubscriptionRequest implements Serializable {
 
     private boolean isValidMsisdn(String msisdn) {
         return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
-    }
-
-    public SubscriptionActivationRequest getSubscriptionActivationRequest() {
-        return new SubscriptionActivationRequest(msisdn, SubscriptionPack.getFor(pack), Channel.getFor(channel));
     }
 }

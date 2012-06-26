@@ -39,23 +39,4 @@ public class SubscriptionRequestTest {
     public void shouldThrowExceptionWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscription() throws ValidationException {
         new SubscriptionRequest("123456789a", SubscriptionPack.TWELVE_MONTHS.name(), Channel.IVR.name()).validate();
     }
-
-    @Test
-    public void ShouldCreateSubscription() {
-        String msisdn = "1234567890";
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, "twelve_months", "ivr");
-        Subscription subscription = subscriptionRequest.getSubscription();
-        assertEquals(msisdn, subscription.getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS, subscription.getPack());
-    }
-
-    @Test
-    public void ShouldReturnSubscriptionActivationRequest() {
-        String msisdn = "1234567890";
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, "twelve_months", "ivr");
-        SubscriptionActivationRequest subscriptionActivationRequest = subscriptionRequest.getSubscriptionActivationRequest();
-        assertEquals(msisdn, subscriptionActivationRequest.getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptionActivationRequest.getPack());
-        assertEquals(Channel.IVR, subscriptionActivationRequest.getChannel());
-    }
 }

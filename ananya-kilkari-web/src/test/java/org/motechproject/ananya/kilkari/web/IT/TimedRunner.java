@@ -9,7 +9,11 @@ public abstract class TimedRunner {
     abstract boolean run();
 
     public void executeWithTimeout() {
-        for (int i = 0; i < 5; i++) {
+        executeWithTimeout(5000, 1000);
+    }
+
+    public void executeWithTimeout(long totalTimeout, long intervalSleep) {
+        for (int i = 0; i < (int)(totalTimeout / intervalSleep); i++) {
             if (run()) break;
 
             try {

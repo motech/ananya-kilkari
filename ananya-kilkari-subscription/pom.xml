@@ -53,7 +53,44 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>Drop DB Before Unit Tests</id>
+                        <id>drop DB Before Integration Tests</id>
+                        <phase>pre-integration-test</phase>
+                        <configuration>
+                            <target>
+                                <echo message="Dropping DB: START"/>
+                                <exec executable="curl">
+                                    <arg value="-s"/>
+                                    <arg value="-S"/>
+                                    <arg value="-X"/>
+                                    <arg value="DELETE"/>
+                                    <arg value="http://${db.server}:${db.port}/${db.name}"/>
+                                </exec>
+                                <echo message="Dropping DB: END"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.9</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <argLine>-XX:MaxPermSize=1024M</argLine>
+                            <includes>
+                                <include>**/*IT.java</include>
+                            </includes>
+                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

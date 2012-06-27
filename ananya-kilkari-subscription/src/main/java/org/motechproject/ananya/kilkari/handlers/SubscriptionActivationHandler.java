@@ -12,15 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProcessSubscriptionHandler {
+public class SubscriptionActivationHandler {
 
     private OnMobileSubscriptionService onMobileSubscriptionService;
 
-    Logger logger = Logger.getLogger(ProcessSubscriptionHandler.class);
+    Logger logger = Logger.getLogger(SubscriptionActivationHandler.class);
     private SubscriptionService subscriptionService;
 
     @Autowired
-    public ProcessSubscriptionHandler(OnMobileSubscriptionService onMobileSubscriptionService, SubscriptionService subscriptionService) {
+    public SubscriptionActivationHandler(OnMobileSubscriptionService onMobileSubscriptionService, SubscriptionService subscriptionService) {
         this.onMobileSubscriptionService = onMobileSubscriptionService;
         this.subscriptionService = subscriptionService;
     }

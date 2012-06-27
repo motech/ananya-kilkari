@@ -16,7 +16,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ProcessSubscriptionHandlerTest {
+public class SubscriptionActivationHandlerTest {
     @Mock
     private OnMobileSubscriptionService onMobileSubscriptionService;
     @Mock
@@ -28,14 +28,14 @@ public class ProcessSubscriptionHandlerTest {
     }
 
     @Test
-    public void shouldInvokeOnMobileSubscriptionServiceToCreateAnActivationRequest() {
+    public void shouldInvokeReportingServiceToCreateASubscriptionRequest() {
         final String msisdn = "msisdn";
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         final Channel channel = Channel.IVR;
         final String subscriptionId = "abcd1234";
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new SubscriptionActivationRequest(msisdn, pack, channel, subscriptionId));}};
 
-        new ProcessSubscriptionHandler(onMobileSubscriptionService, subscriptionService).handleProcessSubscription(new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, parameters));
+        new SubscriptionActivationHandler(onMobileSubscriptionService, subscriptionService).handleProcessSubscription(new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, parameters));
 
         ArgumentCaptor<SubscriptionActivationRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionActivationRequest.class);
         verify(onMobileSubscriptionService).activateSubscription(subscriptionActivationRequestArgumentCaptor.capture());
@@ -55,6 +55,6 @@ public class ProcessSubscriptionHandlerTest {
 
         doThrow(new RuntimeException()).when(onMobileSubscriptionService).activateSubscription(any(SubscriptionActivationRequest.class));
 
-        new ProcessSubscriptionHandler(onMobileSubscriptionService, subscriptionService).handleProcessSubscription(new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, parameters));
+        new SubscriptionActivationHandler(onMobileSubscriptionService, subscriptionService).handleProcessSubscription(new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, parameters));
     }
 }

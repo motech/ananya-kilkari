@@ -24,7 +24,7 @@ public class PublisherTest {
     }
 
     @Test
-    public void shouldPublishSubscriptionCreationDataIntoQueue() {
+    public void shouldPublishProcessSubscriptionEventIntoQueue() {
         String subscriptionId = "ABCD1234";
         publisher.processSubscription(new SubscriptionActivationRequest("1234567890", SubscriptionPack.TWELVE_MONTHS, Channel.IVR, subscriptionId));
 
@@ -39,6 +39,24 @@ public class PublisherTest {
         assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptionActivationRequest.getPack());
         assertEquals(Channel.IVR, subscriptionActivationRequest.getChannel());
         assertEquals(subscriptionId, subscriptionActivationRequest.getSubscriptionId());
+    }
+
+    @Test
+    public void shouldPublishReportSubscriptionCreationEventIntoQueue() {
+        String subscriptionId = "ABCD1234";
+        publisher.reportSubscriptionCreation(new SubscriptionReportRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.IVR.name(), subscriptionId));
+
+        ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
+        ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(eventContext).send(eventArgumentCaptor.capture(), subscriptionReportRequestArgumentCaptor.capture());
+        SubscriptionReportRequest subscriptionReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
+        String eventName = eventArgumentCaptor.getValue();
+
+        assertEquals(SubscriptionEventKeys.REPORT_SUBSCRIPTION_CREATION, eventName);
+        assertEquals("1234567890", subscriptionReportRequest.getMsisdn());
+        assertEquals(SubscriptionPack.TWELVE_MONTHS.name(), subscriptionReportRequest.getPack());
+        assertEquals(Channel.IVR.name(), subscriptionReportRequest.getChannel());
+        assertEquals(subscriptionId, subscriptionReportRequest.getSubscriptionId());
     }
 }
 

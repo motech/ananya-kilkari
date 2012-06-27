@@ -41,12 +41,14 @@ public class SubscriptionServiceTest {
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         ArgumentCaptor<SubscriptionActivationRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionActivationRequest.class);
+        ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
 
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, subscriptionPack.name(), channel.name());
         subscriptionService.createSubscription(subscriptionRequest);
 
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         verify(publisher).processSubscription(subscriptionActivationRequestArgumentCaptor.capture());
+        verify(publisher).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
 
         Subscription subscription = subscriptionArgumentCaptor.getValue();
         assertEquals(msisdn, subscription.getMsisdn());
@@ -56,6 +58,11 @@ public class SubscriptionServiceTest {
         assertEquals(msisdn, actualSubscriptionActivationRequest.getMsisdn());
         assertEquals(subscriptionPack, actualSubscriptionActivationRequest.getPack());
         assertEquals(channel, actualSubscriptionActivationRequest.getChannel());
+
+        SubscriptionReportRequest actualSubscriptionReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
+        assertEquals(msisdn, actualSubscriptionReportRequest.getMsisdn());
+        assertEquals(subscriptionPack.name(), actualSubscriptionReportRequest.getPack());
+        assertEquals(channel.name(), actualSubscriptionReportRequest.getChannel());
     }
 
     @Test(expected = ValidationException.class)

@@ -11,11 +11,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class    SubscriptionService {
-    @Autowired
+public class SubscriptionService {
     private AllSubscriptions allSubscriptions;
 
-    @Autowired
     private Publisher publisher;
 
     @Autowired
@@ -31,6 +29,7 @@ public class    SubscriptionService {
         allSubscriptions.add(subscription);
 
         sendProcessSubscriptionEvent(subscriptionMapper.getSubscriptionActivationRequest());
+        sendReportSubscriptionCreationEvent(subscriptionMapper.getSubscriptionReportRequest());
     }
 
     public List<Subscription> findByMsisdn(String msisdn) throws ValidationException {
@@ -40,6 +39,10 @@ public class    SubscriptionService {
 
     private void sendProcessSubscriptionEvent(SubscriptionActivationRequest subscriptionActivationRequest) {
         publisher.processSubscription(subscriptionActivationRequest);
+    }
+
+    private void sendReportSubscriptionCreationEvent(SubscriptionReportRequest subscriptionReportRequest) {
+        publisher.reportSubscriptionCreation(subscriptionReportRequest);
     }
 
     private void validateMsisdn(String msisdn) throws ValidationException {

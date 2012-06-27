@@ -56,7 +56,7 @@ class ProfileLoader
 
         content_type request_mapping.content_type
         status request_mapping.status_code
-        request_body = ProfileLoader.generate_request_body(params)
+        request_body = ProfileLoader.generate_request_body(params, request)
         
         @@user_requests << UserRequest.new(request.request_method, request.url, request_body, request_mapping.status_code, request_file_path, request_file_type)
         erb request_mapping.response_file.to_sym, params
@@ -74,13 +74,13 @@ class ProfileLoader
     [file_name, file_params[:type]]
   end
   
-  def self.generate_request_body(params)
-    request_body = ""
-    puts params
+  def self.generate_request_body(params, request)
+    request_body = "Params are: "
     params.each do |key, value|
       next if key == 'file' or key == 'splat' or key == 'captures'
       request_body += value != nil ? (key + "=" + value + ",") : (key + ",")
     end
+    request_body += "\nBody is: " + request.body.read
     request_body
   end
 

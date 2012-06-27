@@ -45,10 +45,16 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse activateSubscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
         logger.info(String.format("Processing request: %s", callbackRequest.toString()));
-        if(callbackRequest.getStatus() == CallBackStatus.SUCCESS && callbackRequest.getAction() == CallBackAction.ACT) {
-            logger.info(String.format("Changing subscription status to ACTIVE for msisdn: %s, subscriptionId: %s", callbackRequest.getMsisdn(), subscriptionId));
-            subscriptionService.updateSubscriptionStatus(subscriptionId , SubscriptionStatus.ACTIVE);
+        if(callbackRequest.getAction() == CallBackAction.ACT) {
+            if(callbackRequest.getStatus() == CallBackStatus.SUCCESS) {
+                logger.info(String.format("Changing subscription status to ACTIVE for msisdn: %s, subscriptionId: %s", callbackRequest.getMsisdn(), subscriptionId));
+                subscriptionService.updateSubscriptionStatus(subscriptionId , SubscriptionStatus.ACTIVE);
+            } else {
+                logger.info(String.format("Changing subscription status to ACTIVATION_FAILED for msisdn: %s, subscriptionId: %s", callbackRequest.getMsisdn(), subscriptionId));
+                subscriptionService.updateSubscriptionStatus(subscriptionId , SubscriptionStatus.ACTIVATION_FAILED);
+            }
         }
+
         return new BaseResponse("SUCCESS", "Callback request processed successfully");
     }
 

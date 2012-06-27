@@ -172,7 +172,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void shouldNotActivateTheSubscriptionWhenCallBackUrlIsInvokedWithNonSuccessStatusForActivationRequest() throws Exception {
+    public void shouldMakeActivationFailWhenCallBackUrlIsInvokedWithNonSuccessStatusForActivationRequest() throws Exception {
         String subscriptionId = "abcd1234";
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setMsisdn("msisdn");
@@ -190,7 +190,7 @@ public class SubscriptionControllerTest {
                 .andExpect(content().type("application/json;charset=UTF-8"))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
 
-        verifyZeroInteractions(subscriptionService);
+        verify(subscriptionService).updateSubscriptionStatus(subscriptionId, SubscriptionStatus.ACTIVATION_FAILED);
     }
 
     private void mockSubscription(String msisdn) {

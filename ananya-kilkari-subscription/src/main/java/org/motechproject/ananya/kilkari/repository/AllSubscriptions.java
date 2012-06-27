@@ -34,14 +34,13 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
     public Subscription findBySubscriptionId(String subscriptionId) {
         ViewQuery viewQuery = createQuery("by_subscriptionId").key(subscriptionId).includeDocs(true);
         List<Subscription> subscriptions = db.queryView(viewQuery, Subscription.class);
-        if (subscriptions == null || subscriptions.isEmpty()) return null;
-        return subscriptions.get(0);
+        return singleResult(subscriptions);
     }
 
     @View(name = "find_by_msisdn_and_pack", map = "function(doc) {if(doc.type === 'Subscription') emit([doc.msisdn, doc.pack]);}")
     public Subscription findByMsisdnAndPack(String msisdn, SubscriptionPack pack) {
         List<Subscription> subscriptions = queryView("find_by_msisdn_and_pack", ComplexKey.of(msisdn, pack));
-        return subscriptions.isEmpty() ? null : subscriptions.get(0);
+        return singleResult(subscriptions);
     }
 
     public void add(Subscription subscription) {

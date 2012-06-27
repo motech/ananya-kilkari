@@ -14,8 +14,8 @@ import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.controller.requests.CallbackRequest;
-import org.motechproject.ananya.kilkari.web.domain.CallBackAction;
-import org.motechproject.ananya.kilkari.web.domain.CallBackStatus;
+import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
+import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
@@ -154,11 +154,11 @@ public class SubscriptionControllerTest {
         String subscriptionId = "abcd1234";
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setMsisdn("msisdn");
-        callbackRequest.setAction(CallBackAction.ACT);
-        callbackRequest.setStatus(CallBackStatus.SUCCESS);
+        callbackRequest.setAction(CallbackAction.ACT);
+        callbackRequest.setStatus(CallbackStatus.SUCCESS);
         callbackRequest.setReason("reason");
         callbackRequest.setOperator("operator");
-        callbackRequest.setRenewalAttempt("2");
+        callbackRequest.setGraceCount("2");
         byte[] requestBody = toJson(callbackRequest).getBytes();
 
         MockMvcBuilders.standaloneSetup(subscriptionController).build()
@@ -176,11 +176,11 @@ public class SubscriptionControllerTest {
         String subscriptionId = "abcd1234";
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setMsisdn("msisdn");
-        callbackRequest.setAction(CallBackAction.ACT);
-        callbackRequest.setStatus(CallBackStatus.FAILURE);
+        callbackRequest.setAction(CallbackAction.ACT);
+        callbackRequest.setStatus(CallbackStatus.FAILURE);
         callbackRequest.setReason("reason");
         callbackRequest.setOperator("operator");
-        callbackRequest.setRenewalAttempt("2");
+        callbackRequest.setGraceCount("2");
         byte[] requestBody = toJson(callbackRequest).getBytes();
 
         MockMvcBuilders.standaloneSetup(subscriptionController).build()

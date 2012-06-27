@@ -1,5 +1,5 @@
 package org.motechproject.ananya.kilkari.web.domain;
 
-public enum CallBackAction {
+public enum CallbackAction {
     ACT
 }

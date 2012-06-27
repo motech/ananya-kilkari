@@ -7,8 +7,8 @@ import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.controller.requests.CallbackRequest;
-import org.motechproject.ananya.kilkari.web.domain.CallBackAction;
-import org.motechproject.ananya.kilkari.web.domain.CallBackStatus;
+import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
+import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
@@ -45,8 +45,8 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse activateSubscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
         logger.info(String.format("Processing request: %s", callbackRequest.toString()));
-        if(callbackRequest.getAction() == CallBackAction.ACT) {
-            if(callbackRequest.getStatus() == CallBackStatus.SUCCESS) {
+        if(callbackRequest.getAction() == CallbackAction.ACT) {
+            if(callbackRequest.getStatus() == CallbackStatus.SUCCESS) {
                 logger.info(String.format("Changing subscription status to ACTIVE for msisdn: %s, subscriptionId: %s", callbackRequest.getMsisdn(), subscriptionId));
                 subscriptionService.updateSubscriptionStatus(subscriptionId , SubscriptionStatus.ACTIVE);
             } else {

@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.domain;
 
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -19,9 +18,9 @@ public class SubscriptionReportRequest implements Serializable {
 
     private int ageOfBeneficiary;
 
-    private DateTime estimatedDateOfDelivery;
+    private DateTime edd;
 
-    private DateTime dateOfBirth;
+    private DateTime dob;
 
     private SubscriberLocation location;
 
@@ -84,20 +83,20 @@ public class SubscriptionReportRequest implements Serializable {
         this.ageOfBeneficiary = ageOfBeneficiary;
     }
 
-    public DateTime getEstimatedDateOfDelivery() {
-        return estimatedDateOfDelivery;
+    public DateTime getEdd() {
+        return edd;
     }
 
-    public void setEstimatedDateOfDelivery(DateTime estimatedDateOfDelivery) {
-        this.estimatedDateOfDelivery = estimatedDateOfDelivery;
+    public void setEdd(DateTime edd) {
+        this.edd = edd;
     }
 
-    public DateTime getDateOfBirth() {
-        return dateOfBirth;
+    public DateTime getDob() {
+        return dob;
     }
 
-    public void setDateOfBirth(DateTime dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
+    public void setDob(DateTime dob) {
+        this.dob = dob;
     }
 
     public SubscriberLocation getLocation() {

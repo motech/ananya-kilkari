@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.domain;
 
-public class SubscriberLocation {
+import java.io.Serializable;
+
+public class SubscriberLocation implements Serializable {
     private String district;
 
     private String block;

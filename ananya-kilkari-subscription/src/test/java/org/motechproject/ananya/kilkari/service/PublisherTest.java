@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -44,7 +45,7 @@ public class PublisherTest {
     @Test
     public void shouldPublishReportSubscriptionCreationEventIntoQueue() {
         String subscriptionId = "ABCD1234";
-        publisher.reportSubscriptionCreation(new SubscriptionCreationReportRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.IVR.name(), subscriptionId));
+        publisher.reportSubscriptionCreation(new SubscriptionCreationReportRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.IVR.name(), subscriptionId, DateTime.now()));
 
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
         ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -63,7 +64,7 @@ public class PublisherTest {
     public void shouldPublishSubscriptionStateChangeEventIntoQueue() {
         String subscriptionId = "ABCD1234";
         SubscriptionStatus subscriptionStatus = SubscriptionStatus.ACTIVE;
-        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus.name());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus.name(), DateTime.now());
 
         publisher.reportSubscriptionStateChange(subscriptionStateChangeReportRequest);
 
@@ -76,7 +77,7 @@ public class PublisherTest {
 
         assertEquals(SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE, eventName);
         assertEquals(subscriptionId, actualSubscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(subscriptionStatus.name(), actualSubscriptionStateChangeReportRequest.getStatus());
+        assertEquals(subscriptionStatus.name(), actualSubscriptionStateChangeReportRequest.getSubscriptionStatus());
     }
 }
 

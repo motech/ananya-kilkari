@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.services;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -29,7 +30,7 @@ public class SubscriptionPublisherTest {
         String msisdn = "1234567890";
         String pack = "twelve-months";
         String channel = "ivr";
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, pack, channel);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, pack, channel, DateTime.now());
 
         subscriptionPublisher.createSubscription(subscriptionRequest);
 

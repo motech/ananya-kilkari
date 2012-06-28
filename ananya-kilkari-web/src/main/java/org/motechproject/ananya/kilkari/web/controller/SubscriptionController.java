@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -36,7 +38,7 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
     @ResponseBody
     public BaseResponse createSubscription(@RequestParam String msisdn, @RequestParam String pack, @RequestParam String channel) {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, pack, channel);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, pack, channel, DateTime.now());
         subscriptionPublisher.createSubscription(subscriptionRequest);
         return new BaseResponse("SUCCESS", "Subscription request submitted successfully");
     }

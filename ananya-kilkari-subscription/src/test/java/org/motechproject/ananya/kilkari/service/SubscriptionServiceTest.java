@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -43,7 +44,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<SubscriptionActivationRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionActivationRequest.class);
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
 
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, subscriptionPack.name(), channel.name());
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, subscriptionPack.name(), channel.name(), DateTime.now());
         subscriptionService.createSubscription(subscriptionRequest);
 
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -134,7 +135,7 @@ public class SubscriptionServiceTest {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(status.name(), subscriptionStateChangeReportRequest.getStatus());
+        assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
     }
 
     @Test
@@ -158,7 +159,7 @@ public class SubscriptionServiceTest {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(status.name(), subscriptionStateChangeReportRequest.getStatus());
+        assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
     }
 
     @Test
@@ -182,6 +183,6 @@ public class SubscriptionServiceTest {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(subscriptionStatus.name(), subscriptionStateChangeReportRequest.getStatus());
+        assertEquals(subscriptionStatus.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
     }
 }

@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.mappers.SubscriptionMapper;
@@ -77,7 +78,7 @@ public class SubscriptionService {
     }
 
     private void sendSubscriptionStateChangeEvent(String subscriptionId, SubscriptionStatus status) {
-        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, status.name()));
+        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, status.name(), DateTime.now()));
     }
 
     private void updateWithReporting(Subscription subscription) {

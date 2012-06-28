@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -40,7 +41,7 @@ public class ReportingServiceTest {
         String subscriptionId = "abcd1234";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
-        new ReportingService(restTemplate, kilkariProperties).createSubscription(new SubscriptionCreationReportRequest(msisdn, pack, channel, subscriptionId));
+        new ReportingService(restTemplate, kilkariProperties).createSubscription(new SubscriptionCreationReportRequest(msisdn, pack, channel, subscriptionId, DateTime.now()));
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
@@ -61,7 +62,7 @@ public class ReportingServiceTest {
         String subscriptionStatus = SubscriptionStatus.ACTIVE.name();
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
-        new ReportingService(restTemplate, kilkariProperties).updateSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus));
+        new ReportingService(restTemplate, kilkariProperties).updateSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus, DateTime.now()));
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
@@ -71,6 +72,6 @@ public class ReportingServiceTest {
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         assertEquals("url/updatesubscription/abcd1234", urlArgumentCaptor.getValue());
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(subscriptionStatus, subscriptionStateChangeReportRequest.getStatus());
+        assertEquals(subscriptionStatus, subscriptionStateChangeReportRequest.getSubscriptionStatus());
     }
 }

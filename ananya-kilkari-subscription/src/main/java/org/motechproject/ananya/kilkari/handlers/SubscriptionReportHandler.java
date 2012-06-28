@@ -36,7 +36,7 @@ public class SubscriptionReportHandler {
     @MotechListener(subjects = {SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE})
     public void handleSubscriptionStateChange(MotechEvent event) {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = (SubscriptionStateChangeReportRequest) event.getParameters().get("0");
-        logger.info(String.format("Handling report subscription state change event for subscripitonId: %s, subscriptionStatus: %s", subscriptionStateChangeReportRequest.getSubscriptionId(), subscriptionStateChangeReportRequest.getStatus()));
+        logger.info(String.format("Handling report subscription state change event for subscripitonId: %s, subscriptionStatus: %s", subscriptionStateChangeReportRequest.getSubscriptionId(), subscriptionStateChangeReportRequest.getSubscriptionStatus()));
         try {
             reportingService.updateSubscriptionStateChange(subscriptionStateChangeReportRequest);
         } catch (RuntimeException e) {

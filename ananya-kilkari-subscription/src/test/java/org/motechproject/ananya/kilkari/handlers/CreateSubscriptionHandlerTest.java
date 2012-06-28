@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.handlers;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -14,7 +15,8 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class CreateSubscriptionHandlerTest {
@@ -32,7 +34,7 @@ public class CreateSubscriptionHandlerTest {
         String msisdn = "1234567890";
         String pack = "twelve-months";
         String channel = "ivr";
-        parameters.put("0", new SubscriptionRequest(msisdn, pack, channel));
+        parameters.put("0", new SubscriptionRequest(msisdn, pack, channel, DateTime.now()));
 
         new CreateSubscriptionHandler(subscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, parameters));
 
@@ -49,6 +51,6 @@ public class CreateSubscriptionHandlerTest {
     @Test(expected = ValidationException.class)
     public void shouldThrowExceptionIfDetailsAreInvalidWhileHandlingCreateSubscriptionEvent() throws ValidationException {
         doThrow(new ValidationException("Invalid")).when(subscriptionService).createSubscription(any(SubscriptionRequest.class));
-        new CreateSubscriptionHandler(subscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, new HashMap<String, Object>(){{put("0", new SubscriptionRequest("msisdn", "pack", "channel"));}}));
+        new CreateSubscriptionHandler(subscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, new HashMap<String, Object>(){{put("0", new SubscriptionRequest("msisdn", "pack", "channel", DateTime.now()));}}));
     }
 }

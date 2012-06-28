@@ -1,23 +1,10 @@
 package org.motechproject.ananya.kilkari.domain;
 
-import java.io.Serializable;
+import org.joda.time.DateTime;
 
-public class SubscriptionStateChangeReportRequest implements Serializable {
+public class SubscriptionStateChangeReportRequest extends BaseReportRequest {
 
-    private String subscriptionId;
-
-    private String status;
-
-    public SubscriptionStateChangeReportRequest(String subscriptionId, String status) {
-        this.subscriptionId = subscriptionId;
-        this.status = status;
-    }
-
-    public String getSubscriptionId() {
-        return subscriptionId;
-    }
-
-    public String getStatus() {
-        return status;
+    public SubscriptionStateChangeReportRequest(String subscriptionId, String status, DateTime createdAt) {
+        super(subscriptionId, status, createdAt);
     }
 }

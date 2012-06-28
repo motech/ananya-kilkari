@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.handlers;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -31,7 +32,7 @@ public class SubscriptionReportHandlerTest {
         final String channel = Channel.IVR.name();
         final String subscriptionId = "abcd1234";
 
-        SubscriptionCreationReportRequest subscriptionCreationReportRequest = new SubscriptionCreationReportRequest(msisdn, pack, channel, subscriptionId);
+        SubscriptionCreationReportRequest subscriptionCreationReportRequest = new SubscriptionCreationReportRequest(msisdn, pack, channel, subscriptionId, DateTime.now());
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("0", subscriptionCreationReportRequest);
 
@@ -45,7 +46,7 @@ public class SubscriptionReportHandlerTest {
         final String subscriptionId = "abcd1234";
         final String status = SubscriptionStatus.ACTIVE.name();
 
-        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, status);
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, status, DateTime.now());
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("0", subscriptionStateChangeReportRequest);
 

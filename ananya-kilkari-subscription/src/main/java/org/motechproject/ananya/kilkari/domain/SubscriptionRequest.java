@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.domain;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 
 import java.io.Serializable;
@@ -9,11 +10,13 @@ public class SubscriptionRequest implements Serializable {
     private final String msisdn;
     private final String pack;
     private final String channel;
+    private final DateTime createdAt;
 
-    public SubscriptionRequest(String msisdn, String pack, String channel) {
+    public SubscriptionRequest(String msisdn, String pack, String channel, DateTime createdAt) {
         this.msisdn = msisdn;
         this.pack = pack;
         this.channel = channel;
+        this.createdAt = createdAt;
     }
 
     public String getMsisdn() {
@@ -26,6 +29,10 @@ public class SubscriptionRequest implements Serializable {
 
     public String getChannel() {
         return channel;
+    }
+
+    public DateTime getCreatedAt() {
+        return createdAt;
     }
 
     public void validate() throws ValidationException {

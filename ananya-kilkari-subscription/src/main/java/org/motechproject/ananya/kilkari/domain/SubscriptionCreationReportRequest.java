@@ -2,11 +2,7 @@ package org.motechproject.ananya.kilkari.domain;
 
 import org.joda.time.DateTime;
 
-import java.io.Serializable;
-
-public class SubscriptionCreationReportRequest implements Serializable {
-
-    private String subscriptionId;
+public class SubscriptionCreationReportRequest extends BaseReportRequest {
 
     private String channel;
 
@@ -28,19 +24,11 @@ public class SubscriptionCreationReportRequest implements Serializable {
 
     private String operator;
 
-    public SubscriptionCreationReportRequest(String msisdn, String pack, String channel, String subscriptionId) {
+    public SubscriptionCreationReportRequest(String msisdn, String pack, String channel, String subscriptionId, DateTime createdAt) {
+        super(subscriptionId, SubscriptionStatus.NEW.name(), createdAt);
         this.msisdn = msisdn;
         this.pack = pack;
         this.channel = channel;
-        this.subscriptionId = subscriptionId;
-    }
-
-    public String getSubscriptionId() {
-        return subscriptionId;
-    }
-
-    public void setSubscriptionId(String subscriptionId) {
-        this.subscriptionId = subscriptionId;
     }
 
     public String getChannel() {

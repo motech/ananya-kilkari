@@ -30,6 +30,6 @@ public class SubscriptionMapper {
     }
 
     private SubscriptionCreationReportRequest createSubscriptionReportRequest(SubscriptionRequest subscriptionRequest) {
-        return new SubscriptionCreationReportRequest(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), subscriptionRequest.getChannel(), subscription.getSubscriptionId());
+        return new SubscriptionCreationReportRequest(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), subscriptionRequest.getChannel(), subscription.getSubscriptionId(), subscriptionRequest.getCreatedAt());
     }
 }

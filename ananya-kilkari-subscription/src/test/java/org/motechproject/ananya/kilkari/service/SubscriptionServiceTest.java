@@ -41,7 +41,7 @@ public class SubscriptionServiceTest {
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         ArgumentCaptor<SubscriptionActivationRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionActivationRequest.class);
-        ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
+        ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
 
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, subscriptionPack.name(), channel.name());
         subscriptionService.createSubscription(subscriptionRequest);
@@ -59,10 +59,10 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionPack, actualSubscriptionActivationRequest.getPack());
         assertEquals(channel, actualSubscriptionActivationRequest.getChannel());
 
-        SubscriptionReportRequest actualSubscriptionReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
-        assertEquals(msisdn, actualSubscriptionReportRequest.getMsisdn());
-        assertEquals(subscriptionPack.name(), actualSubscriptionReportRequest.getPack());
-        assertEquals(channel.name(), actualSubscriptionReportRequest.getChannel());
+        SubscriptionCreationReportRequest actualSubscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
+        assertEquals(msisdn, actualSubscriptionCreationReportRequest.getMsisdn());
+        assertEquals(subscriptionPack.name(), actualSubscriptionCreationReportRequest.getPack());
+        assertEquals(channel.name(), actualSubscriptionCreationReportRequest.getChannel());
     }
 
     @Test(expected = ValidationException.class)
@@ -112,29 +112,29 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldUpdateTheSubscriptionDetails() {
-        Subscription subscription = new Subscription("123456890", SubscriptionPack.TWELVE_MONTHS);
-
-        subscriptionService.update(subscription);
-
-        verify(allSubscriptions).update(subscription);
-    }
-
-    @Test
     public void shouldUpdateTheSubscriptionStatusGivenTheMsisdnAndPack() {
         SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         String msisdn = "123456890";
+        String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.ACTIVE;
         Subscription mockedSubscription = mock(Subscription.class);
 
+        when(mockedSubscription.getStatus()).thenReturn(status);
+        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findByMsisdnAndPack(msisdn, pack)).thenReturn(mockedSubscription);
 
         subscriptionService.updateSubscriptionStatus(msisdn, pack.name(), status);
 
-        InOrder order = inOrder(allSubscriptions, mockedSubscription);
+        InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
         order.verify(allSubscriptions).findByMsisdnAndPack(msisdn, pack);
         order.verify(mockedSubscription).setStatus(SubscriptionStatus.ACTIVE);
         order.verify(allSubscriptions).update(mockedSubscription);
+        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+        order.verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(status.name(), subscriptionStateChangeReportRequest.getStatus());
     }
 
     @Test
@@ -143,13 +143,45 @@ public class SubscriptionServiceTest {
         Subscription mockedSubscription = mock(Subscription.class);
         String subscriptionId = "abcd1234";
 
+        when(mockedSubscription.getStatus()).thenReturn(status);
+        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
         subscriptionService.updateSubscriptionStatus(subscriptionId, status);
 
-        InOrder order = inOrder(allSubscriptions, mockedSubscription);
+        InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
         order.verify(mockedSubscription).setStatus(SubscriptionStatus.ACTIVE);
         order.verify(allSubscriptions).update(mockedSubscription);
+        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+        order.verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(status.name(), subscriptionStateChangeReportRequest.getStatus());
+    }
+
+    @Test
+    public void shouldActivateTheSubscriptionGivenTheSubscriptionId() {
+        Subscription mockedSubscription = mock(Subscription.class);
+        String subscriptionId = "abcd1234";
+        SubscriptionStatus subscriptionStatus = SubscriptionStatus.ACTIVE;
+
+        when(mockedSubscription.getStatus()).thenReturn(subscriptionStatus);
+        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
+
+        subscriptionService.activate(subscriptionId);
+
+        InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
+        order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
+        order.verify(mockedSubscription).setStatus(subscriptionStatus);
+        order.verify(allSubscriptions).update(mockedSubscription);
+        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+        order.verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(subscriptionStatus.name(), subscriptionStateChangeReportRequest.getStatus());
     }
 }

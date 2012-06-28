@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public class SubscriptionReportRequest implements Serializable {
+public class SubscriptionCreationReportRequest implements Serializable {
 
     private String subscriptionId;
 
@@ -28,7 +28,7 @@ public class SubscriptionReportRequest implements Serializable {
 
     private String operator;
 
-    public SubscriptionReportRequest(String msisdn, String pack, String channel, String subscriptionId) {
+    public SubscriptionCreationReportRequest(String msisdn, String pack, String channel, String subscriptionId) {
         this.msisdn = msisdn;
         this.pack = pack;
         this.channel = channel;

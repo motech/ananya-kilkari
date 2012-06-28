@@ -29,11 +29,11 @@ public class SubscriptionMapperTest {
     @Test
     public void shouldReturnSubscriptionReportRequestFromSubscriptionRequest() {
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper(new SubscriptionRequest("msisdn", "twelve_months", "ivr"));
-        SubscriptionReportRequest subscriptionReportRequest = subscriptionMapper.getSubscriptionReportRequest();
+        SubscriptionCreationReportRequest subscriptionCreationReportRequest = subscriptionMapper.getSubscriptionCreationReportRequest();
         Subscription subscription = subscriptionMapper.getSubscription();
-        assertEquals("msisdn", subscriptionReportRequest.getMsisdn());
-        assertEquals("twelve_months", subscriptionReportRequest.getPack());
-        assertEquals("ivr", subscriptionReportRequest.getChannel());
-        assertEquals(subscription.getSubscriptionId(), subscriptionReportRequest.getSubscriptionId());
+        assertEquals("msisdn", subscriptionCreationReportRequest.getMsisdn());
+        assertEquals("twelve_months", subscriptionCreationReportRequest.getPack());
+        assertEquals("ivr", subscriptionCreationReportRequest.getChannel());
+        assertEquals(subscription.getSubscriptionId(), subscriptionCreationReportRequest.getSubscriptionId());
     }
 }

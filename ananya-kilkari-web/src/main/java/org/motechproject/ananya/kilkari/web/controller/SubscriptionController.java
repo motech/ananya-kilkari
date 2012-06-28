@@ -47,7 +47,7 @@ public class SubscriptionController {
         if(callbackRequest.getAction() == CallbackAction.ACT) {
             if(callbackRequest.getStatus() == CallbackStatus.SUCCESS) {
                 logger.info(String.format("Changing subscription status to ACTIVE for msisdn: %s, subscriptionId: %s", callbackRequest.getMsisdn(), subscriptionId));
-                subscriptionService.updateSubscriptionStatus(subscriptionId , SubscriptionStatus.ACTIVE);
+                subscriptionService.activate(subscriptionId);
             } else {
                 logger.info(String.format("Changing subscription status to ACTIVATION_FAILED for msisdn: %s, subscriptionId: %s", callbackRequest.getMsisdn(), subscriptionId));
                 subscriptionService.updateSubscriptionStatus(subscriptionId , SubscriptionStatus.ACTIVATION_FAILED);

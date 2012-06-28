@@ -5,9 +5,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.Channel;
-import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.domain.SubscriptionReportRequest;
+import org.motechproject.ananya.kilkari.domain.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -42,18 +40,37 @@ public class ReportingServiceTest {
         String subscriptionId = "abcd1234";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
-        new ReportingService(restTemplate, kilkariProperties).createSubscription(new SubscriptionReportRequest(msisdn, pack, channel, subscriptionId));
+        new ReportingService(restTemplate, kilkariProperties).createSubscription(new SubscriptionCreationReportRequest(msisdn, pack, channel, subscriptionId));
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
+        ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
         verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), subscriptionReportRequestArgumentCaptor.capture(), responseTypeArgumentCaptor.capture(), urlVariablesArgumentCaptor.capture());
-        SubscriptionReportRequest subscriptionReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
+        SubscriptionCreationReportRequest subscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         assertEquals("url/subscription", urlArgumentCaptor.getValue());
-        assertEquals(msisdn, subscriptionReportRequest.getMsisdn());
-        assertEquals(pack, subscriptionReportRequest.getPack());
-        assertEquals(channel, subscriptionReportRequest.getChannel());
-        assertEquals(subscriptionId, subscriptionReportRequest.getSubscriptionId());
+        assertEquals(msisdn, subscriptionCreationReportRequest.getMsisdn());
+        assertEquals(pack, subscriptionCreationReportRequest.getPack());
+        assertEquals(channel, subscriptionCreationReportRequest.getChannel());
+        assertEquals(subscriptionId, subscriptionCreationReportRequest.getSubscriptionId());
+    }
+
+    @Test
+    public void shouldInvokeUpdateOnReportingServiceWithSubscriptionStateChangeDetails() {
+        String subscriptionId = "abcd1234";
+        String subscriptionStatus = SubscriptionStatus.ACTIVE.name();
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+
+        new ReportingService(restTemplate, kilkariProperties).updateSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus));
+
+        ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+        verify(restTemplate).put(urlArgumentCaptor.capture(), subscriptionStateChangeReportRequestArgumentCaptor.capture(), urlVariablesArgumentCaptor.capture());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+
+        verify(kilkariProperties).getProperty("reporting.service.base.url");
+        assertEquals("url/updatesubscription/abcd1234", urlArgumentCaptor.getValue());
+        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(subscriptionStatus, subscriptionStateChangeReportRequest.getStatus());
     }
 }

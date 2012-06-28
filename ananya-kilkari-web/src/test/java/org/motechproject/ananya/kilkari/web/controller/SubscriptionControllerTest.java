@@ -168,7 +168,7 @@ public class SubscriptionControllerTest {
                 .andExpect(content().type("application/json;charset=UTF-8"))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
 
-        verify(subscriptionService).updateSubscriptionStatus(subscriptionId, SubscriptionStatus.ACTIVE);
+        verify(subscriptionService).activate(subscriptionId);
     }
 
     @Test

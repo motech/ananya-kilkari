@@ -29,7 +29,7 @@ public class SubscriptionService {
         allSubscriptions.add(subscription);
 
         sendProcessSubscriptionEvent(subscriptionMapper.getSubscriptionActivationRequest());
-        sendReportSubscriptionCreationEvent(subscriptionMapper.getSubscriptionReportRequest());
+        sendReportSubscriptionCreationEvent(subscriptionMapper.getSubscriptionCreationReportRequest());
     }
 
     public List<Subscription> findByMsisdn(String msisdn) throws ValidationException {
@@ -37,12 +37,34 @@ public class SubscriptionService {
         return allSubscriptions.findByMsisdn(msisdn);
     }
 
+    public Subscription findByMsisdnAndPack(String msisdn, String pack) {
+        return allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.getFor(pack));
+    }
+
+    public void updateSubscriptionStatus(String msisdn, String pack, SubscriptionStatus status) {
+        Subscription subscription = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.getFor(pack));
+        subscription.setStatus(status);
+        updateWithReporting(subscription);
+    }
+
+    public void updateSubscriptionStatus(String subscriptionId, SubscriptionStatus status) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        subscription.setStatus(status);
+        updateWithReporting(subscription);
+    }
+
+    public void activate(String subscriptionId) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        updateWithReporting(subscription);
+    }
+
     private void sendProcessSubscriptionEvent(SubscriptionActivationRequest subscriptionActivationRequest) {
         publisher.processSubscription(subscriptionActivationRequest);
     }
 
-    private void sendReportSubscriptionCreationEvent(SubscriptionReportRequest subscriptionReportRequest) {
-        publisher.reportSubscriptionCreation(subscriptionReportRequest);
+    private void sendReportSubscriptionCreationEvent(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {
+        publisher.reportSubscriptionCreation(subscriptionCreationReportRequest);
     }
 
     private void validateMsisdn(String msisdn) throws ValidationException {
@@ -54,23 +76,12 @@ public class SubscriptionService {
         return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
     }
 
-    public Subscription findByMsisdnAndPack(String msisdn, String pack) {
-        return allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.getFor(pack));
+    private void sendSubscriptionStateChangeEvent(String subscriptionId, SubscriptionStatus status) {
+        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, status.name()));
     }
 
-    public void update(Subscription subscription) {
+    private void updateWithReporting(Subscription subscription) {
         allSubscriptions.update(subscription);
-    }
-
-    public void updateSubscriptionStatus(String msisdn, String pack, SubscriptionStatus status) {
-        Subscription subscription = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.getFor(pack));
-        subscription.setStatus(status);
-        update(subscription);
-    }
-
-    public void updateSubscriptionStatus(String subscriptionId, SubscriptionStatus status) {
-        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        subscription.setStatus(status);
-        update(subscription);
+        sendSubscriptionStateChangeEvent(subscription.getSubscriptionId(), subscription.getStatus());
     }
 }

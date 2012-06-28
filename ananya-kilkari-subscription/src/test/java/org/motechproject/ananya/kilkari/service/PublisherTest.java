@@ -44,19 +44,39 @@ public class PublisherTest {
     @Test
     public void shouldPublishReportSubscriptionCreationEventIntoQueue() {
         String subscriptionId = "ABCD1234";
-        publisher.reportSubscriptionCreation(new SubscriptionReportRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.IVR.name(), subscriptionId));
+        publisher.reportSubscriptionCreation(new SubscriptionCreationReportRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.IVR.name(), subscriptionId));
 
-        ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
+        ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
         ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(eventContext).send(eventArgumentCaptor.capture(), subscriptionReportRequestArgumentCaptor.capture());
-        SubscriptionReportRequest subscriptionReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
+        SubscriptionCreationReportRequest subscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
         String eventName = eventArgumentCaptor.getValue();
 
         assertEquals(SubscriptionEventKeys.REPORT_SUBSCRIPTION_CREATION, eventName);
-        assertEquals("1234567890", subscriptionReportRequest.getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS.name(), subscriptionReportRequest.getPack());
-        assertEquals(Channel.IVR.name(), subscriptionReportRequest.getChannel());
-        assertEquals(subscriptionId, subscriptionReportRequest.getSubscriptionId());
+        assertEquals("1234567890", subscriptionCreationReportRequest.getMsisdn());
+        assertEquals(SubscriptionPack.TWELVE_MONTHS.name(), subscriptionCreationReportRequest.getPack());
+        assertEquals(Channel.IVR.name(), subscriptionCreationReportRequest.getChannel());
+        assertEquals(subscriptionId, subscriptionCreationReportRequest.getSubscriptionId());
+    }
+
+    @Test
+    public void shouldPublishSubscriptionStateChangeEventIntoQueue() {
+        String subscriptionId = "ABCD1234";
+        SubscriptionStatus subscriptionStatus = SubscriptionStatus.ACTIVE;
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus.name());
+
+        publisher.reportSubscriptionStateChange(subscriptionStateChangeReportRequest);
+
+        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+        ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(eventContext).send(eventArgumentCaptor.capture(), subscriptionStateChangeReportRequestArgumentCaptor.capture());
+
+        SubscriptionStateChangeReportRequest actualSubscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+        String eventName = eventArgumentCaptor.getValue();
+
+        assertEquals(SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE, eventName);
+        assertEquals(subscriptionId, actualSubscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(subscriptionStatus.name(), actualSubscriptionStateChangeReportRequest.getStatus());
     }
 }
 

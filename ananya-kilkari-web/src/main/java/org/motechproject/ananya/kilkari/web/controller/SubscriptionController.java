@@ -44,7 +44,6 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.PUT)
     @ResponseBody
     public BaseResponse activateSubscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
-        logger.info(String.format("Processing request: %s", callbackRequest.toString()));
         if(callbackRequest.getAction() == CallbackAction.ACT) {
             if(callbackRequest.getStatus() == CallbackStatus.SUCCESS) {
                 logger.info(String.format("Changing subscription status to ACTIVE for msisdn: %s, subscriptionId: %s", callbackRequest.getMsisdn(), subscriptionId));

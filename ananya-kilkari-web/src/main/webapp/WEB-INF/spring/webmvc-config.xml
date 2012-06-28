@@ -23,6 +23,7 @@
     <mvc:resources location="/" mapping="/**"/>
 
     <mvc:interceptors>
+        <bean class="org.motechproject.ananya.kilkari.web.interceptors.HttpLogInterceptor" />
         <bean class="org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor" />
     </mvc:interceptors>
 

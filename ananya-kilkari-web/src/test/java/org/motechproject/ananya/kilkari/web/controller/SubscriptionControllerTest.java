@@ -6,9 +6,12 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
@@ -24,6 +27,7 @@ import org.springframework.http.MediaType;
 import java.util.ArrayList;
 
 import static junit.framework.Assert.assertNotNull;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
@@ -45,6 +49,10 @@ public class SubscriptionControllerTest {
 
     @Mock
     private SubscriptionPublisher subscriptionPublisher;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
 
     @Before
     public void setUp() {
@@ -244,6 +252,58 @@ public class SubscriptionControllerTest {
         assertEquals(CallbackAction.ACT.name(), callbackRequestWrapper.getAction());
         assertEquals(CallbackStatus.SUCCESS.name(), callbackRequestWrapper.getStatus());
         assertNotNull(callbackRequestWrapper.getCreatedAt());
+    }
+
+    @Test
+    public void shouldValidateSubscriptionRequestIfCreateRequestIsCalledFromCallCenter() {
+        SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
+        when(subscriptionRequest.getChannel()).thenReturn(Channel.CALL_CENTER.name());
+        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate();
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(is("validation error"));
+
+        subscriptionController.createSubscription(subscriptionRequest);
+        verify(subscriptionRequest).validate();
+    }
+
+    @Test
+    public void shouldValidateSubscriptionRequestIfCreateRequestIsCalledFromInvalidChannel() {
+        SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
+        when(subscriptionRequest.getChannel()).thenReturn("invalid_channel");
+        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate();
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(is("validation error"));
+
+        subscriptionController.createSubscription(subscriptionRequest);
+        verify(subscriptionRequest).validate();
+    }
+
+    @Test
+    public void shouldValidateSubscriptionRequestIfCreateRequestIsCalledWithoutChannel() {
+        SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
+        when(subscriptionRequest.getChannel()).thenReturn(null);
+        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate();
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(is("validation error"));
+
+        subscriptionController.createSubscription(subscriptionRequest);
+        verify(subscriptionRequest).validate();
+    }
+
+    @Test
+    public void shouldNotValidateSubscriptionRequestIfCreateRequestIsCalledFromIVR() {
+        SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
+        when(subscriptionRequest.getChannel()).thenReturn(Channel.IVR.name());
+        subscriptionController.createSubscription(subscriptionRequest);
+        verify(subscriptionRequest,never()).validate();
+    }
+
+    @Test
+    public void shouldNotValidateSubscriptionRequestIfCreateRequestIsCalledFromIVRCaseInsensitive() {
+        SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
+        when(subscriptionRequest.getChannel()).thenReturn("ivR");
+        subscriptionController.createSubscription(subscriptionRequest);
+        verify(subscriptionRequest, never()).validate();
     }
 
     private void mockSubscription(String msisdn) {

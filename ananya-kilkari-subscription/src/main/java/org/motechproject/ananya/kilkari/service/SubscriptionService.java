@@ -39,11 +39,11 @@ public class SubscriptionService {
     }
 
     public Subscription findByMsisdnAndPack(String msisdn, String pack) {
-        return allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.getFor(pack));
+        return allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.from(pack));
     }
 
     public void updateSubscriptionStatus(String msisdn, String pack, SubscriptionStatus status, DateTime updatedOn) {
-        Subscription subscription = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.getFor(pack));
+        Subscription subscription = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.from(pack));
         subscription.setStatus(status);
         updateWithReporting(subscription, updatedOn);
     }

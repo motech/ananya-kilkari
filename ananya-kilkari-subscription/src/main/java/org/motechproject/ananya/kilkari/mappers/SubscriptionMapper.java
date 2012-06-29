@@ -8,7 +8,7 @@ public class SubscriptionMapper {
     private SubscriptionCreationReportRequest subscriptionCreationReportRequest;
 
     public SubscriptionMapper(SubscriptionRequest subscriptionRequest) {
-        this.subscription = new Subscription(subscriptionRequest.getMsisdn(), SubscriptionPack.getFor(subscriptionRequest.getPack()));
+        this.subscription = new Subscription(subscriptionRequest.getMsisdn(), SubscriptionPack.from(subscriptionRequest.getPack()));
         this.subscriptionActivationRequest = createSubscriptionActivationRequest(subscriptionRequest);
         this.subscriptionCreationReportRequest = createSubscriptionReportRequest(subscriptionRequest);
     }
@@ -26,7 +26,7 @@ public class SubscriptionMapper {
     }
 
     private SubscriptionActivationRequest createSubscriptionActivationRequest(SubscriptionRequest subscriptionRequest) {
-        return new SubscriptionActivationRequest(subscriptionRequest.getMsisdn(), SubscriptionPack.getFor(subscriptionRequest.getPack()), Channel.getFor(subscriptionRequest.getChannel()), subscription.getSubscriptionId());
+        return new SubscriptionActivationRequest(subscriptionRequest.getMsisdn(), SubscriptionPack.from(subscriptionRequest.getPack()), Channel.from(subscriptionRequest.getChannel()), subscription.getSubscriptionId());
     }
 
     private SubscriptionCreationReportRequest createSubscriptionReportRequest(SubscriptionRequest subscriptionRequest) {

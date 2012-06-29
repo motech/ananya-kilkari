@@ -1,14 +1,11 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
 import org.apache.commons.lang.StringUtils;
-
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.web.domain.CallbackRequestValidator;
-import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
@@ -38,6 +35,9 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
     @ResponseBody
     public BaseResponse createSubscription(SubscriptionRequest subscriptionRequest) {
+        if(!Channel.isIVR(subscriptionRequest.getChannel())) {
+            subscriptionRequest.validate();
+        }
         subscriptionPublisher.createSubscription(subscriptionRequest);
         return new BaseResponse("SUCCESS", "Subscription request submitted successfully");
     }

@@ -83,17 +83,17 @@ public class SubscriptionRequest implements Serializable {
         this.msisdn = msisdn;
     }
 
-    private void validateChannel(String channel)   {
+    private void validateChannel()   {
         if (!Channel.isValid(channel))
             throw new ValidationException(String.format("Invalid channel %s", channel));
     }
 
-    private void validatePack(String subscriptionPack)   {
-        if (!SubscriptionPack.isValid(subscriptionPack))
-            throw new ValidationException(String.format("Invalid subscription pack %s", subscriptionPack));
+    private void validatePack()   {
+        if (!SubscriptionPack.isValid(pack))
+            throw new ValidationException(String.format("Invalid subscription pack %s", pack));
     }
 
-    private void validateMsisdn(String msisdn)   {
+    private void validateMsisdn()   {
         if (!isValidMsisdn(msisdn))
             throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
     }
@@ -103,13 +103,12 @@ public class SubscriptionRequest implements Serializable {
     }
 
     public void validate() {
-        validateMsisdn(msisdn);
-        validatePack(pack);
-        validateChannel(channel);
+        validateMsisdn();
+        validatePack();
+        validateChannel();
         validateAge();
         validateDOB();
         validateEDD();
-
     }
 
     private void validateEDD() {

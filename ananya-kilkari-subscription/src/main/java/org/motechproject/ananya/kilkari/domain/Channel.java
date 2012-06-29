@@ -5,28 +5,21 @@ import org.apache.commons.lang.StringUtils;
 public enum Channel {
     IVR, CALL_CENTER;
 
-    public static Channel getFor(String pack) {
-        return Channel.valueOf(StringUtils.trimToEmpty(pack).toUpperCase());
+    public static boolean isIVR(String channel) {
+        return Channel.IVR.name().equalsIgnoreCase(StringUtils.trim(channel));
+    }
+
+    public static Channel from(String string) {
+        return Channel.valueOf(StringUtils.trimToEmpty(string).toUpperCase());
     }
 
     public static boolean isValid(String channel) {
-        return (channel != null && Channel.contains(channel));
-    }
-
-    private static boolean contains(String value) {
-        for (Channel channel : Channel.values()) {
-            if (channel.name().equals(StringUtils.trimToEmpty(value).toUpperCase())) {
-                return true;
-            }
+        try {
+            from(channel);
+        } catch (Exception e) {
+            return false;
         }
-        return false;
-    }
-
-    /*
-     * Purposely does a string comparison and not a Channel.valueOf to ensure exceptions
-     * are not thrown in case of incorrect values.
-     */
-    public static boolean isIVR(String channel) {
-        return channel.equalsIgnoreCase(Channel.IVR.toString());
+        return true;
     }
 }
+

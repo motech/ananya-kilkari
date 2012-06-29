@@ -5,24 +5,17 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubscriberResponse extends BaseResponse {
+public class SubscriberResponse {
 
     @JsonProperty
     private List<SubscriptionDetails> subscriptionDetails;
 
     public SubscriberResponse() {
-        super("SUCCESS", "Subscriber details successfully fetched");
         this.subscriptionDetails = new ArrayList<SubscriptionDetails>();
     }
 
     public void addSubscriptionDetail(SubscriptionDetails subscriptionDetail) {
         subscriptionDetails.add(subscriptionDetail);
-    }
-
-    public SubscriberResponse forInvalidMsisdn() {
-        status = "ERROR";
-        description = "Invalid Msisdn";
-        return this;
     }
 
     public List<SubscriptionDetails> getSubscriptionDetails() {

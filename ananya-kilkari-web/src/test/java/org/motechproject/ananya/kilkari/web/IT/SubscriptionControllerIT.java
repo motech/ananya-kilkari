@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.IT;
 
+import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.Channel;
@@ -50,7 +51,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
                     .andExpect(content().type("application/json;charset=UTF-8"))
                     .andReturn();
 
-        SubscriberResponse actualResponse = (SubscriberResponse) new SubscriberResponse().fromJson(result.getResponse().getContentAsString());
+        SubscriberResponse actualResponse = fromJson(result.getResponse().getContentAsString(), SubscriberResponse.class);
 
         assertEquals(subscriberResponse, actualResponse);
     }
@@ -89,4 +90,15 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(pack, subscription[0].getPack());
         assertFalse(StringUtils.isBlank(subscription[0].getSubscriptionId()));
     }
+
+    private String toJson(Object objectToSerialize) {
+        Gson gson = new Gson();
+        return gson.toJson(objectToSerialize);
+    }
+
+    private <T> T fromJson(String jsonString, Class<T> subscriberResponseClass) {
+        Gson gson = new Gson();
+        return gson.fromJson(jsonString, subscriberResponseClass);
+    }
+
 }

@@ -1,8 +1,6 @@
-package org.motechproject.ananya.kilkari.web.controller.requests;
+package org.motechproject.ananya.kilkari.domain;
 
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
-import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,8 +13,8 @@ public class CallbackRequestTest {
        callbackRequest.setReason("myreason");
        callbackRequest.setOperator("myoperator");
        callbackRequest.setGraceCount("10");
-       callbackRequest.setAction(CallbackAction.ACT);
-       callbackRequest.setStatus(CallbackStatus.SUCCESS);
+       callbackRequest.setAction("ACT");
+       callbackRequest.setStatus("SUCCESS");
 
        assertEquals("msisdn: mymsisdn; reason: myreason; operator: myoperator; graceCount: 10; action: ACT; status: SUCCESS", callbackRequest.toString());
 

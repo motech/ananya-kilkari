@@ -33,8 +33,9 @@
                 $.ajax({
                     'url' : url,
                     'type' : 'get',
-                    success: function(data){
-                        $("#get_subscriber > textarea").val(JSON.stringify(data));
+                    'dataType' : 'text',
+                    success : function(data){
+                        $("#get_subscriber > textarea").val(data);
                     }
                 });
             });
@@ -47,8 +48,9 @@
                 $.ajax({
                     'url' : url,
                     'type' : 'get',
-                    success: function(data){
-                        $("#create_subscription > textarea").val(JSON.stringify(data));
+                    'dataType' : 'text',
+                    success : function(data){
+                        $("#create_subscription > textarea").val(data);
                     }
                 });
             });
@@ -66,7 +68,7 @@
         </form>
     </div>
 
-    <h3>Query Subcription details for Subcriber</h3>
+    <h3>Query Subscription details for Subscriber</h3>
     <div id="get_subscriber">
         Msisdn: <input type="text" name="msisdn" /> <br/>
         Channel: <input type="text" name="channel" id="channel" /> <br/>

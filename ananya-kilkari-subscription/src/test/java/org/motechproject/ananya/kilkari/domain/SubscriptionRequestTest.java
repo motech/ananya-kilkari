@@ -86,7 +86,7 @@ public class SubscriptionRequestTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid subscription pack Invalid-Pack"));
 
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", "Invalid-Pack", Channel.CALLCENTER.name(), null, null, null, null);
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", "Invalid-Pack", Channel.CALL_CENTER.name(), null, null, null, null);
         subscriptionRequest.validate();
     }
 
@@ -104,7 +104,7 @@ public class SubscriptionRequestTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid msisdn 12345"));
 
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("12345", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALLCENTER.name(), null, null, null, null);
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("12345", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), null, null, null, null);
         subscriptionRequest.validate();
     }
 
@@ -113,7 +113,7 @@ public class SubscriptionRequestTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid msisdn 123456789a"));
 
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("123456789a", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALLCENTER.name(), null, null, null, null);
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("123456789a", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), null, null, null, null);
         subscriptionRequest.validate();
     }
 
@@ -122,16 +122,16 @@ public class SubscriptionRequestTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid beneficiary age 1a"));
 
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALLCENTER.name(), "1a", "NAME", "21-01-2011", "21-01-2011");
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "1a", "NAME", "21-01-2011", "21-01-2011");
         subscriptionRequest.validate();
     }
 
     @Test
     public void shouldNotThrowExceptionWhenNoAgeIsGivenToCreateNewSubscriptionForCC()  {
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALLCENTER.name(), "", "NAME", "21-01-2011", "21-01-2011");
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "", "NAME", "21-01-2011", "21-01-2011");
         subscriptionRequest.validate();
 
-        subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALLCENTER.name(), null, "NAME", "21-01-2011", "21-01-2011");
+        subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), null, "NAME", "21-01-2011", "21-01-2011");
         subscriptionRequest.validate();
     }
 
@@ -139,17 +139,17 @@ public class SubscriptionRequestTest {
     public void shouldThrowExceptionWhenInvalidDOBIsGivenToCreateNewSubscriptionForCC()  {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid date of birth 21-21-11"));
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALLCENTER.name(), "122", "NAME", "21-21-11", "21-01-2011");
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-21-11", "21-01-2011");
 
         subscriptionRequest.validate();
     }
 
     @Test
     public void shouldNotThrowExceptionWhenEmptyDOBIsGivenToCreateNewSubscriptionForCC()  {
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALLCENTER.name(), "122", "NAME", "", "21-01-2011");
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "", "21-01-2011");
         subscriptionRequest.validate();
 
-        subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALLCENTER.name(), "122", "NAME", null, "21-01-2011");
+        subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", null, "21-01-2011");
         subscriptionRequest.validate();
     }
 
@@ -157,17 +157,17 @@ public class SubscriptionRequestTest {
     public void shouldThrowExceptionWhenInvalidEDDIsGivenToCreateNewSubscriptionForCC()  {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid expected date of delivery 21-21-11"));
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALLCENTER.name(), "122", "NAME", "21-12-2012", "21-21-11");
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-12-2012", "21-21-11");
 
         subscriptionRequest.validate();
     }
 
     @Test
     public void shouldNotThrowExceptionWhenEmptyEDDIsGivenToCreateNewSubscriptionForCC()  {
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALLCENTER.name(), "122", "NAME", "21-12-2012", "");
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-12-2012", "");
         subscriptionRequest.validate();
 
-        subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALLCENTER.name(), "122", "NAME", "21-12-2012", null);
+        subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-12-2012", null);
         subscriptionRequest.validate();
     }
 

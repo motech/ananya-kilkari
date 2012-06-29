@@ -22,7 +22,11 @@ public enum Channel {
         return false;
     }
 
+    /*
+     * Purposely does a string comparison and not a Channel.valueOf to ensure exceptions
+     * are not thrown in case of incorrect values.
+     */
     public static boolean isIVR(String channel) {
-        return Channel.getFor(channel).equals(Channel.IVR);
+        return channel.equalsIgnoreCase(Channel.IVR.toString());
     }
 }

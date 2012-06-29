@@ -10,7 +10,7 @@ public class Util {
 
     public static boolean isIvrChannelRequest(HttpServletRequest request) {
         return request.getParameterMap().containsKey(KilkariConstants.CHANNEL_REQUEST_KEY) &&
-                Channel.isIVR(request.getParameter(KilkariConstants.CHANNEL_REQUEST_KEY));
+               Channel.isIVR(request.getParameter(KilkariConstants.CHANNEL_REQUEST_KEY));
     }
 
     public static void setErrorResponseStatusBasedOnRequest(HttpServletRequest request, HttpServletResponse response) {

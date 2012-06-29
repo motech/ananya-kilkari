@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web;
 
+import org.junit.Ignore;
 import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.motechproject.ananya.kilkari.web.views.ExceptionView;
 import org.motechproject.ananya.kilkari.web.views.ValidationExceptionView;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.ViewResolver;
 
 import java.util.*;
 
+@Ignore
 public class TestUtils {
 
     private static class KilkariTestViewResolver implements ViewResolver {

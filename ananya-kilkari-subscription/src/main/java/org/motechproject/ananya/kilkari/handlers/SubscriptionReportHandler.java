@@ -26,23 +26,13 @@ public class SubscriptionReportHandler {
     public void handleSubscriptionCreation(MotechEvent event) {
         SubscriptionCreationReportRequest subscriptionCreationReportRequest = (SubscriptionCreationReportRequest) event.getParameters().get("0");
         logger.info(String.format("Handling report subscription creation event for msisdn: %s, pack: %s, channel: %s", subscriptionCreationReportRequest.getMsisdn(), subscriptionCreationReportRequest.getPack(), subscriptionCreationReportRequest.getChannel()));
-        try {
-            reportingService.createSubscription(subscriptionCreationReportRequest);
-        } catch (RuntimeException e) {
-            logger.error("Exception Occurred while reporting subscription creation reporting", e);
-            throw e;
-        }
+        reportingService.createSubscription(subscriptionCreationReportRequest);
     }
 
     @MotechListener(subjects = {SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE})
     public void handleSubscriptionStateChange(MotechEvent event) {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = (SubscriptionStateChangeReportRequest) event.getParameters().get("0");
         logger.info(String.format("Handling report subscription state change event for subscripitonId: %s, subscriptionStatus: %s", subscriptionStateChangeReportRequest.getSubscriptionId(), subscriptionStateChangeReportRequest.getSubscriptionStatus()));
-        try {
-            reportingService.updateSubscriptionStateChange(subscriptionStateChangeReportRequest);
-        } catch (RuntimeException e) {
-            logger.error("Exception Occurred while reporting subscription state change reporting", e);
-            throw e;
-        }
+        reportingService.updateSubscriptionStateChange(subscriptionStateChangeReportRequest);
     }
 }

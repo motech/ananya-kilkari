@@ -66,7 +66,7 @@ public class SubscriptionControllerTest {
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type("application/javascript;charset=UTF-8"))
                 .andExpect(content().string(subscriberResponseMatcherWithSubscriptions()));
     }
 
@@ -111,7 +111,7 @@ public class SubscriptionControllerTest {
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type("application/javascript;charset=UTF-8"))
                 .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions("ERROR", "Invalid Msisdn")));
     }
 
@@ -125,7 +125,7 @@ public class SubscriptionControllerTest {
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type("application/javascript;charset=UTF-8"))
                 .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions("ERROR", "Invalid Msisdn")));
     }
 
@@ -138,7 +138,7 @@ public class SubscriptionControllerTest {
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
                 .perform(get("/subscription").param("msisdn", msisdn).param("channel", channel).param("pack", pack))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type("application/javascript;charset=UTF-8"))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
 
         ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);

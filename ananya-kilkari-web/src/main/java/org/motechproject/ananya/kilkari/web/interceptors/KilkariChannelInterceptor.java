@@ -20,7 +20,7 @@ public class KilkariChannelInterceptor extends HandlerInterceptorAdapter {
 
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
             throws Exception {
-        if (isIvrChannelRequest(request)) response.setContentType("application/javascript");
+        if (isIvrChannelRequest(request)) response.setContentType("application/javascript;charset=UTF-8");
     }
 
     private boolean isIvrChannelRequest(HttpServletRequest request) {

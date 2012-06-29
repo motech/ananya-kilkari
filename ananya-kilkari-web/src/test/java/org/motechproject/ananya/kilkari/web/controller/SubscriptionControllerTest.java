@@ -12,31 +12,22 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.web.KilkariExceptionResolver;
 import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.web.domain.KilkariConstants;
-import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.services.SubscriptionPublisher;
-import org.motechproject.ananya.kilkari.web.views.ExceptionView;
-import org.motechproject.ananya.kilkari.web.views.ValidationExceptionView;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.server.MockMvc;
-import org.springframework.test.web.server.setup.MockMvcBuilders;
-import org.springframework.test.web.server.setup.StandaloneMockMvcBuilder;
-import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.ViewResolver;
 
-import java.util.*;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.motechproject.ananya.kilkari.web.TestUtils.mockMvc;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
@@ -70,10 +61,10 @@ public class SubscriptionControllerTest {
         subscriptions.add(mockedSubscription);
         when(subscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
-        MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
+        mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/javascript;charset=UTF-8"))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE_IVR))
                 .andExpect(content().string(subscriberResponseMatcherWithSubscriptions(channel)));
     }
 
@@ -87,10 +78,10 @@ public class SubscriptionControllerTest {
         subscriptions.add(mockedSubscription);
         when(subscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
-        MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
+        mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE))
                 .andExpect(content().string(subscriberResponseMatcherWithSubscriptions(channel)));
     }
 
@@ -101,10 +92,10 @@ public class SubscriptionControllerTest {
 
         when(subscriptionService.findByMsisdn(msisdn)).thenReturn(null);
 
-        MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
+        mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/javascript;charset=UTF-8"))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE_IVR))
                 .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions(channel)));
     }
 
@@ -115,44 +106,11 @@ public class SubscriptionControllerTest {
 
         when(subscriptionService.findByMsisdn(msisdn)).thenReturn(null);
 
-        MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
+        mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE))
                 .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions(channel)));
-    }
-
-    private class KilkariTestViewResolver implements ViewResolver {
-
-        private Map<String, View> viewMap;
-
-        public KilkariTestViewResolver() {
-            this.viewMap = new HashMap<>();
-            this.viewMap.put("exceptionView", new ExceptionView());
-            this.viewMap.put("validationExceptionView", new ValidationExceptionView());
-        }
-
-        @Override
-        public View resolveViewName(String viewName, Locale locale) throws Exception {
-            return this.viewMap.get(viewName);
-        }
-    }
-
-    private MockMvc mockMvc() {
-        StandaloneMockMvcBuilder mockMvcBuilder = MockMvcBuilders.standaloneSetup(subscriptionController)
-                .addInterceptors(new KilkariChannelInterceptor())
-                .setViewResolvers(new KilkariTestViewResolver());
-
-        Properties props = new Properties();
-        props.put(".Exception", "exceptionView");
-        props.put("org.motechproject.ananya.kilkari.exceptions.ValidationException", "validationExceptionView");
-
-        KilkariExceptionResolver exceptionResolver = new KilkariExceptionResolver();
-        exceptionResolver.setExceptionMappings(props);
-
-        mockMvcBuilder.setHandlerExceptionResolvers(Arrays.asList(new HandlerExceptionResolver[]{exceptionResolver}));
-
-        return mockMvcBuilder.build();
     }
 
     @Test
@@ -162,10 +120,10 @@ public class SubscriptionControllerTest {
 
         when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
 
-        mockMvc()
+        mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
-                .andExpect(status().isOk())
-                .andExpect(content().type("application/javascript;charset=UTF-8"))
+                .andExpect(status().is(KilkariConstants.IVR_ERROR_CODE))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE_IVR))
                 .andExpect(content().string(errorResponseMatcherForInvalidMsisdn(channel)));
 
     }
@@ -177,11 +135,39 @@ public class SubscriptionControllerTest {
 
         when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
 
-        mockMvc()
+        mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().is(KilkariConstants.ERROR_CODE))
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE))
                 .andExpect(content().string(errorResponseMatcherForInvalidMsisdn(channel)));
+    }
+
+    @Test
+    public void shouldReturnCorrectErrorResponseForRuntimeExceptionForIvr() throws Exception {
+        String msisdn = "12345";
+        String channel = "ivr";
+
+        when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new RuntimeException("runtime exception"));
+
+        mockMvc(subscriptionController)
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
+                .andExpect(status().is(KilkariConstants.IVR_ERROR_CODE))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE_IVR))
+                .andExpect(content().string(errorResponseMatcherForRuntimeException(channel)));
+    }
+
+    @Test
+    public void shouldReturnCorrectErrorResponseForRuntimeExceptionForOtherThanIvr() throws Exception {
+        String msisdn = "12345";
+        String channel = "call_center";
+
+        when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new RuntimeException("runtime exception"));
+
+        mockMvc(subscriptionController)
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
+                .andExpect(status().is(KilkariConstants.ERROR_CODE))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE))
+                .andExpect(content().string(errorResponseMatcherForRuntimeException(channel)));
     }
 
     @Test
@@ -190,10 +176,11 @@ public class SubscriptionControllerTest {
         String channel = "ivr";
         String pack = "twelve-months";
         DateTime beforeCreate = DateTime.now();
-        MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
+
+        mockMvc(subscriptionController)
                 .perform(get("/subscription").param("msisdn", msisdn).param("channel", channel).param("pack", pack))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/javascript;charset=UTF-8"))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE_IVR))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
 
         ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
@@ -219,11 +206,11 @@ public class SubscriptionControllerTest {
 
         byte[] requestBody = toJson(callbackRequest).getBytes();
 
-        MockMvcBuilders.standaloneSetup(subscriptionController).build()
+        mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId)
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE))
                 .andExpect(content().string(baseResponseMatcher("ERROR", "Callback Request Invalid: Invalid msisdn invalidMsisdn,Invalid callbackAction invalidAction,Invalid callbackStatus invalidStatus")));
 
         verifyZeroInteractions(subscriptionService);
@@ -241,11 +228,11 @@ public class SubscriptionControllerTest {
         callbackRequest.setGraceCount("2");
         byte[] requestBody = toJson(callbackRequest).getBytes();
 
-        MockMvcBuilders.standaloneSetup(subscriptionController).build()
+        mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId)
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
 
         verify(subscriptionService).activate(subscriptionId);
@@ -263,11 +250,11 @@ public class SubscriptionControllerTest {
         callbackRequest.setGraceCount("2");
         byte[] requestBody = toJson(callbackRequest).getBytes();
 
-        MockMvcBuilders.standaloneSetup(subscriptionController).build()
+        mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId)
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
 
         verify(subscriptionService).updateSubscriptionStatus(subscriptionId, SubscriptionStatus.ACTIVATION_FAILED);
@@ -298,6 +285,20 @@ public class SubscriptionControllerTest {
             @Override
             public boolean matches(Object o) {
                 return assertErrorResponseForInvalidMsisdn((String) o, channel);
+            }
+
+            @Override
+            public void describeTo(Description matcherDescription) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+        };
+    }
+
+    private Matcher<String> errorResponseMatcherForRuntimeException(final String channel) {
+        return new BaseMatcher<String>() {
+            @Override
+            public boolean matches(Object o) {
+                return assertErrorResponseForRuntimeException((String) o, channel);
             }
 
             @Override
@@ -354,8 +355,17 @@ public class SubscriptionControllerTest {
 
         BaseResponse baseResponse = fromJson(jsonContent, BaseResponse.class);
 
-        return baseResponse.getStatus().equals("ERROR_VALIDATION") &&
+        return baseResponse.getStatus().equals(KilkariConstants.ERROR_STATUS_VALIDATION_EXCEPTION) &&
                 baseResponse.getDescription().equals("Invalid Msisdn");
+    }
+
+    private boolean assertErrorResponseForRuntimeException(String jsonContent, String channel) {
+        jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
+
+        BaseResponse baseResponse = fromJson(jsonContent, BaseResponse.class);
+
+        return baseResponse.getStatus().equals(KilkariConstants.ERROR_STATUS_RUNTIME_EXCEPTION) &&
+                baseResponse.getDescription().equals("runtime exception");
     }
 
     private boolean assertSubscriberResponse(String jsonContent, String channel) {

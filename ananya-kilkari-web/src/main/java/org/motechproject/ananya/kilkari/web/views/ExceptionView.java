@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.views;
 
+import org.motechproject.ananya.kilkari.web.domain.KilkariConstants;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.utils.Util;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
@@ -19,7 +20,8 @@ public class ExceptionView extends AbstractView {
 
         Exception exceptionObject = (Exception) model.get(SimpleMappingExceptionResolver.DEFAULT_EXCEPTION_ATTRIBUTE);
 
-        response.getOutputStream().print(new BaseResponse("ERROR_UNKNOWN", exceptionObject.getMessage()).toJson());
+        response.getOutputStream().print(
+                new BaseResponse(KilkariConstants.ERROR_STATUS_RUNTIME_EXCEPTION, exceptionObject.getMessage()).toJson());
 
         Util.setErrorResponseStatusBasedOnRequest(request, response);
         Util.setContentTypeBaseOnRequest(request, response);

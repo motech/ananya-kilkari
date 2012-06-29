@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.web.views;
 
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.web.domain.KilkariConstants;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.utils.Util;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
@@ -18,7 +19,8 @@ public class ValidationExceptionView extends AbstractView {
         ValidationException exceptionObject =
                 (ValidationException) model.get(SimpleMappingExceptionResolver.DEFAULT_EXCEPTION_ATTRIBUTE);
 
-        response.getOutputStream().print(new BaseResponse("ERROR_VALIDATION", exceptionObject.getMessage()).toJson());
+        response.getOutputStream().print(
+                new BaseResponse(KilkariConstants.ERROR_STATUS_VALIDATION_EXCEPTION, exceptionObject.getMessage()).toJson());
 
         Util.setErrorResponseStatusBasedOnRequest(request, response);
         Util.setContentTypeBaseOnRequest(request, response);

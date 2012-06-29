@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.handlers;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
@@ -31,7 +32,7 @@ public class SubscriptionActivationHandler {
         logger.info(String.format("Handling process subscription event for msisdn: %s, pack: %s, channel: %s", subscriptionActivationRequest.getMsisdn(), subscriptionActivationRequest.getPack(), subscriptionActivationRequest.getChannel()));
         try {
             onMobileSubscriptionService.activateSubscription(subscriptionActivationRequest);
-            subscriptionService.updateSubscriptionStatus(subscriptionActivationRequest.getMsisdn(), subscriptionActivationRequest.getPack().name(), SubscriptionStatus.PENDING_ACTIVATION);
+            subscriptionService.updateSubscriptionStatus(subscriptionActivationRequest.getMsisdn(), subscriptionActivationRequest.getPack().name(), SubscriptionStatus.PENDING_ACTIVATION, DateTime.now());
         }
         catch (RuntimeException e) {
             logger.error("Exception Occurred while sending subscription activation request", e);

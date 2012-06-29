@@ -42,22 +42,22 @@ public class SubscriptionService {
         return allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.getFor(pack));
     }
 
-    public void updateSubscriptionStatus(String msisdn, String pack, SubscriptionStatus status) {
+    public void updateSubscriptionStatus(String msisdn, String pack, SubscriptionStatus status, DateTime updatedOn) {
         Subscription subscription = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.getFor(pack));
         subscription.setStatus(status);
-        updateWithReporting(subscription);
+        updateWithReporting(subscription, updatedOn);
     }
 
-    public void updateSubscriptionStatus(String subscriptionId, SubscriptionStatus status) {
+    public void updateSubscriptionStatus(String subscriptionId, SubscriptionStatus status, DateTime updatedOn) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         subscription.setStatus(status);
-        updateWithReporting(subscription);
+        updateWithReporting(subscription, updatedOn);
     }
 
-    public void activate(String subscriptionId) {
+    public void activate(String subscriptionId, DateTime activatedOn) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         subscription.setStatus(SubscriptionStatus.ACTIVE);
-        updateWithReporting(subscription);
+        updateWithReporting(subscription, activatedOn);
     }
 
     private void sendProcessSubscriptionEvent(SubscriptionActivationRequest subscriptionActivationRequest) {
@@ -77,12 +77,12 @@ public class SubscriptionService {
         return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
     }
 
-    private void sendSubscriptionStateChangeEvent(String subscriptionId, SubscriptionStatus status) {
-        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, status.name(), DateTime.now()));
+    private void sendSubscriptionStateChangeEvent(String subscriptionId, SubscriptionStatus status, DateTime updatedOn) {
+        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, status.name(), updatedOn));
     }
 
-    private void updateWithReporting(Subscription subscription) {
+    private void updateWithReporting(Subscription subscription, DateTime updatedOn) {
         allSubscriptions.update(subscription);
-        sendSubscriptionStateChangeEvent(subscription.getSubscriptionId(), subscription.getStatus());
+        sendSubscriptionStateChangeEvent(subscription.getSubscriptionId(), subscription.getStatus(), updatedOn);
     }
 }

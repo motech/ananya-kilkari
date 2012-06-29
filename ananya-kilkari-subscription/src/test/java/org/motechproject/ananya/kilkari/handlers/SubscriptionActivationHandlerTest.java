@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.handlers;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -13,7 +14,8 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SubscriptionActivationHandlerTest {
@@ -41,7 +43,14 @@ public class SubscriptionActivationHandlerTest {
         verify(onMobileSubscriptionService).activateSubscription(subscriptionActivationRequestArgumentCaptor.capture());
         SubscriptionActivationRequest subscriptionActivationRequest = subscriptionActivationRequestArgumentCaptor.getValue();
 
-        verify(subscriptionService).updateSubscriptionStatus(msisdn, pack.name(), SubscriptionStatus.PENDING_ACTIVATION);
+        ArgumentCaptor<String> msisdnCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> packCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<SubscriptionStatus> statusCaptor = ArgumentCaptor.forClass(SubscriptionStatus.class);
+        verify(subscriptionService).updateSubscriptionStatus(msisdnCaptor.capture(), packCaptor.capture(), statusCaptor.capture(), any(DateTime.class));
+
+        assertEquals(msisdn, msisdnCaptor.getValue());
+        assertEquals(pack.name(), packCaptor.getValue());
+        assertEquals(SubscriptionStatus.PENDING_ACTIVATION, statusCaptor.getValue());
 
         assertEquals(msisdn, subscriptionActivationRequest.getMsisdn());
         assertEquals(channel, subscriptionActivationRequest.getChannel());

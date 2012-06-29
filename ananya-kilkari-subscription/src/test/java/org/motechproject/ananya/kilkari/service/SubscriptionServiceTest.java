@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -35,7 +36,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldCreateNewSubscription() {
+    public void shouldCreateNewSubscription() throws ValidationException {
         String msisdn = "1234567890";
         Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
@@ -67,13 +68,13 @@ public class SubscriptionServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void shouldThrowExceptionWhenInvalidSubscriptionRequestIsGiven() {
+    public void shouldThrowExceptionWhenInvalidSubscriptionRequestIsGiven() throws ValidationException {
         doThrow(new ValidationException("Invalid Request")).when(mockedSubscriptionRequest).validate();
         subscriptionService.createSubscription(mockedSubscriptionRequest);
     }
 
     @Test
-    public void shouldGetSubscriptionsForAGivenMsisdn()  {
+    public void shouldGetSubscriptionsForAGivenMsisdn() throws ValidationException {
         String msisdn = "1234567890";
         ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
         subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS));
@@ -90,12 +91,12 @@ public class SubscriptionServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void shouldThrowAnExceptionForInvalidMsisdnNumbers()  {
+    public void shouldThrowAnExceptionForInvalidMsisdnNumbers() throws ValidationException {
         subscriptionService.findByMsisdn("12345");
     }
 
     @Test(expected = ValidationException.class)
-    public void shouldThrowAnExceptionForNonNumericMsisdn()  {
+    public void shouldThrowAnExceptionForNonNumericMsisdn() throws ValidationException {
         subscriptionService.findByMsisdn("123456789a");
     }
 
@@ -124,7 +125,7 @@ public class SubscriptionServiceTest {
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findByMsisdnAndPack(msisdn, pack)).thenReturn(mockedSubscription);
 
-        subscriptionService.updateSubscriptionStatus(msisdn, pack.name(), status);
+        subscriptionService.updateSubscriptionStatus(msisdn, pack.name(), status, DateTime.now());
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
         order.verify(allSubscriptions).findByMsisdnAndPack(msisdn, pack);
@@ -148,7 +149,7 @@ public class SubscriptionServiceTest {
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.updateSubscriptionStatus(subscriptionId, status);
+        subscriptionService.updateSubscriptionStatus(subscriptionId, status, DateTime.now());
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
@@ -172,7 +173,7 @@ public class SubscriptionServiceTest {
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.activate(subscriptionId);
+        subscriptionService.activate(subscriptionId, DateTime.now());
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);

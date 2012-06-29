@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
 
+import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
@@ -144,7 +145,7 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldReturnCorrectErrorResponseForRuntimeExceptionForIvr() throws Exception {
-        String msisdn = "12345";
+        String msisdn = "1234567890";
         String channel = "ivr";
 
         when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new RuntimeException("runtime exception"));
@@ -158,7 +159,7 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldReturnCorrectErrorResponseForRuntimeExceptionForOtherThanIvr() throws Exception {
-        String msisdn = "12345";
+        String msisdn = "1234567890";
         String channel = "call_center";
 
         when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new RuntimeException("runtime exception"));
@@ -217,7 +218,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void shouldActivateTheSubscriptionWhenCallBackUrlIsInvokedWithSuccessStatusForActivationRequest() throws Exception {
+    public void shouldPublishTheCallbackRequestIfValidationSucceeds() throws Exception {
         String subscriptionId = "abcd1234";
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setMsisdn("1234567890");
@@ -235,29 +236,14 @@ public class SubscriptionControllerTest {
                 .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
 
-        verify(subscriptionService).activate(subscriptionId);
-    }
+        ArgumentCaptor<CallbackRequestWrapper> callbackRequestWrapperArgumentCaptor = ArgumentCaptor.forClass(CallbackRequestWrapper.class);
+        verify(subscriptionPublisher).processCallbackRequest(callbackRequestWrapperArgumentCaptor.capture());
+        CallbackRequestWrapper callbackRequestWrapper = callbackRequestWrapperArgumentCaptor.getValue();
 
-    @Test
-    public void shouldMakeActivationFailWhenCallBackUrlIsInvokedWithNonSuccessStatusForActivationRequest() throws Exception {
-        String subscriptionId = "abcd1234";
-        CallbackRequest callbackRequest = new CallbackRequest();
-        callbackRequest.setMsisdn("1234567890");
-        callbackRequest.setAction(CallbackAction.ACT.name());
-        callbackRequest.setStatus(CallbackStatus.FAILURE.name());
-        callbackRequest.setReason("reason");
-        callbackRequest.setOperator("operator");
-        callbackRequest.setGraceCount("2");
-        byte[] requestBody = toJson(callbackRequest).getBytes();
-
-        mockMvc(subscriptionController)
-                .perform(put("/subscription/" + subscriptionId)
-                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE))
-                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
-
-        verify(subscriptionService).updateSubscriptionStatus(subscriptionId, SubscriptionStatus.ACTIVATION_FAILED);
+        assertEquals(subscriptionId, callbackRequestWrapper.getSubscriptionId());
+        assertEquals(CallbackAction.ACT.name(), callbackRequestWrapper.getAction());
+        assertEquals(CallbackStatus.SUCCESS.name(), callbackRequestWrapper.getStatus());
+        assertNotNull(callbackRequestWrapper.getCreatedAt());
     }
 
     private void mockSubscription(String msisdn) {

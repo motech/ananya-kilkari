@@ -1,10 +1,10 @@
 package org.motechproject.ananya.kilkari.web.services;
 
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.scheduler.context.EventContext;
@@ -30,7 +30,7 @@ public class SubscriptionPublisherTest {
         String msisdn = "1234567890";
         String pack = "twelve-months";
         String channel = "ivr";
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, pack, channel, DateTime.now());
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest(msisdn, pack, channel);
 
         subscriptionPublisher.createSubscription(subscriptionRequest);
 
@@ -44,6 +44,10 @@ public class SubscriptionPublisherTest {
         assertEquals(msisdn, actualSubscriptionRequest.getMsisdn());
         assertEquals(pack, actualSubscriptionRequest.getPack());
         assertEquals(channel, actualSubscriptionRequest.getChannel());
+    }
+
+    private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {
+        return new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).build();
     }
 }
 

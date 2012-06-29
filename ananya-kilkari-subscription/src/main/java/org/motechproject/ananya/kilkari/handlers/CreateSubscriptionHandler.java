@@ -25,7 +25,7 @@ public class CreateSubscriptionHandler {
     }
 
     @MotechListener(subjects = {SubscriptionEventKeys.CREATE_SUBSCRIPTION})
-    public void handleCreateSubscription(MotechEvent event) throws ValidationException {
+    public void handleCreateSubscription(MotechEvent event) {
         SubscriptionRequest subscriptionRequest = (SubscriptionRequest) event.getParameters().get("0");
         logger.info(String.format("Handling create subscription event for msisdn: %s, pack: %s, channel: %s", subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), subscriptionRequest.getChannel()));
         try {

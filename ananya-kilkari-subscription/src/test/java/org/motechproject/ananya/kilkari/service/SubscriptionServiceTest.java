@@ -1,11 +1,11 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
@@ -35,7 +35,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldCreateNewSubscription() throws ValidationException {
+    public void shouldCreateNewSubscription() {
         String msisdn = "1234567890";
         Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
@@ -44,7 +44,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<SubscriptionActivationRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionActivationRequest.class);
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
 
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, subscriptionPack.name(), channel.name(), DateTime.now());
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest(msisdn, subscriptionPack.name(), channel.name());
         subscriptionService.createSubscription(subscriptionRequest);
 
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -67,13 +67,13 @@ public class SubscriptionServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void shouldThrowExceptionWhenInvalidSubscriptionRequestIsGiven() throws ValidationException {
+    public void shouldThrowExceptionWhenInvalidSubscriptionRequestIsGiven() {
         doThrow(new ValidationException("Invalid Request")).when(mockedSubscriptionRequest).validate();
         subscriptionService.createSubscription(mockedSubscriptionRequest);
     }
 
     @Test
-    public void shouldGetSubscriptionsForAGivenMsisdn() throws ValidationException {
+    public void shouldGetSubscriptionsForAGivenMsisdn()  {
         String msisdn = "1234567890";
         ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
         subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS));
@@ -90,12 +90,12 @@ public class SubscriptionServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void shouldThrowAnExceptionForInvalidMsisdnNumbers() throws ValidationException {
+    public void shouldThrowAnExceptionForInvalidMsisdnNumbers()  {
         subscriptionService.findByMsisdn("12345");
     }
 
     @Test(expected = ValidationException.class)
-    public void shouldThrowAnExceptionForNonNumericMsisdn() throws ValidationException {
+    public void shouldThrowAnExceptionForNonNumericMsisdn()  {
         subscriptionService.findByMsisdn("123456789a");
     }
 
@@ -184,5 +184,9 @@ public class SubscriptionServiceTest {
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(subscriptionStatus.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+    }
+
+    private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {
+        return new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).build();
     }
 }

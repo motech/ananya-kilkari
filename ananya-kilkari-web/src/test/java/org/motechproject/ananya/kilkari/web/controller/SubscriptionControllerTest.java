@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.web.controller;
 import com.google.gson.Gson;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,6 +28,7 @@ import org.springframework.test.web.server.setup.MockMvcBuilders;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -134,7 +136,7 @@ public class SubscriptionControllerTest {
         String msisdn = "1234567890";
         String channel = "ivr";
         String pack = "twelve-months";
-
+        DateTime beforeCreate = DateTime.now();
         MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
                 .perform(get("/subscription").param("msisdn", msisdn).param("channel", channel).param("pack", pack))
                 .andExpect(status().isOk())
@@ -148,6 +150,10 @@ public class SubscriptionControllerTest {
         assertEquals(msisdn, subscriptionRequest.getMsisdn());
         assertEquals(pack, subscriptionRequest.getPack());
         assertEquals(channel, subscriptionRequest.getChannel());
+
+        DateTime createdAt = subscriptionRequest.getCreatedAt();
+        assertTrue(createdAt.isEqual(beforeCreate) || createdAt.isAfter(beforeCreate));
+        assertTrue(createdAt.isEqualNow() || createdAt.isBeforeNow());
     }
 
     @Test
@@ -164,7 +170,7 @@ public class SubscriptionControllerTest {
 
         MockMvcBuilders.standaloneSetup(subscriptionController).build()
                 .perform(put("/subscription/" + subscriptionId)
-                .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/json;charset=UTF-8"))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));

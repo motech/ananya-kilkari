@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.domain;
 import org.apache.commons.lang.StringUtils;
 
 public enum Channel {
-    IVR;
+    IVR, CALLCENTER;
 
     public static Channel getFor(String pack) {
         return Channel.valueOf(StringUtils.trimToEmpty(pack).toUpperCase());

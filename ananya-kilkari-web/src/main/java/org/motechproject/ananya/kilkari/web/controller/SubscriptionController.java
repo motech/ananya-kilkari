@@ -37,8 +37,7 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResponse createSubscription(@RequestParam String msisdn, @RequestParam String pack, @RequestParam String channel) {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, pack, channel, DateTime.now());
+    public BaseResponse createSubscription(SubscriptionRequest subscriptionRequest) {
         subscriptionPublisher.createSubscription(subscriptionRequest);
         return new BaseResponse("SUCCESS", "Subscription request submitted successfully");
     }

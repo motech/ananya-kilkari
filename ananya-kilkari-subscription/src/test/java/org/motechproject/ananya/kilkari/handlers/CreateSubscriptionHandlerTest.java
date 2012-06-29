@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
@@ -29,12 +30,12 @@ public class CreateSubscriptionHandlerTest {
     }
 
     @Test
-    public void shouldHandleCreateSubscriptionEvent() throws ValidationException {
+    public void shouldHandleCreateSubscriptionEvent() {
         HashMap<String, Object> parameters = new HashMap<>();
         String msisdn = "1234567890";
         String pack = "twelve-months";
         String channel = "ivr";
-        parameters.put("0", new SubscriptionRequest(msisdn, pack, channel, DateTime.now()));
+        parameters.put("0", createSubscriptionRequest(msisdn, pack, channel));
 
         new CreateSubscriptionHandler(subscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, parameters));
 
@@ -49,8 +50,12 @@ public class CreateSubscriptionHandlerTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void shouldThrowExceptionIfDetailsAreInvalidWhileHandlingCreateSubscriptionEvent() throws ValidationException {
+    public void shouldThrowExceptionIfDetailsAreInvalidWhileHandlingCreateSubscriptionEvent() {
         doThrow(new ValidationException("Invalid")).when(subscriptionService).createSubscription(any(SubscriptionRequest.class));
-        new CreateSubscriptionHandler(subscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, new HashMap<String, Object>(){{put("0", new SubscriptionRequest("msisdn", "pack", "channel", DateTime.now()));}}));
+        new CreateSubscriptionHandler(subscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, new HashMap<String, Object>(){{put("0", createSubscriptionRequest("msisdn", "pack", "channel"));}}));
+    }
+
+    private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {
+        return new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).build();
     }
 }

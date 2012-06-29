@@ -23,7 +23,7 @@ public class SubscriptionService {
         this.publisher = publisher;
     }
 
-    public void createSubscription(SubscriptionRequest subscriptionRequest) throws ValidationException {
+    public void createSubscription(SubscriptionRequest subscriptionRequest) {
         subscriptionRequest.validate();
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper(subscriptionRequest);
         Subscription subscription = subscriptionMapper.getSubscription();
@@ -33,7 +33,7 @@ public class SubscriptionService {
         sendReportSubscriptionCreationEvent(subscriptionMapper.getSubscriptionCreationReportRequest());
     }
 
-    public List<Subscription> findByMsisdn(String msisdn) throws ValidationException {
+    public List<Subscription> findByMsisdn(String msisdn) {
         validateMsisdn(msisdn);
         return allSubscriptions.findByMsisdn(msisdn);
     }
@@ -68,7 +68,7 @@ public class SubscriptionService {
         publisher.reportSubscriptionCreation(subscriptionCreationReportRequest);
     }
 
-    private void validateMsisdn(String msisdn) throws ValidationException {
+    private void validateMsisdn(String msisdn) {
         if (!isValidMsisdn(msisdn))
             throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
     }

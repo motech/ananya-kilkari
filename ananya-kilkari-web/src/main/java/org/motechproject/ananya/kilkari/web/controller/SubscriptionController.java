@@ -8,7 +8,7 @@ import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.web.controller.requests.CallbackRequest;
+import org.motechproject.ananya.kilkari.domain.CallbackRequest;
 import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.web.domain.CallbackRequestValidator;
 import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;

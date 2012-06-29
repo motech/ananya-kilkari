@@ -1,7 +1,4 @@
-package org.motechproject.ananya.kilkari.web.controller.requests;
-
-import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
-import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
+package org.motechproject.ananya.kilkari.domain;
 
 public class CallbackRequest {
     private String msisdn;

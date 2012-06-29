@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.web.domain;
 
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.web.controller.requests.CallbackRequest;
+import org.motechproject.ananya.kilkari.domain.CallbackRequest;
 
 import java.util.List;
 

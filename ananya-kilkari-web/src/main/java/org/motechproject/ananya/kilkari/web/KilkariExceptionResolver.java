@@ -11,7 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public class KilkariExceptionResolver extends SimpleMappingExceptionResolver {
 
-    private static Logger log = LoggerFactory.getLogger(KilkariExceptionResolver.class);
+    private final static Logger log = LoggerFactory.getLogger(KilkariExceptionResolver.class);
+
 
     @Override
     protected ModelAndView doResolveException(HttpServletRequest request,

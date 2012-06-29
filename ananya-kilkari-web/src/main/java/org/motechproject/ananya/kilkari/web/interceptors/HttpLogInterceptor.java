@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
 
 public class HttpLogInterceptor extends HandlerInterceptorAdapter {
-    private final static Logger LOG = LoggerFactory.getLogger(HttpLogInterceptor.class);
+    private final static Logger logger = LoggerFactory.getLogger(HttpLogInterceptor.class);
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -21,13 +21,13 @@ public class HttpLogInterceptor extends HandlerInterceptorAdapter {
             parameterBuilder.append(String.format("%s=>%s,", key, request.getParameter(key)));
         }
 
-        LOG.info(String.format("Request START [uri=%s | Parameters = {%s}]",
+        logger.info(String.format("Request START [uri=%s | Parameters = {%s}]",
                 request.getRequestURI(), parameterBuilder.toString()));
         return true;
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        LOG.info(String.format("Request END [uri=%s]", request.getRequestURI()));
+        logger.info(String.format("Request END [uri=%s]", request.getRequestURI()));
     }
 }

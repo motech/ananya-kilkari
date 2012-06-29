@@ -1,7 +1,8 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class OnMobileSubscriptionService {
     public static final String ACTIVATE_SUBSCRIPTION_PATH = "ActivateSubscription";
     private RestTemplate restTemplate;
     private Properties kilkariProperties;
-    private Logger logger = Logger.getLogger(OnMobileSubscriptionService.class);
+    private final static Logger logger = LoggerFactory.getLogger(OnMobileSubscriptionService.class);
 
     @Autowired
     public OnMobileSubscriptionService(@Qualifier("kilkariRestTemplate") RestTemplate restTemplate, @Qualifier("kilkariProperties") Properties kilkariProperties) {

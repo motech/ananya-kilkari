@@ -1,23 +1,23 @@
 package org.motechproject.ananya.kilkari.handlers;
 
-import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 
 @Component
 public class CreateSubscriptionHandler {
     @Autowired
     private SubscriptionService subscriptionService;
 
-    Logger logger = Logger.getLogger(CreateSubscriptionHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(CreateSubscriptionHandler.class);
 
     @Autowired
     public CreateSubscriptionHandler(SubscriptionService subscriptionService) {

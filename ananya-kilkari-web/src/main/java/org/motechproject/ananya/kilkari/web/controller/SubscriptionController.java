@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
@@ -13,6 +13,8 @@ import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.services.SubscriptionPublisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +27,7 @@ public class SubscriptionController {
     private SubscriptionService subscriptionService;
     private SubscriptionPublisher subscriptionPublisher;
 
-    Logger logger = Logger.getLogger(SubscriptionController.class);
+    private final Logger logger = LoggerFactory.getLogger(SubscriptionController.class);
 
     @Autowired
     public SubscriptionController(SubscriptionService subscriptionService, SubscriptionPublisher subscriptionPublisher) {

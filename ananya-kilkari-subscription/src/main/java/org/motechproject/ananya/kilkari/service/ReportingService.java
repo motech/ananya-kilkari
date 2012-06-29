@@ -1,8 +1,9 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStateChangeReportRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class ReportingService {
     public static final String SUBSCRIPTION_STATE_CHANGE_PATH = "updatesubscription";
     private RestTemplate restTemplate;
     private Properties kilkariProperties;
-    private Logger logger = Logger.getLogger(ReportingService.class);
+    private final static Logger logger = LoggerFactory.getLogger(ReportingService.class);
 
     @Autowired
     public ReportingService(@Qualifier("kilkariRestTemplate") RestTemplate restTemplate, @Qualifier("kilkariProperties") Properties kilkariProperties) {

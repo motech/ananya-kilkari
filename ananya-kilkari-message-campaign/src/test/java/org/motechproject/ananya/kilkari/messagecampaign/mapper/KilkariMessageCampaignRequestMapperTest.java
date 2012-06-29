@@ -7,7 +7,8 @@ import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCa
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+
 
 public class KilkariMessageCampaignRequestMapperTest {
 

@@ -21,7 +21,8 @@ public class HttpLogInterceptor extends HandlerInterceptorAdapter {
             parameterBuilder.append(String.format("%s=>%s,", key, request.getParameter(key)));
         }
 
-        LOG.info("Request START [uri=%s | Parameters = {%s}]", request.getRequestURI(), parameterBuilder.toString());
+        LOG.info(String.format("Request START [uri=%s | Parameters = {%s}]",
+                request.getRequestURI(), parameterBuilder.toString()));
         return true;
     }
 

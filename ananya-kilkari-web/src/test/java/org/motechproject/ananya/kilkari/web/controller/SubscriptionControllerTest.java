@@ -3,30 +3,38 @@ package org.motechproject.ananya.kilkari.web.controller;
 import com.google.gson.Gson;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.Subscription;
-import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
+import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.domain.CallbackRequest;
+import org.motechproject.ananya.kilkari.web.KilkariExceptionResolver;
 import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
+import org.motechproject.ananya.kilkari.web.domain.KilkariConstants;
 import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.services.SubscriptionPublisher;
+import org.motechproject.ananya.kilkari.web.views.ExceptionView;
+import org.motechproject.ananya.kilkari.web.views.ValidationExceptionView;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.server.MockMvc;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
+import org.springframework.test.web.server.setup.StandaloneMockMvcBuilder;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.ViewResolver;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
@@ -66,13 +74,13 @@ public class SubscriptionControllerTest {
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/javascript;charset=UTF-8"))
-                .andExpect(content().string(subscriberResponseMatcherWithSubscriptions()));
+                .andExpect(content().string(subscriberResponseMatcherWithSubscriptions(channel)));
     }
 
     @Test
     public void shouldGetSubscriptionsForGivenMsisdnForChannelOtherThanIvr() throws Exception {
         String msisdn = "1234567890";
-        String channel = "not-ivr";
+        String channel = "call_center";
 
         mockSubscription(msisdn);
         ArrayList<Subscription> subscriptions = new ArrayList<>();
@@ -83,13 +91,27 @@ public class SubscriptionControllerTest {
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/json;charset=UTF-8"))
-                .andExpect(content().string(subscriberResponseMatcherWithSubscriptions()));
+                .andExpect(content().string(subscriberResponseMatcherWithSubscriptions(channel)));
     }
 
     @Test
-    public void shouldGetEmptySubscriptionResponseIfThereAreNoSubscriptionsForAGivenMsisdn() throws Exception {
+    public void shouldGetEmptySubscriptionResponseIfThereAreNoSubscriptionsForAGivenMsisdnForIvr() throws Exception {
         String msisdn = "1234567890";
-        String channel = "not-ivr";
+        String channel = "ivr";
+
+        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(null);
+
+        MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
+                .andExpect(status().isOk())
+                .andExpect(content().type("application/javascript;charset=UTF-8"))
+                .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions(channel)));
+    }
+
+    @Test
+    public void shouldGetEmptySubscriptionResponseIfThereAreNoSubscriptionsForAGivenMsisdnOtherThanIvr() throws Exception {
+        String msisdn = "1234567890";
+        String channel = "call_center";
 
         when(subscriptionService.findByMsisdn(msisdn)).thenReturn(null);
 
@@ -97,35 +119,69 @@ public class SubscriptionControllerTest {
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/json;charset=UTF-8"))
-                .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions("SUCCESS", "Subscriber details successfully fetched")));
+                .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions(channel)));
+    }
+
+    private class KilkariTestViewResolver implements ViewResolver {
+
+        private Map<String, View> viewMap;
+
+        public KilkariTestViewResolver() {
+            this.viewMap = new HashMap<>();
+            this.viewMap.put("exceptionView", new ExceptionView());
+            this.viewMap.put("validationExceptionView", new ValidationExceptionView());
+        }
+
+        @Override
+        public View resolveViewName(String viewName, Locale locale) throws Exception {
+            return this.viewMap.get(viewName);
+        }
+    }
+
+    private MockMvc mockMvc() {
+        StandaloneMockMvcBuilder mockMvcBuilder = MockMvcBuilders.standaloneSetup(subscriptionController)
+                .addInterceptors(new KilkariChannelInterceptor())
+                .setViewResolvers(new KilkariTestViewResolver());
+
+        Properties props = new Properties();
+        props.put(".Exception", "exceptionView");
+        props.put("org.motechproject.ananya.kilkari.exceptions.ValidationException", "validationExceptionView");
+
+        KilkariExceptionResolver exceptionResolver = new KilkariExceptionResolver();
+        exceptionResolver.setExceptionMappings(props);
+
+        mockMvcBuilder.setHandlerExceptionResolvers(Arrays.asList(new HandlerExceptionResolver[]{exceptionResolver}));
+
+        return mockMvcBuilder.build();
     }
 
     @Test
-    public void shouldReturnErrorResponseForInvalidMsisdnNumber() throws Exception {
+    public void shouldReturnErrorResponseForInvalidMsisdnNumberForIvr() throws Exception {
         String msisdn = "12345";
         String channel = "ivr";
 
         when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
 
-        MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
+        mockMvc()
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/javascript;charset=UTF-8"))
-                .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions("ERROR", "Invalid Msisdn")));
+                .andExpect(content().string(errorResponseMatcherForInvalidMsisdn(channel)));
+
     }
 
     @Test
-    public void shouldReturnErrorResponseForNonNumericMsisdnNumber() throws Exception {
-        String msisdn = "123456789a";
-        String channel = "ivr";
+    public void shouldReturnErrorResponseForInvalidMsisdnNumberOtherThanIvr() throws Exception {
+        String msisdn = "12345";
+        String channel = "call_center";
 
         when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
 
-        MockMvcBuilders.standaloneSetup(subscriptionController).addInterceptors(new KilkariChannelInterceptor()).build()
+        mockMvc()
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
-                .andExpect(status().isOk())
-                .andExpect(content().type("application/javascript;charset=UTF-8"))
-                .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions("ERROR", "Invalid Msisdn")));
+                .andExpect(status().is(KilkariConstants.ERROR_CODE))
+                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().string(errorResponseMatcherForInvalidMsisdn(channel)));
     }
 
     @Test
@@ -233,11 +289,11 @@ public class SubscriptionControllerTest {
         };
     }
 
-    private BaseMatcher<String> subscriberResponseMatcherWithNoSubscriptions(final String status, final String description) {
+    private Matcher<String> errorResponseMatcherForInvalidMsisdn(final String channel) {
         return new BaseMatcher<String>() {
             @Override
             public boolean matches(Object o) {
-                return assertSubscriberResponseWithNoSubscriptions((String) o, status, description);
+                return assertErrorResponseForInvalidMsisdn((String) o, channel);
             }
 
             @Override
@@ -247,11 +303,25 @@ public class SubscriptionControllerTest {
         };
     }
 
-    private BaseMatcher<String> subscriberResponseMatcherWithSubscriptions() {
+    private BaseMatcher<String> subscriberResponseMatcherWithNoSubscriptions(final String channel) {
         return new BaseMatcher<String>() {
             @Override
             public boolean matches(Object o) {
-                return assertSubscriberResponse((String) o);
+                return assertSubscriberResponseWithNoSubscriptions((String) o, channel);
+            }
+
+            @Override
+            public void describeTo(Description matcherDescription) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+        };
+    }
+
+    private BaseMatcher<String> subscriberResponseMatcherWithSubscriptions(final String channel) {
+        return new BaseMatcher<String>() {
+            @Override
+            public boolean matches(Object o) {
+                return assertSubscriberResponse((String) o, channel);
             }
 
             @Override
@@ -267,23 +337,40 @@ public class SubscriptionControllerTest {
                 && baseResponse.getDescription().equals(description);
     }
 
-    private boolean assertSubscriberResponse(String jsonContent) {
-        SubscriberResponse subscriberResponse = fromJson(jsonContent.replace("var response = ", ""), SubscriberResponse.class);
+    private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {
+        if (Channel.isIVR(channel)) {
+            assertTrue(jsonContent.startsWith(KilkariConstants.IVR_RESPONSE_FORMAT));
+            jsonContent = jsonContent.replace(KilkariConstants.IVR_RESPONSE_FORMAT, "");
+        }
+        return jsonContent;
+    }
+
+    private boolean assertErrorResponseForInvalidMsisdn(String jsonContent, String channel) {
+        jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
+
+        BaseResponse baseResponse = fromJson(jsonContent, BaseResponse.class);
+
+        return baseResponse.getStatus().equals("ERROR_VALIDATION") &&
+                baseResponse.getDescription().equals("Invalid Msisdn");
+    }
+
+    private boolean assertSubscriberResponse(String jsonContent, String channel) {
+        jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
+
+        SubscriberResponse subscriberResponse = fromJson(jsonContent, SubscriberResponse.class);
         SubscriptionDetails subscriptionDetails = subscriberResponse.getSubscriptionDetails().get(0);
 
-        return subscriberResponse.getStatus().equals("SUCCESS")
-                && subscriberResponse.getDescription().equals("Subscriber details successfully fetched")
-                && subscriptionDetails.getPack().equals(mockedSubscription.getPack().name())
+        return subscriptionDetails.getPack().equals(mockedSubscription.getPack().name())
                 && subscriptionDetails.getStatus().equals(mockedSubscription.getStatus().name())
                 && subscriptionDetails.getSubscriptionId().equals(mockedSubscription.getSubscriptionId());
     }
 
-    private boolean assertSubscriberResponseWithNoSubscriptions(String jsonContent, String status, String description) {
-        SubscriberResponse subscriberResponse = fromJson(jsonContent.replace("var response = ", ""), SubscriberResponse.class);
+    private boolean assertSubscriberResponseWithNoSubscriptions(String jsonContent, String channel) {
+        jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
 
-        return subscriberResponse.getStatus().equals(status)
-                && subscriberResponse.getDescription().equals(description)
-                && subscriberResponse.getSubscriptionDetails().size() == 0;
+        SubscriberResponse subscriberResponse = fromJson(jsonContent, SubscriberResponse.class);
+
+        return subscriberResponse.getSubscriptionDetails().size() == 0;
     }
 
     private String toJson(Object objectToSerialize) {

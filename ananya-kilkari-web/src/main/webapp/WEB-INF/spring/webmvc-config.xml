@@ -31,7 +31,7 @@
         <property name="exceptionMappings">
             <props>
                 <prop key=".Exception">exceptionView</prop>
-                <prop key=".KilkariException">exceptionView</prop>
+                <prop key="org.motechproject.ananya.kilkari.exceptions.ValidationException">validationExceptionView</prop>
             </props>
         </property>
     </bean>

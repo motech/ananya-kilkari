@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.domain;
 import org.apache.commons.lang.StringUtils;
 
 public enum Channel {
-    IVR;
+    IVR, CALL_CENTER;
 
     public static Channel getFor(String pack) {
         return Channel.valueOf(StringUtils.trimToEmpty(pack).toUpperCase());
@@ -20,5 +20,9 @@ public enum Channel {
             }
         }
         return false;
+    }
+
+    public static boolean isIVR(String channel) {
+        return Channel.getFor(channel).equals(Channel.IVR);
     }
 }

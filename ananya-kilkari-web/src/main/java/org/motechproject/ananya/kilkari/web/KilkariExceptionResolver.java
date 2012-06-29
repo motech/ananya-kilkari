@@ -20,8 +20,6 @@ public class KilkariExceptionResolver extends SimpleMappingExceptionResolver {
                                               Exception ex) {
         log.error(getExceptionString(ex));
 
-
-
         return super.doResolveException(request, response, handler, ex);
     }
 

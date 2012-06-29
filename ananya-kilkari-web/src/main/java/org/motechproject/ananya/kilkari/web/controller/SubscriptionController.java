@@ -68,15 +68,11 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscriber", method = RequestMethod.GET)
     @ResponseBody
-    public SubscriberResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
+    public SubscriberResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel)
+            throws ValidationException {
         SubscriberResponse subscriberResponse = new SubscriberResponse();
 
-        List<Subscription> subscriptions;
-        try {
-            subscriptions = subscriptionService.findByMsisdn(msisdn);
-        } catch (ValidationException e) {
-            return subscriberResponse.forInvalidMsisdn();
-        }
+        List<Subscription> subscriptions = subscriptionService.findByMsisdn(msisdn);
 
         if (subscriptions != null) {
             for (Subscription subscription : subscriptions)

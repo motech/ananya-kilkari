@@ -5,8 +5,8 @@ import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
 
 public class CallbackRequest {
     private String msisdn;
-    private CallbackAction action;
-    private CallbackStatus status;
+    private String action;
+    private String status;
     private String reason;
     private String operator;
     private String graceCount;
@@ -15,11 +15,11 @@ public class CallbackRequest {
         return msisdn;
     }
 
-    public CallbackAction getAction() {
+    public String getAction() {
         return action;
     }
 
-    public CallbackStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
@@ -39,11 +39,11 @@ public class CallbackRequest {
         this.msisdn = msisdn;
     }
 
-    public void setAction(CallbackAction action) {
+    public void setAction(String action) {
         this.action = action;
     }
 
-    public void setStatus(CallbackStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

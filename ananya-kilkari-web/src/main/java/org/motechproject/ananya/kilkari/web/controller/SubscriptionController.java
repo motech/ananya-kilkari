@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.Subscription;
@@ -9,6 +10,7 @@ import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.controller.requests.CallbackRequest;
 import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
+import org.motechproject.ananya.kilkari.web.domain.CallbackRequestValidator;
 import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
@@ -18,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -46,8 +47,14 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.PUT)
     @ResponseBody
     public BaseResponse activateSubscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
-        if(callbackRequest.getAction() == CallbackAction.ACT) {
-            if(callbackRequest.getStatus() == CallbackStatus.SUCCESS) {
+
+        List<String> validationErrors = new CallbackRequestValidator().validate(callbackRequest);
+        if (!(validationErrors.isEmpty())) {
+            return new BaseResponse("ERROR", String.format("Callback Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
+        }
+
+        if(CallbackAction.getFor(callbackRequest.getAction()) == CallbackAction.ACT) {
+            if(CallbackStatus.getFor(callbackRequest.getStatus()) == CallbackStatus.SUCCESS) {
                 logger.info(String.format("Changing subscription status to ACTIVE for msisdn: %s, subscriptionId: %s", callbackRequest.getMsisdn(), subscriptionId));
                 subscriptionService.activate(subscriptionId);
             } else {

@@ -27,8 +27,7 @@ import org.springframework.test.web.server.setup.MockMvcBuilders;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.put;
@@ -151,12 +150,32 @@ public class SubscriptionControllerTest {
     }
 
     @Test
+    public void shouldGiveAnErrorMessageWhenCallBackRequestIsInvalid() throws Exception {
+        String subscriptionId = "abcd1234";
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setMsisdn("invalidMsisdn");
+        callbackRequest.setAction("invalidAction");
+        callbackRequest.setStatus("invalidStatus");
+
+        byte[] requestBody = toJson(callbackRequest).getBytes();
+
+        MockMvcBuilders.standaloneSetup(subscriptionController).build()
+                .perform(put("/subscription/" + subscriptionId)
+                .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().string(baseResponseMatcher("ERROR", "Callback Request Invalid: Invalid msisdn invalidMsisdn,Invalid callbackAction invalidAction,Invalid callbackStatus invalidStatus")));
+
+        verifyZeroInteractions(subscriptionService);
+    }
+
+    @Test
     public void shouldActivateTheSubscriptionWhenCallBackUrlIsInvokedWithSuccessStatusForActivationRequest() throws Exception {
         String subscriptionId = "abcd1234";
         CallbackRequest callbackRequest = new CallbackRequest();
-        callbackRequest.setMsisdn("msisdn");
-        callbackRequest.setAction(CallbackAction.ACT);
-        callbackRequest.setStatus(CallbackStatus.SUCCESS);
+        callbackRequest.setMsisdn("1234567890");
+        callbackRequest.setAction(CallbackAction.ACT.name());
+        callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
         callbackRequest.setReason("reason");
         callbackRequest.setOperator("operator");
         callbackRequest.setGraceCount("2");
@@ -164,7 +183,7 @@ public class SubscriptionControllerTest {
 
         MockMvcBuilders.standaloneSetup(subscriptionController).build()
                 .perform(put("/subscription/" + subscriptionId)
-                .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/json;charset=UTF-8"))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
@@ -176,9 +195,9 @@ public class SubscriptionControllerTest {
     public void shouldMakeActivationFailWhenCallBackUrlIsInvokedWithNonSuccessStatusForActivationRequest() throws Exception {
         String subscriptionId = "abcd1234";
         CallbackRequest callbackRequest = new CallbackRequest();
-        callbackRequest.setMsisdn("msisdn");
-        callbackRequest.setAction(CallbackAction.ACT);
-        callbackRequest.setStatus(CallbackStatus.FAILURE);
+        callbackRequest.setMsisdn("1234567890");
+        callbackRequest.setAction(CallbackAction.ACT.name());
+        callbackRequest.setStatus(CallbackStatus.FAILURE.name());
         callbackRequest.setReason("reason");
         callbackRequest.setOperator("operator");
         callbackRequest.setGraceCount("2");

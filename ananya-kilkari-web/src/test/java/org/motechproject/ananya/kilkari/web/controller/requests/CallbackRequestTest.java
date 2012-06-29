@@ -15,8 +15,8 @@ public class CallbackRequestTest {
        callbackRequest.setReason("myreason");
        callbackRequest.setOperator("myoperator");
        callbackRequest.setGraceCount("10");
-       callbackRequest.setAction(CallbackAction.ACT);
-       callbackRequest.setStatus(CallbackStatus.SUCCESS);
+       callbackRequest.setAction(CallbackAction.ACT.name());
+       callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
 
        assertEquals("msisdn: mymsisdn; reason: myreason; operator: myoperator; graceCount: 10; action: ACT; status: SUCCESS", callbackRequest.toString());
 

@@ -1,11 +1,13 @@
 package org.motechproject.ananya.kilkari.handlers;
 
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.*;
+import org.motechproject.ananya.kilkari.domain.Channel;
+import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
+import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
+import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -43,19 +45,12 @@ public class SubscriptionActivationHandlerTest {
         verify(onMobileSubscriptionService).activateSubscription(subscriptionActivationRequestArgumentCaptor.capture());
         SubscriptionActivationRequest subscriptionActivationRequest = subscriptionActivationRequestArgumentCaptor.getValue();
 
-        ArgumentCaptor<String> msisdnCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> packCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<SubscriptionStatus> statusCaptor = ArgumentCaptor.forClass(SubscriptionStatus.class);
-        verify(subscriptionService).updateSubscriptionStatus(msisdnCaptor.capture(), packCaptor.capture(), statusCaptor.capture(), any(DateTime.class));
-
-        assertEquals(msisdn, msisdnCaptor.getValue());
-        assertEquals(pack.name(), packCaptor.getValue());
-        assertEquals(SubscriptionStatus.PENDING_ACTIVATION, statusCaptor.getValue());
-
         assertEquals(msisdn, subscriptionActivationRequest.getMsisdn());
         assertEquals(channel, subscriptionActivationRequest.getChannel());
         assertEquals(pack, subscriptionActivationRequest.getPack());
         assertEquals(subscriptionId, subscriptionActivationRequest.getSubscriptionId());
+
+        verify(subscriptionService).activationRequested(subscriptionId);
     }
 
     @Test(expected = RuntimeException.class)

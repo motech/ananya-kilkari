@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.CallbackRequest;
 import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
-import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 
 import static org.mockito.Mockito.verify;
@@ -30,6 +29,6 @@ public class ActivationFailedHandlerTest {
 
         activationFailedHandler.perform(new CallbackRequestWrapper(new CallbackRequest(), subscriptionId, now));
 
-        verify(subscriptionService).updateSubscriptionStatus(subscriptionId, SubscriptionStatus.ACTIVATION_FAILED, now);
+        verify(subscriptionService).activationFailed(subscriptionId, now);
     }
 }

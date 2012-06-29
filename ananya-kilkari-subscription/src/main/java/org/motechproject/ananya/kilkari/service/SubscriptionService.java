@@ -42,22 +42,37 @@ public class SubscriptionService {
         return allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.from(pack));
     }
 
-    public void updateSubscriptionStatus(String msisdn, String pack, SubscriptionStatus status, DateTime updatedOn) {
-        Subscription subscription = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.from(pack));
-        subscription.setStatus(status);
-        updateWithReporting(subscription, updatedOn);
-    }
-
-    public void updateSubscriptionStatus(String subscriptionId, SubscriptionStatus status, DateTime updatedOn) {
-        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        subscription.setStatus(status);
-        updateWithReporting(subscription, updatedOn);
-    }
-
     public void activate(String subscriptionId, DateTime activatedOn) {
+        updateStatusAndReport(subscriptionId, activatedOn, new Action<Subscription>() {
+            @Override
+            public void perform(Subscription subscription) {
+                subscription.activate();
+            }
+        });
+    }
+
+    public void activationFailed(String subscriptionId, DateTime updatedOn) {
+        updateStatusAndReport(subscriptionId, updatedOn, new Action<Subscription>() {
+            @Override
+            public void perform(Subscription subscription) {
+                subscription.activationFailed();
+            }
+        });
+    }
+
+    public void activationRequested(String subscriptionId) {
+        updateStatusAndReport(subscriptionId, DateTime.now(), new Action<Subscription>() {
+            @Override
+            public void perform(Subscription subscription) {
+                subscription.activationRequested();
+            }
+        });
+    }
+
+    private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, Action<Subscription> action) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
-        updateWithReporting(subscription, activatedOn);
+        action.perform(subscription);
+        updateWithReporting(subscription, updatedOn);
     }
 
     private void sendProcessSubscriptionEvent(SubscriptionActivationRequest subscriptionActivationRequest) {

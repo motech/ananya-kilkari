@@ -114,22 +114,22 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldUpdateTheSubscriptionStatusGivenTheMsisdnAndPack() {
+    public void shouldUpdateTheSubscriptionStatusToPendingActivation_WhenActivationIsRequested() {
         SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         String msisdn = "123456890";
         String subscriptionId = "abcd1234";
-        SubscriptionStatus status = SubscriptionStatus.ACTIVE;
+        SubscriptionStatus status = SubscriptionStatus.PENDING_ACTIVATION;
         Subscription mockedSubscription = mock(Subscription.class);
 
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
-        when(allSubscriptions.findByMsisdnAndPack(msisdn, pack)).thenReturn(mockedSubscription);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.updateSubscriptionStatus(msisdn, pack.name(), status, DateTime.now());
+        subscriptionService.activationRequested(subscriptionId);
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
-        order.verify(allSubscriptions).findByMsisdnAndPack(msisdn, pack);
-        order.verify(mockedSubscription).setStatus(SubscriptionStatus.ACTIVE);
+        order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
+        order.verify(mockedSubscription).activationRequested();
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         order.verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
@@ -140,8 +140,8 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldUpdateTheSubscriptionStatusGivenTheSubscriptionId() {
-        SubscriptionStatus status = SubscriptionStatus.ACTIVE;
+    public void shouldUpdateTheSubscriptionStatusToActivationFailed_GivenSubscriptionId() {
+        SubscriptionStatus status = SubscriptionStatus.ACTIVATION_FAILED;
         Subscription mockedSubscription = mock(Subscription.class);
         String subscriptionId = "abcd1234";
 
@@ -149,11 +149,11 @@ public class SubscriptionServiceTest {
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.updateSubscriptionStatus(subscriptionId, status, DateTime.now());
+        subscriptionService.activationFailed(subscriptionId, DateTime.now());
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
-        order.verify(mockedSubscription).setStatus(SubscriptionStatus.ACTIVE);
+        order.verify(mockedSubscription).activationFailed();
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         order.verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
@@ -177,7 +177,7 @@ public class SubscriptionServiceTest {
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
-        order.verify(mockedSubscription).setStatus(subscriptionStatus);
+        order.verify(mockedSubscription).activate();
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         order.verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());

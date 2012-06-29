@@ -83,4 +83,16 @@ public class Subscription extends MotechBaseDataObject {
         result = 31 * result + (pack != null ? pack.hashCode() : 0);
         return result;
     }
+
+    public void activate() {
+        setStatus(SubscriptionStatus.ACTIVE);
+    }
+
+    public void activationFailed() {
+        setStatus(SubscriptionStatus.ACTIVATION_FAILED);
+    }
+
+    public void activationRequested() {
+        setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+    }
 }

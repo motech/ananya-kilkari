@@ -27,11 +27,24 @@
         <bean class="org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor" />
     </mvc:interceptors>
 
+    <bean class="org.motechproject.ananya.kilkari.web.KilkariExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key=".Exception">exceptionView</prop>
+                <prop key=".KilkariException">exceptionView</prop>
+            </props>
+        </property>
+    </bean>
+
     <bean id="messageAdapter" class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
         <property name="messageConverters">
             <util:list>
                 <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
             </util:list>
         </property>
+    </bean>
+
+    <bean id="xmlViewResolver" class="org.springframework.web.servlet.view.XmlViewResolver">
+        <property name="location" value="/WEB-INF/views.xml"/>
     </bean>
 </beans>

@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.domain;
 
-public class CallbackRequest {
+import java.io.Serializable;
+
+public class CallbackRequest implements Serializable {
     private String msisdn;
     private String action;
     private String status;

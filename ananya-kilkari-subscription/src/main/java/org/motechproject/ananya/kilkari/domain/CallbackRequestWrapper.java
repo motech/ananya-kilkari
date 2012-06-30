@@ -2,7 +2,9 @@ package org.motechproject.ananya.kilkari.domain;
 
 import org.joda.time.DateTime;
 
-public class CallbackRequestWrapper {
+import java.io.Serializable;
+
+public class CallbackRequestWrapper implements Serializable {
 
     private CallbackRequest callbackRequest;
     private String subscriptionId;

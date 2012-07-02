@@ -20,6 +20,28 @@
         <plugins>
 
             <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>Copy Kilkari Config</id>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <target>
+                                <copy todir="${project.build.outputDirectory}">
+                                    <fileset dir="${project.basedir}/../ananya-kilkari-config/src/main/resources">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>8.0.1.v20110908</version>
@@ -31,20 +53,11 @@
                         </systemProperty>
                     </systemProperties>
                     <webAppConfig>
-                        <!--<extraClasspath>~/proj/motech/codebase/ananya-kilkari/ananya-kilkari-config/target/ananya-kilkari-config.jar</extraClasspath>-->
                         <contextPath>/ananya-kilkari</contextPath>
                     </webAppConfig>
                     <stopKey>secret</stopKey>
                     <stopPort>6669</stopPort>
                 </configuration>
-
-                <dependencies>
-                    <dependency>
-                        <groupId>org.motechproject.ananya.kilkari</groupId>
-                        <artifactId>ananya-kilkari-config</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

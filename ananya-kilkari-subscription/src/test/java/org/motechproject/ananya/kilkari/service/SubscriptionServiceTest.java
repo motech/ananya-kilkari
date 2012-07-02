@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -46,8 +47,9 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
 
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest(msisdn, subscriptionPack.name(), channel.name());
-        subscriptionService.createSubscription(subscriptionRequest);
+        String subscriptionId = subscriptionService.createSubscription(subscriptionRequest);
 
+        assertNotNull(subscriptionId);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         verify(publisher).processSubscription(subscriptionActivationRequestArgumentCaptor.capture());
         verify(publisher).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());

@@ -58,25 +58,8 @@
         </dependency>
         <dependency>
             <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-message-campaign</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject.ananya.kilkari</groupId>
             <artifactId>ananya-kilkari-service</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-subscription</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-subscription</artifactId>
-            <version>${project.version}</version>
-            <classifier>tests</classifier>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

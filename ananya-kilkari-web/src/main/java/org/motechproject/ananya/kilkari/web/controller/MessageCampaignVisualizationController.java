@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.web.response.CampaignSchedule;
 import org.motechproject.ananya.kilkari.web.response.UserCampaignSchedule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,20 +17,17 @@ import java.util.List;
 @RequestMapping("/messagecampaign")
 public class MessageCampaignVisualizationController {
 
-    public static final String KILKARI_MESSAGE_CAMPAIGN_NAME = "kilkari-mother-child-campaign";
-
-    private KilkariMessageCampaignService kilkariMessageCampaignService;
+    private KilkariCampaignService kilkariCampaignService;
 
     @Autowired
-    public MessageCampaignVisualizationController(
-            KilkariMessageCampaignService kilkariMessageCampaignService) {
-        this.kilkariMessageCampaignService = kilkariMessageCampaignService;
+    public MessageCampaignVisualizationController(KilkariCampaignService kilkariCampaignService) {
+        this.kilkariCampaignService = kilkariCampaignService;
     }
 
     @RequestMapping(value = "/visualize", method = RequestMethod.GET)
     @ResponseBody
     public UserCampaignSchedule getVisualizationForUser(@RequestParam String msisdn) {
-        List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(msisdn, KILKARI_MESSAGE_CAMPAIGN_NAME);
+        List<DateTime> messageTimings = kilkariCampaignService.getMessageTimings(msisdn);
 
         UserCampaignSchedule userCampaignSchedule = new UserCampaignSchedule(msisdn);
         userCampaignSchedule.addCampaignSchedule(new CampaignSchedule(msisdn, messageTimings));

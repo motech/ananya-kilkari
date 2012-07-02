@@ -23,7 +23,7 @@ public class SubscriptionService {
         this.publisher = publisher;
     }
 
-    public void createSubscription(SubscriptionRequest subscriptionRequest) {
+    public String createSubscription(SubscriptionRequest subscriptionRequest) {
         subscriptionRequest.validate();
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper(subscriptionRequest);
         Subscription subscription = subscriptionMapper.getSubscription();
@@ -31,6 +31,8 @@ public class SubscriptionService {
 
         sendProcessSubscriptionEvent(subscriptionMapper.getSubscriptionActivationRequest());
         sendReportSubscriptionCreationEvent(subscriptionMapper.getSubscriptionCreationReportRequest());
+
+        return subscription.getSubscriptionId();
     }
 
     public List<Subscription> findByMsisdn(String msisdn) {

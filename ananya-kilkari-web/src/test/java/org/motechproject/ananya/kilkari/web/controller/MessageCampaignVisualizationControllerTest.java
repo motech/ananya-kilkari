@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
@@ -20,13 +20,13 @@ public class MessageCampaignVisualizationControllerTest {
     private MessageCampaignVisualizationController messageCampaignVisualizationController;
 
     @Mock
-    private KilkariMessageCampaignService kilkariMessageCampaignService;
+    private KilkariCampaignService kilkariCampaignService;
 
     @Before
     public void setUp() {
         initMocks(this);
         messageCampaignVisualizationController =
-                new MessageCampaignVisualizationController(kilkariMessageCampaignService);
+                new MessageCampaignVisualizationController(kilkariCampaignService);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class MessageCampaignVisualizationControllerTest {
         messageTimings.add(new DateTime(2012, 10, 25, 15, 48, 58));
         messageTimings.add(new DateTime(2012, 12, 20, 12, 43, 53));
 
-        when(kilkariMessageCampaignService.getMessageTimings(msisdn, MessageCampaignVisualizationController.KILKARI_MESSAGE_CAMPAIGN_NAME)).thenReturn(messageTimings);
+        when(kilkariCampaignService.getMessageTimings(msisdn)).thenReturn(messageTimings);
 
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()
                 .perform(get("/messagecampaign/visualize").param("msisdn", msisdn))

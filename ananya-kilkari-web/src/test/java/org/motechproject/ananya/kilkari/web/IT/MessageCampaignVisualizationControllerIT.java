@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.web.controller.MessageCampaignVisualizationController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -30,7 +31,8 @@ public class MessageCampaignVisualizationControllerIT {
         String msisdn = "msisdn";
 
         KilkariMessageCampaignRequest messageCampaignRequest = new KilkariMessageCampaignRequest(
-                msisdn, MessageCampaignVisualizationController.KILKARI_MESSAGE_CAMPAIGN_NAME, new DateTime(2012, 5, 5, 13, 30, 30), new DateTime(2012, 5, 5, 0, 0));
+                msisdn, KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME,
+                new DateTime(2012, 5, 5, 13, 30, 30), new DateTime(2012, 5, 5, 0, 0));
         kilkariMessageCampaignService.start(messageCampaignRequest);
 
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()

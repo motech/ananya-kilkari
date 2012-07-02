@@ -9,7 +9,6 @@
 
     <context:component-scan base-package="org.motechproject.ananya.kilkari"/>
 
-    <import resource="classpath:applicationKilkariMessageCampaignContext.xml"/>
-    <import resource="classpath:applicationAnanyaKilkariSubscriptionContext.xml"/>
+    <import resource="classpath:applicationKilkariServiceContext.xml" />
 </beans>
 

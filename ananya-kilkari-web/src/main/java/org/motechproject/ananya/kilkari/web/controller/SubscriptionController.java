@@ -5,10 +5,10 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
+import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
+import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
+import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.domain.CallbackRequestValidator;
-import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
-import org.motechproject.ananya.kilkari.web.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,9 @@ public class SubscriptionController {
 
         kilkariSubscriptionService.createSubscription(subscriptionRequest);
 
-        return new BaseResponse("SUCCESS", "Subscription request submitted successfully");
+        return BaseResponse.success("Subscription request submitted successfully");
+
+
     }
 
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.PUT)
@@ -46,11 +48,11 @@ public class SubscriptionController {
     public BaseResponse activateSubscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
         List<String> validationErrors = new CallbackRequestValidator().validate(callbackRequest);
         if (!(validationErrors.isEmpty()))
-            return new BaseResponse("ERROR", String.format("Callback Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
+            return BaseResponse.failure(String.format("Callback Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
 
         kilkariSubscriptionService.processCallbackRequest(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
 
-        return new BaseResponse("SUCCESS", "Callback request processed successfully");
+        return BaseResponse.success("Callback request processed successfully");
     }
 
     @RequestMapping(value = "/subscriber", method = RequestMethod.GET)
@@ -70,3 +72,4 @@ public class SubscriptionController {
     }
 
 }
+

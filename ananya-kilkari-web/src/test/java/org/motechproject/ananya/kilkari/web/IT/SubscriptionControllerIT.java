@@ -12,11 +12,10 @@ import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
-import org.motechproject.ananya.kilkari.web.domain.KilkariConstants;
 import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
-import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
-import org.motechproject.ananya.kilkari.web.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
+import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
+import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
+import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.server.MvcResult;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
@@ -152,8 +151,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
     private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {
         if (Channel.isIVR(channel)) {
-            assertTrue(jsonContent.startsWith(KilkariConstants.IVR_RESPONSE_FORMAT));
-            jsonContent = jsonContent.replace(KilkariConstants.IVR_RESPONSE_FORMAT, "");
+            assertTrue(jsonContent.startsWith(KilkariChannelInterceptor.IVR_RESPONSE_PREFIX));
+            jsonContent = jsonContent.replace(KilkariChannelInterceptor.IVR_RESPONSE_PREFIX, "");
         }
         return jsonContent;
     }

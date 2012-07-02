@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.web.interceptors;
 
-import org.motechproject.ananya.kilkari.web.domain.KilkariConstants;
-import org.motechproject.ananya.kilkari.web.utils.Util;
+import org.motechproject.ananya.kilkari.web.ChannelFinder;
+import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -10,16 +10,21 @@ import javax.servlet.http.HttpServletResponse;
 
 public class KilkariChannelInterceptor extends HandlerInterceptorAdapter {
 
+    public static final String IVR_RESPONSE_PREFIX = "var response = ";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws java.lang.Exception {
-        if (Util.isIvrChannelRequest(request)) response.getOutputStream().print(KilkariConstants.IVR_RESPONSE_FORMAT);
+        if (new ChannelFinder(request).isIVRChannel()) {
+            response.getOutputStream().print(IVR_RESPONSE_PREFIX);
+        }
         return true;
     }
 
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
             throws Exception {
-        if (Util.isIvrChannelRequest(request)) response.setContentType("application/javascript;charset=UTF-8");
+        if (new ChannelFinder(request).isIVRChannel()) {
+            response.setContentType(HttpConstants.JAVASCRIPT_CONTENT_TYPE);
+        }
     }
-
 }

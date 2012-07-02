@@ -1,16 +1,13 @@
 package org.motechproject.ananya.kilkari.web.views;
 
-import org.motechproject.ananya.kilkari.web.domain.KilkariConstants;
-import org.motechproject.ananya.kilkari.web.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.utils.Util;
+import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
-import org.springframework.web.servlet.view.AbstractView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
-public class ExceptionView extends AbstractView {
+public class ExceptionView extends KilkariView {
 
     @Override
     protected void renderMergedOutputModel(
@@ -20,11 +17,10 @@ public class ExceptionView extends AbstractView {
 
         Exception exceptionObject = (Exception) model.get(SimpleMappingExceptionResolver.DEFAULT_EXCEPTION_ATTRIBUTE);
 
-        response.getOutputStream().print(
-                new BaseResponse(KilkariConstants.ERROR_STATUS_RUNTIME_EXCEPTION, exceptionObject.getMessage()).toJson());
+        String responseJson = BaseResponse.failure(exceptionObject.getMessage()).toJson();
+        response.getOutputStream().print(responseJson);
 
-        Util.setErrorResponseStatusBasedOnRequest(request, response);
-        Util.setContentTypeBaseOnRequest(request, response);
+        setHttpStatusCodeBasedOnChannel(request, response);
+        setContentTypeToJavaScriptForIVRChannel(request, response);
     }
-
 }

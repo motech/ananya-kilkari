@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.response;
+package org.motechproject.ananya.kilkari.web.contract.response;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 

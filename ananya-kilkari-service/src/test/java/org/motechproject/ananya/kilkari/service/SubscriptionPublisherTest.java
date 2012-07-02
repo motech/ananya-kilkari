@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.services;
+package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
 import org.junit.Before;

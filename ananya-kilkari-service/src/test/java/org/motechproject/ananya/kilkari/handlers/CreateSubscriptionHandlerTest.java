@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.handlers;
 
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;

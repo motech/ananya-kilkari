@@ -4,12 +4,11 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.web.domain.CallbackRequestValidator;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
-import org.motechproject.ananya.kilkari.web.services.SubscriptionPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +20,13 @@ import java.util.List;
 @Controller
 public class SubscriptionController {
 
-    private SubscriptionService subscriptionService;
-    private SubscriptionPublisher subscriptionPublisher;
+    private KilkariSubscriptionService kilkariSubscriptionService;
 
     private final Logger logger = LoggerFactory.getLogger(SubscriptionController.class);
 
     @Autowired
-    public SubscriptionController(SubscriptionService subscriptionService, SubscriptionPublisher subscriptionPublisher) {
-        this.subscriptionService = subscriptionService;
-        this.subscriptionPublisher = subscriptionPublisher;
+    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService) {
+        this.kilkariSubscriptionService = kilkariSubscriptionService;
     }
 
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
@@ -38,7 +35,9 @@ public class SubscriptionController {
         if(!Channel.isIVR(subscriptionRequest.getChannel())) {
             subscriptionRequest.validate();
         }
-        subscriptionPublisher.createSubscription(subscriptionRequest);
+
+        kilkariSubscriptionService.createSubscription(subscriptionRequest);
+
         return new BaseResponse("SUCCESS", "Subscription request submitted successfully");
     }
 
@@ -49,7 +48,7 @@ public class SubscriptionController {
         if (!(validationErrors.isEmpty()))
             return new BaseResponse("ERROR", String.format("Callback Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
 
-        subscriptionPublisher.processCallbackRequest(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
+        kilkariSubscriptionService.processCallbackRequest(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
 
         return new BaseResponse("SUCCESS", "Callback request processed successfully");
     }
@@ -60,7 +59,7 @@ public class SubscriptionController {
             throws ValidationException {
         SubscriberResponse subscriberResponse = new SubscriberResponse();
 
-        List<Subscription> subscriptions = subscriptionService.findByMsisdn(msisdn);
+        List<Subscription> subscriptions = kilkariSubscriptionService.getSubscriptionsFor(msisdn);
 
         if (subscriptions != null) {
             for (Subscription subscription : subscriptions)

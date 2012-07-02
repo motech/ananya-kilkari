@@ -14,22 +14,19 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.web.domain.KilkariConstants;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
-import org.motechproject.ananya.kilkari.web.services.SubscriptionPublisher;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.motechproject.ananya.kilkari.web.MVCTestUtils.mockMvc;
@@ -42,13 +39,10 @@ public class SubscriptionControllerTest {
     private SubscriptionController subscriptionController;
 
     @Mock
-    private SubscriptionService subscriptionService;
-
-    @Mock
     private Subscription mockedSubscription;
 
     @Mock
-    private SubscriptionPublisher subscriptionPublisher;
+    private KilkariSubscriptionService kilkariSubscriptionService;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -57,7 +51,7 @@ public class SubscriptionControllerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(subscriptionService, subscriptionPublisher);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService);
     }
 
     @Test
@@ -68,7 +62,7 @@ public class SubscriptionControllerTest {
         mockSubscription(msisdn);
         ArrayList<Subscription> subscriptions = new ArrayList<>();
         subscriptions.add(mockedSubscription);
-        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
+        when(kilkariSubscriptionService.getSubscriptionsFor(msisdn)).thenReturn(subscriptions);
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -85,7 +79,7 @@ public class SubscriptionControllerTest {
         mockSubscription(msisdn);
         ArrayList<Subscription> subscriptions = new ArrayList<>();
         subscriptions.add(mockedSubscription);
-        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
+        when(kilkariSubscriptionService.getSubscriptionsFor(msisdn)).thenReturn(subscriptions);
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -99,7 +93,7 @@ public class SubscriptionControllerTest {
         String msisdn = "1234567890";
         String channel = "ivr";
 
-        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(null);
+        when(kilkariSubscriptionService.getSubscriptionsFor(msisdn)).thenReturn(null);
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -113,7 +107,7 @@ public class SubscriptionControllerTest {
         String msisdn = "1234567890";
         String channel = "call_center";
 
-        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(null);
+        when(kilkariSubscriptionService.getSubscriptionsFor(msisdn)).thenReturn(null);
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -127,7 +121,7 @@ public class SubscriptionControllerTest {
         String msisdn = "12345";
         String channel = "ivr";
 
-        when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
+        when(kilkariSubscriptionService.getSubscriptionsFor(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -142,7 +136,7 @@ public class SubscriptionControllerTest {
         String msisdn = "12345";
         String channel = "call_center";
 
-        when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
+        when(kilkariSubscriptionService.getSubscriptionsFor(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -156,7 +150,7 @@ public class SubscriptionControllerTest {
         String msisdn = "1234567890";
         String channel = "ivr";
 
-        when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new RuntimeException("runtime exception"));
+        when(kilkariSubscriptionService.getSubscriptionsFor(msisdn)).thenThrow(new RuntimeException("runtime exception"));
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -170,7 +164,7 @@ public class SubscriptionControllerTest {
         String msisdn = "1234567890";
         String channel = "call_center";
 
-        when(subscriptionService.findByMsisdn(msisdn)).thenThrow(new RuntimeException("runtime exception"));
+        when(kilkariSubscriptionService.getSubscriptionsFor(msisdn)).thenThrow(new RuntimeException("runtime exception"));
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -193,7 +187,7 @@ public class SubscriptionControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
 
         ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
-        verify(subscriptionPublisher).createSubscription(subscriptionRequestArgumentCaptor.capture());
+        verify(kilkariSubscriptionService).createSubscription(subscriptionRequestArgumentCaptor.capture());
         SubscriptionRequest subscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
 
         assertEquals(msisdn, subscriptionRequest.getMsisdn());
@@ -222,7 +216,7 @@ public class SubscriptionControllerTest {
                 .andExpect(content().type(KilkariConstants.HTTP_RESPONSE_CONTENT_TYPE))
                 .andExpect(content().string(baseResponseMatcher("ERROR", "Callback Request Invalid: Invalid msisdn invalidMsisdn,Invalid callbackAction invalidAction,Invalid callbackStatus invalidStatus")));
 
-        verifyZeroInteractions(subscriptionService);
+        verifyZeroInteractions(kilkariSubscriptionService);
     }
 
     @Test
@@ -245,7 +239,7 @@ public class SubscriptionControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
 
         ArgumentCaptor<CallbackRequestWrapper> callbackRequestWrapperArgumentCaptor = ArgumentCaptor.forClass(CallbackRequestWrapper.class);
-        verify(subscriptionPublisher).processCallbackRequest(callbackRequestWrapperArgumentCaptor.capture());
+        verify(kilkariSubscriptionService).processCallbackRequest(callbackRequestWrapperArgumentCaptor.capture());
         CallbackRequestWrapper callbackRequestWrapper = callbackRequestWrapperArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, callbackRequestWrapper.getSubscriptionId());

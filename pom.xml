@@ -10,6 +10,7 @@
         <module>ananya-kilkari-message-campaign</module>
         <module>ananya-kilkari-subscription</module>
         <module>ananya-kilkari-web</module>
+        <module>ananya-kilkari-service</module>
     </modules>
     <name>Ananya Kilkari</name>
     <url>http://www.motechproject.org</url>

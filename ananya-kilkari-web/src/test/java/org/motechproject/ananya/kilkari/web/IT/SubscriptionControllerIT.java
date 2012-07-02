@@ -9,6 +9,7 @@ import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
+import org.motechproject.ananya.kilkari.web.domain.KilkariConstants;
 import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
@@ -33,6 +34,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     @Test
     public void shouldRetrieveSubscriptionDetailsFromDatabase() throws Exception {
         String msisdn = "9876543210";
+        String channelString = Channel.IVR.toString();
         Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
         Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS);
         allSubscriptions.add(subscription1);
@@ -46,13 +48,15 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         MvcResult result = MockMvcBuilders.standaloneSetup(subscriptionController)
                 .addInterceptors(new KilkariChannelInterceptor()).build()
-                    .perform(get("/subscriber").param("msisdn", msisdn).param("channel", Channel.IVR.toString()))
+                    .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channelString))
                     .andExpect(status().isOk())
-                    .andExpect(content().type("application/json;charset=UTF-8"))
+                    .andExpect(content().type("application/javascript;charset=UTF-8"))
                     .andReturn();
 
-        SubscriberResponse actualResponse = fromJson(result.getResponse().getContentAsString(), SubscriberResponse.class);
+        String responseString = result.getResponse().getContentAsString();
+        responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
+        SubscriberResponse actualResponse = fromJson(responseString, SubscriberResponse.class);
         assertEquals(subscriberResponse, actualResponse);
     }
 
@@ -60,18 +64,22 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     public void shouldCreateSubscriptionForTheGivenMsisdn() throws Exception {
 
         final String msisdn = "9876543210";
+        String channelString = Channel.IVR.toString();
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
 
         MvcResult result = MockMvcBuilders.standaloneSetup(subscriptionController)
                 .addInterceptors(new KilkariChannelInterceptor()).build()
                 .perform(get("/subscription").param("msisdn", msisdn).param("pack", pack.toString())
-                        .param("channel", Channel.IVR.toString()))
+                        .param("channel", channelString))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type("application/javascript;charset=UTF-8"))
                 .andReturn();
 
-        BaseResponse actualResponse =  (BaseResponse) new BaseResponse().fromJson(result.getResponse().getContentAsString());
+        String responseString = result.getResponse().getContentAsString();
+        responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
+
+        BaseResponse actualResponse =  (BaseResponse) new BaseResponse().fromJson(responseString);
         assertEquals(expectedResponse, actualResponse);
 
         final Subscription[] subscription = new Subscription[1];
@@ -80,7 +88,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
             @Override
             boolean run() {
                 subscription[0] = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
-                return (subscription[0] == null);
+                return (subscription[0] != null);
             }
         }.executeWithTimeout();
 
@@ -89,6 +97,14 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(msisdn, subscription[0].getMsisdn());
         assertEquals(pack, subscription[0].getPack());
         assertFalse(StringUtils.isBlank(subscription[0].getSubscriptionId()));
+    }
+
+    private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {
+        if (Channel.isIVR(channel)) {
+            assertTrue(jsonContent.startsWith(KilkariConstants.IVR_RESPONSE_FORMAT));
+            jsonContent = jsonContent.replace(KilkariConstants.IVR_RESPONSE_FORMAT, "");
+        }
+        return jsonContent;
     }
 
     private String toJson(Object objectToSerialize) {

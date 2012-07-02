@@ -96,25 +96,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                        <configuration>
-                            <argLine>-XX:MaxPermSize=1024M</argLine>
-                            <includes>
-                                <include>**/*IT.java</include>
-                            </includes>
-                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 </project>

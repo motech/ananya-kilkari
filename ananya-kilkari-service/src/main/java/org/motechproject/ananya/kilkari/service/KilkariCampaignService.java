@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,5 +22,9 @@ public class KilkariCampaignService {
 
     public List<DateTime> getMessageTimings(String msisdn) {
         return kilkariMessageCampaignService.getMessageTimings(msisdn, KILKARI_MESSAGE_CAMPAIGN_NAME);
+    }
+
+    public KilkariMessageCampaignEnrollmentRecord getCampaignEnrollmentRecordFor(String subscriptionId){
+        return kilkariMessageCampaignService.searchEnrollment(subscriptionId, KILKARI_MESSAGE_CAMPAIGN_NAME);
     }
 }

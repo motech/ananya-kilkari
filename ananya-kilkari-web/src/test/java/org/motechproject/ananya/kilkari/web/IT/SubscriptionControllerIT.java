@@ -6,7 +6,10 @@ import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
+import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
 import org.motechproject.ananya.kilkari.web.domain.KilkariConstants;
@@ -30,6 +33,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
     @Autowired
     private AllSubscriptions allSubscriptions;
+    @Autowired
+    private KilkariMessageCampaignService kilkariMessageCampaignService;
 
     @Test
     public void shouldRetrieveSubscriptionDetailsFromDatabase() throws Exception {
@@ -89,6 +94,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
             boolean run() {
                 subscription[0] = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
                 return (subscription[0] != null);
+
             }
         }.executeWithTimeout();
 
@@ -97,6 +103,51 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(msisdn, subscription[0].getMsisdn());
         assertEquals(pack, subscription[0].getPack());
         assertFalse(StringUtils.isBlank(subscription[0].getSubscriptionId()));
+
+        final KilkariMessageCampaignEnrollmentRecord[] campaignEnrollmentRecord =
+                new KilkariMessageCampaignEnrollmentRecord[1];
+
+        new TimedRunner() {
+            @Override
+            boolean run() {
+                 campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
+                         subscription[0].getSubscriptionId(), KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME);
+                return (campaignEnrollmentRecord[0] != null);
+            }
+        }.executeWithTimeout();
+
+        assertNotNull(campaignEnrollmentRecord[0]);
+        assertEquals(subscription[0].getSubscriptionId(), campaignEnrollmentRecord[0].getExternalId());
+        assertEquals(KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
+    }
+
+    @Test
+    public void shouldCreateScheduleForTheGivenMsisdn() throws Exception {
+        final String msisdn = "9876543210";
+        String channelString = Channel.IVR.toString();
+        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
+
+        MvcResult result = MockMvcBuilders.standaloneSetup(subscriptionController)
+                .addInterceptors(new KilkariChannelInterceptor()).build()
+                .perform(get("/subscription").param("msisdn", msisdn).param("pack", pack.toString())
+                        .param("channel", channelString))
+                .andExpect(status().isOk())
+                .andExpect(content().type("application/javascript;charset=UTF-8"))
+                .andReturn();
+
+        String responseString = result.getResponse().getContentAsString();
+        responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
+
+        BaseResponse actualResponse =  (BaseResponse) new BaseResponse().fromJson(responseString);
+        assertEquals(expectedResponse, actualResponse);
+
+       assertScheduleCreatedFor(msisdn);
+
+    }
+
+    private void assertScheduleCreatedFor(String msisdn) {
+
     }
 
     private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {

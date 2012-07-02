@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.IT;
+package org.motechproject.ananya.kilkari.web.it;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;

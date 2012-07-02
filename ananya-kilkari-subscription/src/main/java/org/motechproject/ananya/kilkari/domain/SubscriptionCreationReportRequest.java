@@ -20,8 +20,6 @@ public class SubscriptionCreationReportRequest extends BaseReportRequest {
 
     private SubscriberLocation location;
 
-    private int subscriptionWeekNumber;
-
     private String operator;
 
     public SubscriptionCreationReportRequest(String msisdn, String pack, String channel, String subscriptionId, DateTime createdAt) {
@@ -93,14 +91,6 @@ public class SubscriptionCreationReportRequest extends BaseReportRequest {
 
     public void setLocation(SubscriberLocation location) {
         this.location = location;
-    }
-
-    public int getSubscriptionWeekNumber() {
-        return subscriptionWeekNumber;
-    }
-
-    public void setSubscriptionWeekNumber(int subscriptionWeekNumber) {
-        this.subscriptionWeekNumber = subscriptionWeekNumber;
     }
 
     public String getOperator() {

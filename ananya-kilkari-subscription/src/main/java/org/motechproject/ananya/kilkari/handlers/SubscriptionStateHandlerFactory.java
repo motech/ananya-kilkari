@@ -25,7 +25,7 @@ public class SubscriptionStateHandlerFactory {
     }
 
     public SubscriptionStateHandler getHandler(CallbackRequestWrapper callbackRequestWrapper) {
-        String status = callbackRequestWrapper.getStatus() == SUCCESS ? callbackRequestWrapper.getStatus() : FAILURE;
+        String status = callbackRequestWrapper.getStatus().equals(SUCCESS) ? callbackRequestWrapper.getStatus() : FAILURE;
         String actionAndStatus = callbackRequestWrapper.getAction() + MAPPING_SEPARATOR + status;
         SubscriptionStateHandler subscriptionStateHandler = null;
         try {

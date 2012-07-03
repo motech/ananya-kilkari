@@ -1,11 +1,16 @@
-package org.motechproject.ananya.kilkari.web.it;
+package org.motechproject.ananya.kilkari.web.IT;
 
 import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.motechproject.ananya.kilkari.domain.Subscription;
+import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
+import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.controller.MessageCampaignVisualizationController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -18,22 +23,31 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.s
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationContext.xml")
-public class MessageCampaignVisualizationControllerIT {
+public class MessageCampaignVisualizationControllerIT extends SpringIntegrationTest {
 
     @Autowired
     private MessageCampaignVisualizationController messageCampaignVisualizationController;
-
     @Autowired
     private KilkariMessageCampaignService kilkariMessageCampaignService;
+    @Autowired
+    private AllSubscriptions allSubscriptions;
+    
+    @Before
+    public void setUp(){
+
+    }
 
     @Test
     public void shouldGetVisualizationForGivenExternalId() throws Exception {
-        String msisdn = "msisdn";
+        String msisdn = "9876543210";
 
         KilkariMessageCampaignRequest messageCampaignRequest = new KilkariMessageCampaignRequest(
                 msisdn, KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME,
                 new DateTime(2012, 5, 5, 13, 30, 30), new DateTime(2012, 5, 5, 0, 0));
         kilkariMessageCampaignService.start(messageCampaignRequest);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS);
+        allSubscriptions.add(subscription);
+        markForDeletion(subscription);
 
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()
                 .perform(get("/messagecampaign/visualize").param("msisdn", msisdn))
@@ -41,5 +55,6 @@ public class MessageCampaignVisualizationControllerIT {
                 .andExpect(content().type("application/json;charset=UTF-8"));
 //                .andExpect(content().string("{\"externalId\":\"msisdn\",\"schedules\":[{\"mid\":\"msisdn\",\"messages\":[1351160338000,1355987633000]}]}"));
 
+        kilkariMessageCampaignService.stop(messageCampaignRequest);
     }
 }

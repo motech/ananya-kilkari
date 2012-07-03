@@ -9,7 +9,7 @@
     <script type="text/javascript">
         function doAjax() {
             $.ajax({
-                url: '/ananya/kilkari/messagecampaign/visualize?msisdn=' + $("#msisdn").val(),
+                url: '/ananya-kilkari/messagecampaign/visualize?msisdn=' + $("#msisdn").val(),
                 success: function(data) {
                     new Schedule(new Date("Jun 18, 2012"), 3).draw(data);
                     return;

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Controller
@@ -27,11 +28,12 @@ public class MessageCampaignVisualizationController {
     @RequestMapping(value = "/visualize", method = RequestMethod.GET)
     @ResponseBody
     public UserCampaignSchedule getVisualizationForUser(@RequestParam String msisdn) {
-        List<DateTime> messageTimings = kilkariCampaignService.getMessageTimings(msisdn);
+        HashMap<String, List<DateTime>> subscriptionCampaignMap = kilkariCampaignService.getMessageTimings(msisdn);
 
         UserCampaignSchedule userCampaignSchedule = new UserCampaignSchedule(msisdn);
-        userCampaignSchedule.addCampaignSchedule(new CampaignSchedule(msisdn, messageTimings));
-
+        for(List<DateTime> subscriptionCampaign : subscriptionCampaignMap.values()){
+            userCampaignSchedule.addCampaignSchedule(new CampaignSchedule(msisdn, subscriptionCampaign));
+        }
         return userCampaignSchedule;
     }
 

@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.it;
+package org.motechproject.ananya.kilkari.web.IT;
 
 public abstract class TimedRunner {
 

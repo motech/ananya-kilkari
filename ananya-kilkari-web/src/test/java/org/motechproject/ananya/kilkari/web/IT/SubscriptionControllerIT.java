@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.web.it;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.Subscription;
@@ -34,6 +35,11 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     private AllSubscriptions allSubscriptions;
     @Autowired
     private KilkariMessageCampaignService kilkariMessageCampaignService;
+
+    @Before
+    public void setUp()  {
+        allSubscriptions.removeAll();
+    }
 
     @Test
     public void shouldRetrieveSubscriptionDetailsFromDatabase() throws Exception {

@@ -18,7 +18,13 @@ public class CallbackRequestValidator {
         validateMsisdn(callbackRequest.getMsisdn());
         validateCallbackAction(callbackRequest.getAction());
         validateCallbackStatus(callbackRequest.getStatus());
+        validateOperator(callbackRequest.getOperator());
         return errors;
+    }
+
+    private void validateOperator(String operator) {
+        if (!Operator.isValid(operator))
+            errors.add(String.format("Invalid operator %s", operator));
     }
 
     private void validateMsisdn(String msisdn) {

@@ -62,4 +62,28 @@ public class CallbackRequestValidatorTest {
         assertFalse(errors.isEmpty());
         assertEquals("Invalid callbackStatus invalid", errors.get(0));
     }
+
+    @Test
+    public void shouldReturnInvalidIfOperatorIsInvalid() {
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setMsisdn("1234567890");
+        callbackRequest.setAction(CallbackAction.ACT.name());
+        callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
+        callbackRequest.setOperator("invalid_operator");
+        List<String> errors = new CallbackRequestValidator().validate(callbackRequest);
+        assertFalse(errors.isEmpty());
+        assertEquals("Invalid operator invalid_operator", errors.get(0));
+    }
+
+    @Test
+    public void shouldReturnInvalidIfOperatorIsNotGiven() {
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setMsisdn("1234567890");
+        callbackRequest.setAction(CallbackAction.ACT.name());
+        callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
+        callbackRequest.setOperator(null);
+        List<String> errors = new CallbackRequestValidator().validate(callbackRequest);
+        assertFalse(errors.isEmpty());
+        assertEquals("Invalid operator null", errors.get(0));
+    }
 }

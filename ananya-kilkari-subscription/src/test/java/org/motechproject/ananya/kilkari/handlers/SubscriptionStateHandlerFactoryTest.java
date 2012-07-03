@@ -45,10 +45,10 @@ public class SubscriptionStateHandlerFactoryTest {
     }
 
     @Test
-    public void shouldReturnTheActivationFailedHandlerGivenAnActivationFailedCallbackRequestWrapper() {
+    public void shouldReturnTheActivationFailedHandlerGivenACallbackRequestWrapperWithStatusAnythingOtherThanSuccessForACTAction() {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("ACT");
-        callbackRequest.setStatus("FAILURE");
+        callbackRequest.setStatus("anything_other_than_success");
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
 
         SubscriptionStateHandler subscriptionStateHandler = new SubscriptionStateHandlerFactory(subscriptionService).getHandler(callbackRequestWrapper);

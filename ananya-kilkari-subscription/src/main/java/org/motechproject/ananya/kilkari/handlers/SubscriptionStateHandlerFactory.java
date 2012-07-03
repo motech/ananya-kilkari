@@ -10,18 +10,23 @@ import java.util.HashMap;
 @Component
 public class SubscriptionStateHandlerFactory {
     public static final String MAPPING_SEPARATOR = "|";
+    public static final String SUCCESS = "SUCCESS";
+    public static final String FAILURE = "FAILURE";
     private SubscriptionService subscriptionService;
 
-    private HashMap<String, Class> handlerMappings;
+    private static HashMap<String, Class> handlerMappings = new HashMap<String, Class>() {{
+        put("ACT|SUCCESS", ActivateHandler.class);
+        put("ACT|FAILURE", ActivationFailedHandler.class);
+    }};
 
     @Autowired
     public SubscriptionStateHandlerFactory(SubscriptionService subscriptionService) {
         this.subscriptionService = subscriptionService;
-        populateHandlerMapping();
     }
 
     public SubscriptionStateHandler getHandler(CallbackRequestWrapper callbackRequestWrapper) {
-        String actionAndStatus = callbackRequestWrapper.getAction() + MAPPING_SEPARATOR + callbackRequestWrapper.getStatus();
+        String status = callbackRequestWrapper.getStatus() == SUCCESS ? callbackRequestWrapper.getStatus() : FAILURE;
+        String actionAndStatus = callbackRequestWrapper.getAction() + MAPPING_SEPARATOR + status;
         SubscriptionStateHandler subscriptionStateHandler = null;
         try {
            subscriptionStateHandler = (SubscriptionStateHandler) handlerMappings.get(actionAndStatus).newInstance();
@@ -36,11 +41,5 @@ public class SubscriptionStateHandlerFactory {
 
     public HashMap<String, Class> getHandlerMappings() {
         return handlerMappings;
-    }
-
-    private void populateHandlerMapping() {
-        handlerMappings = new HashMap<>();
-        handlerMappings.put("ACT|SUCCESS", ActivateHandler.class);
-        handlerMappings.put("ACT|FAILURE", ActivationFailedHandler.class);
     }
 }

@@ -64,7 +64,8 @@ public class PublisherTest {
     public void shouldPublishSubscriptionStateChangeEventIntoQueue() {
         String subscriptionId = "ABCD1234";
         SubscriptionStatus subscriptionStatus = SubscriptionStatus.ACTIVE;
-        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus.name(), DateTime.now());
+        String reason = "my own reason";
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus.name(), DateTime.now(), reason);
 
         publisher.reportSubscriptionStateChange(subscriptionStateChangeReportRequest);
 
@@ -78,6 +79,7 @@ public class PublisherTest {
         assertEquals(SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE, eventName);
         assertEquals(subscriptionId, actualSubscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(subscriptionStatus.name(), actualSubscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(reason, actualSubscriptionStateChangeReportRequest.getReason());
     }
 }
 

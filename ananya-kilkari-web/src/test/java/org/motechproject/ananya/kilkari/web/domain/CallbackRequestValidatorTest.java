@@ -16,6 +16,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setMsisdn("1234567890");
         callbackRequest.setAction(CallbackAction.ACT.name());
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
+        callbackRequest.setOperator(Operator.AIRTEL.name());
         assertTrue(new CallbackRequestValidator().validate(callbackRequest).isEmpty());
     }
 

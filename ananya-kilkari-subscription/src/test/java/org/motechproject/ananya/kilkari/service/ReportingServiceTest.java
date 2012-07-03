@@ -60,9 +60,10 @@ public class ReportingServiceTest {
     public void shouldInvokeUpdateOnReportingServiceWithSubscriptionStateChangeDetails() {
         String subscriptionId = "abcd1234";
         String subscriptionStatus = SubscriptionStatus.ACTIVE.name();
+        String reason = "my own error reason";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
-        new ReportingService(restTemplate, kilkariProperties).updateSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus, DateTime.now()));
+        new ReportingService(restTemplate, kilkariProperties).updateSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus, DateTime.now(), reason));
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
@@ -73,5 +74,6 @@ public class ReportingServiceTest {
         assertEquals("url/updatesubscription/abcd1234", urlArgumentCaptor.getValue());
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(subscriptionStatus, subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(reason, subscriptionStateChangeReportRequest.getReason());
     }
 }

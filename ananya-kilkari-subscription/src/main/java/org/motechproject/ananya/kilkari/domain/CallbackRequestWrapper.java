@@ -24,6 +24,10 @@ public class CallbackRequestWrapper implements Serializable {
         return callbackRequest.getStatus();
     }
 
+    public String getReason() {
+        return callbackRequest.getReason();
+    }
+
     public String getSubscriptionId() {
         return subscriptionId;
     }

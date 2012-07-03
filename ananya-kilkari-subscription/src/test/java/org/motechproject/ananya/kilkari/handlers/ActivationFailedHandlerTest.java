@@ -27,8 +27,10 @@ public class ActivationFailedHandlerTest {
         String subscriptionId = "abcd1234";
         DateTime now = DateTime.now();
 
-        activationFailedHandler.perform(new CallbackRequestWrapper(new CallbackRequest(), subscriptionId, now));
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setReason("my own reason");
+        activationFailedHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now));
 
-        verify(subscriptionService).activationFailed(subscriptionId, now);
+        verify(subscriptionService).activationFailed(subscriptionId, now, "my own reason");
     }
 }

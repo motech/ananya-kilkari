@@ -21,6 +21,7 @@ import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
+import org.motechproject.ananya.kilkari.web.domain.Operator;
 import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.springframework.http.MediaType;
 
@@ -207,6 +208,7 @@ public class SubscriptionControllerTest {
         callbackRequest.setMsisdn("invalidMsisdn");
         callbackRequest.setAction("invalidAction");
         callbackRequest.setStatus("invalidStatus");
+        callbackRequest.setOperator("invalidOperator");
 
         byte[] requestBody = toJson(callbackRequest).getBytes();
 
@@ -215,7 +217,7 @@ public class SubscriptionControllerTest {
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
-                .andExpect(content().string(baseResponseMatcher("ERROR", "Callback Request Invalid: Invalid msisdn invalidMsisdn,Invalid callbackAction invalidAction,Invalid callbackStatus invalidStatus")));
+                .andExpect(content().string(baseResponseMatcher("ERROR", "Callback Request Invalid: Invalid msisdn invalidMsisdn,Invalid callbackAction invalidAction,Invalid callbackStatus invalidStatus,Invalid operator invalidOperator")));
 
         verifyZeroInteractions(kilkariSubscriptionService);
     }
@@ -228,7 +230,7 @@ public class SubscriptionControllerTest {
         callbackRequest.setAction(CallbackAction.ACT.name());
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
         callbackRequest.setReason("reason");
-        callbackRequest.setOperator("operator");
+        callbackRequest.setOperator(Operator.AIRTEL.name());
         callbackRequest.setGraceCount("2");
         byte[] requestBody = toJson(callbackRequest).getBytes();
 

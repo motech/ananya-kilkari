@@ -45,8 +45,9 @@ public class SubscriptionReportHandlerTest {
     public void shouldInvokeReportingServiceToUpdateASubscription() {
         final String subscriptionId = "abcd1234";
         final String status = SubscriptionStatus.ACTIVE.name();
+        final String reason = "my own reason";
 
-        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, status, DateTime.now());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, status, DateTime.now(), reason);
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("0", subscriptionStateChangeReportRequest);
 

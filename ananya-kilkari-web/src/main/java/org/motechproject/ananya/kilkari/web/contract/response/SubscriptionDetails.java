@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.contract.response;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class SubscriptionDetails {
@@ -53,4 +54,8 @@ public class SubscriptionDetails {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 }

@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.contract.response;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.ArrayList;
@@ -38,5 +39,10 @@ public class SubscriberResponse {
     @Override
     public int hashCode() {
         return subscriptionDetails != null ? subscriptionDetails.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

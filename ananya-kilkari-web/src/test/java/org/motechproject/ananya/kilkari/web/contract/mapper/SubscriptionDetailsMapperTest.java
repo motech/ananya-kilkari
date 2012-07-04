@@ -13,7 +13,6 @@ public class SubscriptionDetailsMapperTest {
         Subscription subscription = new Subscription("1234", SubscriptionPack.FIFTEEN_MONTHS);
 
         SubscriptionDetails subscriptionDetails = SubscriptionDetailsMapper.mapFrom(subscription);
-        System.out.println(subscriptionDetails);
 
         assertEquals(subscription.getSubscriptionId(), subscriptionDetails.getSubscriptionId());
         assertEquals(subscription.getPack().name(), subscriptionDetails.getPack());

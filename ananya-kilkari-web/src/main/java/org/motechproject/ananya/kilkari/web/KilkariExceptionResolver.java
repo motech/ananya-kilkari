@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.web;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,8 @@ import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Properties;
 
 @Component
@@ -19,7 +22,7 @@ public class KilkariExceptionResolver extends SimpleMappingExceptionResolver {
     public KilkariExceptionResolver() {
         Properties properties = new Properties();
         properties.put(".Exception", "exceptionView");
-        properties.put("org.motechproject.ananya.kilkari.exceptions.ValidationException", "validationExceptionView");
+        properties.put(ValidationException.class.getCanonicalName(), "validationExceptionView");
 
         setExceptionMappings(properties);
     }

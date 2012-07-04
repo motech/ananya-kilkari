@@ -11,10 +11,7 @@ import org.motechproject.server.messagecampaign.service.MessageCampaignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class KilkariMessageCampaignService {
@@ -46,16 +43,18 @@ public class KilkariMessageCampaignService {
     }
 
     public List<DateTime> getMessageTimings(String subscriptionId, String campaignName) {
-        DateTime now = DateTime.now();
-        Map<String,List<Date>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
-                now.toDate(), now.plusYears(1).toDate());
-        List<Date> dateList = campaignTimings.get(campaignName);
-        List<DateTime> messageTimings = new ArrayList<>();
-        if(dateList == null ||dateList.isEmpty())
-            return messageTimings;
-        for (Date date : dateList) {
-            messageTimings.add(new DateTime(date.getTime()));
-        }
-        return messageTimings;
+          //TODO:commenting the actual method until new platform release
+//        DateTime now = DateTime.now();
+//        Map<String,List<Date>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
+//                now.toDate(), now.plusYears(1).toDate());
+//        List<Date> dateList = campaignTimings.get(campaignName);
+//        List<DateTime> messageTimings = new ArrayList<>();
+//        if(dateList == null ||dateList.isEmpty())
+//            return messageTimings;
+//        for (Date date : dateList) {
+//            messageTimings.add(new DateTime(date.getTime()));
+//        }
+//        return messageTimings;
+        return Collections.emptyList();
     }
 }

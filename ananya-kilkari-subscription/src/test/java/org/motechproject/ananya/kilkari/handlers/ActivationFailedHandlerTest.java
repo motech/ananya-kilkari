@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.CallbackRequest;
 import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.domain.Operator;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 
 import static org.mockito.Mockito.verify;
@@ -25,12 +26,14 @@ public class ActivationFailedHandlerTest {
         ActivationFailedHandler activationFailedHandler = new ActivationFailedHandler();
         activationFailedHandler.setSubscriptionService(subscriptionService);
         String subscriptionId = "abcd1234";
+        String operator = Operator.AIRTEL.name();
         DateTime now = DateTime.now();
 
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setReason("my own reason");
+        callbackRequest.setOperator(operator);
         activationFailedHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now));
 
-        verify(subscriptionService).activationFailed(subscriptionId, now, "my own reason");
+        verify(subscriptionService).activationFailed(subscriptionId, now, "my own reason", operator);
     }
 }

@@ -14,6 +14,7 @@ import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -67,6 +68,7 @@ public class SubscriptionServiceTest {
         assertEquals(msisdn, actualSubscriptionCreationReportRequest.getMsisdn());
         assertEquals(subscriptionPack.name(), actualSubscriptionCreationReportRequest.getPack());
         assertEquals(channel.name(), actualSubscriptionCreationReportRequest.getChannel());
+        assertNull(actualSubscriptionCreationReportRequest.getOperator());
     }
 
     @Test(expected = ValidationException.class)
@@ -139,6 +141,7 @@ public class SubscriptionServiceTest {
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertNull(subscriptionStateChangeReportRequest.getOperator());
     }
 
     @Test
@@ -146,13 +149,14 @@ public class SubscriptionServiceTest {
         SubscriptionStatus status = SubscriptionStatus.ACTIVATION_FAILED;
         Subscription mockedSubscription = mock(Subscription.class);
         String subscriptionId = "abcd1234";
+        String operator = Operator.AIRTEL.name();
         String reason = "Activation Failed For some error";
 
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.activationFailed(subscriptionId, DateTime.now(), reason);
+        subscriptionService.activationFailed(subscriptionId, DateTime.now(), reason, operator);
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
@@ -165,6 +169,7 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(reason, subscriptionStateChangeReportRequest.getReason());
+        assertEquals(operator, subscriptionStateChangeReportRequest.getOperator());
     }
 
     @Test
@@ -172,12 +177,13 @@ public class SubscriptionServiceTest {
         Subscription mockedSubscription = mock(Subscription.class);
         String subscriptionId = "abcd1234";
         SubscriptionStatus subscriptionStatus = SubscriptionStatus.ACTIVE;
+        String operator = Operator.AIRTEL.name();
 
         when(mockedSubscription.getStatus()).thenReturn(subscriptionStatus);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.activate(subscriptionId, DateTime.now());
+        subscriptionService.activate(subscriptionId, DateTime.now(), operator);
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
@@ -189,6 +195,7 @@ public class SubscriptionServiceTest {
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(subscriptionStatus.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(operator, subscriptionStateChangeReportRequest.getOperator());
     }
 
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {

@@ -65,7 +65,8 @@ public class PublisherTest {
         String subscriptionId = "ABCD1234";
         SubscriptionStatus subscriptionStatus = SubscriptionStatus.ACTIVE;
         String reason = "my own reason";
-        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus.name(), DateTime.now(), reason);
+        String operator = Operator.AIRTEL.name();
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus.name(), DateTime.now(), reason, operator);
 
         publisher.reportSubscriptionStateChange(subscriptionStateChangeReportRequest);
 
@@ -80,6 +81,7 @@ public class PublisherTest {
         assertEquals(subscriptionId, actualSubscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(subscriptionStatus.name(), actualSubscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(reason, actualSubscriptionStateChangeReportRequest.getReason());
+        assertEquals(operator, actualSubscriptionStateChangeReportRequest.getOperator());
     }
 }
 

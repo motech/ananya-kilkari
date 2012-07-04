@@ -35,4 +35,8 @@ public class CallbackRequestWrapper implements Serializable {
     public DateTime getCreatedAt() {
         return createdAt;
     }
+
+    public String getOperator() {
+        return callbackRequest.getOperator();
+    }
 }

@@ -44,8 +44,8 @@ public class SubscriptionService {
         return allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.from(pack));
     }
 
-    public void activate(String subscriptionId, DateTime activatedOn) {
-        updateStatusAndReport(subscriptionId, activatedOn, null, new Action<Subscription>() {
+    public void activate(String subscriptionId, DateTime activatedOn, String operator) {
+        updateStatusAndReport(subscriptionId, activatedOn, null, operator, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.activate();
@@ -53,8 +53,8 @@ public class SubscriptionService {
         });
     }
 
-    public void activationFailed(String subscriptionId, DateTime updatedOn, String reason) {
-        updateStatusAndReport(subscriptionId, updatedOn, reason, new Action<Subscription>() {
+    public void activationFailed(String subscriptionId, DateTime updatedOn, String reason, String operator) {
+        updateStatusAndReport(subscriptionId, updatedOn, reason, operator, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.activationFailed();
@@ -63,7 +63,7 @@ public class SubscriptionService {
     }
 
     public void activationRequested(String subscriptionId) {
-        updateStatusAndReport(subscriptionId, DateTime.now(), null, new Action<Subscription>() {
+        updateStatusAndReport(subscriptionId, DateTime.now(), null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.activationRequested();
@@ -71,10 +71,10 @@ public class SubscriptionService {
         });
     }
 
-    private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, Action<Subscription> action) {
+    private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Action<Subscription> action) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         action.perform(subscription);
-        updateWithReporting(subscription, updatedOn, reason);
+        updateWithReporting(subscription, updatedOn, reason, operator);
     }
 
     private void sendProcessSubscriptionEvent(SubscriptionActivationRequest subscriptionActivationRequest) {
@@ -94,12 +94,12 @@ public class SubscriptionService {
         return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
     }
 
-    private void sendSubscriptionStateChangeEvent(String subscriptionId, SubscriptionStatus status, DateTime updatedOn, String reason) {
-        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, status.name(), updatedOn, reason));
+    private void sendSubscriptionStateChangeEvent(String subscriptionId, SubscriptionStatus status, DateTime updatedOn, String reason, String operator) {
+        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, status.name(), updatedOn, reason, operator));
     }
 
-    private void updateWithReporting(Subscription subscription, DateTime updatedOn, String reason) {
+    private void updateWithReporting(Subscription subscription, DateTime updatedOn, String reason, String operator) {
         allSubscriptions.update(subscription);
-        sendSubscriptionStateChangeEvent(subscription.getSubscriptionId(), subscription.getStatus(), updatedOn, reason);
+        sendSubscriptionStateChangeEvent(subscription.getSubscriptionId(), subscription.getStatus(), updatedOn, reason, operator);
     }
 }

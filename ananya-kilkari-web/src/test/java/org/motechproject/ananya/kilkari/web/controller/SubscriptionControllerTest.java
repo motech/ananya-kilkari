@@ -21,7 +21,7 @@ import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
-import org.motechproject.ananya.kilkari.web.domain.Operator;
+import org.motechproject.ananya.kilkari.domain.Operator;
 import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.springframework.http.MediaType;
 

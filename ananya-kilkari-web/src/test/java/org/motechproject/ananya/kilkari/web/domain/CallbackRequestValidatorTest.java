@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.web.domain;
 
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.CallbackRequest;
+import org.motechproject.ananya.kilkari.domain.Operator;
 
 import java.util.List;
 

@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.contract.response;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class BaseResponse extends BaseObject {
@@ -56,6 +57,7 @@ public class BaseResponse extends BaseObject {
         return result;
     }
 
+    @JsonIgnore
     public boolean isError() {
         return status.equals(ERROR);
     }

@@ -1,6 +1,9 @@
 package org.motechproject.ananya.kilkari.web.contract.response;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class SubscriptionDetails {
@@ -38,24 +41,25 @@ public class SubscriptionDetails {
 
         SubscriptionDetails that = (SubscriptionDetails) o;
 
-        if (pack != null ? !pack.equals(that.pack) : that.pack != null) return false;
-        if (status != null ? !status.equals(that.status) : that.status != null) return false;
-        if (subscriptionId != null ? !subscriptionId.equals(that.subscriptionId) : that.subscriptionId != null)
-            return false;
-
-        return true;
+        return new EqualsBuilder().append(this.subscriptionId, that.subscriptionId)
+                .append(this.pack, that.pack)
+                .append(this.status, that.status)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        int result = subscriptionId != null ? subscriptionId.hashCode() : 0;
-        result = 31 * result + (pack != null ? pack.hashCode() : 0);
-        result = 31 * result + (status != null ? status.hashCode() : 0);
-        return result;
+        return new HashCodeBuilder()
+                .append(this.subscriptionId)
+                .append(this.pack)
+                .append(this.status).hashCode();
     }
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append(subscriptionId)
+                .append(pack)
+                .append(status).toString();
     }
 }

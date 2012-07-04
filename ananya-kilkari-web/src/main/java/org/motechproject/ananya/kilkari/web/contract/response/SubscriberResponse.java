@@ -1,6 +1,9 @@
 package org.motechproject.ananya.kilkari.web.contract.response;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ public class SubscriberResponse {
         return subscriptionDetails;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -30,19 +34,20 @@ public class SubscriberResponse {
 
         SubscriberResponse that = (SubscriberResponse) o;
 
-        if (subscriptionDetails != null ? !subscriptionDetails.equals(that.subscriptionDetails) : that.subscriptionDetails != null)
-            return false;
-
-        return true;
+        return new EqualsBuilder().append(this.subscriptionDetails, that.subscriptionDetails)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return subscriptionDetails != null ? subscriptionDetails.hashCode() : 0;
+        return new HashCodeBuilder()
+                .append(this.subscriptionDetails).hashCode();
     }
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append(this.subscriptionDetails).toString();
     }
+
 }

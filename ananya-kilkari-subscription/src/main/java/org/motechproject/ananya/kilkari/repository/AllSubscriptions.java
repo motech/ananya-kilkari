@@ -8,6 +8,8 @@ import org.ektorp.support.View;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.dao.MotechBaseRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -16,6 +18,8 @@ import java.util.List;
 
 @Repository
 public class AllSubscriptions extends MotechBaseRepository<Subscription> {
+    private final static Logger logger = LoggerFactory.getLogger(AllSubscriptions.class);
+
     @Autowired
     protected AllSubscriptions(@Qualifier("kilkariDbConnector") CouchDbConnector db) {
         super(Subscription.class, db);
@@ -47,5 +51,8 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
         Subscription existingSubscription = findByMsisdnAndPack(subscription.getMsisdn(), subscription.getPack());
         if (existingSubscription == null)
             super.add(subscription);
+        else
+            logger.info(String.format("Ignored Create subscription for msisdn: %s, pack: %s as an active subscription already exists for the given msisdn and pack.",
+                    subscription.getMsisdn(), subscription.getPack()));
     }
 }

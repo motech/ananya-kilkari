@@ -10,7 +10,6 @@ import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -32,7 +31,7 @@ public class SubscriptionReportHandlerTest {
         final String channel = Channel.IVR.name();
         final String subscriptionId = "abcd1234";
 
-        SubscriptionCreationReportRequest subscriptionCreationReportRequest = new SubscriptionCreationReportRequest(msisdn, pack, channel, subscriptionId, DateTime.now());
+        SubscriptionCreationReportRequest subscriptionCreationReportRequest = new SubscriptionCreationReportRequest(new Subscription(), null, 0, null, null, null, null);
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("0", subscriptionCreationReportRequest);
 
@@ -44,7 +43,7 @@ public class SubscriptionReportHandlerTest {
     @Test
     public void shouldInvokeReportingServiceToUpdateASubscription() {
         final String subscriptionId = "abcd1234";
-        final String status = SubscriptionStatus.ACTIVE.name();
+        final SubscriptionStatus status = SubscriptionStatus.ACTIVE;
         final String reason = "my own reason";
         final String operator = Operator.AIRTEL.name();
 

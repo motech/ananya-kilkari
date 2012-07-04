@@ -31,10 +31,13 @@ public class SubscriptionServiceTest {
     @Mock
     private SubscriptionRequest mockedSubscriptionRequest;
 
+    @Mock
+    private ReportingService reportingService;
+
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, publisher);
+        subscriptionService = new SubscriptionService(allSubscriptions, publisher, reportingService);
     }
 
     @Test
@@ -66,14 +69,14 @@ public class SubscriptionServiceTest {
 
         SubscriptionCreationReportRequest actualSubscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
         assertEquals(msisdn, actualSubscriptionCreationReportRequest.getMsisdn());
-        assertEquals(subscriptionPack.name(), actualSubscriptionCreationReportRequest.getPack());
-        assertEquals(channel.name(), actualSubscriptionCreationReportRequest.getChannel());
+        assertEquals(subscriptionPack, actualSubscriptionCreationReportRequest.getPack());
+        assertEquals(channel, actualSubscriptionCreationReportRequest.getChannel());
         assertNull(actualSubscriptionCreationReportRequest.getOperator());
     }
 
     @Test(expected = ValidationException.class)
     public void shouldThrowExceptionWhenInvalidSubscriptionRequestIsGiven() throws ValidationException {
-        doThrow(new ValidationException("Invalid Request")).when(mockedSubscriptionRequest).validate();
+        doThrow(new ValidationException("Invalid Request")).when(mockedSubscriptionRequest).validate(reportingService);
         subscriptionService.createSubscription(mockedSubscriptionRequest);
     }
 
@@ -119,8 +122,6 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldUpdateTheSubscriptionStatusToPendingActivation_WhenActivationIsRequested() {
-        SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
-        String msisdn = "123456890";
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.PENDING_ACTIVATION;
         Subscription mockedSubscription = mock(Subscription.class);
@@ -140,7 +141,7 @@ public class SubscriptionServiceTest {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(status, subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertNull(subscriptionStateChangeReportRequest.getOperator());
     }
 
@@ -167,7 +168,7 @@ public class SubscriptionServiceTest {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(status, subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(reason, subscriptionStateChangeReportRequest.getReason());
         assertEquals(operator, subscriptionStateChangeReportRequest.getOperator());
     }
@@ -194,7 +195,7 @@ public class SubscriptionServiceTest {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(subscriptionStatus.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(subscriptionStatus, subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(operator, subscriptionStateChangeReportRequest.getOperator());
     }
 

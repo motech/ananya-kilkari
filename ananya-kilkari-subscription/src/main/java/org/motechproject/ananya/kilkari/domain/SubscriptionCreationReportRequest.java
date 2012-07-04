@@ -4,11 +4,11 @@ import org.joda.time.DateTime;
 
 public class SubscriptionCreationReportRequest extends BaseReportRequest {
 
-    private String channel;
+    private Channel channel;
 
     private String msisdn;
 
-    private String pack;
+    private SubscriptionPack pack;
 
     private String name;
 
@@ -22,82 +22,51 @@ public class SubscriptionCreationReportRequest extends BaseReportRequest {
 
     private String operator;
 
-    public SubscriptionCreationReportRequest(String msisdn, String pack, String channel, String subscriptionId, DateTime createdAt) {
-        super(subscriptionId, SubscriptionStatus.NEW.name(), createdAt);
-        this.msisdn = msisdn;
-        this.pack = pack;
+    public SubscriptionCreationReportRequest(Subscription subscription, Channel channel, int ageOfBeneficiary, String name, DateTime dob, DateTime edd, SubscriberLocation location) {
+        super(subscription.getSubscriptionId(), subscription.getStatus(), subscription.getCreationDate());
+        this.name = name;
+        this.msisdn = subscription.getMsisdn();
+        this.pack = subscription.getPack();
         this.channel = channel;
+        this.ageOfBeneficiary = ageOfBeneficiary;
+        this.dob = dob;
+        this.edd = edd;
+        this.location = location;
     }
 
-    public String getChannel() {
+    public Channel getChannel() {
         return channel;
-    }
-
-    public void setChannel(String channel) {
-        this.channel = channel;
     }
 
     public String getMsisdn() {
         return msisdn;
     }
 
-    public void setMsisdn(String msisdn) {
-        this.msisdn = msisdn;
-    }
-
-    public String getPack() {
+    public SubscriptionPack getPack() {
         return pack;
-    }
-
-    public void setPack(String pack) {
-        this.pack = pack;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getAgeOfBeneficiary() {
         return ageOfBeneficiary;
-    }
-
-    public void setAgeOfBeneficiary(int ageOfBeneficiary) {
-        this.ageOfBeneficiary = ageOfBeneficiary;
     }
 
     public DateTime getEdd() {
         return edd;
     }
 
-    public void setEdd(DateTime edd) {
-        this.edd = edd;
-    }
-
     public DateTime getDob() {
         return dob;
-    }
-
-    public void setDob(DateTime dob) {
-        this.dob = dob;
     }
 
     public SubscriberLocation getLocation() {
         return location;
     }
 
-    public void setLocation(SubscriberLocation location) {
-        this.location = location;
-    }
-
     public String getOperator() {
         return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
     }
 }

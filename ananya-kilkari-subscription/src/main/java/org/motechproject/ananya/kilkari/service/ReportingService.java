@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.motechproject.ananya.kilkari.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStateChangeReportRequest;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ public class ReportingService {
 
     public static final String CREATE_SUBSCRIPTION_PATH = "subscription";
     public static final String SUBSCRIPTION_STATE_CHANGE_PATH = "updatesubscription";
+    public static final String GET_LOCATION_PATH = "location";
     private RestTemplate restTemplate;
     private Properties kilkariProperties;
     private final static Logger logger = LoggerFactory.getLogger(ReportingService.class);
@@ -29,8 +31,7 @@ public class ReportingService {
     }
 
     public void createSubscription(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {
-        String baseUrl = kilkariProperties.getProperty("reporting.service.base.url");
-        String url = (baseUrl.endsWith("/")) ? String.format("%s%s", baseUrl, CREATE_SUBSCRIPTION_PATH) : String.format("%s/%s", baseUrl, CREATE_SUBSCRIPTION_PATH);
+        String url = String.format("%s%s", getBaseUrl(), CREATE_SUBSCRIPTION_PATH);
         try {
             restTemplate.postForLocation(url, subscriptionCreationReportRequest, String.class, new HashMap<String, String>());
         } catch  (HttpClientErrorException ex) {
@@ -40,9 +41,8 @@ public class ReportingService {
     }
 
     public void updateSubscriptionStateChange(SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest) {
-        String baseUrl = kilkariProperties.getProperty("reporting.service.base.url");
         String subscriptionId = subscriptionStateChangeReportRequest.getSubscriptionId();
-        String url = (baseUrl.endsWith("/")) ? String.format("%s%s/%s", baseUrl, SUBSCRIPTION_STATE_CHANGE_PATH, subscriptionId) : String.format("%s/%s/%s", baseUrl, SUBSCRIPTION_STATE_CHANGE_PATH, subscriptionId);
+        String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIPTION_STATE_CHANGE_PATH, subscriptionId);
         try {
             restTemplate.put(url, subscriptionStateChangeReportRequest, new HashMap<String, String>());
         } catch  (HttpClientErrorException ex) {
@@ -50,5 +50,24 @@ public class ReportingService {
             throw ex;
         }
 
+    }
+
+    public SubscriberLocation getLocation(String district, String block, String panchayat) {
+        String url = String.format("%s%s", getBaseUrl(), GET_LOCATION_PATH );
+        HashMap<String, String> locationParameters = new HashMap<String, String>();
+        locationParameters.put("district",district);
+        locationParameters.put("block",block);
+        locationParameters.put("panchayat",panchayat);
+        try {
+            return restTemplate.getForEntity(url, SubscriberLocation.class, locationParameters).getBody();
+        } catch  (HttpClientErrorException ex) {
+            logger.error(String.format("Reporting subscription state change failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
+            throw ex;
+        }
+    }
+
+    private String getBaseUrl() {
+        String baseUrl = kilkariProperties.getProperty("reporting.service.base.url");
+        return baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
     }
 }

@@ -4,7 +4,6 @@ import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 
 public class SubscriptionRequestBuilder {
 
-
     private SubscriptionRequest request;
 
     public SubscriptionRequestBuilder withDefaults() {
@@ -49,5 +48,20 @@ public class SubscriptionRequestBuilder {
 
     public SubscriptionRequest build() {
         return request;
+    }
+
+    public SubscriptionRequestBuilder withDistrict(String district) {
+        request.setDistrict(district);
+        return this;
+    }
+
+    public SubscriptionRequestBuilder withBlock(String block) {
+        request.setBlock(block);
+        return this;
+    }
+
+    public SubscriptionRequestBuilder withPanchayat(String panchayat) {
+        request.setPanchayat(panchayat);
+        return this;
     }
 }

@@ -16,15 +16,17 @@ public class SubscriptionService {
     private AllSubscriptions allSubscriptions;
 
     private Publisher publisher;
+    private ReportingService reportingService;
 
     @Autowired
-    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher) {
+    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher, ReportingService reportingService) {
         this.allSubscriptions = allSubscriptions;
         this.publisher = publisher;
+        this.reportingService = reportingService;
     }
 
     public String createSubscription(SubscriptionRequest subscriptionRequest) {
-        subscriptionRequest.validate();
+        subscriptionRequest.validate(reportingService);
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper(subscriptionRequest);
         Subscription subscription = subscriptionMapper.getSubscription();
         allSubscriptions.add(subscription);
@@ -95,7 +97,7 @@ public class SubscriptionService {
     }
 
     private void sendSubscriptionStateChangeEvent(String subscriptionId, SubscriptionStatus status, DateTime updatedOn, String reason, String operator) {
-        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, status.name(), updatedOn, reason, operator));
+        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, status, updatedOn, reason, operator));
     }
 
     private void updateWithReporting(Subscription subscription, DateTime updatedOn, String reason, String operator) {

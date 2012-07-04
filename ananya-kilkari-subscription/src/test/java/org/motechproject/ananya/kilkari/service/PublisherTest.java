@@ -44,8 +44,8 @@ public class PublisherTest {
 
     @Test
     public void shouldPublishReportSubscriptionCreationEventIntoQueue() {
-        String subscriptionId = "ABCD1234";
-        publisher.reportSubscriptionCreation(new SubscriptionCreationReportRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.IVR.name(), subscriptionId, DateTime.now()));
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.TWELVE_MONTHS);
+        publisher.reportSubscriptionCreation(new SubscriptionCreationReportRequest(subscription, Channel.IVR, 0, null, null, null, null));
 
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
         ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -55,9 +55,9 @@ public class PublisherTest {
 
         assertEquals(SubscriptionEventKeys.REPORT_SUBSCRIPTION_CREATION, eventName);
         assertEquals("1234567890", subscriptionCreationReportRequest.getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS.name(), subscriptionCreationReportRequest.getPack());
-        assertEquals(Channel.IVR.name(), subscriptionCreationReportRequest.getChannel());
-        assertEquals(subscriptionId, subscriptionCreationReportRequest.getSubscriptionId());
+        assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptionCreationReportRequest.getPack());
+        assertEquals(Channel.IVR, subscriptionCreationReportRequest.getChannel());
+        assertEquals(subscription.getSubscriptionId(), subscriptionCreationReportRequest.getSubscriptionId());
     }
 
     @Test
@@ -66,7 +66,7 @@ public class PublisherTest {
         SubscriptionStatus subscriptionStatus = SubscriptionStatus.ACTIVE;
         String reason = "my own reason";
         String operator = Operator.AIRTEL.name();
-        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus.name(), DateTime.now(), reason, operator);
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus, DateTime.now(), reason, operator);
 
         publisher.reportSubscriptionStateChange(subscriptionStateChangeReportRequest);
 
@@ -79,7 +79,7 @@ public class PublisherTest {
 
         assertEquals(SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE, eventName);
         assertEquals(subscriptionId, actualSubscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(subscriptionStatus.name(), actualSubscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(subscriptionStatus, actualSubscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(reason, actualSubscriptionStateChangeReportRequest.getReason());
         assertEquals(operator, actualSubscriptionStateChangeReportRequest.getOperator());
     }

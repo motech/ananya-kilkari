@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
+import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
@@ -21,19 +22,22 @@ import java.util.List;
 public class SubscriptionController {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
+    private ReportingService reportingService;
 
     private final Logger logger = LoggerFactory.getLogger(SubscriptionController.class);
 
     @Autowired
-    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService) {
+    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, ReportingService reportingService) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
+        this.reportingService = reportingService;
     }
+
 
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
     @ResponseBody
     public BaseResponse createSubscription(SubscriptionRequest subscriptionRequest) {
         if(!Channel.isIVR(subscriptionRequest.getChannel())) {
-            subscriptionRequest.validate();
+            subscriptionRequest.validate(reportingService);
         }
 
         kilkariSubscriptionService.createSubscription(subscriptionRequest);

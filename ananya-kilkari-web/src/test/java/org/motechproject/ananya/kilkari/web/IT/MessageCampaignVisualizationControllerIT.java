@@ -31,11 +31,6 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
     private KilkariMessageCampaignService kilkariMessageCampaignService;
     @Autowired
     private AllSubscriptions allSubscriptions;
-    
-    @Before
-    public void setUp(){
-
-    }
 
     @Test
     public void shouldGetVisualizationForGivenExternalId() throws Exception {

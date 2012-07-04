@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.messagecampaign.it;
+package org.motechproject.ananya.kilkari.messagecampaign.IT;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -27,7 +27,8 @@ public class MessageCampaignModuleIT {
 
         kilkariMessageCampaignService.start(messageCampaignRequest);
 
-        List<DateTime> dateTimeList = kilkariMessageCampaignService.getMessageTimings(messageCampaignRequest.getExternalId(), messageCampaignRequest.getCampaignName());
+        List<DateTime> dateTimeList = kilkariMessageCampaignService.getMessageTimings(
+                messageCampaignRequest.getExternalId(), messageCampaignRequest.getCampaignName());
 
         assertNotNull(dateTimeList);
     }

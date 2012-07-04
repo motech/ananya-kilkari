@@ -5,13 +5,16 @@ import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
 import org.motechproject.server.messagecampaign.service.MessageCampaignService;
-
+import java.util.Date;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -59,8 +62,7 @@ public class KilkariMessageCampaignServiceTest {
 
         kilkariMessageCampaignService.getMessageTimings(subscriptionId, campaignName);
 
-        // TODO: introduce back after platform fix
-        //verify(messageCampaignService).getMessageTimings(subscriptionId, campaignName);
+        verify(messageCampaignService).getCampaignTimings(eq(subscriptionId), eq(campaignName), Matchers.<Date>any(), Matchers.<Date>any());
     }
 
     private void assertRequestParameters(KilkariMessageCampaignRequest kilkariMessageCampaignRequest, CampaignRequest campaignRequest) {

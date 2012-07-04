@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class KilkariMessageCampaignService {
@@ -45,13 +46,13 @@ public class KilkariMessageCampaignService {
     }
 
     public List<DateTime> getMessageTimings(String subscriptionId, String campaignName) {
-        // TODO: to remove comment and remove the dummy lines below after platform fix
-//        List<Date> dateList = campaignService.getMessageTimings(subscriptionId, campaignName);
-        List<Date> dateList = new ArrayList<Date>();
-        dateList.add(new Date(DateTime.now().getMillis()));
-        dateList.add(new Date(DateTime.now().getMillis()));
-        dateList.add(new Date(DateTime.now().getMillis()));
-        List<DateTime> messageTimings = new ArrayList<DateTime>();
+        DateTime now = DateTime.now();
+        Map<String,List<Date>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
+                now.toDate(), now.plusYears(1).toDate());
+        List<Date> dateList = campaignTimings.get(campaignName);
+        List<DateTime> messageTimings = new ArrayList<>();
+        if(dateList == null ||dateList.isEmpty())
+            return messageTimings;
         for (Date date : dateList) {
             messageTimings.add(new DateTime(date.getTime()));
         }

@@ -1,9 +1,10 @@
 package org.motechproject.ananya.kilkari.web.contract.response;
 
+import com.google.gson.Gson;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class BaseResponse extends BaseObject {
+public class BaseResponse {
 
     private static final String ERROR = "ERROR";
     private static final String SUCCESS = "SUCCESS";
@@ -60,5 +61,13 @@ public class BaseResponse extends BaseObject {
     @JsonIgnore
     public boolean isError() {
         return status.equals(ERROR);
+    }
+
+    public Object fromJson(String jsonSerializedString) {
+        return new Gson().fromJson(jsonSerializedString, this.getClass());
+    }
+
+    public String toJson() {
+        return new Gson().toJson(this);
     }
 }

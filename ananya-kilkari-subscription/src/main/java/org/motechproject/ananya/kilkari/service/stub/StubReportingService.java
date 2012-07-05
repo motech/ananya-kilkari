@@ -3,12 +3,12 @@ package org.motechproject.ananya.kilkari.service.stub;
 import org.motechproject.ananya.kilkari.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.profile.Test;
 import org.motechproject.ananya.kilkari.service.IReportingService;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile("test")
+@Test
 public class StubReportingService implements IReportingService {
 
     private IReportingService behavior;

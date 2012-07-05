@@ -3,11 +3,11 @@ package org.motechproject.ananya.kilkari.service;
 import org.motechproject.ananya.kilkari.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.profile.Production;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 @Service
-@Profile("prod")
+@Production
 public class ReportingService implements IReportingService {
 
     private RestTemplate restTemplate;

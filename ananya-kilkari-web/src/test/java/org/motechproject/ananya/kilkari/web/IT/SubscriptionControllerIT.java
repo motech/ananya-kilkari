@@ -54,7 +54,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
     @Before
      public void setUp()  {
-        //allSubscriptions.removeAll();
+        allSubscriptions.removeAll();
     }
 
     @Test

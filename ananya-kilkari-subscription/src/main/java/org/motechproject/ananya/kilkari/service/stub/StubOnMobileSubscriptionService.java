@@ -1,12 +1,12 @@
 package org.motechproject.ananya.kilkari.service.stub;
 
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
+import org.motechproject.ananya.kilkari.profile.Test;
 import org.motechproject.ananya.kilkari.service.IOnMobileSubscriptionService;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile("test")
+@Test
 public class StubOnMobileSubscriptionService implements IOnMobileSubscriptionService {
 
     private IOnMobileSubscriptionService behavior;

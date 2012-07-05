@@ -24,8 +24,6 @@ public class SubscriptionController {
     private KilkariSubscriptionService kilkariSubscriptionService;
     private ReportingService reportingService;
 
-    private final Logger logger = LoggerFactory.getLogger(SubscriptionController.class);
-
     @Autowired
     public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, ReportingService reportingService) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;

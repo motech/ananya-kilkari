@@ -24,11 +24,10 @@ public class SubscriptionStateHandlerFactoryTest {
 
     @Test
     public void shouldPopulateHandlerMappings() {
-        SubscriptionStateHandlerFactory subscriptionStateHandlerFactory = new SubscriptionStateHandlerFactory(subscriptionService);
-        HashMap<String,Class> handlerMappings = subscriptionStateHandlerFactory.getHandlerMappings();
+        HashMap<ActionStatus, Class> handlerMappings = SubscriptionStateHandlerFactory.handlerMappings;
 
-        assertEquals(ActivateHandler.class, handlerMappings.get("ACT|SUCCESS"));
-        assertEquals(ActivationFailedHandler.class, handlerMappings.get("ACT|FAILURE"));
+        assertEquals(ActivateHandler.class, handlerMappings.get(new ActionStatus("ACT", "SUCCESS")));
+        assertEquals(ActivationFailedHandler.class, handlerMappings.get(new ActionStatus("ACT", "FAILURE")));
     }
 
     @Test

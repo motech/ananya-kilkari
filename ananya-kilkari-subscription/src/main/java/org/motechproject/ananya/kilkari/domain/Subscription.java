@@ -85,7 +85,6 @@ public class Subscription extends MotechBaseDataObject {
                 .append(this.pack, that.pack)
                 .append(this.subscriptionId, that.subscriptionId)
                 .append(this.operator, that.operator)
-                .append(this.status, that.status)
                 .isEquals();
     }
 
@@ -96,7 +95,7 @@ public class Subscription extends MotechBaseDataObject {
                 .append(this.msisdn)
                 .append(this.subscriptionId)
                 .append(this.pack)
-                .append(this.status).hashCode();
+                .hashCode();
     }
 
     @Override

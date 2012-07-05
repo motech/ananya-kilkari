@@ -46,7 +46,7 @@ public class OnMobileSubscriptionServiceTest {
         urlVariables.put("refid", subscriptionId);
         urlVariables.put("user", username);
         urlVariables.put("pass", password);
-        verify(restTemplate).getForEntity("url/ActivateSubscription", String.class, urlVariables);
+        verify(restTemplate).getForEntity("url/ActivateSubscription?msisdn={msisdn}&srvkey={srvkey}&mode={mode}&refid={refid}&user={user}&pass={pass}", String.class, urlVariables);
         verify(kilkariProperties).getProperty("omsm.base.url");
         verify(kilkariProperties).getProperty("omsm.username");
         verify(kilkariProperties).getProperty("omsm.password");

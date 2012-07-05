@@ -29,6 +29,7 @@ public class OnMobileSubscriptionService {
     public void activateSubscription(SubscriptionActivationRequest subscriptionActivationRequest) {
         String baseUrl = kilkariProperties.getProperty("omsm.base.url");
         String url = (baseUrl.endsWith("/")) ? String.format("%s%s", baseUrl, ACTIVATE_SUBSCRIPTION_PATH) : String.format("%s/%s", baseUrl, ACTIVATE_SUBSCRIPTION_PATH);
+        String urlWithParams = String.format("%s?msisdn={msisdn}&srvkey={srvkey}&mode={mode}&refid={refid}&user={user}&pass={pass}", url);
         String username = kilkariProperties.getProperty("omsm.username");
         String password = kilkariProperties.getProperty("omsm.password");
 
@@ -41,7 +42,7 @@ public class OnMobileSubscriptionService {
         urlVariables.put("pass", password);
 
         try {
-            restTemplate.getForEntity(url, String.class, urlVariables);
+            restTemplate.getForEntity(urlWithParams, String.class, urlVariables);
         } catch  (HttpClientErrorException ex) {
             logger.error(String.format("OnMobile subscription request failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
             throw ex;

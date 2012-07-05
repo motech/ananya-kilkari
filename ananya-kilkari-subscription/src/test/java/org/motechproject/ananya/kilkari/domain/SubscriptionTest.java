@@ -3,9 +3,7 @@ package org.motechproject.ananya.kilkari.domain;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class SubscriptionTest {
 
@@ -32,23 +30,26 @@ public class SubscriptionTest {
         subscription.activationRequested();
 
         assertEquals(SubscriptionStatus.PENDING_ACTIVATION, subscription.getStatus());
+        assertNull(subscription.getOperator());
     }
 
     @Test
     public void shouldChangeStatusOfSubscriptionToActiveForSuccessfulActivation() {
         Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
-        subscription.activationRequested();
-        subscription.activate();
+        String operator = Operator.AIRTEL.name();
+        subscription.activate(operator);
 
         assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
+        assertEquals(operator, subscription.getOperator());
     }
 
     @Test
     public void shouldChangeStatusOfSubscriptionToActivationFailedForUnsuccessfulActivation() {
         Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
-        subscription.activationRequested();
-        subscription.activationFailed();
+        String operator = Operator.AIRTEL.name();
+        subscription.activationFailed(operator);
 
         assertEquals(SubscriptionStatus.ACTIVATION_FAILED, subscription.getStatus());
+        assertEquals(operator, subscription.getOperator());
     }
 }

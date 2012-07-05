@@ -164,7 +164,7 @@ public class SubscriptionServiceTest {
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
-        order.verify(mockedSubscription).activationFailed();
+        order.verify(mockedSubscription).activationFailed(operator);
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         order.verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
@@ -191,7 +191,7 @@ public class SubscriptionServiceTest {
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
-        order.verify(mockedSubscription).activate();
+        order.verify(mockedSubscription).activate(operator);
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         order.verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());

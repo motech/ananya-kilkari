@@ -13,6 +13,9 @@ public class Subscription extends MotechBaseDataObject {
     private String msisdn;
 
     @JsonProperty
+    private String operator;
+
+    @JsonProperty
     private String subscriptionId;
 
     @JsonProperty
@@ -59,6 +62,14 @@ public class Subscription extends MotechBaseDataObject {
         this.status = status;
     }
 
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -84,12 +95,14 @@ public class Subscription extends MotechBaseDataObject {
         return result;
     }
 
-    public void activate() {
+    public void activate(String operator) {
         setStatus(SubscriptionStatus.ACTIVE);
+        setOperator(operator);
     }
 
-    public void activationFailed() {
+    public void activationFailed(String operator) {
         setStatus(SubscriptionStatus.ACTIVATION_FAILED);
+        setOperator(operator);
     }
 
     public void activationRequested() {

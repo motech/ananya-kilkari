@@ -49,8 +49,8 @@ public class SubscriptionService {
     public void activate(String subscriptionId, DateTime activatedOn, String operator) {
         updateStatusAndReport(subscriptionId, activatedOn, null, operator, new Action<Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
-                subscription.activate();
+            public void perform(Subscription subscription, String operator) {
+                subscription.activate(operator);
             }
         });
     }
@@ -58,8 +58,8 @@ public class SubscriptionService {
     public void activationFailed(String subscriptionId, DateTime updatedOn, String reason, String operator) {
         updateStatusAndReport(subscriptionId, updatedOn, reason, operator, new Action<Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
-                subscription.activationFailed();
+            public void perform(Subscription subscription, String operator) {
+                subscription.activationFailed(operator);
             }
         });
     }
@@ -67,7 +67,7 @@ public class SubscriptionService {
     public void activationRequested(String subscriptionId) {
         updateStatusAndReport(subscriptionId, DateTime.now(), null, null, new Action<Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
+            public void perform(Subscription subscription, String operator) {
                 subscription.activationRequested();
             }
         });
@@ -75,7 +75,7 @@ public class SubscriptionService {
 
     private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Action<Subscription> action) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        action.perform(subscription);
+        action.perform(subscription, operator);
         updateWithReporting(subscription, updatedOn, reason, operator);
     }
 

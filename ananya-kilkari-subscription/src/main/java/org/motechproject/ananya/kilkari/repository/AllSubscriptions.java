@@ -21,7 +21,7 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
     private final static Logger logger = LoggerFactory.getLogger(AllSubscriptions.class);
 
     @Autowired
-    protected AllSubscriptions(@Qualifier("kilkariDbConnector") CouchDbConnector db) {
+    protected AllSubscriptions(@Qualifier("kilkariSubscriptionDbConnector") CouchDbConnector db) {
         super(Subscription.class, db);
         initStandardDesignDocument();
     }

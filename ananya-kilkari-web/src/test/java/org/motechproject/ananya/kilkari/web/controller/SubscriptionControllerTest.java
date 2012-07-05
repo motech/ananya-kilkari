@@ -24,6 +24,7 @@ import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetail
 import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.domain.Operator;
+import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.springframework.http.MediaType;
 
@@ -327,6 +328,30 @@ public class SubscriptionControllerTest {
         when(subscriptionRequest.getChannel()).thenReturn("ivR");
         subscriptionController.createSubscription(subscriptionRequest);
         verify(subscriptionRequest, never()).validate(reportingService);
+    }
+
+    @Test
+    public void shouldPublishSubscriberCareEventIntoTheQueue() throws Exception {
+        String msisdn = "1234567890";
+        String reason = SubscriberCareReasons.CHANGE_PACK.name();
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest();
+        subscriberCareRequest.setMsisdn(msisdn);
+        subscriberCareRequest.setReason(reason);
+        byte[] requestBody = toJson(subscriberCareRequest).getBytes();
+
+        mockMvc(subscriptionController)
+                .perform(post("/subscriber/care")
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber care request processed successfully")));
+
+        ArgumentCaptor<SubscriberCareRequest> subscriberCareRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
+        verify(kilkariSubscriptionService).processSubscriberCareRequest(subscriberCareRequestArgumentCaptor.capture());
+        SubscriberCareRequest careRequest = subscriberCareRequestArgumentCaptor.getValue();
+
+        assertEquals(msisdn, careRequest.getMsisdn());
+        assertEquals(reason, careRequest.getReason());
     }
 
     private void mockSubscription(String msisdn) {

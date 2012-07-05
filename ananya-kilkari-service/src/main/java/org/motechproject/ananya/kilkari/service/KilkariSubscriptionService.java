@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
@@ -40,6 +41,10 @@ public class  KilkariSubscriptionService {
 
     public void processCallbackRequest(CallbackRequestWrapper callbackRequestWrapper) {
         subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
+    }
+
+    public void processSubscriberCareRequest(SubscriberCareRequest subscriberCareRequest) {
+        subscriptionPublisher.processSubscriberCareRequest(subscriberCareRequest);
     }
 
     public List<Subscription> getSubscriptionsFor(String msisdn) {

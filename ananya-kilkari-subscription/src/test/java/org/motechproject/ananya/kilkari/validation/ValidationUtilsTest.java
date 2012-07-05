@@ -50,7 +50,7 @@ public class ValidationUtilsTest {
     }
 
     @Test
-         public void assertDateShouldThrowValidationExceptionForNullDateString() {
+    public void assertDateShouldThrowValidationExceptionForNullDateString() {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid date format null dd-MM-yyyy"));
 
@@ -68,5 +68,37 @@ public class ValidationUtilsTest {
     @Test
     public void assertDateShouldNotThrowValidationExceptionForValidDateString() {
         ValidationUtils.assertDateFormat("21-01-2012", "dd-MM-yyyy", "Invalid date format %s %s");
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenInvalidPackIsGivenToCreateNewSubscription() {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(is("Invalid subscription pack Invalid-Pack"));
+
+        ValidationUtils.assertPack("Invalid-Pack");
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenInvalidChannelIsGivenToCreateNewSubscription() {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(is("Invalid channel Invalid-Channel"));
+
+        ValidationUtils.assertChannel("Invalid-Channel");
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenInvalidMsisdnNumberIsGivenToCreateNewSubscription() {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(is("Invalid msisdn 12345"));
+
+        ValidationUtils.assertMsisdn("12345");
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscription() {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(is("Invalid msisdn 123456789a"));
+
+        ValidationUtils.assertMsisdn("123456789a");
     }
 }

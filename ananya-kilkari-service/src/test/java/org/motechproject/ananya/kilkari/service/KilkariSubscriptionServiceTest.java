@@ -1,9 +1,12 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
+import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
@@ -55,5 +58,23 @@ public class KilkariSubscriptionServiceTest {
 
         KilkariMessageCampaignRequest kilkariMessageCampaignRequest = captor.getValue();
         assertEquals(subscriptionId,kilkariMessageCampaignRequest.getExternalId());
+    }
+
+    @Test
+    public void shouldPublishSubscriberCareRequestEvent() {
+        String msisdn = "1234566789";
+        String reason = SubscriberCareReasons.CHANGE_PACK.name();
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest();
+        subscriberCareRequest.setMsisdn(msisdn);
+        subscriberCareRequest.setReason(reason);
+
+        kilkariSubscriptionService.processSubscriberCareRequest(subscriberCareRequest);
+
+        ArgumentCaptor<SubscriberCareRequest> subscriberCareRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
+        verify(subscriptionPublisher).processSubscriberCareRequest(subscriberCareRequestArgumentCaptor.capture());
+        SubscriberCareRequest careRequest = subscriberCareRequestArgumentCaptor.getValue();
+
+        Assert.assertEquals(msisdn, careRequest.getMsisdn());
+        Assert.assertEquals(reason, careRequest.getReason());
     }
 }

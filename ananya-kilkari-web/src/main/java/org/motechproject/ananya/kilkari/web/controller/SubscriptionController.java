@@ -77,5 +77,12 @@ public class SubscriptionController {
         return subscriberResponse;
     }
 
+    @RequestMapping(value = "/subscriber/care", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseResponse createSubscriberCareRequest(@RequestBody SubscriberCareRequest subscriberCareRequests) {
+        kilkariSubscriptionService.processSubscriberCareRequest(subscriberCareRequests);
+        return BaseResponse.success("Subscriber care request processed successfully");
+    }
+
 }
 

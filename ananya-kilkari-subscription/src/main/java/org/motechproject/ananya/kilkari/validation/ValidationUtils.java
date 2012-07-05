@@ -2,6 +2,8 @@ package org.motechproject.ananya.kilkari.validation;
 
 
 import org.apache.commons.lang.StringUtils;
+import org.motechproject.ananya.kilkari.domain.Channel;
+import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 
 import java.text.ParseException;
@@ -24,7 +26,7 @@ public class ValidationUtils {
     }
 
     private static boolean assertDateFormat(String value, String format) {
-        if(StringUtils.isEmpty(value)) {
+        if (StringUtils.isEmpty(value)) {
             return false;
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
@@ -37,5 +39,24 @@ public class ValidationUtils {
         }
 
         return simpleDateFormat.format(parsedDate).equals(value);
+    }
+
+    public static void assertChannel(String channel) {
+        if (!Channel.isValid(channel))
+            throw new ValidationException(String.format("Invalid channel %s", channel));
+    }
+
+    public static void assertPack(String pack) {
+        if (!SubscriptionPack.isValid(pack))
+            throw new ValidationException(String.format("Invalid subscription pack %s", pack));
+    }
+
+    public static void assertMsisdn(String msisdn) {
+        if (!isValidMsisdn(msisdn))
+            throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
+    }
+
+    private static boolean isValidMsisdn(String msisdn) {
+        return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
     }
 }

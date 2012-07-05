@@ -115,29 +115,10 @@ public class SubscriptionRequest implements Serializable {
         this.msisdn = msisdn;
     }
 
-    private void validateChannel() {
-        if (!Channel.isValid(channel))
-            throw new ValidationException(String.format("Invalid channel %s", channel));
-    }
-
-    private void validatePack() {
-        if (!SubscriptionPack.isValid(pack))
-            throw new ValidationException(String.format("Invalid subscription pack %s", pack));
-    }
-
-    private void validateMsisdn() {
-        if (!isValidMsisdn(msisdn))
-            throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
-    }
-
-    private boolean isValidMsisdn(String msisdn) {
-        return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
-    }
-
     public void validate(IReportingService reportingService) {
-        validateMsisdn();
-        validatePack();
-        validateChannel();
+        ValidationUtils.assertMsisdn(msisdn);
+        ValidationUtils.assertPack(pack);
+        ValidationUtils.assertChannel(channel);
         validateAge();
         validateDOB();
         validateEDD();

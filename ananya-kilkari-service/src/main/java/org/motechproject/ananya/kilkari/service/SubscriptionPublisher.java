@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.scheduler.context.EventContext;
@@ -23,5 +24,9 @@ public class SubscriptionPublisher {
 
     public void processCallbackRequest(CallbackRequestWrapper callbackRequestWrapper) {
         eventContext.send(SubscriptionEventKeys.PROCESS_CALLBACK_REQUEST, callbackRequestWrapper);
+    }
+
+    public void processSubscriberCareRequest(SubscriberCareRequest subscriberCareRequest) {
+        eventContext.send(SubscriptionEventKeys.PROCESS_SUBSCRIBER_CARE_REQUEST, subscriberCareRequest);
     }
 }

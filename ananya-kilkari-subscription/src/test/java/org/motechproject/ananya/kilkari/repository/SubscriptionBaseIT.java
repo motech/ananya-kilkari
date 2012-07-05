@@ -17,9 +17,9 @@ import java.util.ArrayList;
 @ActiveProfiles("test")
 public abstract class SubscriptionBaseIT {
 
-    @Qualifier("kilkariDbConnector")
+    @Qualifier("kilkariSubscriptionDbConnector")
     @Autowired
-    protected CouchDbConnector kilkariDbConnector;
+    protected CouchDbConnector kilkariSubscriptionDbConnector;
 
     protected ArrayList<BulkDeleteDocument> toDelete;
 
@@ -30,7 +30,7 @@ public abstract class SubscriptionBaseIT {
 
     @After
     public void after() {
-        kilkariDbConnector.executeBulk(toDelete);
+        kilkariSubscriptionDbConnector.executeBulk(toDelete);
     }
 
     protected void markForDeletion(Object document) {

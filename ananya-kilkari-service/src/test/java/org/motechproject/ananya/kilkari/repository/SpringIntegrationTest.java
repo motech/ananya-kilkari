@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web;
+package org.motechproject.ananya.kilkari.repository;
 
 import org.ektorp.BulkDeleteDocument;
 import org.ektorp.CouchDbConnector;
@@ -14,24 +14,24 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:applicationContext.xml")
+@ContextConfiguration("classpath:applicationKilkariServiceContext.xml")
 @ActiveProfiles("test")
 public abstract class SpringIntegrationTest {
 
-    @Qualifier("kilkariSubscriptionDbConnector")
+    @Qualifier("kilkariDbConnector")
     @Autowired
-    protected CouchDbConnector kilkariSubscriptionDbConnector;
+    protected CouchDbConnector kilkariDbConnector;
 
     protected ArrayList<BulkDeleteDocument> toDelete;
 
     @Before
     public void before() {
-        toDelete = new ArrayList<BulkDeleteDocument>();
+        toDelete = new ArrayList<>();
     }
 
     @After
     public void after() {
-        kilkariSubscriptionDbConnector.executeBulk(toDelete);
+        kilkariDbConnector.executeBulk(toDelete);
     }
 
     protected void markForDeletion(Object document) {

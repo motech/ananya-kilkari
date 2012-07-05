@@ -5,10 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
-import org.motechproject.ananya.kilkari.domain.CallbackRequest;
-import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
-import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.scheduler.context.EventContext;
 
 import static org.mockito.Mockito.verify;
@@ -42,6 +39,17 @@ public class SubscriptionPublisherTest {
         subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
 
         verify(eventContext).send(SubscriptionEventKeys.PROCESS_CALLBACK_REQUEST, callbackRequestWrapper);
+    }
+
+    @Test
+    public void shouldPublishSubscriberCareRequestIntoQueue() {
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest();
+        subscriberCareRequest.setMsisdn("1234567890");
+        subscriberCareRequest.setReason(SubscriberCareReasons.CHANGE_PACK.name());
+
+        subscriptionPublisher.processSubscriberCareRequest(subscriberCareRequest);
+
+        verify(eventContext).send(SubscriptionEventKeys.PROCESS_SUBSCRIBER_CARE_REQUEST, subscriberCareRequest);
     }
 
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {

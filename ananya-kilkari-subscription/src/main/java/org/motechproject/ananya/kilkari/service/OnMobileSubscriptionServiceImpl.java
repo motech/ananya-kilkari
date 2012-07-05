@@ -1,7 +1,8 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
-import org.motechproject.ananya.kilkari.profile.Production;
+import org.motechproject.ananya.kilkari.profile.ProductionProfile;
+import org.motechproject.ananya.kilkari.profile.ProductionProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 @Service
-@Production
+@ProductionProfile
 public class OnMobileSubscriptionServiceImpl implements
         OnMobileSubscriptionService {
 

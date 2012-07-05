@@ -16,10 +16,10 @@ public class SubscriptionService {
     private AllSubscriptions allSubscriptions;
 
     private Publisher publisher;
-    private ReportingService reportingService;
+    private IReportingService reportingService;
 
     @Autowired
-    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher, ReportingService reportingService) {
+    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher, IReportingService reportingService) {
         this.allSubscriptions = allSubscriptions;
         this.publisher = publisher;
         this.reportingService = reportingService;

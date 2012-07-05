@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.handlers;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStateChangeReportRequest;
-import org.motechproject.ananya.kilkari.service.ReportingService;
+import org.motechproject.ananya.kilkari.service.IReportingService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
 import org.slf4j.Logger;
@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
 public class SubscriptionReportHandler {
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionReportHandler.class);
-    private ReportingService reportingService;
+    private IReportingService reportingService;
 
     @Autowired
-    public SubscriptionReportHandler(ReportingService reportingService) {
+    public SubscriptionReportHandler(IReportingService reportingService) {
         this.reportingService = reportingService;
     }
 

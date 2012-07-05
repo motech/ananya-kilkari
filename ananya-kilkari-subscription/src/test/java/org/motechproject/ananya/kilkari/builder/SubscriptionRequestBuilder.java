@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.builder;
 
+import org.motechproject.ananya.kilkari.domain.Channel;
+import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 
 public class SubscriptionRequestBuilder {
@@ -8,6 +10,16 @@ public class SubscriptionRequestBuilder {
 
     public SubscriptionRequestBuilder withDefaults() {
         request = new SubscriptionRequest();
+        request.setPack(SubscriptionPack.FIFTEEN_MONTHS.name());
+        request.setChannel(Channel.CALL_CENTER.name());
+        request.setMsisdn("9876543210");
+        request.setBeneficiaryAge("25");
+        request.setBeneficiaryName("name");
+        request.setDistrict("district");
+        request.setBlock("block");
+        request.setPanchayat("panchayat");
+        request.setDateOfBirth("13-08-2001");
+        request.setExpectedDateOfDelivery("20-09-2001");
         return this;
     }
 

@@ -8,7 +8,7 @@ import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
+import org.motechproject.ananya.kilkari.service.IOnMobileSubscriptionService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
 
@@ -22,7 +22,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SubscriptionActivationHandlerTest {
     @Mock
-    private OnMobileSubscriptionService onMobileSubscriptionService;
+    private IOnMobileSubscriptionService onMobileSubscriptionService;
     @Mock
     private SubscriptionService subscriptionService;
 

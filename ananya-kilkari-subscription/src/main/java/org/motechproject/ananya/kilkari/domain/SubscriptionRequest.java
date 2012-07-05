@@ -1,10 +1,12 @@
 package org.motechproject.ananya.kilkari.domain;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.ReportingService;
+import org.motechproject.ananya.kilkari.service.IReportingService;
 import org.motechproject.ananya.kilkari.validation.ValidationUtils;
 
 import java.io.Serializable;
@@ -15,12 +17,15 @@ public class SubscriptionRequest implements Serializable {
     private String msisdn;
     private String pack;
     private String channel;
+    @JsonIgnore
     private DateTime createdAt;
     private String beneficiaryName;
     private String beneficiaryAge;
     private String district;
-    private String block;
     private String panchayat;
+    private String block;
+    private String expectedDateOfDelivery;
+    private String dateOfBirth;
 
     public SubscriptionRequest() {
         this.createdAt = DateTime.now();
@@ -55,7 +60,7 @@ public class SubscriptionRequest implements Serializable {
     }
 
     public int getBeneficiaryAge() {
-        return beneficiaryAge == null ? 0 : Integer.parseInt(beneficiaryAge);
+        return StringUtils.isNotEmpty(beneficiaryAge) ? Integer.parseInt(beneficiaryAge) : 0;
     }
 
     public DateTime getExpectedDateOfDelivery() {
@@ -81,10 +86,6 @@ public class SubscriptionRequest implements Serializable {
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
-
-    private String expectedDateOfDelivery;
-
-    private String dateOfBirth;
 
     public String getMsisdn() {
         return msisdn;
@@ -133,7 +134,7 @@ public class SubscriptionRequest implements Serializable {
         return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
     }
 
-    public void validate(ReportingService reportingService) {
+    public void validate(IReportingService reportingService) {
         validateMsisdn();
         validatePack();
         validateChannel();
@@ -143,7 +144,7 @@ public class SubscriptionRequest implements Serializable {
         validateLocation(reportingService);
     }
 
-    private void validateLocation(ReportingService reportingService) {
+    private void validateLocation(IReportingService reportingService) {
         if (isLocationEmpty()) {
             return;
         }
@@ -175,6 +176,31 @@ public class SubscriptionRequest implements Serializable {
     }
 
     private DateTime parseDateTime(String dateTime) {
-        return dateTime == null ? null : DateTimeFormat.forPattern(SubscriptionRequest.DATE_TIME_FORMAT).parseDateTime(dateTime);
+        return StringUtils.isNotEmpty(dateTime) ? DateTimeFormat.forPattern(SubscriptionRequest.DATE_TIME_FORMAT).parseDateTime(dateTime) : null;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SubscriptionRequest)) return false;
+
+        SubscriptionRequest that = (SubscriptionRequest) o;
+
+        return new EqualsBuilder()
+                .append(this.msisdn, that.msisdn)
+                .append(this.pack, that.pack)
+                .append(this.channel, that.channel)
+                .append(this.channel, that.channel)
+                .append(this.beneficiaryAge, that.beneficiaryAge)
+                .append(this.beneficiaryName, that.beneficiaryName)
+                .append(this.dateOfBirth, that.dateOfBirth)
+                .append(this.expectedDateOfDelivery, that.expectedDateOfDelivery)
+                .append(this.district, that.district)
+                .append(this.block, that.block)
+                .append(this.panchayat, that.panchayat)
+                .isEquals();
+
+    }
+
+
 }

@@ -4,8 +4,8 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.service.IReportingService;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
@@ -22,10 +22,10 @@ import java.util.List;
 public class SubscriptionController {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
-    private ReportingService reportingService;
+    private IReportingService reportingService;
 
     @Autowired
-    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, ReportingService reportingService) {
+    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, IReportingService reportingService) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.reportingService = reportingService;
     }
@@ -33,7 +33,13 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResponse createSubscription(SubscriptionRequest subscriptionRequest) {
+    public BaseResponse createSubscriptionFromIVR(SubscriptionRequest subscriptionRequest) {
+        return createSubscription(subscriptionRequest);
+    }
+
+    @RequestMapping(value = "/subscription", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseResponse createSubscription(@RequestBody SubscriptionRequest subscriptionRequest) {
         if(!Channel.isIVR(subscriptionRequest.getChannel())) {
             subscriptionRequest.validate(reportingService);
         }
@@ -41,8 +47,6 @@ public class SubscriptionController {
         kilkariSubscriptionService.createSubscription(subscriptionRequest);
 
         return BaseResponse.success("Subscription request submitted successfully");
-
-
     }
 
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.PUT)

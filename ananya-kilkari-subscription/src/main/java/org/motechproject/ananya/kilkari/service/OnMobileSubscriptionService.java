@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -13,9 +14,9 @@ import java.util.HashMap;
 import java.util.Properties;
 
 @Service
-public class OnMobileSubscriptionService {
+@Profile("prod")
+public class OnMobileSubscriptionService implements IOnMobileSubscriptionService{
 
-    public static final String ACTIVATE_SUBSCRIPTION_PATH = "ActivateSubscription";
     private RestTemplate restTemplate;
     private Properties kilkariProperties;
     private final static Logger logger = LoggerFactory.getLogger(OnMobileSubscriptionService.class);
@@ -27,9 +28,9 @@ public class OnMobileSubscriptionService {
     }
 
     public void activateSubscription(SubscriptionActivationRequest subscriptionActivationRequest) {
-        String baseUrl = kilkariProperties.getProperty("omsm.base.url");
-        String url = (baseUrl.endsWith("/")) ? String.format("%s%s", baseUrl, ACTIVATE_SUBSCRIPTION_PATH) : String.format("%s/%s", baseUrl, ACTIVATE_SUBSCRIPTION_PATH);
+        String url = String.format("%s%s", baseUrl(), IOnMobileSubscriptionService.ACTIVATE_SUBSCRIPTION_PATH);
         String urlWithParams = String.format("%s?msisdn={msisdn}&srvkey={srvkey}&mode={mode}&refid={refid}&user={user}&pass={pass}", url);
+
         String username = kilkariProperties.getProperty("omsm.username");
         String password = kilkariProperties.getProperty("omsm.password");
 
@@ -48,4 +49,10 @@ public class OnMobileSubscriptionService {
             throw ex;
         }
     }
+    
+    private String baseUrl() {
+        String baseUrl = kilkariProperties.getProperty("omsm.base.url");
+        return baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+    }
+
 }

@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.*;
-import org.motechproject.ananya.kilkari.service.ReportingService;
+import org.motechproject.ananya.kilkari.service.IReportingService;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SubscriptionReportHandlerTest {
     @Mock
-    private ReportingService reportingService;
+    private IReportingService reportingService;
 
     @Before
     public void setUp() {

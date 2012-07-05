@@ -4,25 +4,34 @@ import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.domain.Channel;
-import org.motechproject.ananya.kilkari.domain.Subscription;
-import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
+import org.mockito.Mockito;
+import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
+import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.service.IOnMobileSubscriptionService;
+import org.motechproject.ananya.kilkari.service.IReportingService;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
+import org.motechproject.ananya.kilkari.service.stub.StubOnMobileSubscriptionService;
+import org.motechproject.ananya.kilkari.service.stub.StubReportingService;
+import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
-import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
-import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
+import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
+import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.server.MvcResult;
-import org.springframework.test.web.server.setup.MockMvcBuilders;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.motechproject.ananya.kilkari.web.MVCTestUtils.mockMvc;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.server.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 
@@ -33,12 +42,19 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
     @Autowired
     private AllSubscriptions allSubscriptions;
+
     @Autowired
     private KilkariMessageCampaignService kilkariMessageCampaignService;
 
+    @Autowired
+    private StubReportingService reportingService;
+
+    @Autowired
+    private StubOnMobileSubscriptionService onMobileSubscriptionService;
+
     @Before
-    public void setUp()  {
-        allSubscriptions.removeAll();
+     public void setUp()  {
+        //allSubscriptions.removeAll();
     }
 
     @Test
@@ -56,9 +72,11 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         subscriberResponse.addSubscriptionDetail(SubscriptionDetailsMapper.mapFrom(subscription1));
         subscriberResponse.addSubscriptionDetail(SubscriptionDetailsMapper.mapFrom(subscription2));
 
-        MvcResult result = MockMvcBuilders.standaloneSetup(subscriptionController)
-                .addInterceptors(new KilkariChannelInterceptor()).build()
-                    .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channelString))
+        reportingService.setBehavior(mock(IReportingService.class));
+        onMobileSubscriptionService.setBehavior(mock(IOnMobileSubscriptionService.class));
+
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channelString))
                     .andExpect(status().isOk())
                     .andExpect(content().type("application/javascript;charset=UTF-8"))
                     .andReturn();
@@ -71,15 +89,17 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     }
 
     @Test
-    public void shouldCreateSubscriptionForTheGivenMsisdn() throws Exception {
+    public void shouldCreateSubscriptionForTheGivenMsisdnForTheIVRChannel() throws Exception {
 
         final String msisdn = "9876543210";
         String channelString = Channel.IVR.toString();
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
 
-        MvcResult result = MockMvcBuilders.standaloneSetup(subscriptionController)
-                .addInterceptors(new KilkariChannelInterceptor()).build()
+        reportingService.setBehavior(mock(IReportingService.class));
+        onMobileSubscriptionService.setBehavior(mock(IOnMobileSubscriptionService.class));
+
+        MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscription").param("msisdn", msisdn).param("pack", pack.toString())
                         .param("channel", channelString))
                 .andExpect(status().isOk())
@@ -94,7 +114,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         final Subscription[] subscription = new Subscription[1];
 
-        new TimedRunner() {
+        new TimedRunner(20,1000) {
             @Override
             boolean run() {
                 subscription[0] = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
@@ -112,7 +132,67 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final KilkariMessageCampaignEnrollmentRecord[] campaignEnrollmentRecord =
                 new KilkariMessageCampaignEnrollmentRecord[1];
 
-        new TimedRunner() {
+        new TimedRunner(20,1000) {
+            @Override
+            boolean run() {
+                 campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
+                         subscription[0].getSubscriptionId(), KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME);
+                return (campaignEnrollmentRecord[0] != null);
+            }
+        }.executeWithTimeout();
+
+        assertNotNull(campaignEnrollmentRecord[0]);
+        assertEquals(subscription[0].getSubscriptionId(), campaignEnrollmentRecord[0].getExternalId());
+        assertEquals(KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
+    }
+
+    @Test
+    public void shouldCreateSubscriptionForTheGivenMsisdnForTheCallCentreChannel() throws Exception {
+        final String msisdn = "9876543210";
+        String channelString = Channel.CALL_CENTER.toString();
+        final SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
+        BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
+
+        IReportingService mockedReportingService = Mockito.mock(IReportingService.class);
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
+        reportingService.setBehavior(mockedReportingService);
+        onMobileSubscriptionService.setBehavior(mock(IOnMobileSubscriptionService.class));
+
+        SubscriptionRequest expectedRequest= new SubscriptionRequestBuilder().withDefaults().build();
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(post("/subscription").body(toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andReturn();
+
+
+        String responseString = result.getResponse().getContentAsString();
+        responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
+
+        BaseResponse actualResponse =  (BaseResponse) new BaseResponse().fromJson(responseString);
+        assertEquals(expectedResponse, actualResponse);
+
+        final Subscription[] subscription = new Subscription[1];
+
+        new TimedRunner(20, 1000) {
+            @Override
+            boolean run() {
+                subscription[0] = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
+                return (subscription[0] != null);
+
+            }
+        }.executeWithTimeout();
+
+        assertNotNull(subscription[0]);
+        markForDeletion(subscription[0]);
+        assertEquals(msisdn, subscription[0].getMsisdn());
+        assertEquals(pack, subscription[0].getPack());
+        assertFalse(StringUtils.isBlank(subscription[0].getSubscriptionId()));
+
+        final KilkariMessageCampaignEnrollmentRecord[] campaignEnrollmentRecord =
+                new KilkariMessageCampaignEnrollmentRecord[1];
+
+        new TimedRunner(20,1000) {
             @Override
             boolean run() {
                  campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
@@ -133,8 +213,10 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
 
-        MvcResult result = MockMvcBuilders.standaloneSetup(subscriptionController)
-                .addInterceptors(new KilkariChannelInterceptor()).build()
+        reportingService.setBehavior(mock(IReportingService.class));
+        onMobileSubscriptionService.setBehavior(mock(IOnMobileSubscriptionService.class));
+
+        MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscription").param("msisdn", msisdn).param("pack", pack.toString())
                         .param("channel", channelString))
                 .andExpect(status().isOk())

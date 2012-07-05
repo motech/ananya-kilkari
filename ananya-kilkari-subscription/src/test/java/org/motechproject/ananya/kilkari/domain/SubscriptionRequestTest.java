@@ -10,7 +10,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.ReportingService;
+import org.motechproject.ananya.kilkari.service.IReportingService;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -26,7 +26,7 @@ public class SubscriptionRequestTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private ReportingService reportingService;
+    private IReportingService reportingService;
 
     @Before
     public void setUp() {
@@ -226,19 +226,23 @@ public class SubscriptionRequestTest {
     @Test
     public void shouldConvertAgeToIntegerAndReturn() {
         assertEquals(12, new SubscriptionRequestBuilder().withDefaults().withBeneficiaryAge("12").build().getBeneficiaryAge());
-        assertEquals(0, new SubscriptionRequestBuilder().withDefaults().build().getBeneficiaryAge());
+        assertEquals(0, new SubscriptionRequestBuilder().withDefaults().withBeneficiaryAge(null).build().getBeneficiaryAge());
+        assertEquals(0, new SubscriptionRequestBuilder().withDefaults().withBeneficiaryAge("").build().getBeneficiaryAge());
     }
 
     @Test
     public void shouldConvertEDDToDateTimeAndReturn() {
         DateTimeFormatter formatter = DateTimeFormat.forPattern(SubscriptionRequest.DATE_TIME_FORMAT);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withEDD("13-01-2012").build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withDOB("15-04-2013").withEDD("13-01-2012").build();
         assertEquals(formatter.parseDateTime("13-01-2012"), subscriptionRequest.getExpectedDateOfDelivery());
-        assertNull(subscriptionRequest.getDateOfBirth());
-
-        subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withDOB("15-04-2013").build();
         assertEquals(formatter.parseDateTime("15-04-2013"), subscriptionRequest.getDateOfBirth());
+
+        subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withDOB(null).withEDD(null).build();
+        assertNull(subscriptionRequest.getDateOfBirth());
         assertNull(subscriptionRequest.getExpectedDateOfDelivery());
 
+        subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withDOB("").withEDD("").build();
+        assertNull(subscriptionRequest.getDateOfBirth());
+        assertNull(subscriptionRequest.getExpectedDateOfDelivery());
     }
 }

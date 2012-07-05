@@ -12,10 +12,11 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.service.IReportingService;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.motechproject.ananya.kilkari.web.MVCTestUtils.mockMvc;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.server.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
@@ -51,7 +53,7 @@ public class SubscriptionControllerTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private ReportingService reportingService;
+    private IReportingService reportingService;
 
 
     @Before
@@ -200,10 +202,30 @@ public class SubscriptionControllerTest {
         assertEquals(pack, subscriptionRequest.getPack());
         assertEquals(channel, subscriptionRequest.getChannel());
 
-        DateTime createdAt = subscriptionRequest.getCreatedAt();
-        assertTrue(createdAt.isEqual(beforeCreate) || createdAt.isAfter(beforeCreate));
-        assertTrue(createdAt.isEqualNow() || createdAt.isBeforeNow());
+        assertCreatedAt(beforeCreate, subscriptionRequest);
     }
+
+    @Test
+    public void shouldCreateNewSubscriptionEventForCC() throws Exception {
+        DateTime beforeCreate = DateTime.now();
+
+        SubscriptionRequest expectedRequest= new SubscriptionRequestBuilder().withDefaults().build();
+
+        when(reportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
+        mockMvc(subscriptionController)
+                .perform(post("/subscription").body(toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
+
+        ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
+        verify(kilkariSubscriptionService).createSubscription(subscriptionRequestArgumentCaptor.capture());
+        SubscriptionRequest subscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
+
+        assertTrue(expectedRequest.equals(subscriptionRequest));
+        assertCreatedAt(beforeCreate, subscriptionRequest);
+    }
+
 
     @Test
     public void shouldGiveAnErrorMessageWhenCallBackRequestIsInvalid() throws Exception {
@@ -312,6 +334,13 @@ public class SubscriptionControllerTest {
         when(mockedSubscription.getPack()).thenReturn(SubscriptionPack.FIFTEEN_MONTHS);
         when(mockedSubscription.getStatus()).thenReturn(SubscriptionStatus.NEW);
         when(mockedSubscription.getSubscriptionId()).thenReturn("subscription-id");
+    }
+
+    private void assertCreatedAt(DateTime beforeCreate, SubscriptionRequest subscriptionRequest) {
+        DateTime createdAt = subscriptionRequest.getCreatedAt();
+        DateTime afterCreate =  DateTime.now();
+        assertTrue(createdAt.isEqual(beforeCreate) || createdAt.isAfter(beforeCreate));
+        assertTrue(createdAt.isEqual(afterCreate) || createdAt.isBefore(afterCreate));
     }
 
     private BaseMatcher<String> baseResponseMatcher(final String status, final String description) {

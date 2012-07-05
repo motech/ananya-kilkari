@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -15,11 +16,9 @@ import java.util.HashMap;
 import java.util.Properties;
 
 @Service
-public class ReportingService {
+@Profile("prod")
+public class ReportingService implements IReportingService {
 
-    public static final String CREATE_SUBSCRIPTION_PATH = "subscription";
-    public static final String SUBSCRIPTION_STATE_CHANGE_PATH = "updatesubscription";
-    public static final String GET_LOCATION_PATH = "location";
     private RestTemplate restTemplate;
     private Properties kilkariProperties;
     private final static Logger logger = LoggerFactory.getLogger(ReportingService.class);
@@ -30,6 +29,7 @@ public class ReportingService {
         this.kilkariProperties = kilkariProperties;
     }
 
+    @Override
     public void createSubscription(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {
         String url = String.format("%s%s", getBaseUrl(), CREATE_SUBSCRIPTION_PATH);
         try {
@@ -40,6 +40,7 @@ public class ReportingService {
         }
     }
 
+    @Override
     public void updateSubscriptionStateChange(SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest) {
         String subscriptionId = subscriptionStateChangeReportRequest.getSubscriptionId();
         String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIPTION_STATE_CHANGE_PATH, subscriptionId);
@@ -52,6 +53,7 @@ public class ReportingService {
 
     }
 
+    @Override
     public SubscriberLocation getLocation(String district, String block, String panchayat) {
         String url = String.format("%s%s", getBaseUrl(), GET_LOCATION_PATH );
         HashMap<String, String> locationParameters = new HashMap<String, String>();

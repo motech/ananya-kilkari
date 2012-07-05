@@ -2,6 +2,16 @@ package org.motechproject.ananya.kilkari.web.IT;
 
 public abstract class TimedRunner {
 
+    private int tries;
+    private int intervalSleep;
+
+    public TimedRunner() {
+        this(5, 1000);
+    }
+    public TimedRunner(int tries, int intervalSleep) {
+        this.tries = tries;
+        this.intervalSleep = intervalSleep;
+    }
     /*
      * Function to run within the timeout. It returns a boolean. If the value is true, the code
      * will break out of the loop immediately else try again within the timeout period.
@@ -9,15 +19,11 @@ public abstract class TimedRunner {
     abstract boolean run();
 
     public void executeWithTimeout() {
-        executeWithTimeout(5000, 1000);
-    }
-
-    public void executeWithTimeout(long totalTimeout, long intervalSleep) {
-        for (int i = 0; i < (int)(totalTimeout / intervalSleep); i++) {
+        for (int i = 0; i < tries; i++) {
             if (run()) break;
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(intervalSleep);
             } catch (InterruptedException e) {
                 throw new RuntimeException("Thread was interrupted.", e);
             }

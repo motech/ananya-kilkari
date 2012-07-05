@@ -32,7 +32,7 @@ public class SubscriptionServiceTest {
     private SubscriptionRequest mockedSubscriptionRequest;
 
     @Mock
-    private ReportingService reportingService;
+    private IReportingService reportingService;
 
     @Before
     public void setUp() {
@@ -51,6 +51,9 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
 
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest(msisdn, subscriptionPack.name(), channel.name());
+
+        when(reportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
+
         String subscriptionId = subscriptionService.createSubscription(subscriptionRequest);
 
         assertNotNull(subscriptionId);

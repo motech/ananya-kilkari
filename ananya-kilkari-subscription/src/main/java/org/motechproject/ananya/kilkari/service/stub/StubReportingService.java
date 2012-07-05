@@ -4,14 +4,14 @@ import org.motechproject.ananya.kilkari.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.profile.Test;
-import org.motechproject.ananya.kilkari.service.IReportingService;
+import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.springframework.stereotype.Service;
 
 @Service
 @Test
-public class StubReportingService implements IReportingService {
+public class StubReportingService implements ReportingService {
 
-    private IReportingService behavior;
+    private ReportingService behavior;
 
     @Override
     public void createSubscription(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {
@@ -35,7 +35,7 @@ public class StubReportingService implements IReportingService {
         return null;
     }
 
-    public void setBehavior(IReportingService behavior) {
+    public void setBehavior(ReportingService behavior) {
         this.behavior = behavior;
     }
 

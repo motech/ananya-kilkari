@@ -2,14 +2,14 @@ package org.motechproject.ananya.kilkari.service.stub;
 
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.profile.Test;
-import org.motechproject.ananya.kilkari.service.IOnMobileSubscriptionService;
+import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
 import org.springframework.stereotype.Service;
 
 @Service
 @Test
-public class StubOnMobileSubscriptionService implements IOnMobileSubscriptionService {
+public class StubOnMobileSubscriptionService implements OnMobileSubscriptionService {
 
-    private IOnMobileSubscriptionService behavior;
+    private OnMobileSubscriptionService behavior;
 
     @Override
     public void activateSubscription(SubscriptionActivationRequest subscriptionActivationRequest) {
@@ -18,7 +18,7 @@ public class StubOnMobileSubscriptionService implements IOnMobileSubscriptionSer
         }
     }
 
-    public void setBehavior(IOnMobileSubscriptionService behavior) {
+    public void setBehavior(OnMobileSubscriptionService behavior) {
         this.behavior = behavior;
     }
 

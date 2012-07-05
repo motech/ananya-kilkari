@@ -6,7 +6,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.IReportingService;
+import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.validation.ValidationUtils;
 
 import java.io.Serializable;
@@ -115,7 +115,7 @@ public class SubscriptionRequest implements Serializable {
         this.msisdn = msisdn;
     }
 
-    public void validate(IReportingService reportingService) {
+    public void validate(ReportingService reportingService) {
         ValidationUtils.assertMsisdn(msisdn);
         ValidationUtils.assertPack(pack);
         ValidationUtils.assertChannel(channel);
@@ -125,7 +125,7 @@ public class SubscriptionRequest implements Serializable {
         validateLocation(reportingService);
     }
 
-    private void validateLocation(IReportingService reportingService) {
+    private void validateLocation(ReportingService reportingService) {
         if (isLocationEmpty()) {
             return;
         }

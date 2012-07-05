@@ -15,7 +15,7 @@ import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.IReportingService;
+import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
@@ -54,7 +54,7 @@ public class SubscriptionControllerTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private IReportingService reportingService;
+    private ReportingService reportingService;
 
 
     @Before

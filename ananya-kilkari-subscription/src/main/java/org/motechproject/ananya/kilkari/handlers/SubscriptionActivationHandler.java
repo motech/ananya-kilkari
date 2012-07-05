@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.handlers;
 
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.service.IOnMobileSubscriptionService;
+import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
@@ -14,14 +14,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubscriptionActivationHandler {
 
-    private IOnMobileSubscriptionService onMobileSubscriptionService;
+    private OnMobileSubscriptionService onMobileSubscriptionService;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionActivationHandler.class);
 
     private SubscriptionService subscriptionService;
 
     @Autowired
-    public SubscriptionActivationHandler(IOnMobileSubscriptionService onMobileSubscriptionService, SubscriptionService subscriptionService) {
+    public SubscriptionActivationHandler(OnMobileSubscriptionService onMobileSubscriptionService, SubscriptionService subscriptionService) {
         this.onMobileSubscriptionService = onMobileSubscriptionService;
         this.subscriptionService = subscriptionService;
     }

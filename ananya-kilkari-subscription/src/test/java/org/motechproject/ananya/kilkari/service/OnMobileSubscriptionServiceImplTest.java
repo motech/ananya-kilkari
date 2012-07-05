@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class OnMobileSubscriptionServiceTest {
+public class OnMobileSubscriptionServiceImplTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
@@ -37,7 +37,7 @@ public class OnMobileSubscriptionServiceTest {
         when(kilkariProperties.getProperty("omsm.base.url")).thenReturn("url");
         when(kilkariProperties.getProperty("omsm.username")).thenReturn("thoughtworks");
         when(kilkariProperties.getProperty("omsm.password")).thenReturn("password123");
-        new OnMobileSubscriptionService(restTemplate, kilkariProperties).activateSubscription(new SubscriptionActivationRequest(msisdn, pack, channel, subscriptionId));
+        new OnMobileSubscriptionServiceImpl(restTemplate, kilkariProperties).activateSubscription(new SubscriptionActivationRequest(msisdn, pack, channel, subscriptionId));
 
         HashMap<String, String> urlVariables = new HashMap<>();
         urlVariables.put("msisdn", msisdn);

@@ -10,8 +10,8 @@ import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
-import org.motechproject.ananya.kilkari.service.IOnMobileSubscriptionService;
-import org.motechproject.ananya.kilkari.service.IReportingService;
+import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
+import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.service.stub.StubOnMobileSubscriptionService;
 import org.motechproject.ananya.kilkari.service.stub.StubReportingService;
@@ -72,8 +72,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         subscriberResponse.addSubscriptionDetail(SubscriptionDetailsMapper.mapFrom(subscription1));
         subscriberResponse.addSubscriptionDetail(SubscriptionDetailsMapper.mapFrom(subscription2));
 
-        reportingService.setBehavior(mock(IReportingService.class));
-        onMobileSubscriptionService.setBehavior(mock(IOnMobileSubscriptionService.class));
+        reportingService.setBehavior(mock(ReportingService.class));
+        onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionService.class));
 
         MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channelString))
@@ -96,8 +96,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
 
-        reportingService.setBehavior(mock(IReportingService.class));
-        onMobileSubscriptionService.setBehavior(mock(IOnMobileSubscriptionService.class));
+        reportingService.setBehavior(mock(ReportingService.class));
+        onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionService.class));
 
         MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscription").param("msisdn", msisdn).param("pack", pack.toString())
@@ -153,10 +153,10 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
         BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
 
-        IReportingService mockedReportingService = Mockito.mock(IReportingService.class);
+        ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
         when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
         reportingService.setBehavior(mockedReportingService);
-        onMobileSubscriptionService.setBehavior(mock(IOnMobileSubscriptionService.class));
+        onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionService.class));
 
         SubscriptionRequest expectedRequest= new SubscriptionRequestBuilder().withDefaults().build();
         MvcResult result = mockMvc(subscriptionController)
@@ -213,8 +213,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
 
-        reportingService.setBehavior(mock(IReportingService.class));
-        onMobileSubscriptionService.setBehavior(mock(IOnMobileSubscriptionService.class));
+        reportingService.setBehavior(mock(ReportingService.class));
+        onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionService.class));
 
         MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscription").param("msisdn", msisdn).param("pack", pack.toString())

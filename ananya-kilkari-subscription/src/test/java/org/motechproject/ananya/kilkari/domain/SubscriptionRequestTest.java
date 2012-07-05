@@ -10,7 +10,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.IReportingService;
+import org.motechproject.ananya.kilkari.service.ReportingService;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -26,7 +26,7 @@ public class SubscriptionRequestTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private IReportingService reportingService;
+    private ReportingService reportingService;
 
     @Before
     public void setUp() {

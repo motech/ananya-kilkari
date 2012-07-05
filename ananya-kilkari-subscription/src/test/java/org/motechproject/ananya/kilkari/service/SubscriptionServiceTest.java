@@ -32,7 +32,7 @@ public class SubscriptionServiceTest {
     private SubscriptionRequest mockedSubscriptionRequest;
 
     @Mock
-    private IReportingService reportingService;
+    private ReportingService reportingService;
 
     @Before
     public void setUp() {

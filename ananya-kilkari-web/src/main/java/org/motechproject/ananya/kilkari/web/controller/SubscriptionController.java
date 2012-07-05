@@ -4,14 +4,12 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.IReportingService;
+import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.domain.CallbackRequestValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +20,10 @@ import java.util.List;
 public class SubscriptionController {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
-    private IReportingService reportingService;
+    private ReportingService reportingService;
 
     @Autowired
-    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, IReportingService reportingService) {
+    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, ReportingService reportingService) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.reportingService = reportingService;
     }

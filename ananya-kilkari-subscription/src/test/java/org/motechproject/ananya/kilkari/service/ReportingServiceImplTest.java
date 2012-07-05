@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ReportingServiceTest {
+public class ReportingServiceImplTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
@@ -47,7 +47,7 @@ public class ReportingServiceTest {
         DateTime edd = DateTime.now().plusMonths(3);
         String name = "name";
         Subscription subscription = new Subscription(msisdn, pack);
-        new ReportingService(restTemplate, kilkariProperties).createSubscription(new SubscriptionCreationReportRequest(subscription,channel, 42, name, dob, edd, new SubscriberLocation("district", "block", "panchayat")));
+        new ReportingServiceImpl(restTemplate, kilkariProperties).createSubscription(new SubscriptionCreationReportRequest(subscription,channel, 42, name, dob, edd, new SubscriberLocation("district", "block", "panchayat")));
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
@@ -67,7 +67,7 @@ public class ReportingServiceTest {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         when(restTemplate.getForEntity(any(String.class), any(Class.class), any(HashMap.class))).thenReturn(new ResponseEntity(new SubscriberLocation("mydistrict","myblock","mypanchayat"), HttpStatus.OK));
 
-        new ReportingService(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
+        new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
@@ -93,7 +93,7 @@ public class ReportingServiceTest {
         String reason = "my own error reason";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
-        new ReportingService(restTemplate, kilkariProperties).updateSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus, DateTime.now(), reason, operator));
+        new ReportingServiceImpl(restTemplate, kilkariProperties).updateSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus, DateTime.now(), reason, operator));
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);

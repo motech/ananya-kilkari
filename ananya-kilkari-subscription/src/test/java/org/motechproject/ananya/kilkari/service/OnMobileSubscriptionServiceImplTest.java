@@ -9,7 +9,6 @@ import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
-import java.util.Properties;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,7 +18,7 @@ public class OnMobileSubscriptionServiceImplTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
-    private Properties kilkariProperties;
+    private OnMobileEndpoints onMobileEndpoints;
 
     @Before
     public void setUp() {
@@ -34,10 +33,12 @@ public class OnMobileSubscriptionServiceImplTest {
         String username = "thoughtworks";
         String password = "password123";
         String subscriptionId = "abcd1234";
-        when(kilkariProperties.getProperty("omsm.base.url")).thenReturn("url");
-        when(kilkariProperties.getProperty("omsm.username")).thenReturn("thoughtworks");
-        when(kilkariProperties.getProperty("omsm.password")).thenReturn("password123");
-        new OnMobileSubscriptionServiceImpl(restTemplate, kilkariProperties).activateSubscription(new SubscriptionActivationRequest(msisdn, pack, channel, subscriptionId));
+        when(onMobileEndpoints.activateSubscriptionURL()).thenReturn("url");
+        when(onMobileEndpoints.username()).thenReturn("thoughtworks");
+        when(onMobileEndpoints.password()).thenReturn("password123");
+
+        OnMobileSubscriptionServiceImpl onMobileSubscriptionService = new OnMobileSubscriptionServiceImpl(restTemplate, onMobileEndpoints);
+        onMobileSubscriptionService.activateSubscription(new SubscriptionActivationRequest(msisdn, pack, channel, subscriptionId));
 
         HashMap<String, String> urlVariables = new HashMap<>();
         urlVariables.put("msisdn", msisdn);
@@ -46,9 +47,7 @@ public class OnMobileSubscriptionServiceImplTest {
         urlVariables.put("refid", subscriptionId);
         urlVariables.put("user", username);
         urlVariables.put("pass", password);
-        verify(restTemplate).getForEntity("url/ActivateSubscription?msisdn={msisdn}&srvkey={srvkey}&mode={mode}&refid={refid}&user={user}&pass={pass}", String.class, urlVariables);
-        verify(kilkariProperties).getProperty("omsm.base.url");
-        verify(kilkariProperties).getProperty("omsm.username");
-        verify(kilkariProperties).getProperty("omsm.password");
+
+        verify(restTemplate).getForEntity("url", String.class, urlVariables);
     }
 }

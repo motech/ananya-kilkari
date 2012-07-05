@@ -96,12 +96,8 @@ public class SubscriptionService {
         return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
     }
 
-    private void sendSubscriptionStateChangeEvent(String subscriptionId, SubscriptionStatus status, DateTime updatedOn, String reason, String operator) {
-        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, status, updatedOn, reason, operator));
-    }
-
     private void updateWithReporting(Subscription subscription, DateTime updatedOn, String reason, String operator) {
         allSubscriptions.update(subscription);
-        sendSubscriptionStateChangeEvent(subscription.getSubscriptionId(), subscription.getStatus(), updatedOn, reason, operator);
+        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscription.getSubscriptionId(), subscription.getStatus(), updatedOn, reason, operator));
     }
 }

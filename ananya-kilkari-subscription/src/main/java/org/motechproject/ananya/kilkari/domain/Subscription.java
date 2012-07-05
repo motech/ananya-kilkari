@@ -1,5 +1,9 @@
 package org.motechproject.ananya.kilkari.domain;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
@@ -73,27 +77,39 @@ public class Subscription extends MotechBaseDataObject {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Subscription)) return false;
 
         Subscription that = (Subscription) o;
 
-        if (msisdn != null ? !msisdn.equals(that.msisdn) : that.msisdn != null) return false;
-        if (pack != that.pack) return false;
-        if (status != that.status) return false;
-        if (subscriptionId != null ? !subscriptionId.equals(that.subscriptionId) : that.subscriptionId != null)
-            return false;
-
-        return true;
+        return new EqualsBuilder().append(this.msisdn, that.msisdn)
+                .append(this.pack, that.pack)
+                .append(this.subscriptionId, that.subscriptionId)
+                .append(this.operator, that.operator)
+                .append(this.status, that.status)
+                .isEquals();
     }
+
 
     @Override
     public int hashCode() {
-        int result = msisdn != null ? msisdn.hashCode() : 0;
-        result = 31 * result + (subscriptionId != null ? subscriptionId.hashCode() : 0);
-        result = 31 * result + (status != null ? status.hashCode() : 0);
-        result = 31 * result + (pack != null ? pack.hashCode() : 0);
-        return result;
+        return new HashCodeBuilder()
+                .append(this.msisdn)
+                .append(this.subscriptionId)
+                .append(this.pack)
+                .append(this.status).hashCode();
     }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append(this.msisdn)
+                .append(this.subscriptionId)
+                .append(this.pack)
+                .append(this.status)
+                .append(this.creationDate)
+                .toString();
+    }
+
 
     public void activate(String operator) {
         setStatus(SubscriptionStatus.ACTIVE);

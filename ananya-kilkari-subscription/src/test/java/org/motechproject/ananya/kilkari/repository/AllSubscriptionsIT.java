@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class AllSubscriptionsTestIT extends SubscriptionBaseIT {
+public class AllSubscriptionsIT extends SubscriptionBaseIT {
     @Autowired
     private AllSubscriptions allSubscriptions;
 

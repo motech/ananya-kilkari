@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.IT;
+package org.motechproject.ananya.kilkari.web.it;
 
 import org.joda.time.DateTime;
 import org.junit.Test;

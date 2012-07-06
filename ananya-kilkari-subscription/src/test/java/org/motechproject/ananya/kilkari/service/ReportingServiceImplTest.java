@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,24 +66,60 @@ public class ReportingServiceImplTest {
     @Test
     public void shouldInvokeReportingServiceWithGetLocations() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        when(restTemplate.getForEntity(any(String.class), any(Class.class), any(HashMap.class))).thenReturn(new ResponseEntity(new SubscriberLocation("mydistrict","myblock","mypanchayat"), HttpStatus.OK));
+        when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(new SubscriberLocation("mydistrict","myblock","mypanchayat"), HttpStatus.OK));
 
         new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
-        verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture(), urlVariablesArgumentCaptor.capture());
+        verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture());
 
         assertEquals(SubscriberLocation.class, subscriberLocationCaptor.getValue());
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
-        assertEquals("url/location", urlArgumentCaptor.getValue());
+        String url = urlArgumentCaptor.getValue();
+        assertTrue(url.startsWith("url/location?"));
+        assertTrue(url.contains("district=mydistrict"));
+        assertTrue(url.contains("block=myblock"));
+        assertTrue(url.contains("panchayat=mypanchayat"));
+    }
 
-        HashMap<String, String> paramMap = urlVariablesArgumentCaptor.getValue();
-        assertEquals(3, paramMap.size());
-        assertEquals("mydistrict", paramMap.get("district"));
-        assertEquals("myblock", paramMap.get("block"));
-        assertEquals("mypanchayat", paramMap.get("panchayat"));
+    @Test
+    public void shouldInvokeReportingServiceWithGetLocationsIfDistrctNotPresent() {
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(new SubscriberLocation("mydistrict","myblock","mypanchayat"), HttpStatus.OK));
+
+        new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation(null, "myblock", "mypanchayat");
+
+        ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
+        verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture());
+
+        assertEquals(SubscriberLocation.class, subscriberLocationCaptor.getValue());
+
+        verify(kilkariProperties).getProperty("reporting.service.base.url");
+        String url = urlArgumentCaptor.getValue();
+        assertTrue(url.startsWith("url/location?"));
+        assertTrue(url.contains("block=myblock"));
+        assertTrue(url.contains("panchayat=mypanchayat"));
+    }
+
+    @Test
+    public void shouldInvokeReportingServiceWithGetLocationsIfDistrctBlockAndPanchayatAreNotPresent() {
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(new SubscriberLocation("mydistrict","myblock","mypanchayat"), HttpStatus.OK));
+
+        new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation(null, null, null);
+
+        ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
+        verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture());
+
+        assertEquals(SubscriberLocation.class, subscriberLocationCaptor.getValue());
+
+        verify(kilkariProperties).getProperty("reporting.service.base.url");
+        String url = urlArgumentCaptor.getValue();
+        assertEquals("url/location", url);
     }
 
     @Test

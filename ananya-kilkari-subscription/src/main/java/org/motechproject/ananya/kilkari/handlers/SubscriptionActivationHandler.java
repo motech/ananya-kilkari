@@ -29,7 +29,7 @@ public class SubscriptionActivationHandler {
     @MotechListener(subjects = {SubscriptionEventKeys.PROCESS_SUBSCRIPTION})
     public void handleProcessSubscription(MotechEvent event) {
         SubscriptionActivationRequest subscriptionActivationRequest = (SubscriptionActivationRequest) event.getParameters().get("0");
-        logger.info(String.format("Handling process subscription event for msisdn: %s, pack: %s, channel: %s", subscriptionActivationRequest.getMsisdn(), subscriptionActivationRequest.getPack(), subscriptionActivationRequest.getChannel()));
+        logger.info(String.format("Handling process subscription event for subscriptionid: %s, msisdn: %s, pack: %s, channel: %s", subscriptionActivationRequest.getSubscriptionId(), subscriptionActivationRequest.getMsisdn(), subscriptionActivationRequest.getPack(), subscriptionActivationRequest.getChannel()));
         onMobileSubscriptionService.activateSubscription(subscriptionActivationRequest);
         subscriptionService.activationRequested(subscriptionActivationRequest.getSubscriptionId());
     }

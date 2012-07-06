@@ -9,6 +9,10 @@ public class SubscriberLocation implements Serializable {
 
     private String panchayat;
 
+    public SubscriberLocation() {
+
+    }
+
     public SubscriberLocation(String district, String block, String panchayat) {
         this.district = district;
         this.block = block;

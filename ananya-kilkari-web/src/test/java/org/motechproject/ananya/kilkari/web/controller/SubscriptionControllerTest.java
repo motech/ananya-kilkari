@@ -15,17 +15,14 @@ import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
+import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
-import org.motechproject.ananya.kilkari.domain.Operator;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
-import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
@@ -35,9 +32,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.motechproject.ananya.kilkari.web.MVCTestUtils.mockMvc;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.server.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 
@@ -56,6 +51,9 @@ public class SubscriptionControllerTest {
     @Mock
     private ReportingService reportingService;
 
+    private static final String CONTENT_TYPE_JAVASCRIPT = "application/javascript;charset=UTF-8";
+    private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
+    private static final String IVR_RESPONSE_PREFIX = "var response = ";
 
     @Before
     public void setUp() {
@@ -76,7 +74,7 @@ public class SubscriptionControllerTest {
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.JAVASCRIPT_CONTENT_TYPE))
+                .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
                 .andExpect(content().string(subscriberResponseMatcherWithSubscriptions(channel)));
     }
 
@@ -93,7 +91,7 @@ public class SubscriptionControllerTest {
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andExpect(content().type(CONTENT_TYPE_JSON))
                 .andExpect(content().string(subscriberResponseMatcherWithSubscriptions(channel)));
     }
 
@@ -107,7 +105,7 @@ public class SubscriptionControllerTest {
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.JAVASCRIPT_CONTENT_TYPE))
+                .andExpect(content().type(HttpConstants.IVR.getResponseContentType()))
                 .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions(channel)));
     }
 
@@ -121,7 +119,7 @@ public class SubscriptionControllerTest {
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andExpect(content().type(CONTENT_TYPE_JSON))
                 .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions(channel)));
     }
 
@@ -134,8 +132,8 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
-                .andExpect(status().is(HttpConstants.IVR_ERROR_CODE))
-                .andExpect(content().type(HttpConstants.JAVASCRIPT_CONTENT_TYPE))
+                .andExpect(status().isOk())
+                .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
                 .andExpect(content().string(errorResponseMatcherForInvalidMsisdn(channel)));
 
     }
@@ -149,8 +147,8 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
-                .andExpect(status().is(HttpConstants.ERROR_CODE))
-                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andExpect(status().is(400))
+                .andExpect(content().type(CONTENT_TYPE_JSON))
                 .andExpect(content().string(errorResponseMatcherForInvalidMsisdn(channel)));
     }
 
@@ -163,8 +161,8 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
-                .andExpect(status().is(HttpConstants.IVR_ERROR_CODE))
-                .andExpect(content().type(HttpConstants.JAVASCRIPT_CONTENT_TYPE))
+                .andExpect(status().isOk())
+                .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
                 .andExpect(content().string(errorResponseMatcherForRuntimeException(channel)));
     }
 
@@ -177,8 +175,8 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
-                .andExpect(status().is(HttpConstants.ERROR_CODE))
-                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andExpect(status().is(500))
+                .andExpect(content().type(CONTENT_TYPE_JSON))
                 .andExpect(content().string(errorResponseMatcherForRuntimeException(channel)));
     }
 
@@ -192,7 +190,7 @@ public class SubscriptionControllerTest {
         mockMvc(subscriptionController)
                 .perform(get("/subscription").param("msisdn", msisdn).param("channel", channel).param("pack", pack))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.JAVASCRIPT_CONTENT_TYPE))
+                .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
 
         ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
@@ -216,7 +214,7 @@ public class SubscriptionControllerTest {
         mockMvc(subscriptionController)
                 .perform(post("/subscription").body(toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andExpect(content().type(CONTENT_TYPE_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
 
         ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
@@ -243,7 +241,7 @@ public class SubscriptionControllerTest {
                 .perform(put("/subscription/" + subscriptionId)
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andExpect(content().type(CONTENT_TYPE_JSON))
                 .andExpect(content().string(baseResponseMatcher("ERROR", "Callback Request Invalid: Invalid msisdn invalidMsisdn,Invalid callbackAction invalidAction,Invalid callbackStatus invalidStatus,Invalid operator invalidOperator")));
 
         verifyZeroInteractions(kilkariSubscriptionService);
@@ -265,7 +263,7 @@ public class SubscriptionControllerTest {
                 .perform(put("/subscription/" + subscriptionId)
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andExpect(content().type(CONTENT_TYPE_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Callback request processed successfully")));
 
         ArgumentCaptor<CallbackRequestWrapper> callbackRequestWrapperArgumentCaptor = ArgumentCaptor.forClass(CallbackRequestWrapper.class);
@@ -340,7 +338,7 @@ public class SubscriptionControllerTest {
                 .perform(get("/help")
                         .param("msisdn", msisdn).param("reason", reason).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.JAVASCRIPT_CONTENT_TYPE))
+                .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber care request processed successfully")));
 
         ArgumentCaptor<SubscriberCareRequest> subscriberCareRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
@@ -442,8 +440,8 @@ public class SubscriptionControllerTest {
 
     private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {
         if (Channel.isIVR(channel)) {
-            assertTrue(jsonContent.startsWith(KilkariChannelInterceptor.IVR_RESPONSE_PREFIX));
-            jsonContent = jsonContent.replace(KilkariChannelInterceptor.IVR_RESPONSE_PREFIX, "");
+            assertTrue(jsonContent.startsWith(IVR_RESPONSE_PREFIX));
+            jsonContent = jsonContent.replace(IVR_RESPONSE_PREFIX, "");
         }
         return jsonContent;
     }

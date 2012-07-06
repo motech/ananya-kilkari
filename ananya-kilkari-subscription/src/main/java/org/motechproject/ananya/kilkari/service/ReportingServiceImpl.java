@@ -4,7 +4,6 @@ import org.motechproject.ananya.kilkari.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.profile.ProductionProfile;
-import org.motechproject.ananya.kilkari.profile.ProductionProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,17 +55,31 @@ public class ReportingServiceImpl implements ReportingService {
 
     @Override
     public SubscriberLocation getLocation(String district, String block, String panchayat) {
-        String url = String.format("%s%s", getBaseUrl(), GET_LOCATION_PATH);
         HashMap<String, String> locationParameters = new HashMap<String, String>();
-        locationParameters.put("district",district);
-        locationParameters.put("block",block);
-        locationParameters.put("panchayat",panchayat);
+        locationParameters.put("district", district);
+        locationParameters.put("block", block);
+        locationParameters.put("panchayat", panchayat);
+        String url = constructGetLocationUrl(locationParameters);
         try {
-            return restTemplate.getForEntity(url, SubscriberLocation.class, locationParameters).getBody();
+            return restTemplate.getForEntity(url, SubscriberLocation.class).getBody();
         } catch  (HttpClientErrorException ex) {
             logger.error(String.format("Reporting subscription state change failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
             throw ex;
         }
+    }
+    
+    private String constructGetLocationUrl(HashMap<String, String> params) {
+        String url = String.format("%s%s", getBaseUrl(), ReportingService.GET_LOCATION_PATH);
+        boolean paramAdded = false;
+        for(String paramName: params.keySet()) {
+            String paramValue = params.get(paramName);
+            if(paramValue == null) {
+                continue;
+            }
+            url = String.format("%s%s%s=%s", url, (paramAdded ? "&" : "?"), paramName, paramValue);
+            paramAdded = true;
+        }
+        return url;
     }
 
     private String getBaseUrl() {

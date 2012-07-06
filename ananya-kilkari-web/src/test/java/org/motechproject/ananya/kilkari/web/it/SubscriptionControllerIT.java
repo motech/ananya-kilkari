@@ -10,18 +10,16 @@ import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
 import org.motechproject.ananya.kilkari.service.ReportingService;
-import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.service.stub.StubOnMobileSubscriptionService;
 import org.motechproject.ananya.kilkari.service.stub.StubReportingService;
-import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
-import org.motechproject.ananya.kilkari.web.interceptors.KilkariChannelInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.server.MvcResult;
@@ -56,6 +54,10 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
      public void setUp()  {
         allSubscriptions.removeAll();
     }
+
+    private static final String CONTENT_TYPE_JAVASCRIPT = "application/javascript;charset=UTF-8";
+    private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
+    private static final String IVR_RESPONSE_PREFIX = "var response = ";
 
     @Test
     public void shouldRetrieveSubscriptionDetailsFromDatabase() throws Exception {
@@ -162,7 +164,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         MvcResult result = mockMvc(subscriptionController)
                 .perform(post("/subscription").body(toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andExpect(content().type(CONTENT_TYPE_JSON))
                 .andReturn();
 
 
@@ -174,7 +176,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         final Subscription[] subscription = new Subscription[1];
 
-        new TimedRunner(20, 1000) {
+        new org.motechproject.ananya.kilkari.web.it.TimedRunner(20, 1000) {
             @Override
             boolean run() {
                 subscription[0] = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
@@ -239,8 +241,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
     private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {
         if (Channel.isIVR(channel)) {
-            assertTrue(jsonContent.startsWith(KilkariChannelInterceptor.IVR_RESPONSE_PREFIX));
-            jsonContent = jsonContent.replace(KilkariChannelInterceptor.IVR_RESPONSE_PREFIX, "");
+            assertTrue(jsonContent.startsWith(IVR_RESPONSE_PREFIX));
+            jsonContent = jsonContent.replace(IVR_RESPONSE_PREFIX, "");
         }
         return jsonContent;
     }

@@ -14,7 +14,7 @@ public class ChannelFinder
         this.request = request;
     }
 
-    public boolean isIVRChannel() {
-        return Channel.isIVR(request.getParameter(CHANNEL_REQUEST_KEY));
+    public Channel getChannel() {
+        return Channel.isIVR(request.getParameter(CHANNEL_REQUEST_KEY)) ? Channel.IVR : Channel.CALL_CENTER;
     }
 }

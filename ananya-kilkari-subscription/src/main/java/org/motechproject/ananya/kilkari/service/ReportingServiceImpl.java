@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -34,7 +35,7 @@ public class ReportingServiceImpl implements ReportingService {
         String url = String.format("%s%s", getBaseUrl(), CREATE_SUBSCRIPTION_PATH);
         try {
             restTemplate.postForLocation(url, subscriptionCreationReportRequest, String.class, new HashMap<String, String>());
-        } catch  (HttpClientErrorException ex) {
+        } catch (HttpClientErrorException ex) {
             logger.error(String.format("Reporting subscription creation failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
             throw ex;
         }
@@ -46,7 +47,7 @@ public class ReportingServiceImpl implements ReportingService {
         String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIPTION_STATE_CHANGE_PATH, subscriptionId);
         try {
             restTemplate.put(url, subscriptionStateChangeReportRequest, new HashMap<String, String>());
-        } catch  (HttpClientErrorException ex) {
+        } catch (HttpClientErrorException ex) {
             logger.error(String.format("Reporting subscription state change failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
             throw ex;
         }
@@ -62,18 +63,20 @@ public class ReportingServiceImpl implements ReportingService {
         String url = constructGetLocationUrl(locationParameters);
         try {
             return restTemplate.getForEntity(url, SubscriberLocation.class).getBody();
-        } catch  (HttpClientErrorException ex) {
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                return null;
             logger.error(String.format("Reporting subscription state change failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
             throw ex;
         }
     }
-    
+
     private String constructGetLocationUrl(HashMap<String, String> params) {
         String url = String.format("%s%s", getBaseUrl(), ReportingService.GET_LOCATION_PATH);
         boolean paramAdded = false;
-        for(String paramName: params.keySet()) {
+        for (String paramName : params.keySet()) {
             String paramValue = params.get(paramName);
-            if(paramValue == null) {
+            if (paramValue == null) {
                 continue;
             }
             url = String.format("%s%s%s=%s", url, (paramAdded ? "&" : "?"), paramName, paramValue);

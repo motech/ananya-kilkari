@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.CallbackRequest;
 import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;
@@ -26,7 +25,7 @@ public class CallbackRequestHandlerTest {
     }
 
     @Test
-    public void shouldHandleProcessCallbackRequestEvent() throws ValidationException {
+    public void shouldHandleProcessCallbackRequestEvent() {
         HashMap<String, Object> parameters = new HashMap<>();
         String msisdn = "1234567890";
         String subscriptionId = "abcd1234";

@@ -3,9 +3,9 @@ package org.motechproject.ananya.kilkari.web.controller;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
-import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
+import org.motechproject.ananya.kilkari.service.ReportingService;
+import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
@@ -21,11 +21,13 @@ public class SubscriptionController {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
     private ReportingService reportingService;
+    private SubscriptionService subscriptionService;
 
     @Autowired
-    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, ReportingService reportingService) {
+    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, ReportingService reportingService, SubscriptionService subscriptionService) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.reportingService = reportingService;
+        this.subscriptionService = subscriptionService;
     }
 
 
@@ -39,7 +41,7 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse createSubscription(@RequestBody SubscriptionRequest subscriptionRequest) {
         if(!Channel.isIVR(subscriptionRequest.getChannel())) {
-            subscriptionRequest.validate(reportingService);
+            subscriptionRequest.validate(reportingService, subscriptionService);
         }
 
         kilkariSubscriptionService.createSubscription(subscriptionRequest);
@@ -61,8 +63,7 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscriber", method = RequestMethod.GET)
     @ResponseBody
-    public SubscriberResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel)
-            throws ValidationException {
+    public SubscriberResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
         SubscriberResponse subscriberResponse = new SubscriberResponse();
 
         List<Subscription> subscriptions = kilkariSubscriptionService.getSubscriptionsFor(msisdn);

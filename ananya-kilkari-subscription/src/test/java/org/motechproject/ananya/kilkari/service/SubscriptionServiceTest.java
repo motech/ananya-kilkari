@@ -40,6 +40,7 @@ public class SubscriptionServiceTest {
     @Mock
     private ReportingService reportingService;
 
+
     @Before
     public void setUp() {
         initMocks(this);
@@ -47,7 +48,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldCreateNewSubscription() throws ValidationException {
+    public void shouldCreateNewSubscription() {
         String msisdn = "1234567890";
         Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
@@ -83,14 +84,17 @@ public class SubscriptionServiceTest {
         assertNull(actualSubscriptionCreationReportRequest.getOperator());
     }
 
-    @Test(expected = ValidationException.class)
-    public void shouldThrowExceptionWhenInvalidSubscriptionRequestIsGiven() throws ValidationException {
-        doThrow(new ValidationException("Invalid Request")).when(mockedSubscriptionRequest).validate(reportingService);
+    @Test
+    public void shouldThrowExceptionWhenInvalidSubscriptionRequestIsGiven() {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid Request");
+
+        doThrow(new ValidationException("Invalid Request")).when(mockedSubscriptionRequest).validate(reportingService, subscriptionService);
         subscriptionService.createSubscription(mockedSubscriptionRequest);
     }
 
     @Test
-    public void shouldGetSubscriptionsForAGivenMsisdn() throws ValidationException {
+    public void shouldGetSubscriptionsForAGivenMsisdn() {
         String msisdn = "1234567890";
         ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
         subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS));
@@ -106,13 +110,19 @@ public class SubscriptionServiceTest {
         assertEquals(SubscriptionPack.FIFTEEN_MONTHS, subscriptions.get(1).getPack());
     }
 
-    @Test(expected = ValidationException.class)
-    public void shouldThrowAnExceptionForInvalidMsisdnNumbers() throws ValidationException {
+    @Test
+    public void shouldThrowAnExceptionForInvalidMsisdnNumbers() {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid msisdn 12345");
+
         subscriptionService.findByMsisdn("12345");
     }
 
-    @Test(expected = ValidationException.class)
-    public void shouldThrowAnExceptionForNonNumericMsisdn() throws ValidationException {
+    @Test
+    public void shouldThrowAnExceptionForNonNumericMsisdn() {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid msisdn 123456789a");
+
         subscriptionService.findByMsisdn("123456789a");
     }
 

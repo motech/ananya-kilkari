@@ -27,7 +27,7 @@ public class SubscriptionService {
     }
 
     public String createSubscription(SubscriptionRequest subscriptionRequest) {
-        subscriptionRequest.validate(reportingService);
+        subscriptionRequest.validate(reportingService, this);
 
         Subscription existingSubscription = allSubscriptions.findByMsisdnAndPack(
                 subscriptionRequest.getMsisdn(), SubscriptionPack.from(subscriptionRequest.getPack()));

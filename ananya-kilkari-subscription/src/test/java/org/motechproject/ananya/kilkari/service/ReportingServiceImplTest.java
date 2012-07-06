@@ -2,20 +2,22 @@ package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,6 +32,9 @@ public class ReportingServiceImplTest {
     private ArgumentCaptor<Class<String>> responseTypeArgumentCaptor;
     @Captor
     private ArgumentCaptor<HashMap<String,String>> urlVariablesArgumentCaptor;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() {
@@ -66,7 +71,55 @@ public class ReportingServiceImplTest {
     @Test
     public void shouldInvokeReportingServiceWithGetLocations() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(new SubscriberLocation("mydistrict","myblock","mypanchayat"), HttpStatus.OK));
+        SubscriberLocation expectedLocation = new SubscriberLocation("mydistrict", "myblock", "mypanchayat");
+        when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
+
+        SubscriberLocation actualLocation = new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
+
+        assertEquals(expectedLocation, actualLocation);
+
+        ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
+        verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture());
+
+        assertEquals(SubscriberLocation.class, subscriberLocationCaptor.getValue());
+
+        verify(kilkariProperties).getProperty("reporting.service.base.url");
+        String url = urlArgumentCaptor.getValue();
+        assertTrue(url.startsWith("url/location?"));
+        assertTrue(url.contains("district=mydistrict"));
+        assertTrue(url.contains("block=myblock"));
+        assertTrue(url.contains("panchayat=mypanchayat"));
+    }
+
+    @Test
+    public void shouldReturnNullIfLocationNotPresent() {
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        SubscriberLocation actualLocation = new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
+
+        assertNull(actualLocation);
+
+        ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
+        verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture());
+
+        assertEquals(SubscriberLocation.class, subscriberLocationCaptor.getValue());
+
+        verify(kilkariProperties).getProperty("reporting.service.base.url");
+        String url = urlArgumentCaptor.getValue();
+        assertTrue(url.startsWith("url/location?"));
+        assertTrue(url.contains("district=mydistrict"));
+        assertTrue(url.contains("block=myblock"));
+        assertTrue(url.contains("panchayat=mypanchayat"));
+    }
+ @Test
+    public void shouldRethrowAnyOtherExceptionOnGetLocation() {
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+        expectedException.expect(HttpClientErrorException.class);
+        expectedException.expectMessage("400 BAD_REQUEST");
 
         new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
 
@@ -87,9 +140,12 @@ public class ReportingServiceImplTest {
     @Test
     public void shouldInvokeReportingServiceWithGetLocationsIfDistrctNotPresent() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(new SubscriberLocation("mydistrict","myblock","mypanchayat"), HttpStatus.OK));
+        SubscriberLocation expectedLocation = new SubscriberLocation(null, "myblock", "mypanchayat");
+        when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation(null, "myblock", "mypanchayat");
+        SubscriberLocation actualLocation = new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation(null, "myblock", "mypanchayat");
+
+        assertEquals(expectedLocation, actualLocation);
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
@@ -105,11 +161,14 @@ public class ReportingServiceImplTest {
     }
 
     @Test
-    public void shouldInvokeReportingServiceWithGetLocationsIfDistrctBlockAndPanchayatAreNotPresent() {
+    public void shouldInvokeReportingServiceToGetLocationIfDistrictBlockAndPanchayatAreNotPresent() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(new SubscriberLocation("mydistrict","myblock","mypanchayat"), HttpStatus.OK));
+        SubscriberLocation expectedLocation = new SubscriberLocation(null, "myblock", "mypanchayat");
+        when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation(null, null, null);
+        SubscriberLocation actualLocation = new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation(null, null, null);
+
+        assertEquals(expectedLocation, actualLocation);
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);

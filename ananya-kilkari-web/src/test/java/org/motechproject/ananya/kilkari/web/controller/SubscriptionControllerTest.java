@@ -17,6 +17,7 @@ import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.service.ReportingService;
+import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
@@ -49,8 +50,10 @@ public class SubscriptionControllerTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private ReportingService reportingService;
+    private SubscriptionService subscriptionService;
 
+    @Mock
+    private ReportingService reportingService;
     private static final String CONTENT_TYPE_JAVASCRIPT = "application/javascript;charset=UTF-8";
     private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
@@ -58,7 +61,7 @@ public class SubscriptionControllerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, reportingService);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService, reportingService, subscriptionService);
     }
 
     @Test
@@ -280,36 +283,36 @@ public class SubscriptionControllerTest {
     public void shouldValidateSubscriptionRequestIfCreateRequestIsCalledFromCallCenter() {
         SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
         when(subscriptionRequest.getChannel()).thenReturn(Channel.CALL_CENTER.name());
-        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(reportingService);
+        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(reportingService, subscriptionService);
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("validation error"));
 
         subscriptionController.createSubscription(subscriptionRequest);
-        verify(subscriptionRequest).validate(reportingService);
+        verify(subscriptionRequest).validate(reportingService, subscriptionService);
     }
 
     @Test
     public void shouldValidateSubscriptionRequestIfCreateRequestIsCalledFromInvalidChannel() {
         SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
         when(subscriptionRequest.getChannel()).thenReturn("invalid_channel");
-        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(reportingService);
+        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(reportingService, subscriptionService);
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("validation error"));
 
         subscriptionController.createSubscription(subscriptionRequest);
-        verify(subscriptionRequest).validate(reportingService);
+        verify(subscriptionRequest).validate(reportingService, subscriptionService);
     }
 
     @Test
     public void shouldValidateSubscriptionRequestIfCreateRequestIsCalledWithoutChannel() {
         SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
         when(subscriptionRequest.getChannel()).thenReturn(null);
-        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(reportingService);
+        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(reportingService, subscriptionService);
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("validation error"));
 
         subscriptionController.createSubscription(subscriptionRequest);
-        verify(subscriptionRequest).validate(reportingService);
+        verify(subscriptionRequest).validate(reportingService, subscriptionService);
     }
 
     @Test
@@ -317,7 +320,7 @@ public class SubscriptionControllerTest {
         SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
         when(subscriptionRequest.getChannel()).thenReturn(Channel.IVR.name());
         subscriptionController.createSubscription(subscriptionRequest);
-        verify(subscriptionRequest,never()).validate(reportingService);
+        verify(subscriptionRequest,never()).validate(reportingService, subscriptionService);
     }
 
     @Test
@@ -325,7 +328,7 @@ public class SubscriptionControllerTest {
         SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
         when(subscriptionRequest.getChannel()).thenReturn("ivR");
         subscriptionController.createSubscription(subscriptionRequest);
-        verify(subscriptionRequest, never()).validate(reportingService);
+        verify(subscriptionRequest, never()).validate(reportingService, subscriptionService);
     }
 
     @Test

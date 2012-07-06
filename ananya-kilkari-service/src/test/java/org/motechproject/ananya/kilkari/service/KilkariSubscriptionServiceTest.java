@@ -52,14 +52,17 @@ public class KilkariSubscriptionServiceTest {
     public void shouldProcessSubscriptionRequest() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
         String subscriptionId = "111222333";
+        String pack = "SEVEN_MONTHS";
+        subscriptionRequest.setPack(pack);
         when(subscriptionService.createSubscription(subscriptionRequest)).thenReturn(subscriptionId);
+        
         kilkariSubscriptionService.processSubscriptionRequest(subscriptionRequest);
 
         ArgumentCaptor<KilkariMessageCampaignRequest> captor = ArgumentCaptor.forClass(KilkariMessageCampaignRequest.class);
         verify(kilkariMessageCampaignService).start(captor.capture());
-
         KilkariMessageCampaignRequest kilkariMessageCampaignRequest = captor.getValue();
-        assertEquals(subscriptionId, kilkariMessageCampaignRequest.getExternalId());
+        assertEquals(subscriptionId,kilkariMessageCampaignRequest.getExternalId());
+        assertEquals((Integer) SubscriptionPack.valueOf(pack).getStartWeek(),kilkariMessageCampaignRequest.getStartOffset());
     }
 
     @Test

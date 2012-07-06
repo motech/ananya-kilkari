@@ -11,10 +11,16 @@ import org.motechproject.server.messagecampaign.service.MessageCampaignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class KilkariMessageCampaignService {
+
+    public static final String CAMPAIGN_NAME = "kilkari-mother-child-campaign";
+    public static final String CAMPAIGN_MESSAGE_NAME = "Mother Child Health Care";
 
     private MessageCampaignService campaignService;
 
@@ -23,13 +29,12 @@ public class KilkariMessageCampaignService {
         this.campaignService = campaignService;
     }
 
-    public Boolean start(KilkariMessageCampaignRequest campaignRequest) {
-        campaignService.startFor(KilkariMessageCampaignRequestMapper.map(campaignRequest));
-        return true;
+    public void start(KilkariMessageCampaignRequest campaignRequest) {
+        campaignService.startFor(KilkariMessageCampaignRequestMapper.newRequestFrom(campaignRequest));
     }
 
-    public Boolean stop(KilkariMessageCampaignRequest enrollRequest) {
-        campaignService.stopAll(KilkariMessageCampaignRequestMapper.map(enrollRequest));
+    public boolean stop(KilkariMessageCampaignRequest enrollRequest) {
+        campaignService.stopAll(KilkariMessageCampaignRequestMapper.newRequestFrom(enrollRequest));
         return true;
     }
 
@@ -42,19 +47,19 @@ public class KilkariMessageCampaignService {
                 : null;
     }
 
-    public List<DateTime> getMessageTimings(String subscriptionId, String campaignName) {
-          //TODO:commenting the actual method until new platform release
-//        DateTime now = DateTime.now();
-//        Map<String,List<Date>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
-//                now.toDate(), now.plusYears(1).toDate());
-//        List<Date> dateList = campaignTimings.get(campaignName);
-//        List<DateTime> messageTimings = new ArrayList<>();
-//        if(dateList == null ||dateList.isEmpty())
-//            return messageTimings;
-//        for (Date date : dateList) {
-//            messageTimings.add(new DateTime(date.getTime()));
-//        }
-//        return messageTimings;
-        return Collections.emptyList();
+    public List<DateTime> getMessageTimings(String subscriptionId, String campaignName, DateTime startDate, DateTime endDate) {
+
+        Map<String, List<Date>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
+                startDate.toDate(), endDate.toDate());
+        List<Date> campaignMessageTimings = campaignTimings.get(CAMPAIGN_MESSAGE_NAME);
+
+        List<DateTime> alertTimings = new ArrayList<>();
+        if (campaignMessageTimings == null || campaignMessageTimings.isEmpty())
+            return alertTimings;
+
+        for (Date date : campaignMessageTimings) {
+            alertTimings.add(new DateTime(date.getTime()));
+        }
+        return alertTimings;
     }
 }

@@ -144,4 +144,8 @@ public class Subscription extends MotechBaseDataObject {
     public void setRenewalDate(DateTime renewalDate) {
         this.renewalDate = renewalDate;
     }
+
+    public DateTime endDate() {
+        return getCreationDate().plusWeeks(getPack().getTotalWeeks());
+    }
 }

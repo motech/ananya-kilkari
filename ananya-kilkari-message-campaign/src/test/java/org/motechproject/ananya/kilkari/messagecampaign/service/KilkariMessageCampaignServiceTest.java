@@ -10,12 +10,19 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
+import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
+import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
+import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
 import org.motechproject.server.messagecampaign.service.MessageCampaignService;
+
+import java.util.ArrayList;
 import java.util.Date;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class KilkariMessageCampaignServiceTest {
@@ -33,7 +40,15 @@ public class KilkariMessageCampaignServiceTest {
 
     @Test
     public void shouldStartNewCampaignForTheGivenRequest() {
-        KilkariMessageCampaignRequest kilkariMessageCampaignRequest = new KilkariMessageCampaignRequest("externalId", "campaignName", DateTime.now(), DateTime.now());
+        String externalId = "externalId";
+        String campaignName = "campaignName";
+        ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<>();
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(externalId, campaignName,
+                DateTime.now().toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
+        KilkariMessageCampaignRequest kilkariMessageCampaignRequest = new KilkariMessageCampaignRequest(
+                externalId, campaignName, null , DateTime.now(),0);
+        when(messageCampaignService.search(new CampaignEnrollmentsQuery().withExternalId(externalId)
+                .withCampaignName(campaignName))).thenReturn(campaignEnrollmentRecords);
 
         kilkariMessageCampaignService.start(kilkariMessageCampaignRequest);
 
@@ -45,7 +60,8 @@ public class KilkariMessageCampaignServiceTest {
 
     @Test
     public void shouldStop() {
-        KilkariMessageCampaignRequest kilkariMessageCampaignRequest = new KilkariMessageCampaignRequest("externalId", "campaignName", DateTime.now(), DateTime.now());
+        KilkariMessageCampaignRequest kilkariMessageCampaignRequest = new KilkariMessageCampaignRequest(
+                "externalId", "campaignName", DateTime.now(), DateTime.now(), 0);
 
         kilkariMessageCampaignService.stop(kilkariMessageCampaignRequest);
 
@@ -55,23 +71,11 @@ public class KilkariMessageCampaignServiceTest {
         assertRequestParameters(kilkariMessageCampaignRequest, campaignRequest);
     }
 
-    @Test
-    public void shouldGetMessageTimings() {
-        String subscriptionId = "subscriptionId";
-        String campaignName = "campaignName";
-
-        kilkariMessageCampaignService.getMessageTimings(subscriptionId, campaignName);
-
-//        verify(messageCampaignService).getCampaignTimings(eq(subscriptionId), eq(campaignName), Matchers.<Date>any(), Matchers.<Date>any());
-    }
-
     private void assertRequestParameters(KilkariMessageCampaignRequest kilkariMessageCampaignRequest, CampaignRequest campaignRequest) {
-        DateTime reminderTime = kilkariMessageCampaignRequest.getReminderTime();
         DateTime referenceDate = kilkariMessageCampaignRequest.getReferenceDate();
 
         assertEquals(kilkariMessageCampaignRequest.getExternalId(), campaignRequest.externalId());
         assertEquals(kilkariMessageCampaignRequest.getCampaignName(), campaignRequest.campaignName());
-        assertEquals(new Time(reminderTime.getHourOfDay(), reminderTime.getMinuteOfHour()), campaignRequest.reminderTime());
         assertEquals(new LocalDate(referenceDate.getYear(), referenceDate.getMonthOfYear(), referenceDate.getDayOfMonth()), campaignRequest.referenceDate());
     }
 }

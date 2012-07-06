@@ -15,13 +15,13 @@ public class KilkariMessageCampaignRequestMapperTest {
     @Test
     public void shouldMapKilkariMessageCampaignRequestToCampaignRequest() throws Exception {
         KilkariMessageCampaignRequest kilkariMessageCampaignRequest = new KilkariMessageCampaignRequest(
-                "externalId", "campaignName", new DateTime(2012, 5, 5, 13, 30, 30), new DateTime(2012, 5, 5, 0, 0));
+                "externalId", "campaignName", null, new DateTime(2012, 5, 5, 0, 0), 0);
 
-        CampaignRequest campaignRequest = KilkariMessageCampaignRequestMapper.map(kilkariMessageCampaignRequest);
+        CampaignRequest campaignRequest = KilkariMessageCampaignRequestMapper.newRequestFrom(kilkariMessageCampaignRequest);
 
         assertEquals(kilkariMessageCampaignRequest.getExternalId(), campaignRequest.externalId());
         assertEquals(kilkariMessageCampaignRequest.getCampaignName(), campaignRequest.campaignName());
-        assertEquals(new Time(13, 30), campaignRequest.reminderTime());
         assertEquals(new LocalDate(2012, 5, 5), campaignRequest.referenceDate());
+        assertEquals(kilkariMessageCampaignRequest.getStartOffset(), campaignRequest.startOffset());
     }
 }

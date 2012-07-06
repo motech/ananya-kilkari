@@ -17,7 +17,6 @@ import static org.springframework.test.web.server.request.MockMvcRequestBuilders
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 
-
 public class MessageCampaignVisualizationControllerIT extends SpringIntegrationTest {
 
     @Autowired
@@ -30,20 +29,20 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
     @Test
     public void shouldGetVisualizationForGivenExternalId() throws Exception {
         String msisdn = "9876543210";
-
-        KilkariMessageCampaignRequest messageCampaignRequest = new KilkariMessageCampaignRequest(
-                msisdn, KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME,
-                new DateTime(2012, 5, 5, 13, 30, 30), new DateTime(2012, 5, 5, 0, 0));
-        kilkariMessageCampaignService.start(messageCampaignRequest);
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS);
         allSubscriptions.add(subscription);
         markForDeletion(subscription);
+
+        KilkariMessageCampaignRequest messageCampaignRequest = new KilkariMessageCampaignRequest(
+                subscription.getSubscriptionId(), KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME,
+                new DateTime(2012, 5, 5, 13, 30, 30), new DateTime(2012, 5, 5, 0, 0), 0);
+        kilkariMessageCampaignService.start(messageCampaignRequest);
 
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()
                 .perform(get("/messagecampaign/visualize").param("msisdn", msisdn))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/json;charset=UTF-8"));
-//                .andExpect(content().string("{\"externalId\":\"msisdn\",\"schedules\":[{\"mid\":\"msisdn\",\"messages\":[1351160338000,1355987633000]}]}"));
+
 
         kilkariMessageCampaignService.stop(messageCampaignRequest);
     }

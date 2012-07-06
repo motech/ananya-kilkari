@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class KilkariCampaignService {
@@ -25,19 +26,18 @@ public class KilkariCampaignService {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
     }
 
-    public HashMap<String, List<DateTime>> getMessageTimings(String msisdn) {
+    public Map<String, List<DateTime>> getMessageTimings(String msisdn) {
         List<Subscription> subscriptionList = kilkariSubscriptionService.getSubscriptionsFor(msisdn);
-        HashMap<String, List<DateTime>> campaignMessageMap = new HashMap<>();
+        Map<String, List<DateTime>> campaignMessageMap = new HashMap<>();
         for(Subscription subscription : subscriptionList){
             String subscriptionId = subscription.getSubscriptionId();
+
             List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
-                    subscriptionId, KILKARI_MESSAGE_CAMPAIGN_NAME);
+                    subscriptionId, KILKARI_MESSAGE_CAMPAIGN_NAME,
+                    subscription.getCreationDate(), subscription.endDate());
+
             campaignMessageMap.put(subscriptionId, messageTimings);
         }
         return campaignMessageMap;
-    }
-
-    public KilkariMessageCampaignEnrollmentRecord getCampaignEnrollmentRecordFor(String subscriptionId){
-        return kilkariMessageCampaignService.searchEnrollment(subscriptionId, KILKARI_MESSAGE_CAMPAIGN_NAME);
     }
 }

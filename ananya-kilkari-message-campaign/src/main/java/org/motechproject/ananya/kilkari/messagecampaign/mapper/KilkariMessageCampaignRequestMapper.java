@@ -6,12 +6,15 @@ import org.motechproject.server.messagecampaign.contract.CampaignRequest;
 
 public class KilkariMessageCampaignRequestMapper {
 
-    public static CampaignRequest map(KilkariMessageCampaignRequest kilkariMessageCampaignRequest) {
+    public static CampaignRequest newRequestFrom(KilkariMessageCampaignRequest kilkariMessageCampaignRequest) {
         return new CampaignRequest(
                 kilkariMessageCampaignRequest.getExternalId(),
                 kilkariMessageCampaignRequest.getCampaignName(),
-                new Time(kilkariMessageCampaignRequest.getReminderTime().toLocalTime()),
-                kilkariMessageCampaignRequest.getReferenceDate().toLocalDate());
+                //TODO katta/sush pass the reminder time from the service itself
+//                new Time(kilkariMessageCampaignRequest.getReminderTime().toLocalTime()),
+                null,
+                kilkariMessageCampaignRequest.getReferenceDate().toLocalDate(),
+                kilkariMessageCampaignRequest.getStartOffset());
     }
 
 }

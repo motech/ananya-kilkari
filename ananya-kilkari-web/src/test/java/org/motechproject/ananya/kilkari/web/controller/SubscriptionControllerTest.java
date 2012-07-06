@@ -334,16 +334,13 @@ public class SubscriptionControllerTest {
     public void shouldPublishSubscriberCareEventIntoTheQueue() throws Exception {
         String msisdn = "1234567890";
         String reason = SubscriberCareReasons.CHANGE_PACK.name();
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest();
-        subscriberCareRequest.setMsisdn(msisdn);
-        subscriberCareRequest.setReason(reason);
-        byte[] requestBody = toJson(subscriberCareRequest).getBytes();
+        String channel = "ivr";
 
         mockMvc(subscriptionController)
-                .perform(post("/subscriber/care")
-                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .perform(get("/help")
+                        .param("msisdn", msisdn).param("reason", reason).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.JSON_CONTENT_TYPE))
+                .andExpect(content().type(HttpConstants.JAVASCRIPT_CONTENT_TYPE))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber care request processed successfully")));
 
         ArgumentCaptor<SubscriberCareRequest> subscriberCareRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);

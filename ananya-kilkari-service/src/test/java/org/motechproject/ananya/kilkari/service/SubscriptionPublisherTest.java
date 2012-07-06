@@ -43,9 +43,7 @@ public class SubscriptionPublisherTest {
 
     @Test
     public void shouldPublishSubscriberCareRequestIntoQueue() {
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest();
-        subscriberCareRequest.setMsisdn("1234567890");
-        subscriberCareRequest.setReason(SubscriberCareReasons.CHANGE_PACK.name());
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("1234567890", SubscriberCareReasons.CHANGE_PACK.name());
 
         subscriptionPublisher.processSubscriberCareRequest(subscriberCareRequest);
 

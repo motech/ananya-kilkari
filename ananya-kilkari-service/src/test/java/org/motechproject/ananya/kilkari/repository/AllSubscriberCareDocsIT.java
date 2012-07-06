@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.repository;
 
+import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
@@ -13,9 +15,14 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest{
     @Autowired
     private AllSubscriberCareDocs allSubscriberCareDocs;
 
+    @Before
+    public void setUp() {
+        allSubscriberCareDocs.removeAll();
+    }
+
     @Test
     public void shouldAddNewSubscriberCareDoc() {
-        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.CHANGE_PACK.name());
+        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.CHANGE_PACK.name(), DateTime.now());
         allSubscriberCareDocs.add(subscriberCareDoc);
         markForDeletion(subscriberCareDoc);
 

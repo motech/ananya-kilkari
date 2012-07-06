@@ -64,9 +64,7 @@ public class KilkariSubscriptionServiceTest {
     public void shouldPublishSubscriberCareRequestEvent() {
         String msisdn = "1234566789";
         String reason = SubscriberCareReasons.CHANGE_PACK.name();
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest();
-        subscriberCareRequest.setMsisdn(msisdn);
-        subscriberCareRequest.setReason(reason);
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason);
 
         kilkariSubscriptionService.processSubscriberCareRequest(subscriberCareRequest);
 

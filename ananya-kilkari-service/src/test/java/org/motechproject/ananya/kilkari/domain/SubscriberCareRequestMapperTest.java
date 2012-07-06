@@ -9,13 +9,12 @@ public class SubscriberCareRequestMapperTest {
     public void shouldMapSubscriberCareRequestToSubscriberCareDoc() {
         String msisdn = "1234567890";
         String reason = SubscriberCareReasons.CHANGE_PACK.name();
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest();
-        subscriberCareRequest.setMsisdn(msisdn);
-        subscriberCareRequest.setReason(reason);
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason);
 
         SubscriberCareDoc subscriberCareDoc = SubscriberCareRequestMapper.map(subscriberCareRequest);
 
         assertEquals(msisdn, subscriberCareDoc.getMsisdn());
         assertEquals(reason, subscriberCareDoc.getReason());
+        assertEquals(subscriberCareRequest.getCreatedAt(), subscriberCareDoc.getCreatedAt());
     }
 }

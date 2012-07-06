@@ -28,9 +28,7 @@ public class SubscriberCareServiceTest {
 
     @Test(expected = ValidationException.class)
     public void shouldThrowExceptionForInvalidSubscriberCareRequest() {
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest();
-        subscriberCareRequest.setMsisdn("12345");
-        subscriberCareRequest.setReason(SubscriberCareReasons.CHANGE_PACK.name());
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("12345", SubscriberCareReasons.CHANGE_PACK.name());
 
         subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
     }
@@ -39,9 +37,7 @@ public class SubscriberCareServiceTest {
     public void shouldSaveValidSubscriberCareRequest() {
         String msisdn = "1234567890";
         String reason = SubscriberCareReasons.CHANGE_PACK.name();
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest();
-        subscriberCareRequest.setMsisdn(msisdn);
-        subscriberCareRequest.setReason(reason);
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason);
 
         subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
 

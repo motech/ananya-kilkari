@@ -23,8 +23,8 @@ public class SubscriberCareRequestHandler {
     @MotechListener(subjects = {SubscriptionEventKeys.PROCESS_SUBSCRIBER_CARE_REQUEST})
     public void handleSubscriberCareRequest(MotechEvent motechEvent) {
         SubscriberCareRequest subscriberCareRequest = (SubscriberCareRequest) motechEvent.getParameters().get("0");
-        logger.info(String.format("Create subscriber care request event for msisdn: %s, reason: %s",
-                subscriberCareRequest.getMsisdn(), subscriberCareRequest.getReason()));
+        logger.info(String.format("Create subscriber care request event for msisdn: %s, reason: %s, createdAt: %s",
+                subscriberCareRequest.getMsisdn(), subscriberCareRequest.getReason(), subscriberCareRequest.getCreatedAt()));
         subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
     }
 }

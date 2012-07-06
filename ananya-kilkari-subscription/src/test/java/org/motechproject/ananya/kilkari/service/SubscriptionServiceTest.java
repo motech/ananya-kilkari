@@ -2,12 +2,15 @@ package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.*;
+import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 
@@ -23,6 +26,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class SubscriptionServiceTest {
 
     private SubscriptionService subscriptionService;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private AllSubscriptions allSubscriptions;
@@ -200,6 +206,23 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(subscriptionStatus, subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(operator, subscriptionStateChangeReportRequest.getOperator());
+    }
+
+    @Test
+    public void shouldNotAddDuplicateSubscriptions() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults()
+                .withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS.toString()).build();
+
+        Subscription existingSubscription = new Subscription();
+        when(reportingService.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat()))
+                .thenReturn(new SubscriberLocation("district", "block", "panchayat"));
+        when(allSubscriptions.findByMsisdnAndPack(subscriptionRequest.getMsisdn(),
+                SubscriptionPack.from(subscriptionRequest.getPack()))).thenReturn(existingSubscription);
+
+        expectedException.expect(DuplicateSubscriptionException.class);
+
+        subscriptionService.createSubscription(subscriptionRequest);
+
     }
 
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {

@@ -5,15 +5,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
+import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 
 import static junit.framework.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class KilkariSubscriptionServiceTest {
@@ -47,7 +49,7 @@ public class KilkariSubscriptionServiceTest {
     }
 
     @Test
-    public void shouldProcessSubscriptionRequest(){
+    public void shouldProcessSubscriptionRequest() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
         String subscriptionId = "111222333";
         when(subscriptionService.createSubscription(subscriptionRequest)).thenReturn(subscriptionId);
@@ -57,7 +59,7 @@ public class KilkariSubscriptionServiceTest {
         verify(kilkariMessageCampaignService).start(captor.capture());
 
         KilkariMessageCampaignRequest kilkariMessageCampaignRequest = captor.getValue();
-        assertEquals(subscriptionId,kilkariMessageCampaignRequest.getExternalId());
+        assertEquals(subscriptionId, kilkariMessageCampaignRequest.getExternalId());
     }
 
     @Test
@@ -74,5 +76,17 @@ public class KilkariSubscriptionServiceTest {
 
         Assert.assertEquals(msisdn, careRequest.getMsisdn());
         Assert.assertEquals(reason, careRequest.getReason());
+    }
+
+    @Test
+    public void shouldNotScheduleMessageCampaignIfDuplicateSubscriptionIsRequested() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults()
+                .withMsisdn("123").withPack(SubscriptionPack.FIFTEEN_MONTHS.toString()).build();
+
+        doThrow(new DuplicateSubscriptionException("")).when(subscriptionService).createSubscription(subscriptionRequest);
+
+        kilkariSubscriptionService.processSubscriptionRequest(subscriptionRequest);
+
+        verify(kilkariMessageCampaignService, never()).start(any(KilkariMessageCampaignRequest.class));
     }
 }

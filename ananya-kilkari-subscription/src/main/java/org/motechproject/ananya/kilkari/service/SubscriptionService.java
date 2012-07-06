@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.service;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
+import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
@@ -27,6 +28,15 @@ public class SubscriptionService {
 
     public String createSubscription(SubscriptionRequest subscriptionRequest) {
         subscriptionRequest.validate(reportingService);
+
+        Subscription existingSubscription = allSubscriptions.findByMsisdnAndPack(
+                subscriptionRequest.getMsisdn(), SubscriptionPack.from(subscriptionRequest.getPack()));
+
+        if(existingSubscription!=null) {
+            throw new DuplicateSubscriptionException(String.format("Subscription already exists for msisdn[%s] and pack[%s]",
+                    subscriptionRequest.getMsisdn(), subscriptionRequest.getPack()));
+        }
+
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper(subscriptionRequest);
         Subscription subscription = subscriptionMapper.getSubscription();
         allSubscriptions.add(subscription);

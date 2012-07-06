@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +54,7 @@ public class KilkariSubscriptionServiceTest {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
         String subscriptionId = "111222333";
         String pack = "SEVEN_MONTHS";
+        subscriptionRequest.setCreatedAt(DateTime.now());
         subscriptionRequest.setPack(pack);
         when(subscriptionService.createSubscription(subscriptionRequest)).thenReturn(subscriptionId);
         
@@ -62,7 +64,8 @@ public class KilkariSubscriptionServiceTest {
         verify(kilkariMessageCampaignService).start(captor.capture());
         KilkariMessageCampaignRequest kilkariMessageCampaignRequest = captor.getValue();
         assertEquals(subscriptionId,kilkariMessageCampaignRequest.getExternalId());
-        assertEquals((Integer) SubscriptionPack.valueOf(pack).getStartWeek(),kilkariMessageCampaignRequest.getStartOffset());
+        assertEquals(pack,kilkariMessageCampaignRequest.getSubscriptionPack());
+        assertEquals(subscriptionRequest.getCreatedAt(),kilkariMessageCampaignRequest.getSubscriptionCreationDate());
     }
 
     @Test

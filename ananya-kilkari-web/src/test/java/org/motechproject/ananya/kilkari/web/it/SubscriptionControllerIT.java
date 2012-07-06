@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.web.it;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -23,6 +24,8 @@ import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.server.MvcResult;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -80,7 +83,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channelString))
                     .andExpect(status().isOk())
-                    .andExpect(content().type("application/javascript;charset=UTF-8"))
+                    .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
                     .andReturn();
 
         String responseString = result.getResponse().getContentAsString();
@@ -105,7 +108,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
                 .perform(get("/subscription").param("msisdn", msisdn).param("pack", pack.toString())
                         .param("channel", channelString))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/javascript;charset=UTF-8"))
+                .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
                 .andReturn();
 
         String responseString = result.getResponse().getContentAsString();
@@ -138,14 +141,17 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
             @Override
             boolean run() {
                  campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
-                         subscription[0].getSubscriptionId(), KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME);
+                         subscription[0].getSubscriptionId(), KilkariCampaignService.SEVEN_MONTH_CAMPAIGN_NAME);
                 return (campaignEnrollmentRecord[0] != null);
             }
         }.executeWithTimeout();
 
         assertNotNull(campaignEnrollmentRecord[0]);
         assertEquals(subscription[0].getSubscriptionId(), campaignEnrollmentRecord[0].getExternalId());
-        assertEquals(KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
+        assertEquals(KilkariCampaignService.SEVEN_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
+        List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
+                subscription[0].getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
+        assertEquals(28, messageTimings.size());
     }
 
     @Test
@@ -198,14 +204,14 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
             @Override
             boolean run() {
                  campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
-                         subscription[0].getSubscriptionId(), KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME);
+                         subscription[0].getSubscriptionId(), KilkariCampaignService.SEVEN_MONTH_CAMPAIGN_NAME);
                 return (campaignEnrollmentRecord[0] != null);
             }
         }.executeWithTimeout();
 
         assertNotNull(campaignEnrollmentRecord[0]);
         assertEquals(subscription[0].getSubscriptionId(), campaignEnrollmentRecord[0].getExternalId());
-        assertEquals(KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
+        assertEquals(KilkariCampaignService.SEVEN_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
     }
 
     @Test

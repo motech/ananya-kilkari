@@ -20,6 +20,7 @@ public class SubscriptionRequestBuilder {
         request.setPanchayat("panchayat");
         request.setDateOfBirth("13-08-2001");
         request.setExpectedDateOfDelivery("20-09-2001");
+        request.setCreatedAt(null);
         return this;
     }
 

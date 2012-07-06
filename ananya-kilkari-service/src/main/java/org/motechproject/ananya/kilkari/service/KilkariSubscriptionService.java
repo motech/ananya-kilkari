@@ -4,7 +4,6 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.domain.Subscription;
-import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
@@ -66,29 +65,16 @@ public class KilkariSubscriptionService {
     }
 
     public void processSubscriptionRequest(SubscriptionRequest subscriptionRequest) {
-<<<<<<< HEAD
         try {
             String subscriptionId = subscriptionService.createSubscription(subscriptionRequest);
 
-            DateTime now = DateTime.now();
-            kilkariMessageCampaignService.start(new KilkariMessageCampaignRequest(
-                    subscriptionId, KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME, now,
-                    now.plusDays(campaignScheduleDeltaDays).plusMinutes(campaignScheduleDeltaMinutes)));
+            KilkariMessageCampaignRequest campaignRequest = new KilkariMessageCampaignRequest(
+                    subscriptionId, subscriptionRequest.getPack(), subscriptionRequest.getCreatedAt());
+
+            kilkariMessageCampaignService.start(campaignRequest);
         } catch (DuplicateSubscriptionException e) {
             LOGGER.warn(String.format("Subscription for msisdn[%s] and pack[%s] already exists.",
                     subscriptionRequest.getMsisdn(), subscriptionRequest.getPack()));
         }
-=======
-        String subscriptionId = subscriptionService.createSubscription(subscriptionRequest);
-
-        DateTime startDate = DateTime.now().plusDays(campaignScheduleDeltaDays).plusMinutes(campaignScheduleDeltaMinutes);
-        DateTime reminderTime = DateTime.now();
-
-        KilkariMessageCampaignRequest campaignRequest = new KilkariMessageCampaignRequest(
-                subscriptionId, KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME, reminderTime,
-                startDate, 0);
-
-        kilkariMessageCampaignService.start(campaignRequest);
->>>>>>> Katta,Sush|#1741|creating visualisation based on creation date of subscription and end date based on pack. added offset logic for creation of schedule.
     }
 }

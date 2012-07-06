@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.it;
+package org.motechproject.ananya.kilkari.web.IT;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -29,13 +29,13 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
     @Test
     public void shouldGetVisualizationForGivenExternalId() throws Exception {
         String msisdn = "9876543210";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS);
+        SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
+        Subscription subscription = new Subscription(msisdn, subscriptionPack);
         allSubscriptions.add(subscription);
         markForDeletion(subscription);
 
         KilkariMessageCampaignRequest messageCampaignRequest = new KilkariMessageCampaignRequest(
-                subscription.getSubscriptionId(), KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME,
-                new DateTime(2012, 5, 5, 13, 30, 30), new DateTime(2012, 5, 5, 0, 0), 0);
+                subscription.getSubscriptionId(), subscriptionPack.name(), subscription.getCreationDate());
         kilkariMessageCampaignService.start(messageCampaignRequest);
 
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()

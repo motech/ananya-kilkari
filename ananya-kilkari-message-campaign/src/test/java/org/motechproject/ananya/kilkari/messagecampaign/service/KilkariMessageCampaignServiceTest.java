@@ -1,26 +1,19 @@
 package org.motechproject.ananya.kilkari.messagecampaign.service;
 
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.messagecampaign.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
-import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
-import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
-import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
 import org.motechproject.server.messagecampaign.service.MessageCampaignService;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -41,41 +34,64 @@ public class KilkariMessageCampaignServiceTest {
     @Test
     public void shouldStartNewCampaignForTheGivenRequest() {
         String externalId = "externalId";
-        String campaignName = "campaignName";
-        ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<>();
-        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(externalId, campaignName,
-                DateTime.now().toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
+        String subscriptionPack = SubscriptionPack.TWELVE_MONTHS.name();
+        DateTime subscriptionCreationDate = DateTime.now();
         KilkariMessageCampaignRequest kilkariMessageCampaignRequest = new KilkariMessageCampaignRequest(
-                externalId, campaignName, null , DateTime.now(),0);
-        when(messageCampaignService.search(new CampaignEnrollmentsQuery().withExternalId(externalId)
-                .withCampaignName(campaignName))).thenReturn(campaignEnrollmentRecords);
+                externalId, subscriptionPack, subscriptionCreationDate);
 
         kilkariMessageCampaignService.start(kilkariMessageCampaignRequest);
 
         ArgumentCaptor<CampaignRequest> campaignRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignRequest.class);
         verify(messageCampaignService).startFor(campaignRequestArgumentCaptor.capture());
         CampaignRequest campaignRequest = campaignRequestArgumentCaptor.getValue();
-        assertRequestParameters(kilkariMessageCampaignRequest, campaignRequest);
+
+        assertEquals(externalId,campaignRequest.externalId());
+        assertEquals(SubscriptionPack.TWELVE_MONTHS.getCampaignName(),campaignRequest.campaignName());
+        assertEquals(subscriptionCreationDate.toLocalDate(),campaignRequest.referenceDate());
+        assertEquals(new Time(subscriptionCreationDate.toLocalTime()),campaignRequest.reminderTime());
     }
 
     @Test
     public void shouldStop() {
+        String externalId = "externalId";
+        String subscriptionPack = SubscriptionPack.TWELVE_MONTHS.name();
+        DateTime subscriptionCreationDate = DateTime.now();
         KilkariMessageCampaignRequest kilkariMessageCampaignRequest = new KilkariMessageCampaignRequest(
-                "externalId", "campaignName", DateTime.now(), DateTime.now(), 0);
+                externalId, subscriptionPack, subscriptionCreationDate);
 
         kilkariMessageCampaignService.stop(kilkariMessageCampaignRequest);
 
         ArgumentCaptor<CampaignRequest> campaignRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignRequest.class);
         verify(messageCampaignService).stopAll(campaignRequestArgumentCaptor.capture());
         CampaignRequest campaignRequest = campaignRequestArgumentCaptor.getValue();
-        assertRequestParameters(kilkariMessageCampaignRequest, campaignRequest);
+
+        assertEquals(externalId,campaignRequest.externalId());
+        assertEquals(SubscriptionPack.TWELVE_MONTHS.getCampaignName(),campaignRequest.campaignName());
+        assertEquals(subscriptionCreationDate.toLocalDate(),campaignRequest.referenceDate());
+        assertEquals(new Time(subscriptionCreationDate.toLocalTime()), campaignRequest.reminderTime());
     }
+    
+    @Test
+    public void shouldGetMessageTimingsForASubscription() {
+        DateTime startDate = DateTime.now();
+        String subscriptionId = "abcd1234";
+        SubscriptionPack subscriptionPack = SubscriptionPack.SEVEN_MONTHS;
+        DateTime endDate = startDate.plusYears(2);
+        Date messageTime = DateTime.now().toDate();
+        
+        HashMap<String, List<Date>> campaignTimings = new HashMap<>();
+        ArrayList<Date> dates = new ArrayList<Date>();
+        dates.add(messageTime);
+        campaignTimings.put(KilkariMessageCampaignService.CAMPAIGN_MESSAGE_NAME, dates);
+        when(messageCampaignService.getCampaignTimings(subscriptionId, subscriptionPack.getCampaignName(),
+                startDate.toDate(), endDate.toDate())).thenReturn(campaignTimings);
 
-    private void assertRequestParameters(KilkariMessageCampaignRequest kilkariMessageCampaignRequest, CampaignRequest campaignRequest) {
-        DateTime referenceDate = kilkariMessageCampaignRequest.getReferenceDate();
+        List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
+                subscriptionId, subscriptionPack.name(), startDate, endDate);
 
-        assertEquals(kilkariMessageCampaignRequest.getExternalId(), campaignRequest.externalId());
-        assertEquals(kilkariMessageCampaignRequest.getCampaignName(), campaignRequest.campaignName());
-        assertEquals(new LocalDate(referenceDate.getYear(), referenceDate.getMonthOfYear(), referenceDate.getDayOfMonth()), campaignRequest.referenceDate());
+        verify(messageCampaignService).getCampaignTimings(subscriptionId, subscriptionPack.getCampaignName(),
+                startDate.toDate(), endDate.toDate());
+        
+        assertEquals(new DateTime(messageTime), messageTimings.get(0));
     }
 }

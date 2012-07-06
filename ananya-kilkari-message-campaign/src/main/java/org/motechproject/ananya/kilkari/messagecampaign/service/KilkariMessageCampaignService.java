@@ -1,25 +1,26 @@
 package org.motechproject.ananya.kilkari.messagecampaign.service;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.messagecampaign.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.messagecampaign.mapper.KilkariMessageCampaignEnrollmentRecordMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.mapper.KilkariMessageCampaignRequestMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
+import org.motechproject.server.messagecampaign.contract.CampaignRequest;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
 import org.motechproject.server.messagecampaign.service.MessageCampaignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class KilkariMessageCampaignService {
 
-    public static final String CAMPAIGN_NAME = "kilkari-mother-child-campaign";
+    public static final String FIFTEEN_MONTHS = "kilkari-mother-child-campaign-fifteen-months";
+    public static final String TWELVE_MONTHS = "kilkari-mother-child-campaign-twelve-months";
+    public static final String SEVEN_MONTHS = "kilkari-mother-child-campaign-seven-months";
     public static final String CAMPAIGN_MESSAGE_NAME = "Mother Child Health Care";
 
     private MessageCampaignService campaignService;
@@ -47,8 +48,8 @@ public class KilkariMessageCampaignService {
                 : null;
     }
 
-    public List<DateTime> getMessageTimings(String subscriptionId, String campaignName, DateTime startDate, DateTime endDate) {
-
+    public List<DateTime> getMessageTimings(String subscriptionId, String packName, DateTime startDate, DateTime endDate) {
+        String campaignName = SubscriptionPack.from(packName).getCampaignName();
         Map<String, List<Date>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
                 startDate.toDate(), endDate.toDate());
         List<Date> campaignMessageTimings = campaignTimings.get(CAMPAIGN_MESSAGE_NAME);
@@ -58,7 +59,7 @@ public class KilkariMessageCampaignService {
             return alertTimings;
 
         for (Date date : campaignMessageTimings) {
-            alertTimings.add(new DateTime(date.getTime()));
+            alertTimings.add(new DateTime(date));
         }
         return alertTimings;
     }

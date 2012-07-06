@@ -5,41 +5,24 @@ import org.joda.time.DateTime;
 public class KilkariMessageCampaignRequest {
 
     private String externalId;
+    private String subscriptionPack;
+    private DateTime subscriptionCreationDate;
 
-    private String campaignName;
-
-    DateTime reminderTime;
-
-    DateTime referenceDate;
-
-    private Integer startOffset;
-
-    public KilkariMessageCampaignRequest(String externalId, String campaignName, DateTime reminderTime,
-                                         DateTime referenceDate, Integer startOffset) {
+    public KilkariMessageCampaignRequest(String externalId, String subscriptionPack, DateTime subscriptionCreationDate) {
         this.externalId = externalId;
-        this.campaignName = campaignName;
-        this.reminderTime = reminderTime;
-        this.referenceDate = referenceDate;
-        this.startOffset = startOffset;
+        this.subscriptionPack = subscriptionPack;
+        this.subscriptionCreationDate = subscriptionCreationDate;
     }
 
     public String getExternalId() {
         return externalId;
     }
 
-    public String getCampaignName() {
-        return campaignName;
+    public String getSubscriptionPack() {
+        return subscriptionPack;
     }
 
-    public DateTime getReminderTime() {
-        return reminderTime;
-    }
-
-    public DateTime getReferenceDate() {
-        return referenceDate;
-    }
-
-    public Integer getStartOffset() {
-        return startOffset;
+    public DateTime getSubscriptionCreationDate() {
+        return subscriptionCreationDate;
     }
 }

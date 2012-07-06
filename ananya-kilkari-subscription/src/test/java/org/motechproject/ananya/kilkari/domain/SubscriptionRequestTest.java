@@ -55,9 +55,7 @@ public class SubscriptionRequestTest {
         assertEquals("mydistrict", subscriptionRequest.getDistrict());
         assertEquals("myblock", subscriptionRequest.getBlock());
         assertEquals("mypanchayat", subscriptionRequest.getPanchayat());
-        DateTime createdAt = subscriptionRequest.getCreatedAt();
-        assertTrue(createdAt.isEqual(beforeCreated) || createdAt.isAfter(beforeCreated));
-        assertTrue(createdAt.isEqualNow() || createdAt.isBeforeNow());
+        assertNull(subscriptionRequest.getCreatedAt());
     }
 
     @Test
@@ -247,7 +245,8 @@ public class SubscriptionRequestTest {
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel, String age, String name, String dob, String edd, String district, String block, String panchayat) {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults()
                 .withPack(pack).withChannel(channel).withMsisdn(msisdn).withBeneficiaryAge(age)
-                .withBeneficiaryName(name).withDOB(dob).withEDD(edd).withDistrict(district).withBlock(block).withPanchayat(panchayat).build();
+                .withBeneficiaryName(name).withDOB(dob).withEDD(edd).withDistrict(district).withBlock(block)
+                .withPanchayat(panchayat).build();
 
         return subscriptionRequest;
     }

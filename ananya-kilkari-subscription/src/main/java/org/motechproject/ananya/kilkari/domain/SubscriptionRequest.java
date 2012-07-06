@@ -24,8 +24,8 @@ public class SubscriptionRequest implements Serializable {
     private String beneficiaryName;
     private String beneficiaryAge;
     private String district;
-    private String panchayat;
     private String block;
+    private String panchayat;
     private String expectedDateOfDelivery;
     private String dateOfBirth;
 
@@ -87,6 +87,10 @@ public class SubscriptionRequest implements Serializable {
 
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public void setCreatedAt(DateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getMsisdn() {
@@ -199,6 +203,4 @@ public class SubscriptionRequest implements Serializable {
                 .isEquals();
 
     }
-
-
 }

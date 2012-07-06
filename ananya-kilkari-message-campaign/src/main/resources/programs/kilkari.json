@@ -1,8 +1,38 @@
 [
     {
-        "name" : "kilkari-mother-child-campaign",
+        "name" : "kilkari-mother-child-campaign-fifteen-months",
         "type" : "REPEATING",
         "maxDuration" : "60 Weeks",
+        "messages" : [
+            {
+                "name" : "Mother Child Health Care",
+                "formats" : ["IVR"],
+                "languages" : ["en"],
+                "messageKey": "PREGNANCY-cw{Offset}",
+                "deliverTime" : "13:00",
+                "repeatInterval" : "1 week"
+            }
+        ]
+    },
+    {
+        "name" : "kilkari-mother-child-campaign-twelve-months",
+        "type" : "REPEATING",
+        "maxDuration" : "48 Weeks",
+        "messages" : [
+            {
+                "name" : "Mother Child Health Care",
+                "formats" : ["IVR"],
+                "languages" : ["en"],
+                "messageKey": "PREGNANCY-cw{Offset}",
+                "deliverTime" : "13:00",
+                "repeatInterval" : "1 week"
+            }
+        ]
+    },
+    {
+        "name" : "kilkari-mother-child-campaign-seven-months",
+        "type" : "REPEATING",
+        "maxDuration" : "28 Weeks",
         "messages" : [
             {
                 "name" : "Mother Child Health Care",

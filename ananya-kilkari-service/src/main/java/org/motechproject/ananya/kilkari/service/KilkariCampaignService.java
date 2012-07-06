@@ -2,7 +2,6 @@ package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.Subscription;
-import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,9 @@ import java.util.Map;
 @Service
 public class KilkariCampaignService {
 
-    public static final String KILKARI_MESSAGE_CAMPAIGN_NAME = "kilkari-mother-child-campaign";
+    public static final String SEVEN_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-seven-months";
+    public static final String TWELVE_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-twelve-months";
+    public static final String FIFTEEN_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-fifteen-months";
 
     private KilkariMessageCampaignService kilkariMessageCampaignService;
     private KilkariSubscriptionService kilkariSubscriptionService;
@@ -33,7 +34,7 @@ public class KilkariCampaignService {
             String subscriptionId = subscription.getSubscriptionId();
 
             List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
-                    subscriptionId, KILKARI_MESSAGE_CAMPAIGN_NAME,
+                    subscriptionId, subscription.getPack().name(),
                     subscription.getCreationDate(), subscription.endDate());
 
             campaignMessageMap.put(subscriptionId, messageTimings);

@@ -228,7 +228,6 @@ public class SubscriptionControllerTest {
         assertCreatedAt(beforeCreate, subscriptionRequest);
     }
 
-
     @Test
     public void shouldGiveAnErrorMessageWhenCallBackRequestIsInvalid() throws Exception {
         String subscriptionId = "abcd1234";

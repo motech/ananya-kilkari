@@ -1,19 +1,14 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.hamcrest.Matchers;
-import org.hamcrest.collection.IsMapContaining;
 import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +18,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -60,25 +54,25 @@ public class KilkariCampaignServiceTest {
 
         when(kilkariMessageCampaignService.getMessageTimings(
                 subscription1.getSubscriptionId(),
-                KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME,
-                subscription1.getCreationDate(), subscription1.endDate().plusWeeks(1))).thenReturn(dateTimes);
+                subscription1.getPack().name(),
+                subscription1.getCreationDate(), subscription1.endDate())).thenReturn(dateTimes);
         when(kilkariMessageCampaignService.getMessageTimings(
                 subscription2.getSubscriptionId(),
-                KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME,
-                subscription2.getCreationDate(), subscription2.endDate().plusWeeks(1))).thenReturn(dateTimes);
+                subscription2.getPack().name(),
+                subscription2.getCreationDate(), subscription2.endDate())).thenReturn(dateTimes);
 
 
         Map<String, List<DateTime>> messageTimings = kilkariCampaignService.getMessageTimings(msisdn);
 
         verify(kilkariMessageCampaignService).getMessageTimings(
                 eq(subscription1.getSubscriptionId()),
-                eq(KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME),
+                eq(subscription1.getPack().name()),
                 eq(subscription1.getCreationDate()),
                 eq(subscription1.endDate()));
 
         verify(kilkariMessageCampaignService).getMessageTimings(
                 eq(subscription2.getSubscriptionId()),
-                eq(KilkariCampaignService.KILKARI_MESSAGE_CAMPAIGN_NAME),
+                eq(subscription2.getPack().name()),
                 eq(subscription2.getCreationDate()),
                 eq(subscription2.endDate()));
 

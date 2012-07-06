@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.messagecampaign.mapper;
 
+import org.joda.time.LocalDate;
+import org.motechproject.ananya.kilkari.messagecampaign.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
@@ -7,14 +9,10 @@ import org.motechproject.server.messagecampaign.contract.CampaignRequest;
 public class KilkariMessageCampaignRequestMapper {
 
     public static CampaignRequest newRequestFrom(KilkariMessageCampaignRequest kilkariMessageCampaignRequest) {
-        return new CampaignRequest(
-                kilkariMessageCampaignRequest.getExternalId(),
-                kilkariMessageCampaignRequest.getCampaignName(),
-                //TODO katta/sush pass the reminder time from the service itself
-//                new Time(kilkariMessageCampaignRequest.getReminderTime().toLocalTime()),
-                null,
-                kilkariMessageCampaignRequest.getReferenceDate().toLocalDate(),
-                kilkariMessageCampaignRequest.getStartOffset());
-    }
+        String campaignName = SubscriptionPack.from(kilkariMessageCampaignRequest.getSubscriptionPack()).getCampaignName();
+        Time reminderTime = new Time(kilkariMessageCampaignRequest.getSubscriptionCreationDate().toLocalTime());
+        LocalDate referenceDate = kilkariMessageCampaignRequest.getSubscriptionCreationDate().toLocalDate();
 
+        return new CampaignRequest(kilkariMessageCampaignRequest.getExternalId(), campaignName, reminderTime, referenceDate);
+    }
 }

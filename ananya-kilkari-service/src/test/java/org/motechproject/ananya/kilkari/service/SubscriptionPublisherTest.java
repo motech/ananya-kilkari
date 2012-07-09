@@ -16,10 +16,12 @@ public class SubscriptionPublisherTest {
     private EventContext eventContext;
 
     private SubscriptionPublisher subscriptionPublisher;
+    private String channel;
 
     @Before
     public void setUp(){
         initMocks(this);
+        channel = "ivr";
         subscriptionPublisher = new SubscriptionPublisher(eventContext);
     }
 
@@ -43,7 +45,7 @@ public class SubscriptionPublisherTest {
 
     @Test
     public void shouldPublishSubscriberCareRequestIntoQueue() {
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("1234567890", SubscriberCareReasons.CHANGE_PACK.name());
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("1234567890", SubscriberCareReasons.HELP.name(), channel);
 
         subscriptionPublisher.processSubscriberCareRequest(subscriberCareRequest);
 

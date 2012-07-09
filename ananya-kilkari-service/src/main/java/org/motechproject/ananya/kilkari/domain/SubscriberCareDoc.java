@@ -14,14 +14,18 @@ public class SubscriberCareDoc extends MotechBaseDataObject {
     private String reason;
 
     @JsonProperty
+    private Channel channel;
+
+    @JsonProperty
     private DateTime createdAt;
 
     public SubscriberCareDoc() {
     }
 
-    public SubscriberCareDoc(String msisdn, String reason, DateTime createdAt) {
+    public SubscriberCareDoc(String msisdn, String reason, DateTime createdAt, Channel channel) {
         this.msisdn = msisdn;
         this.reason = reason;
+        this.channel = channel;
         this.createdAt = createdAt;
     }
 
@@ -35,5 +39,9 @@ public class SubscriberCareDoc extends MotechBaseDataObject {
 
     public DateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public Channel getChannel() {
+        return channel;
     }
 }

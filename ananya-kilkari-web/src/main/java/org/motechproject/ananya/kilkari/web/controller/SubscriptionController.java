@@ -77,13 +77,5 @@ public class SubscriptionController {
 
         return subscriberResponse;
     }
-
-    @RequestMapping(value = "/help", method = RequestMethod.GET)
-    @ResponseBody
-    public BaseResponse createSubscriberCareRequest(@RequestParam String msisdn, @RequestParam String reason, @RequestParam String channel) {
-        kilkariSubscriptionService.processSubscriberCareRequest(new SubscriberCareRequest(msisdn, reason));
-        return BaseResponse.success("Subscriber care request processed successfully");
-    }
-
 }
 

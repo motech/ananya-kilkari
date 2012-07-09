@@ -10,15 +10,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class SubscriberCareService {
     private AllSubscriberCareDocs allSubscriberCareDocs;
+    private SubscriberCareRequestValidator careRequestValidator;
+    private SubscriptionPublisher subscriptionPublisher;
 
     @Autowired
-    public SubscriberCareService(AllSubscriberCareDocs allSubscriberCareDocs) {
+    public SubscriberCareService(AllSubscriberCareDocs allSubscriberCareDocs, SubscriberCareRequestValidator careRequestValidator,
+                                 SubscriptionPublisher subscriptionPublisher) {
         this.allSubscriberCareDocs = allSubscriberCareDocs;
+        this.careRequestValidator = careRequestValidator;
+        this.subscriptionPublisher = subscriptionPublisher;
+    }
+
+    public void processSubscriberCareRequest(SubscriberCareRequest subscriberCareRequest) {
+        subscriptionPublisher.processSubscriberCareRequest(subscriberCareRequest);
     }
 
     public void createSubscriberCareRequest(SubscriberCareRequest subscriberCareRequest) {
-        SubscriberCareRequestValidator.validate(subscriberCareRequest);
-
+        careRequestValidator.validate(subscriberCareRequest);
         allSubscriberCareDocs.add(SubscriberCareRequestMapper.map(subscriberCareRequest));
     }
 }

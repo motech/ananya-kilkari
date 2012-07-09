@@ -3,11 +3,7 @@ package org.motechproject.ananya.kilkari.domain;
 import org.apache.commons.lang.StringUtils;
 
 public enum SubscriberCareReasons {
-    CHANGE_PACK;
-
-    public static SubscriberCareReasons getFor(String action) {
-        return SubscriberCareReasons.valueOf(StringUtils.trimToEmpty(action).toUpperCase());
-    }
+    HELP;
 
     public static boolean isValid(String subscriberCareReason) {
         return (subscriberCareReason != null && SubscriberCareReasons.contains(subscriberCareReason));

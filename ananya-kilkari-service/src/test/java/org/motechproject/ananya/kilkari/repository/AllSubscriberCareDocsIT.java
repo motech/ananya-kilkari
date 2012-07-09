@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.repository;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest{
 
     @Test
     public void shouldAddNewSubscriberCareDoc() {
-        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.CHANGE_PACK.name(), DateTime.now());
+        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP.name(), DateTime.now(), Channel.IVR);
         allSubscriberCareDocs.add(subscriberCareDoc);
         markForDeletion(subscriberCareDoc);
 

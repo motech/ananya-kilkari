@@ -56,10 +56,6 @@ public class KilkariSubscriptionService {
         subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
     }
 
-    public void processSubscriberCareRequest(SubscriberCareRequest subscriberCareRequest) {
-        subscriptionPublisher.processSubscriberCareRequest(subscriberCareRequest);
-    }
-
     public List<Subscription> getSubscriptionsFor(String msisdn) {
         return subscriptionService.findByMsisdn(msisdn);
     }

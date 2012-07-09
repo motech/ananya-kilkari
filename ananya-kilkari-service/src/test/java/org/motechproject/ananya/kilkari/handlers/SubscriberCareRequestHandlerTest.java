@@ -25,7 +25,8 @@ public class SubscriberCareRequestHandlerTest {
 
     @Test
     public void shouldInvokeSubscriberCareServiceWithTheRequest() {
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("1234567890", SubscriberCareReasons.CHANGE_PACK.name());
+        String channel = "ivr";
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("1234567890", SubscriberCareReasons.HELP.name(), channel);
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put("0", subscriberCareRequest);
         MotechEvent motechEvent = new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIBER_CARE_REQUEST, parameters);

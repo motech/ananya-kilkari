@@ -69,22 +69,6 @@ public class KilkariSubscriptionServiceTest {
     }
 
     @Test
-    public void shouldPublishSubscriberCareRequestEvent() {
-        String msisdn = "1234566789";
-        String reason = SubscriberCareReasons.CHANGE_PACK.name();
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason);
-
-        kilkariSubscriptionService.processSubscriberCareRequest(subscriberCareRequest);
-
-        ArgumentCaptor<SubscriberCareRequest> subscriberCareRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
-        verify(subscriptionPublisher).processSubscriberCareRequest(subscriberCareRequestArgumentCaptor.capture());
-        SubscriberCareRequest careRequest = subscriberCareRequestArgumentCaptor.getValue();
-
-        Assert.assertEquals(msisdn, careRequest.getMsisdn());
-        Assert.assertEquals(reason, careRequest.getReason());
-    }
-
-    @Test
     public void shouldNotScheduleMessageCampaignIfDuplicateSubscriptionIsRequested() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults()
                 .withMsisdn("123").withPack(SubscriptionPack.FIFTEEN_MONTHS.toString()).build();

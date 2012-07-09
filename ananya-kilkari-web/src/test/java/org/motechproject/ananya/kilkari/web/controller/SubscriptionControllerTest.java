@@ -33,6 +33,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.motechproject.ananya.kilkari.web.MVCTestUtils.mockMvc;
+import static org.motechproject.ananya.kilkari.web.controller.ResponseMatchers.baseResponseMatcher;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
@@ -330,26 +331,6 @@ public class SubscriptionControllerTest {
         verify(subscriptionRequest, never()).validate(any(SubscriberLocation.class), any(Subscription.class));
     }
 
-    @Test
-    public void shouldPublishSubscriberCareEventIntoTheQueue() throws Exception {
-        String msisdn = "1234567890";
-        String reason = SubscriberCareReasons.CHANGE_PACK.name();
-        String channel = "ivr";
-
-        mockMvc(subscriptionController)
-                .perform(get("/help")
-                        .param("msisdn", msisdn).param("reason", reason).param("channel", channel))
-                .andExpect(status().isOk())
-                .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
-                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber care request processed successfully")));
-
-        ArgumentCaptor<SubscriberCareRequest> subscriberCareRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
-        verify(kilkariSubscriptionService).processSubscriberCareRequest(subscriberCareRequestArgumentCaptor.capture());
-        SubscriberCareRequest careRequest = subscriberCareRequestArgumentCaptor.getValue();
-
-        assertEquals(msisdn, careRequest.getMsisdn());
-        assertEquals(reason, careRequest.getReason());
-    }
 
     private void mockSubscription(String msisdn) {
         when(mockedSubscription.getMsisdn()).thenReturn(msisdn);
@@ -365,18 +346,6 @@ public class SubscriptionControllerTest {
         assertTrue(createdAt.isEqual(afterCreate) || createdAt.isBefore(afterCreate));
     }
 
-    private BaseMatcher<String> baseResponseMatcher(final String status, final String description) {
-        return new BaseMatcher<String>() {
-            @Override
-            public boolean matches(Object o) {
-                return assertBaseResponse((String) o, status, description);
-            }
-
-            @Override
-            public void describeTo(Description matcherDescription) {
-            }
-        };
-    }
 
     private Matcher<String> errorResponseMatcherForInvalidMsisdn(final String channel) {
         return new BaseMatcher<String>() {
@@ -433,12 +402,6 @@ public class SubscriptionControllerTest {
         };
     }
 
-    private boolean assertBaseResponse(String jsonContent, String status, String description) {
-        BaseResponse baseResponse = fromJson(jsonContent.replace("var response = ", ""), BaseResponse.class);
-
-        return baseResponse.getStatus().equals(status)
-                && baseResponse.getDescription().equals(description);
-    }
 
     private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {
         if (Channel.isIVR(channel)) {

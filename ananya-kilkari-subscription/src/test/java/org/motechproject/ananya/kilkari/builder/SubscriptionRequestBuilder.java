@@ -8,6 +8,10 @@ public class SubscriptionRequestBuilder {
 
     private SubscriptionRequest request;
 
+    public SubscriptionRequestBuilder() {
+        request = new SubscriptionRequest();
+    }
+
     public SubscriptionRequestBuilder withDefaults() {
         request = new SubscriptionRequest();
         request.setPack(SubscriptionPack.FIFTEEN_MONTHS.name());

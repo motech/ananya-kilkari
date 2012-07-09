@@ -7,8 +7,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.ReportingService;
-import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.validation.ValidationUtils;
 
 import java.io.Serializable;
@@ -121,36 +119,29 @@ public class SubscriptionRequest implements Serializable {
         this.msisdn = msisdn;
     }
 
-    public void validate(ReportingService reportingService, SubscriptionService subscriptionService) {
+    public void validate(SubscriberLocation reportLocation, Subscription existingActiveSubscription) {
         ValidationUtils.assertMsisdn(msisdn);
         ValidationUtils.assertPack(pack);
         ValidationUtils.assertChannel(channel);
         validateAge();
         validateDOB();
         validateEDD();
-        validateLocation(reportingService);
-        validateIfAlreadySubscribed(subscriptionService);
+        validateLocation(reportLocation);
+        validateIfAlreadySubscribed(existingActiveSubscription);
     }
 
-    private void validateIfAlreadySubscribed(SubscriptionService subscriptionService) {
-        Subscription existingSubscription = subscriptionService.findByMsisdnAndPack(
-                msisdn, pack);
-
-        if (existingSubscription == null)
+    private void validateIfAlreadySubscribed(Subscription existingActiveSubscription) {
+        if (existingActiveSubscription == null)
             return;
-        SubscriptionStatus subscriptionStatus = existingSubscription.getStatus();
-        if (subscriptionStatus == SubscriptionStatus.COMPLETED || subscriptionStatus == SubscriptionStatus.DEACTIVATED) {
-            return;
-        }
         throw new DuplicateSubscriptionException(String.format("Subscription already exists for msisdn: %s, pack: %s",
                 msisdn, pack));
     }
 
-    private void validateLocation(ReportingService reportingService) {
+    private void validateLocation(SubscriberLocation reportLocation) {
         if (isLocationEmpty()) {
             return;
         }
-        if (reportingService.getLocation(district, block, panchayat) == null) {
+        if (reportLocation == null) {
             throw new ValidationException(String.format("Invalid location with district: %s, block: %s, panchayat: %s", district, block, panchayat));
         }
     }

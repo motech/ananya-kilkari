@@ -74,12 +74,19 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
         Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS);
         allSubscriptions.add(subscription2);
 
+        Subscription subscription3 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        subscription3.setStatus(SubscriptionStatus.COMPLETED);
+        allSubscriptions.add(subscription3);
+
         markForDeletion(subscription1);
         markForDeletion(subscription2);
-        Subscription filteredSubscription = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        markForDeletion(subscription3);
 
-        assertNotNull(filteredSubscription);
-        assertEquals(subscription1, filteredSubscription);
+        List<Subscription> allSubscriptionsByMsisdnAndPack = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.TWELVE_MONTHS);
+
+        assertEquals(2, allSubscriptionsByMsisdnAndPack.size());
+        assertEquals(subscription1, allSubscriptionsByMsisdnAndPack.get(0));
+        assertEquals(subscription3, allSubscriptionsByMsisdnAndPack.get(1));
     }
 
     @Test
@@ -97,22 +104,5 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
 
         assertNotNull(filteredSubscription);
         assertEquals(subscription1, filteredSubscription);
-    }
-
-    @Test
-    public void shouldAddSubscriptionOnlyIfItsNotPresent() {
-        String msisdn = "123456";
-
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
-        allSubscriptions.add(subscription1);
-
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
-        allSubscriptions.add(subscription2);
-
-        markForDeletion(subscription1);
-
-        List<Subscription> filteredSubscriptions = allSubscriptions.findByMsisdn(msisdn);
-        assertNotNull(filteredSubscriptions);
-        assertEquals(1, filteredSubscriptions.size());
     }
 }

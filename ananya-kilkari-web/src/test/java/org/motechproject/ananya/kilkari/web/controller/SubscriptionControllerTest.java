@@ -282,44 +282,43 @@ public class SubscriptionControllerTest {
     public void shouldValidateSubscriptionRequestIfCreateRequestIsCalledFromCallCenter() {
         SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
         when(subscriptionRequest.getChannel()).thenReturn(Channel.CALL_CENTER.name());
-        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(reportingService, subscriptionService);
+        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(any(SubscriberLocation.class), any(Subscription.class));
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("validation error"));
 
         subscriptionController.createSubscription(subscriptionRequest);
-        verify(subscriptionRequest).validate(reportingService, subscriptionService);
     }
 
     @Test
     public void shouldValidateSubscriptionRequestIfCreateRequestIsCalledFromInvalidChannel() {
         SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
         when(subscriptionRequest.getChannel()).thenReturn("invalid_channel");
-        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(reportingService, subscriptionService);
+        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(any(SubscriberLocation.class), any(Subscription.class));
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("validation error"));
 
         subscriptionController.createSubscription(subscriptionRequest);
-        verify(subscriptionRequest).validate(reportingService, subscriptionService);
     }
 
     @Test
     public void shouldValidateSubscriptionRequestIfCreateRequestIsCalledWithoutChannel() {
         SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
         when(subscriptionRequest.getChannel()).thenReturn(null);
-        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(reportingService, subscriptionService);
+        doThrow(new ValidationException("validation error")).when(subscriptionRequest).validate(any(SubscriberLocation.class), any(Subscription.class));
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("validation error"));
 
         subscriptionController.createSubscription(subscriptionRequest);
-        verify(subscriptionRequest).validate(reportingService, subscriptionService);
     }
 
     @Test
     public void shouldNotValidateSubscriptionRequestIfCreateRequestIsCalledFromIVR() {
         SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
         when(subscriptionRequest.getChannel()).thenReturn(Channel.IVR.name());
+
         subscriptionController.createSubscription(subscriptionRequest);
-        verify(subscriptionRequest,never()).validate(reportingService, subscriptionService);
+
+        verify(subscriptionRequest,never()).validate(any(SubscriberLocation.class), any(Subscription.class));
     }
 
     @Test
@@ -327,7 +326,8 @@ public class SubscriptionControllerTest {
         SubscriptionRequest subscriptionRequest = Mockito.mock(SubscriptionRequest.class);
         when(subscriptionRequest.getChannel()).thenReturn("ivR");
         subscriptionController.createSubscription(subscriptionRequest);
-        verify(subscriptionRequest, never()).validate(reportingService, subscriptionService);
+
+        verify(subscriptionRequest, never()).validate(any(SubscriberLocation.class), any(Subscription.class));
     }
 
     @Test

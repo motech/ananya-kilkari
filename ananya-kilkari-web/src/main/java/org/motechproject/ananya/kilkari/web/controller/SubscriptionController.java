@@ -40,12 +40,14 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse createSubscription(@RequestBody SubscriptionRequest subscriptionRequest) {
-        if(!Channel.isIVR(subscriptionRequest.getChannel())) {
-            subscriptionRequest.validate(reportingService, subscriptionService);
+        if (!Channel.isIVR(subscriptionRequest.getChannel())) {
+            SubscriberLocation reportLocation = reportingService.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat());
+            Subscription existingSubscription = subscriptionService.findActiveSubscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack());
+
+            subscriptionRequest.validate(reportLocation, existingSubscription);
         }
 
         kilkariSubscriptionService.createSubscription(subscriptionRequest);
-
         return BaseResponse.success("Subscription request submitted successfully");
     }
 

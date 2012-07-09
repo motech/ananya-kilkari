@@ -3,7 +3,6 @@ package org.motechproject.ananya.kilkari.service;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
-import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
@@ -27,15 +26,10 @@ public class SubscriptionService {
     }
 
     public String createSubscription(SubscriptionRequest subscriptionRequest) {
-        subscriptionRequest.validate(reportingService, this);
+        SubscriberLocation reportLocation = reportingService.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat());
+        Subscription existingSubscription = findActiveSubscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack());
 
-        Subscription existingSubscription = allSubscriptions.findByMsisdnAndPack(
-                subscriptionRequest.getMsisdn(), SubscriptionPack.from(subscriptionRequest.getPack()));
-
-        if(existingSubscription!=null) {
-            throw new DuplicateSubscriptionException(String.format("Subscription already exists for msisdn[%s] and pack[%s]",
-                    subscriptionRequest.getMsisdn(), subscriptionRequest.getPack()));
-        }
+        subscriptionRequest.validate(reportLocation, existingSubscription);
 
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper(subscriptionRequest);
         Subscription subscription = subscriptionMapper.getSubscription();
@@ -52,8 +46,13 @@ public class SubscriptionService {
         return allSubscriptions.findByMsisdn(msisdn);
     }
 
-    public Subscription findByMsisdnAndPack(String msisdn, String pack) {
-        return allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.from(pack));
+    public Subscription findActiveSubscription(String msisdn, String pack) {
+        List<Subscription> allSubscriptionsByMsisdnAndPack = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.from(pack));
+        for (Subscription subscription : allSubscriptionsByMsisdnAndPack) {
+            if (subscription.isActive())
+                return subscription;
+        }
+        return null;
     }
 
     public void activate(String subscriptionId, DateTime activatedOn, final String operator) {

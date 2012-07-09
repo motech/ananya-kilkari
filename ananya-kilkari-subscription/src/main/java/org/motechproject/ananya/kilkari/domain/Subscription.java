@@ -4,6 +4,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
@@ -112,6 +113,10 @@ public class Subscription extends MotechBaseDataObject {
                 .toString();
     }
 
+    @JsonIgnore
+    public boolean isActive() {
+        return status != SubscriptionStatus.COMPLETED && status != SubscriptionStatus.DEACTIVATED;
+    }
 
     public void activateOnRenewal(DateTime renewedDate) {
         setStatus(SubscriptionStatus.ACTIVE);

@@ -55,7 +55,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     private StubOnMobileSubscriptionService onMobileSubscriptionService;
 
     @Before
-     public void setUp()  {
+    public void setUp()  {
         allSubscriptions.removeAll();
     }
 
@@ -83,9 +83,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channelString))
-                    .andExpect(status().isOk())
-                    .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
-                    .andReturn();
+                .andExpect(status().isOk())
+                .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
+                .andReturn();
 
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
@@ -123,7 +123,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         new TimedRunner(20,1000) {
             @Override
             boolean run() {
-                subscription[0] = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
+                List<Subscription> subscriptionList = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
+                subscription[0] = subscriptionList.isEmpty() ? null : subscriptionList.get(0);
                 return (subscription[0] != null);
 
             }
@@ -141,8 +142,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         new TimedRunner(20,1000) {
             @Override
             boolean run() {
-                 campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
-                         subscription[0].getSubscriptionId(), KilkariCampaignService.TWELVE_MONTH_CAMPAIGN_NAME);
+                campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
+                        subscription[0].getSubscriptionId(), KilkariCampaignService.TWELVE_MONTH_CAMPAIGN_NAME);
                 return (campaignEnrollmentRecord[0] != null);
             }
         }.executeWithTimeout();
@@ -186,7 +187,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         new org.motechproject.ananya.kilkari.web.it.TimedRunner(20, 1000) {
             @Override
             boolean run() {
-                subscription[0] = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
+                List<Subscription> subscriptionList = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
+                subscription[0] = subscriptionList.isEmpty() ? null : subscriptionList.get(0);
                 return (subscription[0] != null);
 
             }
@@ -204,8 +206,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         new TimedRunner(20,1000) {
             @Override
             boolean run() {
-                 campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
-                         subscription[0].getSubscriptionId(), KilkariCampaignService.FIFTEEN_MONTH_CAMPAIGN_NAME);
+                campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
+                        subscription[0].getSubscriptionId(), KilkariCampaignService.FIFTEEN_MONTH_CAMPAIGN_NAME);
                 return (campaignEnrollmentRecord[0] != null);
             }
         }.executeWithTimeout();
@@ -235,5 +237,4 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         Gson gson = new Gson();
         return gson.fromJson(jsonString, subscriberResponseClass);
     }
-
 }

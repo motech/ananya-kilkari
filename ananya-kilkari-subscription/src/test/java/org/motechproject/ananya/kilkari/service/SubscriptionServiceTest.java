@@ -83,13 +83,11 @@ public class SubscriptionServiceTest {
         assertNull(actualSubscriptionCreationReportRequest.getOperator());
     }
 
-    @Test
+    @Test(expected = ValidationException.class)
     public void shouldThrowExceptionWhenInvalidSubscriptionRequestIsGiven() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Invalid Request");
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withMsisdn("").build();
 
-        doThrow(new ValidationException("Invalid Request")).when(mockedSubscriptionRequest).validate(reportingService, subscriptionService);
-        subscriptionService.createSubscription(mockedSubscriptionRequest);
+        subscriptionService.createSubscription(subscriptionRequest);
     }
 
     @Test
@@ -129,13 +127,19 @@ public class SubscriptionServiceTest {
     public void shouldFindTheGivenSubscriptionByMsisdnAndPack() {
         String pack = "twelve_months";
         String msisdn = "123456890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
-        when(allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.TWELVE_MONTHS)).thenReturn(subscription);
+        List<Subscription> subscriptions = new ArrayList<>();
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        subscription1.setStatus(SubscriptionStatus.ACTIVE);
+        subscriptions.add(subscription1);
 
-        Subscription actualSubscription = subscriptionService.findByMsisdnAndPack(msisdn, pack);
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        subscription2.setStatus(SubscriptionStatus.COMPLETED);
+        subscriptions.add(subscription2);
+        when(allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.TWELVE_MONTHS)).thenReturn(subscriptions);
 
-        verify(allSubscriptions).findByMsisdnAndPack(msisdn, SubscriptionPack.TWELVE_MONTHS);
-        assertEquals(subscription, actualSubscription);
+        Subscription actualSubscription = subscriptionService.findActiveSubscription(msisdn, pack);
+
+        assertEquals(subscription1, actualSubscription);
     }
 
     @Test
@@ -281,10 +285,12 @@ public class SubscriptionServiceTest {
                 .withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS.toString()).build();
 
         Subscription existingSubscription = new Subscription();
+        List<Subscription> subscriptions = new ArrayList<>();
+        subscriptions.add(existingSubscription);
         when(reportingService.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat()))
                 .thenReturn(new SubscriberLocation("district", "block", "panchayat"));
         when(allSubscriptions.findByMsisdnAndPack(subscriptionRequest.getMsisdn(),
-                SubscriptionPack.from(subscriptionRequest.getPack()))).thenReturn(existingSubscription);
+                SubscriptionPack.from(subscriptionRequest.getPack()))).thenReturn(subscriptions);
 
         expectedException.expect(DuplicateSubscriptionException.class);
 

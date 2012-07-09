@@ -16,7 +16,6 @@ import org.motechproject.ananya.kilkari.service.SubscriptionService;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -59,196 +58,136 @@ public class SubscriptionRequestTest {
     }
 
     @Test
-    public void shouldNotThrowExceptionWhenGivenSubscriptionDetailsAreAllValid()  {
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequestForIVR("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(), Channel.IVR.name());
-        subscriptionRequest.validate(reportingService, subscriptionService);
+    public void shouldNotThrowExceptionWhenGivenSubscriptionDetailsAreAllValid() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS.name()).withChannel(Channel.IVR.name()).build();
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
 
         subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(), Channel.IVR.name(), "12", "myname", "01-11-2013", "04-11-2016", "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
 
         subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(), Channel.IVR.name(), null, null, null, null, "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
 
         subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(), Channel.IVR.name(), "", "", "", "", "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
     }
 
     @Test
-    public void shouldThrowExceptionWhenInvalidPackIsGivenToCreateNewSubscription()  {
+    public void shouldThrowExceptionWhenInvalidPackIsGivenToCreateNewSubscription() {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid subscription pack Invalid-Pack"));
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withMsisdn("1234567890").withPack("Invalid-Pack").withChannel(Channel.IVR.name()).build();
 
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequestForIVR("1234567890", "Invalid-Pack", Channel.IVR.name());
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
     }
 
     @Test
-    public void shouldThrowExceptionWhenSubscriptionAlreadyPresent()  {
+    public void shouldThrowExceptionWhenSubscriptionAlreadyPresent() {
         expectedException.expect(new InstanceOf(ValidationException.class));
         expectedException.expectMessage(is("Subscription already exists for msisdn: 1234567890, pack: FIFTEEN_MONTHS"));
-        when(subscriptionService.findByMsisdnAndPack("1234567890",SubscriptionPack.FIFTEEN_MONTHS.name())).thenReturn(new Subscription());
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequestForIVR("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(), Channel.CALL_CENTER.name());
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        when(subscriptionService.findActiveSubscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name())).thenReturn(new Subscription());
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS.name()).withChannel(Channel.CALL_CENTER.name()).build();
+
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), new Subscription());
     }
 
     @Test
-    public void shouldNotThrowExceptionWhenSubscriptionAlreadyPresentButIsCompleted()  {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS);
-        subscription.setStatus(SubscriptionStatus.COMPLETED);
-        when(subscriptionService.findByMsisdnAndPack("1234567890",SubscriptionPack.FIFTEEN_MONTHS.name())).thenReturn(subscription);
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequestForIVR("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(), Channel.CALL_CENTER.name());
-        subscriptionRequest.validate(reportingService, subscriptionService);
-    }
-
-    @Test
-    public void shouldNotThrowExceptionWhenSubscriptionAlreadyPresentButIsDeactivated() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS);
-        subscription.setStatus(SubscriptionStatus.DEACTIVATED);
-        when(subscriptionService.findByMsisdnAndPack("1234567890",SubscriptionPack.FIFTEEN_MONTHS.name())).thenReturn(subscription);
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequestForIVR("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(), Channel.CALL_CENTER.name());
-        subscriptionRequest.validate(reportingService, subscriptionService);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenInvalidChannelIsGivenToCreateNewSubscription()  {
+    public void shouldThrowExceptionWhenInvalidChannelIsGivenToCreateNewSubscription() {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid channel Invalid-Channel"));
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withMsisdn("1234567890").withPack(SubscriptionPack.TWELVE_MONTHS.name()).withChannel("Invalid-Channel").build();
 
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequestForIVR("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), "Invalid-Channel");
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
     }
 
     @Test
-    public void shouldThrowExceptionWhenInvalidMsisdnNumberIsGivenToCreateNewSubscription()  {
+    public void shouldThrowExceptionWhenInvalidMsisdnNumberIsGivenToCreateNewSubscription() {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid msisdn 12345"));
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withMsisdn("12345").withPack(SubscriptionPack.TWELVE_MONTHS.name()).withChannel(Channel.IVR.name()).build();
 
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequestForIVR("12345", SubscriptionPack.TWELVE_MONTHS.name(), Channel.IVR.name());
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
     }
 
     @Test
-    public void shouldThrowExceptionWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscription()  {
+    public void shouldThrowExceptionWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscription() {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid msisdn 123456789a"));
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withMsisdn("123456789a").withPack(SubscriptionPack.TWELVE_MONTHS.name()).withChannel(Channel.IVR.name()).build();
 
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequestForIVR("123456789a", SubscriptionPack.TWELVE_MONTHS.name(), Channel.IVR.name());
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
     }
 
-    @Test
-    public void shouldThrowExceptionWhenInvalidPackIsGivenToCreateNewSubscriptionForCC()  {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid subscription pack Invalid-Pack"));
-
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", "Invalid-Pack", Channel.CALL_CENTER.name(), null, null, null, null, "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
-    }
 
     @Test
-    public void shouldThrowExceptionWhenInvalidChannelIsGivenToCreateNewSubscriptionForCC()  {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid channel Invalid-Channel"));
-
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), "Invalid-Channel", null, null, null, null, "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenInvalidMsisdnNumberIsGivenToCreateNewSubscriptionForCC()  {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid msisdn 12345"));
-
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("12345", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), null, null, null, null, "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscriptionForCC()  {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid msisdn 123456789a"));
-
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("123456789a", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), null, null, null, null, "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenNonNumericAgeIsGivenToCreateNewSubscriptionForCC()  {
+    public void shouldThrowExceptionWhenNonNumericAgeIsGivenToCreateNewSubscriptionForCC() {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid beneficiary age 1a"));
-
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "1a", "NAME", "21-01-2011", "21-01-2011", "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
+
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
     }
 
     @Test
-    public void shouldNotThrowExceptionWhenNoAgeIsGivenToCreateNewSubscriptionForCC()  {
+    public void shouldNotThrowExceptionWhenNoAgeIsGivenToCreateNewSubscriptionForCC() {
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "", "NAME", "21-01-2011", "21-01-2011", "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
 
         subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), null, "NAME", "21-01-2011", "21-01-2011", "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
     }
 
     @Test
-    public void shouldThrowExceptionWhenInvalidDOBIsGivenToCreateNewSubscriptionForCC()  {
+    public void shouldThrowExceptionWhenInvalidDOBIsGivenToCreateNewSubscriptionForCC() {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid date of birth 21-21-11"));
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-21-11", "21-01-2011", "mydistrict", "myblock", "mypanchayat");
 
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
     }
 
     @Test
-    public void shouldNotThrowExceptionWhenEmptyDOBIsGivenToCreateNewSubscriptionForCC()  {
+    public void shouldNotThrowExceptionWhenEmptyDOBIsGivenToCreateNewSubscriptionForCC() {
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "", "21-01-2011", "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
 
         subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", null, "21-01-2011", "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
     }
 
     @Test
-    public void shouldThrowExceptionWhenInvalidEDDIsGivenToCreateNewSubscriptionForCC()  {
+    public void shouldThrowExceptionWhenInvalidEDDIsGivenToCreateNewSubscriptionForCC() {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(is("Invalid expected date of delivery 21-21-11"));
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-12-2012", "21-21-11", "mydistrict", "myblock", "mypanchayat");
 
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
     }
 
     @Test
-    public void shouldNotThrowExceptionWhenEmptyEDDIsGivenToCreateNewSubscriptionForCC()  {
+    public void shouldNotThrowExceptionWhenEmptyEDDIsGivenToCreateNewSubscriptionForCC() {
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-12-2012", "", "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
 
         subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-12-2012", null, "mydistrict", "myblock", "mypanchayat");
-        subscriptionRequest.validate(reportingService, subscriptionService);
+        subscriptionRequest.validate(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"), null);
     }
 
     @Test
-    public void shouldThrowExceptionWhenInvalidLocationIsGivenToCreateNewSubscriptionForCC()  {
+    public void shouldThrowExceptionWhenInvalidLocationIsGivenToCreateNewSubscriptionForCC() {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid location with district: invaliddistrict, block: invalidblock, panchayat: invalidpanchayat");
         when(reportingService.getLocation("invaliddistrict", "invalidblock", "invalidpanchayat")).thenReturn(null);
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-12-2012", "21-01-2011", "invaliddistrict", "invalidblock", "invalidpanchayat");
 
-        subscriptionRequest.validate(reportingService, subscriptionService);
-        verify(reportingService).getLocation("invaliddistrict", "invalidblock", "invalidpanchayat");
+        subscriptionRequest.validate(null, null);
     }
 
-
-    private SubscriptionRequest createSubscriptionRequestForIVR(String msisdn, String pack, String channel) {
-        return createSubscriptionRequest(msisdn, pack, channel, null, null, null, null, null, null, null);
-    }
 
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel, String age, String name, String dob, String edd, String district, String block, String panchayat) {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults()
+        return new SubscriptionRequestBuilder().withDefaults()
                 .withPack(pack).withChannel(channel).withMsisdn(msisdn).withBeneficiaryAge(age)
-                .withBeneficiaryName(name).withDOB(dob).withEDD(edd).withDistrict(district).withBlock(block)
-                .withPanchayat(panchayat).build();
-
-        return subscriptionRequest;
+                .withBeneficiaryName(name).withDOB(dob).withEDD(edd).withDistrict(district).withBlock(block).withPanchayat(panchayat).build();
     }
 
     @Test

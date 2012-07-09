@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -42,17 +43,8 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
     }
 
     @View(name = "find_by_msisdn_and_pack", map = "function(doc) {if(doc.type === 'Subscription') emit([doc.msisdn, doc.pack]);}")
-    public Subscription findByMsisdnAndPack(String msisdn, SubscriptionPack pack) {
-        List<Subscription> subscriptions = queryView("find_by_msisdn_and_pack", ComplexKey.of(msisdn, pack));
-        return singleResult(subscriptions);
-    }
-
-    public void add(Subscription subscription) {
-        Subscription existingSubscription = findByMsisdnAndPack(subscription.getMsisdn(), subscription.getPack());
-        if (existingSubscription == null)
-            super.add(subscription);
-        else
-            logger.info(String.format("Ignored Create subscription for msisdn: %s, pack: %s as an active subscription already exists for the given msisdn and pack.",
-                    subscription.getMsisdn(), subscription.getPack()));
+    public List<Subscription> findByMsisdnAndPack(String msisdn, SubscriptionPack pack) {
+        List<Subscription> subscriptionsByPackAndMsisdn = queryView("find_by_msisdn_and_pack", ComplexKey.of(msisdn, pack));
+        return subscriptionsByPackAndMsisdn == null ? Collections.EMPTY_LIST : subscriptionsByPackAndMsisdn;
     }
 }

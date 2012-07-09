@@ -26,11 +26,11 @@ public class SubscriptionStateHandlerFactoryTest {
     public void shouldPopulateHandlerMappings() {
         HashMap<ActionStatus, Class> handlerMappings = SubscriptionStateHandlerFactory.handlerMappings;
 
-        assertEquals(ActivateHandler.class, handlerMappings.get(new ActionStatus("ACT", "SUCCESS")));
-        assertEquals(ActivationFailedHandler.class, handlerMappings.get(new ActionStatus("ACT", "FAILURE")));
-        assertEquals(RenewalSuccessHandler.class, handlerMappings.get(new ActionStatus("REN", "SUCCESS")));
-        assertEquals(RenewalSuspensionHandler.class, handlerMappings.get(new ActionStatus("REN", "BAL_LOW")));
-        assertEquals(DeactivateHandler.class, handlerMappings.get(new ActionStatus("DCT", "BAL_LOW")));
+        assertEquals(ActivateHandler.class, handlerMappings.get(ActionStatus.createFor("ACT", "SUCCESS")));
+        assertEquals(ActivationFailedHandler.class, handlerMappings.get(ActionStatus.createFor("ACT", "FAILURE")));
+        assertEquals(RenewalSuccessHandler.class, handlerMappings.get(ActionStatus.createFor("REN", "SUCCESS")));
+        assertEquals(RenewalSuspensionHandler.class, handlerMappings.get(ActionStatus.createFor("REN", "BAL_LOW")));
+        assertEquals(DeactivateHandler.class, handlerMappings.get(ActionStatus.createFor("DCT", "BAL_LOW")));
     }
 
     @Test
@@ -50,7 +50,7 @@ public class SubscriptionStateHandlerFactoryTest {
     public void shouldReturnTheActivationFailedHandlerGivenACallbackRequestWrapperWithStatusAnythingOtherThanSuccessForACTAction() {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("ACT");
-        callbackRequest.setStatus("anything_other_than_success");
+        callbackRequest.setStatus("GRACE");
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
 
         SubscriptionStateHandler subscriptionStateHandler = new SubscriptionStateHandlerFactory(subscriptionService).getHandler(callbackRequestWrapper);

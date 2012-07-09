@@ -57,30 +57,27 @@ public class SubscriptionTest {
     public void shouldChangeStatusOfSubscriptionToActivatedAndUpdateRenewalDate() {
         DateTime renewedDate = DateTime.now();
         Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
-        subscription.activateOnRenewal(renewedDate);
+        subscription.activateOnRenewal();
 
         assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
-        assertEquals(renewedDate, subscription.getRenewalDate());
     }
 
     @Test
     public void shouldChangeStatusOfSubscriptionSuspendedAndUpdateRenewalDate() {
         DateTime renewedDate = DateTime.now();
         Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
-        subscription.suspendOnRenewal(renewedDate);
+        subscription.suspendOnRenewal();
 
         assertEquals(SubscriptionStatus.SUSPENDED, subscription.getStatus());
-        assertEquals(renewedDate, subscription.getRenewalDate());
     }
 
     @Test
     public void shouldChangeStatusOfSubscriptionDeactivatedWithDeactivatedDate() {
         final DateTime deactivationDate = DateTime.now();
         Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
-        subscription.deactivate(deactivationDate);
+        subscription.deactivate();
 
         assertEquals(SubscriptionStatus.DEACTIVATED, subscription.getStatus());
-        assertEquals(deactivationDate, subscription.getRenewalDate());
     }
 
     @Test

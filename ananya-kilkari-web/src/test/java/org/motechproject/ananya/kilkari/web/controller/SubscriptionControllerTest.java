@@ -245,7 +245,7 @@ public class SubscriptionControllerTest {
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(CONTENT_TYPE_JSON))
-                .andExpect(content().string(baseResponseMatcher("ERROR", "Callback Request Invalid: Invalid msisdn invalidMsisdn,Invalid callbackAction invalidAction,Invalid callbackStatus invalidStatus,Invalid operator invalidOperator")));
+                .andExpect(content().string(baseResponseMatcher("ERROR", "Callback Request Invalid: Invalid callbackAction invalidAction,Invalid callbackStatus invalidStatus,Invalid msisdn invalidMsisdn,Invalid operator invalidOperator")));
 
         verifyZeroInteractions(kilkariSubscriptionService);
     }

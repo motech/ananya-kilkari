@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.handlers;
 
+import org.motechproject.ananya.kilkari.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +20,13 @@ public class SubscriptionStateHandlerFactory {
 
     static HashMap<ActionStatus, Class> handlerMappings
             = new HashMap<ActionStatus, Class>() {{
-        put(new ActionStatus("ACT", "SUCCESS"), ActivateHandler.class);
-        put(new ActionStatus("ACT", "FAILURE"), ActivationFailedHandler.class);
+        put(new ActionStatus(CallbackAction.ACT, CallbackStatus.SUCCESS), ActivateHandler.class);
+        put(new ActionStatus(CallbackAction.ACT, CallbackStatus.FAILURE), ActivationFailedHandler.class);
 
-        put(new ActionStatus("REN", "SUCCESS"), RenewalSuccessHandler.class);
-        put(new ActionStatus("REN", "BAL_LOW"), RenewalSuspensionHandler.class);
+        put(new ActionStatus(CallbackAction.REN, CallbackStatus.SUCCESS), RenewalSuccessHandler.class);
+        put(new ActionStatus(CallbackAction.REN, CallbackStatus.BAL_LOW), RenewalSuspensionHandler.class);
 
-        put(new ActionStatus("DCT", "BAL_LOW"), DeactivateHandler.class);
+        put(new ActionStatus(CallbackAction.DCT, CallbackStatus.BAL_LOW), DeactivateHandler.class);
     }};
 
     @Autowired

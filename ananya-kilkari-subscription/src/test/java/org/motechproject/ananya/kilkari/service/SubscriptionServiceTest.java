@@ -243,7 +243,6 @@ public class SubscriptionServiceTest {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
-        assertEquals(renewalDate, subscription.getRenewalDate());
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(SubscriptionStatus.ACTIVE, subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(renewalDate, subscriptionStateChangeReportRequest.getCreatedAt());
@@ -272,7 +271,6 @@ public class SubscriptionServiceTest {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(SubscriptionStatus.SUSPENDED, subscription.getStatus());
-        assertEquals(renewalDate, subscription.getRenewalDate());
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(SubscriptionStatus.SUSPENDED, subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(renewalDate, subscriptionStateChangeReportRequest.getCreatedAt());
@@ -301,7 +299,6 @@ public class SubscriptionServiceTest {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(SubscriptionStatus.DEACTIVATED, subscription.getStatus());
-        assertEquals(date, subscription.getRenewalDate());
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(SubscriptionStatus.DEACTIVATED, subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(date, subscriptionStateChangeReportRequest.getCreatedAt());

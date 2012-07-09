@@ -88,7 +88,7 @@ public class SubscriptionService {
         updateStatusAndReport(subscriptionId, renewedDate, null, null, graceCount, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
-                subscription.activateOnRenewal(renewedDate);
+                subscription.activateOnRenewal();
             }
         });
     }
@@ -97,7 +97,7 @@ public class SubscriptionService {
         updateStatusAndReport(subscriptionId, renewalDate, reason, null, graceCount, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
-                subscription.suspendOnRenewal(renewalDate);
+                subscription.suspendOnRenewal();
             }
         });
     }
@@ -106,7 +106,7 @@ public class SubscriptionService {
         updateStatusAndReport(subscriptionId, deactivationDate, reason, null, graceCount, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
-                subscription.deactivate(deactivationDate);
+                subscription.deactivate();
             }
         });
     }

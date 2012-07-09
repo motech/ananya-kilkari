@@ -2,12 +2,14 @@ package org.motechproject.ananya.kilkari.handlers;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.motechproject.ananya.kilkari.domain.CallbackAction;
+import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 
 class ActionStatus {
-    private String action;
-    private String status;
+    private CallbackAction action;
+    private CallbackStatus status;
 
-    ActionStatus(String action, String status) {
+    ActionStatus(CallbackAction action, CallbackStatus status) {
         this.action = action;
         this.status = status;
     }
@@ -35,6 +37,6 @@ class ActionStatus {
     }
 
     public static ActionStatus createFor(String action, String status) {
-        return new ActionStatus(action, status);
+        return new ActionStatus(CallbackAction.getFor(action), CallbackStatus.getFor(status));
     }
 }

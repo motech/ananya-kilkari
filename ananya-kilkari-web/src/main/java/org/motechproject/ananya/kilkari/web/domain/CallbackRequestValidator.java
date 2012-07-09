@@ -23,11 +23,12 @@ public class CallbackRequestValidator {
     }
 
     public List<String> validate(CallbackRequestWrapper callbackRequestWrapper) {
+        validateCallbackAction(callbackRequestWrapper.getAction());
+        validateCallbackStatus(callbackRequestWrapper.getStatus());
+
         errors.addAll(subscriptionService.validate(callbackRequestWrapper));
 
         validateMsisdn(callbackRequestWrapper.getMsisdn());
-        validateCallbackAction(callbackRequestWrapper.getAction());
-        validateCallbackStatus(callbackRequestWrapper.getStatus());
         validateOperator(callbackRequestWrapper.getOperator());
         return errors;
     }

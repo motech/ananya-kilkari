@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class SubscriptionTest {
 
@@ -51,5 +52,25 @@ public class SubscriptionTest {
 
         assertEquals(SubscriptionStatus.ACTIVATION_FAILED, subscription.getStatus());
         assertEquals(operator, subscription.getOperator());
+    }
+
+    @Test
+    public void shouldChangeStatusOfSubscriptionToActivatedAndUpdateRenewalDate() {
+        DateTime renewedDate = DateTime.now();
+        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
+        subscription.activateOnRenewal(renewedDate);
+
+        assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
+        assertEquals(renewedDate, subscription.getRenewalDate());
+    }
+
+    @Test
+    public void shouldChangeStatusOfSubscriptionSuspendedAndUpdateRenewalDate() {
+        DateTime renewedDate = DateTime.now();
+        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
+        subscription.suspendOnRenewal(renewedDate);
+
+        assertEquals(SubscriptionStatus.SUSPENDED, subscription.getStatus());
+        assertEquals(renewedDate, subscription.getRenewalDate());
     }
 }

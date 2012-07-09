@@ -56,37 +56,56 @@ public class SubscriptionService {
         return allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.from(pack));
     }
 
-    public void activate(String subscriptionId, DateTime activatedOn, String operator) {
-        updateStatusAndReport(subscriptionId, activatedOn, null, operator, new Action<Subscription>() {
+    public void activate(String subscriptionId, DateTime activatedOn, final String operator) {
+        updateStatusAndReport(subscriptionId, activatedOn, null, operator, null, new Action<Subscription>() {
             @Override
-            public void perform(Subscription subscription, String operator) {
+            public void perform(Subscription subscription) {
                 subscription.activate(operator);
             }
         });
     }
 
-    public void activationFailed(String subscriptionId, DateTime updatedOn, String reason, String operator) {
-        updateStatusAndReport(subscriptionId, updatedOn, reason, operator, new Action<Subscription>() {
+    public void activationFailed(String subscriptionId, DateTime updatedOn, String reason, final String operator) {
+        updateStatusAndReport(subscriptionId, updatedOn, reason, operator, null, new Action<Subscription>() {
             @Override
-            public void perform(Subscription subscription, String operator) {
+            public void perform(Subscription subscription) {
                 subscription.activationFailed(operator);
             }
         });
     }
 
     public void activationRequested(String subscriptionId) {
-        updateStatusAndReport(subscriptionId, DateTime.now(), null, null, new Action<Subscription>() {
+        updateStatusAndReport(subscriptionId, DateTime.now(), null, null, null, new Action<Subscription>() {
             @Override
-            public void perform(Subscription subscription, String operator) {
+            public void perform(Subscription subscription) {
                 subscription.activationRequested();
             }
         });
     }
 
-    private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Action<Subscription> action) {
+    public void renewSubscription(String subscriptionId, final DateTime renewedDate, int graceCount) {
+        updateStatusAndReport(subscriptionId, renewedDate, null, null, graceCount, new Action<Subscription>() {
+            @Override
+            public void perform(Subscription subscription) {
+                subscription.activateOnRenewal(renewedDate);
+            }
+        });
+    }
+
+    public void suspendSubscription(String subscriptionId, final DateTime renewalDate, String reason, int graceCount) {
+        updateStatusAndReport(subscriptionId, renewalDate, reason, null, graceCount, new Action<Subscription>() {
+            @Override
+            public void perform(Subscription subscription) {
+                subscription.suspendOnRenewal(renewalDate);
+            }
+        });
+    }
+
+    private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Integer graceCount, Action<Subscription> action) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        action.perform(subscription, operator);
-        updateWithReporting(subscription, updatedOn, reason, operator);
+        action.perform(subscription);
+        allSubscriptions.update(subscription);
+        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscription.getSubscriptionId(), subscription.getStatus(), updatedOn, reason, operator, graceCount));
     }
 
     private void sendProcessSubscriptionEvent(SubscriptionActivationRequest subscriptionActivationRequest) {
@@ -104,10 +123,5 @@ public class SubscriptionService {
 
     private boolean isValidMsisdn(String msisdn) {
         return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
-    }
-
-    private void updateWithReporting(Subscription subscription, DateTime updatedOn, String reason, String operator) {
-        allSubscriptions.update(subscription);
-        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscription.getSubscriptionId(), subscription.getStatus(), updatedOn, reason, operator));
     }
 }

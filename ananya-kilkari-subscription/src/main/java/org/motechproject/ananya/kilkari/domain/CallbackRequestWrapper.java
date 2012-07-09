@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.domain;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -38,5 +39,9 @@ public class CallbackRequestWrapper implements Serializable {
 
     public String getOperator() {
         return callbackRequest.getOperator();
+    }
+
+    public Integer getGraceCount() {
+        return StringUtils.isNumeric(callbackRequest.getGraceCount()) ? Integer.valueOf(callbackRequest.getGraceCount()) : null;
     }
 }

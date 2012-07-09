@@ -40,7 +40,6 @@ public class SubscriptionServiceTest {
     @Mock
     private ReportingService reportingService;
 
-
     @Before
     public void setUp() {
         initMocks(this);
@@ -219,6 +218,64 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    public void shouldActivateRenewedSubscriptionWhichHadBeenSuspended() { //TODO which is already ACTIVATED?
+        final String subscriptionId = "sub123";
+        DateTime renewalDate = DateTime.now();
+        int graceCount = 2;
+
+        Subscription subscription = new Subscription() {
+            public String getSubscriptionId() {
+                return subscriptionId;
+            }
+        };
+        subscription.setStatus(SubscriptionStatus.SUSPENDED);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.renewSubscription(subscriptionId, renewalDate, graceCount);
+
+        verify(allSubscriptions).update(subscription);
+        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+        verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+
+        assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
+        assertEquals(renewalDate, subscription.getRenewalDate());
+        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(SubscriptionStatus.ACTIVE, subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(renewalDate, subscriptionStateChangeReportRequest.getCreatedAt());
+        assertEquals((Integer) graceCount, subscriptionStateChangeReportRequest.getGraceCount());
+    }
+
+    @Test
+    public void shouldSuspendRenewedSubscriptionWhichWasActive() {
+        final String subscriptionId = "subId";
+        final DateTime renewalDate = DateTime.now();
+        final String reason = "Balance Low";
+        final int graceCount = 0;
+        Subscription subscription = new Subscription() {
+            public String getSubscriptionId() {
+                return subscriptionId;
+            }
+        };
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.suspendSubscription(subscriptionId, renewalDate, reason, graceCount);
+
+        verify(allSubscriptions).update(subscription);
+        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+        verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+
+        assertEquals(SubscriptionStatus.SUSPENDED, subscription.getStatus());
+        assertEquals(renewalDate, subscription.getRenewalDate());
+        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(SubscriptionStatus.SUSPENDED, subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(renewalDate, subscriptionStateChangeReportRequest.getCreatedAt());
+        assertEquals((Integer) graceCount, subscriptionStateChangeReportRequest.getGraceCount());
+    }
+
+    @Test
     public void shouldNotAddDuplicateSubscriptions() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults()
                 .withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS.toString()).build();
@@ -232,7 +289,6 @@ public class SubscriptionServiceTest {
         expectedException.expect(DuplicateSubscriptionException.class);
 
         subscriptionService.createSubscription(subscriptionRequest);
-
     }
 
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {

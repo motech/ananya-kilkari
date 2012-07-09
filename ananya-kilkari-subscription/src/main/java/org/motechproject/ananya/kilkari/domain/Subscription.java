@@ -31,6 +31,9 @@ public class Subscription extends MotechBaseDataObject {
     @JsonProperty
     private SubscriptionPack pack;
 
+    @JsonProperty
+    private DateTime renewalDate;
+
     public Subscription() {
     }
 
@@ -110,6 +113,16 @@ public class Subscription extends MotechBaseDataObject {
     }
 
 
+    public void activateOnRenewal(DateTime renewedDate) {
+        setStatus(SubscriptionStatus.ACTIVE);
+        setRenewalDate(renewedDate);
+    }
+
+    public void suspendOnRenewal(DateTime renewalDate) {
+        setStatus(SubscriptionStatus.SUSPENDED);
+        setRenewalDate(renewalDate);
+    }
+
     public void activate(String operator) {
         setStatus(SubscriptionStatus.ACTIVE);
         setOperator(operator);
@@ -122,5 +135,13 @@ public class Subscription extends MotechBaseDataObject {
 
     public void activationRequested() {
         setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+    }
+
+    public DateTime getRenewalDate() {
+        return renewalDate;
+    }
+
+    public void setRenewalDate(DateTime renewalDate) {
+        this.renewalDate = renewalDate;
     }
 }

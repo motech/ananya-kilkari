@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.web.domain;
 import org.apache.commons.lang.StringUtils;
 
 public enum CallbackAction {
-    ACT;
+    ACT, REN, DCT;
 
     public static CallbackAction getFor(String action) {
         return CallbackAction.valueOf(StringUtils.trimToEmpty(action).toUpperCase());

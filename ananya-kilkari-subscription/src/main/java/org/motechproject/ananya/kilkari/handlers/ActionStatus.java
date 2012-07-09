@@ -33,4 +33,8 @@ class ActionStatus {
                 .append(this.status)
                 .hashCode();
     }
+
+    public static ActionStatus createFor(String action, String status) {
+        return new ActionStatus(action, status);
+    }
 }

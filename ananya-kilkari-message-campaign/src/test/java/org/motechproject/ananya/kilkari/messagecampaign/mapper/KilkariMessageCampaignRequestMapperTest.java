@@ -4,9 +4,8 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
-import org.motechproject.server.messagecampaign.contract.CampaignRequest;
-
 import org.motechproject.model.Time;
+import org.motechproject.server.messagecampaign.contract.CampaignRequest;
 
 import static org.junit.Assert.assertEquals;
 

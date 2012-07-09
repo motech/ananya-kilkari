@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.messagecampaign.service;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,10 +38,11 @@ public class KilkariMessageCampaignServiceIT {
                 SubscriptionPack.SEVEN_MONTHS.name(),
                 referenceDate.minusDays(2), referenceDate.plusYears(4));
 
+        LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(2);
         assertThat(dateTimeList.size(), is(28));
-        assertEquals(referenceDate.toLocalDate(), dateTimeList.get(0).toLocalDate());
+        assertEquals(referenceDateWithDelta, dateTimeList.get(0).toLocalDate());
         assertEquals(new LocalTime(13,0), dateTimeList.get(0).toLocalTime());
-        assertEquals(referenceDate.toLocalDate().plusWeeks(27), dateTimeList.get(27).toLocalDate());
+        assertEquals(referenceDateWithDelta.plusWeeks(27), dateTimeList.get(27).toLocalDate());
         assertEquals(new LocalTime(13,0), dateTimeList.get(27).toLocalTime());
     }
 
@@ -58,10 +60,11 @@ public class KilkariMessageCampaignServiceIT {
                 SubscriptionPack.TWELVE_MONTHS.name(),
                 referenceDate.minusDays(2), referenceDate.plusYears(4));
 
+        LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(2);
         assertThat(dateTimeList.size(), is(48));
-        assertEquals(referenceDate.toLocalDate(), dateTimeList.get(0).toLocalDate());
+        assertEquals(referenceDateWithDelta, dateTimeList.get(0).toLocalDate());
         assertEquals(new LocalTime(13,0), dateTimeList.get(0).toLocalTime());
-        assertEquals(referenceDate.toLocalDate().plusWeeks(47), dateTimeList.get(47).toLocalDate());
+        assertEquals(referenceDateWithDelta.plusWeeks(47), dateTimeList.get(47).toLocalDate());
         assertEquals(new LocalTime(13,0), dateTimeList.get(47).toLocalTime());
     }
 
@@ -79,10 +82,11 @@ public class KilkariMessageCampaignServiceIT {
                 SubscriptionPack.FIFTEEN_MONTHS.name(),
                 referenceDate.minusDays(2), referenceDate.plusYears(4));
 
+        LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(2);
         assertThat(dateTimeList.size(), is(60));
-        assertEquals(referenceDate.toLocalDate(), dateTimeList.get(0).toLocalDate());
+        assertEquals(referenceDateWithDelta, dateTimeList.get(0).toLocalDate());
         assertEquals(new LocalTime(13,0), dateTimeList.get(0).toLocalTime());
-        assertEquals(referenceDate.toLocalDate().plusWeeks(59), dateTimeList.get(59).toLocalDate());
+        assertEquals(referenceDateWithDelta.plusWeeks(59), dateTimeList.get(59).toLocalDate());
         assertEquals(new LocalTime(13,0), dateTimeList.get(59).toLocalTime());
     }
 }

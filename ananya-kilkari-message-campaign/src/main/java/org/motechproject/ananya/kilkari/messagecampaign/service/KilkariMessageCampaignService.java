@@ -6,14 +6,17 @@ import org.motechproject.ananya.kilkari.messagecampaign.mapper.KilkariMessageCam
 import org.motechproject.ananya.kilkari.messagecampaign.mapper.KilkariMessageCampaignRequestMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
-import org.motechproject.server.messagecampaign.contract.CampaignRequest;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
 import org.motechproject.server.messagecampaign.service.MessageCampaignService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class KilkariMessageCampaignService {
@@ -22,6 +25,18 @@ public class KilkariMessageCampaignService {
     public static final String TWELVE_MONTHS = "kilkari-mother-child-campaign-twelve-months";
     public static final String SEVEN_MONTHS = "kilkari-mother-child-campaign-seven-months";
     public static final String CAMPAIGN_MESSAGE_NAME = "Mother Child Health Care";
+    public static int campaignScheduleDeltaDays;
+    public static int campaignScheduleDeltaMinutes;
+
+    @Value("#{kilkariProperties['kilkari.campaign.schedule.delta.days']}")
+    public void setCampaignScheduleDeltaDays(int campaignScheduleDeltaDays) {
+        this.campaignScheduleDeltaDays = campaignScheduleDeltaDays;
+    }
+
+    @Value("#{kilkariProperties['kilkari.campaign.schedule.delta.minutes']}")
+    public void setCampaignScheduleDeltaMinutes(int campaignScheduleDeltaMinutes) {
+        this.campaignScheduleDeltaMinutes = campaignScheduleDeltaMinutes;
+    }
 
     private MessageCampaignService campaignService;
 

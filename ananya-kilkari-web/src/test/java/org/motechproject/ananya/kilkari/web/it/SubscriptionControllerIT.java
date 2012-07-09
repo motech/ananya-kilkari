@@ -28,6 +28,7 @@ import org.springframework.test.web.server.MvcResult;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.motechproject.ananya.kilkari.web.MVCTestUtils.mockMvc;
@@ -141,17 +142,17 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
             @Override
             boolean run() {
                  campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
-                         subscription[0].getSubscriptionId(), KilkariCampaignService.SEVEN_MONTH_CAMPAIGN_NAME);
+                         subscription[0].getSubscriptionId(), KilkariCampaignService.TWELVE_MONTH_CAMPAIGN_NAME);
                 return (campaignEnrollmentRecord[0] != null);
             }
         }.executeWithTimeout();
 
         assertNotNull(campaignEnrollmentRecord[0]);
         assertEquals(subscription[0].getSubscriptionId(), campaignEnrollmentRecord[0].getExternalId());
-        assertEquals(KilkariCampaignService.SEVEN_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
+        assertEquals(KilkariCampaignService.TWELVE_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
         List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
                 subscription[0].getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
-        assertEquals(28, messageTimings.size());
+        assertEquals(48, messageTimings.size());
     }
 
     @Test
@@ -204,45 +205,17 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
             @Override
             boolean run() {
                  campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
-                         subscription[0].getSubscriptionId(), KilkariCampaignService.SEVEN_MONTH_CAMPAIGN_NAME);
+                         subscription[0].getSubscriptionId(), KilkariCampaignService.FIFTEEN_MONTH_CAMPAIGN_NAME);
                 return (campaignEnrollmentRecord[0] != null);
             }
         }.executeWithTimeout();
 
         assertNotNull(campaignEnrollmentRecord[0]);
         assertEquals(subscription[0].getSubscriptionId(), campaignEnrollmentRecord[0].getExternalId());
-        assertEquals(KilkariCampaignService.SEVEN_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
-    }
-
-    @Test
-    public void shouldCreateScheduleForTheGivenMsisdn() throws Exception {
-        final String msisdn = "9876543210";
-        String channelString = Channel.IVR.toString();
-        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
-        BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
-
-        reportingService.setBehavior(mock(ReportingService.class));
-        onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionService.class));
-
-        MvcResult result = mockMvc(subscriptionController)
-                .perform(get("/subscription").param("msisdn", msisdn).param("pack", pack.toString())
-                        .param("channel", channelString))
-                .andExpect(status().isOk())
-                .andExpect(content().type("application/javascript;charset=UTF-8"))
-                .andReturn();
-
-        String responseString = result.getResponse().getContentAsString();
-        responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
-
-        BaseResponse actualResponse =  (BaseResponse) new BaseResponse().fromJson(responseString);
-        assertEquals(expectedResponse, actualResponse);
-
-       assertScheduleCreatedFor(msisdn);
-
-    }
-
-    private void assertScheduleCreatedFor(String msisdn) {
-
+        assertEquals(KilkariCampaignService.FIFTEEN_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
+        List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
+                subscription[0].getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
+        assertEquals(60, messageTimings.size());
     }
 
     private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {

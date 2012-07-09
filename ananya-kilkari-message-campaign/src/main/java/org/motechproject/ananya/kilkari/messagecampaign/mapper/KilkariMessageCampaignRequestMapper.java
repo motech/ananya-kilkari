@@ -12,10 +12,12 @@ public class KilkariMessageCampaignRequestMapper {
 
     public static CampaignRequest newRequestFrom(KilkariMessageCampaignRequest kilkariMessageCampaignRequest) {
         String campaignName = SubscriptionPack.from(kilkariMessageCampaignRequest.getSubscriptionPack()).getCampaignName();
-        Time reminderTime = new Time(kilkariMessageCampaignRequest.getSubscriptionCreationDate().toLocalTime());
+        Time reminderTime = new Time(kilkariMessageCampaignRequest.getSubscriptionCreationDate().plusMinutes(KilkariMessageCampaignService.campaignScheduleDeltaMinutes).toLocalTime());
         DateTime referenceDate = kilkariMessageCampaignRequest.getSubscriptionCreationDate();
 
-        LocalDate referenceDateWithDelta = referenceDate.plusDays(KilkariMessageCampaignService.campaignScheduleDeltaDays).plusMinutes(KilkariMessageCampaignService.campaignScheduleDeltaMinutes).toLocalDate();
-        return new CampaignRequest(kilkariMessageCampaignRequest.getExternalId(), campaignName, reminderTime, referenceDateWithDelta);
+        LocalDate referenceDateWithDelta = referenceDate.plusDays(KilkariMessageCampaignService.campaignScheduleDeltaDays).toLocalDate();
+        CampaignRequest campaignRequest = new CampaignRequest(kilkariMessageCampaignRequest.getExternalId(), campaignName, reminderTime, referenceDateWithDelta);
+        campaignRequest.setDeliverTime(reminderTime);
+        return campaignRequest;
     }
 }

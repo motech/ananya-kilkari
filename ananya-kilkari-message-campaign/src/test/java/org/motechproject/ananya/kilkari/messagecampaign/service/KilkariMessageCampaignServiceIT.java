@@ -21,6 +21,8 @@ import static org.junit.Assert.assertEquals;
 @ContextConfiguration("classpath:applicationKilkariMessageCampaignContext.xml")
 public class KilkariMessageCampaignServiceIT {
 
+    public static final int CONFIGURED_DELTA_MINUTES = 30;
+    public static final int CONFIGURED_DELTA_DAYS = 2;
     @Autowired
     private KilkariMessageCampaignService kilkariMessageCampaignService;
 
@@ -38,12 +40,13 @@ public class KilkariMessageCampaignServiceIT {
                 SubscriptionPack.SEVEN_MONTHS.name(),
                 referenceDate.minusDays(2), referenceDate.plusYears(4));
 
-        LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(2);
+        DateTime referenceDateWithDelta = referenceDate.plusDays(CONFIGURED_DELTA_DAYS);
         assertThat(dateTimeList.size(), is(28));
-        assertEquals(referenceDateWithDelta, dateTimeList.get(0).toLocalDate());
-        assertEquals(new LocalTime(13,0), dateTimeList.get(0).toLocalTime());
-        assertEquals(referenceDateWithDelta.plusWeeks(27), dateTimeList.get(27).toLocalDate());
-        assertEquals(new LocalTime(13,0), dateTimeList.get(27).toLocalTime());
+        assertEquals(referenceDateWithDelta.toLocalDate(), dateTimeList.get(0).toLocalDate());
+        LocalTime deliverTime = new LocalTime(referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getHourOfDay(), referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getMinuteOfHour());
+        assertEquals(deliverTime, dateTimeList.get(0).toLocalTime());
+        assertEquals(referenceDateWithDelta.plusWeeks(27).toLocalDate(), dateTimeList.get(27).toLocalDate());
+        assertEquals(deliverTime, dateTimeList.get(27).toLocalTime());
     }
 
     @Test
@@ -60,12 +63,14 @@ public class KilkariMessageCampaignServiceIT {
                 SubscriptionPack.TWELVE_MONTHS.name(),
                 referenceDate.minusDays(2), referenceDate.plusYears(4));
 
-        LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(2);
+        LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(CONFIGURED_DELTA_DAYS);
+        LocalTime deliverTime = new LocalTime(referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getHourOfDay(), referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getMinuteOfHour());
         assertThat(dateTimeList.size(), is(48));
         assertEquals(referenceDateWithDelta, dateTimeList.get(0).toLocalDate());
-        assertEquals(new LocalTime(13,0), dateTimeList.get(0).toLocalTime());
+        assertEquals(deliverTime, dateTimeList.get(0).toLocalTime());
+
         assertEquals(referenceDateWithDelta.plusWeeks(47), dateTimeList.get(47).toLocalDate());
-        assertEquals(new LocalTime(13,0), dateTimeList.get(47).toLocalTime());
+        assertEquals(deliverTime, dateTimeList.get(47).toLocalTime());
     }
 
     @Test
@@ -82,11 +87,14 @@ public class KilkariMessageCampaignServiceIT {
                 SubscriptionPack.FIFTEEN_MONTHS.name(),
                 referenceDate.minusDays(2), referenceDate.plusYears(4));
 
-        LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(2);
+        LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(CONFIGURED_DELTA_DAYS);
+        LocalTime deliverTime = new LocalTime(referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getHourOfDay(), referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getMinuteOfHour());
         assertThat(dateTimeList.size(), is(60));
+
         assertEquals(referenceDateWithDelta, dateTimeList.get(0).toLocalDate());
-        assertEquals(new LocalTime(13,0), dateTimeList.get(0).toLocalTime());
+        assertEquals(deliverTime, dateTimeList.get(0).toLocalTime());
+
         assertEquals(referenceDateWithDelta.plusWeeks(59), dateTimeList.get(59).toLocalDate());
-        assertEquals(new LocalTime(13,0), dateTimeList.get(59).toLocalTime());
+        assertEquals(deliverTime, dateTimeList.get(59).toLocalTime());
     }
 }

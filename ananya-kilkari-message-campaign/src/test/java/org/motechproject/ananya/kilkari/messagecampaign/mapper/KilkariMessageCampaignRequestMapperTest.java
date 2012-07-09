@@ -23,5 +23,6 @@ public class KilkariMessageCampaignRequestMapperTest {
         assertEquals(KilkariMessageCampaignService.TWELVE_MONTHS, campaignRequest.campaignName());
         assertEquals(kilkariMessageCampaignRequest.getSubscriptionCreationDate().toLocalDate(), campaignRequest.referenceDate());
         assertEquals(new Time(kilkariMessageCampaignRequest.getSubscriptionCreationDate().toLocalTime()), campaignRequest.reminderTime());
+        assertEquals(new Time(kilkariMessageCampaignRequest.getSubscriptionCreationDate().toLocalTime()), campaignRequest.deliverTime());
     }
 }

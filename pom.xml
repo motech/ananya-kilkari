@@ -19,6 +19,7 @@
     <properties>
         <spring.version>3.1.0.RELEASE</spring.version>
         <motech-platform.version>0.12-SNAPSHOT</motech-platform.version>
+        <motech-contrib.version>0.11</motech-contrib.version>
         <slf4j.version>1.6.1</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -305,6 +306,11 @@
                 <groupId>org.motechproject</groupId>
                 <artifactId>motech-platform-common-api</artifactId>
                 <version>${motech-platform.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.motechproject</groupId>
+                <artifactId>motech-common</artifactId>
+                <version>${motech-contrib.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.motechproject</groupId>

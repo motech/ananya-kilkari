@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.common.domain.PhoneNumber;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,11 +53,7 @@ public class ValidationUtils {
     }
 
     public static void assertMsisdn(String msisdn) {
-        if (!isValidMsisdn(msisdn))
+        if (PhoneNumber.isNotValid(msisdn))
             throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
-    }
-
-    private static boolean isValidMsisdn(String msisdn) {
-        return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
     }
 }

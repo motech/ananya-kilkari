@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.domain;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.joda.time.DateTime;
 
 public class SubscriptionCreationReportRequest extends BaseReportRequest {
@@ -69,4 +71,11 @@ public class SubscriptionCreationReportRequest extends BaseReportRequest {
     public String getOperator() {
         return operator;
     }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append("channel", channel).toString();
+    }
+
 }

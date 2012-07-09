@@ -25,8 +25,8 @@ public class ReportingServiceImpl implements ReportingService {
     private final static Logger logger = LoggerFactory.getLogger(ReportingServiceImpl.class);
 
     @Autowired
-    public ReportingServiceImpl(@Qualifier("kilkariRestTemplate") RestTemplate restTemplate, @Qualifier("kilkariProperties") Properties kilkariProperties) {
-        this.restTemplate = restTemplate;
+    public ReportingServiceImpl(RestTemplate kilkariRestTemplate, @Qualifier("kilkariProperties") Properties kilkariProperties) {
+        this.restTemplate = kilkariRestTemplate;
         this.kilkariProperties = kilkariProperties;
     }
 

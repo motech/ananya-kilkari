@@ -54,11 +54,13 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.PUT)
     @ResponseBody
     public BaseResponse activateSubscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
-        List<String> validationErrors = new CallbackRequestValidator().validate(callbackRequest);
-        if (!(validationErrors.isEmpty()))
+        final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
+        List<String> validationErrors = new CallbackRequestValidator(subscriptionService).validate(callbackRequestWrapper);
+        if (!(validationErrors.isEmpty())) {
             return BaseResponse.failure(String.format("Callback Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
+        }
 
-        kilkariSubscriptionService.processCallbackRequest(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
+        kilkariSubscriptionService.processCallbackRequest(callbackRequestWrapper);
 
         return BaseResponse.success("Callback request processed successfully");
     }

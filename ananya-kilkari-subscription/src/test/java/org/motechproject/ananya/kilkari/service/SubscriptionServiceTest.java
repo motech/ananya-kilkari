@@ -280,6 +280,35 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    public void shouldDeactivateSubscriptionWithAppropriateReason() {
+        final String subscriptionId = "sub123";
+        DateTime date = DateTime.now();
+        String reason = "balance is low";
+        Integer graceCount = 7;
+        Subscription subscription = new Subscription() {
+            public String getSubscriptionId() {
+                return subscriptionId;
+            }
+        };
+        subscription.setStatus(SubscriptionStatus.SUSPENDED);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.deactivateSubscription(subscriptionId, date, reason, graceCount);
+
+        verify(allSubscriptions).update(subscription);
+        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+        verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+
+        assertEquals(SubscriptionStatus.DEACTIVATED, subscription.getStatus());
+        assertEquals(date, subscription.getRenewalDate());
+        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(SubscriptionStatus.DEACTIVATED, subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(date, subscriptionStateChangeReportRequest.getCreatedAt());
+        assertEquals(graceCount, subscriptionStateChangeReportRequest.getGraceCount());
+    }
+
+    @Test
     public void shouldNotAddDuplicateSubscriptions() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults()
                 .withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS.toString()).build();
@@ -295,6 +324,84 @@ public class SubscriptionServiceTest {
         expectedException.expect(DuplicateSubscriptionException.class);
 
         subscriptionService.createSubscription(subscriptionRequest);
+    }
+
+    @Test
+    public void shouldMarkRenewalRequestAsInvalidWhenSubscriptionStateIsOtherThanActiveOrSuspended() {
+        final String subscriptionId = "subId";
+        final CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setAction(CallbackAction.REN.name());
+        callbackRequest.setStatus(CallbackStatus.BAL_LOW.name());
+        final Subscription subscription = new Subscription();
+        subscription.setStatus(SubscriptionStatus.NEW);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        final List<String> errors = subscriptionService.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
+
+        assertEquals(1, errors.size());
+        assertEquals("Cannot renew. Subscription in NEW state", errors.get(0));
+    }
+
+    @Test
+    public void shouldMarkRenewalDeactivationRequestAsInvalidWhenSubscriptionStateIsOtherThanSuspended() {
+        final String subscriptionId = "subId";
+        final CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setAction(CallbackAction.DCT.name());
+        callbackRequest.setStatus(CallbackStatus.BAL_LOW.name());
+        final Subscription subscription = new Subscription();
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        final List<String> errors = subscriptionService.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
+
+        assertEquals(1, errors.size());
+        assertEquals("Cannot deactivate on renewal. Subscription in ACTIVE state", errors.get(0));
+    }
+
+    @Test
+    public void shouldMarkRenewalRequestAsValidWhenSubscriptionStateIsActive() {
+        final String subscriptionId = "subId";
+        final CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setAction(CallbackAction.REN.name());
+        callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
+        final Subscription subscription = new Subscription();
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        final List<String> errors = subscriptionService.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
+
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    public void shouldMarkRenewalRequestAsValidWhenSubscriptionStateIsSuspended() {
+        final String subscriptionId = "subId";
+        final CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setAction(CallbackAction.REN.name());
+        callbackRequest.setStatus(CallbackStatus.BAL_LOW.name());
+        final Subscription subscription = new Subscription();
+        subscription.setStatus(SubscriptionStatus.SUSPENDED);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        final List<String> errors = subscriptionService.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
+
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    public void shouldReturnErrorWhenSubscriptionRequestActionStateCombinationIsInvalid() {
+        final String subscriptionId = "subId";
+        final CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setAction(CallbackAction.REN.name());
+        callbackRequest.setStatus(CallbackStatus.ERROR.name());
+        final Subscription subscription = new Subscription();
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        final List<String> errors = subscriptionService.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
+
+        assertEquals(1, errors.size());
+        assertEquals("Invalid state ERROR for action REN", errors.get(0));
     }
 
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {

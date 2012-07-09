@@ -23,8 +23,7 @@ public class SubscriptionStateHandlerFactory {
 
         put(new ActionStatus("REN", "SUCCESS"), RenewalSuccessHandler.class);
         put(new ActionStatus("REN", "BAL_LOW"), RenewalSuspensionHandler.class);
-        put(new ActionStatus("REN", "FAILURE"), RenewalFailedHandler.class);
-        
+
         put(new ActionStatus("DCT", "BAL_LOW"), DeactivateHandler.class);
     }};
 
@@ -48,7 +47,7 @@ public class SubscriptionStateHandlerFactory {
         return subscriptionStateHandler;
     }
 
-    private Class getHandlerClass(CallbackRequestWrapper callbackRequestWrapper) {
+    public static Class getHandlerClass(CallbackRequestWrapper callbackRequestWrapper) {
         ActionStatus actionStatus = ActionStatus.createFor(callbackRequestWrapper.getAction(), callbackRequestWrapper.getStatus());
         actionStatus = handlerMappings.keySet().contains(actionStatus) ? actionStatus : ActionStatus.createFor(callbackRequestWrapper.getAction(), STATUS_FAILURE);
         return handlerMappings.get(actionStatus);

@@ -22,8 +22,8 @@ import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetails;
-import org.motechproject.ananya.kilkari.web.domain.CallbackAction;
-import org.motechproject.ananya.kilkari.web.domain.CallbackStatus;
+import org.motechproject.ananya.kilkari.domain.CallbackAction;
+import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;

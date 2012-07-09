@@ -142,6 +142,11 @@ public class Subscription extends MotechBaseDataObject {
         setStatus(SubscriptionStatus.PENDING_ACTIVATION);
     }
 
+    public void deactivate(DateTime deactivationDate) {
+        setStatus(SubscriptionStatus.DEACTIVATED);
+        setRenewalDate(deactivationDate);
+    }
+
     public DateTime getRenewalDate() {
         return renewalDate;
     }

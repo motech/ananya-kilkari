@@ -17,6 +17,10 @@ public class CallbackRequestWrapper implements Serializable {
         this.createdAt = createdAt;
     }
 
+    public String getMsisdn() {
+        return callbackRequest.getMsisdn();
+    }
+
     public String getAction() {
         return callbackRequest.getAction();
     }

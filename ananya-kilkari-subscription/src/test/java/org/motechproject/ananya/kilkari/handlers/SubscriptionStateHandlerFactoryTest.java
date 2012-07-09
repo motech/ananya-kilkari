@@ -84,17 +84,4 @@ public class SubscriptionStateHandlerFactoryTest {
         assertEquals(RenewalSuspensionHandler.class, subscriptionStateHandler.getClass());
         assertEquals(subscriptionService, subscriptionStateHandler.getSubscriptionService());
     }
-
-    @Test
-    public void shouldReturnTheRenewalSuspensionHandlerWithRenewalStatusOtherThanSuccessOrBalanceLow() {
-        CallbackRequest callbackRequest = new CallbackRequest();
-        callbackRequest.setAction("REN");
-        callbackRequest.setStatus("GRACE");
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
-
-        SubscriptionStateHandler subscriptionStateHandler = new SubscriptionStateHandlerFactory(subscriptionService).getHandler(callbackRequestWrapper);
-
-        assertEquals(RenewalFailedHandler.class, subscriptionStateHandler.getClass());
-        assertEquals(subscriptionService, subscriptionStateHandler.getSubscriptionService());
-    }
 }

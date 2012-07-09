@@ -1,8 +1,12 @@
 package org.motechproject.ananya.kilkari.web.domain;
 
 import org.apache.commons.lang.StringUtils;
-import org.motechproject.ananya.kilkari.domain.CallbackRequest;
+import org.motechproject.ananya.kilkari.domain.CallbackAction;
+import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.domain.Operator;
+import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,16 +14,21 @@ import java.util.List;
 public class CallbackRequestValidator {
 
     private List<String> errors;
+    private SubscriptionService subscriptionService;
 
-    public CallbackRequestValidator() {
+    @Autowired
+    public CallbackRequestValidator(SubscriptionService subscriptionService) {
+        this.subscriptionService = subscriptionService;
         this.errors = new ArrayList<>();
     }
 
-    public List<String> validate(CallbackRequest callbackRequest) {
-        validateMsisdn(callbackRequest.getMsisdn());
-        validateCallbackAction(callbackRequest.getAction());
-        validateCallbackStatus(callbackRequest.getStatus());
-        validateOperator(callbackRequest.getOperator());
+    public List<String> validate(CallbackRequestWrapper callbackRequestWrapper) {
+        errors.addAll(subscriptionService.validate(callbackRequestWrapper));
+
+        validateMsisdn(callbackRequestWrapper.getMsisdn());
+        validateCallbackAction(callbackRequestWrapper.getAction());
+        validateCallbackStatus(callbackRequestWrapper.getStatus());
+        validateOperator(callbackRequestWrapper.getOperator());
         return errors;
     }
 

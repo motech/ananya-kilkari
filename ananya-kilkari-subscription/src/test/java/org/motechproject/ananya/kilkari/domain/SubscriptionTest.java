@@ -74,6 +74,16 @@ public class SubscriptionTest {
     }
 
     @Test
+    public void shouldChangeStatusOfSubscriptionDeactivatedWithDeactivatedDate() {
+        final DateTime deactivationDate = DateTime.now();
+        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
+        subscription.deactivate(deactivationDate);
+
+        assertEquals(SubscriptionStatus.DEACTIVATED, subscription.getStatus());
+        assertEquals(deactivationDate, subscription.getRenewalDate());
+    }
+
+    @Test
     public void shouldReturnIsActiveBasedOnStatus() {
         String msisdn = "9876534211";
         SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;

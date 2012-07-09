@@ -117,22 +117,28 @@ public class SubscriptionService {
         final String requestAction = callbackRequestWrapper.getAction();
         final String subscriptionId = callbackRequestWrapper.getSubscriptionId();
 
-        if(SubscriptionStateHandlerFactory.getHandlerClass(callbackRequestWrapper) == null) {
-            errors.add(String.format("Invalid state %s for action %s", requestStatus, requestAction));
+        if (SubscriptionStateHandlerFactory.getHandlerClass(callbackRequestWrapper) == null) {
+            errors.add(String.format("Invalid status %s for action %s", requestStatus, requestAction));
         }
 
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        
         if (CallbackAction.REN.name().equals(requestAction)) {
-            Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
             final SubscriptionStatus subscriptionStatus = subscription.getStatus();
             if (!(subscriptionStatus.equals(SubscriptionStatus.ACTIVE) || subscriptionStatus.equals(SubscriptionStatus.SUSPENDED)))
-                errors.add(String.format("Cannot renew. Subscription in %s state", subscriptionStatus));
+                errors.add(String.format("Cannot renew. Subscription in %s status", subscriptionStatus));
         }
 
         if (CallbackAction.DCT.name().equals(requestAction) && CallbackStatus.BAL_LOW.name().equals(requestStatus)) {
-            Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
             final SubscriptionStatus subscriptionStatus = subscription.getStatus();
             if (!subscriptionStatus.equals(SubscriptionStatus.SUSPENDED))
-                errors.add(String.format("Cannot deactivate on renewal. Subscription in %s state", subscriptionStatus));
+                errors.add(String.format("Cannot deactivate on renewal. Subscription in %s status", subscriptionStatus));
+        }
+
+        if (CallbackAction.ACT.name().equals(requestAction) && (CallbackStatus.SUCCESS.name().equals(requestStatus) || CallbackStatus.BAL_LOW.name().equals(requestStatus))) {
+            final SubscriptionStatus subscriptionStatus = subscription.getStatus();
+            if (!subscriptionStatus.equals(SubscriptionStatus.PENDING_ACTIVATION))
+                errors.add(String.format("Cannot activate. Subscription in %s status", subscriptionStatus));
         }
 
         return errors;

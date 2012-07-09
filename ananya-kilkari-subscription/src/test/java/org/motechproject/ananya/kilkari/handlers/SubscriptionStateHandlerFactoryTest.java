@@ -27,7 +27,7 @@ public class SubscriptionStateHandlerFactoryTest {
         HashMap<ActionStatus, Class> handlerMappings = SubscriptionStateHandlerFactory.handlerMappings;
 
         assertEquals(ActivateHandler.class, handlerMappings.get(ActionStatus.createFor("ACT", "SUCCESS")));
-        assertEquals(ActivationFailedHandler.class, handlerMappings.get(ActionStatus.createFor("ACT", "FAILURE")));
+        assertEquals(ActivationFailedHandler.class, handlerMappings.get(ActionStatus.createFor("ACT", "BAL_LOW")));
         assertEquals(RenewalSuccessHandler.class, handlerMappings.get(ActionStatus.createFor("REN", "SUCCESS")));
         assertEquals(RenewalSuspensionHandler.class, handlerMappings.get(ActionStatus.createFor("REN", "BAL_LOW")));
         assertEquals(DeactivateHandler.class, handlerMappings.get(ActionStatus.createFor("DCT", "BAL_LOW")));
@@ -43,19 +43,6 @@ public class SubscriptionStateHandlerFactoryTest {
         SubscriptionStateHandler subscriptionStateHandler = new SubscriptionStateHandlerFactory(subscriptionService).getHandler(callbackRequestWrapper);
 
         assertEquals(ActivateHandler.class, subscriptionStateHandler.getClass());
-        assertEquals(subscriptionService, subscriptionStateHandler.getSubscriptionService());
-    }
-
-    @Test
-    public void shouldReturnTheActivationFailedHandlerGivenACallbackRequestWrapperWithStatusAnythingOtherThanSuccessForACTAction() {
-        CallbackRequest callbackRequest = new CallbackRequest();
-        callbackRequest.setAction("ACT");
-        callbackRequest.setStatus("GRACE");
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
-
-        SubscriptionStateHandler subscriptionStateHandler = new SubscriptionStateHandlerFactory(subscriptionService).getHandler(callbackRequestWrapper);
-
-        assertEquals(ActivationFailedHandler.class, subscriptionStateHandler.getClass());
         assertEquals(subscriptionService, subscriptionStateHandler.getSubscriptionService());
     }
 

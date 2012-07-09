@@ -18,10 +18,9 @@ public class SubscriptionStateHandlerFactory {
 
     private final Logger LOGGER = LoggerFactory.getLogger(SubscriptionStateHandlerFactory.class);
 
-    static HashMap<ActionStatus, Class> handlerMappings
-            = new HashMap<ActionStatus, Class>() {{
+    static HashMap<ActionStatus, Class> handlerMappings = new HashMap<ActionStatus, Class>() {{
         put(new ActionStatus(CallbackAction.ACT, CallbackStatus.SUCCESS), ActivateHandler.class);
-        put(new ActionStatus(CallbackAction.ACT, CallbackStatus.FAILURE), ActivationFailedHandler.class);
+        put(new ActionStatus(CallbackAction.ACT, CallbackStatus.BAL_LOW), ActivationFailedHandler.class);
 
         put(new ActionStatus(CallbackAction.REN, CallbackStatus.SUCCESS), RenewalSuccessHandler.class);
         put(new ActionStatus(CallbackAction.REN, CallbackStatus.BAL_LOW), RenewalSuspensionHandler.class);
@@ -37,7 +36,7 @@ public class SubscriptionStateHandlerFactory {
     public SubscriptionStateHandler getHandler(CallbackRequestWrapper callbackRequestWrapper) {
         SubscriptionStateHandler subscriptionStateHandler = null;
         Class handlerClass = getHandlerClass(callbackRequestWrapper);
-        
+
         try {
             subscriptionStateHandler = (SubscriptionStateHandler) handlerClass.newInstance();
             subscriptionStateHandler.setSubscriptionService(subscriptionService);
@@ -51,7 +50,6 @@ public class SubscriptionStateHandlerFactory {
 
     public static Class getHandlerClass(CallbackRequestWrapper callbackRequestWrapper) {
         ActionStatus actionStatus = ActionStatus.createFor(callbackRequestWrapper.getAction(), callbackRequestWrapper.getStatus());
-        actionStatus = handlerMappings.keySet().contains(actionStatus) ? actionStatus : ActionStatus.createFor(callbackRequestWrapper.getAction(), STATUS_FAILURE);
         return handlerMappings.get(actionStatus);
     }
 }

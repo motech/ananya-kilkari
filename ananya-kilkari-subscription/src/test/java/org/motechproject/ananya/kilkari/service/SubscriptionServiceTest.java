@@ -340,7 +340,7 @@ public class SubscriptionServiceTest {
         final List<String> errors = subscriptionService.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
 
         assertEquals(1, errors.size());
-        assertEquals("Cannot renew. Subscription in NEW state", errors.get(0));
+        assertEquals("Cannot renew. Subscription in NEW status", errors.get(0));
     }
 
     @Test
@@ -356,7 +356,23 @@ public class SubscriptionServiceTest {
         final List<String> errors = subscriptionService.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
 
         assertEquals(1, errors.size());
-        assertEquals("Cannot deactivate on renewal. Subscription in ACTIVE state", errors.get(0));
+        assertEquals("Cannot deactivate on renewal. Subscription in ACTIVE status", errors.get(0));
+    }
+
+    @Test
+    public void shouldMarkActivationRequestAsInvalidWhenSubscriptionStateIsOtherThanPendingActivation() {
+        final String subscriptionId = "subId";
+        final CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setAction(CallbackAction.ACT.name());
+        callbackRequest.setStatus(CallbackStatus.BAL_LOW.name());
+        final Subscription subscription = new Subscription();
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        final List<String> errors = subscriptionService.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
+
+        assertEquals(1, errors.size());
+        assertEquals("Cannot activate. Subscription in ACTIVE status", errors.get(0));
     }
 
     @Test
@@ -402,7 +418,7 @@ public class SubscriptionServiceTest {
         final List<String> errors = subscriptionService.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
 
         assertEquals(1, errors.size());
-        assertEquals("Invalid state ERROR for action REN", errors.get(0));
+        assertEquals("Invalid status ERROR for action REN", errors.get(0));
     }
 
     @Test

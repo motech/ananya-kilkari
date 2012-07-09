@@ -123,11 +123,13 @@ public class SubscriptionRequest implements Serializable {
         ValidationUtils.assertMsisdn(msisdn);
         ValidationUtils.assertPack(pack);
         ValidationUtils.assertChannel(channel);
-        validateAge();
-        validateDOB();
-        validateEDD();
-        validateLocation(reportLocation);
         validateIfAlreadySubscribed(existingActiveSubscription);
+        if (!Channel.isIVR(channel)) {
+            validateAge();
+            validateDOB();
+            validateEDD();
+            validateLocation(reportLocation);
+        }
     }
 
     private void validateIfAlreadySubscribed(Subscription existingActiveSubscription) {
@@ -138,16 +140,14 @@ public class SubscriptionRequest implements Serializable {
     }
 
     private void validateLocation(SubscriberLocation reportLocation) {
-        if (isLocationEmpty()) {
+        if (isLocationEmpty())
             return;
-        }
-        if (reportLocation == null) {
+        if (reportLocation == null)
             throw new ValidationException(String.format("Invalid location with district: %s, block: %s, panchayat: %s", district, block, panchayat));
-        }
     }
 
     private boolean isLocationEmpty() {
-        return district == null || block == null || panchayat == null;
+        return district == null && block == null && panchayat == null;
     }
 
     private void validateEDD() {

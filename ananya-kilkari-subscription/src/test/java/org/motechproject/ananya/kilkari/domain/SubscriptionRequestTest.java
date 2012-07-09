@@ -15,7 +15,8 @@ import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -55,6 +56,27 @@ public class SubscriptionRequestTest {
         assertEquals("myblock", subscriptionRequest.getBlock());
         assertEquals("mypanchayat", subscriptionRequest.getPanchayat());
         assertNull(subscriptionRequest.getCreatedAt());
+    }
+
+    @Test
+    public void shouldNotValidateLocationAgeDOBEDDForIVR() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withMsisdn("9876543210").withChannel(Channel.IVR.name()).withPack(SubscriptionPack.FIFTEEN_MONTHS.name()).build();
+        subscriptionRequest.validate(null,null);
+    }
+
+    @Test
+    public void shouldNotValidateLocationIfLocationIsCompletelyEmptyForCC() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withChannel(Channel.CALL_CENTER.name()).withDistrict(null).withBlock(null).withPanchayat(null).build();
+        subscriptionRequest.validate(null,null);
+    }
+
+    @Test
+    public void shouldValidateLocationIfLocationIsPresentInRequestForCC() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withChannel(Channel.CALL_CENTER.name()).withDistrict("district").withBlock(null).withPanchayat(null).build();
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid location with district: district, block: null, panchayat: null");
+
+        subscriptionRequest.validate(null,null);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
+import junit.framework.Assert;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,16 +61,19 @@ public class SubscriptionServiceTest {
 
         when(reportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
 
-        String subscriptionId = subscriptionService.createSubscription(subscriptionRequest);
+        Subscription subscription = subscriptionService.createSubscription(subscriptionRequest);
 
-        assertNotNull(subscriptionId);
+        assertNotNull(subscription);
+
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         verify(publisher).processSubscription(subscriptionActivationRequestArgumentCaptor.capture());
         verify(publisher).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
 
-        Subscription subscription = subscriptionArgumentCaptor.getValue();
-        assertEquals(msisdn, subscription.getMsisdn());
-        assertEquals(subscriptionPack, subscription.getPack());
+        Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();
+        Assert.assertEquals(subscription, subscriptionSaved);
+
+        assertEquals(msisdn, subscriptionSaved.getMsisdn());
+        assertEquals(subscriptionPack, subscriptionSaved.getPack());
 
         SubscriptionActivationRequest actualSubscriptionActivationRequest = subscriptionActivationRequestArgumentCaptor.getValue();
         assertEquals(msisdn, actualSubscriptionActivationRequest.getMsisdn());
@@ -401,7 +405,17 @@ public class SubscriptionServiceTest {
         assertEquals("Invalid state ERROR for action REN", errors.get(0));
     }
 
+    @Test
+    public void shouldReturnASubscriptionGivenAnId() {
+        String subscriptionID = "subscriptionID";
+
+        subscriptionService.findBySubscriptionId(subscriptionID);
+
+        verify(allSubscriptions).findBySubscriptionId(subscriptionID);
+    }
+
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {
         return new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).build();
     }
 }
+

@@ -3,23 +3,26 @@ package org.motechproject.ananya.kilkari.service;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
+import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class KilkariCampaignServiceTest {
@@ -30,11 +33,17 @@ public class KilkariCampaignServiceTest {
     private KilkariMessageCampaignService kilkariMessageCampaignService;
     @Mock
     private KilkariSubscriptionService kilkariSubscriptionService;
+    @Mock
+    private AllCampaignMessageAlerts allCampaignMessageAlerts;
+    @Mock
+    private CampaignMessageIdStrategy campaignMessageIdStrategy;
+    @Mock
+    private OBDService obdService;
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService);
+        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, obdService);
     }
 
     @Test
@@ -50,7 +59,7 @@ public class KilkariCampaignServiceTest {
         List<DateTime> dateTimes = new ArrayList<>();
         dateTimes.add(DateTime.now());
 
-        when(kilkariSubscriptionService.getSubscriptionsFor(msisdn)).thenReturn(subscriptions);
+        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
         when(kilkariMessageCampaignService.getMessageTimings(
                 subscription1.getSubscriptionId(),
@@ -79,5 +88,78 @@ public class KilkariCampaignServiceTest {
         assertThat(messageTimings.size(), is(2));
         assertThat(messageTimings, hasEntry(subscription1.getSubscriptionId(), dateTimes));
         assertThat(messageTimings, hasEntry(subscription2.getSubscriptionId(), dateTimes));
+    }
+
+    @Test
+    public void shouldSaveCampaignMessageAlertIfDoesNotExist() {
+
+        String subscriptionId = "mysubscriptionid";
+        String messageId = "mymessageid";
+        Subscription subscription = new Subscription();
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
+        when(campaignMessageIdStrategy.createMessageId(subscription)).thenReturn(messageId);
+
+        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
+
+
+        verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
+        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
+        verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
+        CampaignMessageAlert campaignMessageAlert = campaignMessageAlertArgumentCaptor.getValue();
+        assertEquals(subscriptionId, campaignMessageAlert.getSubscriptionId());
+        assertEquals(messageId, campaignMessageAlert.getMessageId());
+        assertFalse(campaignMessageAlert.isRenewed());
+
+        verifyZeroInteractions(obdService);
+        verify(allCampaignMessageAlerts, never()).remove(any(CampaignMessageAlert.class));
+    }
+
+    @Test
+    public void shouldUpdateCampaignMessageAlertIfAlreadyExistsAndScheduleCampaignMessageIfRenewed() {
+
+        String subscriptionId = "mysubscriptionid";
+        String messageId = "mymessageid";
+        Subscription subscription = new Subscription();
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId", true);
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
+        when(campaignMessageIdStrategy.createMessageId(subscription)).thenReturn(messageId);
+
+        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
+
+        verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
+
+        verify(obdService).scheduleCampaignMessage(subscriptionId, messageId);
+        verify(allCampaignMessageAlerts).remove(campaignMessageAlert);
+    }
+
+    @Test
+    public void shouldUpdateCampaignMessageAlertIfAlreadyExistsButShouldNotScheduleCampaignMessageIfNotRenewed() {
+
+        String subscriptionId = "mysubscriptionid";
+        String messageId = "mymessageid";
+        Subscription subscription = new Subscription();
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId");
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
+        when(campaignMessageIdStrategy.createMessageId(subscription)).thenReturn(messageId);
+
+        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
+
+        verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
+
+        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
+        verify(allCampaignMessageAlerts).update(campaignMessageAlertArgumentCaptor.capture());
+        CampaignMessageAlert actualCampaignMessageAlert = campaignMessageAlertArgumentCaptor.getValue();
+        assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
+        assertEquals(messageId, actualCampaignMessageAlert.getMessageId());
+        assertFalse(actualCampaignMessageAlert.isRenewed());
+
+        verifyZeroInteractions(obdService);
+        verify(allCampaignMessageAlerts, never()).remove(any(CampaignMessageAlert.class));
     }
 }

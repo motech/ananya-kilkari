@@ -1,14 +1,12 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
+import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
@@ -16,6 +14,7 @@ import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCa
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -45,26 +44,27 @@ public class KilkariSubscriptionServiceTest {
     @Test
     public void shouldGetSubscriptionsFor() {
         String msisdn = "998800";
-        kilkariSubscriptionService.getSubscriptionsFor(msisdn);
+        kilkariSubscriptionService.findByMsisdn(msisdn);
         verify(subscriptionService).findByMsisdn(msisdn);
     }
 
     @Test
     public void shouldProcessSubscriptionRequest() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
-        String subscriptionId = "111222333";
-        String pack = "SEVEN_MONTHS";
+        SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
         subscriptionRequest.setCreatedAt(DateTime.now());
-        subscriptionRequest.setPack(pack);
-        when(subscriptionService.createSubscription(subscriptionRequest)).thenReturn(subscriptionId);
+        subscriptionRequest.setPack(pack.name());
+        Subscription subscription = new Subscription("msisdn", SubscriptionPack.FIFTEEN_MONTHS);
+
+        when(subscriptionService.createSubscription(subscriptionRequest)).thenReturn(subscription);
         
         kilkariSubscriptionService.processSubscriptionRequest(subscriptionRequest);
 
         ArgumentCaptor<KilkariMessageCampaignRequest> captor = ArgumentCaptor.forClass(KilkariMessageCampaignRequest.class);
         verify(kilkariMessageCampaignService).start(captor.capture());
         KilkariMessageCampaignRequest kilkariMessageCampaignRequest = captor.getValue();
-        assertEquals(subscriptionId,kilkariMessageCampaignRequest.getExternalId());
-        assertEquals(pack,kilkariMessageCampaignRequest.getSubscriptionPack());
+        assertNotNull(kilkariMessageCampaignRequest.getExternalId());
+        assertEquals(pack.name(),kilkariMessageCampaignRequest.getSubscriptionPack());
         assertEquals(subscriptionRequest.getCreatedAt(),kilkariMessageCampaignRequest.getSubscriptionCreationDate());
     }
 
@@ -78,5 +78,16 @@ public class KilkariSubscriptionServiceTest {
         kilkariSubscriptionService.processSubscriptionRequest(subscriptionRequest);
 
         verify(kilkariMessageCampaignService, never()).start(any(KilkariMessageCampaignRequest.class));
+    }
+
+    @Test
+    public void shouldReturnSubscriptionGivenASubscriptionId() {
+        Subscription exptectedSubscription = new Subscription();
+        String susbscriptionid = "susbscriptionid";
+        when(subscriptionService.findBySubscriptionId(susbscriptionid)).thenReturn(exptectedSubscription);
+
+        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(susbscriptionid);
+
+        assertEquals(exptectedSubscription, subscription);
     }
 }

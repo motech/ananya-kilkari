@@ -70,7 +70,7 @@ public class SubscriptionController {
     public SubscriberResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
         SubscriberResponse subscriberResponse = new SubscriberResponse();
 
-        List<Subscription> subscriptions = kilkariSubscriptionService.getSubscriptionsFor(msisdn);
+        List<Subscription> subscriptions = kilkariSubscriptionService.findByMsisdn(msisdn);
 
         if (subscriptions != null) {
             for (Subscription subscription : subscriptions)

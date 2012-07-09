@@ -1,8 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
@@ -56,16 +54,20 @@ public class KilkariSubscriptionService {
         subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
     }
 
-    public List<Subscription> getSubscriptionsFor(String msisdn) {
+    public List<Subscription> findByMsisdn(String msisdn) {
         return subscriptionService.findByMsisdn(msisdn);
+    }
+
+    public Subscription findBySubscriptionId(String subscriptionId) {
+        return subscriptionService.findBySubscriptionId(subscriptionId);
     }
 
     public void processSubscriptionRequest(SubscriptionRequest subscriptionRequest) {
         try {
-            String subscriptionId = subscriptionService.createSubscription(subscriptionRequest);
+            Subscription subscription = subscriptionService.createSubscription(subscriptionRequest);
 
             KilkariMessageCampaignRequest campaignRequest = new KilkariMessageCampaignRequest(
-                    subscriptionId, subscriptionRequest.getPack(), subscriptionRequest.getCreatedAt());
+                    subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getCreationDate());
 
             kilkariMessageCampaignService.start(campaignRequest);
         } catch (DuplicateSubscriptionException e) {

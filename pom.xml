@@ -10,6 +10,7 @@
         <module>ananya-kilkari-message-campaign</module>
         <module>ananya-kilkari-subscription</module>
         <module>ananya-kilkari-web</module>
+        <module>ananya-kilkari-obd</module>
         <module>ananya-kilkari-service</module>
         <module>ananya-kilkari-smoke</module>
     </modules>
@@ -162,6 +163,7 @@
     <dependencyManagement>
 
         <dependencies>
+
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>

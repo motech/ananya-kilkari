@@ -15,6 +15,7 @@
 
     <import resource="classpath:applicationKilkariMessageCampaignContext.xml"/>
     <import resource="classpath:applicationAnanyaKilkariSubscriptionContext.xml"/>
+    <import resource="classpath:applicationKilkariOBDContext.xml"/>
 
 
     <bean id="kilkariDbInstance" class="org.ektorp.impl.StdCouchDbInstance">

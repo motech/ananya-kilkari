@@ -27,7 +27,7 @@ public class SubscriptionService {
         this.reportingService = reportingService;
     }
 
-    public String createSubscription(SubscriptionRequest subscriptionRequest) {
+    public Subscription createSubscription(SubscriptionRequest subscriptionRequest) {
         SubscriberLocation reportLocation = reportingService.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat());
         Subscription existingSubscription = findActiveSubscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack());
 
@@ -40,7 +40,7 @@ public class SubscriptionService {
         sendProcessSubscriptionEvent(subscriptionMapper.getSubscriptionActivationRequest());
         sendReportSubscriptionCreationEvent(subscriptionMapper.getSubscriptionCreationReportRequest());
 
-        return subscription.getSubscriptionId();
+        return subscription;
     }
 
     public List<Subscription> findByMsisdn(String msisdn) {
@@ -160,5 +160,9 @@ public class SubscriptionService {
 
     private boolean isValidMsisdn(String msisdn) {
         return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
+    }
+
+    public Subscription findBySubscriptionId(String subscriptionId) {
+        return allSubscriptions.findBySubscriptionId(subscriptionId);
     }
 }

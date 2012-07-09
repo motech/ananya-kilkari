@@ -11,7 +11,6 @@ import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
-import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
 import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.service.stub.StubOnMobileSubscriptionService;
@@ -28,7 +27,6 @@ import org.springframework.test.web.server.MvcResult;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.motechproject.ananya.kilkari.web.MVCTestUtils.mockMvc;
@@ -63,6 +61,11 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
 
+
+    private static final String SEVEN_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-seven-months";
+    private static final String TWELVE_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-twelve-months";
+    private static final String FIFTEEN_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-fifteen-months";
+
     @Test
     public void shouldRetrieveSubscriptionDetailsFromDatabase() throws Exception {
         String msisdn = "9876543210";
@@ -84,7 +87,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channelString))
                 .andExpect(status().isOk())
-                .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
+                .andExpect(content().type(SubscriptionControllerIT.CONTENT_TYPE_JAVASCRIPT))
                 .andReturn();
 
         String responseString = result.getResponse().getContentAsString();
@@ -109,7 +112,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
                 .perform(get("/subscription").param("msisdn", msisdn).param("pack", pack.toString())
                         .param("channel", channelString))
                 .andExpect(status().isOk())
-                .andExpect(content().type(CONTENT_TYPE_JAVASCRIPT))
+                .andExpect(content().type(SubscriptionControllerIT.CONTENT_TYPE_JAVASCRIPT))
                 .andReturn();
 
         String responseString = result.getResponse().getContentAsString();
@@ -143,14 +146,14 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
             @Override
             boolean run() {
                 campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
-                        subscription[0].getSubscriptionId(), KilkariCampaignService.TWELVE_MONTH_CAMPAIGN_NAME);
+                        subscription[0].getSubscriptionId(), SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME);
                 return (campaignEnrollmentRecord[0] != null);
             }
         }.executeWithTimeout();
 
         assertNotNull(campaignEnrollmentRecord[0]);
         assertEquals(subscription[0].getSubscriptionId(), campaignEnrollmentRecord[0].getExternalId());
-        assertEquals(KilkariCampaignService.TWELVE_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
+        assertEquals(SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
         List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
                 subscription[0].getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
         assertEquals(48, messageTimings.size());
@@ -172,7 +175,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         MvcResult result = mockMvc(subscriptionController)
                 .perform(post("/subscription").body(toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type(CONTENT_TYPE_JSON))
+                .andExpect(content().type(SubscriptionControllerIT.CONTENT_TYPE_JSON))
                 .andReturn();
 
 
@@ -207,14 +210,14 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
             @Override
             boolean run() {
                 campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
-                        subscription[0].getSubscriptionId(), KilkariCampaignService.FIFTEEN_MONTH_CAMPAIGN_NAME);
+                        subscription[0].getSubscriptionId(), SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME);
                 return (campaignEnrollmentRecord[0] != null);
             }
         }.executeWithTimeout();
 
         assertNotNull(campaignEnrollmentRecord[0]);
         assertEquals(subscription[0].getSubscriptionId(), campaignEnrollmentRecord[0].getExternalId());
-        assertEquals(KilkariCampaignService.FIFTEEN_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
+        assertEquals(SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
         List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
                 subscription[0].getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
         assertEquals(60, messageTimings.size());
@@ -222,8 +225,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
     private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {
         if (Channel.isIVR(channel)) {
-            assertTrue(jsonContent.startsWith(IVR_RESPONSE_PREFIX));
-            jsonContent = jsonContent.replace(IVR_RESPONSE_PREFIX, "");
+            assertTrue(jsonContent.startsWith(SubscriptionControllerIT.IVR_RESPONSE_PREFIX));
+            jsonContent = jsonContent.replace(SubscriptionControllerIT.IVR_RESPONSE_PREFIX, "");
         }
         return jsonContent;
     }

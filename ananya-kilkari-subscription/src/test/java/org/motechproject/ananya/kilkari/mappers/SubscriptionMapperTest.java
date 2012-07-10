@@ -13,22 +13,19 @@ import static org.junit.Assert.assertTrue;
 public class SubscriptionMapperTest {
     @Test
     public void shouldReturnSubscriptionFromSubscriptionRequest() {
-        DateTime before = DateTime.now();
-        SubscriptionMapper subscriptionMapper = new SubscriptionMapper(createSubscriptionRequest("msisdn", "twelve_months", "ivr", "25", null, null, null, null, null, null));
+        DateTime createdAt = DateTime.now();
+        SubscriptionMapper subscriptionMapper = new SubscriptionMapper(createSubscriptionRequest("msisdn", "twelve_months", "ivr", "25", null, null, null, null, null, null, createdAt));
         Subscription subscription = subscriptionMapper.getSubscription();
-        DateTime after = DateTime.now();
         assertEquals("msisdn", subscription.getMsisdn());
         assertEquals(SubscriptionPack.TWELVE_MONTHS, subscription.getPack());
         assertEquals(SubscriptionStatus.NEW, subscription.getStatus());
 
-        DateTime creationDate = subscription.getCreationDate();
-        assertTrue(creationDate.isEqual(before) || creationDate.isAfter(before));
-        assertTrue(creationDate.isEqual(after) || creationDate.isBefore(after));
+        assertEquals(createdAt, subscription.getCreationDate());
     }
 
     @Test
     public void shouldReturnSubscriptionActivationRequestFromSubscriptionRequest() {
-        SubscriptionMapper subscriptionMapper = new SubscriptionMapper(createSubscriptionRequest("msisdn", "twelve_months", "ivr", "25", null, null, null, null, null, null));
+        SubscriptionMapper subscriptionMapper = new SubscriptionMapper(createSubscriptionRequest("msisdn", "twelve_months", "ivr", "25", null, null, null, null, null, null, DateTime.now()));
         SubscriptionActivationRequest subscriptionActivationRequest = subscriptionMapper.getSubscriptionActivationRequest();
         Subscription subscription = subscriptionMapper.getSubscription();
         assertEquals("msisdn", subscriptionActivationRequest.getMsisdn());
@@ -44,7 +41,7 @@ public class SubscriptionMapperTest {
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(SubscriptionRequest.DATE_TIME_FORMAT);
         String name = "name";
 
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("msisdn", "twelve_months", "ivr", "25", dob, edd, name, "mydistrict", "myblock", "mypanchayat");
+        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("msisdn", "twelve_months", "ivr", "25", dob, edd, name, "mydistrict", "myblock", "mypanchayat", DateTime.now());
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper(subscriptionRequest);
 
         SubscriptionCreationReportRequest subscriptionCreationReportRequest = subscriptionMapper.getSubscriptionCreationReportRequest();
@@ -65,8 +62,8 @@ public class SubscriptionMapperTest {
         assertEquals(subscription.getSubscriptionId(), subscriptionCreationReportRequest.getSubscriptionId());
     }
 
-    private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel, String age, String dob, String edd, String name, String district, String block, String panchayat) {
-        return new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).withBeneficiaryAge(age).withDOB(dob).withEDD(edd)
+    private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel, String age, String dob, String edd, String name, String district, String block, String panchayat, DateTime createdAt) {
+        return new SubscriptionRequestBuilder().withDefaults().withCreatedAt(createdAt).withMsisdn(msisdn).withPack(pack).withChannel(channel).withBeneficiaryAge(age).withDOB(dob).withEDD(edd)
                 .withBeneficiaryName(name)
                 .withDistrict(district)
                 .withBlock(block)

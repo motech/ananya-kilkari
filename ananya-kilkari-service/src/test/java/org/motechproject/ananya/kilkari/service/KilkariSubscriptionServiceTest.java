@@ -54,7 +54,7 @@ public class KilkariSubscriptionServiceTest {
         SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
         subscriptionRequest.setCreatedAt(DateTime.now());
         subscriptionRequest.setPack(pack.name());
-        Subscription subscription = new Subscription("msisdn", SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription = new Subscription("msisdn", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
 
         when(subscriptionService.createSubscription(subscriptionRequest)).thenReturn(subscription);
         

@@ -98,8 +98,8 @@ public class SubscriptionServiceTest {
     public void shouldGetSubscriptionsForAGivenMsisdn() {
         String msisdn = "1234567890";
         ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
-        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS));
-        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS));
+        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now()));
+        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now()));
         when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionsToBeReturned);
 
         List<Subscription> subscriptions = subscriptionService.findByMsisdn(msisdn);
@@ -132,11 +132,11 @@ public class SubscriptionServiceTest {
         String pack = "twelve_months";
         String msisdn = "123456890";
         List<Subscription> subscriptions = new ArrayList<>();
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
         subscription1.setStatus(SubscriptionStatus.ACTIVE);
         subscriptions.add(subscription1);
 
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
         subscription2.setStatus(SubscriptionStatus.COMPLETED);
         subscriptions.add(subscription2);
         when(allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.TWELVE_MONTHS)).thenReturn(subscriptions);

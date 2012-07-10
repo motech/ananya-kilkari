@@ -35,10 +35,10 @@ public class Subscription extends MotechBaseDataObject {
     public Subscription() {
     }
 
-    public Subscription(String msisdn, SubscriptionPack pack) {
+    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt) {
         this.pack = pack;
         this.msisdn = msisdn;
-        this.creationDate = DateTime.now();
+        this.creationDate = createdAt;
         this.status = SubscriptionStatus.NEW;
         this.subscriptionId = UUID.randomUUID().toString();
     }

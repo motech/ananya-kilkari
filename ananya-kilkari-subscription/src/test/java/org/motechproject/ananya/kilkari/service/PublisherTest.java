@@ -44,7 +44,7 @@ public class PublisherTest {
 
     @Test
     public void shouldPublishReportSubscriptionCreationEventIntoQueue() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.TWELVE_MONTHS);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.TWELVE_MONTHS, DateTime.now());
         publisher.reportSubscriptionCreation(new SubscriptionCreationReportRequest(subscription, Channel.IVR, 0, null, null, null, null));
 
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);

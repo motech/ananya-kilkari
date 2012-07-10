@@ -10,7 +10,7 @@ public class SubscriptionTest {
     @Test
     public void shouldInitializeSubscription() {
         DateTime beforeCreation = DateTime.now();
-        Subscription subscription = new Subscription("mymsisdn", SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription = new Subscription("mymsisdn", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         DateTime afterCreation = DateTime.now();
 
         assertEquals(SubscriptionStatus.NEW, subscription.getStatus());
@@ -26,7 +26,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionToPendingDuringActivationRequest() {
-        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         subscription.activationRequested();
 
         assertEquals(SubscriptionStatus.PENDING_ACTIVATION, subscription.getStatus());
@@ -35,7 +35,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionToActiveForSuccessfulActivation() {
-        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String operator = Operator.AIRTEL.name();
         subscription.activate(operator);
 
@@ -45,7 +45,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionToActivationFailedForUnsuccessfulActivation() {
-        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String operator = Operator.AIRTEL.name();
         subscription.activationFailed(operator);
 
@@ -55,8 +55,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionToActivatedAndUpdateRenewalDate() {
-        DateTime renewedDate = DateTime.now();
-        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         subscription.activateOnRenewal();
 
         assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
@@ -64,8 +63,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionSuspendedAndUpdateRenewalDate() {
-        DateTime renewedDate = DateTime.now();
-        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         subscription.suspendOnRenewal();
 
         assertEquals(SubscriptionStatus.SUSPENDED, subscription.getStatus());
@@ -73,8 +71,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionDeactivatedWithDeactivatedDate() {
-        final DateTime deactivationDate = DateTime.now();
-        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         subscription.deactivate();
 
         assertEquals(SubscriptionStatus.DEACTIVATED, subscription.getStatus());
@@ -84,7 +81,7 @@ public class SubscriptionTest {
     public void shouldReturnIsActiveBasedOnStatus() {
         String msisdn = "9876534211";
         SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
-        Subscription subscription = new Subscription(msisdn, pack);
+        Subscription subscription = new Subscription(msisdn, pack, DateTime.now());
 
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         assertTrue(subscription.isActive());

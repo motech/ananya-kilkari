@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.builder;
 
+import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
@@ -79,6 +80,11 @@ public class SubscriptionRequestBuilder {
 
     public SubscriptionRequestBuilder withPanchayat(String panchayat) {
         request.setPanchayat(panchayat);
+        return this;
+    }
+
+    public SubscriptionRequestBuilder withCreatedAt(DateTime createdAt) {
+        request.setCreatedAt(createdAt);
         return this;
     }
 }

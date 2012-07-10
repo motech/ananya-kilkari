@@ -52,7 +52,7 @@ public class ReportingServiceImplTest {
         DateTime dob = DateTime.now().minusMonths(8);
         DateTime edd = DateTime.now().plusMonths(3);
         String name = "name";
-        Subscription subscription = new Subscription(msisdn, pack);
+        Subscription subscription = new Subscription(msisdn, pack, DateTime.now());
         new ReportingServiceImpl(restTemplate, kilkariProperties).createSubscription(new SubscriptionCreationReportRequest(subscription,channel, 42, name, dob, edd, new SubscriberLocation("district", "block", "panchayat")));
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);

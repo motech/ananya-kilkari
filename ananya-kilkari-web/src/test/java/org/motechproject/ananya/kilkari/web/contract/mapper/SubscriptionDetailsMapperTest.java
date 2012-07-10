@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.contract.mapper;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
@@ -10,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 public class SubscriptionDetailsMapperTest {
     @Test
     public void shouldMapFromSubscriptionToSubscriptionDetails() {
-        Subscription subscription = new Subscription("1234", SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription = new Subscription("1234", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
 
         SubscriptionDetails subscriptionDetails = SubscriptionDetailsMapper.mapFrom(subscription);
 

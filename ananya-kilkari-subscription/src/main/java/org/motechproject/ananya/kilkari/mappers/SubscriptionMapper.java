@@ -8,7 +8,7 @@ public class SubscriptionMapper {
     private SubscriptionCreationReportRequest subscriptionCreationReportRequest;
 
     public SubscriptionMapper(SubscriptionRequest subscriptionRequest) {
-        this.subscription = new Subscription(subscriptionRequest.getMsisdn(), SubscriptionPack.from(subscriptionRequest.getPack()));
+        this.subscription = new Subscription(subscriptionRequest.getMsisdn(), SubscriptionPack.from(subscriptionRequest.getPack()), subscriptionRequest.getCreatedAt());
         this.subscriptionActivationRequest = createSubscriptionActivationRequest(subscriptionRequest);
         this.subscriptionCreationReportRequest = createSubscriptionReportRequest(subscriptionRequest);
     }

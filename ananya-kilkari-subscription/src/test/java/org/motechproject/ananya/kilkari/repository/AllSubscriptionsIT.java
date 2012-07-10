@@ -1,15 +1,11 @@
 package org.motechproject.ananya.kilkari.repository;
 
-import org.junit.After;
-import org.junit.Before;
+import org.joda.time.DateTime;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +20,7 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
     public void shouldAddASubscriptionIntoDb() {
         String msisdn = "123456";
 
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
         allSubscriptions.add(subscription);
 
         markForDeletion(subscription);
@@ -44,9 +40,9 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
     public void shouldQueryForSubscriptionsInDbBasedOnGivenMsisdn() {
         String msisdn = "123456";
 
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS);
-        Subscription subscription3 = new Subscription("some_other_msisdn", SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        Subscription subscription3 = new Subscription("some_other_msisdn", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
         allSubscriptions.add(subscription3);
@@ -68,13 +64,13 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
     public void shouldFindSubscriptionByMsisdnAndPack() {
         String msisdn = "123456";
 
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
         allSubscriptions.add(subscription1);
 
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         allSubscriptions.add(subscription2);
 
-        Subscription subscription3 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
+        Subscription subscription3 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
         subscription3.setStatus(SubscriptionStatus.COMPLETED);
         allSubscriptions.add(subscription3);
 
@@ -93,8 +89,8 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
     public void shouldFindSubscriptionBySubscriptionId() {
         String msisdn = "123456";
 
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS);
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
 

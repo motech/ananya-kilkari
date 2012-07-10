@@ -7,7 +7,6 @@ import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
-import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.controller.MessageCampaignVisualizationController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
     public void shouldGetVisualizationForGivenExternalId() throws Exception {
         String msisdn = "9876543210";
         SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
-        Subscription subscription = new Subscription(msisdn, subscriptionPack);
+        Subscription subscription = new Subscription(msisdn, subscriptionPack, DateTime.now());
         allSubscriptions.add(subscription);
         markForDeletion(subscription);
 

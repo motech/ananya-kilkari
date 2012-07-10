@@ -9,7 +9,7 @@ public class SubscriptionCreationReportRequestTest {
 
     @Test
     public void shouldCreateASubscriptionReportRequest() {
-        Subscription subscription = new Subscription("msisdn", SubscriptionPack.FIFTEEN_MONTHS);
+        Subscription subscription = new Subscription("msisdn", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
 
         DateTime edd = DateTime.now().plusMonths(9);

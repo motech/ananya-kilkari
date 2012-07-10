@@ -49,10 +49,9 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldGetMessageTimings() {
         String msisdn = "99880";
-
-        List<Subscription> subscriptions = new ArrayList<>();
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS);
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.SEVEN_MONTHS);
+        List<Subscription> subscriptions = new ArrayList<> ();
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.SEVEN_MONTHS, DateTime.now());
         subscriptions.add(subscription1);
         subscriptions.add(subscription2);
 

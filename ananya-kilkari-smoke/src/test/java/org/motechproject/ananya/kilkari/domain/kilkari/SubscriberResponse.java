@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.response;
+package org.motechproject.ananya.kilkari.domain.kilkari;
 
 import java.util.ArrayList;
 import java.util.List;

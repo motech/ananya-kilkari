@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.response;
+package org.motechproject.ananya.kilkari.domain.kilkari;
 
 public class SubscriptionDetails {
     private String subscriptionId;

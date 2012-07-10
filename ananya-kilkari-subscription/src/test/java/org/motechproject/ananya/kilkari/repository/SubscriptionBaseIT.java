@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:applicationAnanyaKilkariSubscriptionContext.xml")
+@ContextConfiguration("classpath:applicationKilkariSubscriptionContext.xml")
 @ActiveProfiles("test")
 public abstract class SubscriptionBaseIT {
 

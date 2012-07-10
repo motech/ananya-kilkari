@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.domain;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -14,6 +15,59 @@ import java.io.Serializable;
 public class SubscriptionRequest implements Serializable {
     public static final String DATE_TIME_FORMAT = "dd-MM-yyyy";
 
+    public static class Location implements Serializable {
+        private String district;
+        private String block;
+        private String panchayat;
+
+        public String getDistrict() {
+            return district;
+        }
+
+        public void setDistrict(String district) {
+            this.district = district;
+        }
+
+        public String getBlock() {
+            return block;
+        }
+
+        public void setBlock(String block) {
+            this.block = block;
+        }
+
+        public String getPanchayat() {
+            return panchayat;
+        }
+
+        public void setPanchayat(String panchayat) {
+            this.panchayat = panchayat;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Location)) return false;
+
+            Location that = (Location) o;
+
+            return new EqualsBuilder()
+                    .append(this.district, that.district)
+                    .append(this.block, that.block)
+                    .append(this.panchayat, that.panchayat)
+                    .isEquals();
+        }
+
+        @Override
+        public int hashCode() {
+            return new HashCodeBuilder()
+                    .append(this.district)
+                    .append(this.block)
+                    .append(this.panchayat)
+                    .hashCode();
+        }
+    }
+
     private String msisdn;
     private String pack;
     private String channel;
@@ -21,38 +75,38 @@ public class SubscriptionRequest implements Serializable {
     private DateTime createdAt;
     private String beneficiaryName;
     private String beneficiaryAge;
-    private String district;
-    private String block;
-    private String panchayat;
+
     private String expectedDateOfDelivery;
     private String dateOfBirth;
+    private Location location;
 
     public SubscriptionRequest() {
+        this.location = new Location();
         this.createdAt = DateTime.now();
     }
 
     public String getDistrict() {
-        return district;
+        return location == null ? null : location.district;
     }
 
     public void setDistrict(String district) {
-        this.district = district;
+        this.location.district = district;
     }
 
     public String getBlock() {
-        return block;
+        return location == null ? null : location.block;
     }
 
     public void setBlock(String block) {
-        this.block = block;
+        this.location.block = block;
     }
 
     public String getPanchayat() {
-        return panchayat;
+        return location == null ? null : location.panchayat;
     }
 
     public void setPanchayat(String panchayat) {
-        this.panchayat = panchayat;
+        this.location.panchayat = panchayat;
     }
 
     public String getBeneficiaryName() {
@@ -119,6 +173,14 @@ public class SubscriptionRequest implements Serializable {
         this.msisdn = msisdn;
     }
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
     public void validate(SubscriberLocation reportLocation, Subscription existingActiveSubscription) {
         ValidationUtils.assertMsisdn(msisdn);
         ValidationUtils.assertPack(pack);
@@ -143,11 +205,11 @@ public class SubscriptionRequest implements Serializable {
         if (isLocationEmpty())
             return;
         if (reportLocation == null)
-            throw new ValidationException(String.format("Invalid location with district: %s, block: %s, panchayat: %s", district, block, panchayat));
+            throw new ValidationException(String.format("Invalid location with district: %s, block: %s, panchayat: %s", getDistrict(), getBlock(), getPanchayat()));
     }
 
     private boolean isLocationEmpty() {
-        return district == null && block == null && panchayat == null;
+        return getDistrict() == null && getBlock() == null && getPanchayat() == null;
     }
 
     private void validateEDD() {
@@ -188,10 +250,22 @@ public class SubscriptionRequest implements Serializable {
                 .append(this.beneficiaryName, that.beneficiaryName)
                 .append(this.dateOfBirth, that.dateOfBirth)
                 .append(this.expectedDateOfDelivery, that.expectedDateOfDelivery)
-                .append(this.district, that.district)
-                .append(this.block, that.block)
-                .append(this.panchayat, that.panchayat)
+                .append(this.location, that.location)
                 .isEquals();
+    }
 
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(this.msisdn)
+                .append(this.pack)
+                .append(this.channel)
+                .append(this.channel)
+                .append(this.beneficiaryAge)
+                .append(this.beneficiaryName)
+                .append(this.dateOfBirth)
+                .append(this.expectedDateOfDelivery)
+                .append(this.location)
+                .hashCode();
     }
 }

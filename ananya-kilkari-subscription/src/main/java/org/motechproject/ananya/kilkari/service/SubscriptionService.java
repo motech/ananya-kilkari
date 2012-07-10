@@ -1,12 +1,12 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.handlers.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
+import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -84,7 +84,7 @@ public class SubscriptionService {
         });
     }
 
-    public void renewSubscription(String subscriptionId, final DateTime renewedDate, int graceCount) {
+    public void renewSubscription(String subscriptionId, final DateTime renewedDate, Integer graceCount) {
         updateStatusAndReport(subscriptionId, renewedDate, null, null, graceCount, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
@@ -93,7 +93,7 @@ public class SubscriptionService {
         });
     }
 
-    public void suspendSubscription(String subscriptionId, final DateTime renewalDate, String reason, int graceCount) {
+    public void suspendSubscription(String subscriptionId, final DateTime renewalDate, String reason, Integer graceCount) {
         updateStatusAndReport(subscriptionId, renewalDate, reason, null, graceCount, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
@@ -160,12 +160,8 @@ public class SubscriptionService {
     }
 
     private void validateMsisdn(String msisdn) {
-        if (!isValidMsisdn(msisdn))
+        if (PhoneNumber.isNotValid(msisdn))
             throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
-    }
-
-    private boolean isValidMsisdn(String msisdn) {
-        return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
     }
 
     public Subscription findBySubscriptionId(String subscriptionId) {

@@ -6,7 +6,8 @@ public enum CallbackAction {
     ACT, REN, DCT;
 
     public static CallbackAction getFor(String action) {
-        return CallbackAction.valueOf(StringUtils.trimToEmpty(action).toUpperCase());
+        final String standardizedAction = StringUtils.trimToEmpty(action).toUpperCase();
+        return isValid(standardizedAction) ? CallbackAction.valueOf(standardizedAction) : null;
     }
 
     public static boolean isValid(String callbackAction) {

@@ -23,13 +23,16 @@ public class CallbackRequestValidator {
     }
 
     public List<String> validate(CallbackRequestWrapper callbackRequestWrapper) {
-        validateCallbackAction(callbackRequestWrapper.getAction());
-        validateCallbackStatus(callbackRequestWrapper.getStatus());
 
-        errors.addAll(subscriptionService.validate(callbackRequestWrapper));
+        final boolean isValidCallbackAction = validateCallbackAction(callbackRequestWrapper.getAction());
+        final boolean isValidCallbackStatus = validateCallbackStatus(callbackRequestWrapper.getStatus());
+        if (isValidCallbackAction && isValidCallbackStatus) {
+            errors.addAll(subscriptionService.validate(callbackRequestWrapper));
+        }
 
         validateMsisdn(callbackRequestWrapper.getMsisdn());
         validateOperator(callbackRequestWrapper.getOperator());
+
         return errors;
     }
 
@@ -43,14 +46,20 @@ public class CallbackRequestValidator {
             errors.add(String.format("Invalid msisdn %s", msisdn));
     }
 
-    private void validateCallbackAction(String callbackAction) {
-        if (!CallbackAction.isValid(callbackAction))
+    private boolean validateCallbackAction(String callbackAction) {
+        if (!CallbackAction.isValid(callbackAction)) {
             errors.add(String.format("Invalid callbackAction %s", callbackAction));
+            return false;
+        }
+        return true;
     }
 
-    private void validateCallbackStatus(String callbackStatus) {
-        if (!CallbackStatus.isValid(callbackStatus))
+    private boolean validateCallbackStatus(String callbackStatus) {
+        if (!CallbackStatus.isValid(callbackStatus)) {
             errors.add(String.format("Invalid callbackStatus %s", callbackStatus));
+            return false;
+        }
+        return true;
     }
 
     private boolean isValidMsisdn(String msisdn) {

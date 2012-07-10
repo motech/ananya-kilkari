@@ -6,7 +6,8 @@ public enum CallbackStatus {
     FAILURE, SUCCESS, ERROR, BAL_LOW, GRACE, SUS;
 
     public static CallbackStatus getFor(String status) {
-        return CallbackStatus.valueOf(StringUtils.trimToEmpty(status).toUpperCase());
+        final String standardizedStatus = StringUtils.trimToEmpty(status).toUpperCase();
+        return isValid(standardizedStatus) ? CallbackStatus.valueOf(standardizedStatus) : null;
     }
 
     public static boolean isValid(String callbackStatus) {

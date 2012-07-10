@@ -226,7 +226,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldActivateRenewedSubscriptionWhichHadBeenSuspended() { //TODO which is already ACTIVATED?
+    public void shouldActivateRenewedSubscriptionWhichHadBeenSuspended() {
         final String subscriptionId = "sub123";
         DateTime renewalDate = DateTime.now();
         int graceCount = 2;

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -19,10 +21,10 @@ public class CallbackRequestValidatorTest {
     private SubscriptionService subscriptionService;
 
     @Before
-    public void setup(){
+    public void setup() {
         initMocks(this);
     }
-    
+
     @Test
     public void shouldReturnValidIfCallbackRequestDetailsAreCorrect() {
         CallbackRequest callbackRequest = new CallbackRequest();
@@ -119,5 +121,22 @@ public class CallbackRequestValidatorTest {
 
         assertEquals(1, errorsFromValidator.size());
         assertEquals(error, errorsFromValidator.get(0));
+    }
+
+    @Test
+    public void shouldNotInvokeSubscriptionServiceValidationIfCallbackActionOrStatusIsInvalid() {
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setMsisdn("12345");
+        callbackRequest.setAction("Invalid Action");
+        callbackRequest.setStatus(CallbackStatus.BAL_LOW.name());
+        callbackRequest.setOperator(Operator.AIRTEL.name());
+
+        final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now());
+
+        final List<String> errors = new CallbackRequestValidator(subscriptionService).validate(callbackRequestWrapper);
+        verify(subscriptionService, never()).validate(callbackRequestWrapper);
+
+        assertEquals(2, errors.size());
+
     }
 }

@@ -70,7 +70,8 @@ public class KilkariCampaignService {
         }
 
         obdService.scheduleCampaignMessage(subscriptionId, messageId);
-        allCampaignMessageAlerts.remove(campaignMessageAlert);
+        campaignMessageAlert.clear();
+        allCampaignMessageAlerts.update(campaignMessageAlert);
     }
 
     private void processNewCampaignMessageAlert(String subscriptionId, String messageId) {

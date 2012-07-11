@@ -117,7 +117,6 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldUpdateCampaignMessageAlertIfAlreadyExistsAndScheduleCampaignMessageIfRenewed() {
-
         String subscriptionId = "mysubscriptionid";
         String messageId = "mymessageid";
         Subscription subscription = new Subscription();
@@ -130,9 +129,10 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-
         verify(obdService).scheduleCampaignMessage(subscriptionId, messageId);
-        verify(allCampaignMessageAlerts).remove(campaignMessageAlert);
+        assertEquals(null, campaignMessageAlert.getMessageId());
+        assertFalse(campaignMessageAlert.isRenewed());
+        verify(allCampaignMessageAlerts).update(campaignMessageAlert);
     }
 
     @Test

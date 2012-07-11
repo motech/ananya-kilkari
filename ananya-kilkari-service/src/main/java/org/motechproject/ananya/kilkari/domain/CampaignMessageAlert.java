@@ -51,4 +51,9 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
     public boolean canBeScheduled() {
         return renewed && !StringUtil.isNullOrEmpty(messageId);
     }
+
+    public void clear() {
+        messageId = null;
+        renewed = false;
+    }
 }

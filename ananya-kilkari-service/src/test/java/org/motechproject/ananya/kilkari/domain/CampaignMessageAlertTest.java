@@ -44,4 +44,14 @@ public class CampaignMessageAlertTest {
         campaignMessageAlert = new CampaignMessageAlert("subscriptionId", null, true);
         assertFalse(campaignMessageAlert.canBeScheduled());
     }
+
+    @Test
+    public void shouldClearTheMessageIdAndSetRenewToFalse() {
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true);
+
+        campaignMessageAlert.clear();
+
+        assertNull(campaignMessageAlert.getMessageId());
+        assertFalse(campaignMessageAlert.isRenewed());
+    }
 }

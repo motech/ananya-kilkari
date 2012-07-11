@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessages;
@@ -20,6 +22,12 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
 
     @Autowired
     private AllCampaignMessages allCampaignMessages;
+
+    @After
+    @Before
+    public void setUp() {
+        allCampaignMessages.removeAll();
+    }
 
     @Test
     public void shouldDeleteTheCampaignMessageIfItExists() {

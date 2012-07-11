@@ -2,10 +2,10 @@ package org.motechproject.ananya.kilkari.web.domain;
 
 import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.domain.CallbackAction;
-import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.domain.Operator;
-import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -14,11 +14,11 @@ import java.util.List;
 public class CallbackRequestValidator {
 
     private List<String> errors;
-    private SubscriptionService subscriptionService;
+    private KilkariSubscriptionService kilkariSubscriptionService;
 
     @Autowired
-    public CallbackRequestValidator(SubscriptionService subscriptionService) {
-        this.subscriptionService = subscriptionService;
+    public CallbackRequestValidator(KilkariSubscriptionService kilkariSubscriptionService) {
+        this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.errors = new ArrayList<>();
     }
 
@@ -27,7 +27,7 @@ public class CallbackRequestValidator {
         final boolean isValidCallbackAction = validateCallbackAction(callbackRequestWrapper.getAction());
         final boolean isValidCallbackStatus = validateCallbackStatus(callbackRequestWrapper.getStatus());
         if (isValidCallbackAction && isValidCallbackStatus) {
-            errors.addAll(subscriptionService.validate(callbackRequestWrapper));
+            errors.addAll(kilkariSubscriptionService.validate(callbackRequestWrapper));
         }
 
         validateMsisdn(callbackRequestWrapper.getMsisdn());

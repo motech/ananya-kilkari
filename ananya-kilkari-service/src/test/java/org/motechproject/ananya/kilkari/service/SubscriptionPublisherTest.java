@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.*;
+import org.motechproject.ananya.kilkari.request.CallbackRequest;
+import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.scheduler.context.EventContext;
 
 import static org.mockito.Mockito.verify;

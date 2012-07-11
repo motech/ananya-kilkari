@@ -4,9 +4,11 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.CallbackRequest;
-import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.handlers.callback.SubscriptionStateHandler;
+import org.motechproject.ananya.kilkari.request.CallbackRequest;
+import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
+import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;

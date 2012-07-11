@@ -4,14 +4,12 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
-import org.motechproject.ananya.kilkari.handlers.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -110,39 +108,6 @@ public class SubscriptionService {
                 subscription.deactivate();
             }
         });
-    }
-
-    public List<String> validate(CallbackRequestWrapper callbackRequestWrapper) {
-        List<String> errors = new ArrayList<>();
-        final String requestStatus = callbackRequestWrapper.getStatus();
-        final String requestAction = callbackRequestWrapper.getAction();
-        final String subscriptionId = callbackRequestWrapper.getSubscriptionId();
-
-        if (SubscriptionStateHandlerFactory.getHandlerClass(callbackRequestWrapper) == null) {
-            errors.add(String.format("Invalid status %s for action %s", requestStatus, requestAction));
-        }
-
-        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-
-        if (CallbackAction.REN.name().equals(requestAction)) {
-            final SubscriptionStatus subscriptionStatus = subscription.getStatus();
-            if (!(subscriptionStatus.equals(SubscriptionStatus.ACTIVE) || subscriptionStatus.equals(SubscriptionStatus.SUSPENDED)))
-                errors.add(String.format("Cannot renew. Subscription in %s status", subscriptionStatus));
-        }
-
-        if (CallbackAction.DCT.name().equals(requestAction) && CallbackStatus.BAL_LOW.name().equals(requestStatus)) {
-            final SubscriptionStatus subscriptionStatus = subscription.getStatus();
-            if (!subscriptionStatus.equals(SubscriptionStatus.SUSPENDED))
-                errors.add(String.format("Cannot deactivate on renewal. Subscription in %s status", subscriptionStatus));
-        }
-
-        if (CallbackAction.ACT.name().equals(requestAction) && (CallbackStatus.SUCCESS.name().equals(requestStatus) || CallbackStatus.BAL_LOW.name().equals(requestStatus))) {
-            final SubscriptionStatus subscriptionStatus = subscription.getStatus();
-            if (!subscriptionStatus.equals(SubscriptionStatus.PENDING_ACTIVATION))
-                errors.add(String.format("Cannot activate. Subscription in %s status", subscriptionStatus));
-        }
-
-        return errors;
     }
 
     private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Integer graceCount, Action<Subscription> action) {

@@ -4,21 +4,23 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.*;
-import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.domain.CallbackAction;
+import org.motechproject.ananya.kilkari.domain.CallbackStatus;
+import org.motechproject.ananya.kilkari.domain.Operator;
+import org.motechproject.ananya.kilkari.request.CallbackRequest;
+import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class CallbackRequestValidatorTest {
     @Mock
-    private SubscriptionService subscriptionService;
+    private KilkariSubscriptionService kilkariSubscriptionService;
 
     @Before
     public void setup() {
@@ -33,7 +35,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
         callbackRequest.setOperator(Operator.AIRTEL.name());
         new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now());
-        assertTrue(new CallbackRequestValidator(subscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now())).isEmpty());
+        assertTrue(new CallbackRequestValidator(kilkariSubscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now())).isEmpty());
     }
 
     @Test
@@ -42,7 +44,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setMsisdn("12345");
         callbackRequest.setAction(CallbackAction.ACT.name());
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
-        List<String> errors = new CallbackRequestValidator(subscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
+        List<String> errors = new CallbackRequestValidator(kilkariSubscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
         assertFalse(errors.isEmpty());
         assertEquals("Invalid msisdn 12345", errors.get(0));
     }
@@ -53,7 +55,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setMsisdn("123456789a");
         callbackRequest.setAction(CallbackAction.ACT.name());
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
-        List<String> errors = new CallbackRequestValidator(subscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
+        List<String> errors = new CallbackRequestValidator(kilkariSubscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
         assertFalse(errors.isEmpty());
         assertEquals("Invalid msisdn 123456789a", errors.get(0));
     }
@@ -64,7 +66,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setMsisdn("1234567890");
         callbackRequest.setAction("invalid");
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
-        List<String> errors = new CallbackRequestValidator(subscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
+        List<String> errors = new CallbackRequestValidator(kilkariSubscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
         assertFalse(errors.isEmpty());
         assertEquals("Invalid callbackAction invalid", errors.get(0));
     }
@@ -75,7 +77,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setMsisdn("1234567890");
         callbackRequest.setAction(CallbackAction.ACT.name());
         callbackRequest.setStatus("invalid");
-        List<String> errors = new CallbackRequestValidator(subscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
+        List<String> errors = new CallbackRequestValidator(kilkariSubscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
         assertFalse(errors.isEmpty());
         assertEquals("Invalid callbackStatus invalid", errors.get(0));
     }
@@ -87,7 +89,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setAction(CallbackAction.ACT.name());
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
         callbackRequest.setOperator("invalid_operator");
-        List<String> errors = new CallbackRequestValidator(subscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
+        List<String> errors = new CallbackRequestValidator(kilkariSubscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
         assertFalse(errors.isEmpty());
         assertEquals("Invalid operator invalid_operator", errors.get(0));
     }
@@ -99,7 +101,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setAction(CallbackAction.ACT.name());
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
         callbackRequest.setOperator(null);
-        List<String> errors = new CallbackRequestValidator(subscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
+        List<String> errors = new CallbackRequestValidator(kilkariSubscriptionService).validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
         assertFalse(errors.isEmpty());
         assertEquals("Invalid operator null", errors.get(0));
     }
@@ -115,9 +117,9 @@ public class CallbackRequestValidatorTest {
         final ArrayList<String> errorFromService = new ArrayList<>();
         final String error = "Invalid status";
         errorFromService.add(error);
-        when(subscriptionService.validate(callbackRequestWrapper)).thenReturn(errorFromService);
+        when(kilkariSubscriptionService.validate(callbackRequestWrapper)).thenReturn(errorFromService);
 
-        final List<String> errorsFromValidator = new CallbackRequestValidator(subscriptionService).validate(callbackRequestWrapper);
+        final List<String> errorsFromValidator = new CallbackRequestValidator(kilkariSubscriptionService).validate(callbackRequestWrapper);
 
         assertEquals(1, errorsFromValidator.size());
         assertEquals(error, errorsFromValidator.get(0));
@@ -133,8 +135,8 @@ public class CallbackRequestValidatorTest {
 
         final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now());
 
-        final List<String> errors = new CallbackRequestValidator(subscriptionService).validate(callbackRequestWrapper);
-        verify(subscriptionService, never()).validate(callbackRequestWrapper);
+        final List<String> errors = new CallbackRequestValidator(kilkariSubscriptionService).validate(callbackRequestWrapper);
+        verify(kilkariSubscriptionService, never()).validate(callbackRequestWrapper);
 
         assertEquals(2, errors.size());
 

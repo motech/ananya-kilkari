@@ -1,11 +1,11 @@
-package org.motechproject.ananya.kilkari.handlers;
+package org.motechproject.ananya.kilkari.handlers.callback;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.CallbackRequest;
-import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.request.CallbackRequest;
+import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 
 import static org.mockito.Mockito.verify;

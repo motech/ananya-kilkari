@@ -1,15 +1,13 @@
-package org.motechproject.ananya.kilkari.handlers;
+package org.motechproject.ananya.kilkari.domain;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.motechproject.ananya.kilkari.domain.CallbackAction;
-import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 
-class ActionStatus {
+public class ActionStatus {
     private CallbackAction action;
     private CallbackStatus status;
 
-    ActionStatus(CallbackAction action, CallbackStatus status) {
+    public ActionStatus(CallbackAction action, CallbackStatus status) {
         this.action = action;
         this.status = status;
     }

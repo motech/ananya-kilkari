@@ -1,6 +1,6 @@
-package org.motechproject.ananya.kilkari.handlers;
+package org.motechproject.ananya.kilkari.handlers.callback;
 
-import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 
 public class RenewalSuccessHandler extends SubscriptionStateHandler {
     @Override

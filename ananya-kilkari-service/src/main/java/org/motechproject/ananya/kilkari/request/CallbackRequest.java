@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.domain;
+package org.motechproject.ananya.kilkari.request;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;

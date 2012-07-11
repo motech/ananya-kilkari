@@ -2,6 +2,8 @@ package org.motechproject.ananya.kilkari.domain;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.request.CallbackRequest;
+import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;

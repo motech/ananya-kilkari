@@ -1,6 +1,6 @@
-package org.motechproject.ananya.kilkari.handlers;
+package org.motechproject.ananya.kilkari.handlers.callback;
 
-import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 
 public abstract class SubscriptionStateHandler {

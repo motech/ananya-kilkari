@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.domain;
+package org.motechproject.ananya.kilkari.request;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;

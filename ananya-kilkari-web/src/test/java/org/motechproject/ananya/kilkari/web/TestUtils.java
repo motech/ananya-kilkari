@@ -2,10 +2,12 @@ package org.motechproject.ananya.kilkari.web;
 
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Ignore;
 
 import java.io.IOException;
 import java.io.StringWriter;
 
+@Ignore
 public class TestUtils {
     public static String toJson(Object objectToSerialize) {
         ObjectMapper mapper = new ObjectMapper();

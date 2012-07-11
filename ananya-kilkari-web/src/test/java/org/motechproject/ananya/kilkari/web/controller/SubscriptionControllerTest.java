@@ -234,8 +234,18 @@ public class SubscriptionControllerTest {
         callbackRequest.setAction("invalidAction");
         callbackRequest.setStatus("invalidStatus");
         callbackRequest.setOperator("invalidOperator");
+        ArrayList<String> errors = new ArrayList<String>() {
+            {
+                add("Invalid callbackAction invalidAction");
+                add("Invalid callbackStatus invalidStatus");
+                add("Invalid msisdn invalidMsisdn");
+                add("Invalid operator invalidOperator");
+            }
+        };
 
+        when(callbackRequestValidator.validate(any(CallbackRequestWrapper.class))).thenReturn(errors);
         byte[] requestBody = TestUtils.toJson(callbackRequest).getBytes();
+
 
         mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId)

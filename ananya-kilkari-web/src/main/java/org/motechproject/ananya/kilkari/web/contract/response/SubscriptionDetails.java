@@ -4,6 +4,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class SubscriptionDetails {
@@ -25,14 +26,17 @@ public class SubscriptionDetails {
         this.status = status;
     }
 
+    @JsonIgnore
     public String getSubscriptionId() {
         return subscriptionId;
     }
 
+    @JsonIgnore
     public String getPack() {
         return pack;
     }
 
+    @JsonIgnore
     public String getStatus() {
         return status;
     }

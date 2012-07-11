@@ -228,12 +228,6 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldGiveAnErrorMessageWhenCallBackRequestIsInvalid() throws Exception {
-        String subscriptionId = "abcd1234";
-        CallbackRequest callbackRequest = new CallbackRequest();
-        callbackRequest.setMsisdn("invalidMsisdn");
-        callbackRequest.setAction("invalidAction");
-        callbackRequest.setStatus("invalidStatus");
-        callbackRequest.setOperator("invalidOperator");
         ArrayList<String> errors = new ArrayList<String>() {
             {
                 add("Invalid callbackAction invalidAction");
@@ -243,12 +237,12 @@ public class SubscriptionControllerTest {
             }
         };
 
-        when(callbackRequestValidator.validate(any(CallbackRequestWrapper.class))).thenReturn(errors);
-        byte[] requestBody = TestUtils.toJson(callbackRequest).getBytes();
+        byte[] requestBody = TestUtils.toJson(new CallbackRequest()).getBytes();
 
+        when(callbackRequestValidator.validate(any(CallbackRequestWrapper.class))).thenReturn(errors);
 
         mockMvc(subscriptionController)
-                .perform(put("/subscription/" + subscriptionId)
+                .perform(put("/subscription/abcd1234")
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(CONTENT_TYPE_JSON))

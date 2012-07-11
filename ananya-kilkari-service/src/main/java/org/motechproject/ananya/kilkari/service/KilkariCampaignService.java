@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.domain.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
@@ -102,4 +103,7 @@ public class KilkariCampaignService {
         return lockName.intern();
     }
 
+    public void processSuccessfulMessageDelivery(OBDRequestWrapper obdRequestWrapper) {
+        campaignMessageService.deleteCampaignMessage(obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId());
+    }
 }

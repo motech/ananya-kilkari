@@ -5,10 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
-import org.motechproject.ananya.kilkari.domain.Operator;
-import org.motechproject.ananya.kilkari.domain.Subscription;
-import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
@@ -207,5 +204,17 @@ public class KilkariCampaignServiceTest {
 
         verifyZeroInteractions(campaignMessageService);
         verify(allCampaignMessageAlerts, never()).remove(any(CampaignMessageAlert.class));
+    }
+ 
+    @Test
+    public void shouldDeleteOBDRecordOnSuccessfulCampaignMessageDelivery() {
+        OBDRequest obdRequest = new OBDRequest();
+        obdRequest.setCampaignId("WEEK1");
+        String subscriptionId = "subscriptionId";
+        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now());
+
+        kilkariCampaignService.processSuccessfulMessageDelivery(obdRequestWrapper);
+
+        verify(campaignMessageService).deleteCampaignMessage(obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId());
     }
 }

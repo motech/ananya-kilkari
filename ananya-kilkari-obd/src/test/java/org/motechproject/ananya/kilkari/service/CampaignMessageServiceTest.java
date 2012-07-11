@@ -177,4 +177,33 @@ public class CampaignMessageServiceTest {
         verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         verifyZeroInteractions(onMobileOBDGateway);
     }
+
+    @Test
+    public void shouldDeleteTheCampaignMessageOnlyIfItExists() {
+        String subscriptionId = "subscriptionId";
+        String campaignId = "campaignId";
+
+        when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(new CampaignMessage(subscriptionId, campaignId, null, null));
+
+        campaignMessageService.deleteCampaignMessage(subscriptionId, campaignId);
+
+        ArgumentCaptor<CampaignMessage> campaignMessageArgumentCaptor = ArgumentCaptor.forClass(CampaignMessage.class);
+        verify(allCampaignMessages).delete(campaignMessageArgumentCaptor.capture());
+        CampaignMessage campaignMessage = campaignMessageArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, campaignMessage.getSubscriptionId());
+        assertEquals(campaignId, campaignMessage.getMessageId());
+    }
+
+    @Test
+    public void shouldNotDeleteTheCampaignMessageIfItDoesNotExists() {
+        String subscriptionId = "subscriptionId";
+        String campaignId = "campaignId";
+
+        when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(null);
+
+        campaignMessageService.deleteCampaignMessage(subscriptionId, campaignId);
+
+        verify(allCampaignMessages, never()).delete(any(CampaignMessage.class));
+    }
 }

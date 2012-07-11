@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class CampaignMessageServiceIT extends SpringIntegrationTest {
@@ -20,6 +22,30 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
     private AllCampaignMessages allCampaignMessages;
 
     @Test
+    public void shouldDeleteTheCampaignMessageIfItExists() {
+        String subscriptionId = "subscriptionId";
+        String messageId = "messageId";
+        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, null, null));
+
+        campaignMessageService.deleteCampaignMessage(subscriptionId, messageId);
+
+        CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
+        assertNull(campaignMessage);
+    }
+
+    @Test
+    public void shouldNotDeleteTheCampaignMessageIfItDoesNotExists() {
+        String subscriptionId = "subscriptionId";
+        String messageId = "messageId";
+        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, null, null));
+
+        campaignMessageService.deleteCampaignMessage("subscriptionId2", messageId);
+
+        CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
+        assertNotNull(campaignMessage);
+    }
+
+    @Test
     public void shouldSaveTheCampaignMessageToDB() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
@@ -29,8 +55,8 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator);
 
         List<CampaignMessage> all = allCampaignMessages.getAll();
-        for(CampaignMessage campaignMessage: all) {
-            if(equals(new CampaignMessage(subscriptionId, messageId, msisdn, operator), campaignMessage)) {
+        for (CampaignMessage campaignMessage : all) {
+            if (equals(new CampaignMessage(subscriptionId, messageId, msisdn, operator), campaignMessage)) {
                 markForDeletion(campaignMessage);
                 return;
             }
@@ -39,7 +65,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
     }
 
     private boolean equals(CampaignMessage expected, CampaignMessage actual) {
-        if(actual == null) {
+        if (actual == null) {
             return false;
         }
         return new EqualsBuilder()

@@ -47,4 +47,10 @@ public class CampaignMessageService {
             allCampaignMessages.update(message);
         }
     }
+
+    public void deleteCampaignMessage(String subscriptionId, String campaignId) {
+        CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, campaignId);
+        if(campaignMessage != null)
+            allCampaignMessages.delete(campaignMessage);
+    }
 }

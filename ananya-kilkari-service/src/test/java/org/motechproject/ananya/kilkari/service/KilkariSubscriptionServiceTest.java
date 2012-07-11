@@ -65,7 +65,8 @@ public class KilkariSubscriptionServiceTest {
         KilkariMessageCampaignRequest kilkariMessageCampaignRequest = captor.getValue();
         assertNotNull(kilkariMessageCampaignRequest.getExternalId());
         assertEquals(pack.name(),kilkariMessageCampaignRequest.getSubscriptionPack());
-        assertEquals(subscriptionRequest.getCreatedAt(),kilkariMessageCampaignRequest.getSubscriptionCreationDate());
+
+        assertEquals(subscriptionRequest.getCreatedAt().toLocalDate(),kilkariMessageCampaignRequest.getSubscriptionCreationDate().toLocalDate());
     }
 
     @Test

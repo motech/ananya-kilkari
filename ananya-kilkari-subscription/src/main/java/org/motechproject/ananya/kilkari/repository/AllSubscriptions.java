@@ -19,7 +19,6 @@ import java.util.List;
 
 @Repository
 public class AllSubscriptions extends MotechBaseRepository<Subscription> {
-    private final static Logger logger = LoggerFactory.getLogger(AllSubscriptions.class);
 
     @Autowired
     protected AllSubscriptions(@Qualifier("kilkariSubscriptionDbConnector") CouchDbConnector db) {

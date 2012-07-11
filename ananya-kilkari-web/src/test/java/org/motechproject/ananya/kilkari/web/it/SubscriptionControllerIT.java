@@ -53,7 +53,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     private StubOnMobileSubscriptionService onMobileSubscriptionService;
 
     @Before
-    public void setUp()  {
+    public void setUp() {
         allSubscriptions.removeAll();
     }
 
@@ -118,44 +118,39 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
-        BaseResponse actualResponse =  (BaseResponse) new BaseResponse().fromJson(responseString);
+        BaseResponse actualResponse = (BaseResponse) new BaseResponse().fromJson(responseString);
         assertEquals(expectedResponse, actualResponse);
 
-        final Subscription[] subscription = new Subscription[1];
-
-        new TimedRunner(20,1000) {
+        final Subscription subscription = new TimedRunner<Subscription>(20, 1000) {
             @Override
-            boolean run() {
+            Subscription run() {
                 List<Subscription> subscriptionList = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
-                subscription[0] = subscriptionList.isEmpty() ? null : subscriptionList.get(0);
-                return (subscription[0] != null);
-
+                return subscriptionList.isEmpty() ? null : subscriptionList.get(0);
             }
-        }.executeWithTimeout();
+        }.execute();
 
-        assertNotNull(subscription[0]);
-        markForDeletion(subscription[0]);
-        assertEquals(msisdn, subscription[0].getMsisdn());
-        assertEquals(pack, subscription[0].getPack());
-        assertFalse(StringUtils.isBlank(subscription[0].getSubscriptionId()));
+        assertNotNull(subscription);
+        markForDeletion(subscription);
+        assertEquals(msisdn, subscription.getMsisdn());
+        assertEquals(pack, subscription.getPack());
+        assertFalse(StringUtils.isBlank(subscription.getSubscriptionId()));
 
-        final KilkariMessageCampaignEnrollmentRecord[] campaignEnrollmentRecord =
-                new KilkariMessageCampaignEnrollmentRecord[1];
 
-        new TimedRunner(20,1000) {
+        KilkariMessageCampaignEnrollmentRecord campaignEnrollmentRecord = new TimedRunner<KilkariMessageCampaignEnrollmentRecord>(20, 1000) {
             @Override
-            boolean run() {
-                campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
-                        subscription[0].getSubscriptionId(), SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME);
-                return (campaignEnrollmentRecord[0] != null);
+            KilkariMessageCampaignEnrollmentRecord run() {
+                KilkariMessageCampaignEnrollmentRecord enrollmentRecord = kilkariMessageCampaignService.searchEnrollment(
+                        subscription.getSubscriptionId(), SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME);
+                return enrollmentRecord;
             }
-        }.executeWithTimeout();
+        }.execute();
 
-        assertNotNull(campaignEnrollmentRecord[0]);
-        assertEquals(subscription[0].getSubscriptionId(), campaignEnrollmentRecord[0].getExternalId());
-        assertEquals(SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
+
+        assertNotNull(campaignEnrollmentRecord);
+        assertEquals(subscription.getSubscriptionId(), campaignEnrollmentRecord.getExternalId());
+        assertEquals(SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord.getCampaignName());
         List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
-                subscription[0].getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
+                subscription.getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
         assertEquals(48, messageTimings.size());
     }
 
@@ -171,7 +166,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         reportingService.setBehavior(mockedReportingService);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionService.class));
 
-        SubscriptionRequest expectedRequest= new SubscriptionRequestBuilder().withDefaults().build();
+        SubscriptionRequest expectedRequest = new SubscriptionRequestBuilder().withDefaults().build();
         MvcResult result = mockMvc(subscriptionController)
                 .perform(post("/subscription").body(toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -182,44 +177,40 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
-        BaseResponse actualResponse =  (BaseResponse) new BaseResponse().fromJson(responseString);
+        BaseResponse actualResponse = (BaseResponse) new BaseResponse().fromJson(responseString);
         assertEquals(expectedResponse, actualResponse);
 
-        final Subscription[] subscription = new Subscription[1];
-
-        new org.motechproject.ananya.kilkari.web.it.TimedRunner(20, 1000) {
+        final Subscription subscription = new TimedRunner<Subscription>(20, 1000) {
             @Override
-            boolean run() {
-                List<Subscription> subscriptionList = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
-                subscription[0] = subscriptionList.isEmpty() ? null : subscriptionList.get(0);
-                return (subscription[0] != null);
+            Subscription run() {
+                List<Subscription> subscriptions = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
+                return subscriptions.isEmpty() ? null : subscriptions.get(0);
 
             }
-        }.executeWithTimeout();
+        }.execute();
 
-        assertNotNull(subscription[0]);
-        markForDeletion(subscription[0]);
-        assertEquals(msisdn, subscription[0].getMsisdn());
-        assertEquals(pack, subscription[0].getPack());
-        assertFalse(StringUtils.isBlank(subscription[0].getSubscriptionId()));
+        assertNotNull(subscription);
+        markForDeletion(subscription);
+        assertEquals(msisdn, subscription.getMsisdn());
+        assertEquals(pack, subscription.getPack());
+        assertFalse(StringUtils.isBlank(subscription.getSubscriptionId()));
 
-        final KilkariMessageCampaignEnrollmentRecord[] campaignEnrollmentRecord =
-                new KilkariMessageCampaignEnrollmentRecord[1];
 
-        new TimedRunner(20,1000) {
+        KilkariMessageCampaignEnrollmentRecord campaignEnrollmentRecord = new TimedRunner<KilkariMessageCampaignEnrollmentRecord>(20, 1000) {
             @Override
-            boolean run() {
-                campaignEnrollmentRecord[0] = kilkariMessageCampaignService.searchEnrollment(
-                        subscription[0].getSubscriptionId(), SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME);
-                return (campaignEnrollmentRecord[0] != null);
-            }
-        }.executeWithTimeout();
+            KilkariMessageCampaignEnrollmentRecord run() {
+                return kilkariMessageCampaignService.searchEnrollment(
+                        subscription.getSubscriptionId(), SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME);
 
-        assertNotNull(campaignEnrollmentRecord[0]);
-        assertEquals(subscription[0].getSubscriptionId(), campaignEnrollmentRecord[0].getExternalId());
-        assertEquals(SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord[0].getCampaignName());
+            }
+        }.execute();
+
+
+        assertNotNull(campaignEnrollmentRecord);
+        assertEquals(subscription.getSubscriptionId(), campaignEnrollmentRecord.getExternalId());
+        assertEquals(SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord.getCampaignName());
         List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
-                subscription[0].getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
+                subscription.getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
         assertEquals(60, messageTimings.size());
     }
 

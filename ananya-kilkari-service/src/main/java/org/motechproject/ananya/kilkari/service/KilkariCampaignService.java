@@ -59,12 +59,13 @@ public class KilkariCampaignService {
             }
 
             boolean renewed = campaignMessageAlert.isRenewed();
-            processExistingCampaignMessageAlert(subscriptionId, messageId, renewed, campaignMessageAlert);
+            processExistingCampaignMessageAlert(subscription, messageId, renewed, campaignMessageAlert);
         }
     }
 
     public void renewSchedule(String subscriptionId) {
         synchronized (getLockName(subscriptionId)) {
+            Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
             CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
 
             if (campaignMessageAlert == null) {
@@ -73,11 +74,11 @@ public class KilkariCampaignService {
             }
 
             String messageId = campaignMessageAlert.getMessageId();
-            processExistingCampaignMessageAlert(subscriptionId, messageId, true, campaignMessageAlert);
+            processExistingCampaignMessageAlert(subscription, messageId, true, campaignMessageAlert);
         }
     }
 
-    private void processExistingCampaignMessageAlert(String subscriptionId, String messageId, boolean renewed, CampaignMessageAlert campaignMessageAlert) {
+    private void processExistingCampaignMessageAlert(Subscription subscription, String messageId, boolean renewed, CampaignMessageAlert campaignMessageAlert) {
         campaignMessageAlert.updateWith(messageId, renewed);
 
         if (!campaignMessageAlert.canBeScheduled()) {
@@ -85,7 +86,7 @@ public class KilkariCampaignService {
             return;
         }
 
-        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId);
+        campaignMessageService.scheduleCampaignMessage(subscription.getSubscriptionId(), messageId, subscription.getMsisdn(), subscription.getOperator().name());
         campaignMessageAlert.clear();
         allCampaignMessageAlerts.update(campaignMessageAlert);
     }

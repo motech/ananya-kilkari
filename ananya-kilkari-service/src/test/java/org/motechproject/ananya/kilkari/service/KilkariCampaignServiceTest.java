@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.domain.Operator;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
@@ -132,15 +133,22 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldRenewCampaignMessageAlertAndScheduleCampaignMessageIfMessageIdExists() {
-        String subscriptionId = "mysubscriptionid";
         String messageId = "mymessageid";
+        String msisdn = "msisdn";
+        Operator operator = Operator.AIRTEL;
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        subscription.setOperator(operator);
+        String subscriptionId = subscription.getSubscriptionId();
+
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, true);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         kilkariCampaignService.renewSchedule(subscriptionId);
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId);
+        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator.name());
         ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
         verify(allCampaignMessageAlerts).update(captor.capture());
         CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
@@ -150,9 +158,13 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldUpdateCampaignMessageAlertIfAlreadyExistsAndScheduleCampaignMessageIfRenewed() {
-        String subscriptionId = "mysubscriptionid";
         String messageId = "mymessageid";
-        Subscription subscription = new Subscription();
+        String msisdn = "msisdn";
+        Operator operator = Operator.AIRTEL;
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        subscription.setOperator(operator);
+        String subscriptionId = subscription.getSubscriptionId();
+
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId", true);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -162,7 +174,7 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId);
+        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator.name());
         ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
         verify(allCampaignMessageAlerts).update(captor.capture());
         CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();

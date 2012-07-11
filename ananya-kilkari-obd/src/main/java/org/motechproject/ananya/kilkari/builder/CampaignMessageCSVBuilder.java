@@ -9,6 +9,19 @@ import java.util.List;
 public class CampaignMessageCSVBuilder {
 
     public String getCSV(List<CampaignMessage> campaignMessages) {
-        return null;
+        StringBuilder csvContent = new StringBuilder();
+        for(CampaignMessage campaignMessage  : campaignMessages){
+            appendCampaignMessage(csvContent, campaignMessage);
+        }
+        return csvContent.toString();
+    }
+
+    private void appendCampaignMessage(StringBuilder csvContent, CampaignMessage campaignMessage) {
+        csvContent
+                .append(campaignMessage.getMsisdn()).append(",")
+                .append(campaignMessage.getMessageId()).append(",")
+                .append(campaignMessage.getSubscriptionId()).append(",")
+                .append(campaignMessage.getOperator());
+        csvContent.append("\n");
     }
 }

@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.repository;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,11 +9,15 @@ import org.motechproject.ananya.kilkari.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class AllCampaignMessagesIT extends SpringIntegrationTest{
 
@@ -27,40 +32,28 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest{
 
     @Before
     public void setUp() {
-        newCampaignMessage = new CampaignMessage("subscriptionId1", "messageId1");
+        newCampaignMessage = new CampaignMessage("subscriptionId1", "messageId1", "msisdn1", "operator1");
 
-        dncCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2");
+        dncCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", "msisdn2", "operator2");
         dncCampaignMessage.markSent();
         dncCampaignMessage.markDidNotCall();
 
-        newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3");
+        newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3", "msisdn3", "operator3");
         newCampaignMessageSent.markSent();
 
-        dncCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4");
+        dncCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4", "msisdn4", "operator4");
         dncCampaignMessageSent.markSent();
         dncCampaignMessageSent.markDidNotCall();
         dncCampaignMessageSent.markSent();
 
-        dnpCampaignMessage = new CampaignMessage("subscriptionId5", "messageId5");
+        dnpCampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", "msisdn5", "operator5");
         dnpCampaignMessage.markSent();
         dnpCampaignMessage.markDidNotPickup();
 
-        dnpCampaignMessageSent = new CampaignMessage("subscriptionId6", "messageId6");
+        dnpCampaignMessageSent = new CampaignMessage("subscriptionId6", "messageId6", "msisdn6", "operator6");
         dnpCampaignMessageSent.markSent();
         dnpCampaignMessageSent.markDidNotPickup();
         dnpCampaignMessageSent.markSent();
-    }
-
-    @After
-    @Override
-    public void after() {
-        markForDeletion(newCampaignMessage);
-        markForDeletion(newCampaignMessageSent);
-        markForDeletion(dncCampaignMessage);
-        markForDeletion(dncCampaignMessageSent);
-        markForDeletion(dnpCampaignMessage);
-        markForDeletion(dnpCampaignMessageSent);
-        super.after();
     }
 
     @Test
@@ -72,6 +65,13 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest{
         obdDbConnector.create(dncCampaignMessageSent);
         obdDbConnector.create(dnpCampaignMessage);
         obdDbConnector.create(dnpCampaignMessageSent);
+
+        markForDeletion(newCampaignMessage);
+        markForDeletion(newCampaignMessageSent);
+        markForDeletion(dncCampaignMessage);
+        markForDeletion(dncCampaignMessageSent);
+        markForDeletion(dnpCampaignMessage);
+        markForDeletion(dnpCampaignMessageSent);
 
         List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
 
@@ -95,6 +95,13 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest{
         obdDbConnector.create(dncCampaignMessageSent);
         obdDbConnector.create(dnpCampaignMessage);
         obdDbConnector.create(dnpCampaignMessageSent);
+
+        markForDeletion(newCampaignMessage);
+        markForDeletion(newCampaignMessageSent);
+        markForDeletion(dncCampaignMessage);
+        markForDeletion(dncCampaignMessageSent);
+        markForDeletion(dnpCampaignMessage);
+        markForDeletion(dnpCampaignMessageSent);
 
         List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentRetryMessages();
 

@@ -14,9 +14,7 @@
     <artifactId>ananya-kilkari-subscription</artifactId>
 
     <properties>
-        <db.server>localhost</db.server>
         <db.name>motech-subscription</db.name>
-        <db.port>5984</db.port>
     </properties>
 
     <dependencies>

@@ -36,8 +36,8 @@ public class SubscriptionTest {
     @Test
     public void shouldChangeStatusOfSubscriptionToActiveForSuccessfulActivation() {
         Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
-        String operator = Operator.AIRTEL.name();
-        subscription.activate(operator);
+        Operator operator = Operator.AIRTEL;
+        subscription.activate(operator.name());
 
         assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
         assertEquals(operator, subscription.getOperator());
@@ -46,8 +46,8 @@ public class SubscriptionTest {
     @Test
     public void shouldChangeStatusOfSubscriptionToActivationFailedForUnsuccessfulActivation() {
         Subscription subscription = new Subscription("mymsisnd", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
-        String operator = Operator.AIRTEL.name();
-        subscription.activationFailed(operator);
+        Operator operator = Operator.AIRTEL;
+        subscription.activationFailed(operator.name());
 
         assertEquals(SubscriptionStatus.ACTIVATION_FAILED, subscription.getStatus());
         assertEquals(operator, subscription.getOperator());

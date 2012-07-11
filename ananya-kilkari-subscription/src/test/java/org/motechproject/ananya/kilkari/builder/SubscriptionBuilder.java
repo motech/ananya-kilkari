@@ -41,7 +41,7 @@ public class SubscriptionBuilder {
     public Subscription build() {
         Subscription subscription = new Subscription(msisdn, pack, DateTime.now());
         subscription.setStatus(status);
-        subscription.setOperator(operator.name());
+        subscription.setOperator(operator);
         
         return subscription;
     }

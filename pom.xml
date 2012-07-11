@@ -23,6 +23,8 @@
         <motech-contrib.version>0.11</motech-contrib.version>
         <slf4j.version>1.6.1</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <db.server>localhost</db.server>
+        <db.port>5984</db.port>
     </properties>
 
     <distributionManagement>

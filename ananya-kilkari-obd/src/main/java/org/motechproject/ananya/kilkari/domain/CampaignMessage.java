@@ -14,10 +14,16 @@ public class CampaignMessage extends MotechBaseDataObject {
     private String messageId;
 
     @JsonProperty
+    private String msisdn;
+
+    @JsonProperty
+    private String operator;
+
+    @JsonProperty
     private boolean sent;
 
     @JsonProperty
-    private  CampaignMessageStatus status = CampaignMessageStatus.NEW;
+    private CampaignMessageStatus status = CampaignMessageStatus.NEW;
 
     @JsonProperty
     private int retryCount;
@@ -25,9 +31,11 @@ public class CampaignMessage extends MotechBaseDataObject {
     public CampaignMessage() {
     }
 
-    public CampaignMessage(String subscriptionId, String messageId) {
+    public CampaignMessage(String subscriptionId, String messageId, String msisdn, String operator) {
         this.subscriptionId = subscriptionId;
         this.messageId = messageId;
+        this.msisdn = msisdn;
+        this.operator = operator;
     }
 
     public String getSubscriptionId() {
@@ -36,6 +44,14 @@ public class CampaignMessage extends MotechBaseDataObject {
 
     public String getMessageId() {
         return messageId;
+    }
+
+    public String getMsisdn() {
+        return msisdn;
+    }
+
+    public String getOperator() {
+        return operator;
     }
 
     public boolean isSent() {

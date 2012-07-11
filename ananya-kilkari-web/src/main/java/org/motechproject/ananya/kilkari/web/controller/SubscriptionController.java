@@ -55,7 +55,7 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.PUT)
     @ResponseBody
-    public BaseResponse activateSubscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
+    public BaseResponse subscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
         final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
         List<String> validationErrors = new CallbackRequestValidator(kilkariSubscriptionService).validate(callbackRequestWrapper);
         if (!(validationErrors.isEmpty())) {

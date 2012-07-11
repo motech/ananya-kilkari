@@ -23,6 +23,7 @@ import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetails;
+import org.motechproject.ananya.kilkari.web.domain.CallbackRequestValidator;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
@@ -36,23 +37,21 @@ import static org.springframework.test.web.server.request.MockMvcRequestBuilders
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 
+
 public class SubscriptionControllerTest {
     private SubscriptionController subscriptionController;
-
     @Mock
     private Subscription mockedSubscription;
-
     @Mock
     private KilkariSubscriptionService kilkariSubscriptionService;
-
     @Mock
     private SubscriptionRequestValidator subscriptionRequestValidator;
-
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-
     @Mock
     private SubscriptionService subscriptionService;
+    @Mock
+    private CallbackRequestValidator callbackRequestValidator;
 
     private static final String CONTENT_TYPE_JAVASCRIPT = "application/javascript;charset=UTF-8";
     private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
@@ -61,7 +60,7 @@ public class SubscriptionControllerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, subscriptionService, subscriptionRequestValidator);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService, subscriptionRequestValidator, callbackRequestValidator);
     }
 
     @Test
@@ -259,6 +258,7 @@ public class SubscriptionControllerTest {
         callbackRequest.setOperator(Operator.AIRTEL.name());
         callbackRequest.setGraceCount("2");
         byte[] requestBody = TestUtils.toJson(callbackRequest).getBytes();
+        when(callbackRequestValidator.validate(any(CallbackRequestWrapper.class))).thenReturn(new ArrayList<String>());
 
         mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId)

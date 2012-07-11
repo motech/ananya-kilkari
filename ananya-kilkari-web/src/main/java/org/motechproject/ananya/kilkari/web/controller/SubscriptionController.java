@@ -2,8 +2,9 @@ package org.motechproject.ananya.kilkari.web.controller;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.domain.*;
-import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
+import org.motechproject.ananya.kilkari.domain.Channel;
+import org.motechproject.ananya.kilkari.domain.Subscription;
+import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
@@ -23,14 +24,14 @@ import java.util.List;
 public class SubscriptionController {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
-    private SubscriptionService subscriptionService;
     private SubscriptionRequestValidator subscriptionRequestValidator;
+    private CallbackRequestValidator callbackRequestValidator;
 
     @Autowired
-    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, SubscriptionService subscriptionService, SubscriptionRequestValidator subscriptionRequestValidator) {
+    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, SubscriptionRequestValidator subscriptionRequestValidator, CallbackRequestValidator callbackRequestValidator) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
-        this.subscriptionService = subscriptionService;
         this.subscriptionRequestValidator = subscriptionRequestValidator;
+        this.callbackRequestValidator = callbackRequestValidator;
     }
 
 
@@ -57,7 +58,7 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse subscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
         final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
-        List<String> validationErrors = new CallbackRequestValidator(kilkariSubscriptionService).validate(callbackRequestWrapper);
+        List<String> validationErrors = callbackRequestValidator.validate(callbackRequestWrapper);
         if (!(validationErrors.isEmpty())) {
             return BaseResponse.failure(String.format("Callback Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
         }

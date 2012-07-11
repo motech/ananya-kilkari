@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 
 import static org.mockito.Mockito.verify;
@@ -14,12 +15,14 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class RenewalSuccessHandlerTest {
     @Mock
     private SubscriptionService subscriptionService;
+    @Mock
+    private KilkariCampaignService kilkariCampaignService;
     private RenewalSuccessHandler renewalSuccessHandler;
 
     @Before
     public void setup(){
         initMocks(this);
-        renewalSuccessHandler = new RenewalSuccessHandler(subscriptionService);
+        renewalSuccessHandler = new RenewalSuccessHandler(subscriptionService, kilkariCampaignService);
     }
 
     @Test
@@ -33,5 +36,6 @@ public class RenewalSuccessHandlerTest {
         renewalSuccessHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now));
 
         verify(subscriptionService).renewSubscription(subscriptionId, now, Integer.valueOf(graceCount));
+        verify(kilkariCampaignService).renewSchedule(subscriptionId);
     }
 }

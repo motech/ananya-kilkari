@@ -13,7 +13,7 @@ public class AllCampaignMessageAlertsIT extends SpringIntegrationTest {
     private AllCampaignMessageAlerts allCampaignMessageAlerts;
 
     @Test
-    public void shouldReturnTheCampaignMessageAlertIfexists() {
+    public void shouldReturnTheCampaignMessageAlertIfExists() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
         CampaignMessageAlert actualCampaignMessage = new CampaignMessageAlert(subscriptionId, messageId, true);

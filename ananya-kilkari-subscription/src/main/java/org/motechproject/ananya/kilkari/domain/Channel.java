@@ -9,6 +9,10 @@ public enum Channel {
         return Channel.IVR.name().equalsIgnoreCase(StringUtils.trim(channel));
     }
 
+    public static boolean isCallCenter(String channel) {
+        return Channel.CALL_CENTER.name().equalsIgnoreCase(StringUtils.trim(channel));
+    }
+
     public static Channel from(String string) {
         return Channel.valueOf(StringUtils.trimToEmpty(string).toUpperCase());
     }

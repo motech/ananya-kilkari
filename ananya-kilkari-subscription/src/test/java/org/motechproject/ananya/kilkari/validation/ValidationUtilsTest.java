@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.validation;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -100,5 +101,39 @@ public class ValidationUtilsTest {
         expectedException.expectMessage(is("Invalid msisdn 123456789a"));
 
         ValidationUtils.assertMsisdn("123456789a");
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenAssertingNullForNotNull() {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("invalid");
+
+        ValidationUtils.assertNotNull(null, "invalid");
+    }
+
+    @Test
+    public void shouldNotThrowExceptionWhenAssertingNotNullForNotNull() {
+        try {
+            ValidationUtils.assertNotNull(new Object(), "invalid");
+        } catch (ValidationException e) {
+            Assert.fail("ValidationException not expected");
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenAssertingNotNullForNull() {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("invalid");
+
+        ValidationUtils.assertNull(new Object(), "invalid");
+    }
+
+    @Test
+    public void shouldNotThrowExceptionWhenAssertingNullForNull() {
+        try {
+            ValidationUtils.assertNull(null, "invalid");
+        } catch (ValidationException e) {
+            Assert.fail("ValidationException not expected");
+        }
     }
 }

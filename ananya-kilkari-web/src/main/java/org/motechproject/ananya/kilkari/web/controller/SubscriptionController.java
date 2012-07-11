@@ -8,6 +8,7 @@ import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.validator.SubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
@@ -22,14 +23,14 @@ import java.util.List;
 public class SubscriptionController {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
-    private ReportingGateway reportingGateway;
     private SubscriptionService subscriptionService;
+    private SubscriptionRequestValidator subscriptionRequestValidator;
 
     @Autowired
-    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, ReportingGateway reportingGateway, SubscriptionService subscriptionService) {
+    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, SubscriptionService subscriptionService, SubscriptionRequestValidator subscriptionRequestValidator) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
-        this.reportingGateway = reportingGateway;
         this.subscriptionService = subscriptionService;
+        this.subscriptionRequestValidator = subscriptionRequestValidator;
     }
 
 
@@ -42,11 +43,10 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse createSubscription(@RequestBody SubscriptionRequest subscriptionRequest) {
-        if (!Channel.isIVR(subscriptionRequest.getChannel())) {
-            SubscriberLocation reportLocation = reportingGateway.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat());
-            Subscription existingSubscription = subscriptionService.findActiveSubscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack());
+        subscriptionRequest.validateChannel();
 
-            subscriptionRequest.validate(reportLocation, existingSubscription);
+        if (Channel.isCallCenter(subscriptionRequest.getChannel())) {
+            subscriptionRequestValidator.validate(subscriptionRequest);
         }
 
         kilkariSubscriptionService.createSubscription(subscriptionRequest);

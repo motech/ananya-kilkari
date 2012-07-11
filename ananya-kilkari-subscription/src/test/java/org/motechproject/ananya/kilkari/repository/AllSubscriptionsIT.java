@@ -101,4 +101,25 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
         assertNotNull(filteredSubscription);
         assertEquals(subscription1, filteredSubscription);
     }
+
+    @Test
+    public void shouldFindSubscriptionInProgress() {
+        String pack = "twelve_months";
+        String msisdn = "123456890";
+
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
+        subscription1.setStatus(SubscriptionStatus.ACTIVE);
+        allSubscriptions.add(subscription1);
+
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
+        subscription2.setStatus(SubscriptionStatus.COMPLETED);
+        allSubscriptions.add(subscription2);
+
+        markForDeletion(subscription1);
+        markForDeletion(subscription2);
+
+        Subscription actualSubscription = allSubscriptions.findSubscriptionInProgress(msisdn, pack);
+
+        assertEquals(subscription1, actualSubscription);
+    }
 }

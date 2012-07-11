@@ -84,18 +84,18 @@ public class SubscriptionTest {
         Subscription subscription = new Subscription(msisdn, pack, DateTime.now());
 
         subscription.setStatus(SubscriptionStatus.ACTIVE);
-        assertTrue(subscription.isActive());
+        assertTrue(subscription.isInProgress());
 
         subscription.setStatus(SubscriptionStatus.COMPLETED);
-        assertFalse(subscription.isActive());
+        assertFalse(subscription.isInProgress());
 
         subscription.setStatus(SubscriptionStatus.NEW);
-        assertTrue(subscription.isActive());
+        assertTrue(subscription.isInProgress());
 
         subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
-        assertTrue(subscription.isActive());
+        assertTrue(subscription.isInProgress());
 
         subscription.setStatus(SubscriptionStatus.DEACTIVATED);
-        assertFalse(subscription.isActive());
+        assertFalse(subscription.isInProgress());
     }
 }

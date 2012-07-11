@@ -3,9 +3,9 @@ package org.motechproject.ananya.kilkari.service;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.validator.SubscriptionRequestValidator;
 import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,20 +17,19 @@ public class SubscriptionService {
     private AllSubscriptions allSubscriptions;
 
     private Publisher publisher;
-    private ReportingGateway reportingGateway;
+
+    private SubscriptionRequestValidator subscriptionRequestValidator;
 
     @Autowired
-    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher, ReportingGateway reportingGateway) {
+    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher, SubscriptionRequestValidator subscriptionRequestValidator) {
         this.allSubscriptions = allSubscriptions;
         this.publisher = publisher;
-        this.reportingGateway = reportingGateway;
+        this.subscriptionRequestValidator = subscriptionRequestValidator;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest) {
-        SubscriberLocation reportLocation = reportingGateway.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat());
-        Subscription existingSubscription = findActiveSubscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack());
 
-        subscriptionRequest.validate(reportLocation, existingSubscription);
+        validate(subscriptionRequest);
 
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper(subscriptionRequest);
         Subscription subscription = subscriptionMapper.getSubscription();
@@ -42,18 +41,15 @@ public class SubscriptionService {
         return subscription;
     }
 
+    private void validate(SubscriptionRequest subscriptionRequest) {
+        if (Channel.isIVR(subscriptionRequest.getChannel())) {
+            subscriptionRequestValidator.validate(subscriptionRequest);
+        }
+    }
+
     public List<Subscription> findByMsisdn(String msisdn) {
         validateMsisdn(msisdn);
         return allSubscriptions.findByMsisdn(msisdn);
-    }
-
-    public Subscription findActiveSubscription(String msisdn, String pack) {
-        List<Subscription> allSubscriptionsByMsisdnAndPack = allSubscriptions.findByMsisdnAndPack(msisdn, SubscriptionPack.from(pack));
-        for (Subscription subscription : allSubscriptionsByMsisdnAndPack) {
-            if (subscription.isActive())
-                return subscription;
-        }
-        return null;
     }
 
     public void activate(String subscriptionId, DateTime activatedOn, final String operator) {
@@ -110,6 +106,10 @@ public class SubscriptionService {
         });
     }
 
+    public Subscription findBySubscriptionId(String subscriptionId) {
+        return allSubscriptions.findBySubscriptionId(subscriptionId);
+    }
+
     private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Integer graceCount, Action<Subscription> action) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         action.perform(subscription);
@@ -128,9 +128,5 @@ public class SubscriptionService {
     private void validateMsisdn(String msisdn) {
         if (PhoneNumber.isNotValid(msisdn))
             throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
-    }
-
-    public Subscription findBySubscriptionId(String subscriptionId) {
-        return allSubscriptions.findBySubscriptionId(subscriptionId);
     }
 }

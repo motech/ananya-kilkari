@@ -56,4 +56,14 @@ public class ValidationUtils {
         if (PhoneNumber.isNotValid(msisdn))
             throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
     }
+
+    public static void assertNotNull(Object object, String message) {
+        if (object == null)
+            throw new ValidationException(message);
+    }
+
+    public static void assertNull(Object object, String message) {
+        if (object != null)
+            throw new ValidationException(message);
+    }
 }

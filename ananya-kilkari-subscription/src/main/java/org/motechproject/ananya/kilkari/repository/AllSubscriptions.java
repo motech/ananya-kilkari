@@ -7,9 +7,8 @@ import org.ektorp.support.GenerateView;
 import org.ektorp.support.View;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.domain.Subscriptions;
 import org.motechproject.dao.MotechBaseRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -46,4 +45,10 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
         List<Subscription> subscriptionsByPackAndMsisdn = queryView("find_by_msisdn_and_pack", ComplexKey.of(msisdn, pack));
         return subscriptionsByPackAndMsisdn == null ? Collections.EMPTY_LIST : subscriptionsByPackAndMsisdn;
     }
+
+    public Subscription findSubscriptionInProgress(String msisdn, String pack) {
+        List<Subscription> allSubscriptionsByMsisdnAndPack = findByMsisdnAndPack(msisdn, SubscriptionPack.from(pack));
+        return new Subscriptions(allSubscriptionsByMsisdnAndPack).subscriptionInProgress();
+    }
+
 }

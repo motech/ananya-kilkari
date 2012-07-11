@@ -49,4 +49,21 @@ public class ChannelTest {
         assertFalse(Channel.isIVR("abc"));
         assertFalse(Channel.isIVR("CALL_CENTER"));
     }
+
+    @Test
+    public void shouldReturnTrueIfChannelIsCallCenter() {
+        assertTrue(Channel.isCallCenter("call_center"));
+        assertTrue(Channel.isCallCenter("CALL_CENTER"));
+        assertTrue(Channel.isCallCenter("CALL_center"));
+        assertTrue(Channel.isCallCenter(" Call_center "));
+    }
+
+    @Test
+    public void shouldReturnFalseIfChannelIsNotCallCenter() {
+        assertFalse(Channel.isCallCenter(""));
+        assertFalse(Channel.isCallCenter(" "));
+        assertFalse(Channel.isCallCenter(null));
+        assertFalse(Channel.isCallCenter("abc"));
+        assertFalse(Channel.isCallCenter("ivr"));
+    }
 }

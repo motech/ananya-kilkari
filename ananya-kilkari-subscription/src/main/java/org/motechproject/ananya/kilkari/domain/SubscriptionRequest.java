@@ -7,8 +7,6 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
-import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.validation.ValidationUtils;
 
 import java.io.Serializable;
@@ -46,6 +44,7 @@ public class SubscriptionRequest implements Serializable {
                     .append(this.panchayat)
                     .hashCode();
         }
+
     }
 
     @JsonProperty
@@ -177,34 +176,23 @@ public class SubscriptionRequest implements Serializable {
         this.msisdn = msisdn;
     }
 
-    public void validate(SubscriberLocation reportLocation, Subscription existingActiveSubscription) {
+    public void validate() {
         ValidationUtils.assertMsisdn(msisdn);
         ValidationUtils.assertPack(pack);
-        ValidationUtils.assertChannel(channel);
-        validateIfAlreadySubscribed(existingActiveSubscription);
+        validateChannel();
         if (!Channel.isIVR(channel)) {
             validateAge();
             validateDOB();
             validateEDD();
-            validateLocation(reportLocation);
         }
     }
 
-    private void validateIfAlreadySubscribed(Subscription existingActiveSubscription) {
-        if (existingActiveSubscription == null)
-            return;
-        throw new DuplicateSubscriptionException(String.format("Subscription already exists for msisdn: %s, pack: %s",
-                msisdn, pack));
+    public void validateChannel() {
+        ValidationUtils.assertChannel(channel);
     }
 
-    private void validateLocation(SubscriberLocation reportLocation) {
-        if (isLocationEmpty())
-            return;
-        if (reportLocation == null)
-            throw new ValidationException(String.format("Invalid location with district: %s, block: %s, panchayat: %s", getDistrict(), getBlock(), getPanchayat()));
-    }
-
-    private boolean isLocationEmpty() {
+    @JsonIgnore
+    public boolean isLocationEmpty() {
         return getDistrict() == null && getBlock() == null && getPanchayat() == null;
     }
 

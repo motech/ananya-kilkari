@@ -48,7 +48,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldGetMessageTimings() {
         String msisdn = "99880";
-        List<Subscription> subscriptions = new ArrayList<> ();
+        List<Subscription> subscriptions = new ArrayList<>();
         Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.SEVEN_MONTHS, DateTime.now());
         subscriptions.add(subscription1);
@@ -141,9 +141,11 @@ public class KilkariCampaignServiceTest {
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
         verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId);
-        assertEquals(null, campaignMessageAlert.getMessageId());
-        assertFalse(campaignMessageAlert.isRenewed());
-        verify(allCampaignMessageAlerts).update(campaignMessageAlert);
+        ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
+        verify(allCampaignMessageAlerts).update(captor.capture());
+        CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
+        assertNull(actualCampaignMessageAlert.getMessageId());
+        assertFalse(actualCampaignMessageAlert.isRenewed());
     }
 
     @Test
@@ -160,11 +162,12 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-
         verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId);
-        assertEquals(null, campaignMessageAlert.getMessageId());
-        assertFalse(campaignMessageAlert.isRenewed());
-        verify(allCampaignMessageAlerts).update(campaignMessageAlert);
+        ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
+        verify(allCampaignMessageAlerts).update(captor.capture());
+        CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
+        assertNull(actualCampaignMessageAlert.getMessageId());
+        assertFalse(actualCampaignMessageAlert.isRenewed());
     }
 
     @Test

@@ -1,7 +1,5 @@
 package org.motechproject.ananya.kilkari.repository;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.CampaignMessage;
@@ -9,17 +7,11 @@ import org.motechproject.ananya.kilkari.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static junit.framework.Assert.*;
 
-public class AllCampaignMessagesIT extends SpringIntegrationTest{
+public class AllCampaignMessagesIT extends SpringIntegrationTest {
 
     @Autowired
     private AllCampaignMessages allCampaignMessages;
@@ -58,7 +50,6 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest{
 
     @Test
     public void shouldReturnAllTheUnsentNewMessages() {
-
         obdDbConnector.create(newCampaignMessage);
         obdDbConnector.create(newCampaignMessageSent);
         obdDbConnector.create(dncCampaignMessage);

@@ -6,7 +6,6 @@ import org.motechproject.ananya.kilkari.domain.CampaignMessage;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class CampaignMessageCSVBuilderTest {
     @Test

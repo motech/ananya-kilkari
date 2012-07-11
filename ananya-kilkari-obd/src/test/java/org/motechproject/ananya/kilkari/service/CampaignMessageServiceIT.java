@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 public class CampaignMessageServiceIT extends SpringIntegrationTest {
@@ -29,15 +28,14 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
 
         campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator);
 
-
         List<CampaignMessage> all = allCampaignMessages.getAll();
         for(CampaignMessage campaignMessage: all) {
             if(equals(new CampaignMessage(subscriptionId, messageId, msisdn, operator), campaignMessage)) {
+                markForDeletion(campaignMessage);
                 return;
             }
         }
         fail("Should have found created campaign message");
-
     }
 
     private boolean equals(CampaignMessage expected, CampaignMessage actual) {

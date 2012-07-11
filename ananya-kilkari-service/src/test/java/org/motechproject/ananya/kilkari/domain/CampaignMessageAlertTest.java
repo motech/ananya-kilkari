@@ -54,4 +54,16 @@ public class CampaignMessageAlertTest {
         assertNull(campaignMessageAlert.getMessageId());
         assertFalse(campaignMessageAlert.isRenewed());
     }
+
+    @Test
+    public void shouldUpdateWithMessageIdAndSetRenewStatus() {
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true);
+        String expectedMessageId = "newMessageId";
+        boolean expectedRenew = false;
+
+        campaignMessageAlert.updateWith(expectedMessageId, expectedRenew);
+
+        assertEquals(expectedMessageId, campaignMessageAlert.getMessageId());
+        assertEquals(expectedRenew, campaignMessageAlert.isRenewed());
+    }
 }

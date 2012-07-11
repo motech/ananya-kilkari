@@ -19,8 +19,7 @@ import java.util.Map;
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -113,6 +112,38 @@ public class KilkariCampaignServiceTest {
 
         verifyZeroInteractions(obdService);
         verify(allCampaignMessageAlerts, never()).remove(any(CampaignMessageAlert.class));
+    }
+
+    @Test
+    public void shouldAddCampaignMessageAlertOnRenewIfItDoesNotExist() {
+        String subscriptionId = "mysubscriptionid";
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
+
+        kilkariCampaignService.renewSchedule(subscriptionId);
+
+        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
+        verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
+        CampaignMessageAlert value = campaignMessageAlertArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, value.getSubscriptionId());
+        assertNull(value.getMessageId());
+        assertTrue(value.isRenewed());
+    }
+
+    @Test
+    public void shouldRenewCampaignMessageAlertAndScheduleCampaignMessageIfMessageIdExists() {
+        String subscriptionId = "mysubscriptionid";
+        String messageId = "mymessageid";
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, true);
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
+
+        kilkariCampaignService.renewSchedule(subscriptionId);
+
+        verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
+        verify(obdService).scheduleCampaignMessage(subscriptionId, messageId);
+        assertEquals(null, campaignMessageAlert.getMessageId());
+        assertFalse(campaignMessageAlert.isRenewed());
+        verify(allCampaignMessageAlerts).update(campaignMessageAlert);
     }
 
     @Test

@@ -44,10 +44,6 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
         return renewed;
     }
 
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
-    }
-
     public boolean canBeScheduled() {
         return renewed && !StringUtil.isNullOrEmpty(messageId);
     }
@@ -55,5 +51,10 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
     public void clear() {
         messageId = null;
         renewed = false;
+    }
+
+    public void updateWith(String messageId, boolean renewed) {
+        this.messageId = messageId;
+        this.renewed = renewed;
     }
 }

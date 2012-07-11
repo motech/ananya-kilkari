@@ -20,7 +20,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class OBDSchedulerTest {
 
     @Mock
-    FreshMessagesSenderJob freshMessagesSenderJob;
+    NewMessagesSenderJob newMessagesSenderJob;
     @Mock
     RetryMessagesSenderJob retryMessagesSenderJob;
     @Mock
@@ -32,14 +32,14 @@ public class OBDSchedulerTest {
     }
 
     @Test
-    public void shouldScheduleAFreshAndRetryMessage() {
+    public void shouldScheduleANewAndRetryMessageJobs() {
 
-        CronSchedulableJob cronSchedulableJobForFreshMessages = new CronSchedulableJob(new MotechEvent("subject.fresh"), "cronexpression.fresh");
+        CronSchedulableJob cronSchedulableJobForNewMessages = new CronSchedulableJob(new MotechEvent("subject.new"), "cronexpression.new");
         CronSchedulableJob cronSchedulableJobForRetryMessages = new CronSchedulableJob(new MotechEvent("subject.retry"), "cronexpression.retry");
-        when(freshMessagesSenderJob.getCronJob()).thenReturn(cronSchedulableJobForFreshMessages);
+        when(newMessagesSenderJob.getCronJob()).thenReturn(cronSchedulableJobForNewMessages);
         when(retryMessagesSenderJob.getCronJob()).thenReturn(cronSchedulableJobForRetryMessages);
 
-        new OBDScheduler(schedulerService, freshMessagesSenderJob, retryMessagesSenderJob);
+        new OBDScheduler(schedulerService, newMessagesSenderJob, retryMessagesSenderJob);
 
         ArgumentCaptor<CronSchedulableJob> captor = ArgumentCaptor.forClass(CronSchedulableJob.class);
         verify(schedulerService, times(2)).safeScheduleJob(captor.capture());
@@ -47,7 +47,7 @@ public class OBDSchedulerTest {
         List<CronSchedulableJob> cronSchedulableJobs = captor.getAllValues();
 
         assertEquals(2, cronSchedulableJobs.size());
-        assertTrue(cronSchedulableJobs.contains(cronSchedulableJobForFreshMessages));
+        assertTrue(cronSchedulableJobs.contains(cronSchedulableJobForNewMessages));
         assertTrue(cronSchedulableJobs.contains(cronSchedulableJobForRetryMessages));
     }
 

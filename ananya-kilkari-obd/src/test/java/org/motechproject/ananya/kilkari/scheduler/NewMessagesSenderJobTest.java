@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class FreshMessagesSenderJobTest {
+public class NewMessagesSenderJobTest {
     @Mock
     private Properties obdProperties;
 
@@ -30,9 +30,9 @@ public class FreshMessagesSenderJobTest {
     @Test
     public void shouldScheduleCronJobsAtConstruction() {
         String cronJobExpression = "mycronjobexpression";
-        when(obdProperties.getProperty("obd.fresh.messages.job.cron.expression")).thenReturn(cronJobExpression);
+        when(obdProperties.getProperty("obd.new.messages.job.cron.expression")).thenReturn(cronJobExpression);
 
-        CronSchedulableJob cronSchedulableJob = new FreshMessagesSenderJob(campaignMessageService, obdProperties).getCronJob();
+        CronSchedulableJob cronSchedulableJob = new NewMessagesSenderJob(campaignMessageService, obdProperties).getCronJob();
 
         assertEquals(cronJobExpression, cronSchedulableJob.getCronExpression());
         assertNull(cronSchedulableJob.getEndTime());
@@ -41,13 +41,13 @@ public class FreshMessagesSenderJobTest {
         assertFalse(startDateTime.isAfter(DateTime.now()));
 
         MotechEvent motechEvent = cronSchedulableJob.getMotechEvent();
-        assertEquals(FreshMessagesSenderJob.SEND_FRESH_MESSAGES, motechEvent.getSubject());
+        assertEquals(NewMessagesSenderJob.SEND_NEW_MESSAGES, motechEvent.getSubject());
     }
 
     @Test
-    public void shouldInvokeCampaignMessageServiceToSendFreshMessagesToOBD() {
-        FreshMessagesSenderJob freshMessagesSenderJob = new FreshMessagesSenderJob(campaignMessageService, obdProperties);
-        freshMessagesSenderJob.sendMessages(new MotechEvent(""));
-        verify(campaignMessageService).sendFreshMessages();
+    public void shouldInvokeCampaignMessageServiceToSendNewMessagesToOBD() {
+        NewMessagesSenderJob newMessagesSenderJob = new NewMessagesSenderJob(campaignMessageService, obdProperties);
+        newMessagesSenderJob.sendMessages(new MotechEvent(""));
+        verify(campaignMessageService).sendNewMessages();
     }
 }

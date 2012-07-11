@@ -13,24 +13,34 @@ import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 @Component
 public class OnMobileOBDGateway {
 
     private HttpClient obdHttpClient;
+    private Properties obdProperties;
 
     private static final Logger logger = LoggerFactory.getLogger(OnMobileOBDGateway.class);
+    private static final String DELIVERY_URL_PROPERTY = "obd.message.delivery.url";
+    private static final String DELIVERY_FILENAME_PROPERTY = "obd.message.delivery.filename";
+    private static final String DELIVERY_FILE_PROPERTY = "obd.message.delivery.file";
 
     @Autowired
-    public OnMobileOBDGateway(HttpClient obdHttpClient) {
+    public OnMobileOBDGateway(HttpClient obdHttpClient, Properties obdProperties) {
         this.obdHttpClient = obdHttpClient;
+        this.obdProperties = obdProperties;
     }
 
     public void send(String content) {
-        HttpPost httpPost = new HttpPost("https://www.commcarehq.org/a/ananya-care/receiver/");
-        InputStreamBody inputStreamBody = new InputStreamBody(new ByteArrayInputStream(content.getBytes()), "file.csv");
+        String url = obdProperties.getProperty(DELIVERY_URL_PROPERTY);
+        String fileName = obdProperties.getProperty(DELIVERY_FILENAME_PROPERTY);
+        String file = obdProperties.getProperty(DELIVERY_FILE_PROPERTY);
+
+        HttpPost httpPost = new HttpPost(url);
+        InputStreamBody inputStreamBody = new InputStreamBody(new ByteArrayInputStream(content.getBytes()), fileName);
         MultipartEntity reqEntity = new MultipartEntity();
-        reqEntity.addPart("file", inputStreamBody);
+        reqEntity.addPart(file, inputStreamBody);
         httpPost.setEntity(reqEntity);
         try {
             HttpResponse response = obdHttpClient.execute(httpPost);
@@ -45,10 +55,14 @@ public class OnMobileOBDGateway {
         StatusLine statusLine = response.getStatusLine();
         int statusCode = statusLine.getStatusCode();
         String reasonPhrase = statusLine.getReasonPhrase();
-        if(201 != statusCode || !"CREATED".equalsIgnoreCase(reasonPhrase)) {
+        if(!isStatusOk(statusCode)) {
             String errorMessage = String.format("Sending messages to OBD failed with code: %s, reason: %s", statusCode, reasonPhrase);
             logger.error(errorMessage);
             throw new RuntimeException(errorMessage);
         }
+    }
+
+    private boolean isStatusOk(int status) {
+        return status >= 200 && status <= 299;
     }
 }

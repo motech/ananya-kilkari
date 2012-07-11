@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class OBDScheduler {
 
     @Autowired
-    public OBDScheduler(MotechSchedulerService schedulerService, FreshMessagesSenderJob freshMessagesSenderJob, RetryMessagesSenderJob retryMessagesSenderJob) {
-        scheduleJob(schedulerService, freshMessagesSenderJob);
+    public OBDScheduler(MotechSchedulerService schedulerService, NewMessagesSenderJob newMessagesSenderJob, RetryMessagesSenderJob retryMessagesSenderJob) {
+        scheduleJob(schedulerService, newMessagesSenderJob);
         scheduleJob(schedulerService, retryMessagesSenderJob);
     }
 

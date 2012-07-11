@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.handlers;
 
-import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.domain.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.scheduler.domain.MotechEvent;

@@ -3,15 +3,15 @@ package org.motechproject.ananya.kilkari.service.stub;
 import org.motechproject.ananya.kilkari.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.profile.TestProfile;
-import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.springframework.stereotype.Service;
 
 @Service
 @TestProfile
-public class StubReportingService implements ReportingService {
+public class StubReportingGateway implements ReportingGateway {
 
-    private ReportingService behavior;
+    private ReportingGateway behavior;
 
     @Override
     public void createSubscription(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {
@@ -35,7 +35,7 @@ public class StubReportingService implements ReportingService {
         return null;
     }
 
-    public void setBehavior(ReportingService behavior) {
+    public void setBehavior(ReportingGateway behavior) {
         this.behavior = behavior;
     }
 

@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.*;
-import org.motechproject.ananya.kilkari.service.ReportingService;
+import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SubscriptionReportHandlerTest {
     @Mock
-    private ReportingService reportingService;
+    private ReportingGateway reportingGateway;
 
     @Before
     public void setUp() {
@@ -35,9 +35,9 @@ public class SubscriptionReportHandlerTest {
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("0", subscriptionCreationReportRequest);
 
-        new SubscriptionReportHandler(reportingService).handleSubscriptionCreation(new MotechEvent(SubscriptionEventKeys.REPORT_SUBSCRIPTION_CREATION, parameters));
+        new SubscriptionReportHandler(reportingGateway).handleSubscriptionCreation(new MotechEvent(SubscriptionEventKeys.REPORT_SUBSCRIPTION_CREATION, parameters));
 
-        verify(reportingService).createSubscription(subscriptionCreationReportRequest);
+        verify(reportingGateway).createSubscription(subscriptionCreationReportRequest);
     }
 
     @Test
@@ -51,9 +51,9 @@ public class SubscriptionReportHandlerTest {
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("0", subscriptionStateChangeReportRequest);
 
-        new SubscriptionReportHandler(reportingService).handleSubscriptionStateChange(new MotechEvent(SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE, parameters));
+        new SubscriptionReportHandler(reportingGateway).handleSubscriptionStateChange(new MotechEvent(SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE, parameters));
 
-        verify(reportingService).updateSubscriptionStateChange(subscriptionStateChangeReportRequest);
+        verify(reportingGateway).updateSubscriptionStateChange(subscriptionStateChangeReportRequest);
     }
 
     @Test(expected = RuntimeException.class)
@@ -62,9 +62,9 @@ public class SubscriptionReportHandlerTest {
             put("0", null);
         }};
 
-        doThrow(new RuntimeException()).when(reportingService).createSubscription(any(SubscriptionCreationReportRequest.class));
+        doThrow(new RuntimeException()).when(reportingGateway).createSubscription(any(SubscriptionCreationReportRequest.class));
 
-        new SubscriptionReportHandler(reportingService).handleSubscriptionCreation(new MotechEvent(SubscriptionEventKeys.REPORT_SUBSCRIPTION_CREATION, parameters));
+        new SubscriptionReportHandler(reportingGateway).handleSubscriptionCreation(new MotechEvent(SubscriptionEventKeys.REPORT_SUBSCRIPTION_CREATION, parameters));
     }
 
     @Test(expected = RuntimeException.class)
@@ -73,8 +73,8 @@ public class SubscriptionReportHandlerTest {
             put("0", null);
         }};
 
-        doThrow(new RuntimeException()).when(reportingService).updateSubscriptionStateChange(any(SubscriptionStateChangeReportRequest.class));
+        doThrow(new RuntimeException()).when(reportingGateway).updateSubscriptionStateChange(any(SubscriptionStateChangeReportRequest.class));
 
-        new SubscriptionReportHandler(reportingService).handleSubscriptionStateChange(new MotechEvent(SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE, parameters));
+        new SubscriptionReportHandler(reportingGateway).handleSubscriptionStateChange(new MotechEvent(SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE, parameters));
     }
 }

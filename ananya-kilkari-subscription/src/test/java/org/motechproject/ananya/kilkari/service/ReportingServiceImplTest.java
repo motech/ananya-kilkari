@@ -9,6 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.*;
+import org.motechproject.ananya.kilkari.gateway.ReportingGatewayImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -53,7 +54,7 @@ public class ReportingServiceImplTest {
         DateTime edd = DateTime.now().plusMonths(3);
         String name = "name";
         Subscription subscription = new Subscription(msisdn, pack, DateTime.now());
-        new ReportingServiceImpl(restTemplate, kilkariProperties).createSubscription(new SubscriptionCreationReportRequest(subscription,channel, 42, name, dob, edd, new SubscriberLocation("district", "block", "panchayat")));
+        new ReportingGatewayImpl(restTemplate, kilkariProperties).createSubscription(new SubscriptionCreationReportRequest(subscription,channel, 42, name, dob, edd, new SubscriberLocation("district", "block", "panchayat")));
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
@@ -74,7 +75,7 @@ public class ReportingServiceImplTest {
         SubscriberLocation expectedLocation = new SubscriberLocation("mydistrict", "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        SubscriberLocation actualLocation = new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
+        SubscriberLocation actualLocation = new ReportingGatewayImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -97,7 +98,7 @@ public class ReportingServiceImplTest {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        SubscriberLocation actualLocation = new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
+        SubscriberLocation actualLocation = new ReportingGatewayImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
 
         assertNull(actualLocation);
 
@@ -121,7 +122,7 @@ public class ReportingServiceImplTest {
         expectedException.expect(HttpClientErrorException.class);
         expectedException.expectMessage("400 BAD_REQUEST");
 
-        new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
+        new ReportingGatewayImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
@@ -143,7 +144,7 @@ public class ReportingServiceImplTest {
         SubscriberLocation expectedLocation = new SubscriberLocation(null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        SubscriberLocation actualLocation = new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation(null, "myblock", "mypanchayat");
+        SubscriberLocation actualLocation = new ReportingGatewayImpl(restTemplate, kilkariProperties).getLocation(null, "myblock", "mypanchayat");
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -166,7 +167,7 @@ public class ReportingServiceImplTest {
         SubscriberLocation expectedLocation = new SubscriberLocation(null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        SubscriberLocation actualLocation = new ReportingServiceImpl(restTemplate, kilkariProperties).getLocation(null, null, null);
+        SubscriberLocation actualLocation = new ReportingGatewayImpl(restTemplate, kilkariProperties).getLocation(null, null, null);
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -189,7 +190,7 @@ public class ReportingServiceImplTest {
         String reason = "my own error reason";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
-        new ReportingServiceImpl(restTemplate, kilkariProperties).updateSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus, DateTime.now(), reason, operator));
+        new ReportingGatewayImpl(restTemplate, kilkariProperties).updateSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus, DateTime.now(), reason, operator));
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);

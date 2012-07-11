@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.service;
+package org.motechproject.ananya.kilkari.gateway;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

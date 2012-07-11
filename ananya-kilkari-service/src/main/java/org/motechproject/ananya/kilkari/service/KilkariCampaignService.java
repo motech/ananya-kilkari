@@ -20,16 +20,16 @@ public class KilkariCampaignService {
     private KilkariSubscriptionService kilkariSubscriptionService;
     private CampaignMessageIdStrategy campaignMessageIdStrategy;
     private AllCampaignMessageAlerts allCampaignMessageAlerts;
-    private OBDService obdService;
+    private CampaignMessageService campaignMessageService;
 
     @Autowired
     public KilkariCampaignService(KilkariMessageCampaignService kilkariMessageCampaignService,
-                                  KilkariSubscriptionService kilkariSubscriptionService, CampaignMessageIdStrategy campaignMessageIdStrategy, AllCampaignMessageAlerts allCampaignMessageAlerts, OBDService obdService) {
+                                  KilkariSubscriptionService kilkariSubscriptionService, CampaignMessageIdStrategy campaignMessageIdStrategy, AllCampaignMessageAlerts allCampaignMessageAlerts, CampaignMessageService campaignMessageService) {
         this.kilkariMessageCampaignService = kilkariMessageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.campaignMessageIdStrategy = campaignMessageIdStrategy;
         this.allCampaignMessageAlerts = allCampaignMessageAlerts;
-        this.obdService = obdService;
+        this.campaignMessageService = campaignMessageService;
     }
 
     public Map<String, List<DateTime>> getMessageTimings(String msisdn) {
@@ -81,7 +81,7 @@ public class KilkariCampaignService {
             return;
         }
 
-        obdService.scheduleCampaignMessage(subscriptionId, messageId);
+        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId);
         campaignMessageAlert.clear();
         allCampaignMessageAlerts.update(campaignMessageAlert);
     }

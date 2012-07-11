@@ -57,7 +57,7 @@ public class KilkariSubscriptionServiceTest {
         Subscription subscription = new Subscription("msisdn", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
 
         when(subscriptionService.createSubscription(subscriptionRequest)).thenReturn(subscription);
-        
+
         kilkariSubscriptionService.processSubscriptionRequest(subscriptionRequest);
 
         ArgumentCaptor<KilkariMessageCampaignRequest> captor = ArgumentCaptor.forClass(KilkariMessageCampaignRequest.class);

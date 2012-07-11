@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.handlers;
 
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
+import org.motechproject.ananya.kilkari.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
@@ -14,15 +14,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubscriptionActivationHandler {
 
-    private OnMobileSubscriptionService onMobileSubscriptionService;
+    private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionActivationHandler.class);
 
     private SubscriptionService subscriptionService;
 
     @Autowired
-    public SubscriptionActivationHandler(OnMobileSubscriptionService onMobileSubscriptionService, SubscriptionService subscriptionService) {
-        this.onMobileSubscriptionService = onMobileSubscriptionService;
+    public SubscriptionActivationHandler(OnMobileSubscriptionGateway onMobileSubscriptionGateway, SubscriptionService subscriptionService) {
+        this.onMobileSubscriptionGateway = onMobileSubscriptionGateway;
         this.subscriptionService = subscriptionService;
     }
 
@@ -30,7 +30,7 @@ public class SubscriptionActivationHandler {
     public void handleProcessSubscription(MotechEvent event) {
         SubscriptionActivationRequest subscriptionActivationRequest = (SubscriptionActivationRequest) event.getParameters().get("0");
         logger.info(String.format("Handling process subscription event for subscriptionid: %s, msisdn: %s, pack: %s, channel: %s", subscriptionActivationRequest.getSubscriptionId(), subscriptionActivationRequest.getMsisdn(), subscriptionActivationRequest.getPack(), subscriptionActivationRequest.getChannel()));
-        onMobileSubscriptionService.activateSubscription(subscriptionActivationRequest);
+        onMobileSubscriptionGateway.activateSubscription(subscriptionActivationRequest);
         subscriptionService.activationRequested(subscriptionActivationRequest.getSubscriptionId());
     }
 }

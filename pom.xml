@@ -195,6 +195,11 @@
                 <version>${spring.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>4.0.1</version>
+            </dependency>
+            <dependency>
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-mapper-asl</artifactId>
                 <version>1.8.4</version>
@@ -294,6 +299,11 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>org.motechproject</groupId>
+                <artifactId>motech-scheduler</artifactId>
+                <version>${motech-platform.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
@@ -352,6 +362,11 @@
                 <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
                 <version>3.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

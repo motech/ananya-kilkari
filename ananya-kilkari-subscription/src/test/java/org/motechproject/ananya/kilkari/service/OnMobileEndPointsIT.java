@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.gateway.OnMobileEndpoints;
 import org.motechproject.ananya.kilkari.repository.SubscriptionBaseIT;
 import org.springframework.beans.factory.annotation.Autowired;
 

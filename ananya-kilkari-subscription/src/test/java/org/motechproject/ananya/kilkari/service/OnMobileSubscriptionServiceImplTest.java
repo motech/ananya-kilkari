@@ -6,6 +6,8 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.gateway.OnMobileEndpoints;
+import org.motechproject.ananya.kilkari.gateway.OnMobileSubscriptionGatewayImpl;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -37,7 +39,7 @@ public class OnMobileSubscriptionServiceImplTest {
         when(onMobileEndpoints.username()).thenReturn("thoughtworks");
         when(onMobileEndpoints.password()).thenReturn("password123");
 
-        OnMobileSubscriptionServiceImpl onMobileSubscriptionService = new OnMobileSubscriptionServiceImpl(restTemplate, onMobileEndpoints);
+        OnMobileSubscriptionGatewayImpl onMobileSubscriptionService = new OnMobileSubscriptionGatewayImpl(restTemplate, onMobileEndpoints);
         onMobileSubscriptionService.activateSubscription(new SubscriptionActivationRequest(msisdn, pack, channel, subscriptionId));
 
         HashMap<String, String> urlVariables = new HashMap<>();

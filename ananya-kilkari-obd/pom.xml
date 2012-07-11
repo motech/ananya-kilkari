@@ -15,6 +15,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
+            <artifactId>ananya-kilkari-config</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-platform-common-api</artifactId>
         </dependency>
@@ -25,6 +31,27 @@
         <dependency>
             <groupId>org.ektorp</groupId>
             <artifactId>org.ektorp.spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.motechproject</groupId>
+            <artifactId>motech-scheduler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.motechproject</groupId>
+            <artifactId>motech-platform-server-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

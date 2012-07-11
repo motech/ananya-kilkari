@@ -8,7 +8,7 @@ import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
+import org.motechproject.ananya.kilkari.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
 
@@ -22,7 +22,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SubscriptionActivationHandlerTest {
     @Mock
-    private OnMobileSubscriptionService onMobileSubscriptionService;
+    private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
     @Mock
     private SubscriptionService subscriptionService;
 
@@ -39,10 +39,10 @@ public class SubscriptionActivationHandlerTest {
         final String subscriptionId = "abcd1234";
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new SubscriptionActivationRequest(msisdn, pack, channel, subscriptionId));}};
 
-        new SubscriptionActivationHandler(onMobileSubscriptionService, subscriptionService).handleProcessSubscription(new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, parameters));
+        new SubscriptionActivationHandler(onMobileSubscriptionGateway, subscriptionService).handleProcessSubscription(new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, parameters));
 
         ArgumentCaptor<SubscriptionActivationRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionActivationRequest.class);
-        verify(onMobileSubscriptionService).activateSubscription(subscriptionActivationRequestArgumentCaptor.capture());
+        verify(onMobileSubscriptionGateway).activateSubscription(subscriptionActivationRequestArgumentCaptor.capture());
         SubscriptionActivationRequest subscriptionActivationRequest = subscriptionActivationRequestArgumentCaptor.getValue();
 
         assertEquals(msisdn, subscriptionActivationRequest.getMsisdn());
@@ -57,8 +57,8 @@ public class SubscriptionActivationHandlerTest {
     public void shouldThrowExceptionsRaisedByOnMobileSubscriptionServiceToCreateAnActivationRequest() {
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", null);}};
 
-        doThrow(new RuntimeException()).when(onMobileSubscriptionService).activateSubscription(any(SubscriptionActivationRequest.class));
+        doThrow(new RuntimeException()).when(onMobileSubscriptionGateway).activateSubscription(any(SubscriptionActivationRequest.class));
 
-        new SubscriptionActivationHandler(onMobileSubscriptionService, subscriptionService).handleProcessSubscription(new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, parameters));
+        new SubscriptionActivationHandler(onMobileSubscriptionGateway, subscriptionService).handleProcessSubscription(new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIPTION, parameters));
     }
 }

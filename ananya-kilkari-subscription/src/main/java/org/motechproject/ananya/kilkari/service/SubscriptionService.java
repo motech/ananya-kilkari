@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.service;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.handlers.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
@@ -18,17 +19,17 @@ public class SubscriptionService {
     private AllSubscriptions allSubscriptions;
 
     private Publisher publisher;
-    private ReportingService reportingService;
+    private ReportingGateway reportingGateway;
 
     @Autowired
-    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher, ReportingService reportingService) {
+    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher, ReportingGateway reportingGateway) {
         this.allSubscriptions = allSubscriptions;
         this.publisher = publisher;
-        this.reportingService = reportingService;
+        this.reportingGateway = reportingGateway;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest) {
-        SubscriberLocation reportLocation = reportingService.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat());
+        SubscriberLocation reportLocation = reportingGateway.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat());
         Subscription existingSubscription = findActiveSubscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack());
 
         subscriptionRequest.validate(reportLocation, existingSubscription);
@@ -122,7 +123,7 @@ public class SubscriptionService {
         }
 
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        
+
         if (CallbackAction.REN.name().equals(requestAction)) {
             final SubscriptionStatus subscriptionStatus = subscription.getStatus();
             if (!(subscriptionStatus.equals(SubscriptionStatus.ACTIVE) || subscriptionStatus.equals(SubscriptionStatus.SUSPENDED)))

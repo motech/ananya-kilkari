@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.service;
+package org.motechproject.ananya.kilkari.gateway;
 
 import org.motechproject.ananya.kilkari.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
@@ -18,14 +18,14 @@ import java.util.Properties;
 
 @Service
 @ProductionProfile
-public class ReportingServiceImpl implements ReportingService {
+public class ReportingGatewayImpl implements ReportingGateway {
 
     private RestTemplate restTemplate;
     private Properties kilkariProperties;
-    private final static Logger logger = LoggerFactory.getLogger(ReportingServiceImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(ReportingGatewayImpl.class);
 
     @Autowired
-    public ReportingServiceImpl(RestTemplate kilkariRestTemplate, @Qualifier("kilkariProperties") Properties kilkariProperties) {
+    public ReportingGatewayImpl(RestTemplate kilkariRestTemplate, @Qualifier("kilkariProperties") Properties kilkariProperties) {
         this.restTemplate = kilkariRestTemplate;
         this.kilkariProperties = kilkariProperties;
     }
@@ -72,7 +72,7 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     private String constructGetLocationUrl(HashMap<String, String> params) {
-        String url = String.format("%s%s", getBaseUrl(), ReportingService.GET_LOCATION_PATH);
+        String url = String.format("%s%s", getBaseUrl(), GET_LOCATION_PATH);
         boolean paramAdded = false;
         for (String paramName : params.keySet()) {
             String paramValue = params.get(paramName);

@@ -10,10 +10,10 @@ import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 
-public class OBDServiceIT extends SpringIntegrationTest {
+public class CampaignMessageServiceIT extends SpringIntegrationTest {
 
     @Autowired
-    private OBDService obdService;
+    private CampaignMessageService campaignMessageService;
 
     @Autowired
     private AllCampaignMessages allCampaignMessages;
@@ -23,7 +23,7 @@ public class OBDServiceIT extends SpringIntegrationTest {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
 
-        obdService.scheduleCampaignMessage(subscriptionId, messageId);
+        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId);
 
         CampaignMessage campaignMessage = findCampaignMessageFor(subscriptionId, messageId);
         assertNotNull(campaignMessage);

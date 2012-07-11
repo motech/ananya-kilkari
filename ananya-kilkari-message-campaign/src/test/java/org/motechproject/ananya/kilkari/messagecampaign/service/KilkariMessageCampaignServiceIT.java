@@ -23,6 +23,7 @@ public class KilkariMessageCampaignServiceIT {
 
     public static final int CONFIGURED_DELTA_MINUTES = 30;
     public static final int CONFIGURED_DELTA_DAYS = 2;
+
     @Autowired
     private KilkariMessageCampaignService kilkariMessageCampaignService;
 

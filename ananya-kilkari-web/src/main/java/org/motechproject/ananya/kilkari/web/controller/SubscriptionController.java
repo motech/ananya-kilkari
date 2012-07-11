@@ -3,8 +3,8 @@ package org.motechproject.ananya.kilkari.web.controller;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.*;
+import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
@@ -20,13 +20,13 @@ import java.util.List;
 public class SubscriptionController {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
-    private ReportingService reportingService;
+    private ReportingGateway reportingGateway;
     private SubscriptionService subscriptionService;
 
     @Autowired
-    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, ReportingService reportingService, SubscriptionService subscriptionService) {
+    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, ReportingGateway reportingGateway, SubscriptionService subscriptionService) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
-        this.reportingService = reportingService;
+        this.reportingGateway = reportingGateway;
         this.subscriptionService = subscriptionService;
     }
 
@@ -41,7 +41,7 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse createSubscription(@RequestBody SubscriptionRequest subscriptionRequest) {
         if (!Channel.isIVR(subscriptionRequest.getChannel())) {
-            SubscriberLocation reportLocation = reportingService.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat());
+            SubscriberLocation reportLocation = reportingGateway.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat());
             Subscription existingSubscription = subscriptionService.findActiveSubscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack());
 
             subscriptionRequest.validate(reportLocation, existingSubscription);

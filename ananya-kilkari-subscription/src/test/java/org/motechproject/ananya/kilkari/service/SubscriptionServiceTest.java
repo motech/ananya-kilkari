@@ -13,6 +13,7 @@ import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
 
 import java.util.ArrayList;
@@ -39,12 +40,12 @@ public class SubscriptionServiceTest {
     private SubscriptionRequest mockedSubscriptionRequest;
 
     @Mock
-    private ReportingService reportingService;
+    private ReportingGateway reportingGateway;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, publisher, reportingService);
+        subscriptionService = new SubscriptionService(allSubscriptions, publisher, reportingGateway);
     }
 
     @Test
@@ -59,7 +60,7 @@ public class SubscriptionServiceTest {
 
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest(msisdn, subscriptionPack.name(), channel.name());
 
-        when(reportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
+        when(reportingGateway.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
 
         Subscription subscription = subscriptionService.createSubscription(subscriptionRequest);
 
@@ -317,7 +318,7 @@ public class SubscriptionServiceTest {
         Subscription existingSubscription = new Subscription();
         List<Subscription> subscriptions = new ArrayList<>();
         subscriptions.add(existingSubscription);
-        when(reportingService.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat()))
+        when(reportingGateway.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat()))
                 .thenReturn(new SubscriberLocation("district", "block", "panchayat"));
         when(allSubscriptions.findByMsisdnAndPack(subscriptionRequest.getMsisdn(),
                 SubscriptionPack.from(subscriptionRequest.getPack()))).thenReturn(subscriptions);

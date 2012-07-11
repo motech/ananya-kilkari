@@ -37,12 +37,12 @@ public class KilkariCampaignServiceTest {
     @Mock
     private CampaignMessageIdStrategy campaignMessageIdStrategy;
     @Mock
-    private OBDService obdService;
+    private CampaignMessageService campaignMessageService;
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, obdService);
+        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class KilkariCampaignServiceTest {
         assertEquals(messageId, campaignMessageAlert.getMessageId());
         assertFalse(campaignMessageAlert.isRenewed());
 
-        verifyZeroInteractions(obdService);
+        verifyZeroInteractions(campaignMessageService);
         verify(allCampaignMessageAlerts, never()).remove(any(CampaignMessageAlert.class));
     }
 
@@ -140,7 +140,7 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.renewSchedule(subscriptionId);
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-        verify(obdService).scheduleCampaignMessage(subscriptionId, messageId);
+        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId);
         assertEquals(null, campaignMessageAlert.getMessageId());
         assertFalse(campaignMessageAlert.isRenewed());
         verify(allCampaignMessageAlerts).update(campaignMessageAlert);
@@ -160,7 +160,8 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-        verify(obdService).scheduleCampaignMessage(subscriptionId, messageId);
+
+        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId);
         assertEquals(null, campaignMessageAlert.getMessageId());
         assertFalse(campaignMessageAlert.isRenewed());
         verify(allCampaignMessageAlerts).update(campaignMessageAlert);
@@ -189,7 +190,7 @@ public class KilkariCampaignServiceTest {
         assertEquals(messageId, actualCampaignMessageAlert.getMessageId());
         assertFalse(actualCampaignMessageAlert.isRenewed());
 
-        verifyZeroInteractions(obdService);
+        verifyZeroInteractions(campaignMessageService);
         verify(allCampaignMessageAlerts, never()).remove(any(CampaignMessageAlert.class));
     }
 }

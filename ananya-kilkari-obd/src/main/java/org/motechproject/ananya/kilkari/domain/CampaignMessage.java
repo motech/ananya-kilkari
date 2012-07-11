@@ -7,43 +7,62 @@ import org.motechproject.model.MotechBaseDataObject;
 @TypeDiscriminator("doc.type === 'CampaignMessage'")
 public class CampaignMessage extends MotechBaseDataObject {
 
-        @JsonProperty
-        private String subscriptionId;
+    @JsonProperty
+    private String subscriptionId;
 
-        @JsonProperty
-        private String messageId;
+    @JsonProperty
+    private String messageId;
 
-        @JsonProperty
-        private boolean renewed;
+    @JsonProperty
+    private boolean sent;
 
-        public CampaignMessage() {
+    @JsonProperty
+    private  CampaignMessageStatus status = CampaignMessageStatus.NEW;
 
-        }
+    @JsonProperty
+    private int retryCount;
 
-        public CampaignMessage(String subscriptionId, String messageId) {
-            this.subscriptionId = subscriptionId;
-            this.messageId = messageId;
-        }
+    public CampaignMessage() {
+    }
 
-        public CampaignMessage(String subscriptionId, String messageId, boolean renewed) {
-            this.subscriptionId = subscriptionId;
-            this.messageId = messageId;
-            this.renewed = renewed;
-        }
+    public CampaignMessage(String subscriptionId, String messageId) {
+        this.subscriptionId = subscriptionId;
+        this.messageId = messageId;
+    }
 
-        public String getSubscriptionId() {
-            return subscriptionId;
-        }
+    public String getSubscriptionId() {
+        return subscriptionId;
+    }
 
-        public String getMessageId() {
-            return messageId;
-        }
+    public String getMessageId() {
+        return messageId;
+    }
 
-        public boolean isRenewed() {
-            return renewed;
-        }
+    public boolean isSent() {
+        return sent;
+    }
 
-        public void setMessageId(String messageId) {
-            this.messageId = messageId;
-        }
+    public CampaignMessageStatus getStatus() {
+        return status;
+    }
+
+    public void markSent() {
+        if(this.status == CampaignMessageStatus.DNP)
+            this.retryCount++;
+        this.sent = true;
+    }
+
+    public void markDidNotPickup() {
+        this.status = CampaignMessageStatus.DNP;
+        this.sent = false;
+    }
+
+    public void markDidNotCall() {
+        this.status = CampaignMessageStatus.DNC;
+        this.sent = false;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
 }

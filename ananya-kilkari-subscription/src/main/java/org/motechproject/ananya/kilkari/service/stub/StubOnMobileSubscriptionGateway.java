@@ -1,15 +1,15 @@
 package org.motechproject.ananya.kilkari.service.stub;
 
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
+import org.motechproject.ananya.kilkari.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.profile.TestProfile;
-import org.motechproject.ananya.kilkari.service.OnMobileSubscriptionService;
 import org.springframework.stereotype.Service;
 
 @Service
 @TestProfile
-public class StubOnMobileSubscriptionService implements OnMobileSubscriptionService {
+public class StubOnMobileSubscriptionGateway implements OnMobileSubscriptionGateway {
 
-    private OnMobileSubscriptionService behavior;
+    private OnMobileSubscriptionGateway behavior;
 
     @Override
     public void activateSubscription(SubscriptionActivationRequest subscriptionActivationRequest) {
@@ -18,7 +18,7 @@ public class StubOnMobileSubscriptionService implements OnMobileSubscriptionServ
         }
     }
 
-    public void setBehavior(OnMobileSubscriptionService behavior) {
+    public void setBehavior(OnMobileSubscriptionGateway behavior) {
         this.behavior = behavior;
     }
 

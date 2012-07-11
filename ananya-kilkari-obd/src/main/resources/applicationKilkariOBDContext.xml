@@ -8,8 +8,12 @@
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
 
+    <util:properties id="obdProperties" location="classpath:/obd.properties"/>
 
     <context:component-scan base-package="org.motechproject.ananya.kilkari"/>
+
+    <import resource="classpath*:applicationScheduler.xml"/>
+    <import resource="classpath*:applicationPlatformServerAPI.xml"/>
 
     <bean id="obdDbInstance" class="org.ektorp.impl.StdCouchDbInstance">
         <constructor-arg>
@@ -21,4 +25,6 @@
         <constructor-arg value="motech-obd"/>
         <constructor-arg ref="obdDbInstance"/>
     </bean>
+
+    <bean id="obdHttpClient" class="org.apache.http.impl.client.DefaultHttpClient" />
 </beans>

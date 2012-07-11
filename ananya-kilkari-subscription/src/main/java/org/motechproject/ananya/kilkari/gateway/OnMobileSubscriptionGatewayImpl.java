@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.service;
+package org.motechproject.ananya.kilkari.gateway;
 
 import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.profile.ProductionProfile;
@@ -15,14 +15,14 @@ import java.util.Map;
 
 @Service
 @ProductionProfile
-public class OnMobileSubscriptionServiceImpl implements OnMobileSubscriptionService {
+public class OnMobileSubscriptionGatewayImpl implements OnMobileSubscriptionGateway {
 
     private RestTemplate restTemplate;
     private OnMobileEndpoints onMobileEndpoints;
-    private final static Logger LOGGER = LoggerFactory.getLogger(OnMobileSubscriptionServiceImpl.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(OnMobileSubscriptionGatewayImpl.class);
 
     @Autowired
-    public OnMobileSubscriptionServiceImpl(@Qualifier("kilkariRestTemplate") RestTemplate restTemplate,
+    public OnMobileSubscriptionGatewayImpl(@Qualifier("kilkariRestTemplate") RestTemplate restTemplate,
                                            OnMobileEndpoints onMobileEndpoints) {
         this.restTemplate = restTemplate;
         this.onMobileEndpoints = onMobileEndpoints;

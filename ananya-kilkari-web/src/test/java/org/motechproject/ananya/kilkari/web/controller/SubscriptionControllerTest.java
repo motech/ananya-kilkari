@@ -14,8 +14,8 @@ import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.TestUtils;
@@ -52,7 +52,7 @@ public class SubscriptionControllerTest {
     private SubscriptionService subscriptionService;
 
     @Mock
-    private ReportingService reportingService;
+    private ReportingGateway reportingGateway;
     private static final String CONTENT_TYPE_JAVASCRIPT = "application/javascript;charset=UTF-8";
     private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
@@ -60,7 +60,7 @@ public class SubscriptionControllerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, reportingService, subscriptionService);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService, reportingGateway, subscriptionService);
     }
 
     @Test
@@ -212,7 +212,7 @@ public class SubscriptionControllerTest {
 
         SubscriptionRequest expectedRequest= new SubscriptionRequestBuilder().withDefaults().withCreatedAt(createdAt).build();
 
-        when(reportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
+        when(reportingGateway.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
         mockMvc(subscriptionController)
                 .perform(post("/subscription").body(TestUtils.toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

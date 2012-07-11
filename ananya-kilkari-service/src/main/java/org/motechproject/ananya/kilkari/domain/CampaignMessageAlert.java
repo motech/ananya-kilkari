@@ -18,7 +18,6 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
     private boolean renewed;
 
     public CampaignMessageAlert() {
-
     }
 
     public CampaignMessageAlert(String subscriptionId, String messageId) {

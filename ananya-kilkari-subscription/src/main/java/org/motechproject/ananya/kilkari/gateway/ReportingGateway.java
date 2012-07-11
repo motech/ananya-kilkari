@@ -1,10 +1,10 @@
-package org.motechproject.ananya.kilkari.service;
+package org.motechproject.ananya.kilkari.gateway;
 
 import org.motechproject.ananya.kilkari.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStateChangeReportRequest;
 
-public interface ReportingService {
+public interface ReportingGateway {
     String CREATE_SUBSCRIPTION_PATH = "subscription";
     String SUBSCRIPTION_STATE_CHANGE_PATH = "updatesubscription";
     String GET_LOCATION_PATH = "location";

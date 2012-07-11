@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.internal.matchers.InstanceOf;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.service.ReportingService;
+import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -26,14 +26,14 @@ public class SubscriptionRequestTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private ReportingService reportingService;
+    private ReportingGateway reportingGateway;
     @Mock
     private SubscriptionService subscriptionService;
 
     @Before
     public void setUp() {
         initMocks(this);
-        when(reportingService.getLocation("mydistrict", "myblock", "mypanchayat")).thenReturn(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"));
+        when(reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat")).thenReturn(new SubscriberLocation("mydistrict", "myblock", "mypanchayat"));
     }
 
     @Test
@@ -199,8 +199,8 @@ public class SubscriptionRequestTest {
     public void shouldThrowExceptionWhenInvalidLocationIsGivenToCreateNewSubscriptionForCC() {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid location with district: invaliddistrict, block: invalidblock, panchayat: invalidpanchayat");
-        when(reportingService.getLocation("invaliddistrict", "invalidblock", "invalidpanchayat")).thenReturn(null);
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-12-2012", "21-01-2011", "invaliddistrict", "invalidblock", "invalidpanchayat", DateTime.now());
+        when(reportingGateway.getLocation("invaliddistrict", "invalidblock", "invalidpanchayat")).thenReturn(null);
 
         subscriptionRequest.validate(null, null);
     }

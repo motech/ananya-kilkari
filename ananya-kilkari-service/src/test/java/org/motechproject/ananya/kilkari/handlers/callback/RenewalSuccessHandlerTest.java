@@ -19,8 +19,7 @@ public class RenewalSuccessHandlerTest {
     @Before
     public void setup(){
         initMocks(this);
-        renewalSuccessHandler = new RenewalSuccessHandler();
-        renewalSuccessHandler.setSubscriptionService(subscriptionService);
+        renewalSuccessHandler = new RenewalSuccessHandler(subscriptionService);
     }
 
     @Test

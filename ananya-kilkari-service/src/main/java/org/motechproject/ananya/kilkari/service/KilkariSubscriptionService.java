@@ -21,6 +21,7 @@ public class KilkariSubscriptionService {
     private SubscriptionPublisher subscriptionPublisher;
     private SubscriptionService subscriptionService;
     private KilkariMessageCampaignService kilkariMessageCampaignService;
+    private SubscriptionStateHandlerFactory subscriptionStateHandlerFactory;
 
     private final Logger LOGGER = LoggerFactory.getLogger(KilkariSubscriptionService.class);
 
@@ -41,10 +42,12 @@ public class KilkariSubscriptionService {
     @Autowired
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
                                       SubscriptionService subscriptionService,
-                                      KilkariMessageCampaignService kilkariMessageCampaignService) {
+                                      KilkariMessageCampaignService kilkariMessageCampaignService,
+                                      SubscriptionStateHandlerFactory subscriptionStateHandlerFactory) {
         this.subscriptionPublisher = subscriptionPublisher;
         this.subscriptionService = subscriptionService;
         this.kilkariMessageCampaignService = kilkariMessageCampaignService;
+        this.subscriptionStateHandlerFactory = subscriptionStateHandlerFactory;
     }
 
     public void createSubscription(SubscriptionRequest subscriptionRequest) {
@@ -83,7 +86,7 @@ public class KilkariSubscriptionService {
         final String requestAction = callbackRequestWrapper.getAction();
         final String subscriptionId = callbackRequestWrapper.getSubscriptionId();
 
-        if (SubscriptionStateHandlerFactory.getHandlerClass(callbackRequestWrapper) == null) {
+        if (subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper) == null) {
             errors.add(String.format("Invalid status %s for action %s", requestStatus, requestAction));
         }
 

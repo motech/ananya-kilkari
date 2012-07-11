@@ -23,8 +23,7 @@ public class ActivateHandlerTest {
 
     @Test
     public void shouldInvokeSubscriptionServiceToActivateASubscription() {
-        ActivateHandler activateHandler = new ActivateHandler();
-        activateHandler.setSubscriptionService(subscriptionService);
+        ActivateHandler activateHandler = new ActivateHandler(subscriptionService);
         String subscriptionId = "abcd1234";
         String operator = Operator.AIRTEL.name();
         DateTime now = DateTime.now();

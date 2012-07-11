@@ -23,8 +23,7 @@ public class ActivationFailedHandlerTest {
 
     @Test
     public void shouldUpdateSubscriptionStatusToActivationFailed() {
-        ActivationFailedHandler activationFailedHandler = new ActivationFailedHandler();
-        activationFailedHandler.setSubscriptionService(subscriptionService);
+        ActivationFailedHandler activationFailedHandler = new ActivationFailedHandler(subscriptionService);
         String subscriptionId = "abcd1234";
         String operator = Operator.AIRTEL.name();
         DateTime now = DateTime.now();

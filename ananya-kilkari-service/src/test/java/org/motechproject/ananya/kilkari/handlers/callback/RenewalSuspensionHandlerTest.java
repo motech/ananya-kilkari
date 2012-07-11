@@ -20,8 +20,7 @@ public class RenewalSuspensionHandlerTest {
     @Before
     public void setup(){
         initMocks(this);
-        renewalSuspensionHandler = new RenewalSuspensionHandler();
-        renewalSuspensionHandler.setSubscriptionService(subscriptionService);
+        renewalSuspensionHandler = new RenewalSuspensionHandler(subscriptionService);
     }
 
     @Test

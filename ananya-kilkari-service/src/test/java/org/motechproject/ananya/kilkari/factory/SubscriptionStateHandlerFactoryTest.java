@@ -4,35 +4,34 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.ActionStatus;
 import org.motechproject.ananya.kilkari.handlers.callback.*;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 
-import java.util.HashMap;
-
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SubscriptionStateHandlerFactoryTest {
     @Mock
     private SubscriptionService subscriptionService;
+    @Mock
+    private ActivateHandler activateHandler;
+    @Mock
+    private ActivationFailedHandler activationFailedHandler;
+    @Mock
+    private RenewalSuccessHandler renewalSuccessHandler;
+    @Mock
+    private RenewalSuspensionHandler renewalSuspensionHandler;
+    @Mock
+    private DeactivateHandler deactivateHandler;
+    private SubscriptionStateHandlerFactory subscriptionStateHandlerFactory;
 
     @Before
     public void setUp() {
         initMocks(this);
-    }
-
-    @Test
-    public void shouldPopulateHandlerMappings() {
-        HashMap<ActionStatus, Class> handlerMappings = SubscriptionStateHandlerFactory.handlerMappings;
-
-        assertEquals(ActivateHandler.class, handlerMappings.get(ActionStatus.createFor("ACT", "SUCCESS")));
-        assertEquals(ActivationFailedHandler.class, handlerMappings.get(ActionStatus.createFor("ACT", "BAL_LOW")));
-        assertEquals(RenewalSuccessHandler.class, handlerMappings.get(ActionStatus.createFor("REN", "SUCCESS")));
-        assertEquals(RenewalSuspensionHandler.class, handlerMappings.get(ActionStatus.createFor("REN", "BAL_LOW")));
-        assertEquals(DeactivateHandler.class, handlerMappings.get(ActionStatus.createFor("DCT", "BAL_LOW")));
+        subscriptionStateHandlerFactory = new SubscriptionStateHandlerFactory(activateHandler, activationFailedHandler,
+                renewalSuccessHandler, renewalSuspensionHandler, deactivateHandler);
     }
 
     @Test
@@ -42,10 +41,21 @@ public class SubscriptionStateHandlerFactoryTest {
         callbackRequest.setStatus("SUCCESS");
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
 
-        SubscriptionStateHandler subscriptionStateHandler = new SubscriptionStateHandlerFactory(subscriptionService).getHandler(callbackRequestWrapper);
+        SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
 
-        assertEquals(ActivateHandler.class, subscriptionStateHandler.getClass());
-        assertEquals(subscriptionService, subscriptionStateHandler.getSubscriptionService());
+        assertTrue(subscriptionStateHandler instanceof ActivateHandler);
+    }
+
+   @Test
+    public void shouldReturnTheActivationFailedHandlerGivenAnActivationCallbackWithBalanceLow() {
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setAction("ACT");
+        callbackRequest.setStatus("BAL_LOW");
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
+
+        SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
+
+        assertTrue(subscriptionStateHandler instanceof ActivationFailedHandler);
     }
 
     @Test
@@ -55,10 +65,9 @@ public class SubscriptionStateHandlerFactoryTest {
         callbackRequest.setStatus("SUCCESS");
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
 
-        SubscriptionStateHandler subscriptionStateHandler = new SubscriptionStateHandlerFactory(subscriptionService).getHandler(callbackRequestWrapper);
+        SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
 
-        assertEquals(RenewalSuccessHandler.class, subscriptionStateHandler.getClass());
-        assertEquals(subscriptionService, subscriptionStateHandler.getSubscriptionService());
+        assertTrue(subscriptionStateHandler instanceof RenewalSuccessHandler);
     }
 
     @Test
@@ -68,9 +77,20 @@ public class SubscriptionStateHandlerFactoryTest {
         callbackRequest.setStatus("BAL_LOW");
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
 
-        SubscriptionStateHandler subscriptionStateHandler = new SubscriptionStateHandlerFactory(subscriptionService).getHandler(callbackRequestWrapper);
+        SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
 
-        assertEquals(RenewalSuspensionHandler.class, subscriptionStateHandler.getClass());
-        assertEquals(subscriptionService, subscriptionStateHandler.getSubscriptionService());
+        assertTrue(subscriptionStateHandler instanceof RenewalSuspensionHandler);
+    }
+
+    @Test
+    public void shouldReturnTheDeactivationHandlerGivenDeactivationRequestWithLowBalance() {
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setAction("DCT");
+        callbackRequest.setStatus("BAL_LOW");
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
+
+        SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
+
+        assertTrue(subscriptionStateHandler instanceof DeactivateHandler);
     }
 }

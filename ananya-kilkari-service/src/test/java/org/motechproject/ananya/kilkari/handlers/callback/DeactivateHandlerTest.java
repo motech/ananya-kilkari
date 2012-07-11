@@ -20,8 +20,7 @@ public class DeactivateHandlerTest {
     @Before
     public void setup() {
         initMocks(this);
-        deactivateHandler = new DeactivateHandler();
-        deactivateHandler.setSubscriptionService(subscriptionService);
+        deactivateHandler = new DeactivateHandler(subscriptionService);
     }
 
     @Test

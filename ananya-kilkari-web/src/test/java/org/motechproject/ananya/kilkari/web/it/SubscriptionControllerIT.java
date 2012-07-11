@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.web.it;
 
-import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -16,6 +15,7 @@ import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.service.stub.StubOnMobileSubscriptionService;
 import org.motechproject.ananya.kilkari.service.stub.StubReportingService;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
+import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
@@ -61,8 +61,6 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
 
-
-    private static final String SEVEN_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-seven-months";
     private static final String TWELVE_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-twelve-months";
     private static final String FIFTEEN_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-fifteen-months";
 
@@ -93,7 +91,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
-        SubscriberResponse actualResponse = fromJson(responseString, SubscriberResponse.class);
+        SubscriberResponse actualResponse = TestUtils.fromJson(responseString, SubscriberResponse.class);
         assertEquals(subscriberResponse, actualResponse);
     }
 
@@ -118,7 +116,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
-        BaseResponse actualResponse = (BaseResponse) new BaseResponse().fromJson(responseString);
+        BaseResponse actualResponse =  TestUtils.fromJson(responseString, BaseResponse.class);
         assertEquals(expectedResponse, actualResponse);
 
         final Subscription subscription = new TimedRunner<Subscription>(20, 1000) {
@@ -168,7 +166,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         SubscriptionRequest expectedRequest = new SubscriptionRequestBuilder().withDefaults().build();
         MvcResult result = mockMvc(subscriptionController)
-                .perform(post("/subscription").body(toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .perform(post("/subscription").body(TestUtils.toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(SubscriptionControllerIT.CONTENT_TYPE_JSON))
                 .andReturn();
@@ -177,7 +175,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
-        BaseResponse actualResponse = (BaseResponse) new BaseResponse().fromJson(responseString);
+        BaseResponse actualResponse =  TestUtils.fromJson(responseString, BaseResponse.class);
         assertEquals(expectedResponse, actualResponse);
 
         final Subscription subscription = new TimedRunner<Subscription>(20, 1000) {
@@ -220,15 +218,5 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
             jsonContent = jsonContent.replace(SubscriptionControllerIT.IVR_RESPONSE_PREFIX, "");
         }
         return jsonContent;
-    }
-
-    private String toJson(Object objectToSerialize) {
-        Gson gson = new Gson();
-        return gson.toJson(objectToSerialize);
-    }
-
-    private <T> T fromJson(String jsonString, Class<T> subscriberResponseClass) {
-        Gson gson = new Gson();
-        return gson.fromJson(jsonString, subscriberResponseClass);
     }
 }

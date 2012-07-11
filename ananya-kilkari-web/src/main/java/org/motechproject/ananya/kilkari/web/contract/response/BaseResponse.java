@@ -1,8 +1,11 @@
 package org.motechproject.ananya.kilkari.web.contract.response;
 
-import com.google.gson.Gson;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import java.io.IOException;
+import java.io.StringWriter;
 
 public class BaseResponse {
 
@@ -63,11 +66,14 @@ public class BaseResponse {
         return status.equals(ERROR);
     }
 
-    public Object fromJson(String jsonSerializedString) {
-        return new Gson().fromJson(jsonSerializedString, this.getClass());
-    }
-
     public String toJson() {
-        return new Gson().toJson(this);
+        ObjectMapper mapper = new ObjectMapper();
+        StringWriter stringWriter = new StringWriter();
+        try {
+            mapper.writeValue(stringWriter, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stringWriter.toString();
     }
 }

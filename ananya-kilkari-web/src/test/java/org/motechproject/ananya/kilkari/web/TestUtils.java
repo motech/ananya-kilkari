@@ -1,19 +1,21 @@
-package org.motechproject.ananya.kilkari.utils;
+package org.motechproject.ananya.kilkari.web;
+
 
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
-import java.util.Map;
+import java.io.StringWriter;
 
 public class TestUtils {
-    public static final String KILKARI_URL = "http://localhost:8080/ananya-kilkari";
-
-    public static String constructUrl(String url, String path, Map<String, String> parametersMap) {
-        url += "/" + path + "?";
-        for (String key : parametersMap.keySet()) {
-            url += key + "=" + parametersMap.get(key) + "&";
+    public static String toJson(Object objectToSerialize) {
+        ObjectMapper mapper = new ObjectMapper();
+        StringWriter stringWriter = new StringWriter();
+        try {
+            mapper.writeValue(stringWriter, objectToSerialize);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return url;
+        return stringWriter.toString();
     }
 
     public static <T> T fromJson(String jsonString, Class<T> subscriberResponseClass) {

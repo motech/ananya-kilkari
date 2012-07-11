@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
-import com.google.gson.Gson;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -19,11 +18,10 @@ import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
+import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetails;
-import org.motechproject.ananya.kilkari.domain.CallbackAction;
-import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
@@ -210,13 +208,13 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldCreateNewSubscriptionEventForCC() throws Exception {
-        DateTime beforeCreate = DateTime.now();
+        DateTime createdAt = DateTime.now();
 
-        SubscriptionRequest expectedRequest= new SubscriptionRequestBuilder().withDefaults().build();
+        SubscriptionRequest expectedRequest= new SubscriptionRequestBuilder().withDefaults().withCreatedAt(createdAt).build();
 
         when(reportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
         mockMvc(subscriptionController)
-                .perform(post("/subscription").body(toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .perform(post("/subscription").body(TestUtils.toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(CONTENT_TYPE_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
@@ -226,7 +224,7 @@ public class SubscriptionControllerTest {
         SubscriptionRequest subscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
 
         assertTrue(expectedRequest.equals(subscriptionRequest));
-        assertCreatedAt(beforeCreate, subscriptionRequest);
+        assertCreatedAt(createdAt, subscriptionRequest);
     }
 
     @Test
@@ -238,7 +236,7 @@ public class SubscriptionControllerTest {
         callbackRequest.setStatus("invalidStatus");
         callbackRequest.setOperator("invalidOperator");
 
-        byte[] requestBody = toJson(callbackRequest).getBytes();
+        byte[] requestBody = TestUtils.toJson(callbackRequest).getBytes();
 
         mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId)
@@ -260,7 +258,7 @@ public class SubscriptionControllerTest {
         callbackRequest.setReason("reason");
         callbackRequest.setOperator(Operator.AIRTEL.name());
         callbackRequest.setGraceCount("2");
-        byte[] requestBody = toJson(callbackRequest).getBytes();
+        byte[] requestBody = TestUtils.toJson(callbackRequest).getBytes();
 
         mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId)
@@ -356,7 +354,6 @@ public class SubscriptionControllerTest {
 
             @Override
             public void describeTo(Description matcherDescription) {
-                //To change body of implemented methods use File | Settings | File Templates.
             }
         };
     }
@@ -370,7 +367,6 @@ public class SubscriptionControllerTest {
 
             @Override
             public void describeTo(Description matcherDescription) {
-                //To change body of implemented methods use File | Settings | File Templates.
             }
         };
     }
@@ -384,7 +380,6 @@ public class SubscriptionControllerTest {
 
             @Override
             public void describeTo(Description matcherDescription) {
-                //To change body of implemented methods use File | Settings | File Templates.
             }
         };
     }
@@ -414,7 +409,7 @@ public class SubscriptionControllerTest {
     private boolean assertErrorResponseForInvalidMsisdn(String jsonContent, String channel) {
         jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
 
-        BaseResponse baseResponse = fromJson(jsonContent, BaseResponse.class);
+        BaseResponse baseResponse = TestUtils.fromJson(jsonContent, BaseResponse.class);
 
         return baseResponse.isError() &&
                 baseResponse.getDescription().equals("Invalid Msisdn");
@@ -423,7 +418,7 @@ public class SubscriptionControllerTest {
     private boolean assertErrorResponseForRuntimeException(String jsonContent, String channel) {
         jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
 
-        BaseResponse baseResponse = fromJson(jsonContent, BaseResponse.class);
+        BaseResponse baseResponse = TestUtils.fromJson(jsonContent, BaseResponse.class);
 
         return baseResponse.isError() &&
                 baseResponse.getDescription().equals("runtime exception");
@@ -432,7 +427,7 @@ public class SubscriptionControllerTest {
     private boolean assertSubscriberResponse(String jsonContent, String channel) {
         jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
 
-        SubscriberResponse subscriberResponse = fromJson(jsonContent, SubscriberResponse.class);
+        SubscriberResponse subscriberResponse = TestUtils.fromJson(jsonContent, SubscriberResponse.class);
         SubscriptionDetails subscriptionDetails = subscriberResponse.getSubscriptionDetails().get(0);
 
         return subscriptionDetails.getPack().equals(mockedSubscription.getPack().name())
@@ -443,18 +438,8 @@ public class SubscriptionControllerTest {
     private boolean assertSubscriberResponseWithNoSubscriptions(String jsonContent, String channel) {
         jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
 
-        SubscriberResponse subscriberResponse = fromJson(jsonContent, SubscriberResponse.class);
+        SubscriberResponse subscriberResponse = TestUtils.fromJson(jsonContent, SubscriberResponse.class);
 
         return subscriberResponse.getSubscriptionDetails().size() == 0;
-    }
-
-    private String toJson(Object objectToSerialize) {
-        Gson gson = new Gson();
-        return gson.toJson(objectToSerialize);
-    }
-
-    private <T> T fromJson(String jsonString, Class<T> subscriberResponseClass) {
-        Gson gson = new Gson();
-        return gson.fromJson(jsonString, subscriberResponseClass);
     }
 }

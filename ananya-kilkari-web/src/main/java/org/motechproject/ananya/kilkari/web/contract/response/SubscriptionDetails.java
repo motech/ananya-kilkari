@@ -16,6 +16,9 @@ public class SubscriptionDetails {
     @JsonProperty
     private String status;
 
+    SubscriptionDetails() {
+    }
+
     public SubscriptionDetails(String subscriptionId, String pack, String status) {
         this.subscriptionId = subscriptionId;
         this.pack = pack;

@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
@@ -16,33 +17,12 @@ public class SubscriptionRequest implements Serializable {
     public static final String DATE_TIME_FORMAT = "dd-MM-yyyy";
 
     public static class Location implements Serializable {
+        @JsonProperty
         private String district;
+        @JsonProperty
         private String block;
+        @JsonProperty
         private String panchayat;
-
-        public String getDistrict() {
-            return district;
-        }
-
-        public void setDistrict(String district) {
-            this.district = district;
-        }
-
-        public String getBlock() {
-            return block;
-        }
-
-        public void setBlock(String block) {
-            this.block = block;
-        }
-
-        public String getPanchayat() {
-            return panchayat;
-        }
-
-        public void setPanchayat(String panchayat) {
-            this.panchayat = panchayat;
-        }
 
         @Override
         public boolean equals(Object o) {
@@ -68,16 +48,23 @@ public class SubscriptionRequest implements Serializable {
         }
     }
 
+    @JsonProperty
     private String msisdn;
+    @JsonProperty
     private String pack;
+    @JsonProperty
     private String channel;
     @JsonIgnore
     private DateTime createdAt;
+    @JsonProperty
     private String beneficiaryName;
+    @JsonProperty
     private String beneficiaryAge;
-
+    @JsonProperty
     private String expectedDateOfDelivery;
+    @JsonProperty
     private String dateOfBirth;
+    @JsonProperty
     private Location location;
 
     public SubscriptionRequest() {
@@ -85,44 +72,77 @@ public class SubscriptionRequest implements Serializable {
         this.createdAt = DateTime.now();
     }
 
+    @JsonIgnore
+    public String getMsisdn() {
+        return msisdn;
+    }
+
+    @JsonIgnore
+    public String getPack() {
+        return pack;
+    }
+
+    @JsonIgnore
+    public String getChannel() {
+        return channel;
+    }
+
+    @JsonIgnore
+    public DateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    @JsonIgnore
+    public String getBeneficiaryName() {
+        return beneficiaryName;
+    }
+
+    @JsonIgnore
+    public int getBeneficiaryAge() {
+        return StringUtils.isNotEmpty(beneficiaryAge) ? Integer.parseInt(beneficiaryAge) : 0;
+    }
+
+    @JsonIgnore
+    public DateTime getExpectedDateOfDelivery() {
+        return parseDateTime(expectedDateOfDelivery);
+    }
+
+    @JsonIgnore
+    public DateTime getDateOfBirth() {
+        return parseDateTime(dateOfBirth);
+    }
+
+    @JsonIgnore
     public String getDistrict() {
         return location == null ? null : location.district;
     }
 
-    public void setDistrict(String district) {
-        this.location.district = district;
-    }
-
+    @JsonIgnore
     public String getBlock() {
         return location == null ? null : location.block;
+    }
+
+    @JsonIgnore
+    public String getPanchayat() {
+        return location == null ? null : location.panchayat;
+    }
+
+    @JsonIgnore
+    public Location getLocation() {
+        return location;
+    }
+
+
+    public void setDistrict(String district) {
+        this.location.district = district;
     }
 
     public void setBlock(String block) {
         this.location.block = block;
     }
 
-    public String getPanchayat() {
-        return location == null ? null : location.panchayat;
-    }
-
     public void setPanchayat(String panchayat) {
         this.location.panchayat = panchayat;
-    }
-
-    public String getBeneficiaryName() {
-        return beneficiaryName;
-    }
-
-    public int getBeneficiaryAge() {
-        return StringUtils.isNotEmpty(beneficiaryAge) ? Integer.parseInt(beneficiaryAge) : 0;
-    }
-
-    public DateTime getExpectedDateOfDelivery() {
-        return parseDateTime(expectedDateOfDelivery);
-    }
-
-    public DateTime getDateOfBirth() {
-        return parseDateTime(dateOfBirth);
     }
 
     public void setBeneficiaryName(String beneficiaryName) {
@@ -145,22 +165,6 @@ public class SubscriptionRequest implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public String getMsisdn() {
-        return msisdn;
-    }
-
-    public String getPack() {
-        return pack;
-    }
-
-    public String getChannel() {
-        return channel;
-    }
-
-    public DateTime getCreatedAt() {
-        return createdAt;
-    }
-
     public void setPack(String pack) {
         this.pack = pack;
     }
@@ -171,14 +175,6 @@ public class SubscriptionRequest implements Serializable {
 
     public void setMsisdn(String msisdn) {
         this.msisdn = msisdn;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
     }
 
     public void validate(SubscriberLocation reportLocation, Subscription existingActiveSubscription) {

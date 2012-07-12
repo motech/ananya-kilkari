@@ -6,11 +6,11 @@ import org.joda.time.DateTime;
 
 public class SubscriptionCreationReportRequest extends BaseReportRequest {
 
-    private Channel channel;
+    private String channel;
 
     private String msisdn;
 
-    private SubscriptionPack pack;
+    private String pack;
 
     private String name;
 
@@ -22,13 +22,11 @@ public class SubscriptionCreationReportRequest extends BaseReportRequest {
 
     private SubscriberLocation location;
 
-    private String operator;
-
-    public SubscriptionCreationReportRequest(Subscription subscription, Channel channel, int ageOfBeneficiary, String name, DateTime dob, DateTime edd, SubscriberLocation location) {
-        super(subscription.getSubscriptionId(), subscription.getStatus(), subscription.getCreationDate());
+    public SubscriptionCreationReportRequest(SubscriptionDetails subscriptionDetails, String channel, int ageOfBeneficiary, String name, DateTime dob, DateTime edd, SubscriberLocation location) {
+        super(subscriptionDetails.getSubscriptionId(), subscriptionDetails.getStatus(), subscriptionDetails.getCreationDate());
         this.name = name;
-        this.msisdn = subscription.getMsisdn();
-        this.pack = subscription.getPack();
+        this.msisdn = subscriptionDetails.getMsisdn();
+        this.pack = subscriptionDetails.getPack();
         this.channel = channel;
         this.ageOfBeneficiary = ageOfBeneficiary;
         this.dob = dob;
@@ -36,7 +34,7 @@ public class SubscriptionCreationReportRequest extends BaseReportRequest {
         this.location = location;
     }
 
-    public Channel getChannel() {
+    public String getChannel() {
         return channel;
     }
 
@@ -44,7 +42,7 @@ public class SubscriptionCreationReportRequest extends BaseReportRequest {
         return msisdn;
     }
 
-    public SubscriptionPack getPack() {
+    public String getPack() {
         return pack;
     }
 
@@ -66,10 +64,6 @@ public class SubscriptionCreationReportRequest extends BaseReportRequest {
 
     public SubscriberLocation getLocation() {
         return location;
-    }
-
-    public String getOperator() {
-        return operator;
     }
 
     @Override

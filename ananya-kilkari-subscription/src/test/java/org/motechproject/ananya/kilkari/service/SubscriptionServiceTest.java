@@ -39,11 +39,13 @@ public class SubscriptionServiceTest {
     private SubscriptionRequest mockedSubscriptionRequest;
     @Mock
     private SubscriptionRequestValidator subscriptionRequestValidator;
+    @Mock
+    private ReportingServiceImpl reportingServiceImpl;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, publisher, subscriptionRequestValidator);
+        subscriptionService = new SubscriptionService(allSubscriptions, publisher, subscriptionRequestValidator, reportingServiceImpl);
     }
 
     @Test
@@ -64,7 +66,7 @@ public class SubscriptionServiceTest {
 
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         verify(publisher).processSubscription(subscriptionActivationRequestArgumentCaptor.capture());
-        verify(publisher).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
+        verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
 
         Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();
         Assert.assertEquals(subscription, subscriptionSaved);
@@ -79,9 +81,8 @@ public class SubscriptionServiceTest {
 
         SubscriptionCreationReportRequest actualSubscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
         assertEquals(msisdn, actualSubscriptionCreationReportRequest.getMsisdn());
-        assertEquals(subscriptionPack, actualSubscriptionCreationReportRequest.getPack());
-        assertEquals(channel, actualSubscriptionCreationReportRequest.getChannel());
-        assertNull(actualSubscriptionCreationReportRequest.getOperator());
+        assertEquals(subscriptionPack.name(), actualSubscriptionCreationReportRequest.getPack());
+        assertEquals(channel.name(), actualSubscriptionCreationReportRequest.getChannel());
     }
 
     @Test
@@ -147,16 +148,16 @@ public class SubscriptionServiceTest {
 
         subscriptionService.activationRequested(subscriptionId);
 
-        InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
+        InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
         order.verify(mockedSubscription).activationRequested();
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
-        order.verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(status, subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertNull(subscriptionStateChangeReportRequest.getOperator());
     }
 
@@ -174,16 +175,16 @@ public class SubscriptionServiceTest {
 
         subscriptionService.activationFailed(subscriptionId, DateTime.now(), reason, operator);
 
-        InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
+        InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
         order.verify(mockedSubscription).activationFailed(operator);
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
-        order.verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(status, subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(reason, subscriptionStateChangeReportRequest.getReason());
         assertEquals(operator, subscriptionStateChangeReportRequest.getOperator());
     }
@@ -201,16 +202,16 @@ public class SubscriptionServiceTest {
 
         subscriptionService.activate(subscriptionId, DateTime.now(), operator);
 
-        InOrder order = inOrder(allSubscriptions, mockedSubscription, publisher);
+        InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
         order.verify(mockedSubscription).activate(operator);
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
-        order.verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(subscriptionStatus, subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(subscriptionStatus.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(operator, subscriptionStateChangeReportRequest.getOperator());
     }
 
@@ -232,12 +233,12 @@ public class SubscriptionServiceTest {
 
         verify(allSubscriptions).update(subscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
-        verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(SubscriptionStatus.ACTIVE, subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(SubscriptionStatus.ACTIVE.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(renewalDate, subscriptionStateChangeReportRequest.getCreatedAt());
         assertEquals((Integer) graceCount, subscriptionStateChangeReportRequest.getGraceCount());
     }
@@ -260,12 +261,12 @@ public class SubscriptionServiceTest {
 
         verify(allSubscriptions).update(subscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
-        verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(SubscriptionStatus.SUSPENDED, subscription.getStatus());
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(SubscriptionStatus.SUSPENDED, subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(SubscriptionStatus.SUSPENDED.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(renewalDate, subscriptionStateChangeReportRequest.getCreatedAt());
         assertEquals((Integer) graceCount, subscriptionStateChangeReportRequest.getGraceCount());
     }
@@ -288,12 +289,12 @@ public class SubscriptionServiceTest {
 
         verify(allSubscriptions).update(subscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
-        verify(publisher).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         assertEquals(SubscriptionStatus.DEACTIVATED, subscription.getStatus());
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(SubscriptionStatus.DEACTIVATED, subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(SubscriptionStatus.DEACTIVATED.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(date, subscriptionStateChangeReportRequest.getCreatedAt());
         assertEquals(graceCount, subscriptionStateChangeReportRequest.getGraceCount());
     }

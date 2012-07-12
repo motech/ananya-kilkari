@@ -10,9 +10,9 @@ public class BaseReportRequest implements Serializable {
 
     private DateTime createdAt;
 
-    private SubscriptionStatus subscriptionStatus;
+    private String subscriptionStatus;
 
-    public BaseReportRequest(String subscriptionId, SubscriptionStatus subscriptionStatus, DateTime createdAt) {
+    public BaseReportRequest(String subscriptionId, String subscriptionStatus, DateTime createdAt) {
         this.subscriptionId = subscriptionId;
         this.subscriptionStatus = subscriptionStatus;
         this.createdAt = createdAt;
@@ -26,7 +26,7 @@ public class BaseReportRequest implements Serializable {
         return createdAt;
     }
 
-    public SubscriptionStatus getSubscriptionStatus() {
+    public String getSubscriptionStatus() {
         return subscriptionStatus;
     }
 }

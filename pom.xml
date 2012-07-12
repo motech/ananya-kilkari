@@ -13,6 +13,7 @@
         <module>ananya-kilkari-obd</module>
         <module>ananya-kilkari-service</module>
         <module>ananya-kilkari-smoke</module>
+        <module>ananya-kilkari-reporting</module>
     </modules>
     <name>Ananya Kilkari</name>
     <url>http://www.motechproject.org</url>

@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.handlers;
 
+import org.motechproject.ananya.kilkari.domain.ReportingEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
-import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -22,14 +22,14 @@ public class SubscriptionReportHandler {
         this.reportingGateway = reportingGateway;
     }
 
-    @MotechListener(subjects = {SubscriptionEventKeys.REPORT_SUBSCRIPTION_CREATION})
+    @MotechListener(subjects = {ReportingEventKeys.REPORT_SUBSCRIPTION_CREATION})
     public void handleSubscriptionCreation(MotechEvent event) {
         SubscriptionCreationReportRequest subscriptionCreationReportRequest = (SubscriptionCreationReportRequest) event.getParameters().get("0");
         logger.info(String.format("Handling report subscription creation event for msisdn: %s, pack: %s, channel: %s", subscriptionCreationReportRequest.getMsisdn(), subscriptionCreationReportRequest.getPack(), subscriptionCreationReportRequest.getChannel()));
         reportingGateway.createSubscription(subscriptionCreationReportRequest);
     }
 
-    @MotechListener(subjects = {SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE})
+    @MotechListener(subjects = {ReportingEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE})
     public void handleSubscriptionStateChange(MotechEvent event) {
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = (SubscriptionStateChangeReportRequest) event.getParameters().get("0");
         logger.info(String.format("Handling report subscription state change event for subscripitonId: %s, subscriptionStatus: %s", subscriptionStateChangeReportRequest.getSubscriptionId(), subscriptionStateChangeReportRequest.getSubscriptionStatus()));

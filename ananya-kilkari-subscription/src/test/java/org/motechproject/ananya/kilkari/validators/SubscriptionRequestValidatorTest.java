@@ -17,8 +17,8 @@ import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.service.ReportingService;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class SubscriptionRequestValidatorTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private ReportingGateway reportingService;
+    private ReportingService reportingService;
     @Mock
     private AllSubscriptions allSubscriptions;
 

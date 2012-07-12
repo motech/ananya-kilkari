@@ -19,12 +19,14 @@ public class SubscriptionService {
     private Publisher publisher;
 
     private SubscriptionRequestValidator subscriptionRequestValidator;
+    private ReportingService reportingService;
 
     @Autowired
-    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher, SubscriptionRequestValidator subscriptionRequestValidator) {
+    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher, SubscriptionRequestValidator subscriptionRequestValidator, ReportingService reportingService) {
         this.allSubscriptions = allSubscriptions;
         this.publisher = publisher;
         this.subscriptionRequestValidator = subscriptionRequestValidator;
+        this.reportingService = reportingService;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest) {
@@ -114,7 +116,7 @@ public class SubscriptionService {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         action.perform(subscription);
         allSubscriptions.update(subscription);
-        publisher.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscription.getSubscriptionId(), subscription.getStatus(), updatedOn, reason, operator, graceCount));
+        reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscription.getSubscriptionId(), subscription.getStatus().name(), updatedOn, reason, operator, graceCount));
     }
 
     private void sendProcessSubscriptionEvent(SubscriptionActivationRequest subscriptionActivationRequest) {
@@ -122,7 +124,7 @@ public class SubscriptionService {
     }
 
     private void sendReportSubscriptionCreationEvent(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {
-        publisher.reportSubscriptionCreation(subscriptionCreationReportRequest);
+        reportingService.reportSubscriptionCreation(subscriptionCreationReportRequest);
     }
 
     private void validateMsisdn(String msisdn) {

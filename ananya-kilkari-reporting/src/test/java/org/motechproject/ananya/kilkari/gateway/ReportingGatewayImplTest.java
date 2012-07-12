@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.service;
+package org.motechproject.ananya.kilkari.gateway;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -8,8 +8,10 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.*;
-import org.motechproject.ananya.kilkari.gateway.ReportingGatewayImpl;
+import org.motechproject.ananya.kilkari.domain.SubscriberLocation;
+import org.motechproject.ananya.kilkari.domain.SubscriptionCreationReportRequest;
+import org.motechproject.ananya.kilkari.domain.SubscriptionDetails;
+import org.motechproject.ananya.kilkari.domain.SubscriptionStateChangeReportRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -24,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ReportingServiceImplTest {
+public class ReportingGatewayImplTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
@@ -45,16 +47,16 @@ public class ReportingServiceImplTest {
     @Test
     public void shouldInvokeReportingServiceWithSubscriptionDetails() {
         String msisdn = "msisdn";
-        SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
-        Channel channel = Channel.IVR;
+        String pack = "TWELVE_MONTHS";
+        String channel = "IVR";
         String subscriptionId = "abcd1234";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
         DateTime dob = DateTime.now().minusMonths(8);
         DateTime edd = DateTime.now().plusMonths(3);
         String name = "name";
-        Subscription subscription = new Subscription(msisdn, pack, DateTime.now());
-        new ReportingGatewayImpl(restTemplate, kilkariProperties).createSubscription(new SubscriptionCreationReportRequest(subscription,channel, 42, name, dob, edd, new SubscriberLocation("district", "block", "panchayat")));
+        SubscriptionDetails subscriptionDetails = new SubscriptionDetails(msisdn, pack, DateTime.now(),"ACTIVE", subscriptionId);
+        new ReportingGatewayImpl(restTemplate, kilkariProperties).createSubscription(new SubscriptionCreationReportRequest(subscriptionDetails,channel, 42, name, dob, edd, new SubscriberLocation("district", "block", "panchayat")));
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
@@ -66,7 +68,7 @@ public class ReportingServiceImplTest {
         assertEquals(msisdn, subscriptionCreationReportRequest.getMsisdn());
         assertEquals(pack, subscriptionCreationReportRequest.getPack());
         assertEquals(channel, subscriptionCreationReportRequest.getChannel());
-        assertEquals(subscription.getSubscriptionId(), subscriptionCreationReportRequest.getSubscriptionId());
+        assertEquals(subscriptionDetails.getSubscriptionId(), subscriptionCreationReportRequest.getSubscriptionId());
     }
 
     @Test
@@ -115,7 +117,7 @@ public class ReportingServiceImplTest {
         assertTrue(url.contains("block=myblock"));
         assertTrue(url.contains("panchayat=mypanchayat"));
     }
- @Test
+    @Test
     public void shouldRethrowAnyOtherExceptionOnGetLocation() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
@@ -185,8 +187,8 @@ public class ReportingServiceImplTest {
     @Test
     public void shouldInvokeUpdateOnReportingServiceWithSubscriptionStateChangeDetails() {
         String subscriptionId = "abcd1234";
-        SubscriptionStatus subscriptionStatus = SubscriptionStatus.ACTIVE;
-        String operator = Operator.AIRTEL.name();
+        String subscriptionStatus = "ACTIVE";
+        String operator = "AIRTEL";
         String reason = "my own error reason";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 

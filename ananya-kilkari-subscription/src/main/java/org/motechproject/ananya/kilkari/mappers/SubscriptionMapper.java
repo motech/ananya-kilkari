@@ -30,7 +30,8 @@ public class SubscriptionMapper {
     }
 
     private SubscriptionCreationReportRequest createSubscriptionReportRequest(SubscriptionRequest subscriptionRequest) {
+        SubscriptionDetails subscriptionDetails = new SubscriptionDetails(subscription.getMsisdn(), subscription.getPack().name(), subscription.getCreationDate(), subscription.getStatus().name(), subscription.getSubscriptionId());
         SubscriberLocation subscriberLocation = new SubscriberLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat());
-        return new SubscriptionCreationReportRequest(subscription, Channel.from(subscriptionRequest.getChannel()), subscriptionRequest.getBeneficiaryAge(), subscriptionRequest.getBeneficiaryName(), subscriptionRequest.getDateOfBirth(), subscriptionRequest.getExpectedDateOfDelivery(), subscriberLocation);
+        return new SubscriptionCreationReportRequest(subscriptionDetails, subscriptionRequest.getChannel(), subscriptionRequest.getBeneficiaryAge(), subscriptionRequest.getBeneficiaryName(), subscriptionRequest.getDateOfBirth(), subscriptionRequest.getExpectedDateOfDelivery(), subscriberLocation);
     }
 }

@@ -8,12 +8,14 @@ import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.gateway.OnMobileSubscriptionGateway;
-import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
+import org.motechproject.ananya.kilkari.service.ReportingService;
+import org.motechproject.ananya.kilkari.service.StubReportingService;
 import org.motechproject.ananya.kilkari.service.stub.StubOnMobileSubscriptionGateway;
-import org.motechproject.ananya.kilkari.service.stub.StubReportingGateway;
+import org.motechproject.ananya.kilkari.validators.SubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
@@ -47,7 +49,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     private KilkariMessageCampaignService kilkariMessageCampaignService;
 
     @Autowired
-    private StubReportingGateway reportingService;
+    private StubReportingService reportingService;
 
     @Autowired
     private StubOnMobileSubscriptionGateway onMobileSubscriptionService;
@@ -79,7 +81,6 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         subscriberResponse.addSubscriptionDetail(SubscriptionDetailsMapper.mapFrom(subscription1));
         subscriberResponse.addSubscriptionDetail(SubscriptionDetailsMapper.mapFrom(subscription2));
 
-        reportingService.setBehavior(mock(ReportingGateway.class));
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 
         MvcResult result = mockMvc(subscriptionController)
@@ -103,7 +104,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
 
-        reportingService.setBehavior(mock(ReportingGateway.class));
+        reportingService.setBehavior(mock(ReportingService.class));
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 
         MvcResult result = mockMvc(subscriptionController)
@@ -159,9 +160,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
         BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
 
-        ReportingGateway mockedReportingGateway = Mockito.mock(ReportingGateway.class);
-        when(mockedReportingGateway.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
-        reportingService.setBehavior(mockedReportingGateway);
+        ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
+        reportingService.setBehavior(mockedReportingService);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 
         SubscriptionRequest expectedRequest = new SubscriptionRequestBuilder().withDefaults().build();

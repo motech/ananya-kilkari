@@ -8,13 +8,13 @@ public class SubscriptionStateChangeReportRequest extends BaseReportRequest {
     private String operator;
     private Integer graceCount;
 
-    public SubscriptionStateChangeReportRequest(String subscriptionId, SubscriptionStatus status, DateTime createdAt, String reason, String operator) {
+    public SubscriptionStateChangeReportRequest(String subscriptionId, String status, DateTime createdAt, String reason, String operator) {
         super(subscriptionId, status, createdAt);
         this.reason = reason;
         this.operator = operator;
     }
 
-    public SubscriptionStateChangeReportRequest(String subscriptionId, SubscriptionStatus status, DateTime createdAt, String reason, String operator, Integer graceCount) {
+    public SubscriptionStateChangeReportRequest(String subscriptionId, String status, DateTime createdAt, String reason, String operator, Integer graceCount) {
         this(subscriptionId, status, createdAt, reason, operator);
         this.graceCount = graceCount;
     }

@@ -1,11 +1,13 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.*;
+import org.motechproject.ananya.kilkari.domain.Channel;
+import org.motechproject.ananya.kilkari.domain.SubscriptionActivationRequest;
+import org.motechproject.ananya.kilkari.domain.SubscriptionEventKeys;
+import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
 import org.motechproject.scheduler.context.EventContext;
 
 import static org.junit.Assert.assertEquals;
@@ -40,48 +42,6 @@ public class PublisherTest {
         assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptionActivationRequest.getPack());
         assertEquals(Channel.IVR, subscriptionActivationRequest.getChannel());
         assertEquals(subscriptionId, subscriptionActivationRequest.getSubscriptionId());
-    }
-
-    @Test
-    public void shouldPublishReportSubscriptionCreationEventIntoQueue() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.TWELVE_MONTHS, DateTime.now());
-        publisher.reportSubscriptionCreation(new SubscriptionCreationReportRequest(subscription, Channel.IVR, 0, null, null, null, null));
-
-        ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
-        ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        verify(eventContext).send(eventArgumentCaptor.capture(), subscriptionReportRequestArgumentCaptor.capture());
-        SubscriptionCreationReportRequest subscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
-        String eventName = eventArgumentCaptor.getValue();
-
-        assertEquals(SubscriptionEventKeys.REPORT_SUBSCRIPTION_CREATION, eventName);
-        assertEquals("1234567890", subscriptionCreationReportRequest.getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptionCreationReportRequest.getPack());
-        assertEquals(Channel.IVR, subscriptionCreationReportRequest.getChannel());
-        assertEquals(subscription.getSubscriptionId(), subscriptionCreationReportRequest.getSubscriptionId());
-    }
-
-    @Test
-    public void shouldPublishSubscriptionStateChangeEventIntoQueue() {
-        String subscriptionId = "ABCD1234";
-        SubscriptionStatus subscriptionStatus = SubscriptionStatus.ACTIVE;
-        String reason = "my own reason";
-        String operator = Operator.AIRTEL.name();
-        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus, DateTime.now(), reason, operator);
-
-        publisher.reportSubscriptionStateChange(subscriptionStateChangeReportRequest);
-
-        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
-        ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        verify(eventContext).send(eventArgumentCaptor.capture(), subscriptionStateChangeReportRequestArgumentCaptor.capture());
-
-        SubscriptionStateChangeReportRequest actualSubscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
-        String eventName = eventArgumentCaptor.getValue();
-
-        assertEquals(SubscriptionEventKeys.REPORT_SUBSCRIPTION_STATE_CHANGE, eventName);
-        assertEquals(subscriptionId, actualSubscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(subscriptionStatus, actualSubscriptionStateChangeReportRequest.getSubscriptionStatus());
-        assertEquals(reason, actualSubscriptionStateChangeReportRequest.getReason());
-        assertEquals(operator, actualSubscriptionStateChangeReportRequest.getOperator());
     }
 }
 

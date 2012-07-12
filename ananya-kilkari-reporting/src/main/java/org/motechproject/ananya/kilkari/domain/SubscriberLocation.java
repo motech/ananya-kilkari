@@ -23,23 +23,11 @@ public class SubscriberLocation implements Serializable {
         return district;
     }
 
-    public void setDistrict(String district) {
-        this.district = district;
-    }
-
     public String getBlock() {
         return block;
     }
 
-    public void setBlock(String block) {
-        this.block = block;
-    }
-
     public String getPanchayat() {
         return panchayat;
-    }
-
-    public void setPanchayat(String panchayat) {
-        this.panchayat = panchayat;
     }
 }

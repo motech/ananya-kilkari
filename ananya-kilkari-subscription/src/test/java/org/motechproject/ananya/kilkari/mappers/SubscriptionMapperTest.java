@@ -47,7 +47,7 @@ public class SubscriptionMapperTest {
         Subscription subscription = subscriptionMapper.getSubscription();
 
         assertEquals("msisdn", subscriptionCreationReportRequest.getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptionCreationReportRequest.getPack());
+        assertEquals(SubscriptionPack.TWELVE_MONTHS.name(), subscriptionCreationReportRequest.getPack());
         assertEquals(25, subscriptionCreationReportRequest.getAgeOfBeneficiary());
         assertEquals(dateTimeFormatter.parseDateTime(dob), subscriptionCreationReportRequest.getDob());
         assertEquals(dateTimeFormatter.parseDateTime(edd), subscriptionCreationReportRequest.getEdd());
@@ -56,7 +56,7 @@ public class SubscriptionMapperTest {
         assertEquals("myblock", location.getBlock());
         assertEquals("mypanchayat", location.getPanchayat());
         assertEquals(name, subscriptionCreationReportRequest.getName());
-        assertEquals(SubscriptionStatus.NEW, subscriptionCreationReportRequest.getSubscriptionStatus());
+        assertEquals(SubscriptionStatus.NEW.name(), subscriptionCreationReportRequest.getSubscriptionStatus());
         assertEquals(subscriptionMapper.getSubscription().getCreationDate(), subscriptionCreationReportRequest.getCreatedAt());
         assertEquals(subscription.getSubscriptionId(), subscriptionCreationReportRequest.getSubscriptionId());
     }

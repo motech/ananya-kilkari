@@ -7,8 +7,8 @@ import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.service.ReportingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,10 +18,10 @@ import java.util.List;
 @Component
 public class SubscriptionRequestValidator {
     private AllSubscriptions allSubscriptions;
-    private ReportingGateway reportingService;
+    private ReportingService reportingService;
 
     @Autowired
-    public SubscriptionRequestValidator(AllSubscriptions allSubscriptions, ReportingGateway reportingService) {
+    public SubscriptionRequestValidator(AllSubscriptions allSubscriptions, ReportingService reportingService) {
         this.allSubscriptions = allSubscriptions;
         this.reportingService = reportingService;
     }

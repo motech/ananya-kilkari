@@ -9,6 +9,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.validators.ValidationUtils;
+import org.motechproject.common.domain.PhoneNumber;
 
 import java.io.Serializable;
 import java.util.List;
@@ -196,7 +197,7 @@ public class SubscriptionRequest implements Serializable {
     }
 
     private void validateMsisdn(List<String> errors) {
-        if (!ValidationUtils.assertMsisdn(msisdn)) {
+        if (PhoneNumber.isNotValid(msisdn)) {
             errors.add(String.format("Invalid msisdn %s", msisdn));
         }
     }

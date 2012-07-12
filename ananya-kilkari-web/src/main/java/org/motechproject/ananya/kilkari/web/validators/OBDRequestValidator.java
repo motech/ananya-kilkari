@@ -5,6 +5,7 @@ import org.motechproject.ananya.kilkari.domain.CampaignCode;
 import org.motechproject.ananya.kilkari.domain.OBDRequest;
 import org.motechproject.ananya.kilkari.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -56,11 +57,7 @@ public class OBDRequestValidator {
     }
 
     private void validateMsisdn(String msisdn, List<String> errors) {
-        if (!isValidMsisdn(msisdn))
+        if (PhoneNumber.isNotValid(msisdn))
             errors.add(String.format("Invalid msisdn %s", msisdn));
-    }
-
-    private boolean isValidMsisdn(String msisdn) {
-        return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
     }
 }

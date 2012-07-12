@@ -5,7 +5,6 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
-import org.motechproject.common.domain.PhoneNumber;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,10 +38,6 @@ public class ValidationUtils {
 
     public static boolean assertPack(String pack) {
         return SubscriptionPack.isValid(pack);
-    }
-
-    public static boolean assertMsisdn(String msisdn) {
-        return PhoneNumber.isValid(msisdn);
     }
 
     public static boolean assertNotNull(Object object) {

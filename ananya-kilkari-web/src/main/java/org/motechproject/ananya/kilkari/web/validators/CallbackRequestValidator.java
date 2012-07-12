@@ -1,10 +1,10 @@
 package org.motechproject.ananya.kilkari.web.validators;
 
-import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -75,7 +75,7 @@ public class CallbackRequestValidator {
     }
 
     private void validateMsisdn(String msisdn, List<String> errors) {
-        if (!isValidMsisdn(msisdn))
+        if (PhoneNumber.isNotValid(msisdn))
             errors.add(String.format("Invalid msisdn %s", msisdn));
     }
 
@@ -93,9 +93,5 @@ public class CallbackRequestValidator {
             return false;
         }
         return true;
-    }
-
-    private boolean isValidMsisdn(String msisdn) {
-        return (StringUtils.length(msisdn) >= 10 && StringUtils.isNumeric(msisdn));
     }
 }

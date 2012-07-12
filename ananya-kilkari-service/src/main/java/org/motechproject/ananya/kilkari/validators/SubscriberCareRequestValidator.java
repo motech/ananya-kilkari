@@ -4,6 +4,7 @@ import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,7 +17,7 @@ public class SubscriberCareRequestValidator {
 
     private void validateMsisdn(SubscriberCareRequest subscriberCareRequest) {
         String msisdn = subscriberCareRequest.getMsisdn();
-        if(!ValidationUtils.assertMsisdn(msisdn)) {
+        if(PhoneNumber.isNotValid(msisdn)) {
             throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
         }
     }

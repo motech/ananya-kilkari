@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.motechproject.common.domain.PhoneNumber;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -74,13 +75,13 @@ public class ValidationUtilsTest {
     @Test
     public void shouldReturnFalseWhenInvalidMsisdnNumberIsGivenToCreateNewSubscription() {
 
-        assertFalse(ValidationUtils.assertMsisdn("12345"));
+        assertFalse(PhoneNumber.isValid("12345"));
     }
 
     @Test
     public void shouldReturnFalseWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscription() {
 
-        assertFalse(ValidationUtils.assertMsisdn("123456789a"));
+        assertFalse(PhoneNumber.isValid("123456789a"));
     }
 
     @Test

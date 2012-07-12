@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class OnMobileOBDGatewayTest {
+public class OnMobileOBDGatewayImplTest {
 
     @Mock
     private HttpClient httpClient;
@@ -43,7 +43,7 @@ public class OnMobileOBDGatewayTest {
         obdProperties.put("obd.message.delivery.filename", "myfile.txt");
         obdProperties.put("obd.message.delivery.file", "myfile");
 
-        onMobileOBDGateway = new OnMobileOBDGateway(httpClient, obdProperties);
+        onMobileOBDGateway = new OnMobileOBDGatewayImpl(httpClient, obdProperties);
     }
 
     @Test

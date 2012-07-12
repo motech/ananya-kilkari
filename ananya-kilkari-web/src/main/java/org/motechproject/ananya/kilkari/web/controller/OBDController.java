@@ -18,17 +18,19 @@ import java.util.List;
 public class OBDController {
     private SubscriptionService subscriptionService;
     private KilkariCampaignService kilkariCampaignService;
+    private OBDRequestValidator obdRequestValidator;
 
     @Autowired
-    public OBDController(SubscriptionService subscriptionService, KilkariCampaignService kilkariCampaignService) {
+    public OBDController(SubscriptionService subscriptionService, KilkariCampaignService kilkariCampaignService, OBDRequestValidator obdRequestValidator) {
         this.subscriptionService = subscriptionService;
         this.kilkariCampaignService = kilkariCampaignService;
+        this.obdRequestValidator = obdRequestValidator;
     }
 
     @RequestMapping(value = "/obd/calldetails/{subscriptionId}", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse handleSuccessfulResponse(@RequestBody OBDRequest obdRequest, @PathVariable String subscriptionId){
-        List<String> validationErrors = new OBDRequestValidator(subscriptionService).validate(obdRequest, subscriptionId);
+        List<String> validationErrors = obdRequestValidator.validate(obdRequest, subscriptionId);
         if (!(validationErrors.isEmpty())) {
             return BaseResponse.failure(String.format("OBD Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
         }

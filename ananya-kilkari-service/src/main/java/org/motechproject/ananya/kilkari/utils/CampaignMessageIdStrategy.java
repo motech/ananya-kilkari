@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CampaignMessageIdStrategy {
 
-    private static final String MESSAGE_ID_FORMAT = "Week%s";
+    private static final String MESSAGE_ID_FORMAT = "WEEK%s";
 
     public String createMessageId(Subscription subscription) {
         int weeksDifference = Weeks.weeksBetween(subscription.getCreationDate(), DateTime.now()).getWeeks();

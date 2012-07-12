@@ -4,6 +4,8 @@ import org.motechproject.ananya.kilkari.builder.CampaignMessageCSVBuilder;
 import org.motechproject.ananya.kilkari.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.gateway.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessages;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ public class CampaignMessageService {
     private AllCampaignMessages allCampaignMessages;
     private OnMobileOBDGateway onMobileOBDGateway;
     private CampaignMessageCSVBuilder campaignMessageCSVBuilder;
+
+    private static final Logger logger = LoggerFactory.getLogger(CampaignMessageService.class);
 
     @Autowired
     public CampaignMessageService(AllCampaignMessages allCampaignMessages, OnMobileOBDGateway onMobileOBDGateway, CampaignMessageCSVBuilder campaignMessageCSVBuilder) {
@@ -38,6 +42,7 @@ public class CampaignMessageService {
     }
 
     private void sendMessagesToOBD(List<CampaignMessage> messages) {
+        logger.info("Sending %s campaign messages to obd", messages.size());
         if(messages.isEmpty())
             return;
         String campaignMessageCSVContent = campaignMessageCSVBuilder.getCSV(messages);

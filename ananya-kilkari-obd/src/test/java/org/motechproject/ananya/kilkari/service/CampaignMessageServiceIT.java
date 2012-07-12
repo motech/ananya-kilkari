@@ -4,16 +4,18 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.CampaignMessage;
+import org.motechproject.ananya.kilkari.gateway.OnMobileOBDGateway;
+import org.motechproject.ananya.kilkari.gateway.StubOnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.verify;
 
 public class CampaignMessageServiceIT extends SpringIntegrationTest {
 
@@ -22,6 +24,9 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
 
     @Autowired
     private AllCampaignMessages allCampaignMessages;
+
+    @Autowired
+    private StubOnMobileOBDGateway onMobileOBDGateway;
 
     @After
     @Before
@@ -82,5 +87,23 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
                 .append(expected.getMsisdn(), actual.getMsisdn())
                 .append(expected.getOperator(), expected.getOperator())
                 .isEquals();
+    }
+
+    @Test
+    public void shouldSendNewCampaignMessagesToOBD() {
+        String subscriptionId = "subscriptionId";
+        String messageId = "messageId";
+        String operator = "airtel";
+        String msisdn = "msisdn";
+
+        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator);
+        markForDeletion(allCampaignMessages.find(subscriptionId, messageId));
+
+        OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
+        onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
+
+        campaignMessageService.sendNewMessages();
+        verify(mockOnMobileOBDGateway).send("msisdn,messageId,subscriptionId,airtel\n");
+
     }
 }

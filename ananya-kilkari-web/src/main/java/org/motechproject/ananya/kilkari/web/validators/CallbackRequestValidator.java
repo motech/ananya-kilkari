@@ -14,7 +14,6 @@ import java.util.List;
 @Component
 public class CallbackRequestValidator {
 
-    private List<String> errors;
     private final SubscriptionStateHandlerFactory subscriptionStateHandlerFactory;
     private final SubscriptionService subscriptionService;
 
@@ -22,19 +21,18 @@ public class CallbackRequestValidator {
     public CallbackRequestValidator(SubscriptionStateHandlerFactory subscriptionStateHandlerFactory, SubscriptionService subscriptionService) {
         this.subscriptionStateHandlerFactory = subscriptionStateHandlerFactory;
         this.subscriptionService = subscriptionService;
-        this.errors = new ArrayList<>();
     }
 
     public List<String> validate(CallbackRequestWrapper callbackRequestWrapper) {
-
-        final boolean isValidCallbackAction = validateCallbackAction(callbackRequestWrapper.getAction());
-        final boolean isValidCallbackStatus = validateCallbackStatus(callbackRequestWrapper.getStatus());
+        List<String> errors = new ArrayList<>();
+        final boolean isValidCallbackAction = validateCallbackAction(callbackRequestWrapper.getAction(), errors);
+        final boolean isValidCallbackStatus = validateCallbackStatus(callbackRequestWrapper.getStatus(), errors);
         if (isValidCallbackAction && isValidCallbackStatus) {
             errors.addAll(validateSubscriptionRequest(callbackRequestWrapper));
         }
 
-        validateMsisdn(callbackRequestWrapper.getMsisdn());
-        validateOperator(callbackRequestWrapper.getOperator());
+        validateMsisdn(callbackRequestWrapper.getMsisdn(), errors);
+        validateOperator(callbackRequestWrapper.getOperator(), errors);
 
         return errors;
     }
@@ -71,17 +69,17 @@ public class CallbackRequestValidator {
     }
 
 
-    private void validateOperator(String operator) {
+    private void validateOperator(String operator, List<String> errors) {
         if (!Operator.isValid(operator))
             errors.add(String.format("Invalid operator %s", operator));
     }
 
-    private void validateMsisdn(String msisdn) {
+    private void validateMsisdn(String msisdn, List<String> errors) {
         if (!isValidMsisdn(msisdn))
             errors.add(String.format("Invalid msisdn %s", msisdn));
     }
 
-    private boolean validateCallbackAction(String callbackAction) {
+    private boolean validateCallbackAction(String callbackAction, List<String> errors) {
         if (!CallbackAction.isValid(callbackAction)) {
             errors.add(String.format("Invalid callbackAction %s", callbackAction));
             return false;
@@ -89,7 +87,7 @@ public class CallbackRequestValidator {
         return true;
     }
 
-    private boolean validateCallbackStatus(String callbackStatus) {
+    private boolean validateCallbackStatus(String callbackStatus, List<String> errors) {
         if (!CallbackStatus.isValid(callbackStatus)) {
             errors.add(String.format("Invalid callbackStatus %s", callbackStatus));
             return false;

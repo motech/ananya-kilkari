@@ -19,7 +19,7 @@ public class CampaignMessageIdStrategyTest {
 
         String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
 
-        assertEquals("Week1", messageId);
+        assertEquals("WEEK1", messageId);
     }
 
     @Test
@@ -30,7 +30,7 @@ public class CampaignMessageIdStrategyTest {
 
         String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
 
-        assertEquals("Week1", messageId);
+        assertEquals("WEEK1", messageId);
     }
 
     @Test
@@ -41,7 +41,7 @@ public class CampaignMessageIdStrategyTest {
 
         String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
 
-        assertEquals("Week1", messageId);
+        assertEquals("WEEK1", messageId);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class CampaignMessageIdStrategyTest {
 
         String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
 
-        assertEquals("Week2", messageId);
+        assertEquals("WEEK2", messageId);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class CampaignMessageIdStrategyTest {
 
         String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
 
-        assertEquals("Week14", messageId);
+        assertEquals("WEEK14", messageId);
     }
 
     @Test
@@ -74,8 +74,6 @@ public class CampaignMessageIdStrategyTest {
 
         String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
 
-        assertEquals("Week34", messageId);
+        assertEquals("WEEK34", messageId);
     }
-
-
 }

@@ -2,114 +2,78 @@ package org.motechproject.ananya.kilkari.web.domain;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.domain.OBDRequest;
-import org.motechproject.ananya.kilkari.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.validators.OBDRequestValidator;
 
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class OBDRequestValidatorTest {
 
+    private OBDRequestValidator obdRequestValidator;
+
     @Mock
     private SubscriptionService subscriptionService;
 
-    private OBDRequestValidator obdRequestValidator;
-
     @Before
-    public void setUp() {
+    public void setUp(){
         initMocks(this);
         obdRequestValidator = new OBDRequestValidator(subscriptionService);
     }
 
     @Test
-    public void shouldValidateWithoutAnyErrors() {
+    public void shouldValidateValidRequest() {
+        String subscriptionId = "sub001";
         OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setMsisdn("1234567890");
-        obdRequest.setCampaignId("WEEK1");
-        obdRequest.setServiceOption(ServiceOption.HELP.name());
-        when(subscriptionService.findBySubscriptionId(Matchers.anyString())).thenReturn(new Subscription());
+        obdRequest.setCampaignId("WEEK33");
+        obdRequest.setMsisdn("9876543211");
+        obdRequest.setServiceOption("UNSUBSCRIBE");
+        obdRequest.setCallDetailRecord(new CallDetailRecord());
 
-        List<String> validationErrors = obdRequestValidator.validate(obdRequest, "subscriptionId");
+        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
+        List<String> errors = obdRequestValidator.validate(obdRequest, subscriptionId);
 
-        assertTrue(validationErrors.isEmpty());
+        assertTrue(errors.isEmpty());
     }
 
     @Test
-    public void shouldValidateInvalidMsisdn() {
+    public void shouldValidateInvalidRequest() {
+        String subscriptionId = "sub001";
         OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setMsisdn("123456789");
-        obdRequest.setCampaignId("WEEK1");
-        obdRequest.setServiceOption(ServiceOption.HELP.name());
-        when(subscriptionService.findBySubscriptionId(Matchers.anyString())).thenReturn(new Subscription());
+        obdRequest.setCampaignId("");
+        obdRequest.setMsisdn("123");
+        obdRequest.setServiceOption("invalid");
+        obdRequest.setCallDetailRecord(new CallDetailRecord());
+        List<String> errors = obdRequestValidator.validate(obdRequest, subscriptionId);
 
-        List<String> validationErrors = obdRequestValidator.validate(obdRequest, "subscriptionId");
-
-        assertEquals(1, validationErrors.size());
-        assertEquals("Invalid msisdn 123456789", validationErrors.get(0));
+        assertEquals(4, errors.size());
+        assertTrue(errors.contains("Invalid msisdn 123"));
+        assertTrue(errors.contains("Invalid service option invalid"));
+        assertTrue(errors.contains("Invalid campaign id "));
+        assertTrue(errors.contains("Invalid subscription id sub001"));
     }
 
     @Test
-    public void shouldValidateInvalidNonNumericMsisdn() {
+    public void shouldReturnErrorForInvalidCampaignId() {
+        String subscriptionId = "sub001";
         OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setMsisdn("123456789a");
-        obdRequest.setCampaignId("WEEK1");
-        obdRequest.setServiceOption(ServiceOption.HELP.name());
-        when(subscriptionService.findBySubscriptionId(Matchers.anyString())).thenReturn(new Subscription());
+        obdRequest.setCampaignId("WEEK33WEEK");
+        obdRequest.setMsisdn("9876543211");
+        obdRequest.setServiceOption("UNSUBSCRIBE");
+        obdRequest.setCallDetailRecord(new CallDetailRecord());
 
-        List<String> validationErrors = obdRequestValidator.validate(obdRequest, "subscriptionId");
+        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
+        List<String> errors = obdRequestValidator.validate(obdRequest, subscriptionId);
 
-        assertEquals(1, validationErrors.size());
-        assertEquals("Invalid msisdn 123456789a", validationErrors.get(0));
-    }
-
-    @Test
-    public void shouldValidateInvalidCampaignName() {
-        OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setMsisdn("1234567890");
-        obdRequest.setCampaignId("WEEKS1");
-        obdRequest.setServiceOption(ServiceOption.HELP.name());
-        when(subscriptionService.findBySubscriptionId(Matchers.anyString())).thenReturn(new Subscription());
-
-        List<String> validationErrors = obdRequestValidator.validate(obdRequest, "subscriptionId");
-
-        assertEquals(1, validationErrors.size());
-        assertEquals("Invalid campaign id WEEKS1", validationErrors.get(0));
-    }
-
-    @Test
-    public void shouldValidateInvalidServiceOption() {
-        OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setMsisdn("1234567890");
-        obdRequest.setCampaignId("WEEK1");
-        obdRequest.setServiceOption("RANDOM_OPTION");
-        when(subscriptionService.findBySubscriptionId(Matchers.anyString())).thenReturn(new Subscription());
-
-        List<String> validationErrors = obdRequestValidator.validate(obdRequest, "subscriptionId");
-
-        assertEquals(1, validationErrors.size());
-        assertEquals("Invalid service option RANDOM_OPTION", validationErrors.get(0));
-    }
-
-    @Test
-    public void shouldValidateInvalidSubscription() {
-        OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setMsisdn("1234567890");
-        obdRequest.setCampaignId("WEEK1");
-        obdRequest.setServiceOption(ServiceOption.HELP.name());
-        when(subscriptionService.findBySubscriptionId(Matchers.anyString())).thenReturn(null);
-
-        List<String> validationErrors = obdRequestValidator.validate(obdRequest, "subscriptionId");
-
-        assertEquals(1, validationErrors.size());
-        assertEquals("Invalid subscription id subscriptionId", validationErrors.get(0));
+        assertEquals(1, errors.size());
+        assertTrue(errors.contains("Invalid campaign id WEEK33WEEK"));
     }
 }

@@ -1,10 +1,8 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.domain.OBDRequest;
@@ -13,14 +11,16 @@ import org.motechproject.ananya.kilkari.domain.Subscription;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.TestUtils;
+import org.motechproject.ananya.kilkari.web.validators.OBDRequestValidator;
 import org.springframework.http.MediaType;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -38,17 +38,23 @@ public class OBDControllerTest {
     @Mock
     private KilkariCampaignService kilkariCampaignService;
 
+    @Mock
+    private OBDRequestValidator obdRequestValidator;
+
     private OBDController obdController;
+
     private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
 
     @Before
     public void setUp() {
         initMocks(this);
-        obdController = new OBDController(subscriptionService, kilkariCampaignService);
+        obdController = new OBDController(subscriptionService, kilkariCampaignService, obdRequestValidator);
     }
 
     @Test
     public void shouldHandleSuccessfulResponseFromObd() throws Exception {
+        when(obdRequestValidator.validate(any(OBDRequest.class), anyString())).thenReturn(new ArrayList<String>());
+
         OBDRequest obdRequest = new OBDRequest();
         obdRequest.setMsisdn("1234567890");
         obdRequest.setCampaignId("WEEK12");
@@ -69,6 +75,8 @@ public class OBDControllerTest {
 
     @Test
     public void shouldValidateObdRequest() throws Exception {
+        when(obdRequestValidator.validate(any(OBDRequest.class), anyString())).thenReturn(Arrays.asList("Invalid msisdn 12345", "Invalid service option RANDOM_SERVICE_OPTION", "Invalid campaign id WEEKabc123"));
+
         OBDRequest obdRequest = new OBDRequest();
         obdRequest.setMsisdn("12345");
         obdRequest.setCampaignId("WEEKabc123");
@@ -90,6 +98,8 @@ public class OBDControllerTest {
     @Test
     public void shouldValidateSubscriptionId() throws Exception {
         String subscriptionId = "abcd1234";
+
+        when(obdRequestValidator.validate(any(OBDRequest.class), anyString())).thenReturn(Arrays.asList("Invalid msisdn null" ,"Invalid service option null", "Invalid campaign id null" ,"Invalid subscription id " + subscriptionId));
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(null);
         byte[] requestBody = TestUtils.toJson(new OBDRequest()).getBytes();
 
@@ -102,6 +112,8 @@ public class OBDControllerTest {
 
     @Test
     public void shouldInvokeKilkariCampaignServiceForProcessingValidObdRequest() throws Exception {
+        when(obdRequestValidator.validate(any(OBDRequest.class), anyString())).thenReturn(new ArrayList<String>());
+
         String subscriptionId = "abcd1234";
         OBDRequest obdRequest = new OBDRequest();
         obdRequest.setMsisdn("1234567890");

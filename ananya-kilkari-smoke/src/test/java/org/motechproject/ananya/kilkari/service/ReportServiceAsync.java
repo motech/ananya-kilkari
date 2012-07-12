@@ -59,7 +59,7 @@ public class ReportServiceAsync {
                         String channel = resultSet.getString("channel");
                         subscriptionStatusMeasures.add(new SubscriptionStatusMeasure(msisdn, status, pack, channel));
                     }
-                    return subscriptionStatusMeasures.isEmpty() ? null : subscriptionStatusMeasures;
+                    return subscriptionStatusMeasures.size() == 2 ?  subscriptionStatusMeasures : null;
                 } finally {
                     resultSet.close();
                     statement.close();

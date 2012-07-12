@@ -39,7 +39,7 @@ public class IvrSmokeTest {
 
     @Test(timeout = 10000)
     public void shouldPostHttpRequestAndVerifyEntriesInReportDbAndCouchDb() throws InterruptedException, SQLException {
-        String channel = "ivr";
+        String channel = "IVR";
         String msisdn = "9000000001";
         String pack = "FIFTEEN_MONTHS";
 
@@ -60,8 +60,15 @@ public class IvrSmokeTest {
         assertEquals("PENDING_ACTIVATION", subscriptionDetails.getStatus());
 
         List<SubscriptionStatusMeasure> subscriptionStatusMeasures = reportServiceAsync.getSubscriptionStatusMeasure();
-        assertEquals(1, subscriptionStatusMeasures.size());
+        assertEquals(2, subscriptionStatusMeasures.size());
         assertEquals(msisdn, subscriptionStatusMeasures.get(0).getMsisdn());
         assertEquals(pack, subscriptionStatusMeasures.get(0).getPack().toUpperCase());
+        assertEquals(channel, subscriptionStatusMeasures.get(0).getChannel().toUpperCase());
+        assertEquals("NEW", subscriptionStatusMeasures.get(0).getStatus().toUpperCase());
+
+        assertEquals(msisdn, subscriptionStatusMeasures.get(1).getMsisdn());
+        assertEquals(pack, subscriptionStatusMeasures.get(1).getPack().toUpperCase());
+        assertEquals(channel, subscriptionStatusMeasures.get(1).getChannel().toUpperCase());
+        assertEquals("PENDING_ACTIVATION", subscriptionStatusMeasures.get(1).getStatus().toUpperCase());
     }
 }

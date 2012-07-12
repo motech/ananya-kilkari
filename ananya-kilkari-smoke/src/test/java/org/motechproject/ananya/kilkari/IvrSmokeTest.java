@@ -37,7 +37,7 @@ public class IvrSmokeTest {
         restTemplate = new RestTemplate();
     }
 
-    @Test(timeout = 10000)
+    @Test(timeout = 20000)
     public void shouldPostHttpRequestAndVerifyEntriesInReportDbAndCouchDb() throws InterruptedException, SQLException {
         String channel = "IVR";
         String msisdn = "9000000001";

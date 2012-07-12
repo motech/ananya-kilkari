@@ -25,7 +25,7 @@ public class ReportServiceAsync {
     }
 
     public List<SubscriptionStatusMeasure> getSubscriptionStatusMeasure() {
-        return new TimedRunner(5, 1000) {
+        return new TimedRunner(10, 1000) {
 
             @Override
             protected List<SubscriptionStatusMeasure> run() {

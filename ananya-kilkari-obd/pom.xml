@@ -41,6 +41,10 @@
             <artifactId>motech-scheduler</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
+            <artifactId>motech-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-platform-server-api</artifactId>
         </dependency>

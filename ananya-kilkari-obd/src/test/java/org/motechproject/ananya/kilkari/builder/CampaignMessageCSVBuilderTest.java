@@ -12,19 +12,18 @@ public class CampaignMessageCSVBuilderTest {
     public void shouldReturnCsvContentForAList() {
         CampaignMessageCSVBuilder campaignMessageCSVBuilder = new CampaignMessageCSVBuilder();
         ArrayList<CampaignMessage> campaignMessages = new ArrayList<>();
-        campaignMessages.add(new CampaignMessage("subscriptionId1","message1", "msisdn1", "operator1"));
-        campaignMessages.add(new CampaignMessage("subscriptionId2","message2", "msisdn2", "operator2"));
-        campaignMessages.add(new CampaignMessage("subscriptionId3","message3", "msisdn3", "operator3"));
+        campaignMessages.add(new CampaignMessage("subscriptionId1","message1", "1234567891", "operator1"));
+        campaignMessages.add(new CampaignMessage("subscriptionId2","message2", "1234567892", "operator2"));
+        campaignMessages.add(new CampaignMessage("subscriptionId3","message3", "1234567893", "operator3"));
 
         String csvContent = campaignMessageCSVBuilder.getCSV(campaignMessages);
 
         String expectedContect = getCSVLine(1) + "\n" + getCSVLine(2) + "\n" + getCSVLine(3) + "\n";
 
         assertEquals(expectedContect, csvContent);
-
     }
 
     private String getCSVLine(int index) {
-        return String.format("msisdn%s,message%s,subscriptionId%s,operator%s", index, index, index, index);
+        return String.format("123456789%s,message%s,subscriptionId%s,operator%s", index, index, index, index);
     }
 }

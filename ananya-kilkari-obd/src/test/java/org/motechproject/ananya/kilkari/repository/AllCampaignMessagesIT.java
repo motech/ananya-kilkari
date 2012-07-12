@@ -24,25 +24,25 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
 
     @Before
     public void setUp() {
-        newCampaignMessage = new CampaignMessage("subscriptionId1", "messageId1", "msisdn1", "operator1");
+        newCampaignMessage = new CampaignMessage("subscriptionId1", "messageId1", "1234657980", "operator1");
 
-        dncCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", "msisdn2", "operator2");
+        dncCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", "912134567890", "operator2");
         dncCampaignMessage.markSent();
         dncCampaignMessage.markDidNotCall();
 
-        newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3", "msisdn3", "operator3");
+        newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3", "3124567890", "operator3");
         newCampaignMessageSent.markSent();
 
-        dncCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4", "msisdn4", "operator4");
+        dncCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4", "004123567890", "operator4");
         dncCampaignMessageSent.markSent();
         dncCampaignMessageSent.markDidNotCall();
         dncCampaignMessageSent.markSent();
 
-        dnpCampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", "msisdn5", "operator5");
+        dnpCampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", "5123467890", "operator5");
         dnpCampaignMessage.markSent();
         dnpCampaignMessage.markDidNotPickup();
 
-        dnpCampaignMessageSent = new CampaignMessage("subscriptionId6", "messageId6", "msisdn6", "operator6");
+        dnpCampaignMessageSent = new CampaignMessage("subscriptionId6", "messageId6", "6123457890", "operator6");
         dnpCampaignMessageSent.markSent();
         dnpCampaignMessageSent.markDidNotPickup();
         dnpCampaignMessageSent.markSent();

@@ -46,7 +46,7 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldGetSubscriptionsFor() {
-        String msisdn = "998800";
+        String msisdn = "1234567890";
         kilkariSubscriptionService.findByMsisdn(msisdn);
         verify(subscriptionService).findByMsisdn(msisdn);
     }
@@ -57,7 +57,7 @@ public class KilkariSubscriptionServiceTest {
         SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
         subscriptionRequest.setCreatedAt(DateTime.now());
         subscriptionRequest.setPack(pack.name());
-        Subscription subscription = new Subscription("msisdn", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
 
         when(subscriptionService.createSubscription(subscriptionRequest)).thenReturn(subscription);
 
@@ -75,7 +75,7 @@ public class KilkariSubscriptionServiceTest {
     @Test
     public void shouldNotScheduleMessageCampaignIfDuplicateSubscriptionIsRequested() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults()
-                .withMsisdn("123").withPack(SubscriptionPack.FIFTEEN_MONTHS.toString()).build();
+                .withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS.toString()).build();
 
         doThrow(new DuplicateSubscriptionException("")).when(subscriptionService).createSubscription(subscriptionRequest);
 

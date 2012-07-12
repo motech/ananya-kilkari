@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.domain;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
+import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
 
 @TypeDiscriminator("doc.type === 'SubscriberCareDoc'")
@@ -23,7 +24,7 @@ public class SubscriberCareDoc extends MotechBaseDataObject {
     }
 
     public SubscriberCareDoc(String msisdn, String reason, DateTime createdAt, Channel channel) {
-        this.msisdn = msisdn;
+        this.msisdn = PhoneNumber.formatPhoneNumberTo10Digits(msisdn).toString();
         this.reason = reason;
         this.channel = channel;
         this.createdAt = createdAt;

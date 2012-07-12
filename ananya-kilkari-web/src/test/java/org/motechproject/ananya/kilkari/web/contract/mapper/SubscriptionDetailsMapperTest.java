@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 public class SubscriptionDetailsMapperTest {
     @Test
     public void shouldMapFromSubscriptionToSubscriptionDetails() {
-        Subscription subscription = new Subscription("1234", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
 
         SubscriptionDetails subscriptionDetails = SubscriptionDetailsMapper.mapFrom(subscription);
 

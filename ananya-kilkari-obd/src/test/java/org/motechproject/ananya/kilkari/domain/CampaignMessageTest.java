@@ -2,6 +2,8 @@ package org.motechproject.ananya.kilkari.domain;
 
 import org.junit.Test;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.*;
 
 public class CampaignMessageTest {
@@ -11,6 +13,14 @@ public class CampaignMessageTest {
         CampaignMessage campaignMessage = new CampaignMessage();
         assertEquals(CampaignMessageStatus.NEW, campaignMessage.getStatus());
         assertFalse(campaignMessage.isSent());
+    }
+
+    @Test
+    public void shouldReturn10DigitPhoneNumberWhenGivenANumber() {
+        String expectedNumber = "1234567890";
+        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "1234567890", "operator1").getMsisdn());
+        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "911234567890", "operator1").getMsisdn());
+        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "001234567890", "operator1").getMsisdn());
     }
 
     @Test

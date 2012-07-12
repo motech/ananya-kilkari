@@ -18,7 +18,7 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
 
     @Test
     public void shouldAddASubscriptionIntoDb() {
-        String msisdn = "123456";
+        String msisdn = "1234567890";
 
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
         allSubscriptions.add(subscription);
@@ -38,11 +38,11 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
 
     @Test
     public void shouldQueryForSubscriptionsInDbBasedOnGivenMsisdn() {
-        String msisdn = "123456";
+        String msisdn = "1234567890";
 
         Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
         Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
-        Subscription subscription3 = new Subscription("some_other_msisdn", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        Subscription subscription3 = new Subscription("2314567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
         allSubscriptions.add(subscription3);
@@ -62,7 +62,7 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
 
     @Test
     public void shouldFindSubscriptionByMsisdnAndPack() {
-        String msisdn = "123456";
+        String msisdn = "1234567890";
 
         Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
         allSubscriptions.add(subscription1);
@@ -87,7 +87,7 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
 
     @Test
     public void shouldFindSubscriptionBySubscriptionId() {
-        String msisdn = "123456";
+        String msisdn = "1234567890";
 
         Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
         Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
@@ -105,7 +105,8 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
     @Test
     public void shouldFindSubscriptionInProgress() {
         String pack = "twelve_months";
-        String msisdn = "123456890";
+        String msisdn1 = "1234567890";
+        String msisdn = "91" + msisdn1;
 
         Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
         subscription1.setStatus(SubscriptionStatus.ACTIVE);
@@ -118,7 +119,7 @@ public class AllSubscriptionsIT extends SubscriptionBaseIT {
         markForDeletion(subscription1);
         markForDeletion(subscription2);
 
-        Subscription actualSubscription = allSubscriptions.findSubscriptionInProgress(msisdn, pack);
+        Subscription actualSubscription = allSubscriptions.findSubscriptionInProgress(msisdn1, pack);
 
         assertEquals(subscription1, actualSubscription);
     }

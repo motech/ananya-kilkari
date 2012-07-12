@@ -38,7 +38,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
     public void shouldDeleteTheCampaignMessageIfItExists() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
-        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, null, null));
+        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, "1234567890", null));
 
         campaignMessageService.deleteCampaignMessage(subscriptionId, messageId);
 
@@ -50,7 +50,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
     public void shouldNotDeleteTheCampaignMessageIfItDoesNotExists() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
-        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, null, null));
+        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, "1234567890", null));
 
         campaignMessageService.deleteCampaignMessage("subscriptionId2", messageId);
 
@@ -63,7 +63,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
         String operator = "airtel";
-        String msisdn = "msisdn";
+        String msisdn = "1234567890";
 
         campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator);
 
@@ -94,7 +94,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
         String operator = "airtel";
-        String msisdn = "msisdn";
+        String msisdn = "1234567890";
 
         campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator);
         markForDeletion(allCampaignMessages.find(subscriptionId, messageId));
@@ -103,7 +103,6 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
         campaignMessageService.sendNewMessages();
-        verify(mockOnMobileOBDGateway).send("msisdn,messageId,subscriptionId,airtel\n");
-
+        verify(mockOnMobileOBDGateway).send("1234567890,messageId,subscriptionId,airtel\n");
     }
 }

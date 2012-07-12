@@ -45,7 +45,7 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldGetMessageTimings() {
-        String msisdn = "99880";
+        String msisdn = "1234567890";
         List<Subscription> subscriptions = new ArrayList<>();
         Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.SEVEN_MONTHS, DateTime.now());
@@ -131,7 +131,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldRenewCampaignMessageAlertAndScheduleCampaignMessageIfMessageIdExists() {
         String messageId = "mymessageid";
-        String msisdn = "msisdn";
+        String msisdn = "1234567890";
         Operator operator = Operator.AIRTEL;
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         subscription.setOperator(operator);
@@ -156,7 +156,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldUpdateCampaignMessageAlertIfAlreadyExistsAndScheduleCampaignMessageIfRenewed() {
         String messageId = "mymessageid";
-        String msisdn = "msisdn";
+        String msisdn = "1234567890";
         Operator operator = Operator.AIRTEL;
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         subscription.setOperator(operator);

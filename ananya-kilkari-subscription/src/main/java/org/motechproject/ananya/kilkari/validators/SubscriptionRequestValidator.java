@@ -19,7 +19,6 @@ import java.util.List;
 public class SubscriptionRequestValidator {
     private AllSubscriptions allSubscriptions;
     private ReportingGateway reportingService;
-    private List<String> errors =  new ArrayList<>();
 
     @Autowired
     public SubscriptionRequestValidator(AllSubscriptions allSubscriptions, ReportingGateway reportingService) {
@@ -28,6 +27,7 @@ public class SubscriptionRequestValidator {
     }
 
     public void validate(SubscriptionRequest subscriptionRequest) {
+        List<String> errors =  new ArrayList<>();
         subscriptionRequest.validate(errors);
 
         if (!Channel.isIVR(subscriptionRequest.getChannel()) && !subscriptionRequest.isLocationEmpty()) {

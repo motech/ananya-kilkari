@@ -42,7 +42,7 @@ public class CampaignMessageService {
     }
 
     private void sendMessagesToOBD(List<CampaignMessage> messages) {
-        logger.info("Sending %s campaign messages to obd", messages.size());
+        logger.info(String.format("Sending %s campaign messages to obd", messages.size()));
         if(messages.isEmpty())
             return;
         String campaignMessageCSVContent = campaignMessageCSVBuilder.getCSV(messages);

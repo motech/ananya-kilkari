@@ -27,7 +27,7 @@ public class RetryMessagesSenderJob extends MessagesSenderJob {
 
     @MotechListener(subjects = {RetryMessagesSenderJob.SEND_RETRY_MESSAGES})
     public void sendMessages(MotechEvent motechEvent) {
-        logger.info("Handing send new messages event");
+        logger.info("Handling send retry messages event");
         campaignMessageService.sendRetryMessages();
     }
 }

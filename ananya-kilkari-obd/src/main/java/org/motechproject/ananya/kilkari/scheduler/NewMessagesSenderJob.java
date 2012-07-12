@@ -27,7 +27,7 @@ public class NewMessagesSenderJob extends MessagesSenderJob {
 
     @MotechListener(subjects = {NewMessagesSenderJob.SEND_NEW_MESSAGES})
     public void sendMessages(MotechEvent motechEvent) {
-        logger.info("Handing send new messages event");
+        logger.info("Handling send new messages event");
         campaignMessageService.sendNewMessages();
 
     }

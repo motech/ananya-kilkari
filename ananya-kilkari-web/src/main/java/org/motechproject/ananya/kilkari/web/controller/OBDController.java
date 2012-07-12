@@ -7,7 +7,7 @@ import org.motechproject.ananya.kilkari.domain.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.domain.OBDRequestValidator;
+import org.motechproject.ananya.kilkari.web.validators.OBDRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;

@@ -17,13 +17,13 @@ import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.validator.SubscriptionRequestValidator;
+import org.motechproject.ananya.kilkari.validators.SubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetails;
-import org.motechproject.ananya.kilkari.web.domain.CallbackRequestValidator;
+import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;

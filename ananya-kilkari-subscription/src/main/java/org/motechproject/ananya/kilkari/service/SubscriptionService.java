@@ -5,7 +5,7 @@ import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
-import org.motechproject.ananya.kilkari.validator.SubscriptionRequestValidator;
+import org.motechproject.ananya.kilkari.validators.SubscriptionRequestValidator;
 import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

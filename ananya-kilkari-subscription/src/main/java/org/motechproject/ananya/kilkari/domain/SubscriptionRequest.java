@@ -7,7 +7,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-import org.motechproject.ananya.kilkari.validation.ValidationUtils;
+import org.motechproject.ananya.kilkari.validators.ValidationUtils;
 
 import java.io.Serializable;
 

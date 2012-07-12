@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.domain;
+package org.motechproject.ananya.kilkari.web.validators;
 
 import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.domain.*;

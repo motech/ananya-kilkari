@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.validation;
+package org.motechproject.ananya.kilkari.validators;
 
 import org.junit.Assert;
 import org.junit.Rule;

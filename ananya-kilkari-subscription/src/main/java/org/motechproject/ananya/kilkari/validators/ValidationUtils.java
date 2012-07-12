@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.validation;
+package org.motechproject.ananya.kilkari.validators;
 
 
 import org.apache.commons.lang.StringUtils;
@@ -10,7 +10,6 @@ import org.motechproject.common.domain.PhoneNumber;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 
 public class ValidationUtils {
 

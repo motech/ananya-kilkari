@@ -13,7 +13,7 @@ import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.*;
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
-import org.motechproject.ananya.kilkari.validator.SubscriptionRequestValidator;
+import org.motechproject.ananya.kilkari.validators.SubscriptionRequestValidator;
 
 import java.util.ArrayList;
 import java.util.List;

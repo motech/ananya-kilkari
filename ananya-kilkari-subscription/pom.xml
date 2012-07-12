@@ -54,7 +54,7 @@
             <artifactId>spring-webmvc</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.motechproject</groupId>
+            <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
             <artifactId>motech-common</artifactId>
         </dependency>
         <dependency>

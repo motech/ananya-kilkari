@@ -1,11 +1,13 @@
 package org.motechproject.ananya.kilkari.validators;
 
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.builder.SubscriptionRequestBuilder;
@@ -17,6 +19,8 @@ import org.motechproject.ananya.kilkari.exceptions.DuplicateSubscriptionExceptio
 import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.repository.AllSubscriptions;
+
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -54,7 +58,7 @@ public class SubscriptionRequestValidatorTest {
         //then
         InOrder inOrder = Mockito.inOrder(subscriptionRequest, reportingService, allSubscriptions);
 
-        inOrder.verify(subscriptionRequest).validate();
+        inOrder.verify(subscriptionRequest).validate(Matchers.<List<String>>any());
         inOrder.verify(reportingService).getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat());
         inOrder.verify(allSubscriptions).findSubscriptionInProgress(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack());
     }
@@ -129,4 +133,16 @@ public class SubscriptionRequestValidatorTest {
         }
     }
 
+    @Test
+    public void shouldAccumulateAllErrorsAndThrowValidationExceptionIfErrorsPresent() {
+        String dob = DateTime.now().plusDays(50).toString("dd-MM-yyyy");
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withChannel(Channel.CALL_CENTER.name()).withDOB(dob).build();
+        when(reportingService.getLocation(subscriptionRequest.getDistrict(), subscriptionRequest.getBlock(), subscriptionRequest.getPanchayat()))
+                     .thenReturn(null);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid date of birth " + dob + ",Location does not exist for District[district] Block[block] and Panchayat[panchayat]");
+
+        subscriptionRequestValidator.validate(subscriptionRequest);
+    }
 }

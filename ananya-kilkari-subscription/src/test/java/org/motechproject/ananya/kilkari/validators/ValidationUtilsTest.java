@@ -1,12 +1,12 @@
 package org.motechproject.ananya.kilkari.validators;
 
-import org.junit.Assert;
+import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ValidationUtilsTest {
 
@@ -14,126 +14,105 @@ public class ValidationUtilsTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void assertNumericShouldThrowValidationExceptionForAlphaNumericStrings() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid string 234a"));
+    public void assertNumericShouldReturnFalseForAlphaNumericStrings() {
 
-        ValidationUtils.assertNumeric("234a", "Invalid string %s");
+        assertFalse(ValidationUtils.assertNumeric("234a"));
     }
 
     @Test
-    public void assertNumericShouldThrowValidationExceptionForNull() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid string null"));
+    public void assertNumericShouldReturnFalseForNull() {
 
-        ValidationUtils.assertNumeric(null, "Invalid string %s");
+        assertFalse(ValidationUtils.assertNumeric(null));
     }
 
     @Test
-    public void assertNumericShouldThrowValidationExceptionForEmptyString() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid string "));
-
-        ValidationUtils.assertNumeric("", "Invalid string %s");
+    public void assertNumericShouldReturnFalseForEmptyString() {
+        assertFalse(ValidationUtils.assertNumeric(""));
     }
 
     @Test
-    public void assertNumericShouldNotThrowValidationExceptionForNumericString() {
-        ValidationUtils.assertNumeric("1123", "Invalid string %s");
+    public void assertNumericShouldNotReturnFalseForNumericString() {
+        assertTrue(ValidationUtils.assertNumeric("1123"));
     }
 
     @Test
-    public void assertDateShouldThrowValidationExceptionForInvalidDateString() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid date format 12-12-1 dd-MM-yyyy"));
+    public void assertDateShouldReturnFalseForInvalidDateString() {
 
-        ValidationUtils.assertDateFormat("12-12-1", "dd-MM-yyyy", "Invalid date format %s %s");
+        assertFalse(ValidationUtils.assertDateFormat("12-12-1", "dd-MM-yyyy"));
     }
 
     @Test
-    public void assertDateShouldThrowValidationExceptionForNullDateString() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid date format null dd-MM-yyyy"));
+    public void assertDateShouldReturnFalseForNullDateString() {
 
-        ValidationUtils.assertDateFormat(null, "dd-MM-yyyy", "Invalid date format %s %s");
+        assertFalse(ValidationUtils.assertDateFormat(null, "dd-MM-yyyy"));
     }
 
     @Test
-    public void assertDateShouldThrowValidationExceptionForEmptyDateString() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid date format  dd-MM-yyyy"));
+    public void assertDateShouldReturnFalseForEmptyDateString() {
 
-        ValidationUtils.assertDateFormat("", "dd-MM-yyyy", "Invalid date format %s %s");
+        assertFalse(ValidationUtils.assertDateFormat("", "dd-MM-yyyy"));
     }
 
     @Test
-    public void assertDateShouldNotThrowValidationExceptionForValidDateString() {
-        ValidationUtils.assertDateFormat("21-01-2012", "dd-MM-yyyy", "Invalid date format %s %s");
+    public void assertDateShouldNotReturnFalseForValidDateString() {
+
+        assertTrue(ValidationUtils.assertDateFormat("21-01-2012", "dd-MM-yyyy"));
     }
 
     @Test
-    public void shouldThrowExceptionWhenInvalidPackIsGivenToCreateNewSubscription() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid subscription pack Invalid-Pack"));
+    public void shouldReturnFalseWhenInvalidPackIsGivenToCreateNewSubscription() {
 
-        ValidationUtils.assertPack("Invalid-Pack");
+        assertFalse(ValidationUtils.assertPack("Invalid-Pack"));
     }
 
     @Test
-    public void shouldThrowExceptionWhenInvalidChannelIsGivenToCreateNewSubscription() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid channel Invalid-Channel"));
+    public void shouldReturnFalseWhenInvalidChannelIsGivenToCreateNewSubscription() {
 
-        ValidationUtils.assertChannel("Invalid-Channel");
+        assertFalse(ValidationUtils.assertChannel("Invalid-Channel"));
     }
 
     @Test
-    public void shouldThrowExceptionWhenInvalidMsisdnNumberIsGivenToCreateNewSubscription() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid msisdn 12345"));
+    public void shouldReturnFalseWhenInvalidMsisdnNumberIsGivenToCreateNewSubscription() {
 
-        ValidationUtils.assertMsisdn("12345");
+        assertFalse(ValidationUtils.assertMsisdn("12345"));
     }
 
     @Test
-    public void shouldThrowExceptionWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscription() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(is("Invalid msisdn 123456789a"));
+    public void shouldReturnFalseWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscription() {
 
-        ValidationUtils.assertMsisdn("123456789a");
+        assertFalse(ValidationUtils.assertMsisdn("123456789a"));
     }
 
     @Test
-    public void shouldThrowExceptionWhenAssertingNullForNotNull() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("invalid");
+    public void shouldReturnFalseWhenAssertingNullForNotNull() {
 
-        ValidationUtils.assertNotNull(null, "invalid");
+        assertFalse(ValidationUtils.assertNotNull(null));
     }
 
     @Test
-    public void shouldNotThrowExceptionWhenAssertingNotNullForNotNull() {
-        try {
-            ValidationUtils.assertNotNull(new Object(), "invalid");
-        } catch (ValidationException e) {
-            Assert.fail("ValidationException not expected");
-        }
+    public void shouldNotReturnFalseWhenAssertingNotNullForNotNull() {
+        assertTrue(ValidationUtils.assertNotNull(new Object()));
     }
 
     @Test
-    public void shouldThrowExceptionWhenAssertingNotNullForNull() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("invalid");
+    public void shouldReturnFalseWhenAssertingNotNullForNull() {
 
-        ValidationUtils.assertNull(new Object(), "invalid");
+        assertFalse(ValidationUtils.assertNull(new Object()));
     }
 
     @Test
-    public void shouldNotThrowExceptionWhenAssertingNullForNull() {
-        try {
-            ValidationUtils.assertNull(null, "invalid");
-        } catch (ValidationException e) {
-            Assert.fail("ValidationException not expected");
-        }
+    public void shouldNotReturnFalseWhenAssertingNullForNull() {
+        assertTrue(ValidationUtils.assertNull(null));
+    }
+
+    @Test
+    public void shouldReturnFalseWhenDateNotBeforeNow() {
+
+        assertFalse(ValidationUtils.assertDateBefore(DateTime.now().plusWeeks(3), DateTime.now()));
+    }
+
+    @Test
+    public void shouldNotReturnFalseWhenDateBeforeNow() {
+        assertTrue(ValidationUtils.assertDateBefore(DateTime.now().minusDays(4), DateTime.now()));
     }
 }

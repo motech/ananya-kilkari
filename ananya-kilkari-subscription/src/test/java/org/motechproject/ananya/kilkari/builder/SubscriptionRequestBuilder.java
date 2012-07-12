@@ -23,9 +23,9 @@ public class SubscriptionRequestBuilder {
         request.setDistrict("district");
         request.setBlock("block");
         request.setPanchayat("panchayat");
-        request.setDateOfBirth("13-08-2001");
-        request.setExpectedDateOfDelivery("20-09-2001");
-        request.setCreatedAt(null);
+        request.setDateOfBirth(null);
+        request.setExpectedDateOfDelivery(DateTime.now().plusDays(30).toString("dd-MM-yyyy"));
+        request.setCreatedAt(DateTime.now());
         return this;
     }
 

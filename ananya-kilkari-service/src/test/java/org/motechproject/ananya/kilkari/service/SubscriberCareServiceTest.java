@@ -33,7 +33,7 @@ public class SubscriberCareServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void shouldThrowExceptionForInvalidSubscriberCareRequest() {
+    public void shouldThrowExceptionForInvalidMsisdnInSubscriberCareRequest() {
         SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("12345", SubscriberCareReasons.HELP.name(), "ivr");
 
         subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);

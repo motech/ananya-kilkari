@@ -7,9 +7,11 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.validators.ValidationUtils;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class SubscriptionRequest implements Serializable {
     public static final String DATE_TIME_FORMAT = "dd-MM-yyyy";
@@ -176,19 +178,39 @@ public class SubscriptionRequest implements Serializable {
         this.msisdn = msisdn;
     }
 
-    public void validate() {
-        ValidationUtils.assertMsisdn(msisdn);
-        ValidationUtils.assertPack(pack);
-        validateChannel();
+    public void validate(List<String> errors) {
+        validateMsisdn(errors);
+        validatePack(errors);
+        validateChannel(errors);
         if (!Channel.isIVR(channel)) {
-            validateAge();
-            validateDOB();
-            validateEDD();
+            validateAge(errors);
+            validateDOB(errors);
+            validateEDD(errors);
+        }
+    }
+
+    private void validatePack(List<String> errors) {
+        if (!ValidationUtils.assertPack(pack)) {
+            errors.add(String.format("Invalid subscription pack %s", pack));
+        }
+    }
+
+    private void validateMsisdn(List<String> errors) {
+        if (!ValidationUtils.assertMsisdn(msisdn)) {
+            errors.add(String.format("Invalid msisdn %s", msisdn));
+        }
+    }
+
+    public void validateChannel(List<String> errors) {
+        if (!ValidationUtils.assertChannel(channel)) {
+            errors.add(String.format("Invalid channel %s", channel));
         }
     }
 
     public void validateChannel() {
-        ValidationUtils.assertChannel(channel);
+        if (!ValidationUtils.assertChannel(channel)) {
+            throw new ValidationException(String.format("Invalid channel %s", channel));
+        }
     }
 
     @JsonIgnore
@@ -196,21 +218,41 @@ public class SubscriptionRequest implements Serializable {
         return getDistrict() == null && getBlock() == null && getPanchayat() == null;
     }
 
-    private void validateEDD() {
+    private void validateEDD(List<String> errors) {
         if (StringUtils.isNotEmpty(expectedDateOfDelivery)) {
-            ValidationUtils.assertDateFormat(expectedDateOfDelivery, SubscriptionRequest.DATE_TIME_FORMAT, "Invalid expected date of delivery %s");
+            String errorMessage = "Invalid expected date of delivery %s";
+
+            if (!ValidationUtils.assertDateFormat(expectedDateOfDelivery, SubscriptionRequest.DATE_TIME_FORMAT)) {
+                errors.add(String.format(errorMessage, expectedDateOfDelivery));
+                return;
+            }
+
+            if (!ValidationUtils.assertDateBefore(createdAt, parseDateTime(expectedDateOfDelivery))) {
+                errors.add(String.format(errorMessage, expectedDateOfDelivery));
+            }
         }
     }
 
-    private void validateDOB() {
+    private void validateDOB(List<String> errors) {
         if (StringUtils.isNotEmpty(dateOfBirth)) {
-            ValidationUtils.assertDateFormat(dateOfBirth, SubscriptionRequest.DATE_TIME_FORMAT, "Invalid date of birth %s");
+            String errorMessage = "Invalid date of birth %s";
+
+            if (!ValidationUtils.assertDateFormat(dateOfBirth, SubscriptionRequest.DATE_TIME_FORMAT)) {
+                errors.add(String.format(errorMessage, dateOfBirth));
+                return;
+            }
+
+            if (!ValidationUtils.assertDateBefore(parseDateTime(dateOfBirth), createdAt)) {
+                errors.add(String.format(errorMessage, dateOfBirth));
+            }
         }
     }
 
-    private void validateAge() {
+    private void validateAge(List<String> errors) {
         if (StringUtils.isNotEmpty(beneficiaryAge)) {
-            ValidationUtils.assertNumeric(beneficiaryAge, "Invalid beneficiary age %s");
+            if (!ValidationUtils.assertNumeric(beneficiaryAge)) {
+                errors.add(String.format("Invalid beneficiary age %s", beneficiaryAge));
+            }
         }
     }
 

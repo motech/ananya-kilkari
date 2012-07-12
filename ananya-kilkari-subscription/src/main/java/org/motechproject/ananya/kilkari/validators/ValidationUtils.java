@@ -2,9 +2,9 @@ package org.motechproject.ananya.kilkari.validators;
 
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.common.domain.PhoneNumber;
 
 import java.text.ParseException;
@@ -13,19 +13,11 @@ import java.util.Date;
 
 public class ValidationUtils {
 
-    public static void assertNumeric(String value, String errorMessage) {
-        if (StringUtils.isEmpty(value) || !StringUtils.isNumeric(value)) {
-            throw new ValidationException(String.format(errorMessage, value));
-        }
+    public static boolean assertNumeric(String value) {
+        return !StringUtils.isEmpty(value) && StringUtils.isNumeric(value);
     }
 
-    public static void assertDateFormat(String value, String format, String errorMessage) {
-        if (!assertDateFormat(value, format)) {
-            throw new ValidationException(String.format(errorMessage, value, format));
-        }
-    }
-
-    private static boolean assertDateFormat(String value, String format) {
+    public static boolean assertDateFormat(String value, String format) {
         if (StringUtils.isEmpty(value)) {
             return false;
         }
@@ -41,28 +33,27 @@ public class ValidationUtils {
         return simpleDateFormat.format(parsedDate).equals(value);
     }
 
-    public static void assertChannel(String channel) {
-        if (!Channel.isValid(channel))
-            throw new ValidationException(String.format("Invalid channel %s", channel));
+    public static boolean assertChannel(String channel) {
+        return Channel.isValid(channel);
     }
 
-    public static void assertPack(String pack) {
-        if (!SubscriptionPack.isValid(pack))
-            throw new ValidationException(String.format("Invalid subscription pack %s", pack));
+    public static boolean assertPack(String pack) {
+        return SubscriptionPack.isValid(pack);
     }
 
-    public static void assertMsisdn(String msisdn) {
-        if (PhoneNumber.isNotValid(msisdn))
-            throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
+    public static boolean assertMsisdn(String msisdn) {
+        return PhoneNumber.isValid(msisdn);
     }
 
-    public static void assertNotNull(Object object, String message) {
-        if (object == null)
-            throw new ValidationException(message);
+    public static boolean assertNotNull(Object object) {
+        return object != null;
     }
 
-    public static void assertNull(Object object, String message) {
-        if (object != null)
-            throw new ValidationException(message);
+    public static boolean assertNull(Object object) {
+        return object == null;
+    }
+
+    public static boolean assertDateBefore(DateTime before, DateTime now) {
+        return before.isBefore(now);
     }
 }

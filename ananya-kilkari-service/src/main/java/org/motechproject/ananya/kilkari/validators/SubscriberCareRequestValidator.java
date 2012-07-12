@@ -9,9 +9,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubscriberCareRequestValidator {
     public void validate(SubscriberCareRequest subscriberCareRequest) {
-        ValidationUtils.assertMsisdn(subscriberCareRequest.getMsisdn());
+        validateMsisdn(subscriberCareRequest);
         assertSubscriberCareReason(subscriberCareRequest);
         assertChannel(subscriberCareRequest);
+    }
+
+    private void validateMsisdn(SubscriberCareRequest subscriberCareRequest) {
+        String msisdn = subscriberCareRequest.getMsisdn();
+        if(!ValidationUtils.assertMsisdn(msisdn)) {
+            throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
+        }
     }
 
     private void assertChannel(SubscriberCareRequest subscriberCareRequest) {

@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.reporting.gateway;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 @Service
+@ProductionProfile
 public class ReportingGatewayImpl implements ReportingGateway {
 
     private RestTemplate restTemplate;

@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public class BaseReportRequest implements Serializable {
+public class SubscriptionBaseReportRequest implements Serializable {
 
     private String subscriptionId;
 
@@ -12,7 +12,7 @@ public class BaseReportRequest implements Serializable {
 
     private String subscriptionStatus;
 
-    public BaseReportRequest(String subscriptionId, String subscriptionStatus, DateTime createdAt) {
+    public SubscriptionBaseReportRequest(String subscriptionId, String subscriptionStatus, DateTime createdAt) {
         this.subscriptionId = subscriptionId;
         this.subscriptionStatus = subscriptionStatus;
         this.createdAt = createdAt;

@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
+import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
@@ -10,4 +11,6 @@ public interface ReportingService {
     void reportSubscriptionCreation(SubscriptionCreationReportRequest subscriptionCreationReportRequest);
 
     void reportSubscriptionStateChange(SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest);
+
+    void reportCampaignMessageDelivered(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest);
 }

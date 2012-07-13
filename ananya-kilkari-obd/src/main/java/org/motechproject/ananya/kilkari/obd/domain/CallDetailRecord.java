@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.obd.domain;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class CallDetailRecord {
@@ -16,6 +17,17 @@ public class CallDetailRecord {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+
+    @JsonIgnore
+    public String getStartTime() {
+        return startTime;
+    }
+
+    @JsonIgnore
+    public String getEndTime() {
+        return endTime;
     }
 
     @Override

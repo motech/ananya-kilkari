@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.reporting.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
@@ -56,5 +57,13 @@ public class ReportingServiceImplTest {
         reportingServiceImpl.reportSubscriptionStateChange(subscriptionCreationReportRequest);
 
         verify(reportingPublisher).reportSubscriptionStateChange(subscriptionCreationReportRequest);
+    }
+
+    @Test
+    public void shouldReportASuccessfulCampaignMessageDelivery() {
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = mock(CampaignMessageDeliveryReportRequest.class);
+        reportingServiceImpl.reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
+
+        verify(reportingPublisher).reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
     }
 }

@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
+import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
@@ -31,6 +32,13 @@ public class StubReportingService implements ReportingService {
     public void reportSubscriptionStateChange(SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest) {
         if (verify()) {
             behavior.reportSubscriptionStateChange(subscriptionStateChangeReportRequest);
+        }
+    }
+
+    @Override
+    public void reportCampaignMessageDelivered(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
+        if (verify()) {
+            behavior.reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
         }
     }
 

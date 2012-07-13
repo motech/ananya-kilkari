@@ -5,11 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.gateway.StubReportingGateway;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionDetails;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.reporting.it.TimedRunner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +58,7 @@ public class ReportingServiceImplIT {
         stubReportingGateway.setBehavior(reportingGateway);
 
         reportingService.reportSubscriptionCreation(subscriptionCreationReportRequest);
+
         new TimedRunner(20, 1000) {
             @Override
             public boolean run(){
@@ -85,6 +83,7 @@ public class ReportingServiceImplIT {
         stubReportingGateway.setBehavior(reportingGateway);
 
         reportingService.reportSubscriptionStateChange(subscriptionStateChangeReportRequest);
+
         new TimedRunner(20, 1000) {
             @Override
             public boolean run(){
@@ -102,5 +101,31 @@ public class ReportingServiceImplIT {
         assertEquals(subscriptionStateChangeReportRequest.getCreatedAt(), actualSubscriptionStateChangeReportRequest.getCreatedAt());
         assertEquals(subscriptionStateChangeReportRequest.getReason(), actualSubscriptionStateChangeReportRequest.getReason());
         assertEquals(subscriptionStateChangeReportRequest.getOperator(), actualSubscriptionStateChangeReportRequest.getOperator());
+    }
+
+    @Test
+    public void shouldReportCampaignMessageDelivery() {
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest("subscriptionId", "msisdn", "campaignId", "serviceOption", "3", new CallDetailsReportRequest("25-12-2012", "27-12-2012"));
+        ReportingGateway reportingGateway = mock(ReportingGateway.class);
+        stubReportingGateway.setBehavior(reportingGateway);
+
+        reportingService.reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
+
+        new TimedRunner(20, 1000) {
+            @Override
+            public boolean run(){
+                return stubReportingGateway.isReportCampaignMessageDeliveryCalled();
+            }
+        }.execute();
+        stubReportingGateway.setReportCampaignMessageDeliveryCalled(false);
+
+        ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
+        verify(reportingGateway).reportCampaignMessageDelivery(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
+        CampaignMessageDeliveryReportRequest actualCampaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
+
+        assertEquals(campaignMessageDeliveryReportRequest.getSubscriptionId(), actualCampaignMessageDeliveryReportRequest.getSubscriptionId());
+        assertEquals(campaignMessageDeliveryReportRequest.getMsisdn(), actualCampaignMessageDeliveryReportRequest.getMsisdn());
+        assertEquals(campaignMessageDeliveryReportRequest.getCampaignId(), actualCampaignMessageDeliveryReportRequest.getCampaignId());
+        assertEquals(campaignMessageDeliveryReportRequest.getServiceOption(), actualCampaignMessageDeliveryReportRequest.getServiceOption());
     }
 }

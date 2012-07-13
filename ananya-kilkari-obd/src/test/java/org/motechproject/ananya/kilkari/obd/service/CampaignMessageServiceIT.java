@@ -35,12 +35,42 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
     }
 
     @Test
+    public void shouldFindTheCampaignMessage() {
+        String subscriptionId = "subscriptionId";
+        String messageId = "messageId";
+        String msisdn = "1234567890";
+        String operator = "airtel";
+        allCampaignMessages.add(new CampaignMessage("subscriptionId2", "messageId2", "9876543210", "operator2"));
+        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, msisdn, operator));
+
+        CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
+
+        assertNotNull(campaignMessage);
+        assertEquals(subscriptionId, campaignMessage.getSubscriptionId());
+        assertEquals(messageId, campaignMessage.getMessageId());
+        assertEquals(msisdn, campaignMessage.getMsisdn());
+        assertEquals(operator, campaignMessage.getOperator());
+    }
+
+    @Test
+    public void shouldDeleteTheCampaignMessage() {
+        String subscriptionId = "subscriptionId";
+        String messageId = "messageId";
+        CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, messageId, "1234567890", null);
+        allCampaignMessages.add(campaignMessage);
+
+        campaignMessageService.deleteCampaignMessage(campaignMessage);
+
+        assertTrue(allCampaignMessages.getAll().isEmpty());
+    }
+
+    @Test
     public void shouldDeleteTheCampaignMessageIfItExists() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
         allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, "1234567890", null));
 
-        campaignMessageService.deleteCampaignMessage(subscriptionId, messageId);
+        campaignMessageService.deleteCampaignMessageIfExists(subscriptionId, messageId);
 
         CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
         assertNull(campaignMessage);
@@ -52,7 +82,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         String messageId = "messageId";
         allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, "1234567890", null));
 
-        campaignMessageService.deleteCampaignMessage("subscriptionId2", messageId);
+        campaignMessageService.deleteCampaignMessageIfExists("subscriptionId2", messageId);
 
         CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
         assertNotNull(campaignMessage);

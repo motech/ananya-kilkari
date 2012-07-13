@@ -1,9 +1,9 @@
 package org.motechproject.ananya.kilkari.reporting.gateway;
 
+import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
-import org.motechproject.ananya.kilkari.reporting.gateway.ReportingGateway;
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +13,15 @@ public class StubReportingGateway implements ReportingGateway {
 
     private ReportingGateway behavior;
     private boolean isCreateSubscriptionCalled;
+    private boolean isReportCampaignMessageDeliveryCalled;
+
+    public boolean isReportCampaignMessageDeliveryCalled() {
+        return isReportCampaignMessageDeliveryCalled;
+    }
+
+    public void setReportCampaignMessageDeliveryCalled(boolean reportCampaignMessageDeliveryCalled) {
+        isReportCampaignMessageDeliveryCalled = reportCampaignMessageDeliveryCalled;
+    }
 
     public boolean isUpdateSubscriptionCalled() {
         return isUpdateSubscriptionCalled;
@@ -54,6 +63,14 @@ public class StubReportingGateway implements ReportingGateway {
             return behavior.getLocation(district, block, panchayat);
         }
         return null;
+    }
+
+    @Override
+    public void reportCampaignMessageDelivery(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
+        if (verify()) {
+            behavior.reportCampaignMessageDelivery(campaignMessageDeliveryReportRequest);
+            isReportCampaignMessageDeliveryCalled = true;
+        }
     }
 
     public void setBehavior(ReportingGateway behavior) {

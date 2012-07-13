@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
+import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
@@ -34,5 +35,10 @@ public class ReportingServiceImpl implements ReportingService {
     @Override
     public void reportSubscriptionStateChange(SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest) {
         reportingPublisher.reportSubscriptionStateChange(subscriptionStateChangeReportRequest);
+    }
+
+    @Override
+    public void reportCampaignMessageDelivered(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
+        reportingPublisher.reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
     }
 }

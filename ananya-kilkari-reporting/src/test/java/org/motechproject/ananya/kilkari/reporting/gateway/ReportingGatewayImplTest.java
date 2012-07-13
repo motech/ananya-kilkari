@@ -8,10 +8,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionDetails;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -205,5 +202,35 @@ public class ReportingGatewayImplTest {
         assertEquals(subscriptionStatus, subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(reason, subscriptionStateChangeReportRequest.getReason());
         assertEquals(operator, subscriptionStateChangeReportRequest.getOperator());
+    }
+
+    @Test
+    public void shouldInvokeReportingServiceWithCampaignMessageDeliveryDetails() {
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+
+        String msisdn = "1234567890";
+        String subscriptionId = "abcd1234";
+        String campaignId = "WEEK12";
+        String retryCount = "3";
+        String startTime = "25-12-2012";
+        String endTime = "27-12-2012";
+        String serviceOption = "HELP";
+        new ReportingGatewayImpl(restTemplate, kilkariProperties).reportCampaignMessageDelivery(new CampaignMessageDeliveryReportRequest(subscriptionId, msisdn, campaignId, serviceOption, retryCount, new CallDetailsReportRequest(startTime, endTime)));
+
+        ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
+        verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), campaignMessageDeliveryReportRequestArgumentCaptor.capture(), urlVariablesArgumentCaptor.capture());
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
+
+        verify(kilkariProperties).getProperty("reporting.service.base.url");
+        assertEquals("url/obd/callDetails", urlArgumentCaptor.getValue());
+        assertEquals(msisdn, campaignMessageDeliveryReportRequest.getMsisdn());
+        assertEquals(subscriptionId, campaignMessageDeliveryReportRequest.getSubscriptionId());
+        assertEquals(campaignId, campaignMessageDeliveryReportRequest.getCampaignId());
+        assertEquals(retryCount, campaignMessageDeliveryReportRequest.getRetryCount());
+        assertEquals(serviceOption, campaignMessageDeliveryReportRequest.getServiceOption());
+        CallDetailsReportRequest callDetailReportRequest = campaignMessageDeliveryReportRequest.getCallDetailRecord();
+        assertEquals(startTime, callDetailReportRequest.getStartTime());
+        assertEquals(endTime, callDetailReportRequest.getEndTime());
     }
 }

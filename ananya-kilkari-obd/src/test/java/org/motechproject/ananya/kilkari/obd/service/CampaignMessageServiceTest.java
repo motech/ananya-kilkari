@@ -63,6 +63,19 @@ public class CampaignMessageServiceTest {
     }
 
     @Test
+    public void shouldFindACampaignMessageBasedOnSubscriptionIdAndMessageId() {
+        String subscriptionId = "subscriptionId";
+        String messageId = "messageId";
+        CampaignMessage campaignMessage = mock(CampaignMessage.class);
+        when(allCampaignMessages.find(subscriptionId, messageId)).thenReturn(campaignMessage);
+
+        CampaignMessage actualCampaignMessage = campaignMessageService.find(subscriptionId, messageId);
+
+        verify(allCampaignMessages).find(subscriptionId, messageId);
+        assertEquals(campaignMessage, actualCampaignMessage);
+    }
+
+    @Test
     public void sendNewMessagesShouldFetchNewAndDidNotCallMessages() {
         CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1");
         CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2");
@@ -190,7 +203,7 @@ public class CampaignMessageServiceTest {
 
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(new CampaignMessage(subscriptionId, campaignId, "1234567890", null));
 
-        campaignMessageService.deleteCampaignMessage(subscriptionId, campaignId);
+        campaignMessageService.deleteCampaignMessageIfExists(subscriptionId, campaignId);
 
         ArgumentCaptor<CampaignMessage> campaignMessageArgumentCaptor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages).delete(campaignMessageArgumentCaptor.capture());
@@ -207,11 +220,11 @@ public class CampaignMessageServiceTest {
 
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(null);
 
-        campaignMessageService.deleteCampaignMessage(subscriptionId, campaignId);
+        campaignMessageService.deleteCampaignMessageIfExists(subscriptionId, campaignId);
 
         verify(allCampaignMessages, never()).delete(any(CampaignMessage.class));
     }
-    
+
     @Test
     public void shouldSaveInvalidCallRecords() {
         ArrayList<InvalidCallRecord> invalidCallRecords = new ArrayList<>();
@@ -224,5 +237,14 @@ public class CampaignMessageServiceTest {
 
         verify(allInvalidCallRecords).add(invalidCallRecord1);
         verify(allInvalidCallRecords).add(invalidCallRecord2);
+    }
+
+    @Test
+    public void shouldDeleteACampaignMessage() {
+        CampaignMessage campaignMessage = new CampaignMessage();
+
+        campaignMessageService.deleteCampaignMessage(campaignMessage);
+
+        verify(allCampaignMessages).delete(campaignMessage);
     }
 }

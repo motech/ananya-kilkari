@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.gateway;
 
+import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
@@ -67,6 +68,17 @@ public class ReportingGatewayImpl implements ReportingGateway {
             if (ex.getStatusCode().equals(HttpStatus.NOT_FOUND))
                 return null;
             logger.error(String.format("Reporting subscription state change failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
+            throw ex;
+        }
+    }
+
+    @Override
+    public void reportCampaignMessageDelivery(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
+        String url = String.format("%s%s", getBaseUrl(), OBD_CALL_DETAILS_PATH);
+        try {
+            restTemplate.postForLocation(url, campaignMessageDeliveryReportRequest, new HashMap<String, String>());
+        } catch (HttpClientErrorException ex) {
+            logger.error(String.format("Reporting campaign message delivery failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
             throw ex;
         }
     }

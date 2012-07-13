@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.reporting.domain;
 
 import org.joda.time.DateTime;
 
-public class SubscriptionStateChangeReportRequest extends BaseReportRequest {
+public class SubscriptionStateChangeReportRequest extends SubscriptionBaseReportRequest {
 
     private String reason;
     private String operator;

@@ -70,10 +70,18 @@ public class CampaignMessageService {
         }
     }
 
-    public void deleteCampaignMessage(String subscriptionId, String campaignId) {
-        CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, campaignId);
+    public void deleteCampaignMessageIfExists(String subscriptionId, String messageId) {
+        CampaignMessage campaignMessage = find(subscriptionId, messageId);
         if(campaignMessage != null)
-            allCampaignMessages.delete(campaignMessage);
+            deleteCampaignMessage(campaignMessage);
+    }
+
+    public CampaignMessage find(String subscriptionId, String messageId) {
+        return allCampaignMessages.find(subscriptionId, messageId);
+    }
+
+    public void deleteCampaignMessage(CampaignMessage campaignMessage) {
+        allCampaignMessages.delete(campaignMessage);
     }
 
     public void processInvalidCallRecords(ArrayList<InvalidCallRecord> invalidCallRecords) {

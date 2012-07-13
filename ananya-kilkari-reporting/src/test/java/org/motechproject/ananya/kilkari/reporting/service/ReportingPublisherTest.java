@@ -5,10 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.reporting.domain.ReportingEventKeys;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionDetails;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.scheduler.context.EventContext;
 
 import static org.junit.Assert.assertEquals;
@@ -70,6 +67,38 @@ public class ReportingPublisherTest {
         assertEquals(status, actualSubscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(reason, actualSubscriptionStateChangeReportRequest.getReason());
         assertEquals(operator, actualSubscriptionStateChangeReportRequest.getOperator());
+    }
+
+    @Test
+    public void shouldPublishCampaignMessageDeliveredEventIntoQueue() {
+        String subscriptionId = "ABCD1234";
+        String msisdn = "1234567890";
+        String campaignId = "12";
+        String retryCount = "2";
+        String startTime = "25-12-2012";
+        String endTime = "27-12-2012";
+        CallDetailsReportRequest callDetailsReportRequest = new CallDetailsReportRequest(startTime, endTime);
+        String serviceOption = "HELP";
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(subscriptionId, msisdn, campaignId, serviceOption, retryCount, callDetailsReportRequest);
+
+        reportingPublisher.reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
+
+        ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
+        ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(eventContext).send(eventArgumentCaptor.capture(), campaignMessageDeliveryReportRequestArgumentCaptor.capture());
+
+        CampaignMessageDeliveryReportRequest actualCampaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
+        String eventName = eventArgumentCaptor.getValue();
+
+        assertEquals(ReportingEventKeys.REPORT_CAMPAIGN_MESSAGE_DELIVERED, eventName);
+        assertEquals(subscriptionId, actualCampaignMessageDeliveryReportRequest.getSubscriptionId());
+        assertEquals(msisdn, actualCampaignMessageDeliveryReportRequest.getMsisdn());
+        assertEquals(campaignId, actualCampaignMessageDeliveryReportRequest.getCampaignId());
+        assertEquals(retryCount, actualCampaignMessageDeliveryReportRequest.getRetryCount());
+        assertEquals(serviceOption, actualCampaignMessageDeliveryReportRequest.getServiceOption());
+        CallDetailsReportRequest actualCallDetailsReportRequest = actualCampaignMessageDeliveryReportRequest.getCallDetailRecord();
+        assertEquals(startTime, actualCallDetailsReportRequest.getStartTime());
+        assertEquals(endTime, actualCallDetailsReportRequest.getEndTime());
     }
 }
 

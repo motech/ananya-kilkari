@@ -47,6 +47,11 @@ public class OBDRequest {
         return campaignId;
     }
 
+    @JsonIgnore
+    public CallDetailRecord getCallDetailRecord() {
+        return callDetailRecord;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

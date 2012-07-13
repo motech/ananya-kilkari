@@ -40,7 +40,7 @@ public class SubscriptionRequestTest {
         DateTime createdAt = DateTime.now();
         String dob = "01-11-2013";
         String edd = "04-11-2016";
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(SubscriptionRequest.DATE_TIME_FORMAT);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy");
 
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(),
                 Channel.IVR.name(), "12", "myname", dob, edd, "mydistrict", "myblock", "mypanchayat", createdAt);
@@ -221,7 +221,7 @@ public class SubscriptionRequestTest {
 
     @Test
     public void shouldConvertEDDToDateTimeAndReturn() {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(SubscriptionRequest.DATE_TIME_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy");
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withDOB("15-04-2013").withEDD("13-01-2012").build();
         assertEquals(formatter.parseDateTime("13-01-2012"), subscriptionRequest.getExpectedDateOfDelivery());
         assertEquals(formatter.parseDateTime("15-04-2013"), subscriptionRequest.getDateOfBirth());

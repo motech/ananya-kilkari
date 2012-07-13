@@ -39,7 +39,7 @@ public class SubscriptionMapperTest {
     public void shouldReturnSubscriptionReportRequestFromSubscriptionRequest() {
         String dob = "21-01-2012";
         String edd = "23-02-2013";
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(SubscriptionRequest.DATE_TIME_FORMAT);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy");
         String name = "name";
 
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", "twelve_months", "ivr", "25", dob, edd, name, "mydistrict", "myblock", "mypanchayat", DateTime.now());

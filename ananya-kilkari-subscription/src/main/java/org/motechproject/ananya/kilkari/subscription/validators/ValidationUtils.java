@@ -3,12 +3,11 @@ package org.motechproject.ananya.kilkari.subscription.validators;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.regex.Pattern;
 
 public class ValidationUtils {
 
@@ -16,20 +15,16 @@ public class ValidationUtils {
         return !StringUtils.isEmpty(value) && StringUtils.isNumeric(value);
     }
 
-    public static boolean assertDateFormat(String value, String format) {
-        if (StringUtils.isEmpty(value)) {
+    public static boolean assertDateFormat(String value) {
+        if (StringUtils.isEmpty(value) || !Pattern.matches("^\\d{2}-\\d{2}-\\d{4}$", value)) {
             return false;
         }
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-        Date parsedDate;
         try {
-            simpleDateFormat.setLenient(false);
-            parsedDate = simpleDateFormat.parse(value);
-        } catch (ParseException e) {
+            DateTimeFormat.forPattern("dd-MM-yyyy").parseDateTime(value);
+        } catch (Exception e) {
             return false;
         }
-
-        return simpleDateFormat.format(parsedDate).equals(value);
+        return true;
     }
 
     public static boolean assertChannel(String channel) {

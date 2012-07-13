@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.util.List;
 
 public class SubscriptionRequest implements Serializable {
-    public static final String DATE_TIME_FORMAT = "dd-MM-yyyy";
 
     public static class Location implements Serializable {
         @JsonProperty
@@ -223,7 +222,7 @@ public class SubscriptionRequest implements Serializable {
         if (StringUtils.isNotEmpty(expectedDateOfDelivery)) {
             String errorMessage = "Invalid expected date of delivery %s";
 
-            if (!ValidationUtils.assertDateFormat(expectedDateOfDelivery, SubscriptionRequest.DATE_TIME_FORMAT)) {
+            if (!ValidationUtils.assertDateFormat(expectedDateOfDelivery)) {
                 errors.add(String.format(errorMessage, expectedDateOfDelivery));
                 return;
             }
@@ -238,7 +237,7 @@ public class SubscriptionRequest implements Serializable {
         if (StringUtils.isNotEmpty(dateOfBirth)) {
             String errorMessage = "Invalid date of birth %s";
 
-            if (!ValidationUtils.assertDateFormat(dateOfBirth, SubscriptionRequest.DATE_TIME_FORMAT)) {
+            if (!ValidationUtils.assertDateFormat(dateOfBirth)) {
                 errors.add(String.format(errorMessage, dateOfBirth));
                 return;
             }
@@ -258,7 +257,7 @@ public class SubscriptionRequest implements Serializable {
     }
 
     private DateTime parseDateTime(String dateTime) {
-        return StringUtils.isNotEmpty(dateTime) ? DateTimeFormat.forPattern(SubscriptionRequest.DATE_TIME_FORMAT).parseDateTime(dateTime) : null;
+        return StringUtils.isNotEmpty(dateTime) ? DateTimeFormat.forPattern("dd-MM-yyyy").parseDateTime(dateTime) : null;
     }
 
     @Override

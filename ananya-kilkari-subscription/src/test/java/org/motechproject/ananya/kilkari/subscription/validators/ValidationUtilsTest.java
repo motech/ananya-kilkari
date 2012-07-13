@@ -38,55 +38,51 @@ public class ValidationUtilsTest {
 
     @Test
     public void assertDateShouldReturnFalseForInvalidDateString() {
+        assertFalse(ValidationUtils.assertDateFormat("12-12-12"));
+    }
 
-        assertFalse(ValidationUtils.assertDateFormat("12-12-1", "dd-MM-yyyy"));
+    @Test
+    public void assertDateShouldReturnFalseForInvalidDateStringWithYearDigitsGreaterThan4() {
+        assertFalse(ValidationUtils.assertDateFormat("12-12-11232"));
     }
 
     @Test
     public void assertDateShouldReturnFalseForNullDateString() {
-
-        assertFalse(ValidationUtils.assertDateFormat(null, "dd-MM-yyyy"));
+        assertFalse(ValidationUtils.assertDateFormat(null));
     }
 
     @Test
     public void assertDateShouldReturnFalseForEmptyDateString() {
-
-        assertFalse(ValidationUtils.assertDateFormat("", "dd-MM-yyyy"));
+        assertFalse(ValidationUtils.assertDateFormat(""));
     }
 
     @Test
     public void assertDateShouldNotReturnFalseForValidDateString() {
-
-        assertTrue(ValidationUtils.assertDateFormat("21-01-2012", "dd-MM-yyyy"));
+        assertTrue(ValidationUtils.assertDateFormat("21-01-2012"));
     }
 
     @Test
     public void shouldReturnFalseWhenInvalidPackIsGivenToCreateNewSubscription() {
-
         assertFalse(ValidationUtils.assertPack("Invalid-Pack"));
     }
 
     @Test
     public void shouldReturnFalseWhenInvalidChannelIsGivenToCreateNewSubscription() {
-
         assertFalse(ValidationUtils.assertChannel("Invalid-Channel"));
     }
 
     @Test
     public void shouldReturnFalseWhenInvalidMsisdnNumberIsGivenToCreateNewSubscription() {
-
         assertFalse(PhoneNumber.isValid("12345"));
     }
 
     @Test
     public void shouldReturnFalseWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscription() {
-
         assertFalse(PhoneNumber.isValid("123456789a"));
     }
 
     @Test
     public void shouldReturnFalseWhenAssertingNullForNotNull() {
-
         assertFalse(ValidationUtils.assertNotNull(null));
     }
 

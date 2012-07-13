@@ -2,8 +2,8 @@ package org.motechproject.ananya.kilkari.web.contract.mapper;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.domain.Subscription;
-import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetails;
 
 import static org.junit.Assert.assertEquals;

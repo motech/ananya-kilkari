@@ -3,8 +3,8 @@ package org.motechproject.ananya.kilkari.utils;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.domain.Subscription;
-import org.motechproject.ananya.kilkari.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;

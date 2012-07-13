@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.handlers.callback.*;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
-import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;

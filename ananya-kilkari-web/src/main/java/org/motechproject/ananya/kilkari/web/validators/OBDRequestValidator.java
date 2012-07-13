@@ -1,10 +1,10 @@
 package org.motechproject.ananya.kilkari.web.validators;
 
 import org.apache.commons.lang.StringUtils;
-import org.motechproject.ananya.kilkari.domain.CampaignCode;
-import org.motechproject.ananya.kilkari.domain.OBDRequest;
-import org.motechproject.ananya.kilkari.domain.ServiceOption;
-import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.obd.domain.CampaignCode;
+import org.motechproject.ananya.kilkari.obd.domain.OBDRequest;
+import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
+import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

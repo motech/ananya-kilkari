@@ -8,8 +8,8 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
-import org.motechproject.ananya.kilkari.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.repository.AllSubscriberCareDocs;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.validators.SubscriberCareRequestValidator;
 
 import static org.junit.Assert.assertEquals;

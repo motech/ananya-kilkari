@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.web.contract.mapper;
 
-import org.motechproject.ananya.kilkari.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetails;
 
 public class SubscriptionDetailsMapper {

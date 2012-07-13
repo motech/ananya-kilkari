@@ -3,9 +3,9 @@ package org.motechproject.ananya.kilkari.repository;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.domain.Channel;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

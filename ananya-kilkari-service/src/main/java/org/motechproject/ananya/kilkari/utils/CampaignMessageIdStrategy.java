@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.utils;
 
 import org.joda.time.DateTime;
 import org.joda.time.Weeks;
-import org.motechproject.ananya.kilkari.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.springframework.stereotype.Component;
 
 @Component

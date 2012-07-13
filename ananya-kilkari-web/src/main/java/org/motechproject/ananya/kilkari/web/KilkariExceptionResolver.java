@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.web;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.motechproject.ananya.kilkari.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

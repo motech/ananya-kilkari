@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.web;
 
-import org.motechproject.ananya.kilkari.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 
 import javax.servlet.http.HttpServletRequest;
 

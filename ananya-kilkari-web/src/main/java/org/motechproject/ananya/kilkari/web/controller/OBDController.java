@@ -2,10 +2,10 @@ package org.motechproject.ananya.kilkari.web.controller;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.domain.OBDRequest;
-import org.motechproject.ananya.kilkari.domain.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.obd.domain.OBDRequest;
+import org.motechproject.ananya.kilkari.obd.domain.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
-import org.motechproject.ananya.kilkari.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.validators.OBDRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;

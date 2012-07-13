@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.domain;
 
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 
 import static org.junit.Assert.assertEquals;
 

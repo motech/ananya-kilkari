@@ -62,6 +62,31 @@ public class ValidationUtilsTest {
     }
 
     @Test
+    public void assertDateShouldReturnFalseForInvalidDateTimeString() {
+        assertFalse(ValidationUtils.assertDateTimeFormat("12-12-12 23.56.56"));
+    }
+
+    @Test
+    public void assertDateShouldReturnFalseForInvalidDateTimeStringWithYearDigitsGreaterThan4() {
+        assertFalse(ValidationUtils.assertDateTimeFormat("12-12-11232 23-56-56"));
+    }
+
+    @Test
+    public void assertDateShouldReturnFalseForNullDateTimeString() {
+        assertFalse(ValidationUtils.assertDateTimeFormat(null));
+    }
+
+    @Test
+    public void assertDateShouldReturnFalseForEmptyDateTimeString() {
+        assertFalse(ValidationUtils.assertDateTimeFormat(""));
+    }
+
+    @Test
+    public void assertDateShouldNotReturnFalseForValidDateTimeString() {
+        assertTrue(ValidationUtils.assertDateTimeFormat("21-01-2012 23-56-56"));
+    }
+
+    @Test
     public void shouldReturnFalseWhenInvalidPackIsGivenToCreateNewSubscription() {
         assertFalse(ValidationUtils.assertPack("Invalid-Pack"));
     }

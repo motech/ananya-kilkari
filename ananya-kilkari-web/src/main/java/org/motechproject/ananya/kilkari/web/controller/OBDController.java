@@ -2,8 +2,9 @@ package org.motechproject.ananya.kilkari.web.controller;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.obd.domain.OBDRequest;
-import org.motechproject.ananya.kilkari.obd.domain.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
+import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
+import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
@@ -37,5 +38,12 @@ public class OBDController {
 
         kilkariCampaignService.processSuccessfulMessageDelivery(new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now()));
         return new BaseResponse("SUCCESS","OBD call details received successfully");
+    }
+
+    @RequestMapping(value = "/obd/invalidcallrecords", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseResponse handleInvalidCallRecords(@RequestBody InvalidCallRecordsRequest invalidRecordsRequest){
+        kilkariCampaignService.processInvalidCallRecords(invalidRecordsRequest);
+        return new BaseResponse("SUCCESS","OBD invalid call records received successfully");
     }
 }

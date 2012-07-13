@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.domain;
+package org.motechproject.ananya.kilkari.obd.contract;
 
 import org.joda.time.DateTime;
 

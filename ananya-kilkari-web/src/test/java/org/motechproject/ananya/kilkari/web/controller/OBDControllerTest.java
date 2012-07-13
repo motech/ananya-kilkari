@@ -4,9 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
+import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
+import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
-import org.motechproject.ananya.kilkari.obd.domain.OBDRequest;
-import org.motechproject.ananya.kilkari.obd.domain.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -99,7 +102,7 @@ public class OBDControllerTest {
     public void shouldValidateSubscriptionId() throws Exception {
         String subscriptionId = "abcd1234";
 
-        when(obdRequestValidator.validate(any(OBDRequest.class), anyString())).thenReturn(Arrays.asList("Invalid msisdn null" ,"Invalid service option null", "Invalid campaign id null" ,"Invalid subscription id " + subscriptionId));
+        when(obdRequestValidator.validate(any(OBDRequest.class), anyString())).thenReturn(Arrays.asList("Invalid msisdn null", "Invalid service option null", "Invalid campaign id null", "Invalid subscription id " + subscriptionId));
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(null);
         byte[] requestBody = TestUtils.toJson(new OBDRequest()).getBytes();
 
@@ -139,5 +142,59 @@ public class OBDControllerTest {
         assertEquals(subscriptionId, obdRequestWrapper.getSubscriptionId());
         assertEquals(obdRequest, obdRequestWrapper.getObdRequest());
         assertNotNull(obdRequestWrapper.getCreatedAt());
+    }
+
+    @Test
+    public void shouldProcessInvalidRecordsRequest() throws Exception {
+        String invalidRecordJSON1 = createInvalidCallRecordJSON("msisdn1", "subscriptionId1", "campaignId1", "operator1", "description1");
+        String invalidRecordJSON2 = createInvalidCallRecordJSON("msisdn2", "subscriptionId2", "campaignId2", "operator2", "description2");
+        String requestBody = "{\"callrecords\": ["+ invalidRecordJSON1 + "," + invalidRecordJSON2 + "]}";
+        mockMvc(obdController)
+                .perform(post("/obd/invalidcallrecords").body(requestBody.getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(CONTENT_TYPE_JSON))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD invalid call records received successfully")));
+
+        ArgumentCaptor<InvalidCallRecordsRequest> captor= ArgumentCaptor.forClass(InvalidCallRecordsRequest.class);
+        verify(kilkariCampaignService).processInvalidCallRecords(captor.capture());
+        InvalidCallRecordsRequest actualRequest = captor.getValue();
+        ArrayList<InvalidCallRecordRequestObject> callrecords = actualRequest.getCallrecords();
+        assertEquals(2, callrecords.size());
+
+        InvalidCallRecordRequestObject invalidCallRecordRequestObject1 = callrecords.get(0);
+        assertEquals("msisdn1", invalidCallRecordRequestObject1.getMsisdn());
+        assertEquals("subscriptionId1", invalidCallRecordRequestObject1.getSubscriptionId());
+        assertEquals("campaignId1", invalidCallRecordRequestObject1.getCampaignId());
+        assertEquals("operator1", invalidCallRecordRequestObject1.getOperator());
+        assertEquals("description1", invalidCallRecordRequestObject1.getDescription());
+        
+        InvalidCallRecordRequestObject invalidCallRecordRequestObject2 = callrecords.get(0);
+        assertEquals("msisdn1", invalidCallRecordRequestObject2.getMsisdn());
+        assertEquals("subscriptionId1", invalidCallRecordRequestObject2.getSubscriptionId());
+        assertEquals("campaignId1", invalidCallRecordRequestObject2.getCampaignId());
+        assertEquals("operator1", invalidCallRecordRequestObject2.getOperator());
+        assertEquals("description1", invalidCallRecordRequestObject2.getDescription());
+    }
+
+
+    @Test
+    public void shouldProcessInvalidCallRecordsRequestWithZeroItems() throws Exception {
+        String requestBody = "{}";
+        mockMvc(obdController)
+                .perform(post("/obd/invalidcallrecords").body(requestBody.getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(CONTENT_TYPE_JSON))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD invalid call records received successfully")));
+
+        ArgumentCaptor<InvalidCallRecordsRequest> captor= ArgumentCaptor.forClass(InvalidCallRecordsRequest.class);
+        verify(kilkariCampaignService).processInvalidCallRecords(captor.capture());
+        InvalidCallRecordsRequest actualRequest = captor.getValue();
+        ArrayList<InvalidCallRecordRequestObject> callrecords = actualRequest.getCallrecords();
+        assertTrue(callrecords.isEmpty());
+    }
+
+    private String createInvalidCallRecordJSON(String msisdn, String subscriptionId, String campaignId, String operator, String description) {
+        String jsonTemplate = "{\"msisdn\":\"%s\", \"subscriptionId\":\"%s\",\"campaignId\":\"%s\",\"operator\":\"%s\",\"description\":\"%s\"}";
+        return String.format(jsonTemplate, msisdn, subscriptionId, campaignId, operator, description);
     }
 }

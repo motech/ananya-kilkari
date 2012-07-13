@@ -8,8 +8,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
+import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
+import org.motechproject.ananya.kilkari.obd.repository.AllInvalidCallRecords;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,13 +36,16 @@ public class CampaignMessageServiceTest {
     @Mock
     private CampaignMessageCSVBuilder campaignMessageCSVBuilder;
 
+    @Mock
+    private AllInvalidCallRecords allInvalidCallRecords;
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() {
         initMocks(this);
-        campaignMessageService = new CampaignMessageService(allCampaignMessages, onMobileOBDGateway, campaignMessageCSVBuilder);
+        campaignMessageService = new CampaignMessageService(allCampaignMessages, onMobileOBDGateway, campaignMessageCSVBuilder, allInvalidCallRecords);
     }
 
     @Test
@@ -205,5 +210,19 @@ public class CampaignMessageServiceTest {
         campaignMessageService.deleteCampaignMessage(subscriptionId, campaignId);
 
         verify(allCampaignMessages, never()).delete(any(CampaignMessage.class));
+    }
+    
+    @Test
+    public void shouldSaveInvalidCallRecords() {
+        ArrayList<InvalidCallRecord> invalidCallRecords = new ArrayList<>();
+        InvalidCallRecord invalidCallRecord1 = new InvalidCallRecord("msisdn1", "subscription1", "campaign1", "operator1", "description1");
+        InvalidCallRecord invalidCallRecord2 = new InvalidCallRecord("msisdn2", "subscription2", "campaign2", "operator2", "description2");
+        invalidCallRecords.add(invalidCallRecord1);
+        invalidCallRecords.add(invalidCallRecord2);
+
+        campaignMessageService.processInvalidCallRecords(invalidCallRecords);
+
+        verify(allInvalidCallRecords).add(invalidCallRecord1);
+        verify(allInvalidCallRecords).add(invalidCallRecord2);
     }
 }

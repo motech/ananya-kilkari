@@ -3,7 +3,10 @@ package org.motechproject.ananya.kilkari.service;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
-import org.motechproject.ananya.kilkari.obd.domain.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
+import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -11,6 +14,7 @@ import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,5 +110,15 @@ public class KilkariCampaignService {
 
     public void processSuccessfulMessageDelivery(OBDRequestWrapper obdRequestWrapper) {
         campaignMessageService.deleteCampaignMessage(obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId());
+    }
+
+    public void processInvalidCallRecords(InvalidCallRecordsRequest invalidCallRecordsRequest) {
+        ArrayList<InvalidCallRecordRequestObject> requestCallRecords = invalidCallRecordsRequest.getCallrecords();
+        ArrayList<InvalidCallRecord> invalidCallRecords = new ArrayList<>();
+        for(InvalidCallRecordRequestObject requestObject : requestCallRecords){
+            invalidCallRecords.add(new InvalidCallRecord(requestObject.getMsisdn(), requestObject.getSubscriptionId(),
+                    requestObject.getCampaignId(), requestObject.getOperator(), requestObject.getDescription()));
+        }
+        campaignMessageService.processInvalidCallRecords(invalidCallRecords);
     }
 }

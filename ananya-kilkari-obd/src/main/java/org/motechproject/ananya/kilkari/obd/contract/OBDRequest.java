@@ -1,9 +1,10 @@
-package org.motechproject.ananya.kilkari.obd.domain;
+package org.motechproject.ananya.kilkari.obd.contract;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 
 public class OBDRequest {
     @JsonProperty

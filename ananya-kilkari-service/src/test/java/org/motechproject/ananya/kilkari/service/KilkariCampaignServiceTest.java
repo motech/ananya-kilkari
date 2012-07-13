@@ -5,10 +5,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
-import org.motechproject.ananya.kilkari.obd.domain.OBDRequest;
-import org.motechproject.ananya.kilkari.obd.domain.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
+import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
+import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
@@ -222,5 +226,44 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.processSuccessfulMessageDelivery(obdRequestWrapper);
 
         verify(campaignMessageService).deleteCampaignMessage(obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId());
+    }
+
+    @Test
+    public void shouldProcessInvalidCallRecords() {
+        String msisdn1 = "msisdn1";
+        String campaign1 = "campaign1";
+        String desc1 = "desc1";
+        String operator1 = "operator1";
+        String sub1 = "sub1";
+
+        InvalidCallRecordsRequest invalidCallRecordsRequest = Mockito.mock(InvalidCallRecordsRequest.class);
+        ArrayList<InvalidCallRecordRequestObject> invalidCallRecordRequestObjects = new ArrayList<InvalidCallRecordRequestObject>();
+        InvalidCallRecordRequestObject invalidCallRecordRequestObject1 = Mockito.mock(InvalidCallRecordRequestObject.class);
+        when(invalidCallRecordRequestObject1.getMsisdn()).thenReturn(msisdn1);
+        when(invalidCallRecordRequestObject1.getCampaignId()).thenReturn(campaign1);
+        when(invalidCallRecordRequestObject1.getDescription()).thenReturn(desc1);
+        when(invalidCallRecordRequestObject1.getOperator()).thenReturn(operator1);
+        when(invalidCallRecordRequestObject1.getSubscriptionId()).thenReturn(sub1);
+
+        InvalidCallRecordRequestObject invalidCallRecordRequestObject2 = Mockito.mock(InvalidCallRecordRequestObject.class);
+        invalidCallRecordRequestObjects.add(invalidCallRecordRequestObject1);
+        invalidCallRecordRequestObjects.add(invalidCallRecordRequestObject2);
+
+
+        when(invalidCallRecordsRequest.getCallrecords()).thenReturn(invalidCallRecordRequestObjects);
+
+        kilkariCampaignService.processInvalidCallRecords(invalidCallRecordsRequest);
+
+        ArgumentCaptor<ArrayList> captor = ArgumentCaptor.forClass(ArrayList.class);
+        verify(campaignMessageService).processInvalidCallRecords(captor.capture());
+
+        ArrayList actualInvalidCallRecords = captor.getValue();
+        assertEquals(2,actualInvalidCallRecords.size());
+        InvalidCallRecord actualInvalidCallRecord1 = (InvalidCallRecord) actualInvalidCallRecords.get(0);
+        assertEquals(campaign1,actualInvalidCallRecord1.getCampaignId());
+        assertEquals(sub1,actualInvalidCallRecord1.getSubscriptionId());
+        assertEquals(msisdn1,actualInvalidCallRecord1.getMsisdn());
+        assertEquals(operator1,actualInvalidCallRecord1.getOperator());
+        assertEquals(desc1,actualInvalidCallRecord1.getDescription());
     }
 }

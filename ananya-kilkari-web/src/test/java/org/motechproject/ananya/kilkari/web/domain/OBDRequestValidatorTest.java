@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
-import org.motechproject.ananya.kilkari.obd.domain.OBDRequest;
+import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.validators.OBDRequestValidator;

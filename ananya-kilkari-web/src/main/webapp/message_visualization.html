@@ -4,22 +4,22 @@
 <head>
     <title>Message Campaign Visualization</title>
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
-    <script src="http://github.com/DmitryBaranovskiy/raphael/raw/master/raphael-min.js"></script>
-    <script src="js/message_campaign.js"></script>
+    <script src="js/visualization/raphael-min.js" type="text/javascript"></script>
+    <script src="js/visualization/message_campaign.js" type="text/javascript"></script>
     <script type="text/javascript">
         function doAjax() {
             $.ajax({
-                url: '/ananya-kilkari/messagecampaign/visualize?msisdn=' + $("#msisdn").val(),
-                success: function(data) {
-                    new Schedule(new Date("Jun 18, 2012"), 3).draw(data);
-                    return;
+                url:'/ananya-kilkari/messagecampaign/visualize?msisdn=' + $("#msisdn").val(),
+                success:function (data) {
+                    alert(new Date(data.startDate));
+                    new Schedule(new Date(data.startDate), 3).draw(data);
                 }
             });
         }
     </script>
 </head>
 <body>
-<input type="text" name="msisdn" id="msisdn"/>
+<label for="msisdn">MSISDN</label><input type="text" name="msisdn" id="msisdn"/>
 <button id="visualize" name="visualize" onclick="doAjax()" title="Visualize">Get Message Timings!</button>
 <div id="time">
 </div>

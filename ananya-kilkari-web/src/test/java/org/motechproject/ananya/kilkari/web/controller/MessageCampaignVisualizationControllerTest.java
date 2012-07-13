@@ -46,7 +46,7 @@ public class MessageCampaignVisualizationControllerTest {
                 .perform(get("/messagecampaign/visualize").param("msisdn", msisdn))
                 .andExpect(status().isOk())
                 .andExpect(content().type("application/json;charset=UTF-8"))
-                .andExpect(content().string("{\"externalId\":\"msisdn\",\"schedules\":[{\"mid\":\"subid\",\"messages\":[1351160338000,1355987633000]}]}"));
+                .andExpect(content().string("{\"externalId\":\"msisdn\",\"schedules\":[{\"mid\":\"subid\",\"messages\":[1351160338000,1355987633000]}],\"startDate\":1351160338000}"));
 
     }
 }

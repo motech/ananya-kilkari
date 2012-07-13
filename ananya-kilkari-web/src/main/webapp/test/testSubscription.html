@@ -8,83 +8,70 @@
 </head>
 
 <body>
-    <script type="text/javascript">
+<script type="text/javascript">
 
-        var machines = {
-            "qa1" : "192.168.42.51:8080",
-            "qa2" : "192.168.42.52:8080",
-            "showcase" : "192.168.42.53:8080",
-            "local" : "localhost:9979"
-        }
+    function getMachine() {
+        return window.document.location.host;
+    }
 
+    $(document).ready(function () {
 
-        function getMachine() {
-            return machines[$('#select_machine > form > input[name=machine]:checked').val()];
-        }
+        // Get subscriber
+        $("#get_subscriber > button").click(function () {
+            var msisdn = $('#get_subscriber > input[name=msisdn]').val();
+            var channel = $('#get_subscriber > input[name=channel]').val();
+            var url = 'http://' + getMachine() + '/ananya-kilkari/' + 'subscriber' + '?msisdn=' + msisdn + '&channel=' + channel;
 
-        $(document).ready(function() {
-
-            // Get subscriber
-            $("#get_subscriber > button").click(function() {
-                var msisdn = $('#get_subscriber > input[name=msisdn]').val();
-                var channel = $('#get_subscriber > input[name=channel]').val();
-                var url = 'http://' + getMachine() + '/ananya-kilkari/' + 'subscriber' + '?msisdn=' + msisdn + '&channel=' + channel;
-
-                $.ajax({
-                    'url' : url,
-                    'type' : 'get',
-                    'dataType' : 'text',
-                    success : function(data){
-                        $("#get_subscriber > textarea").val(data);
-                    }
-                });
+            $.ajax({
+                'url':url,
+                'type':'get',
+                'dataType':'text',
+                success:function (data) {
+                    $("#get_subscriber > textarea").val(data);
+                }
             });
-
-            $("#create_subscription > button").click(function() {
-                var msisdn = $('#create_subscription > input[name=msisdn]').val();
-                var pack = $('#create_subscription > input[name=pack]').val();
-                var url = 'http://' + getMachine() + '/ananya-kilkari/' + 'subscription' + '?msisdn=' + msisdn + '&pack=' + pack + '&channel=IVR';
-
-                $.ajax({
-                    'url' : url,
-                    'type' : 'get',
-                    'dataType' : 'text',
-                    success : function(data){
-                        $("#create_subscription > textarea").val(data);
-                    }
-                });
-            });
-
         });
 
-    </script>
+        $("#create_subscription > button").click(function () {
+            var msisdn = $('#create_subscription > input[name=msisdn]').val();
+            var pack = $('#create_subscription > input[name=pack]').val();
+            var url = 'http://' + getMachine() + '/ananya-kilkari/' + 'subscription' + '?msisdn=' + msisdn + '&pack=' + pack + '&channel=IVR';
 
-    <div id="select_machine" >
-        <form>
-            <input type="radio" name="machine" value="qa1" /> QA-1
-            <input type="radio" name="machine" value="qa2" /> QA-2
-            <input type="radio" name="machine" value="showcase" /> Showcase
-            <input type="radio" name="machine" value="local" checked /> Local
-        </form>
-    </div>
+            $.ajax({
+                'url':url,
+                'type':'get',
+                'dataType':'text',
+                success:function (data) {
+                    $("#create_subscription > textarea").val(data);
+                }
+            });
+        });
 
-    <h3>Query Subscription details for Subscriber</h3>
-    <div id="get_subscriber">
-        Msisdn: <input type="text" name="msisdn" /> <br/>
-        Channel: <input type="text" name="channel" id="channel" /> <br/>
-        <button name="submit">Call</button> <br />
-        Response : <textarea rows="5" cols="50" name="response" ></textarea> <br />
-    </div>
+    });
 
-    <hr />
+</script>
 
-    <h3>Create subscription from IVR</h3>
-    <div id="create_subscription">
-        Msisdn: <input type="text" name="msisdn" /> <br/>
-        Pack: <input type="text" name="pack" /> <br/>
-        <button name="submit">Call</button> <br />
-        Response : <textarea rows="5" cols="50" name="response" ></textarea> <br />
-    </div>
+<h3>Query Subscription details for Subscriber</h3>
+
+<div id="get_subscriber">
+    Msisdn: <input type="text" name="msisdn"/> <br/>
+    Channel: <input type="text" name="channel" id="channel"/> <br/>
+    <button name="submit">Call</button>
+    <br/>
+    Response : <textarea rows="5" cols="50" name="response"></textarea> <br/>
+</div>
+
+<hr/>
+
+<h3>Create subscription from IVR</h3>
+
+<div id="create_subscription">
+    Msisdn: <input type="text" name="msisdn"/> <br/>
+    Pack: <input type="text" name="pack"/> <br/>
+    <button name="submit">Call</button>
+    <br/>
+    Response : <textarea rows="5" cols="50" name="response"></textarea> <br/>
+</div>
 
 </body>
 </html>

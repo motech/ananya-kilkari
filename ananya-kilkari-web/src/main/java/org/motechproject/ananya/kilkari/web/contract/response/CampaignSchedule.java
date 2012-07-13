@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.contract.response;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 
@@ -17,17 +18,14 @@ public class CampaignSchedule {
     public CampaignSchedule(String subscriptionId, List<DateTime> scheduleTimings) {
         this.subscriptionId = subscriptionId;
 
-        this.scheduleTimings = new ArrayList<Long>();
+        this.scheduleTimings = new ArrayList<>();
         for (DateTime dateTime : scheduleTimings) {
             this.scheduleTimings.add(dateTime.getMillis());
         }
+    }
 
-//        this.scheduleTimings = CollectionUtils.transform(scheduleTimings, new Transformer() {
-//            @Override
-//            public Object transform(Object o) {
-//                Date dateTime = (Date)o;
-//                return dateTime.
-//            }
-//        });
+    @JsonIgnore
+    public List<Long> getScheduleTimings() {
+        return scheduleTimings;
     }
 }

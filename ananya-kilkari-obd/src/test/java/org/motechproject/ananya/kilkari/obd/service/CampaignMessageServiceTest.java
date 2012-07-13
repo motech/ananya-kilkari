@@ -127,7 +127,7 @@ public class CampaignMessageServiceTest {
         ArgumentCaptor<CampaignMessage> captor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages, times(2)).update(captor.capture());
 
-        verify(onMobileOBDGateway).sendNewMessages(csvContent);
+        verify(onMobileOBDGateway).sendRetryMessages(csvContent);
 
         List<CampaignMessage> actualCampaignMessages = captor.getAllValues();
         assertEquals(2, actualCampaignMessages.size());
@@ -154,7 +154,7 @@ public class CampaignMessageServiceTest {
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(campaignMessages);
 
-        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendNewMessages(anyString());
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendRetryMessages(anyString());
 
         try {
             campaignMessageService.sendRetryMessages();

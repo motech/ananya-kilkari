@@ -49,7 +49,7 @@ public class CampaignMessageService {
 
     public void sendRetryMessages() {
         List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentRetryMessages();
-        GatewayAction gatewayAction = new GatewayAction() {
+        GatewayAction gatewayAction =   new GatewayAction() {
             @Override
             public void send(String content) {
                 onMobileOBDGateway.sendRetryMessages(content);

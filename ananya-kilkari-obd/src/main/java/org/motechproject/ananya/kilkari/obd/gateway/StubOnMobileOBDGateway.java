@@ -10,9 +10,16 @@ public class StubOnMobileOBDGateway implements OnMobileOBDGateway {
     private OnMobileOBDGateway behavior;
 
     @Override
-    public void send(String content) {
+    public void sendNewMessages(String content) {
         if(verify()) {
-            behavior.send(content);
+            behavior.sendNewMessages(content);
+        }
+    }
+
+    @Override
+    public void sendRetryMessages(String content) {
+        if(verify()) {
+            behavior.sendRetryMessages(content);
         }
     }
 

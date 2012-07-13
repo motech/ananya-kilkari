@@ -8,6 +8,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.profile.OBDProductionProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +30,11 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     private Properties obdProperties;
 
     private static final Logger logger = LoggerFactory.getLogger(OnMobileOBDGatewayImpl.class);
-    private static final String DELIVERY_URL_PROPERTY = "obd.message.delivery.url";
+    private static final String DELIVERY_BASE_URL_PROPERTY = "obd.message.delivery.base.url";
     private static final String DELIVERY_FILENAME_PROPERTY = "obd.message.delivery.filename";
     private static final String DELIVERY_FILE_PROPERTY = "obd.message.delivery.file";
+    private static final String NEW_DELIVERY_URL_QUERY_STRING = "obd.new.message.delivery.url.query.string";
+    private static final String RETRY_DELIVERY_URL_QUERY_STRING = "obd.retry.message.delivery.url.query.string";
 
 
     @Autowired
@@ -39,8 +44,18 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     }
 
     @Override
-    public void send(String content) {
-        String url = obdProperties.getProperty(DELIVERY_URL_PROPERTY);
+    public void sendNewMessages(String content) {
+        String url = getUrl(NEW_DELIVERY_URL_QUERY_STRING);
+        send(content, url);
+    }
+
+    @Override
+    public void sendRetryMessages(String content) {
+        String url = getUrl(RETRY_DELIVERY_URL_QUERY_STRING);
+        send(content, url);
+    }
+
+    private void send(String content, String url) {
         logger.info(String.format("Uploading the campaign messages to url: %s\nContent:\n%s", url, content));
 
         String fileName = obdProperties.getProperty(DELIVERY_FILENAME_PROPERTY);
@@ -61,11 +76,19 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
         }
     }
 
+    private String getUrl(String queryStringProperty) {
+        String baseUrl = obdProperties.getProperty(DELIVERY_BASE_URL_PROPERTY);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
+        String date = dateTimeFormatter.print(DateTime.now());
+        String queryString = obdProperties.getProperty(queryStringProperty);
+        return String.format(baseUrl + queryString, date, date);
+    }
+
     private void validate(HttpResponse response, String responseContent) {
         StatusLine statusLine = response.getStatusLine();
         int statusCode = statusLine.getStatusCode();
         String reasonPhrase = statusLine.getReasonPhrase();
-        if(!isStatusOk(statusCode)) {
+        if (!isStatusOk(statusCode)) {
             String errorMessage = String.format("Sending messages to OBD failed with code: %s, reason: %s", statusCode, reasonPhrase);
             logger.error(errorMessage);
             logger.error(String.format("response:\n%s", responseContent));
@@ -76,13 +99,13 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     private String readResponse(HttpResponse response) {
         try {
             HttpEntity entity = response.getEntity();
-            if(entity == null) {
+            if (entity == null) {
                 return null;
             }
             BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent()));
             String content = "";
             String line;
-            while((line  = reader.readLine()) != null ) {
+            while ((line = reader.readLine()) != null) {
                 content += line;
             }
             return content;

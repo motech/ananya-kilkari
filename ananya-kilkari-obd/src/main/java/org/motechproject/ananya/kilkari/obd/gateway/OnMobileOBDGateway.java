@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.gateway;
 
 public interface OnMobileOBDGateway {
-    void send(String content);
+    void sendNewMessages(String content);
+
+    void sendRetryMessages(String content);
 }

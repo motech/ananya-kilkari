@@ -38,20 +38,32 @@ public class CampaignMessageService {
 
     public void sendNewMessages() {
         List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
-        sendMessagesToOBD(allNewMessages);
+        GatewayAction gatewayAction = new GatewayAction() {
+            @Override
+            public void send(String content) {
+                onMobileOBDGateway.sendNewMessages(content);
+            }
+        };
+        sendMessagesToOBD(allNewMessages, gatewayAction);
     }
 
     public void sendRetryMessages() {
         List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentRetryMessages();
-        sendMessagesToOBD(allRetryMessages);
+        GatewayAction gatewayAction = new GatewayAction() {
+            @Override
+            public void send(String content) {
+                onMobileOBDGateway.sendRetryMessages(content);
+            }
+        };
+        sendMessagesToOBD(allRetryMessages, gatewayAction);
     }
 
-    private void sendMessagesToOBD(List<CampaignMessage> messages) {
+    private void sendMessagesToOBD(List<CampaignMessage> messages, GatewayAction gatewayAction) {
         logger.info(String.format("Sending %s campaign messages to obd", messages.size()));
         if(messages.isEmpty())
             return;
         String campaignMessageCSVContent = campaignMessageCSVBuilder.getCSV(messages);
-        onMobileOBDGateway.send(campaignMessageCSVContent);
+        gatewayAction.send(campaignMessageCSVContent);
         for (CampaignMessage message : messages) {
             message.markSent();
             allCampaignMessages.update(message);
@@ -68,5 +80,9 @@ public class CampaignMessageService {
         for(InvalidCallRecord record : invalidCallRecords){
             allInvalidCallRecords.add(record);
         }
+    }
+
+    private interface GatewayAction {
+        public void send(String content);
     }
 }

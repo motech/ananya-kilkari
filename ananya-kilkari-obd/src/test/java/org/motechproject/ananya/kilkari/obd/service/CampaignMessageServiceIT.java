@@ -103,6 +103,29 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
         campaignMessageService.sendNewMessages();
-        verify(mockOnMobileOBDGateway).send("1234567890,messageId,subscriptionId,airtel\n");
+
+        verify(mockOnMobileOBDGateway).sendNewMessages("1234567890,messageId,subscriptionId,airtel\n");
+    }
+
+    @Test
+    public void shouldSendRetryCampaignMessagesToOBD() {
+        String subscriptionId = "subscriptionId";
+        String messageId = "messageId";
+        String operator = "airtel";
+        String msisdn = "1234567890";
+
+        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator);
+        CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
+        campaignMessage.markDidNotPickup();
+        allCampaignMessages.update(campaignMessage);
+
+        markForDeletion(campaignMessage);
+
+        OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
+        onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
+
+        campaignMessageService.sendRetryMessages();
+
+        verify(mockOnMobileOBDGateway).sendRetryMessages("1234567890,messageId,subscriptionId,airtel\n");
     }
 }

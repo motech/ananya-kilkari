@@ -73,7 +73,7 @@ public class CampaignMessageServiceTest {
         campaignMessageService.sendNewMessages();
 
         verify(allCampaignMessages).getAllUnsentNewMessages();
-        verify(onMobileOBDGateway).send(csvContent);
+        verify(onMobileOBDGateway).sendNewMessages(csvContent);
 
         ArgumentCaptor<CampaignMessage> captor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages, times(2)).update(captor.capture());
@@ -102,7 +102,7 @@ public class CampaignMessageServiceTest {
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(campaignMessages);
 
-        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).send(anyString());
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendNewMessages(anyString());
 
         try {
             campaignMessageService.sendNewMessages();
@@ -127,7 +127,7 @@ public class CampaignMessageServiceTest {
         ArgumentCaptor<CampaignMessage> captor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages, times(2)).update(captor.capture());
 
-        verify(onMobileOBDGateway).send(csvContent);
+        verify(onMobileOBDGateway).sendNewMessages(csvContent);
 
         List<CampaignMessage> actualCampaignMessages = captor.getAllValues();
         assertEquals(2, actualCampaignMessages.size());
@@ -154,7 +154,7 @@ public class CampaignMessageServiceTest {
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(campaignMessages);
 
-        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).send(anyString());
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendNewMessages(anyString());
 
         try {
             campaignMessageService.sendRetryMessages();

@@ -56,12 +56,13 @@ public class IvrSmokeTest {
         assertEquals("SUCCESS", baseResponse.getStatus());
 
         SubscriberResponse response = subscriptionServiceAsync.getSubscriptionData(msisdn, channel, expectedStatus);
-        assertEquals(1, response.getSubscriptionDetails().size());
-        SubscriptionDetails subscriptionDetails = response.getSubscriptionDetails().get(0);
-        assertEquals(pack, subscriptionDetails.getPack());
-        assertEquals(expectedStatus, subscriptionDetails.getStatus());
+        assertKilkariData(pack, expectedStatus, response);
 
         List<SubscriptionStatusMeasure> subscriptionStatusMeasures = reportServiceAsync.getSubscriptionStatusMeasureForMsisdn(msisdn);
+        assertReportData(subscriptionStatusMeasures, channel, msisdn, pack, expectedStatus);
+    }
+
+    private void assertReportData(List<SubscriptionStatusMeasure> subscriptionStatusMeasures, String channel, String msisdn, String pack, String expectedStatus) {
         assertEquals(2, subscriptionStatusMeasures.size());
         assertEquals(msisdn, subscriptionStatusMeasures.get(0).getMsisdn());
         assertEquals(pack, subscriptionStatusMeasures.get(0).getPack().toUpperCase());
@@ -72,5 +73,12 @@ public class IvrSmokeTest {
         assertEquals(pack, subscriptionStatusMeasures.get(1).getPack().toUpperCase());
         assertEquals(channel, subscriptionStatusMeasures.get(1).getChannel().toUpperCase());
         assertEquals(expectedStatus, subscriptionStatusMeasures.get(1).getStatus().toUpperCase());
+    }
+
+    private void assertKilkariData(String pack, String expectedStatus, SubscriberResponse response) {
+        assertEquals(1, response.getSubscriptionDetails().size());
+        SubscriptionDetails subscriptionDetails = response.getSubscriptionDetails().get(0);
+        assertEquals(pack, subscriptionDetails.getPack());
+        assertEquals(expectedStatus, subscriptionDetails.getStatus());
     }
 }

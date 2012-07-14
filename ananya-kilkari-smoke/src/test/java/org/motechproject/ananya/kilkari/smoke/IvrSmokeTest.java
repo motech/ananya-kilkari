@@ -56,14 +56,15 @@ public class IvrSmokeTest {
         assertEquals("SUCCESS", baseResponse.getStatus());
 
         SubscriberResponse response = subscriptionServiceAsync.getSubscriptionData(msisdn, channel, expectedStatus);
+        assertEquals(1, response.getSubscriptionDetails().size());
         assertKilkariData(pack, expectedStatus, response);
 
         List<SubscriptionStatusMeasure> subscriptionStatusMeasures = reportServiceAsync.getSubscriptionStatusMeasureForMsisdn(msisdn);
+        assertEquals(2, subscriptionStatusMeasures.size());
         assertReportData(subscriptionStatusMeasures, channel, msisdn, pack, expectedStatus);
     }
 
     private void assertReportData(List<SubscriptionStatusMeasure> subscriptionStatusMeasures, String channel, String msisdn, String pack, String expectedStatus) {
-        assertEquals(2, subscriptionStatusMeasures.size());
         assertEquals(msisdn, subscriptionStatusMeasures.get(0).getMsisdn());
         assertEquals(pack, subscriptionStatusMeasures.get(0).getPack().toUpperCase());
         assertEquals(channel, subscriptionStatusMeasures.get(0).getChannel().toUpperCase());
@@ -76,7 +77,6 @@ public class IvrSmokeTest {
     }
 
     private void assertKilkariData(String pack, String expectedStatus, SubscriberResponse response) {
-        assertEquals(1, response.getSubscriptionDetails().size());
         SubscriptionDetails subscriptionDetails = response.getSubscriptionDetails().get(0);
         assertEquals(pack, subscriptionDetails.getPack());
         assertEquals(expectedStatus, subscriptionDetails.getStatus());

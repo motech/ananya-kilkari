@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class TestUtils {
     public static final String KILKARI_URL = "http://localhost:8080/ananya-kilkari";
+    public static final String KILKARI_SUBSCRIPTION_POST_URL = "http://localhost:8080/ananya-kilkari/subscription";
 
     public static String constructUrl(String url, String path, Map<String, String> parametersMap) {
         url += "/" + path + "?";

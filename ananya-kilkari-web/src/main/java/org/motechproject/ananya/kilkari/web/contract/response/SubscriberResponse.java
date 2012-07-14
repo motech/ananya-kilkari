@@ -15,7 +15,7 @@ public class SubscriberResponse {
     private List<SubscriptionDetails> subscriptionDetails;
 
     public SubscriberResponse() {
-        this.subscriptionDetails = new ArrayList<SubscriptionDetails>();
+        this.subscriptionDetails = new ArrayList<>();
     }
 
     public void addSubscriptionDetail(SubscriptionDetails subscriptionDetail) {

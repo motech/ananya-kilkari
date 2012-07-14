@@ -24,19 +24,19 @@ public class ReportServiceAsync {
         this.dataSource = dataSource;
     }
 
-    public List<SubscriptionStatusMeasure> getSubscriptionStatusMeasure() {
+    public List<SubscriptionStatusMeasure> getSubscriptionStatusMeasureForMsisdn(final String msisdn) {
         return new TimedRunner(10, 1000) {
 
             @Override
             protected List<SubscriptionStatusMeasure> run() {
                 List<SubscriptionStatusMeasure> subscriptionStatusMeasures = null;
                 try {
-                    String query = "select ssm.status,s.msisdn,spd.subscription_pack,cd.channel " +
+                    String query = "select ssm.status,s.msisdn,s.name,s.age_of_beneficiary,s.estimated_date_of_delivery,s.date_of_birth,spd.subscription_pack,cd.channel " +
                             "from report.subscription_status_measure ssm " +
                             "join report.subscriptions sc on sc.id = ssm.subscription_id " +
                             "join report.subscribers s on s.id=sc.subscriber_id " +
                             "join report.channel_dimension cd on cd.id = sc.channel_id " +
-                            "join report.subscription_pack_dimension spd on spd.id = sc.subscription_pack_id";
+                            "join report.subscription_pack_dimension spd on spd.id = sc.subscription_pack_id where msisdn = " + msisdn;
                     subscriptionStatusMeasures = executeQuery(query);
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -57,9 +57,13 @@ public class ReportServiceAsync {
                         String status = resultSet.getString("status");
                         String pack = resultSet.getString("subscription_pack");
                         String channel = resultSet.getString("channel");
-                        subscriptionStatusMeasures.add(new SubscriptionStatusMeasure(msisdn, status, pack, channel));
+                        String name = resultSet.getString("name");
+                        String age = resultSet.getString("age_of_beneficiary");
+                        String estimatedDateOfDelivery = resultSet.getString("estimated_date_of_delivery");
+                        String dateOfBirth = resultSet.getString("date_of_birth");
+                        subscriptionStatusMeasures.add(new SubscriptionStatusMeasure(msisdn, status, pack, channel, name, age, estimatedDateOfDelivery, dateOfBirth));
                     }
-                    return subscriptionStatusMeasures.size() == 2 ?  subscriptionStatusMeasures : null;
+                    return subscriptionStatusMeasures.size() == 2 ? subscriptionStatusMeasures : null;
                 } finally {
                     resultSet.close();
                     statement.close();
@@ -67,5 +71,38 @@ public class ReportServiceAsync {
                 }
             }
         }.executeWithTimeout();
+    }
+
+    public void createNewLocation(String district, String block, String panchayat) throws SQLException{
+        Connection connection = null;
+        Statement statement = null;
+
+        try {
+        connection = dataSource.getConnection();
+        statement = connection.createStatement();
+        statement.execute("insert into report.location_dimension(district,block,panchayat) values ('" + district + "','" + block + "','" + panchayat + "')");
+        }
+        finally {
+            connection.close();
+            statement.close();
+        }
+    }
+
+    public void deleteAll() throws SQLException {
+        Connection connection = null;
+        Statement statement = null;
+
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
+            statement.execute("delete from report.subscription_status_measure");
+            statement.execute("delete from report.subscriptions");
+            statement.execute("delete from report.subscribers");
+            statement.execute("delete from report.location_dimension");
+        }
+        finally {
+            connection.close();
+            statement.close();
+        }
     }
 }

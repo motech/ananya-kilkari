@@ -1,31 +1,28 @@
 package org.motechproject.ananya.kilkari.smoke;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.motechproject.ananya.kilkari.smoke.domain.kilkari.BaseResponse;
-import org.motechproject.ananya.kilkari.smoke.domain.kilkari.SubscriberResponse;
-import org.motechproject.ananya.kilkari.smoke.domain.kilkari.SubscriptionDetails;
+import org.motechproject.ananya.kilkari.smoke.domain.kilkari.*;
 import org.motechproject.ananya.kilkari.smoke.domain.report.SubscriptionStatusMeasure;
 import org.motechproject.ananya.kilkari.smoke.service.ReportServiceAsync;
 import org.motechproject.ananya.kilkari.smoke.service.SubscriptionServiceAsync;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
-import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.*;
+import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.KILKARI_SUBSCRIPTION_POST_URL;
+import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.fromJson;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationKilkariSmokeContext.xml")
-public class IvrSmokeTest {
+public class CallCenterSmokeTest {
     RestTemplate restTemplate;
     SubscriptionServiceAsync subscriptionServiceAsync;
     @Autowired
@@ -36,23 +33,25 @@ public class IvrSmokeTest {
         subscriptionServiceAsync = new SubscriptionServiceAsync();
         restTemplate = new RestTemplate();
         reportServiceAsync.deleteAll();
+        reportServiceAsync.createNewLocation("D1", "B1", "P1");
     }
 
     @Test(timeout = 20000)
     public void shouldPostHttpRequestAndVerifyEntriesInReportDbAndCouchDb() throws InterruptedException, SQLException {
-        String channel = "IVR";
-        String msisdn = "9000000001";
+        String channel = "CALL_CENTER";
+        String msisdn = "9000000002";
         String pack = "FIFTEEN_MONTHS";
         String expectedStatus = "PENDING_ACTIVATION";
+        DateTime createdAt = DateTime.now();
+        String beneficiaryName = "John Doe";
+        String beneficiaryAge = "24";
+        String dateOfBirth = DateTime.now().minusYears(24).toString("dd-MM-yyyy");
+        String estimatedDateOfDelivery = DateTime.now().plusDays(20).toString("dd-MM-yyyy");
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, pack, channel, createdAt, beneficiaryName, beneficiaryAge, estimatedDateOfDelivery, dateOfBirth, new Location("D1", "B1", "P1"));
 
-        Map<String, String> parametersMap = new HashMap<>();
-        parametersMap.put("msisdn", msisdn);
-        parametersMap.put("channel", channel);
-        parametersMap.put("pack", pack);
+        String responseEntity = restTemplate.postForObject(KILKARI_SUBSCRIPTION_POST_URL, subscriptionRequest, String.class);
 
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(constructUrl(KILKARI_URL, "subscription", parametersMap), String.class);
-
-        BaseResponse baseResponse = fromJson(responseEntity.getBody().replace("var response = ", ""), BaseResponse.class);
+        BaseResponse baseResponse = fromJson(responseEntity.replace("var response = ", ""), BaseResponse.class);
         assertEquals("SUCCESS", baseResponse.getStatus());
 
         SubscriberResponse response = subscriptionServiceAsync.getSubscriptionData(msisdn, channel, expectedStatus);
@@ -67,6 +66,10 @@ public class IvrSmokeTest {
         assertEquals(pack, subscriptionStatusMeasures.get(0).getPack().toUpperCase());
         assertEquals(channel, subscriptionStatusMeasures.get(0).getChannel().toUpperCase());
         assertEquals("NEW", subscriptionStatusMeasures.get(0).getStatus().toUpperCase());
+        assertEquals(beneficiaryName, subscriptionStatusMeasures.get(0).getName());
+        assertEquals(beneficiaryAge, subscriptionStatusMeasures.get(0).getAge());
+        assertEquals(dateOfBirth, new DateTime(subscriptionStatusMeasures.get(0).getDateOfBirth()).toString("dd-MM-yyyy"));
+        assertEquals(estimatedDateOfDelivery, new DateTime(subscriptionStatusMeasures.get(0).getEstimatedDateOfDelivery()).toString("dd-MM-yyyy"));
 
         assertEquals(msisdn, subscriptionStatusMeasures.get(1).getMsisdn());
         assertEquals(pack, subscriptionStatusMeasures.get(1).getPack().toUpperCase());

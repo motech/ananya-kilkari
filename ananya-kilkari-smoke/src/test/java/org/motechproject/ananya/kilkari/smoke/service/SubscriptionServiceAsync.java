@@ -11,7 +11,7 @@ import java.util.Map;
 import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.*;
 
 public class SubscriptionServiceAsync {
-    public SubscriberResponse getSubscriptionData(final String msisdn, final String channel) throws InterruptedException {
+    public SubscriberResponse getSubscriptionData(final String msisdn, final String channel, final String status) throws InterruptedException {
         return new TimedRunner(5, 1000) {
             @Override
             protected SubscriberResponse run() {
@@ -22,7 +22,7 @@ public class SubscriptionServiceAsync {
                 ResponseEntity<String> subscriberResponseResponseEntity = restTemplate.getForEntity(constructUrl(KILKARI_URL, "subscriber", parametersMap), String.class);
                 SubscriberResponse subscriberResponse = fromJson(subscriberResponseResponseEntity.getBody().replace("var response = ", ""), SubscriberResponse.class);
                 return subscriberResponse.getSubscriptionDetails().isEmpty()
-                        || !subscriberResponse.getSubscriptionDetails().get(0).getStatus().equals("PENDING_ACTIVATION")
+                        || !subscriberResponse.getSubscriptionDetails().get(0).getStatus().equals(status)
                         ? null : subscriberResponse;
             }
         }.executeWithTimeout();

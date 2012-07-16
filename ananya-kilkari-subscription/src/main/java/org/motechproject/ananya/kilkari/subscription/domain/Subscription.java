@@ -138,6 +138,14 @@ public class Subscription extends MotechBaseDataObject {
         setStatus(SubscriptionStatus.PENDING_ACTIVATION);
     }
 
+    public void deactivationRequested() {
+        setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
+    }
+
+    public void requestDeactivation() {
+        setStatus(SubscriptionStatus.DEACTIVATION_REQUESTED);
+    }
+
     public void deactivate() {
         setStatus(SubscriptionStatus.DEACTIVATED);
     }

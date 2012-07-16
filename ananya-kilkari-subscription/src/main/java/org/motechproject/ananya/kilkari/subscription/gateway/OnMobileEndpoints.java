@@ -21,6 +21,11 @@ public class OnMobileEndpoints {
                 baseUrl(), kilkariProperties.get("omsm.activate.subscription.url"));
     }
 
+    public String deactivateSubscriptionURL() {
+        return String.format("%s/%s?msisdn={msisdn}&srvkey={srvkey}&mode={mode}&refid={refid}&user={user}&pass={pass}",
+                baseUrl(), kilkariProperties.get("omsm.deactivate.subscription.url"));
+    }
+
     private String baseUrl() {
         return kilkariProperties.getProperty("omsm.base.url");
     }

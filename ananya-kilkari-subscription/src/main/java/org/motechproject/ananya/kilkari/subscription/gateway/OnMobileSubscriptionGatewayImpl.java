@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.gateway;
 
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionActivationRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +28,25 @@ public class OnMobileSubscriptionGatewayImpl implements OnMobileSubscriptionGate
         this.onMobileEndpoints = onMobileEndpoints;
     }
 
-    public void activateSubscription(SubscriptionActivationRequest subscriptionActivationRequest) {
+    public void activateSubscription(ProcessSubscriptionRequest processSubscriptionRequest) {
+        processSubscription(processSubscriptionRequest, onMobileEndpoints.activateSubscriptionURL());
+    }
+
+    public void deactivateSubscription(ProcessSubscriptionRequest processSubscriptionRequest) {
+        processSubscription(processSubscriptionRequest, onMobileEndpoints.deactivateSubscriptionURL());
+    }
+
+    private void processSubscription(ProcessSubscriptionRequest processSubscriptionRequest, String url) {
         Map<String, String> urlVariables = new HashMap<>();
-        urlVariables.put("msisdn", subscriptionActivationRequest.getMsisdn());
-        urlVariables.put("srvkey", subscriptionActivationRequest.getPack().name());
-        urlVariables.put("mode", subscriptionActivationRequest.getChannel().name());
-        urlVariables.put("refid", subscriptionActivationRequest.getSubscriptionId());
+        urlVariables.put("msisdn", processSubscriptionRequest.getMsisdn());
+        urlVariables.put("srvkey", processSubscriptionRequest.getPack().name());
+        urlVariables.put("mode", processSubscriptionRequest.getChannel().name());
+        urlVariables.put("refid", processSubscriptionRequest.getSubscriptionId());
         urlVariables.put("user", onMobileEndpoints.username());
         urlVariables.put("pass", onMobileEndpoints.password());
 
         try {
-            restTemplate.getForEntity(onMobileEndpoints.activateSubscriptionURL(), String.class, urlVariables);
+            restTemplate.getForEntity(url, String.class, urlVariables);
         } catch (HttpClientErrorException ex) {
             LOGGER.error(String.format("OnMobile subscription request failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
             throw ex;

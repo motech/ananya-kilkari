@@ -5,11 +5,12 @@ import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationRep
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionActivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.mappers.SubscriptionMapper;
+import org.motechproject.ananya.kilkari.subscription.mappers.SubscriptionRequestMapper;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionRequestValidator;
 import org.motechproject.common.domain.PhoneNumber;
@@ -21,9 +22,7 @@ import java.util.List;
 @Service
 public class SubscriptionService {
     private AllSubscriptions allSubscriptions;
-
     private OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher;
-
     private SubscriptionRequestValidator subscriptionRequestValidator;
     private ReportingService reportingService;
 
@@ -36,15 +35,14 @@ public class SubscriptionService {
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest) {
-
         validate(subscriptionRequest);
 
-        SubscriptionMapper subscriptionMapper = new SubscriptionMapper(subscriptionRequest);
-        Subscription subscription = subscriptionMapper.getSubscription();
+        SubscriptionRequestMapper subscriptionRequestMapper = new SubscriptionRequestMapper(subscriptionRequest);
+        Subscription subscription = subscriptionRequestMapper.getSubscription();
         allSubscriptions.add(subscription);
 
-        sendProcessSubscriptionEvent(subscriptionMapper.getSubscriptionActivationRequest());
-        sendReportSubscriptionCreationEvent(subscriptionMapper.getSubscriptionCreationReportRequest());
+        sendProcessSubscriptionEvent(subscriptionRequestMapper.getProcessSubscriptionRequest());
+        sendReportSubscriptionCreationEvent(subscriptionRequestMapper.getSubscriptionCreationReportRequest());
 
         return subscription;
     }
@@ -87,6 +85,26 @@ public class SubscriptionService {
         });
     }
 
+    public void requestDeactivation(String subscriptionId, Channel channel) {
+        updateStatusAndReport(subscriptionId, DateTime.now(), null, null, null, new Action<Subscription>() {
+            @Override
+            public void perform(Subscription subscription) {
+                subscription.requestDeactivation();
+            }
+        });
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        onMobileSubscriptionManagerPublisher.processDeactivation(SubscriptionMapper.mapFrom(subscription, channel));
+    }
+
+    public void deactivationRequested(String subscriptionId) {
+        updateStatusAndReport(subscriptionId, DateTime.now(), null, null, null, new Action<Subscription>() {
+            @Override
+            public void perform(Subscription subscription) {
+                subscription.deactivationRequested();
+            }
+        });
+    }
+
     public void renewSubscription(String subscriptionId, final DateTime renewedDate, Integer graceCount) {
         updateStatusAndReport(subscriptionId, renewedDate, null, null, graceCount, new Action<Subscription>() {
             @Override
@@ -125,9 +143,10 @@ public class SubscriptionService {
         reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscription.getSubscriptionId(), subscription.getStatus().name(), updatedOn, reason, operator, graceCount));
     }
 
-    private void sendProcessSubscriptionEvent(SubscriptionActivationRequest subscriptionActivationRequest) {
-        onMobileSubscriptionManagerPublisher.processSubscription(subscriptionActivationRequest);
+    private void sendProcessSubscriptionEvent(ProcessSubscriptionRequest processSubscriptionRequest) {
+        onMobileSubscriptionManagerPublisher.processActivation(processSubscriptionRequest);
     }
+
 
     private void sendReportSubscriptionCreationEvent(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {
         reportingService.reportSubscriptionCreation(subscriptionCreationReportRequest);

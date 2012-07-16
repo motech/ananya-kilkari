@@ -58,7 +58,7 @@ public class SubscriptionServiceTest {
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
-        ArgumentCaptor<SubscriptionActivationRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionActivationRequest.class);
+        ArgumentCaptor<ProcessSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
 
         SubscriptionRequest subscriptionRequest = createSubscriptionRequest(msisdn, subscriptionPack.name(), channel.name());
@@ -68,7 +68,7 @@ public class SubscriptionServiceTest {
         assertNotNull(subscription);
 
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        verify(onMobileSubscriptionManagerPublisher).processSubscription(subscriptionActivationRequestArgumentCaptor.capture());
+        verify(onMobileSubscriptionManagerPublisher).processActivation(subscriptionActivationRequestArgumentCaptor.capture());
         verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
 
         Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();
@@ -77,10 +77,10 @@ public class SubscriptionServiceTest {
         assertEquals(msisdn, subscriptionSaved.getMsisdn());
         assertEquals(subscriptionPack, subscriptionSaved.getPack());
 
-        SubscriptionActivationRequest actualSubscriptionActivationRequest = subscriptionActivationRequestArgumentCaptor.getValue();
-        assertEquals(msisdn, actualSubscriptionActivationRequest.getMsisdn());
-        assertEquals(subscriptionPack, actualSubscriptionActivationRequest.getPack());
-        assertEquals(channel, actualSubscriptionActivationRequest.getChannel());
+        ProcessSubscriptionRequest actualProcessSubscriptionRequest = subscriptionActivationRequestArgumentCaptor.getValue();
+        assertEquals(msisdn, actualProcessSubscriptionRequest.getMsisdn());
+        assertEquals(subscriptionPack, actualProcessSubscriptionRequest.getPack());
+        assertEquals(channel, actualProcessSubscriptionRequest.getChannel());
 
         SubscriptionCreationReportRequest actualSubscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
         assertEquals(msisdn, actualSubscriptionCreationReportRequest.getMsisdn());
@@ -154,6 +154,56 @@ public class SubscriptionServiceTest {
         InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
         order.verify(mockedSubscription).activationRequested();
+        order.verify(allSubscriptions).update(mockedSubscription);
+        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+        order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertNull(subscriptionStateChangeReportRequest.getOperator());
+    }
+
+    @Test
+    public void shouldUpdateTheSubscriptionStatusToDeactivationRequested_WhenDeactivationIsRequested() {
+        String subscriptionId = "abcd1234";
+        SubscriptionStatus status = SubscriptionStatus.ACTIVE;
+        Subscription mockedSubscription = mock(Subscription.class);
+
+        when(mockedSubscription.getStatus()).thenReturn(status);
+        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
+
+        subscriptionService.requestDeactivation(subscriptionId, Channel.IVR);
+
+        InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
+        order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
+        order.verify(mockedSubscription).requestDeactivation();
+        order.verify(allSubscriptions).update(mockedSubscription);
+        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+        order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertNull(subscriptionStateChangeReportRequest.getOperator());
+    }
+
+    @Test
+    public void shouldUpdateTheSubscriptionStatusToPendingDeactivation_WhenDeactivationRequestedIsComplete() {
+        String subscriptionId = "abcd1234";
+        SubscriptionStatus status = SubscriptionStatus.DEACTIVATION_REQUESTED;
+        Subscription mockedSubscription = mock(Subscription.class);
+
+        when(mockedSubscription.getStatus()).thenReturn(status);
+        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
+
+        subscriptionService.deactivationRequested(subscriptionId);
+
+        InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
+        order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
+        order.verify(mockedSubscription).deactivationRequested();
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
@@ -309,6 +359,30 @@ public class SubscriptionServiceTest {
         subscriptionService.findBySubscriptionId(subscriptionID);
 
         verify(allSubscriptions).findBySubscriptionId(subscriptionID);
+    }
+
+    @Test
+    public void shouldProcessDeactivation() {
+        String subscriptionId = "subscriptionId";
+        String msisdn = "1234567890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.SEVEN_MONTHS, DateTime.now());
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        Channel channel = Channel.IVR;
+
+        subscriptionService.requestDeactivation(subscriptionId, channel);
+
+        ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
+        ArgumentCaptor<ProcessSubscriptionRequest> captor1 = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
+        verify(allSubscriptions).update(captor.capture());
+        Subscription actualSubscription = captor.getValue();
+        Assert.assertEquals(msisdn, actualSubscription.getMsisdn());
+        Assert.assertEquals(SubscriptionStatus.DEACTIVATION_REQUESTED, actualSubscription.getStatus());
+
+        verify(onMobileSubscriptionManagerPublisher).processDeactivation(captor1.capture());
+        ProcessSubscriptionRequest actualProcessSubscriptionRequest = captor1.getValue();
+        assertEquals(msisdn, actualProcessSubscriptionRequest.getMsisdn());
+        assertEquals(channel, actualProcessSubscriptionRequest.getChannel());
+        assertEquals(subscription.getSubscriptionId(), actualProcessSubscriptionRequest.getSubscriptionId());
     }
 
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {

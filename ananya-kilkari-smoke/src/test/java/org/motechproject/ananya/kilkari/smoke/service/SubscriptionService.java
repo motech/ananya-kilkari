@@ -10,9 +10,9 @@ import java.util.Map;
 
 import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.*;
 
-public class SubscriptionServiceAsync {
+public class SubscriptionService {
     public SubscriberResponse getSubscriptionData(final String msisdn, final String channel, final String status) throws InterruptedException {
-        return new TimedRunner(5, 1000) {
+        return new TimedRunner<SubscriberResponse>(5, 1000) {
             @Override
             protected SubscriberResponse run() {
                 Map<String, String> parametersMap = new HashMap<>();

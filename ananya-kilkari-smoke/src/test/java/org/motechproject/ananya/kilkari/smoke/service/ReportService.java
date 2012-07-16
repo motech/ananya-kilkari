@@ -14,18 +14,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class ReportServiceAsync {
+public class ReportService {
 
     private BasicDataSource dataSource;
 
 
     @Autowired
-    public ReportServiceAsync(BasicDataSource dataSource) {
+    public ReportService(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     public List<SubscriptionStatusMeasure> getSubscriptionStatusMeasureForMsisdn(final String msisdn) {
-        return new TimedRunner(10, 1000) {
+        return new TimedRunner<List<SubscriptionStatusMeasure>>(10, 1000) {
 
             @Override
             protected List<SubscriptionStatusMeasure> run() {
@@ -46,11 +46,11 @@ public class ReportServiceAsync {
             }
 
             private List<SubscriptionStatusMeasure> executeQuery(String query) throws SQLException {
-                Connection connection = dataSource.getConnection();
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(query);
 
-                try {
+
+                try (Connection connection = dataSource.getConnection();
+                     Statement statement = connection.createStatement();
+                     ResultSet resultSet = statement.executeQuery(query)) {
                     List<SubscriptionStatusMeasure> subscriptionStatusMeasures = new ArrayList<>();
                     while (resultSet.next()) {
                         String msisdn = resultSet.getString("msisdn");
@@ -64,45 +64,27 @@ public class ReportServiceAsync {
                         subscriptionStatusMeasures.add(new SubscriptionStatusMeasure(msisdn, status, pack, channel, name, age, estimatedDateOfDelivery, dateOfBirth));
                     }
                     return subscriptionStatusMeasures.size() == 2 ? subscriptionStatusMeasures : null;
-                } finally {
-                    resultSet.close();
-                    statement.close();
-                    connection.close();
                 }
             }
         }.executeWithTimeout();
     }
 
-    public void createNewLocation(String district, String block, String panchayat) throws SQLException{
-        Connection connection = null;
-        Statement statement = null;
+    public void createNewLocation(String district, String block, String panchayat) throws SQLException {
 
-        try {
-        connection = dataSource.getConnection();
-        statement = connection.createStatement();
-        statement.execute("insert into report.location_dimension(district,block,panchayat) values ('" + district + "','" + block + "','" + panchayat + "')");
+        try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
+            statement.execute("insert into report.location_dimension(district,block,panchayat) values ('" + district + "','" + block + "','" + panchayat + "')");
         }
-        finally {
-            connection.close();
-            statement.close();
-        }
+
     }
 
     public void deleteAll() throws SQLException {
-        Connection connection = null;
-        Statement statement = null;
 
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.createStatement();
+        try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
             statement.execute("delete from report.subscription_status_measure");
             statement.execute("delete from report.subscriptions");
             statement.execute("delete from report.subscribers");
             statement.execute("delete from report.location_dimension");
         }
-        finally {
-            connection.close();
-            statement.close();
-        }
+
     }
 }

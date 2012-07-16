@@ -7,8 +7,8 @@ import org.motechproject.ananya.kilkari.smoke.domain.kilkari.BaseResponse;
 import org.motechproject.ananya.kilkari.smoke.domain.kilkari.SubscriberResponse;
 import org.motechproject.ananya.kilkari.smoke.domain.kilkari.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.smoke.domain.report.SubscriptionStatusMeasure;
-import org.motechproject.ananya.kilkari.smoke.service.ReportServiceAsync;
-import org.motechproject.ananya.kilkari.smoke.service.SubscriptionServiceAsync;
+import org.motechproject.ananya.kilkari.smoke.service.ReportService;
+import org.motechproject.ananya.kilkari.smoke.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,15 +27,15 @@ import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.*;
 @ContextConfiguration("classpath:applicationKilkariSmokeContext.xml")
 public class IvrSmokeTest {
     RestTemplate restTemplate;
-    SubscriptionServiceAsync subscriptionServiceAsync;
+    SubscriptionService subscriptionService;
     @Autowired
-    ReportServiceAsync reportServiceAsync;
+    ReportService reportService;
 
     @Before
     public void setUp() throws SQLException {
-        subscriptionServiceAsync = new SubscriptionServiceAsync();
+        subscriptionService = new SubscriptionService();
         restTemplate = new RestTemplate();
-        reportServiceAsync.deleteAll();
+        reportService.deleteAll();
     }
 
     @Test(timeout = 20000)
@@ -55,11 +55,11 @@ public class IvrSmokeTest {
         BaseResponse baseResponse = fromJson(responseEntity.getBody().replace("var response = ", ""), BaseResponse.class);
         assertEquals("SUCCESS", baseResponse.getStatus());
 
-        SubscriberResponse response = subscriptionServiceAsync.getSubscriptionData(msisdn, channel, expectedStatus);
+        SubscriberResponse response = subscriptionService.getSubscriptionData(msisdn, channel, expectedStatus);
         assertEquals(1, response.getSubscriptionDetails().size());
         assertKilkariData(pack, expectedStatus, response);
 
-        List<SubscriptionStatusMeasure> subscriptionStatusMeasures = reportServiceAsync.getSubscriptionStatusMeasureForMsisdn(msisdn);
+        List<SubscriptionStatusMeasure> subscriptionStatusMeasures = reportService.getSubscriptionStatusMeasureForMsisdn(msisdn);
         assertEquals(2, subscriptionStatusMeasures.size());
         assertReportData(subscriptionStatusMeasures, channel, msisdn, pack, expectedStatus);
     }

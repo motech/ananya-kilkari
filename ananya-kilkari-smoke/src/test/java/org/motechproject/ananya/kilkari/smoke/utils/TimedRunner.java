@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.smoke.utils;
 
-public abstract class TimedRunner {
+public abstract class TimedRunner<T> {
 
     private int tries;
     private int intervalSleep;
@@ -16,9 +16,9 @@ public abstract class TimedRunner {
      * Function to run within the timeout. It returns a boolean. If the value is true, the code
      * will break out of the loop immediately else try again within the timeout period.
      */
-    protected abstract <T> T run();
+    protected abstract T run();
 
-    public <T> T executeWithTimeout() {
+    public T executeWithTimeout() {
         T result = null;
         for (int i = 0; i < tries; i++) {
             result = run();

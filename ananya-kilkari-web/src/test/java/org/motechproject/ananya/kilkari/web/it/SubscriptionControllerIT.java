@@ -18,6 +18,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
+import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
@@ -61,8 +62,6 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         allSubscriptions.removeAll();
     }
 
-    private static final String CONTENT_TYPE_JAVASCRIPT = "application/javascript;charset=UTF-8";
-    private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
 
     private static final String TWELVE_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-twelve-months";
@@ -88,7 +87,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channelString))
                 .andExpect(status().isOk())
-                .andExpect(content().type(SubscriptionControllerIT.CONTENT_TYPE_JAVASCRIPT))
+                .andExpect(content().type(HttpHeaders.APPLICATION_JAVASCRIPT))
                 .andReturn();
 
         String responseString = result.getResponse().getContentAsString();
@@ -113,7 +112,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
                 .perform(get("/subscription").param("msisdn", msisdn).param("pack", pack.toString())
                         .param("channel", channelString))
                 .andExpect(status().isOk())
-                .andExpect(content().type(SubscriptionControllerIT.CONTENT_TYPE_JAVASCRIPT))
+                .andExpect(content().type(HttpHeaders.APPLICATION_JAVASCRIPT))
                 .andReturn();
 
         String responseString = result.getResponse().getContentAsString();
@@ -171,7 +170,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         MvcResult result = mockMvc(subscriptionController)
                 .perform(post("/subscription").body(TestUtils.toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type(SubscriptionControllerIT.CONTENT_TYPE_JSON))
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andReturn();
 
 

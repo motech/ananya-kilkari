@@ -8,9 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 
 public enum HttpConstants {
 
-    IVR("application/javascript;charset=UTF-8", HttpStatus.OK.value(), HttpStatus.OK.value(), "var response = "),
+    IVR(HttpHeaders.APPLICATION_JAVASCRIPT, HttpStatus.OK.value(), HttpStatus.OK.value(), "var response = "),
 
-    CALL_CENTER("application/json;charset=UTF-8", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.BAD_REQUEST.value(), "");
+    CALL_CENTER(HttpHeaders.APPLICATION_JSON, HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.BAD_REQUEST.value(), "");
 
     private static final String CHANNEL_REQUEST_KEY = "channel";
 

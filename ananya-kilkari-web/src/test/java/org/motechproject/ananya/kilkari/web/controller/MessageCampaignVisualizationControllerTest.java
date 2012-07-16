@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
+import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class MessageCampaignVisualizationControllerTest {
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()
                 .perform(get("/messagecampaign/visualize").param("msisdn", msisdn))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"))
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string("{\"externalId\":\"msisdn\",\"schedules\":[{\"mid\":\"subid\",\"messages\":[1351160338000,1355987633000]}],\"startDate\":1351160338000}"));
 
     }

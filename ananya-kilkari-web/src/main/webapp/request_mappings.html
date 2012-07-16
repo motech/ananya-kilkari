@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Request Mappings</title>
+    <style type="text/css">
+        table, th, td {
+            border: 1px solid black
+        }
+    </style>
+
+    <script type="text/javascript" src="js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="js/jquery.json2html-3.0-min.js"></script>
+    <script type="text/javascript">
+
+        function requestMappings() {
+
+            $.ajax({
+                url:'/ananya-kilkari/requestmappings',
+                success:function (data) {
+
+                    var transformer =
+                    {"tag":"tr", "children":[
+                        {"tag":"td", "html":"${methods}"},
+                        {"tag":"td", "html":"${patterns}"},
+                        {"tag":"td", "html":"${parameters}"},
+                        {"tag":"td", "html":"${headers}"},
+                        {"tag":"td", "html":"${produces}"},
+                        {"tag":"td", "html":"${consumes}"},
+                        {"tag":"td", "html":"${handler}"}
+                    ]};
+
+                    $('#mappings').json2html(data.mappings, transformer);
+                }
+            });
+        }
+    </script>
+</head>
+<body onload="requestMappings()">
+
+
+<table cellpadding="0" cellspacing="0">
+    <tr>
+        <th>Methods</th>
+        <th>Patterns</th>
+        <th>Parameters</th>
+        <th>Headers</th>
+        <th>Produces</th>
+        <th>Consumes</th>
+        <th>Handler</th>
+    </tr>
+    <tbody id="mappings">
+    </tbody>
+</table>
+</body>
+</html>

@@ -7,6 +7,7 @@ import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCa
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.controller.MessageCampaignVisualizationController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()
                 .perform(get("/messagecampaign/visualize").param("msisdn", msisdn))
                 .andExpect(status().isOk())
-                .andExpect(content().type("application/json;charset=UTF-8"));
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON));
 
 
         kilkariMessageCampaignService.stop(messageCampaignRequest);

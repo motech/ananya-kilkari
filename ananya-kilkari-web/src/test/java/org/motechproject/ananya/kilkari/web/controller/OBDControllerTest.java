@@ -12,6 +12,7 @@ import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.motechproject.ananya.kilkari.web.validators.OBDRequestValidator;
 import org.springframework.http.MediaType;
@@ -46,8 +47,6 @@ public class OBDControllerTest {
 
     private OBDController obdController;
 
-    private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
-
     @Before
     public void setUp() {
         initMocks(this);
@@ -72,7 +71,7 @@ public class OBDControllerTest {
         mockMvc(obdController)
                 .perform(post("/obd/calldetails/abcd1234").body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type(CONTENT_TYPE_JSON))
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD call details received successfully")));
     }
 
@@ -94,7 +93,7 @@ public class OBDControllerTest {
         mockMvc(obdController)
                 .perform(post("/obd/calldetails/abcd1234").body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().type(CONTENT_TYPE_JSON))
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("ERROR", "OBD Request Invalid: Invalid msisdn 12345,Invalid service option RANDOM_SERVICE_OPTION,Invalid campaign id WEEKabc123")));
     }
 
@@ -109,7 +108,7 @@ public class OBDControllerTest {
         mockMvc(obdController)
                 .perform(post("/obd/calldetails/" + subscriptionId).body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().type(CONTENT_TYPE_JSON))
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("ERROR", "OBD Request Invalid: Invalid msisdn null,Invalid service option null,Invalid campaign id null,Invalid subscription id " + subscriptionId)));
     }
 
@@ -132,7 +131,7 @@ public class OBDControllerTest {
         mockMvc(obdController)
                 .perform(post("/obd/calldetails/" + subscriptionId).body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type(CONTENT_TYPE_JSON))
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD call details received successfully")));
 
         ArgumentCaptor<OBDRequestWrapper> obdRequestWrapperArgumentCaptor = ArgumentCaptor.forClass(OBDRequestWrapper.class);
@@ -152,7 +151,7 @@ public class OBDControllerTest {
         mockMvc(obdController)
                 .perform(post("/obd/invalidcallrecords").body(requestBody.getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type(CONTENT_TYPE_JSON))
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD invalid call records received successfully")));
 
         ArgumentCaptor<InvalidCallRecordsRequest> captor= ArgumentCaptor.forClass(InvalidCallRecordsRequest.class);
@@ -183,7 +182,7 @@ public class OBDControllerTest {
         mockMvc(obdController)
                 .perform(post("/obd/invalidcallrecords").body(requestBody.getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().type(CONTENT_TYPE_JSON))
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD invalid call records received successfully")));
 
         ArgumentCaptor<InvalidCallRecordsRequest> captor= ArgumentCaptor.forClass(InvalidCallRecordsRequest.class);

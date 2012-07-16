@@ -276,6 +276,33 @@ public class KilkariCampaignServiceTest {
     }
 
     @Test
+    public void shouldNotProcessSuccessfulCampaignMessageDeliveryIfThereIsNoSubscriptionAvailable() {
+        OBDRequest obdRequest = new OBDRequest();
+        String subscriptionId = "subscriptionId";
+        String campaignId = "WEEK1";
+        String msisdn = "1234567890";
+        String serviceOption = ServiceOption.HELP.name();
+        String startTime = "25-12-2012";
+        String endTime = "27-12-2012";
+        CallDetailRecord callDetailRecord = new CallDetailRecord();
+        callDetailRecord.setStartTime(startTime);
+        callDetailRecord.setEndTime(endTime);
+
+        obdRequest.setMsisdn(msisdn);
+        obdRequest.setCampaignId(campaignId);
+        obdRequest.setServiceOption(serviceOption);
+        obdRequest.setCallDetailRecord(callDetailRecord);
+        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now());
+        when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(null);
+
+        kilkariCampaignService.processSuccessfulMessageDelivery(obdRequestWrapper);
+
+        verify(campaignMessageService).find(subscriptionId, campaignId);
+        verify(campaignMessageService, never()).deleteCampaignMessage(any(CampaignMessage.class));
+        verifyZeroInteractions(reportingService);
+    }
+
+    @Test
     public void shouldProcessInvalidCallRecords() {
         String msisdn1 = "msisdn1";
         String campaign1 = "campaign1";
@@ -305,7 +332,7 @@ public class KilkariCampaignServiceTest {
         verify(campaignMessageService).processInvalidCallRecords(captor.capture());
 
         ArrayList actualInvalidCallRecords = captor.getValue();
-        assertEquals(2,actualInvalidCallRecords.size());
+        assertEquals(2, actualInvalidCallRecords.size());
         InvalidCallRecord actualInvalidCallRecord1 = (InvalidCallRecord) actualInvalidCallRecords.get(0);
         assertEquals(campaign1,actualInvalidCallRecord1.getCampaignId());
         assertEquals(sub1,actualInvalidCallRecord1.getSubscriptionId());

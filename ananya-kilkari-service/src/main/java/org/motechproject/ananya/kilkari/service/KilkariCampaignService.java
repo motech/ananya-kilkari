@@ -14,6 +14,8 @@ import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,8 @@ public class KilkariCampaignService {
     private CampaignMessageService campaignMessageService;
     private ReportingService reportingService;
     private OBDRequestCallbackPublisher obdRequestCallbackPublisher;
+
+    private final Logger LOGGER = LoggerFactory.getLogger(KilkariCampaignService.class);
 
     @Autowired
     public KilkariCampaignService(KilkariMessageCampaignService kilkariMessageCampaignService,
@@ -117,6 +121,11 @@ public class KilkariCampaignService {
 
     public void processSuccessfulMessageDelivery(OBDRequestWrapper obdRequestWrapper) {
         CampaignMessage campaignMessage = campaignMessageService.find(obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId());
+        if(campaignMessage == null) {
+            LOGGER.error(String.format("Campaign Message not present for subscriptionId[%s] and campaignId[%s].",
+                    obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId()));
+            return;
+        }
         int retryCount = campaignMessage.getRetryCount();
         campaignMessageService.deleteCampaignMessage(campaignMessage);
         reportingService.reportCampaignMessageDelivered(new CampaignMessageDeliveryReportRequestMapper().mapFrom(obdRequestWrapper, retryCount));

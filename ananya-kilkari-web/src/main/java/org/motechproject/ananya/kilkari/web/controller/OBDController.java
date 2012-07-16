@@ -6,6 +6,7 @@ import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
 import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
 import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.validators.OBDRequestValidator;
@@ -31,12 +32,14 @@ public class OBDController {
     @RequestMapping(value = "/obd/calldetails/{subscriptionId}", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse handleSuccessfulResponse(@RequestBody OBDRequest obdRequest, @PathVariable String subscriptionId){
+
         List<String> validationErrors = obdRequestValidator.validate(obdRequest, subscriptionId);
         if (!(validationErrors.isEmpty())) {
-            return BaseResponse.failure(String.format("OBD Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
+            throw new ValidationException(String.format("OBD Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
         }
 
         kilkariCampaignService.processOBDCallbackRequest(new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now()));
+
         return new BaseResponse("SUCCESS","OBD call details received successfully");
     }
 

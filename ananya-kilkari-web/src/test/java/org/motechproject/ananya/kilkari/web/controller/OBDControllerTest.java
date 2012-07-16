@@ -93,7 +93,7 @@ public class OBDControllerTest {
 
         mockMvc(obdController)
                 .perform(post("/obd/calldetails/abcd1234").body(requestBody).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().type(CONTENT_TYPE_JSON))
                 .andExpect(content().string(baseResponseMatcher("ERROR", "OBD Request Invalid: Invalid msisdn 12345,Invalid service option RANDOM_SERVICE_OPTION,Invalid campaign id WEEKabc123")));
     }
@@ -108,7 +108,7 @@ public class OBDControllerTest {
 
         mockMvc(obdController)
                 .perform(post("/obd/calldetails/" + subscriptionId).body(requestBody).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().type(CONTENT_TYPE_JSON))
                 .andExpect(content().string(baseResponseMatcher("ERROR", "OBD Request Invalid: Invalid msisdn null,Invalid service option null,Invalid campaign id null,Invalid subscription id " + subscriptionId)));
     }

@@ -37,8 +37,8 @@ public class OBDRequestValidatorTest {
         obdRequest.setMsisdn("9876543211");
         obdRequest.setServiceOption("UNSUBSCRIBE");
         CallDetailRecord callDetailRecord = new CallDetailRecord();
-        callDetailRecord.setStartTime("25-12-2012 23-56-56");
-        callDetailRecord.setEndTime("25-12-2012 23-57-56");
+        callDetailRecord.setStartTime("25-12-2012 23:56:56");
+        callDetailRecord.setEndTime("25-12-2012 23:57:56");
         obdRequest.setCallDetailRecord(callDetailRecord);
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
@@ -78,8 +78,8 @@ public class OBDRequestValidatorTest {
         obdRequest.setMsisdn("9876543211");
         obdRequest.setServiceOption("UNSUBSCRIBE");
         CallDetailRecord callDetailRecord = new CallDetailRecord();
-        callDetailRecord.setStartTime("25-12-2012 23-56-56");
-        callDetailRecord.setEndTime("25-12-2012 23-57-56");
+        callDetailRecord.setStartTime("25-12-2012 23:56:56");
+        callDetailRecord.setEndTime("25-12-2012 23:57:56");
         obdRequest.setCallDetailRecord(callDetailRecord);
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());

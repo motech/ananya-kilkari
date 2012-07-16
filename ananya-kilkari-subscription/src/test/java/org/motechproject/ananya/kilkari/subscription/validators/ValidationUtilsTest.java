@@ -68,7 +68,7 @@ public class ValidationUtilsTest {
 
     @Test
     public void assertDateShouldReturnFalseForInvalidDateTimeStringWithYearDigitsGreaterThan4() {
-        assertFalse(ValidationUtils.assertDateTimeFormat("12-12-11232 23-56-56"));
+        assertFalse(ValidationUtils.assertDateTimeFormat("12-12-11232 23:56:56"));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ValidationUtilsTest {
 
     @Test
     public void assertDateShouldNotReturnFalseForValidDateTimeString() {
-        assertTrue(ValidationUtils.assertDateTimeFormat("21-01-2012 23-56-56"));
+        assertTrue(ValidationUtils.assertDateTimeFormat("21-01-2012 23:56:56"));
     }
 
     @Test

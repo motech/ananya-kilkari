@@ -48,11 +48,11 @@ public class ValidationUtils {
     }
 
     public static boolean assertDateTimeFormat(String value) {
-        if (StringUtils.isEmpty(value) || !Pattern.matches("^\\d{2}-\\d{2}-\\d{4} \\d{2}-\\d{2}-\\d{2}$", value)) {
+        if (StringUtils.isEmpty(value) || !Pattern.matches("^\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}:\\d{2}$", value)) {
             return false;
         }
         try {
-            DateTimeFormat.forPattern("dd-MM-yyyy HH-mm-ss").parseDateTime(value);
+            DateTimeFormat.forPattern("dd-MM-yyyy HH:mm:ss").parseDateTime(value);
         } catch (Exception e) {
             return false;
         }

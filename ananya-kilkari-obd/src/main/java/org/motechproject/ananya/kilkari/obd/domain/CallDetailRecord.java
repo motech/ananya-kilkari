@@ -5,7 +5,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class CallDetailRecord {
+import java.io.Serializable;
+
+public class CallDetailRecord  implements Serializable {
     @JsonProperty
     private String startTime;
     @JsonProperty

@@ -6,7 +6,9 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 
-public class OBDRequest {
+import java.io.Serializable;
+
+public class OBDRequest implements Serializable {
     @JsonProperty
     private String msisdn;
     @JsonProperty

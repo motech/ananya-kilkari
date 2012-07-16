@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.factory;
 import org.motechproject.ananya.kilkari.domain.ActionStatus;
 import org.motechproject.ananya.kilkari.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.domain.CallbackStatus;
-import org.motechproject.ananya.kilkari.handlers.callback.*;
+import org.motechproject.ananya.kilkari.handlers.callback.subscription.*;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

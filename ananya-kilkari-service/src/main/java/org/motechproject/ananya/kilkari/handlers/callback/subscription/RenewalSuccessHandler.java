@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.handlers.callback;
+package org.motechproject.ananya.kilkari.handlers.callback.subscription;
 
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
@@ -7,19 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ActivateHandler implements SubscriptionStateHandler {
+public class RenewalSuccessHandler implements SubscriptionStateHandler {
     private SubscriptionService subscriptionService;
     private KilkariCampaignService kilkariCampaignService;
 
     @Autowired
-    public ActivateHandler(SubscriptionService subscriptionService, KilkariCampaignService kilkariCampaignService) {
+    public RenewalSuccessHandler(SubscriptionService subscriptionService, KilkariCampaignService kilkariCampaignService) {
         this.subscriptionService = subscriptionService;
         this.kilkariCampaignService = kilkariCampaignService;
     }
 
+    @Override
     public void perform(CallbackRequestWrapper callbackRequestWrapper) {
         String subscriptionId = callbackRequestWrapper.getSubscriptionId();
-        subscriptionService.activate(subscriptionId, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getOperator());
+        subscriptionService.renewSubscription(subscriptionId, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getGraceCount());
         kilkariCampaignService.renewSchedule(subscriptionId);
     }
 }

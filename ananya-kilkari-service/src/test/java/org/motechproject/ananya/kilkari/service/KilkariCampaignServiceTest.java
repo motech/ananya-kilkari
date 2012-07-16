@@ -52,11 +52,13 @@ public class KilkariCampaignServiceTest {
     private CampaignMessageService campaignMessageService;
     @Mock
     private ReportingService reportingService;
+    @Mock
+    private OBDRequestCallbackPublisher obdRequestCallbackPublisher;
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService);
+        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestCallbackPublisher);
     }
 
     @Test
@@ -221,7 +223,16 @@ public class KilkariCampaignServiceTest {
         verifyZeroInteractions(campaignMessageService);
         verify(allCampaignMessageAlerts, never()).remove(any(CampaignMessageAlert.class));
     }
- 
+
+    @Test
+    public void shouldPublishObdCallbackRequest() {
+        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(new OBDRequest(), "subscriptionId", DateTime.now());
+
+        kilkariCampaignService.processOBDCallbackRequest(obdRequestWrapper);
+
+        verify(obdRequestCallbackPublisher).publishObdCallbackRequest(obdRequestWrapper);
+    }
+
     @Test
     public void shouldProcessSuccessfulCampaignMessageDelivery() {
         OBDRequest obdRequest = new OBDRequest();

@@ -31,16 +31,18 @@ public class KilkariCampaignService {
     private AllCampaignMessageAlerts allCampaignMessageAlerts;
     private CampaignMessageService campaignMessageService;
     private ReportingService reportingService;
+    private OBDRequestCallbackPublisher obdRequestCallbackPublisher;
 
     @Autowired
     public KilkariCampaignService(KilkariMessageCampaignService kilkariMessageCampaignService,
-                                  KilkariSubscriptionService kilkariSubscriptionService, CampaignMessageIdStrategy campaignMessageIdStrategy, AllCampaignMessageAlerts allCampaignMessageAlerts, CampaignMessageService campaignMessageService, ReportingService reportingService) {
+                                  KilkariSubscriptionService kilkariSubscriptionService, CampaignMessageIdStrategy campaignMessageIdStrategy, AllCampaignMessageAlerts allCampaignMessageAlerts, CampaignMessageService campaignMessageService, ReportingService reportingService, OBDRequestCallbackPublisher obdRequestCallbackPublisher) {
         this.kilkariMessageCampaignService = kilkariMessageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.campaignMessageIdStrategy = campaignMessageIdStrategy;
         this.allCampaignMessageAlerts = allCampaignMessageAlerts;
         this.campaignMessageService = campaignMessageService;
         this.reportingService = reportingService;
+        this.obdRequestCallbackPublisher = obdRequestCallbackPublisher;
     }
 
     public Map<String, List<DateTime>> getMessageTimings(String msisdn) {
@@ -128,5 +130,9 @@ public class KilkariCampaignService {
                     requestObject.getCampaignId(), requestObject.getOperator(), requestObject.getDescription()));
         }
         campaignMessageService.processInvalidCallRecords(invalidCallRecords);
+    }
+
+    public void processOBDCallbackRequest(OBDRequestWrapper obdRequestWrapper) {
+        obdRequestCallbackPublisher.publishObdCallbackRequest(obdRequestWrapper);
     }
 }

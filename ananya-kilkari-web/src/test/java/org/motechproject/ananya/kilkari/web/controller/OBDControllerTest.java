@@ -136,7 +136,7 @@ public class OBDControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD call details received successfully")));
 
         ArgumentCaptor<OBDRequestWrapper> obdRequestWrapperArgumentCaptor = ArgumentCaptor.forClass(OBDRequestWrapper.class);
-        verify(kilkariCampaignService).processSuccessfulMessageDelivery(obdRequestWrapperArgumentCaptor.capture());
+        verify(kilkariCampaignService).processOBDCallbackRequest(obdRequestWrapperArgumentCaptor.capture());
         OBDRequestWrapper obdRequestWrapper = obdRequestWrapperArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, obdRequestWrapper.getSubscriptionId());

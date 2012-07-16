@@ -36,7 +36,7 @@ public class OBDController {
             return BaseResponse.failure(String.format("OBD Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
         }
 
-        kilkariCampaignService.processSuccessfulMessageDelivery(new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now()));
+        kilkariCampaignService.processOBDCallbackRequest(new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now()));
         return new BaseResponse("SUCCESS","OBD call details received successfully");
     }
 

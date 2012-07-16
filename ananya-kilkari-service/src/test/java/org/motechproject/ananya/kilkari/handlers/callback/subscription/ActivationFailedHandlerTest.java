@@ -1,9 +1,10 @@
-package org.motechproject.ananya.kilkari.handlers.callback;
+package org.motechproject.ananya.kilkari.handlers.callback.subscription;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.handlers.callback.subscription.ActivationFailedHandler;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;

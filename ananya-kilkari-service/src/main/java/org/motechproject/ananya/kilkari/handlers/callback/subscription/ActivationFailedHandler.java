@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.handlers.callback;
+package org.motechproject.ananya.kilkari.handlers.callback.subscription;
 
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;

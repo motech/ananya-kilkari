@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.handlers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.handlers.CampaignMessageAlertHandler;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.messagecampaign.EventKeys;

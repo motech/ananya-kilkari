@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-public class Publisher {
+public class OnMobileSubscriptionManagerPublisher {
     @Autowired
     private EventContext eventContext;
 
     @Autowired
-    public Publisher(@Qualifier("eventContext") EventContext eventContext) {
+    public OnMobileSubscriptionManagerPublisher(@Qualifier("eventContext") EventContext eventContext) {
         this.eventContext = eventContext;
     }
 

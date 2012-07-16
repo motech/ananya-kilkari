@@ -37,7 +37,7 @@ public class SubscriptionServiceTest {
     @Mock
     private AllSubscriptions allSubscriptions;
     @Mock
-    private Publisher publisher;
+    private OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher;
     @Mock
     private SubscriptionRequest mockedSubscriptionRequest;
     @Mock
@@ -48,7 +48,7 @@ public class SubscriptionServiceTest {
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, publisher, subscriptionRequestValidator, reportingServiceImpl);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionRequestValidator, reportingServiceImpl);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class SubscriptionServiceTest {
         assertNotNull(subscription);
 
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        verify(publisher).processSubscription(subscriptionActivationRequestArgumentCaptor.capture());
+        verify(onMobileSubscriptionManagerPublisher).processSubscription(subscriptionActivationRequestArgumentCaptor.capture());
         verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
 
         Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();

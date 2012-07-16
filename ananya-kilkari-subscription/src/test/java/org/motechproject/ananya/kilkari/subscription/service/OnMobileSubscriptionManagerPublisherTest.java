@@ -14,22 +14,22 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class PublisherTest {
+public class OnMobileSubscriptionManagerPublisherTest {
     @Mock
     private EventContext eventContext;
 
-    private Publisher publisher;
+    private OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher;
 
     @Before
     public void setUp() {
         initMocks(this);
-        publisher = new Publisher(eventContext);
+        onMobileSubscriptionManagerPublisher = new OnMobileSubscriptionManagerPublisher(eventContext);
     }
 
     @Test
     public void shouldPublishProcessSubscriptionEventIntoQueue() {
         String subscriptionId = "ABCD1234";
-        publisher.processSubscription(new SubscriptionActivationRequest("1234567890", SubscriptionPack.TWELVE_MONTHS, Channel.IVR, subscriptionId));
+        onMobileSubscriptionManagerPublisher.processSubscription(new SubscriptionActivationRequest("1234567890", SubscriptionPack.TWELVE_MONTHS, Channel.IVR, subscriptionId));
 
         ArgumentCaptor<SubscriptionActivationRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionActivationRequest.class);
         ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);

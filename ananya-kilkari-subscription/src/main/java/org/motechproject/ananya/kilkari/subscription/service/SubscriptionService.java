@@ -22,15 +22,15 @@ import java.util.List;
 public class SubscriptionService {
     private AllSubscriptions allSubscriptions;
 
-    private Publisher publisher;
+    private OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher;
 
     private SubscriptionRequestValidator subscriptionRequestValidator;
     private ReportingService reportingService;
 
     @Autowired
-    public SubscriptionService(AllSubscriptions allSubscriptions, Publisher publisher, SubscriptionRequestValidator subscriptionRequestValidator, ReportingService reportingService) {
+    public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher, SubscriptionRequestValidator subscriptionRequestValidator, ReportingService reportingService) {
         this.allSubscriptions = allSubscriptions;
-        this.publisher = publisher;
+        this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionRequestValidator = subscriptionRequestValidator;
         this.reportingService = reportingService;
     }
@@ -126,7 +126,7 @@ public class SubscriptionService {
     }
 
     private void sendProcessSubscriptionEvent(SubscriptionActivationRequest subscriptionActivationRequest) {
-        publisher.processSubscription(subscriptionActivationRequest);
+        onMobileSubscriptionManagerPublisher.processSubscription(subscriptionActivationRequest);
     }
 
     private void sendReportSubscriptionCreationEvent(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {

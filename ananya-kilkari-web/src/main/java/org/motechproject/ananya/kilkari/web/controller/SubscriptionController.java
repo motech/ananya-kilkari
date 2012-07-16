@@ -9,7 +9,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionRequestValidator;
-import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
+import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;

@@ -21,7 +21,7 @@ import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSu
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.TestUtils;
-import org.motechproject.ananya.kilkari.web.contract.mapper.SubscriptionDetailsMapper;
+import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;

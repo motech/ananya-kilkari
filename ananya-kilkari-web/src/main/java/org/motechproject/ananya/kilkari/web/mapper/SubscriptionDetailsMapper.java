@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.contract.mapper;
+package org.motechproject.ananya.kilkari.web.mapper;
 
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetails;

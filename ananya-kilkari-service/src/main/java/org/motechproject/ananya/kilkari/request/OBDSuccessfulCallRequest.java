@@ -8,7 +8,7 @@ import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 
 import java.io.Serializable;
 
-public class OBDRequest implements Serializable {
+public class OBDSuccessfulCallRequest implements Serializable {
     @JsonProperty
     private String msisdn;
     @JsonProperty
@@ -57,9 +57,9 @@ public class OBDRequest implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof OBDRequest)) return false;
+        if (!(o instanceof OBDSuccessfulCallRequest)) return false;
 
-        OBDRequest that = (OBDRequest) o;
+        OBDSuccessfulCallRequest that = (OBDSuccessfulCallRequest) o;
 
         return new EqualsBuilder()
                 .append(this.msisdn, that.msisdn)

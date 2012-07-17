@@ -10,18 +10,16 @@ import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
-import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
-import org.motechproject.ananya.kilkari.request.OBDRequest;
-import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -57,14 +55,15 @@ public class KilkariCampaignServiceTest {
     @Mock
     private ReportingService reportingService;
     @Mock
-    private OBDRequestCallbackPublisher obdRequestCallbackPublisher;
+    private OBDRequestPublisher obdRequestsPublisher;
     @Mock
     private SubscriberCareService subscriberCareService;
+
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, subscriberCareService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestCallbackPublisher);
+        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, subscriberCareService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestsPublisher);
     }
 
     @Test
@@ -230,16 +229,16 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldPublishObdCallbackRequest() {
-        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(new OBDRequest(), "subscriptionId", DateTime.now(), Channel.IVR);
+        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(new OBDSuccessfulCallRequest(), "subscriptionId", DateTime.now(), Channel.IVR);
 
-        kilkariCampaignService.processOBDCallbackRequest(obdRequestWrapper);
+        kilkariCampaignService.processSuccessfulCallRequest(successfulCallRequestWrapper);
 
-        verify(obdRequestCallbackPublisher).publishObdCallbackRequest(obdRequestWrapper);
+        verify(obdRequestsPublisher).publishSuccessfulCallRequest(successfulCallRequestWrapper);
     }
 
     @Test
     public void shouldProcessSuccessfulCampaignMessageDelivery() {
-        OBDRequest obdRequest = new OBDRequest();
+        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK1";
         String msisdn = "1234567890";
@@ -251,16 +250,16 @@ public class KilkariCampaignServiceTest {
         callDetailRecord.setStartTime(startTime);
         callDetailRecord.setEndTime(endTime);
 
-        obdRequest.setMsisdn(msisdn);
-        obdRequest.setCampaignId(campaignId);
-        obdRequest.setServiceOption(serviceOption);
-        obdRequest.setCallDetailRecord(callDetailRecord);
-        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now(), Channel.IVR);
+        successfulCallRequest.setMsisdn(msisdn);
+        successfulCallRequest.setCampaignId(campaignId);
+        successfulCallRequest.setServiceOption(serviceOption);
+        successfulCallRequest.setCallDetailRecord(callDetailRecord);
+        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, DateTime.now(), Channel.IVR);
         CampaignMessage campaignMessage = mock(CampaignMessage.class);
         when(campaignMessage.getRetryCount()).thenReturn(retryCount);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        kilkariCampaignService.processSuccessfulMessageDelivery(obdRequestWrapper);
+        kilkariCampaignService.processSuccessfulMessageDelivery(successfulCallRequestWrapper);
 
         InOrder inOrder = Mockito.inOrder(campaignMessageService, reportingService, subscriberCareService);
         inOrder.verify(campaignMessageService).find(subscriptionId, campaignId);
@@ -288,7 +287,7 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldProcessSuccessfulCampaignMessageDeliveryWithOutCreatingACareRquest() {
-        OBDRequest obdRequest = new OBDRequest();
+        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK1";
         String msisdn = "1234567890";
@@ -300,16 +299,16 @@ public class KilkariCampaignServiceTest {
         callDetailRecord.setStartTime(startTime);
         callDetailRecord.setEndTime(endTime);
 
-        obdRequest.setMsisdn(msisdn);
-        obdRequest.setCampaignId(campaignId);
-        obdRequest.setServiceOption(serviceOption);
-        obdRequest.setCallDetailRecord(callDetailRecord);
-        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now(), Channel.IVR);
+        successfulCallRequest.setMsisdn(msisdn);
+        successfulCallRequest.setCampaignId(campaignId);
+        successfulCallRequest.setServiceOption(serviceOption);
+        successfulCallRequest.setCallDetailRecord(callDetailRecord);
+        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, DateTime.now(), Channel.IVR);
         CampaignMessage campaignMessage = mock(CampaignMessage.class);
         when(campaignMessage.getRetryCount()).thenReturn(retryCount);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        kilkariCampaignService.processSuccessfulMessageDelivery(obdRequestWrapper);
+        kilkariCampaignService.processSuccessfulMessageDelivery(successfulCallRequestWrapper);
 
         InOrder inOrder = Mockito.inOrder(campaignMessageService, reportingService, subscriberCareService);
         inOrder.verify(campaignMessageService).find(subscriptionId, campaignId);
@@ -320,7 +319,7 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldNotProcessSuccessfulCampaignMessageDeliveryIfThereIsNoSubscriptionAvailable() {
-        OBDRequest obdRequest = new OBDRequest();
+        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK1";
         String msisdn = "1234567890";
@@ -331,14 +330,14 @@ public class KilkariCampaignServiceTest {
         callDetailRecord.setStartTime(startTime);
         callDetailRecord.setEndTime(endTime);
 
-        obdRequest.setMsisdn(msisdn);
-        obdRequest.setCampaignId(campaignId);
-        obdRequest.setServiceOption(serviceOption);
-        obdRequest.setCallDetailRecord(callDetailRecord);
-        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now(), Channel.IVR);
+        successfulCallRequest.setMsisdn(msisdn);
+        successfulCallRequest.setCampaignId(campaignId);
+        successfulCallRequest.setServiceOption(serviceOption);
+        successfulCallRequest.setCallDetailRecord(callDetailRecord);
+        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, DateTime.now(), Channel.IVR);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(null);
 
-        kilkariCampaignService.processSuccessfulMessageDelivery(obdRequestWrapper);
+        kilkariCampaignService.processSuccessfulMessageDelivery(successfulCallRequestWrapper);
 
         verify(campaignMessageService).find(subscriptionId, campaignId);
         verify(campaignMessageService, never()).deleteCampaignMessage(any(CampaignMessage.class));
@@ -347,40 +346,10 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldProcessInvalidCallRecords() {
-        String msisdn1 = "msisdn1";
-        String campaign1 = "campaign1";
-        String desc1 = "desc1";
-        String operator1 = "operator1";
-        String sub1 = "sub1";
+        InvalidCallRecordsRequest invalidCallRecordsRequest = new InvalidCallRecordsRequest();
 
-        InvalidCallRecordsRequest invalidCallRecordsRequest = Mockito.mock(InvalidCallRecordsRequest.class);
-        ArrayList<InvalidCallRecordRequestObject> invalidCallRecordRequestObjects = new ArrayList<InvalidCallRecordRequestObject>();
-        InvalidCallRecordRequestObject invalidCallRecordRequestObject1 = Mockito.mock(InvalidCallRecordRequestObject.class);
-        when(invalidCallRecordRequestObject1.getMsisdn()).thenReturn(msisdn1);
-        when(invalidCallRecordRequestObject1.getCampaignId()).thenReturn(campaign1);
-        when(invalidCallRecordRequestObject1.getDescription()).thenReturn(desc1);
-        when(invalidCallRecordRequestObject1.getOperator()).thenReturn(operator1);
-        when(invalidCallRecordRequestObject1.getSubscriptionId()).thenReturn(sub1);
+        kilkariCampaignService.processInvalidCallRecordsRequest(invalidCallRecordsRequest);
 
-        InvalidCallRecordRequestObject invalidCallRecordRequestObject2 = Mockito.mock(InvalidCallRecordRequestObject.class);
-        invalidCallRecordRequestObjects.add(invalidCallRecordRequestObject1);
-        invalidCallRecordRequestObjects.add(invalidCallRecordRequestObject2);
-
-
-        when(invalidCallRecordsRequest.getCallrecords()).thenReturn(invalidCallRecordRequestObjects);
-
-        kilkariCampaignService.processInvalidCallRecords(invalidCallRecordsRequest);
-
-        ArgumentCaptor<ArrayList> captor = ArgumentCaptor.forClass(ArrayList.class);
-        verify(campaignMessageService).processInvalidCallRecords(captor.capture());
-
-        ArrayList actualInvalidCallRecords = captor.getValue();
-        assertEquals(2, actualInvalidCallRecords.size());
-        InvalidCallRecord actualInvalidCallRecord1 = (InvalidCallRecord) actualInvalidCallRecords.get(0);
-        assertEquals(campaign1, actualInvalidCallRecord1.getCampaignId());
-        assertEquals(sub1, actualInvalidCallRecord1.getSubscriptionId());
-        assertEquals(msisdn1, actualInvalidCallRecord1.getMsisdn());
-        assertEquals(operator1, actualInvalidCallRecord1.getOperator());
-        assertEquals(desc1, actualInvalidCallRecord1.getDescription());
+        verify(obdRequestsPublisher).publishInvalidCallRecordsRequest(invalidCallRecordsRequest);
     }
 }

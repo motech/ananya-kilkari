@@ -16,39 +16,6 @@ import java.util.List;
 
 public class SubscriptionRequest implements Serializable {
 
-    public static class Location implements Serializable {
-        @JsonProperty
-        private String district;
-        @JsonProperty
-        private String block;
-        @JsonProperty
-        private String panchayat;
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Location)) return false;
-
-            Location that = (Location) o;
-
-            return new EqualsBuilder()
-                    .append(this.district, that.district)
-                    .append(this.block, that.block)
-                    .append(this.panchayat, that.panchayat)
-                    .isEquals();
-        }
-
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder()
-                    .append(this.district)
-                    .append(this.block)
-                    .append(this.panchayat)
-                    .hashCode();
-        }
-
-    }
-
     @JsonProperty
     private String msisdn;
     @JsonProperty
@@ -66,10 +33,10 @@ public class SubscriptionRequest implements Serializable {
     @JsonProperty
     private String dateOfBirth;
     @JsonProperty
-    private Location location;
+    private LocationRequest location;
 
     public SubscriptionRequest() {
-        this.location = new Location();
+        this.location = new LocationRequest();
         this.createdAt = DateTime.now();
     }
 
@@ -115,35 +82,35 @@ public class SubscriptionRequest implements Serializable {
 
     @JsonIgnore
     public String getDistrict() {
-        return location == null ? null : location.district;
+        return location == null ? null : location.getDistrict();
     }
 
     @JsonIgnore
     public String getBlock() {
-        return location == null ? null : location.block;
+        return location == null ? null : location.getBlock();
     }
 
     @JsonIgnore
     public String getPanchayat() {
-        return location == null ? null : location.panchayat;
+        return location == null ? null : location.getPanchayat();
     }
 
     @JsonIgnore
-    public Location getLocation() {
+    public LocationRequest getLocation() {
         return location;
     }
 
 
     public void setDistrict(String district) {
-        this.location.district = district;
+        location.setDistrict(district);
     }
 
     public void setBlock(String block) {
-        this.location.block = block;
+        location.setBlock(block);
     }
 
     public void setPanchayat(String panchayat) {
-        this.location.panchayat = panchayat;
+        location.setPanchayat(panchayat);
     }
 
     public void setBeneficiaryName(String beneficiaryName) {

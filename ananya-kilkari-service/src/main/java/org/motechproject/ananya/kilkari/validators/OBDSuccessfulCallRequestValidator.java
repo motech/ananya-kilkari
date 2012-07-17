@@ -6,8 +6,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignCode;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
-import org.motechproject.ananya.kilkari.request.OBDRequest;
-import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 import org.motechproject.common.domain.PhoneNumber;
@@ -20,22 +20,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public class OBDRequestValidator {
+public class OBDSuccessfulCallRequestValidator {
 
     private SubscriptionService subscriptionService;
 
     @Autowired
-    public OBDRequestValidator(SubscriptionService subscriptionService) {
+    public OBDSuccessfulCallRequestValidator(SubscriptionService subscriptionService) {
         this.subscriptionService = subscriptionService;
     }
 
-    public List<String> validate(OBDRequestWrapper obdRequestWrapper) {
+    public List<String> validate(OBDSuccessfulCallRequestWrapper obdRequestWrapper) {
         List<String> errors = new ArrayList<>();
-        OBDRequest obdRequest = obdRequestWrapper.getObdRequest();
-        validateMsisdn(obdRequest.getMsisdn(), errors);
-        validateServiceOption(obdRequest.getServiceOption(), errors);
-        validateCampaignId(obdRequest.getCampaignId(), errors);
-        validateDateFormat(obdRequest.getCallDetailRecord(), errors);
+        OBDSuccessfulCallRequest successfulCallRequest = obdRequestWrapper.getSuccessfulCallRequest();
+        validateMsisdn(successfulCallRequest.getMsisdn(), errors);
+        validateServiceOption(successfulCallRequest.getServiceOption(), errors);
+        validateCampaignId(successfulCallRequest.getCampaignId(), errors);
+        validateDateFormat(successfulCallRequest.getCallDetailRecord(), errors);
         validateSubscription(obdRequestWrapper.getSubscriptionId(), errors);
 
         return errors;

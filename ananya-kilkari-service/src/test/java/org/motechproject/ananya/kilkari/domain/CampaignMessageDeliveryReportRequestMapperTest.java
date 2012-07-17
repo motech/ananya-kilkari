@@ -4,8 +4,8 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
-import org.motechproject.ananya.kilkari.request.OBDRequest;
-import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 
 import static junit.framework.Assert.assertEquals;
@@ -20,25 +20,25 @@ public class CampaignMessageDeliveryReportRequestMapperTest {
         callDetailRecord.setStartTime(startTime.toString());
         callDetailRecord.setEndTime(endTime.toString());
 
-        OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setMsisdn("1234567890");
-        obdRequest.setServiceOption("HELP");
-        obdRequest.setCampaignId("CampaignId");
-        obdRequest.setCallDetailRecord(callDetailRecord);
+        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
+        successfulCallRequest.setMsisdn("1234567890");
+        successfulCallRequest.setServiceOption("HELP");
+        successfulCallRequest.setCampaignId("CampaignId");
+        successfulCallRequest.setCallDetailRecord(callDetailRecord);
 
         Integer retryCount = 3;
         String subscriptionId = "subscriptionId";
         CampaignMessageDeliveryReportRequestMapper campaignMessageDeliveryReportRequestMapper = new CampaignMessageDeliveryReportRequestMapper();
-        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now(), Channel.IVR);
+        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, DateTime.now(), Channel.IVR);
 
-        CampaignMessageDeliveryReportRequest actualDeliveryReportRequest = campaignMessageDeliveryReportRequestMapper.mapFrom(obdRequestWrapper, retryCount);
+        CampaignMessageDeliveryReportRequest actualDeliveryReportRequest = campaignMessageDeliveryReportRequestMapper.mapFrom(successfulCallRequestWrapper, retryCount);
 
         assertEquals(subscriptionId, actualDeliveryReportRequest.getSubscriptionId());
-        assertEquals(obdRequest.getMsisdn(), actualDeliveryReportRequest.getMsisdn());
-        assertEquals(obdRequest.getCampaignId(), actualDeliveryReportRequest.getCampaignId());
-        assertEquals(obdRequest.getServiceOption(), actualDeliveryReportRequest.getServiceOption());
+        assertEquals(successfulCallRequest.getMsisdn(), actualDeliveryReportRequest.getMsisdn());
+        assertEquals(successfulCallRequest.getCampaignId(), actualDeliveryReportRequest.getCampaignId());
+        assertEquals(successfulCallRequest.getServiceOption(), actualDeliveryReportRequest.getServiceOption());
         assertEquals(retryCount.toString(), actualDeliveryReportRequest.getRetryCount());
-        assertEquals(startTime.toString(), obdRequest.getCallDetailRecord().getStartTime());
-        assertEquals(endTime.toString(), obdRequest.getCallDetailRecord().getEndTime());
+        assertEquals(startTime.toString(), successfulCallRequest.getCallDetailRecord().getStartTime());
+        assertEquals(endTime.toString(), successfulCallRequest.getCallDetailRecord().getEndTime());
     }
 }

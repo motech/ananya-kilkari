@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.handlers.callback.obd;
 
-import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 
 public interface ServiceOptionHandler {
-    public void process(OBDRequestWrapper obdRequestWrapper);
+    public void process(OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper);
 }

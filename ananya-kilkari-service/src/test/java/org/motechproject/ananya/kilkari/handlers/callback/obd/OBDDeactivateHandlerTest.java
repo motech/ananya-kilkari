@@ -6,8 +6,8 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.motechproject.ananya.kilkari.request.OBDRequest;
-import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -26,9 +26,9 @@ public class OBDDeactivateHandlerTest {
         OBDDeactivateHandler obdDeactivateHandler = new OBDDeactivateHandler(subscriptionService);
         Channel channel = Channel.IVR;
         String subscriptionId = "subscriptionId";
-        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(new OBDRequest(), subscriptionId, DateTime.now(), channel);
+        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(new OBDSuccessfulCallRequest(), subscriptionId, DateTime.now(), channel);
 
-        obdDeactivateHandler.process(obdRequestWrapper);
+        obdDeactivateHandler.process(successfulCallRequestWrapper);
 
         ArgumentCaptor<DeactivationRequest> captor = ArgumentCaptor.forClass(DeactivationRequest.class);
         verify(subscriptionService).requestDeactivation(captor.capture());

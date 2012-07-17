@@ -5,15 +5,15 @@ import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 
 import java.io.Serializable;
 
-public class OBDRequestWrapper implements Serializable {
+public class OBDSuccessfulCallRequestWrapper implements Serializable {
 
-    private OBDRequest obdRequest;
+    private OBDSuccessfulCallRequest successfulCallRequest;
     private String subscriptionId;
     private DateTime createdAt;
     private Channel channel;
 
-    public OBDRequestWrapper(OBDRequest obdRequest, String subscriptionId, DateTime createdAt, Channel channel) {
-        this.obdRequest = obdRequest;
+    public OBDSuccessfulCallRequestWrapper(OBDSuccessfulCallRequest successfulCallRequest, String subscriptionId, DateTime createdAt, Channel channel) {
+        this.successfulCallRequest = successfulCallRequest;
         this.subscriptionId = subscriptionId;
         this.createdAt = createdAt;
         this.channel = channel;
@@ -23,8 +23,8 @@ public class OBDRequestWrapper implements Serializable {
         return subscriptionId;
     }
 
-    public OBDRequest getObdRequest() {
-        return obdRequest;
+    public OBDSuccessfulCallRequest getSuccessfulCallRequest() {
+        return successfulCallRequest;
     }
 
     public DateTime getCreatedAt() {
@@ -32,7 +32,7 @@ public class OBDRequestWrapper implements Serializable {
     }
 
     public String getCampaignId() {
-        return obdRequest.getCampaignId();
+        return successfulCallRequest.getCampaignId();
     }
 
     public Channel getChannel() {

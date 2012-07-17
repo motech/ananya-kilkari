@@ -85,6 +85,10 @@ public class CampaignMessageService {
     }
 
     public void processInvalidCallRecords(ArrayList<InvalidCallRecord> invalidCallRecords) {
+        if(invalidCallRecords.isEmpty()) {
+            return;
+        }
+        logger.error(String.format("Received obd callback for %s invalid call records.", invalidCallRecords.size()));
         for(InvalidCallRecord record : invalidCallRecords){
             allInvalidCallRecords.add(record);
         }

@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
-import org.motechproject.ananya.kilkari.request.OBDRequest;
-import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 
@@ -16,9 +16,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class OBDRequestValidatorTest {
+public class SuccessfulCallRequestValidatorTest {
 
-    private OBDRequestValidator obdRequestValidator;
+    private OBDSuccessfulCallRequestValidator successfulCallRequestValidator;
 
     @Mock
     private SubscriptionService subscriptionService;
@@ -26,23 +26,23 @@ public class OBDRequestValidatorTest {
     @Before
     public void setUp(){
         initMocks(this);
-        obdRequestValidator = new OBDRequestValidator(subscriptionService);
+        successfulCallRequestValidator = new OBDSuccessfulCallRequestValidator(subscriptionService);
     }
 
     @Test
     public void shouldValidateValidRequest() {
         String subscriptionId = "sub001";
-        OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setCampaignId("WEEK33");
-        obdRequest.setMsisdn("9876543211");
-        obdRequest.setServiceOption("UNSUBSCRIBE");
+        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
+        successfulCallRequest.setCampaignId("WEEK33");
+        successfulCallRequest.setMsisdn("9876543211");
+        successfulCallRequest.setServiceOption("UNSUBSCRIBE");
         CallDetailRecord callDetailRecord = new CallDetailRecord();
         callDetailRecord.setStartTime("25-12-2012 23:56:56");
         callDetailRecord.setEndTime("25-12-2012 23:57:56");
-        obdRequest.setCallDetailRecord(callDetailRecord);
+        successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
+        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
         assertTrue(errors.isEmpty());
     }
@@ -50,16 +50,16 @@ public class OBDRequestValidatorTest {
     @Test
     public void shouldValidateInvalidRequest() {
         String subscriptionId = "sub001";
-        OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setCampaignId("");
-        obdRequest.setMsisdn("123");
-        obdRequest.setServiceOption("invalid");
+        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
+        successfulCallRequest.setCampaignId("");
+        successfulCallRequest.setMsisdn("123");
+        successfulCallRequest.setServiceOption("invalid");
         CallDetailRecord callDetailRecord = new CallDetailRecord();
         callDetailRecord.setStartTime("25-12-2012");
         callDetailRecord.setEndTime("27-12-2012");
-        obdRequest.setCallDetailRecord(callDetailRecord);
+        successfulCallRequest.setCallDetailRecord(callDetailRecord);
 
-        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
+        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
         assertEquals(6, errors.size());
         assertTrue(errors.contains("Invalid msisdn 123"));
@@ -74,17 +74,17 @@ public class OBDRequestValidatorTest {
     @Test
     public void shouldNotThrowErrorForEmptyServiceOption() {
         String subscriptionId = "sub001";
-        OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setCampaignId("WEEK13");
-        obdRequest.setMsisdn("1234567890");
-        obdRequest.setServiceOption("");
+        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
+        successfulCallRequest.setCampaignId("WEEK13");
+        successfulCallRequest.setMsisdn("1234567890");
+        successfulCallRequest.setServiceOption("");
         CallDetailRecord callDetailRecord = new CallDetailRecord();
         callDetailRecord.setStartTime("25-12-2012 20:20:20");
         callDetailRecord.setEndTime("27-12-2012 20:25:20");
-        obdRequest.setCallDetailRecord(callDetailRecord);
+        successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
+        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
         assertTrue(errors.isEmpty());
     }
@@ -92,17 +92,17 @@ public class OBDRequestValidatorTest {
     @Test
     public void shouldNotThrowErrorForNoServiceOption() {
         String subscriptionId = "sub001";
-        OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setCampaignId("WEEK13");
-        obdRequest.setMsisdn("1234567890");
-        obdRequest.setServiceOption(null);
+        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
+        successfulCallRequest.setCampaignId("WEEK13");
+        successfulCallRequest.setMsisdn("1234567890");
+        successfulCallRequest.setServiceOption(null);
         CallDetailRecord callDetailRecord = new CallDetailRecord();
         callDetailRecord.setStartTime("25-12-2012 20:20:20");
         callDetailRecord.setEndTime("27-12-2012 20:25:20");
-        obdRequest.setCallDetailRecord(callDetailRecord);
+        successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
+        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
         assertTrue(errors.isEmpty());
     }
@@ -110,17 +110,17 @@ public class OBDRequestValidatorTest {
     @Test
     public void shouldThrowErrorIfStartTimeNotBeforeEndTime() {
         String subscriptionId = "sub001";
-        OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setCampaignId("WEEK13");
-        obdRequest.setMsisdn("1234567890");
-        obdRequest.setServiceOption(null);
+        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
+        successfulCallRequest.setCampaignId("WEEK13");
+        successfulCallRequest.setMsisdn("1234567890");
+        successfulCallRequest.setServiceOption(null);
         CallDetailRecord callDetailRecord = new CallDetailRecord();
         callDetailRecord.setStartTime("27-12-2012 21:20:20");
         callDetailRecord.setEndTime("27-12-2012 20:20:20");
-        obdRequest.setCallDetailRecord(callDetailRecord);
+        successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
+        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
         assertEquals(1,errors.size());
         assertEquals("Start DateTime[27-12-2012 21:20:20] should not be greater than End DateTime[27-12-2012 20:20:20]",errors.get(0));
@@ -129,17 +129,17 @@ public class OBDRequestValidatorTest {
     @Test
     public void shouldReturnErrorForInvalidCampaignId() {
         String subscriptionId = "sub001";
-        OBDRequest obdRequest = new OBDRequest();
-        obdRequest.setCampaignId("WEEK33WEEK");
-        obdRequest.setMsisdn("9876543211");
-        obdRequest.setServiceOption("UNSUBSCRIBE");
+        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
+        successfulCallRequest.setCampaignId("WEEK33WEEK");
+        successfulCallRequest.setMsisdn("9876543211");
+        successfulCallRequest.setServiceOption("UNSUBSCRIBE");
         CallDetailRecord callDetailRecord = new CallDetailRecord();
         callDetailRecord.setStartTime("25-12-2012 23:56:56");
         callDetailRecord.setEndTime("25-12-2012 23:57:56");
-        obdRequest.setCallDetailRecord(callDetailRecord);
+        successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
+        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
         assertEquals(1, errors.size());
         assertTrue(errors.contains("Invalid campaign id WEEK33WEEK"));

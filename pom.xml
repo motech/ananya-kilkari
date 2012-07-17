@@ -332,6 +332,11 @@
                 <version>${motech-contrib.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
+                <artifactId>motech-retry</artifactId>
+                <version>${motech-contrib.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.motechproject</groupId>
                 <artifactId>motech-platform-common</artifactId>
                 <version>${motech-platform.version}</version>

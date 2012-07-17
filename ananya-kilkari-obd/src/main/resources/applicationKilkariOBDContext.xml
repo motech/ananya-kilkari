@@ -14,6 +14,7 @@
 
     <import resource="classpath*:applicationScheduler.xml"/>
     <import resource="classpath*:applicationPlatformServerAPI.xml"/>
+    <import resource="classpath*:applicationContext-retry.xml"/>
 
     <bean id="obdDbInstance" class="org.ektorp.impl.StdCouchDbInstance">
         <constructor-arg>

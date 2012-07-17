@@ -68,7 +68,7 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
         try {
             HttpResponse response = obdHttpClient.execute(httpPost);
             String responseContent = readResponse(response); //Read the response from stream first thing. As it should be read completely before making any other request.
-            validate(response, responseContent);
+            validateResponse(response, responseContent);
             logger.info(String.format("Uploaded campaign messages successfully.\nResponse:\n%s", responseContent));
         } catch (IOException ex) {
             logger.error("Sending messages to OBD failed", ex);
@@ -84,7 +84,7 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
         return String.format(baseUrl + queryString, date, date);
     }
 
-    private void validate(HttpResponse response, String responseContent) {
+    private void validateResponse(HttpResponse response, String responseContent) {
         StatusLine statusLine = response.getStatusLine();
         int statusCode = statusLine.getStatusCode();
         String reasonPhrase = statusLine.getReasonPhrase();

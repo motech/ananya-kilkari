@@ -29,12 +29,9 @@
             <artifactId>motech-platform-common-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.ektorp</groupId>
-            <artifactId>org.ektorp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.ektorp</groupId>
-            <artifactId>org.ektorp.spring</artifactId>
+            <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
+            <artifactId>motech-retry</artifactId>
+            <version>${motech-contrib.version}</version>
         </dependency>
         <dependency>
             <groupId>org.motechproject</groupId>
@@ -47,6 +44,14 @@
         <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-platform-server-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ektorp</groupId>
+            <artifactId>org.ektorp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ektorp</groupId>
+            <artifactId>org.ektorp.spring</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

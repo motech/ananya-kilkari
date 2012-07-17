@@ -174,7 +174,7 @@ public class SubscriptionServiceTest {
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.requestDeactivation(subscriptionId, Channel.IVR);
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR));
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
@@ -369,7 +369,7 @@ public class SubscriptionServiceTest {
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         Channel channel = Channel.IVR;
 
-        subscriptionService.requestDeactivation(subscriptionId, channel);
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, channel));
 
         ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
         ArgumentCaptor<ProcessSubscriptionRequest> captor1 = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);

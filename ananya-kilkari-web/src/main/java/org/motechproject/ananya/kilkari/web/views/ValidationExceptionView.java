@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.web.views;
 
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
-import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
+import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 import org.springframework.web.servlet.view.AbstractView;
 

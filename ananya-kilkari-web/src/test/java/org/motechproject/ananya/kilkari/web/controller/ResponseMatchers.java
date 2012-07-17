@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.web.controller;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.motechproject.ananya.kilkari.web.TestUtils;
-import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
+import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 
 public class ResponseMatchers {
 

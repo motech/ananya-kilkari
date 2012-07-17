@@ -6,7 +6,7 @@ import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequ
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
@@ -95,30 +95,6 @@ public class KilkariCampaignService {
         }
     }
 
-    private void processExistingCampaignMessageAlert(Subscription subscription, String messageId, boolean renewed, CampaignMessageAlert campaignMessageAlert) {
-        campaignMessageAlert.updateWith(messageId, renewed);
-
-        if (!campaignMessageAlert.canBeScheduled()) {
-            allCampaignMessageAlerts.update(campaignMessageAlert);
-            return;
-        }
-
-        campaignMessageService.scheduleCampaignMessage(subscription.getSubscriptionId(), messageId, subscription.getMsisdn(), subscription.getOperator().name());
-        campaignMessageAlert.clear();
-        allCampaignMessageAlerts.update(campaignMessageAlert);
-    }
-
-    private void processNewCampaignMessageAlert(String subscriptionId, String messageId, boolean renew) {
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, renew);
-        allCampaignMessageAlerts.add(campaignMessageAlert);
-        return;
-    }
-
-    private String getLockName(String subscriptionId) {
-        String lockName = getClass().getCanonicalName() + ":" + subscriptionId;
-        return lockName.intern();
-    }
-
     public void processSuccessfulMessageDelivery(OBDRequestWrapper obdRequestWrapper) {
         CampaignMessage campaignMessage = campaignMessageService.find(obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId());
         if(campaignMessage == null) {
@@ -143,5 +119,29 @@ public class KilkariCampaignService {
 
     public void processOBDCallbackRequest(OBDRequestWrapper obdRequestWrapper) {
         obdRequestCallbackPublisher.publishObdCallbackRequest(obdRequestWrapper);
+    }
+
+    private void processExistingCampaignMessageAlert(Subscription subscription, String messageId, boolean renewed, CampaignMessageAlert campaignMessageAlert) {
+        campaignMessageAlert.updateWith(messageId, renewed);
+
+        if (!campaignMessageAlert.canBeScheduled()) {
+            allCampaignMessageAlerts.update(campaignMessageAlert);
+            return;
+        }
+
+        campaignMessageService.scheduleCampaignMessage(subscription.getSubscriptionId(), messageId, subscription.getMsisdn(), subscription.getOperator().name());
+        campaignMessageAlert.clear();
+        allCampaignMessageAlerts.update(campaignMessageAlert);
+    }
+
+    private void processNewCampaignMessageAlert(String subscriptionId, String messageId, boolean renew) {
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, renew);
+        allCampaignMessageAlerts.add(campaignMessageAlert);
+        return;
+    }
+
+    private String getLockName(String subscriptionId) {
+        String lockName = getClass().getCanonicalName() + ":" + subscriptionId;
+        return lockName.intern();
     }
 }

@@ -2,10 +2,11 @@ package org.motechproject.ananya.kilkari.domain;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
+import org.motechproject.ananya.kilkari.request.OBDRequest;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -28,7 +29,7 @@ public class CampaignMessageDeliveryReportRequestMapperTest {
         Integer retryCount = 3;
         String subscriptionId = "subscriptionId";
         CampaignMessageDeliveryReportRequestMapper campaignMessageDeliveryReportRequestMapper = new CampaignMessageDeliveryReportRequestMapper();
-        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now());
+        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now(), Channel.IVR);
 
         CampaignMessageDeliveryReportRequest actualDeliveryReportRequest = campaignMessageDeliveryReportRequestMapper.mapFrom(obdRequestWrapper, retryCount);
 

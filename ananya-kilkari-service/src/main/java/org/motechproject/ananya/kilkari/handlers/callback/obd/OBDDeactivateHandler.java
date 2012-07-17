@@ -1,7 +1,8 @@
 package org.motechproject.ananya.kilkari.handlers.callback.obd;
 
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.mapper.OBDRequestMapper;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ public class OBDDeactivateHandler implements ServiceOptionHandler {
 
     @Override
     public void process(OBDRequestWrapper obdRequestWrapper) {
-        subscriptionService.requestDeactivation(obdRequestWrapper.getSubscriptionId(), Channel.IVR);
+        DeactivationRequest deactivationRequest = OBDRequestMapper.mapFrom(obdRequestWrapper);
+        subscriptionService.requestDeactivation(deactivationRequest);
     }
 }

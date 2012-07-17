@@ -8,11 +8,12 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
+import org.motechproject.ananya.kilkari.request.OBDRequest;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public class OBDServiceOptionHandlerTest {
         HashMap<String, Object> stringObjectHashMap = new HashMap<>();
         OBDRequest obdRequest = new OBDRequest();
         obdRequest.setServiceOption(ServiceOption.HELP.name());
-        OBDRequestWrapper expectedObdRequest = new OBDRequestWrapper(obdRequest, "subscriptionId", DateTime.now());
+        OBDRequestWrapper expectedObdRequest = new OBDRequestWrapper(obdRequest, "subscriptionId", DateTime.now(), Channel.IVR);
         stringObjectHashMap.put("0", expectedObdRequest);
         when(obdServiceOptionFactory.getHandler(ServiceOption.HELP)).thenReturn(serviceOptionHandler);
 
@@ -57,7 +58,7 @@ public class OBDServiceOptionHandlerTest {
         HashMap<String, Object> stringObjectHashMap = new HashMap<>();
         OBDRequest obdRequest = new OBDRequest();
         obdRequest.setServiceOption(ServiceOption.UNSUBSCRIBE.name());
-        OBDRequestWrapper expectedObdRequest = new OBDRequestWrapper(obdRequest, "subscriptionId", DateTime.now());
+        OBDRequestWrapper expectedObdRequest = new OBDRequestWrapper(obdRequest, "subscriptionId", DateTime.now(), Channel.IVR);
         stringObjectHashMap.put("0", expectedObdRequest);
         when(obdServiceOptionFactory.getHandler(ServiceOption.UNSUBSCRIBE)).thenReturn(serviceOptionHandler);
 

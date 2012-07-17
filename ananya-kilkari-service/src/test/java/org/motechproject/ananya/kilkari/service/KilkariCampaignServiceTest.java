@@ -11,14 +11,17 @@ import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
+import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
-import org.motechproject.ananya.kilkari.obd.domain.*;
+import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
+import org.motechproject.ananya.kilkari.request.OBDRequest;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -226,7 +229,7 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldPublishObdCallbackRequest() {
-        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(new OBDRequest(), "subscriptionId", DateTime.now());
+        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(new OBDRequest(), "subscriptionId", DateTime.now(), Channel.IVR);
 
         kilkariCampaignService.processOBDCallbackRequest(obdRequestWrapper);
 
@@ -251,7 +254,7 @@ public class KilkariCampaignServiceTest {
         obdRequest.setCampaignId(campaignId);
         obdRequest.setServiceOption(serviceOption);
         obdRequest.setCallDetailRecord(callDetailRecord);
-        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now());
+        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now(), Channel.IVR);
         CampaignMessage campaignMessage = mock(CampaignMessage.class);
         when(campaignMessage.getRetryCount()).thenReturn(retryCount);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
@@ -292,7 +295,7 @@ public class KilkariCampaignServiceTest {
         obdRequest.setCampaignId(campaignId);
         obdRequest.setServiceOption(serviceOption);
         obdRequest.setCallDetailRecord(callDetailRecord);
-        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now());
+        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now(), Channel.IVR);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(null);
 
         kilkariCampaignService.processSuccessfulMessageDelivery(obdRequestWrapper);

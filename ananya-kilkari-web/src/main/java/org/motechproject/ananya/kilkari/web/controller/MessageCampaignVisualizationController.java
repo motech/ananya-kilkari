@@ -2,8 +2,8 @@ package org.motechproject.ananya.kilkari.web.controller;
 
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
-import org.motechproject.ananya.kilkari.web.contract.response.CampaignSchedule;
-import org.motechproject.ananya.kilkari.web.contract.response.UserCampaignSchedule;
+import org.motechproject.ananya.kilkari.web.response.CampaignSchedule;
+import org.motechproject.ananya.kilkari.web.response.UserCampaignSchedule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.web.domain;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
+import org.motechproject.ananya.kilkari.request.OBDRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;

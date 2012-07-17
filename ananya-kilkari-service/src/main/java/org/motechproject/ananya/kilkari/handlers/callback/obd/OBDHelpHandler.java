@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.handlers.callback.obd;
 
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
 import org.springframework.stereotype.Component;
 
 @Component

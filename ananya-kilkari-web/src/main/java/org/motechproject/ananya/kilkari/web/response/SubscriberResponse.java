@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.contract.response;
+package org.motechproject.ananya.kilkari.web.response;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;

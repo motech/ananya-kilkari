@@ -23,9 +23,9 @@ import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionRequ
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.TestUtils;
-import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.contract.response.SubscriberResponse;
-import org.motechproject.ananya.kilkari.web.contract.response.SubscriptionDetails;
+import org.motechproject.ananya.kilkari.web.response.BaseResponse;
+import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
+import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
 import org.springframework.http.MediaType;
 

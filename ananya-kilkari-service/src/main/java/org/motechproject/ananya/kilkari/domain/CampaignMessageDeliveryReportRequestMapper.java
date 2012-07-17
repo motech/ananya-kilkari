@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.domain;
 
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDRequest;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.reporting.domain.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;

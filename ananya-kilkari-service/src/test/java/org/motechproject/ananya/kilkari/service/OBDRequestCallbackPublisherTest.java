@@ -6,9 +6,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
+import org.motechproject.ananya.kilkari.request.OBDRequest;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.scheduler.context.EventContext;
 
 import static org.mockito.Mockito.verify;
@@ -28,7 +29,7 @@ public class OBDRequestCallbackPublisherTest {
 
     @Test
     public void shouldPublishCallBackRequests() {
-        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(new OBDRequest(), "subscriptionID", DateTime.now());
+        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(new OBDRequest(), "subscriptionID", DateTime.now(), Channel.IVR);
         obdRequestCallbackPublisher.publishObdCallbackRequest(obdRequestWrapper);
 
         verify(eventContext).send(OBDEventKeys.PROCESS_CALLBACK_REQUEST, obdRequestWrapper);

@@ -3,12 +3,13 @@ package org.motechproject.ananya.kilkari.web.controller;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequest;
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDRequest;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.web.contract.response.BaseResponse;
+import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.validators.OBDRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,7 +39,7 @@ public class OBDController {
             throw new ValidationException(String.format("OBD Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
         }
 
-        kilkariCampaignService.processOBDCallbackRequest(new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now()));
+        kilkariCampaignService.processOBDCallbackRequest(new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now(), Channel.IVR));
 
         return new BaseResponse("SUCCESS","OBD call details received successfully");
     }

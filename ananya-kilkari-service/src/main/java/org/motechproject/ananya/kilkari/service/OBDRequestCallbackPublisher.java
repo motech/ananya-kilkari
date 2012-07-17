@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.motechproject.ananya.kilkari.obd.contract.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.scheduler.context.EventContext;
 import org.springframework.beans.factory.annotation.Autowired;

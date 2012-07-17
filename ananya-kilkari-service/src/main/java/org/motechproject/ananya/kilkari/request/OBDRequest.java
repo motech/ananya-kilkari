@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.contract;
+package org.motechproject.ananya.kilkari.request;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;

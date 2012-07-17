@@ -4,10 +4,7 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.mappers.SubscriptionRequestMapper;
@@ -85,7 +82,8 @@ public class SubscriptionService {
         });
     }
 
-    public void requestDeactivation(String subscriptionId, Channel channel) {
+    public void requestDeactivation(DeactivationRequest deactivationRequest) {
+        String subscriptionId = deactivationRequest.getSubscriptionId();
         updateStatusAndReport(subscriptionId, DateTime.now(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
@@ -93,7 +91,7 @@ public class SubscriptionService {
             }
         });
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        onMobileSubscriptionManagerPublisher.processDeactivation(SubscriptionMapper.mapFrom(subscription, channel));
+        onMobileSubscriptionManagerPublisher.processDeactivation(SubscriptionMapper.mapFrom(subscription, deactivationRequest.getChannel()));
     }
 
     public void deactivationRequested(String subscriptionId) {

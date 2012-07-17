@@ -4,7 +4,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 
 public class SubscriberCareRequestMapper {
     public static SubscriberCareDoc map(SubscriberCareRequest subscriberCareRequest) {
-        return new SubscriberCareDoc(subscriberCareRequest.getMsisdn(), subscriberCareRequest.getReason(),
+        return new SubscriberCareDoc(subscriberCareRequest.getMsisdn(), SubscriberCareReasons.getFor(subscriberCareRequest.getReason()),
                 subscriberCareRequest.getCreatedAt(), Channel.from(subscriberCareRequest.getChannel()));
     }
 }

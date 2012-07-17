@@ -42,13 +42,13 @@ public class SubscriberCareServiceTest {
     @Test
     public void shouldSaveValidSubscriberCareRequest() {
         String msisdn = "1234567890";
-        String reason = SubscriberCareReasons.HELP.name();
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason, "ivr");
+        SubscriberCareReasons reason = SubscriberCareReasons.HELP;
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason.name(), "ivr");
 
         subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
 
         ArgumentCaptor<SubscriberCareDoc> subscriberCareDocArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareDoc.class);
-        verify(allSubscriberCareDocs).add(subscriberCareDocArgumentCaptor.capture());
+        verify(allSubscriberCareDocs).addOrUpdate(subscriberCareDocArgumentCaptor.capture());
         SubscriberCareDoc subscriberCareDoc = subscriberCareDocArgumentCaptor.getValue();
 
         assertEquals(msisdn, subscriberCareDoc.getMsisdn());

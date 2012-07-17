@@ -9,9 +9,9 @@ public class SubscriberCareRequestMapperTest {
     @Test
     public void shouldMapSubscriberCareRequestToSubscriberCareDoc() {
         String msisdn = "1234567890";
-        String reason = SubscriberCareReasons.HELP.name();
+        SubscriberCareReasons reason = SubscriberCareReasons.HELP;
         String channel = "ivr";
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason, channel);
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason.name().toLowerCase(), channel);
 
         SubscriberCareDoc subscriberCareDoc = SubscriberCareRequestMapper.map(subscriberCareRequest);
 

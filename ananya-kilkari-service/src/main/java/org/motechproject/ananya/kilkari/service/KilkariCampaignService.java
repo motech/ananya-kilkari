@@ -1,17 +1,22 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequestMapper;
+import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
-import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
+import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
+import org.motechproject.ananya.kilkari.request.OBDRequest;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.slf4j.Logger;
@@ -29,6 +34,7 @@ public class KilkariCampaignService {
 
     private KilkariMessageCampaignService kilkariMessageCampaignService;
     private KilkariSubscriptionService kilkariSubscriptionService;
+    private SubscriberCareService subscriberCareService;
     private CampaignMessageIdStrategy campaignMessageIdStrategy;
     private AllCampaignMessageAlerts allCampaignMessageAlerts;
     private CampaignMessageService campaignMessageService;
@@ -39,9 +45,10 @@ public class KilkariCampaignService {
 
     @Autowired
     public KilkariCampaignService(KilkariMessageCampaignService kilkariMessageCampaignService,
-                                  KilkariSubscriptionService kilkariSubscriptionService, CampaignMessageIdStrategy campaignMessageIdStrategy, AllCampaignMessageAlerts allCampaignMessageAlerts, CampaignMessageService campaignMessageService, ReportingService reportingService, OBDRequestCallbackPublisher obdRequestCallbackPublisher) {
+                                  KilkariSubscriptionService kilkariSubscriptionService, SubscriberCareService subscriberCareService, CampaignMessageIdStrategy campaignMessageIdStrategy, AllCampaignMessageAlerts allCampaignMessageAlerts, CampaignMessageService campaignMessageService, ReportingService reportingService, OBDRequestCallbackPublisher obdRequestCallbackPublisher) {
         this.kilkariMessageCampaignService = kilkariMessageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
+        this.subscriberCareService = subscriberCareService;
         this.campaignMessageIdStrategy = campaignMessageIdStrategy;
         this.allCampaignMessageAlerts = allCampaignMessageAlerts;
         this.campaignMessageService = campaignMessageService;
@@ -103,8 +110,10 @@ public class KilkariCampaignService {
             return;
         }
         int retryCount = campaignMessage.getRetryCount();
-        campaignMessageService.deleteCampaignMessage(campaignMessage);
+
         reportingService.reportCampaignMessageDelivered(new CampaignMessageDeliveryReportRequestMapper().mapFrom(obdRequestWrapper, retryCount));
+        createSubscriberCareDoc(obdRequestWrapper.getObdRequest());
+        campaignMessageService.deleteCampaignMessage(campaignMessage);
     }
 
     public void processInvalidCallRecords(InvalidCallRecordsRequest invalidCallRecordsRequest) {
@@ -143,5 +152,12 @@ public class KilkariCampaignService {
     private String getLockName(String subscriptionId) {
         String lockName = getClass().getCanonicalName() + ":" + subscriptionId;
         return lockName.intern();
+    }
+
+    private void createSubscriberCareDoc(OBDRequest obdRequest) {
+        if(StringUtils.equalsIgnoreCase(obdRequest.getServiceOption(), ServiceOption.HELP.name())) {
+            SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(obdRequest.getMsisdn(), obdRequest.getServiceOption(), Channel.IVR.name());
+            subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
+        }
     }
 }

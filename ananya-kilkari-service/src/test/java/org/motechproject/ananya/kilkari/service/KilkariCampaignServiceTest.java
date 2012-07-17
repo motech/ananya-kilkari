@@ -8,6 +8,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
@@ -57,11 +58,13 @@ public class KilkariCampaignServiceTest {
     private ReportingService reportingService;
     @Mock
     private OBDRequestCallbackPublisher obdRequestCallbackPublisher;
+    @Mock
+    private SubscriberCareService subscriberCareService;
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestCallbackPublisher);
+        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, subscriberCareService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestCallbackPublisher);
     }
 
     @Test
@@ -261,13 +264,18 @@ public class KilkariCampaignServiceTest {
 
         kilkariCampaignService.processSuccessfulMessageDelivery(obdRequestWrapper);
 
-        InOrder inOrder = Mockito.inOrder(campaignMessageService, reportingService);
+        InOrder inOrder = Mockito.inOrder(campaignMessageService, reportingService, subscriberCareService);
         inOrder.verify(campaignMessageService).find(subscriptionId, campaignId);
-        inOrder.verify(campaignMessageService).deleteCampaignMessage(campaignMessage);
 
         ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
         inOrder.verify(reportingService).reportCampaignMessageDelivered(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
         CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
+
+        ArgumentCaptor<SubscriberCareRequest> subscriberCareRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
+        inOrder.verify(subscriberCareService).createSubscriberCareRequest(subscriberCareRequestArgumentCaptor.capture());
+        SubscriberCareRequest subscriberCareRequest = subscriberCareRequestArgumentCaptor.getValue();
+
+        inOrder.verify(campaignMessageService).deleteCampaignMessage(campaignMessage);
 
         assertEquals(subscriptionId, campaignMessageDeliveryReportRequest.getSubscriptionId());
         assertEquals(msisdn, campaignMessageDeliveryReportRequest.getMsisdn());
@@ -276,6 +284,40 @@ public class KilkariCampaignServiceTest {
         assertEquals(serviceOption, campaignMessageDeliveryReportRequest.getServiceOption());
         assertEquals(startTime, campaignMessageDeliveryReportRequest.getCallDetailRecord().getStartTime());
         assertEquals(endTime, campaignMessageDeliveryReportRequest.getCallDetailRecord().getEndTime());
+        assertEquals(msisdn, subscriberCareRequest.getMsisdn());
+        assertEquals(serviceOption, subscriberCareRequest.getReason());
+    }
+
+    @Test
+    public void shouldProcessSuccessfulCampaignMessageDeliveryWithOutCreatingACareRquest() {
+        OBDRequest obdRequest = new OBDRequest();
+        String subscriptionId = "subscriptionId";
+        String campaignId = "WEEK1";
+        String msisdn = "1234567890";
+        Integer retryCount = 3;
+        String serviceOption = ServiceOption.UNSUBSCRIBE.name();
+        String startTime = "25-12-2012";
+        String endTime = "27-12-2012";
+        CallDetailRecord callDetailRecord = new CallDetailRecord();
+        callDetailRecord.setStartTime(startTime);
+        callDetailRecord.setEndTime(endTime);
+
+        obdRequest.setMsisdn(msisdn);
+        obdRequest.setCampaignId(campaignId);
+        obdRequest.setServiceOption(serviceOption);
+        obdRequest.setCallDetailRecord(callDetailRecord);
+        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, subscriptionId, DateTime.now(), Channel.IVR);
+        CampaignMessage campaignMessage = mock(CampaignMessage.class);
+        when(campaignMessage.getRetryCount()).thenReturn(retryCount);
+        when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
+
+        kilkariCampaignService.processSuccessfulMessageDelivery(obdRequestWrapper);
+
+        InOrder inOrder = Mockito.inOrder(campaignMessageService, reportingService, subscriberCareService);
+        inOrder.verify(campaignMessageService).find(subscriptionId, campaignId);
+        inOrder.verify(reportingService).reportCampaignMessageDelivered(any(CampaignMessageDeliveryReportRequest.class));
+        inOrder.verify(subscriberCareService, never()).createSubscriberCareRequest(any(SubscriberCareRequest.class));
+        inOrder.verify(campaignMessageService).deleteCampaignMessage(campaignMessage);
     }
 
     @Test

@@ -5,6 +5,11 @@ import org.apache.commons.lang.StringUtils;
 public enum SubscriberCareReasons {
     HELP;
 
+    public static SubscriberCareReasons getFor(String reason) {
+        final String standardizedReason = StringUtils.trimToEmpty(reason).toUpperCase();
+        return isValid(standardizedReason) ? SubscriberCareReasons.valueOf(standardizedReason) : null;
+    }
+
     public static boolean isValid(String subscriberCareReason) {
         return (subscriberCareReason != null && SubscriberCareReasons.contains(subscriberCareReason));
     }

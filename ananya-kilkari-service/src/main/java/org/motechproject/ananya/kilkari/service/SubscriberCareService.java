@@ -27,6 +27,6 @@ public class SubscriberCareService {
 
     public void createSubscriberCareRequest(SubscriberCareRequest subscriberCareRequest) {
         careRequestValidator.validate(subscriberCareRequest);
-        allSubscriberCareDocs.add(SubscriberCareRequestMapper.map(subscriberCareRequest));
+        allSubscriberCareDocs.addOrUpdate(SubscriberCareRequestMapper.map(subscriberCareRequest));
     }
 }

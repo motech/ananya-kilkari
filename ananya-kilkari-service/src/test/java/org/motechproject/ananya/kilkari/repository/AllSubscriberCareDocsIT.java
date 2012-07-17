@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.repository;
 
 import org.joda.time.DateTime;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareDoc;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class AllSubscriberCareDocsIT extends SpringIntegrationTest{
     @Autowired
@@ -22,12 +24,41 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest{
     }
 
     @Test
+    public void shouldFindSubscriberCareDoc() {
+        String msisdn = "9876543211";
+        SubscriberCareReasons reason = SubscriberCareReasons.HELP;
+        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc(msisdn, reason, DateTime.now(), Channel.IVR);
+        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
+        markForDeletion(subscriberCareDoc);
+
+        SubscriberCareDoc subscriberCareDocs = allSubscriberCareDocs.find(msisdn, reason.name());
+        assertNotNull(subscriberCareDocs);
+        assertEquals(msisdn, subscriberCareDocs.getMsisdn());
+        assertEquals(reason, subscriberCareDocs.getReason());
+    }
+
+    @Test
     public void shouldAddNewSubscriberCareDoc() {
-        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP.name(), DateTime.now(), Channel.IVR);
-        allSubscriberCareDocs.add(subscriberCareDoc);
+        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR);
+        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
         markForDeletion(subscriberCareDoc);
 
         List<SubscriberCareDoc> subscriberCareDocs = allSubscriberCareDocs.getAll();
         assertEquals(1, subscriberCareDocs.size());
+    }
+
+    @Test
+    public void shouldUpdateAnExistingSubscriberCareDocIfMsisdnAndReasonAreSame() {
+        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR);
+        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
+        markForDeletion(subscriberCareDoc);
+
+        DateTime createdAt = DateTime.now().plusDays(1);
+        SubscriberCareDoc subscriberCareDoc2 = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, createdAt, Channel.IVR);
+        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc2);
+
+        List<SubscriberCareDoc> subscriberCareDocs = allSubscriberCareDocs.getAll();
+        assertEquals(1, subscriberCareDocs.size());
+        assertEquals(createdAt.getDayOfYear(), subscriberCareDocs.get(0).getCreatedAt().getDayOfYear());
     }
 }

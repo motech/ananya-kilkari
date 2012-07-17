@@ -13,7 +13,7 @@ public class SubscriberCareDoc extends MotechBaseDataObject {
     private String msisdn;
 
     @JsonProperty
-    private String reason;
+    private SubscriberCareReasons reason;
 
     @JsonProperty
     private Channel channel;
@@ -24,7 +24,7 @@ public class SubscriberCareDoc extends MotechBaseDataObject {
     public SubscriberCareDoc() {
     }
 
-    public SubscriberCareDoc(String msisdn, String reason, DateTime createdAt, Channel channel) {
+    public SubscriberCareDoc(String msisdn, SubscriberCareReasons reason, DateTime createdAt, Channel channel) {
         this.msisdn = PhoneNumber.formatPhoneNumberTo10Digits(msisdn).toString();
         this.reason = reason;
         this.channel = channel;
@@ -35,7 +35,7 @@ public class SubscriberCareDoc extends MotechBaseDataObject {
         return msisdn;
     }
 
-    public String getReason() {
+    public SubscriberCareReasons getReason() {
         return reason;
     }
 
@@ -45,5 +45,9 @@ public class SubscriberCareDoc extends MotechBaseDataObject {
 
     public Channel getChannel() {
         return channel;
+    }
+
+    public void setCreatedAt(DateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

@@ -4,8 +4,8 @@
     "retries" : [
         {
             "name" : "obd-send-new-messages",
-            "retryCount" : "5",
-            "retryInterval" : ["3 minutes"],
+            "retryCount" : "4",
+            "retryInterval" : ["1 minutes"],
             "offset" : "0 minutes"
         }
     ]

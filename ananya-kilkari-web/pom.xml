@@ -28,9 +28,7 @@
                         <configuration>
                             <target>
                                 <copy todir="${project.build.outputDirectory}">
-                                    <fileset dir="${project.basedir}/../ananya-kilkari-config/src/main/resources">
-                                        <include name="*.properties" />
-                                    </fileset>
+                                    <fileset dir="${project.basedir}/../ananya-kilkari-config/src/main/resources" />
                                 </copy>
                             </target>
                         </configuration>

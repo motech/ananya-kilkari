@@ -8,6 +8,7 @@ import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
@@ -59,7 +60,7 @@ public class SubscriptionController {
         final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
         List<String> validationErrors = callbackRequestValidator.validate(callbackRequestWrapper);
         if (!(validationErrors.isEmpty())) {
-            return BaseResponse.failure(String.format("Callback Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
+            throw new ValidationException(StringUtils.join(validationErrors, ","));
         }
 
         kilkariSubscriptionService.processCallbackRequest(callbackRequestWrapper);

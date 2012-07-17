@@ -231,8 +231,6 @@ public class SubscriptionControllerTest {
     public void shouldGiveAnErrorMessageWhenCallBackRequestIsInvalid() throws Exception {
         ArrayList<String> errors = new ArrayList<String>() {
             {
-                add("Invalid callbackAction invalidAction");
-                add("Invalid callbackStatus invalidStatus");
                 add("Invalid msisdn invalidMsisdn");
                 add("Invalid operator invalidOperator");
             }
@@ -245,9 +243,10 @@ public class SubscriptionControllerTest {
         mockMvc(subscriptionController)
                 .perform(put("/subscription/abcd1234")
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("ERROR", "Callback Request Invalid: Invalid callbackAction invalidAction,Invalid callbackStatus invalidStatus,Invalid msisdn invalidMsisdn,Invalid operator invalidOperator")));
+                .andExpect(content().string(baseResponseMatcher("ERROR", "Invalid msisdn invalidMsisdn,Invalid operator invalidOperator")));
+
 
         verifyZeroInteractions(kilkariSubscriptionService);
     }

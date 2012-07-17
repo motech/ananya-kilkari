@@ -39,8 +39,11 @@ public class OBDServiceOptionHandler {
         validateRequest(obdRequestWrapper);
 
         kilkariCampaignService.processSuccessfulMessageDelivery(obdRequestWrapper);
-        ServiceOption serviceOption = ServiceOption.getFor(obdRequestWrapper.getObdRequest().getServiceOption());
-        obdServiceOptionFactory.getHandler(serviceOption).process(obdRequestWrapper);
+        String serviceOption = obdRequestWrapper.getObdRequest().getServiceOption();
+        if(!serviceOption.isEmpty()) {
+            ServiceOption option = ServiceOption.getFor(serviceOption);
+            obdServiceOptionFactory.getHandler(option).process(obdRequestWrapper);
+        }
         logger.info("Completed handling OBD callback for : " + obdRequestWrapper.getSubscriptionId());
     }
 

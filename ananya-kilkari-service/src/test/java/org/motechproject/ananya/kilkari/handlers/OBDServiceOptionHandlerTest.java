@@ -20,7 +20,9 @@ import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,4 +95,17 @@ public class OBDServiceOptionHandlerTest {
         verify(serviceOptionHandler, never()).process(expectedObdRequest);
     }
 
+    @Test
+    public void shouldNotInvokeFactoryForHandlerIfServiceOptionIsEmpty() {
+
+        Map<String, Object> map = new HashMap<>();
+        OBDRequest obdRequest = new OBDRequest();
+        obdRequest.setServiceOption("");
+        OBDRequestWrapper obdRequestWrapper = new OBDRequestWrapper(obdRequest, "subscriptionId", DateTime.now(), Channel.IVR);
+        map.put("0", obdRequestWrapper);
+
+        obdServiceOptionHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_CALLBACK_REQUEST, map));
+
+        verify(obdServiceOptionFactory, never()).getHandler(any(ServiceOption.class));
+    }
 }

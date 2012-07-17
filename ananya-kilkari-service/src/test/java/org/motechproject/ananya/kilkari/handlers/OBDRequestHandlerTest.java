@@ -29,10 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OBDRequestHandlerTest {
@@ -105,8 +102,7 @@ public class OBDRequestHandlerTest {
     }
 
     @Test
-    public void shouldNotInvokeFactoryForHandlerIfServiceOptionIsEmpty() {
-
+    public void shouldNotThrowExceptionIfHandlerIsNotThereForServiceOption() {
         Map<String, Object> map = new HashMap<>();
         OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
         successfulCallRequest.setServiceOption("");
@@ -114,8 +110,6 @@ public class OBDRequestHandlerTest {
         map.put("0", successfulCallRequestWrapper);
 
         obdRequestHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, map));
-
-        verify(obdServiceOptionFactory, never()).getHandler(any(ServiceOption.class));
     }
 
     @Test

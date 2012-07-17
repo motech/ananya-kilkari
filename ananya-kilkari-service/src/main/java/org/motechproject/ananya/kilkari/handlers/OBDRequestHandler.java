@@ -6,10 +6,10 @@ import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
-import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.validators.OBDSuccessfulCallRequestValidator;
@@ -46,10 +46,9 @@ public class OBDRequestHandler {
         validateSuccessfulCallRequest(successfulCallRequestWrapper);
 
         kilkariCampaignService.processSuccessfulMessageDelivery(successfulCallRequestWrapper);
-        String serviceOption = successfulCallRequestWrapper.getSuccessfulCallRequest().getServiceOption();
-        if(!serviceOption.isEmpty()) {
-            ServiceOption option = ServiceOption.getFor(serviceOption);
-            obdServiceOptionFactory.getHandler(option).process(successfulCallRequestWrapper);
+        ServiceOption serviceOption = ServiceOption.getFor(successfulCallRequestWrapper.getSuccessfulCallRequest().getServiceOption());
+        if (obdServiceOptionFactory.getHandler(serviceOption) != null) {
+            obdServiceOptionFactory.getHandler(serviceOption).process(successfulCallRequestWrapper);
         }
         logger.info("Completed handling OBD callback for : " + successfulCallRequestWrapper.getSubscriptionId());
     }
@@ -65,7 +64,7 @@ public class OBDRequestHandler {
     public void handleInvalidCallRecordsRequest(InvalidCallRecordsRequest invalidCallRecordsRequest) {
         ArrayList<InvalidCallRecordRequestObject> requestCallRecords = invalidCallRecordsRequest.getCallrecords();
         ArrayList<InvalidCallRecord> invalidCallRecords = new ArrayList<>();
-        for(InvalidCallRecordRequestObject requestObject : requestCallRecords){
+        for (InvalidCallRecordRequestObject requestObject : requestCallRecords) {
             invalidCallRecords.add(new InvalidCallRecord(requestObject.getMsisdn(), requestObject.getSubscriptionId(),
                     requestObject.getCampaignId(), requestObject.getOperator(), requestObject.getDescription()));
         }

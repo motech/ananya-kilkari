@@ -46,16 +46,6 @@ public class CampaignMessageAlertTest {
     }
 
     @Test
-    public void shouldClearTheMessageIdAndSetRenewToFalse() {
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true);
-
-        campaignMessageAlert.clear();
-
-        assertNull(campaignMessageAlert.getMessageId());
-        assertFalse(campaignMessageAlert.isRenewed());
-    }
-
-    @Test
     public void shouldUpdateWithMessageIdAndSetRenewStatus() {
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true);
         String expectedMessageId = "newMessageId";

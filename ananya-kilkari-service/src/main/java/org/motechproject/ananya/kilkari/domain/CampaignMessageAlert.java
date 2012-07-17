@@ -47,11 +47,6 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
         return renewed && !StringUtil.isNullOrEmpty(messageId);
     }
 
-    public void clear() {
-        messageId = null;
-        renewed = false;
-    }
-
     public void updateWith(String messageId, boolean renewed) {
         this.messageId = messageId;
         this.renewed = renewed;

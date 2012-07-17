@@ -1,13 +1,13 @@
-package org.motechproject.ananya.kilkari.web.domain;
+package org.motechproject.ananya.kilkari.validators;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.request.OBDRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
+import org.motechproject.ananya.kilkari.request.OBDRequest;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.web.validators.OBDRequestValidator;
 
 import java.util.List;
 
@@ -40,9 +40,9 @@ public class OBDRequestValidatorTest {
         callDetailRecord.setStartTime("25-12-2012 23:56:56");
         callDetailRecord.setEndTime("25-12-2012 23:57:56");
         obdRequest.setCallDetailRecord(callDetailRecord);
-
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
-        List<String> errors = obdRequestValidator.validate(obdRequest, subscriptionId);
+
+        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
 
         assertTrue(errors.isEmpty());
     }
@@ -58,7 +58,8 @@ public class OBDRequestValidatorTest {
         callDetailRecord.setStartTime("25-12-2012");
         callDetailRecord.setEndTime("27-12-2012");
         obdRequest.setCallDetailRecord(callDetailRecord);
-        List<String> errors = obdRequestValidator.validate(obdRequest, subscriptionId);
+
+        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
 
         assertEquals(6, errors.size());
         assertTrue(errors.contains("Invalid msisdn 123"));
@@ -83,7 +84,7 @@ public class OBDRequestValidatorTest {
         obdRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = obdRequestValidator.validate(obdRequest, subscriptionId);
+        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
 
         assertTrue(errors.isEmpty());
     }
@@ -101,7 +102,7 @@ public class OBDRequestValidatorTest {
         obdRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = obdRequestValidator.validate(obdRequest, subscriptionId);
+        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
 
         assertTrue(errors.isEmpty());
     }
@@ -119,7 +120,7 @@ public class OBDRequestValidatorTest {
         obdRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = obdRequestValidator.validate(obdRequest, subscriptionId);
+        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
 
         assertEquals(1,errors.size());
         assertEquals("Start DateTime[27-12-2012 21:20:20] should not be greater than End DateTime[27-12-2012 20:20:20]",errors.get(0));
@@ -136,9 +137,9 @@ public class OBDRequestValidatorTest {
         callDetailRecord.setStartTime("25-12-2012 23:56:56");
         callDetailRecord.setEndTime("25-12-2012 23:57:56");
         obdRequest.setCallDetailRecord(callDetailRecord);
-
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
-        List<String> errors = obdRequestValidator.validate(obdRequest, subscriptionId);
+
+        List<String> errors = obdRequestValidator.validate(new OBDRequestWrapper(obdRequest, subscriptionId, null, null));
 
         assertEquals(1, errors.size());
         assertTrue(errors.contains("Invalid campaign id WEEK33WEEK"));

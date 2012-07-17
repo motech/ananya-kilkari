@@ -14,10 +14,14 @@ import org.motechproject.ananya.kilkari.request.OBDRequest;
 import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.validators.OBDRequestValidator;
 import org.motechproject.scheduler.domain.MotechEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,12 +34,14 @@ public class OBDServiceOptionHandlerTest {
     private KilkariCampaignService kilkariCampaignService;
     @Mock
     private ServiceOptionHandler serviceOptionHandler;
+    @Mock
+    private OBDRequestValidator obdRequestValidator;
 
     private OBDServiceOptionHandler obdServiceOptionHandler;
 
     @Before
     public void setUp() {
-        obdServiceOptionHandler = new OBDServiceOptionHandler(obdServiceOptionFactory, kilkariCampaignService);
+        obdServiceOptionHandler = new OBDServiceOptionHandler(obdServiceOptionFactory, kilkariCampaignService, obdRequestValidator);
     }
 
     @Test
@@ -67,4 +73,24 @@ public class OBDServiceOptionHandlerTest {
         verify(kilkariCampaignService).processSuccessfulMessageDelivery(expectedObdRequest);
         verify(serviceOptionHandler).process(expectedObdRequest);
     }
+
+    @Test(expected = ValidationException.class)
+    public void shouldInvalidateTheOBDRquest() {
+        HashMap<String, Object> stringObjectHashMap = new HashMap<>();
+        OBDRequest obdRequest = new OBDRequest();
+        obdRequest.setServiceOption("Random");
+        OBDRequestWrapper expectedObdRequest = new OBDRequestWrapper(obdRequest, "subscriptionId", DateTime.now(), Channel.IVR);
+        stringObjectHashMap.put("0", expectedObdRequest);
+        when(obdServiceOptionFactory.getHandler(ServiceOption.HELP)).thenReturn(serviceOptionHandler);
+        ArrayList<String> errors = new ArrayList<String>() {{
+            add("Invalid service option");
+        }};
+        when(obdRequestValidator.validate(expectedObdRequest)).thenReturn(errors);
+
+        obdServiceOptionHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_CALLBACK_REQUEST, stringObjectHashMap));
+
+        verify(kilkariCampaignService, never()).processSuccessfulMessageDelivery(expectedObdRequest);
+        verify(serviceOptionHandler, never()).process(expectedObdRequest);
+    }
+
 }

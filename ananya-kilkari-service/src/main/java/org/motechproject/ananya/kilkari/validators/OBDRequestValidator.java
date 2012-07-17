@@ -1,12 +1,13 @@
-package org.motechproject.ananya.kilkari.web.validators;
+package org.motechproject.ananya.kilkari.validators;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignCode;
-import org.motechproject.ananya.kilkari.request.OBDRequest;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
+import org.motechproject.ananya.kilkari.request.OBDRequest;
+import org.motechproject.ananya.kilkari.request.OBDRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 import org.motechproject.common.domain.PhoneNumber;
@@ -28,13 +29,14 @@ public class OBDRequestValidator {
         this.subscriptionService = subscriptionService;
     }
 
-    public List<String> validate(OBDRequest obdRequest, String subscriptionId) {
+    public List<String> validate(OBDRequestWrapper obdRequestWrapper) {
         List<String> errors = new ArrayList<>();
+        OBDRequest obdRequest = obdRequestWrapper.getObdRequest();
         validateMsisdn(obdRequest.getMsisdn(), errors);
         validateServiceOption(obdRequest.getServiceOption(), errors);
         validateCampaignId(obdRequest.getCampaignId(), errors);
         validateDateFormat(obdRequest.getCallDetailRecord(), errors);
-        validateSubscription(subscriptionId, errors);
+        validateSubscription(obdRequestWrapper.getSubscriptionId(), errors);
 
         return errors;
     }

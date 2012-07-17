@@ -93,4 +93,16 @@ public class SubscriptionStateHandlerFactoryTest {
 
         assertTrue(subscriptionStateHandler instanceof DeactivateHandler);
     }
+
+    @Test
+    public void shouldReturnTheDeactivationHandlerGivenDeactivationRequestWithSuccess() {
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setAction("DCT");
+        callbackRequest.setStatus("SUCCESS");
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
+
+        SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
+
+        assertTrue(subscriptionStateHandler instanceof DeactivateHandler);
+    }
 }

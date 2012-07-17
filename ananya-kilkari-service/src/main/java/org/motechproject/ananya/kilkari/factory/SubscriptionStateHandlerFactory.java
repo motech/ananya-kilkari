@@ -37,6 +37,7 @@ public class SubscriptionStateHandlerFactory {
         handlerMappings.put(new ActionStatus(CallbackAction.REN, CallbackStatus.SUCCESS), renewalSuccessHandler);
         handlerMappings.put(new ActionStatus(CallbackAction.REN, CallbackStatus.BAL_LOW), renewalSuspensionHandler);
         handlerMappings.put(new ActionStatus(CallbackAction.DCT, CallbackStatus.BAL_LOW), deactivateHandler);
+        handlerMappings.put(new ActionStatus(CallbackAction.DCT, CallbackStatus.SUCCESS), deactivateHandler);
     }
 
     public SubscriptionStateHandler getHandler(CallbackRequestWrapper callbackRequestWrapper) {

@@ -139,8 +139,7 @@ public class KilkariCampaignService {
         }
 
         campaignMessageService.scheduleCampaignMessage(subscription.getSubscriptionId(), messageId, subscription.getMsisdn(), subscription.getOperator().name());
-        campaignMessageAlert.clear();
-        allCampaignMessageAlerts.update(campaignMessageAlert);
+        allCampaignMessageAlerts.remove(campaignMessageAlert);
     }
 
     private void processNewCampaignMessageAlert(String subscriptionId, String messageId, boolean renew) {

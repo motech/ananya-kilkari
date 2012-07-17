@@ -171,14 +171,13 @@ public class KilkariCampaignServiceTest {
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
         verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator.name());
         ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
-        verify(allCampaignMessageAlerts).update(captor.capture());
+        verify(allCampaignMessageAlerts).remove(captor.capture());
         CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
-        assertNull(actualCampaignMessageAlert.getMessageId());
-        assertFalse(actualCampaignMessageAlert.isRenewed());
+        assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
     }
 
     @Test
-    public void shouldUpdateCampaignMessageAlertIfAlreadyExistsAndScheduleCampaignMessageIfRenewed() {
+    public void shouldRemoveCampaignMessageAlertIfAlreadyExistsAndScheduleCampaignMessageIfRenewed() {
         String messageId = "mymessageid";
         String msisdn = "1234567890";
         Operator operator = Operator.AIRTEL;
@@ -197,10 +196,9 @@ public class KilkariCampaignServiceTest {
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
         verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator.name());
         ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
-        verify(allCampaignMessageAlerts).update(captor.capture());
+        verify(allCampaignMessageAlerts).remove(captor.capture());
         CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
-        assertNull(actualCampaignMessageAlert.getMessageId());
-        assertFalse(actualCampaignMessageAlert.isRenewed());
+        assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
     }
 
     @Test
@@ -379,10 +377,10 @@ public class KilkariCampaignServiceTest {
         ArrayList actualInvalidCallRecords = captor.getValue();
         assertEquals(2, actualInvalidCallRecords.size());
         InvalidCallRecord actualInvalidCallRecord1 = (InvalidCallRecord) actualInvalidCallRecords.get(0);
-        assertEquals(campaign1,actualInvalidCallRecord1.getCampaignId());
-        assertEquals(sub1,actualInvalidCallRecord1.getSubscriptionId());
-        assertEquals(msisdn1,actualInvalidCallRecord1.getMsisdn());
-        assertEquals(operator1,actualInvalidCallRecord1.getOperator());
-        assertEquals(desc1,actualInvalidCallRecord1.getDescription());
+        assertEquals(campaign1, actualInvalidCallRecord1.getCampaignId());
+        assertEquals(sub1, actualInvalidCallRecord1.getSubscriptionId());
+        assertEquals(msisdn1, actualInvalidCallRecord1.getMsisdn());
+        assertEquals(operator1, actualInvalidCallRecord1.getOperator());
+        assertEquals(desc1, actualInvalidCallRecord1.getDescription());
     }
 }

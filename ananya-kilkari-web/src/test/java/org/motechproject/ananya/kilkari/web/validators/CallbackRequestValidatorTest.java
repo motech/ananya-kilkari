@@ -199,26 +199,6 @@ public class CallbackRequestValidatorTest {
     }
 
     @Test
-    public void shouldMarkRenewalDeactivationRequestAsInvalidWhenSubscriptionStateIsOtherThanSuspended() {
-        final String subscriptionId = "subId";
-        final CallbackRequest callbackRequest = new CallbackRequest();
-        callbackRequest.setAction(CallbackAction.DCT.name());
-        callbackRequest.setStatus(CallbackStatus.BAL_LOW.name());
-        callbackRequest.setMsisdn("1234567890");
-        callbackRequest.setOperator(Operator.AIRTEL.name());
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
-        final Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
-        when(subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper)).thenReturn(new DummySubscriptionStateHandler());
-        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-
-        final List<String> errors = callbackRequestValidator.validate(callbackRequestWrapper);
-
-        Assert.assertEquals(1, errors.size());
-        Assert.assertEquals("Cannot deactivate on renewal. Subscription in ACTIVE status", errors.get(0));
-    }
-
-    @Test
     public void shouldMarkActivationRequestAsInvalidWhenSubscriptionStateIsOtherThanPendingActivation() {
         final String subscriptionId = "subId";
         final CallbackRequest callbackRequest = new CallbackRequest();

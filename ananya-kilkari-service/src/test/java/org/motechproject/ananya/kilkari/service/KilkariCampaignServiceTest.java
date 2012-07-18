@@ -56,14 +56,12 @@ public class KilkariCampaignServiceTest {
     private ReportingService reportingService;
     @Mock
     private OBDRequestPublisher obdRequestsPublisher;
-    @Mock
-    private SubscriberCareService subscriberCareService;
 
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, subscriberCareService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestsPublisher);
+        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestsPublisher);
     }
 
     @Test
@@ -261,16 +259,12 @@ public class KilkariCampaignServiceTest {
 
         kilkariCampaignService.processSuccessfulMessageDelivery(successfulCallRequestWrapper);
 
-        InOrder inOrder = Mockito.inOrder(campaignMessageService, reportingService, subscriberCareService);
+        InOrder inOrder = Mockito.inOrder(campaignMessageService, reportingService);
         inOrder.verify(campaignMessageService).find(subscriptionId, campaignId);
 
         ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
         inOrder.verify(reportingService).reportCampaignMessageDelivered(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
         CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
-
-        ArgumentCaptor<SubscriberCareRequest> subscriberCareRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
-        inOrder.verify(subscriberCareService).createSubscriberCareRequest(subscriberCareRequestArgumentCaptor.capture());
-        SubscriberCareRequest subscriberCareRequest = subscriberCareRequestArgumentCaptor.getValue();
 
         inOrder.verify(campaignMessageService).deleteCampaignMessage(campaignMessage);
 
@@ -281,40 +275,6 @@ public class KilkariCampaignServiceTest {
         assertEquals(serviceOption, campaignMessageDeliveryReportRequest.getServiceOption());
         assertEquals(startTime, campaignMessageDeliveryReportRequest.getCallDetailRecord().getStartTime());
         assertEquals(endTime, campaignMessageDeliveryReportRequest.getCallDetailRecord().getEndTime());
-        assertEquals(msisdn, subscriberCareRequest.getMsisdn());
-        assertEquals(serviceOption, subscriberCareRequest.getReason());
-    }
-
-    @Test
-    public void shouldProcessSuccessfulCampaignMessageDeliveryWithOutCreatingACareRquest() {
-        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
-        String subscriptionId = "subscriptionId";
-        String campaignId = "WEEK1";
-        String msisdn = "1234567890";
-        Integer retryCount = 3;
-        String serviceOption = ServiceOption.UNSUBSCRIBE.name();
-        String startTime = "25-12-2012";
-        String endTime = "27-12-2012";
-        CallDetailRecord callDetailRecord = new CallDetailRecord();
-        callDetailRecord.setStartTime(startTime);
-        callDetailRecord.setEndTime(endTime);
-
-        successfulCallRequest.setMsisdn(msisdn);
-        successfulCallRequest.setCampaignId(campaignId);
-        successfulCallRequest.setServiceOption(serviceOption);
-        successfulCallRequest.setCallDetailRecord(callDetailRecord);
-        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, DateTime.now(), Channel.IVR);
-        CampaignMessage campaignMessage = mock(CampaignMessage.class);
-        when(campaignMessage.getRetryCount()).thenReturn(retryCount);
-        when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
-
-        kilkariCampaignService.processSuccessfulMessageDelivery(successfulCallRequestWrapper);
-
-        InOrder inOrder = Mockito.inOrder(campaignMessageService, reportingService, subscriberCareService);
-        inOrder.verify(campaignMessageService).find(subscriptionId, campaignId);
-        inOrder.verify(reportingService).reportCampaignMessageDelivered(any(CampaignMessageDeliveryReportRequest.class));
-        inOrder.verify(subscriberCareService, never()).createSubscriberCareRequest(any(SubscriberCareRequest.class));
-        inOrder.verify(campaignMessageService).deleteCampaignMessage(campaignMessage);
     }
 
     @Test

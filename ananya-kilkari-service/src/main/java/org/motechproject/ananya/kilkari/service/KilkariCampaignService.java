@@ -31,7 +31,6 @@ public class KilkariCampaignService {
 
     private KilkariMessageCampaignService kilkariMessageCampaignService;
     private KilkariSubscriptionService kilkariSubscriptionService;
-    private SubscriberCareService subscriberCareService;
     private CampaignMessageIdStrategy campaignMessageIdStrategy;
     private AllCampaignMessageAlerts allCampaignMessageAlerts;
     private CampaignMessageService campaignMessageService;
@@ -42,10 +41,9 @@ public class KilkariCampaignService {
 
     @Autowired
     public KilkariCampaignService(KilkariMessageCampaignService kilkariMessageCampaignService,
-                                  KilkariSubscriptionService kilkariSubscriptionService, SubscriberCareService subscriberCareService, CampaignMessageIdStrategy campaignMessageIdStrategy, AllCampaignMessageAlerts allCampaignMessageAlerts, CampaignMessageService campaignMessageService, ReportingService reportingService, OBDRequestPublisher obdRequestPublisher) {
+                                  KilkariSubscriptionService kilkariSubscriptionService, CampaignMessageIdStrategy campaignMessageIdStrategy, AllCampaignMessageAlerts allCampaignMessageAlerts, CampaignMessageService campaignMessageService, ReportingService reportingService, OBDRequestPublisher obdRequestPublisher) {
         this.kilkariMessageCampaignService = kilkariMessageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
-        this.subscriberCareService = subscriberCareService;
         this.campaignMessageIdStrategy = campaignMessageIdStrategy;
         this.allCampaignMessageAlerts = allCampaignMessageAlerts;
         this.campaignMessageService = campaignMessageService;
@@ -109,7 +107,6 @@ public class KilkariCampaignService {
         int retryCount = campaignMessage.getRetryCount();
 
         reportingService.reportCampaignMessageDelivered(new CampaignMessageDeliveryReportRequestMapper().mapFrom(obdRequestWrapper, retryCount));
-        createSubscriberCareDoc(obdRequestWrapper.getSuccessfulCallRequest());
         campaignMessageService.deleteCampaignMessage(campaignMessage);
     }
 
@@ -143,12 +140,5 @@ public class KilkariCampaignService {
     private String getLockName(String subscriptionId) {
         String lockName = getClass().getCanonicalName() + ":" + subscriptionId;
         return lockName.intern();
-    }
-
-    private void createSubscriberCareDoc(OBDSuccessfulCallRequest obdRequest) {
-        if(StringUtils.equalsIgnoreCase(obdRequest.getServiceOption(), ServiceOption.HELP.name())) {
-            SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(obdRequest.getMsisdn(), obdRequest.getServiceOption(), Channel.IVR.name());
-            subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
-        }
     }
 }

@@ -5,18 +5,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <context:property-placeholder location="classpath*:*.properties"/>
-
     <import resource="classpath*:applicationKilkariServiceContext.xml" />
 
     <context:component-scan base-package="org.motechproject.ananya.kilkari"/>
-
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="${jdbc.driverClassName}"/>
-        <property name="url" value="${jdbc.url}"/>
-        <property name="username" value="${jdbc.username}"/>
-        <property name="password" value="${jdbc.password}"/>
-    </bean>
 
     <bean id="reportingService" class="org.motechproject.ananya.kilkari.reporting.service.StubReportingService"/>
 
@@ -26,4 +17,10 @@
 
     <bean id="reportingGateway" class="org.motechproject.ananya.kilkari.reporting.gateway.StubReportingGateway"/>
 
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="url" value="jdbc:postgresql://localhost/ananya/"/>
+        <property name="username" value="postgres"/>
+        <property name="password" value="password"/>
+    </bean>
 </beans>

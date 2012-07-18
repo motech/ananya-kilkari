@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
+import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.gateway.StubOnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
@@ -86,6 +87,21 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
 
         CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
         assertNotNull(campaignMessage);
+    }
+
+    @Test
+    public void shouldUpdateTheCampaignMessage() {
+        String subscriptionId = "subscriptionId";
+        String messageId = "messageId";
+        CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, messageId, "1234567890", null);
+        allCampaignMessages.add(campaignMessage);
+        assertEquals(CampaignMessageStatus.NEW, campaignMessage.getStatus());
+        campaignMessage.markDidNotPickup();
+
+        campaignMessageService.update(campaignMessage);
+
+        CampaignMessage updatedCampaignMessage = allCampaignMessages.find("subscriptionId", "messageId");
+        assertEquals(CampaignMessageStatus.DNP, updatedCampaignMessage.getStatus());
     }
 
     @Test

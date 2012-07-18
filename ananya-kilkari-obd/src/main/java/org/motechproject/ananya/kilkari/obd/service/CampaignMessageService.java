@@ -94,6 +94,10 @@ public class CampaignMessageService {
         }
     }
 
+    public void update(CampaignMessage campaignMessage) {
+        allCampaignMessages.update(campaignMessage);
+    }
+
     private interface GatewayAction {
         public void send(String content);
     }

@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.service;
 import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
+import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.scheduler.context.EventContext;
@@ -33,5 +34,9 @@ public class OBDRequestPublisher {
 
     public void publishInvalidCallDeliveryFailureRecord(InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord) {
         eventContext.send(OBDEventKeys.PROCESS_INVALID_CALL_DELIVERY_FAILURE_RECORD, invalidCallDeliveryFailureRecord);
+    }
+
+    public void publishValidCallDeliveryFailureRecord(ValidCallDeliveryFailureRecordObject validCallDeliveryFailureRecordObject) {
+        eventContext.send(OBDEventKeys.PROCESS_VALID_CALL_DELIVERY_FAILURE_RECORD, validCallDeliveryFailureRecordObject);
     }
 }

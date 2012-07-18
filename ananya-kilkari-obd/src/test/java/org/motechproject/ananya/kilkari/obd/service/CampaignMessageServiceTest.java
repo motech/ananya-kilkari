@@ -247,4 +247,12 @@ public class CampaignMessageServiceTest {
 
         verify(allCampaignMessages).delete(campaignMessage);
     }
+
+    @Test
+    public void shouldUpdateACampaignMessage() {
+        CampaignMessage campaignMessage = new CampaignMessage();
+        campaignMessageService.update(campaignMessage);
+
+        verify(allCampaignMessages).update(campaignMessage);
+    }
 }

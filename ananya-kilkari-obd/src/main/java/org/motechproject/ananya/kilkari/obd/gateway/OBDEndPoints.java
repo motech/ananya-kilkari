@@ -39,5 +39,9 @@ public class OBDEndPoints {
     public String getRetryMessageDeliveryUrlQueryString() {
         return obdProperties.getProperty("obd.retry.message.delivery.url.query.string");
     }
+
+    public Integer getMaximumRetryCount() {
+        return Integer.parseInt(obdProperties.getProperty("obd.message.max.retry.count"));
+    }
 }
 

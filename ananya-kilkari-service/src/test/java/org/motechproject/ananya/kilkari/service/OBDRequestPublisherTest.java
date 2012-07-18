@@ -9,6 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
+import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
@@ -61,5 +62,13 @@ public class OBDRequestPublisherTest {
         obdRequestPublisher.publishInvalidCallDeliveryFailureRecord(invalidCallDeliveryFailureRecord);
 
         verify(eventContext).send(OBDEventKeys.PROCESS_INVALID_CALL_DELIVERY_FAILURE_RECORD, invalidCallDeliveryFailureRecord);
+    }
+
+    @Test
+    public void shouldPublishValidCallDeliveryFailureRecord() {
+        ValidCallDeliveryFailureRecordObject validCallDeliveryFailureRecordObject = mock(ValidCallDeliveryFailureRecordObject.class);
+        obdRequestPublisher.publishValidCallDeliveryFailureRecord(validCallDeliveryFailureRecordObject);
+
+        verify(eventContext).send(OBDEventKeys.PROCESS_VALID_CALL_DELIVERY_FAILURE_RECORD, validCallDeliveryFailureRecordObject);
     }
 }

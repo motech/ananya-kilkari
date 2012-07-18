@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -9,14 +11,15 @@ import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.scheduler.MotechSchedulerService;
+import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -31,11 +34,19 @@ public class KilkariSubscriptionServiceTest {
     private KilkariMessageCampaignService kilkariMessageCampaignService;
     @Mock
     private SubscriptionStateHandlerFactory subscriptionStateHandlerFactory;
+    @Mock
+    private MotechSchedulerService motechSchedulerService;
 
     @Before
     public void setup() {
         initMocks(this);
-        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, kilkariMessageCampaignService);
+        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, kilkariMessageCampaignService, motechSchedulerService);
+        DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
+    }
+
+    @After
+    public void clear() {
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
@@ -68,9 +79,9 @@ public class KilkariSubscriptionServiceTest {
         verify(kilkariMessageCampaignService).start(captor.capture());
         KilkariMessageCampaignRequest kilkariMessageCampaignRequest = captor.getValue();
         assertNotNull(kilkariMessageCampaignRequest.getExternalId());
-        assertEquals(pack.name(),kilkariMessageCampaignRequest.getSubscriptionPack());
+        assertEquals(pack.name(), kilkariMessageCampaignRequest.getSubscriptionPack());
 
-        assertEquals(subscriptionRequest.getCreatedAt().toLocalDate(),kilkariMessageCampaignRequest.getSubscriptionCreationDate().toLocalDate());
+        assertEquals(subscriptionRequest.getCreatedAt().toLocalDate(), kilkariMessageCampaignRequest.getSubscriptionCreationDate().toLocalDate());
     }
 
     @Test
@@ -94,5 +105,23 @@ public class KilkariSubscriptionServiceTest {
         Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(susbscriptionid);
 
         assertEquals(exptectedSubscription, subscription);
+    }
+
+    @Test
+    public void shouldScheduleASubscriptionCompletionEvent() {
+        String subscriptionId = "subscriptionId";
+        DateTime now = DateTime.now();
+        Subscription mockedSubscription = mock(Subscription.class);
+        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+
+        kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(mockedSubscription);
+
+        ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
+        verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
+        RunOnceSchedulableJob runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
+        assertEquals(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, runOnceSchedulableJob.getMotechEvent().getSubject());
+        assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
+        assertEquals(ProcessSubscriptionRequest.class, runOnceSchedulableJob.getMotechEvent().getParameters().get("0").getClass());
+        assertEquals(now.plusDays(3).toDate(), runOnceSchedulableJob.getStartDate());
     }
 }

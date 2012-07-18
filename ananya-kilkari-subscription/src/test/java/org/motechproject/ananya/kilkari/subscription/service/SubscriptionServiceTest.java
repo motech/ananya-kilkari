@@ -385,6 +385,29 @@ public class SubscriptionServiceTest {
         assertEquals(subscription.getSubscriptionId(), actualProcessSubscriptionRequest.getSubscriptionId());
     }
 
+    @Test
+    public void shouldProcessSubscriptionCompletion() {
+        String msisdn = "1234567890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.SEVEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.subscriptionComplete(subscriptionId);
+
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
+        verify(allSubscriptions).update(subscriptionArgumentCaptor.capture());
+        Subscription actualSubscription = subscriptionArgumentCaptor.getValue();
+        Assert.assertEquals(msisdn, actualSubscription.getMsisdn());
+        Assert.assertEquals(SubscriptionStatus.PENDING_COMPLETION, actualSubscription.getStatus());
+
+        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+        verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(SubscriptionStatus.PENDING_COMPLETION.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals("Subscription completed", subscriptionStateChangeReportRequest.getReason());
+    }
+
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {
         return new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).build();
     }

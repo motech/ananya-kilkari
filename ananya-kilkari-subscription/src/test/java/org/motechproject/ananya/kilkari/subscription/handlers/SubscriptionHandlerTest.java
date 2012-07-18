@@ -77,6 +77,27 @@ public class SubscriptionHandlerTest {
         verify(subscriptionService).deactivationRequested(subscriptionId);
     }
 
+    @Test
+    public void shouldHandleSubscriptionComplete() {
+        final String msisdn = "9988776655";
+        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        final String subscriptionId = "abcd1234";
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
+
+        new SubscriptionHandler(onMobileSubscriptionGateway, subscriptionService).handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
+
+        ArgumentCaptor<ProcessSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
+        verify(onMobileSubscriptionGateway).deactivateSubscription(processSubscriptionRequestArgumentCaptor.capture());
+        ProcessSubscriptionRequest processSubscriptionRequest = processSubscriptionRequestArgumentCaptor.getValue();
+
+        assertEquals(msisdn, processSubscriptionRequest.getMsisdn());
+        assertEquals(null, processSubscriptionRequest.getChannel());
+        assertEquals(pack, processSubscriptionRequest.getPack());
+        assertEquals(subscriptionId, processSubscriptionRequest.getSubscriptionId());
+
+        verify(subscriptionService).subscriptionComplete(subscriptionId);
+    }
+
     @Test(expected = RuntimeException.class)
     public void shouldThrowExceptionsRaisedByOnMobileSubscriptionServiceToCreateAnActivationRequest() {
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", null);}};

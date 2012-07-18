@@ -71,11 +71,29 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldChangeStatusOfSubscriptionDeactivatedWithDeactivatedDate() {
+    public void shouldChangeStatusToDeactivatedOnDeactivationOnlyIfPriorStatusIsNotPendingCompleted() {
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
         subscription.deactivate();
 
         assertEquals(SubscriptionStatus.DEACTIVATED, subscription.getStatus());
+    }
+    
+    @Test
+    public void shouldChangeStatusToCompletedOnDeactivationOnlyIfPriorStatusIsPendingCompleted() {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
+        subscription.deactivate();
+
+        assertEquals(SubscriptionStatus.COMPLETED, subscription.getStatus());
+    }
+
+    @Test
+    public void shouldChangeStatusOfSubscriptionToPendingCompletion() {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        subscription.complete();
+
+        assertEquals(SubscriptionStatus.PENDING_COMPLETION, subscription.getStatus());
     }
 
     @Test

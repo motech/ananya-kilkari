@@ -130,6 +130,15 @@ public class SubscriptionService {
         });
     }
 
+    public void subscriptionComplete(String subscriptionId) {
+        updateStatusAndReport(subscriptionId, DateTime.now(), "Subscription completed", null, null, new Action<Subscription>() {
+            @Override
+            public void perform(Subscription subscription) {
+                subscription.complete();
+            }
+        });
+    }
+
     public Subscription findBySubscriptionId(String subscriptionId) {
         return allSubscriptions.findBySubscriptionId(subscriptionId);
     }
@@ -141,10 +150,10 @@ public class SubscriptionService {
         reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscription.getSubscriptionId(), subscription.getStatus().name(), updatedOn, reason, operator, graceCount));
     }
 
+
     private void sendProcessSubscriptionEvent(ProcessSubscriptionRequest processSubscriptionRequest) {
         onMobileSubscriptionManagerPublisher.processActivation(processSubscriptionRequest);
     }
-
 
     private void sendReportSubscriptionCreationEvent(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {
         reportingService.reportSubscriptionCreation(subscriptionCreationReportRequest);

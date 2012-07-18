@@ -79,6 +79,9 @@ public class KilkariCampaignService {
 
             boolean renewed = campaignMessageAlert.isRenewed();
             processExistingCampaignMessageAlert(subscription, messageId, renewed, campaignMessageAlert);
+
+            if (campaignMessageIdStrategy.hasPackBeenCompleted(subscription))
+                kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(subscription);
         }
     }
 

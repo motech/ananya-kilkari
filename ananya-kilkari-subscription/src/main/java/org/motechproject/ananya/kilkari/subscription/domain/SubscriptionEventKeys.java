@@ -6,4 +6,5 @@ public class SubscriptionEventKeys {
     public static final String DEACTIVATE_SUBSCRIPTION = "org.motechproject.ananya.kilkari.domain.process.osm.deactivate.subscription";
     public static final String PROCESS_CALLBACK_REQUEST = "org.motechproject.ananya.kilkari.domain.process.subscription.subscriptionCallback.request";
     public static final String PROCESS_SUBSCRIBER_CARE_REQUEST = "org.motechproject.ananya.kilkari.domain.process.subscriber.care.request";
+    public static final String SUBSCRIPTION_COMPLETE = "org.motechproject.ananya.kilkari.domain.process.subscription.complete";
 }

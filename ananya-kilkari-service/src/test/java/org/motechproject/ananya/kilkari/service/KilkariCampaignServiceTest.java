@@ -312,4 +312,19 @@ public class KilkariCampaignServiceTest {
 
         verify(obdRequestsPublisher).publishInvalidCallRecordsRequest(invalidCallRecordsRequest);
     }
+
+    @Test
+    public void shouldScheduleUnsubscriptionWhenPackIsCompleted() {
+        String subscriptionId = "subscriptionId";
+        Subscription mockedSubscription = mock(Subscription.class);
+        CampaignMessageAlert mockedCampaignMessageAlert = mock(CampaignMessageAlert.class);
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
+        when(campaignMessageIdStrategy.hasPackBeenCompleted(mockedSubscription)).thenReturn(true);
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(mockedCampaignMessageAlert);
+
+        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
+
+        verify(kilkariSubscriptionService).scheduleSubscriptionPackCompletionEvent(mockedSubscription);
+    }
 }

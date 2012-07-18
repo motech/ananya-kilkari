@@ -147,7 +147,14 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     public void deactivate() {
-        setStatus(SubscriptionStatus.DEACTIVATED);
+        if (SubscriptionStatus.PENDING_COMPLETION.equals(status))
+            setStatus(SubscriptionStatus.COMPLETED);
+        else
+            setStatus(SubscriptionStatus.DEACTIVATED);
+    }
+
+    public void complete() {
+        setStatus(SubscriptionStatus.PENDING_COMPLETION);
     }
 
     public DateTime endDate() {

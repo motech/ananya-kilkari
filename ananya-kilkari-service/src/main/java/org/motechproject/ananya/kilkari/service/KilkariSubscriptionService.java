@@ -29,7 +29,6 @@ public class KilkariSubscriptionService {
     private KilkariMessageCampaignService kilkariMessageCampaignService;
     private MotechSchedulerService motechSchedulerService;
 
-    public static final String SUBSCRIPTION_ID_PARAMETER_KEY = "subscription.id";
     public static final int BUFFER_DAYS_TO_ALLOW_RENEWAL = 3;
     private final Logger LOGGER = LoggerFactory.getLogger(KilkariSubscriptionService.class);
 

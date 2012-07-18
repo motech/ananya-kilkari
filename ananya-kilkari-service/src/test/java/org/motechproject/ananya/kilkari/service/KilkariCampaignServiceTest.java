@@ -203,7 +203,7 @@ public class KilkariCampaignServiceTest {
 
         String subscriptionId = "mysubscriptionid";
         String messageId = "mymessageid";
-        Subscription subscription = new Subscription();
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId");
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -315,17 +315,16 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldScheduleUnsubscriptionWhenPackIsCompleted() {
-        String subscriptionId = "subscriptionId";
-        Subscription mockedSubscription = mock(Subscription.class);
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(59));
+        String subscriptionId = subscription.getSubscriptionId();
         CampaignMessageAlert mockedCampaignMessageAlert = mock(CampaignMessageAlert.class);
 
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
-        when(campaignMessageIdStrategy.hasPackBeenCompleted(mockedSubscription)).thenReturn(true);
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(mockedCampaignMessageAlert);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
 
-        verify(kilkariSubscriptionService).scheduleSubscriptionPackCompletionEvent(mockedSubscription);
+        verify(kilkariSubscriptionService).scheduleSubscriptionPackCompletionEvent(subscription);
     }
 
     @Test

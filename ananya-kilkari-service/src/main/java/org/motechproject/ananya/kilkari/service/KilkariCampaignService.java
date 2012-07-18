@@ -1,24 +1,20 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequestMapper;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
-import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
+import org.motechproject.ananya.kilkari.utils.SubscriptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +78,7 @@ public class KilkariCampaignService {
             boolean renewed = campaignMessageAlert.isRenewed();
             processExistingCampaignMessageAlert(subscription, messageId, renewed, campaignMessageAlert);
 
-            if (campaignMessageIdStrategy.hasPackBeenCompleted(subscription))
+            if (SubscriptionUtils.hasPackBeenCompleted(subscription))
                 kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(subscription);
         }
     }

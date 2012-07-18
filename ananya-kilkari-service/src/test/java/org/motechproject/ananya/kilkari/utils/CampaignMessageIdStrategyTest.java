@@ -7,8 +7,6 @@ import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class CampaignMessageIdStrategyTest {
@@ -77,29 +75,5 @@ public class CampaignMessageIdStrategyTest {
         String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
 
         assertEquals("WEEK34", messageId);
-    }
-
-    @Test
-    public void shouldReturnTrueIfThePackHasBeenCompleted() {
-        Subscription fifteenMonthsubscription = new Subscription("9999999999", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(59));
-        assertTrue(new CampaignMessageIdStrategy().hasPackBeenCompleted(fifteenMonthsubscription));
-
-        Subscription twelveMonthsubscription = new Subscription("9999999999", SubscriptionPack.TWELVE_MONTHS, DateTime.now().minusWeeks(47));
-        assertTrue(new CampaignMessageIdStrategy().hasPackBeenCompleted(twelveMonthsubscription));
-
-        Subscription sevenMonthsubscription = new Subscription("9999999999", SubscriptionPack.SEVEN_MONTHS, DateTime.now().minusWeeks(27));
-        assertTrue(new CampaignMessageIdStrategy().hasPackBeenCompleted(sevenMonthsubscription));
-    }
-
-    @Test
-    public void shouldReturnFalseIfThePackHasNotBeenCompleted() {
-        Subscription fifteenMonthsubscription = new Subscription("9999999999", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(58));
-        assertFalse(new CampaignMessageIdStrategy().hasPackBeenCompleted(fifteenMonthsubscription));
-
-        Subscription twelveMonthsubscription = new Subscription("9999999999", SubscriptionPack.TWELVE_MONTHS, DateTime.now().minusWeeks(46));
-        assertFalse(new CampaignMessageIdStrategy().hasPackBeenCompleted(twelveMonthsubscription));
-
-        Subscription sevenMonthsubscription = new Subscription("9999999999", SubscriptionPack.SEVEN_MONTHS, DateTime.now().minusWeeks(26));
-        assertFalse(new CampaignMessageIdStrategy().hasPackBeenCompleted(sevenMonthsubscription));
     }
 }

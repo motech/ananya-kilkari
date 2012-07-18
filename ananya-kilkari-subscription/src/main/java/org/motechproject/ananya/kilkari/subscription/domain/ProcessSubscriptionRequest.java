@@ -1,5 +1,8 @@
 package org.motechproject.ananya.kilkari.subscription.domain;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 import java.io.Serializable;
 
 public class ProcessSubscriptionRequest implements Serializable {
@@ -30,4 +33,15 @@ public class ProcessSubscriptionRequest implements Serializable {
     public String getSubscriptionId() {
         return subscriptionId;
     }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append("msisdn", msisdn)
+                .append("pack", pack)
+                .append("channel", channel)
+                .append("subscriptionId", subscriptionId)
+                .toString();
+    }
+
 }

@@ -16,9 +16,13 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecordObject;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -31,8 +35,10 @@ public class OnMobileOBDGatewayImplTest {
 
     @Mock
     private HttpClient httpClient;
-
-    private Properties obdProperties;
+    @Mock
+    private RestTemplate restTemplate;
+    @Mock
+    private OBDEndPoints obdEndPoints;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -41,14 +47,14 @@ public class OnMobileOBDGatewayImplTest {
     @Before
     public void setUp() {
         initMocks(this);
-        obdProperties = new Properties();
-        obdProperties.put("obd.message.delivery.base.url", "mybaseurl");
-        obdProperties.put("obd.message.delivery.filename", "myfile.txt");
-        obdProperties.put("obd.message.delivery.file", "myfile");
-        obdProperties.put("obd.new.message.delivery.url.query.string", "?startDate=%s130000&endDate=%s160000");
-        obdProperties.put("obd.retry.message.delivery.url.query.string", "?startDate=%s180000&endDate=%s200000");
+        when(obdEndPoints.getMessageDeliveryBaseUrl()).thenReturn("mybaseurl");
+        when(obdEndPoints.getMessageDeliveryFileName()).thenReturn("myfile.txt");
+        when(obdEndPoints.getMessageDeliveryFile()).thenReturn("myfile");
+        when(obdEndPoints.getNewMessageDeliveryUrlQueryString()).thenReturn("?startDate=%s130000&endDate=%s160000");
+        when(obdEndPoints.getRetryMessageDeliveryUrlQueryString()).thenReturn("?startDate=%s180000&endDate=%s200000");
+        when(obdEndPoints.getFailureReportUrl()).thenReturn("failureUrl");
 
-        onMobileOBDGateway = new OnMobileOBDGatewayImpl(httpClient, obdProperties);
+        onMobileOBDGateway = new OnMobileOBDGatewayImpl(httpClient, obdEndPoints, restTemplate);
     }
 
     @Test
@@ -140,5 +146,31 @@ public class OnMobileOBDGatewayImplTest {
             actualContent += line;
         }
         return actualContent;
+    }
+
+    @Test
+    public void shouldSendInvalidFailureRecordsToObd() {
+        InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord = new InvalidCallDeliveryFailureRecord();
+        ArrayList<InvalidCallDeliveryFailureRecordObject> recordObjects = new ArrayList<>();
+        recordObjects.add(new InvalidCallDeliveryFailureRecordObject("msisdn1", "subscriptionId1", "description1"));
+        recordObjects.add(new InvalidCallDeliveryFailureRecordObject("msisdn2", "subscriptionId2", "description2"));
+        invalidCallDeliveryFailureRecord.setRecordObjects(recordObjects);
+
+        onMobileOBDGateway.sendInvalidFailureRecord(invalidCallDeliveryFailureRecord);
+
+        ArgumentCaptor<InvalidCallDeliveryFailureRecord> invalidCallDeliveryFailureRecordArgumentCaptor = ArgumentCaptor.forClass(InvalidCallDeliveryFailureRecord.class);
+        ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), invalidCallDeliveryFailureRecordArgumentCaptor.capture());
+        String actualUrl = urlArgumentCaptor.getValue();
+        List<InvalidCallDeliveryFailureRecordObject> actualRecordObjects = invalidCallDeliveryFailureRecordArgumentCaptor.getValue().getRecordObjects();
+
+        assertEquals("failureUrl", actualUrl);
+        assertEquals(2, actualRecordObjects.size());
+        assertEquals("msisdn1",actualRecordObjects.get(0).getMsisdn());
+        assertEquals("subscriptionId1",actualRecordObjects.get(0).getSubscriptionId());
+        assertEquals("description1",actualRecordObjects.get(0).getDescription());
+        assertEquals("msisdn2",actualRecordObjects.get(1).getMsisdn());
+        assertEquals("subscriptionId2",actualRecordObjects.get(1).getSubscriptionId());
+        assertEquals("description2",actualRecordObjects.get(1).getDescription());
     }
 }

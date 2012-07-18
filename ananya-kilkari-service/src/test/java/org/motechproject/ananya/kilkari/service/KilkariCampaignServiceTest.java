@@ -8,8 +8,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
@@ -326,5 +326,12 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
 
         verify(kilkariSubscriptionService).scheduleSubscriptionPackCompletionEvent(mockedSubscription);
+    }
+
+    @Test
+    public void shouldPublishCallDeliveryFailureRecords() {
+        CallDeliveryFailureRecord callDeliveryFailureRecord = Mockito.mock(CallDeliveryFailureRecord.class);
+        kilkariCampaignService.processCallDeliveryFailureRequest(callDeliveryFailureRecord);
+        verify(obdRequestsPublisher).publishCallDeliveryFailureRecord(callDeliveryFailureRecord);
     }
 }

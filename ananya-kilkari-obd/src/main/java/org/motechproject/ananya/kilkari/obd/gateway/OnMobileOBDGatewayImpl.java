@@ -11,55 +11,57 @@ import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
 import org.motechproject.ananya.kilkari.obd.profile.OBDProductionProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Properties;
 
 @Component
 @OBDProductionProfile
 public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
 
     private HttpClient obdHttpClient;
-    private Properties obdProperties;
+    private OBDEndPoints obdEndPoints;
+    private RestTemplate restTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(OnMobileOBDGatewayImpl.class);
-    private static final String DELIVERY_BASE_URL_PROPERTY = "obd.message.delivery.base.url";
-    private static final String DELIVERY_FILENAME_PROPERTY = "obd.message.delivery.filename";
-    private static final String DELIVERY_FILE_PROPERTY = "obd.message.delivery.file";
-    private static final String NEW_DELIVERY_URL_QUERY_STRING = "obd.new.message.delivery.url.query.string";
-    private static final String RETRY_DELIVERY_URL_QUERY_STRING = "obd.retry.message.delivery.url.query.string";
-
 
     @Autowired
-    public OnMobileOBDGatewayImpl(HttpClient obdHttpClient, Properties obdProperties) {
+    public OnMobileOBDGatewayImpl(HttpClient obdHttpClient, OBDEndPoints obdEndPoints, RestTemplate kilkariRestTemplate) {
         this.obdHttpClient = obdHttpClient;
-        this.obdProperties = obdProperties;
+        this.obdEndPoints = obdEndPoints;
+        this.restTemplate = kilkariRestTemplate;
     }
 
     @Override
     public void sendNewMessages(String content) {
-        String url = getUrl(NEW_DELIVERY_URL_QUERY_STRING);
+        String url = getUrl(obdEndPoints.getNewMessageDeliveryUrlQueryString());
         send(content, url);
     }
 
     @Override
     public void sendRetryMessages(String content) {
-        String url = getUrl(RETRY_DELIVERY_URL_QUERY_STRING);
+        String url = getUrl(obdEndPoints.getRetryMessageDeliveryUrlQueryString());
         send(content, url);
+    }
+
+    @Override
+    public void sendInvalidFailureRecord(InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord) {
+        restTemplate.postForLocation(obdEndPoints.getFailureReportUrl(), invalidCallDeliveryFailureRecord);
     }
 
     private void send(String content, String url) {
         logger.info(String.format("Uploading the campaign messages to url: %s\nContent:\n%s", url, content));
 
-        String fileName = obdProperties.getProperty(DELIVERY_FILENAME_PROPERTY);
-        String file = obdProperties.getProperty(DELIVERY_FILE_PROPERTY);
+        String fileName = obdEndPoints.getMessageDeliveryFileName();
+        String file = obdEndPoints.getMessageDeliveryFile();
 
         HttpPost httpPost = new HttpPost(url);
         MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
@@ -76,11 +78,10 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
         }
     }
 
-    private String getUrl(String queryStringProperty) {
-        String baseUrl = obdProperties.getProperty(DELIVERY_BASE_URL_PROPERTY);
+    private String getUrl(String queryString) {
+        String baseUrl = obdEndPoints.getMessageDeliveryBaseUrl();
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
         String date = dateTimeFormatter.print(DateTime.now());
-        String queryString = obdProperties.getProperty(queryStringProperty);
         return String.format(baseUrl + queryString, date, date);
     }
 

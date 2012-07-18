@@ -1,9 +1,12 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
+import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
+import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecordObject;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
@@ -17,6 +20,7 @@ import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -65,6 +69,37 @@ public class OBDControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD call details received successfully for subscriptionId : " + subscriptionId)));
+    }
+
+    @Test
+    public void shouldHandleCallDeliveryFailureRecordFromObd() throws Exception {
+        String callDeliveryFailureRecord1 = createCallDeliveryFailureRecordJSON("subscriptionId1", "msisdn1", "campaignId1", "DNP");
+        String callDeliveryFailureRecord2 = createCallDeliveryFailureRecordJSON("subscriptionId2", "msisdn2", "campaignId2", "DNP");
+        String requestBody = "{\"callrecords\": [" + callDeliveryFailureRecord1 + "," + callDeliveryFailureRecord2 + "]}";
+        mockMvc(obdController)
+                .perform(post("/obd/calldetails").body(requestBody.getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD call delivery failure records received successfully")));
+
+        ArgumentCaptor<CallDeliveryFailureRecord> captor = ArgumentCaptor.forClass(CallDeliveryFailureRecord.class);
+        verify(kilkariCampaignService).processCallDeliveryFailureRequest(captor.capture());
+        CallDeliveryFailureRecord callDeliveryFailureRecord = captor.getValue();
+        List<CallDeliveryFailureRecordObject> callDeliveryFailureRecordObjects = callDeliveryFailureRecord.getCallrecords();
+        assertEquals(2, callDeliveryFailureRecordObjects.size());
+
+        assertNotNull(callDeliveryFailureRecord.getCreatedAt());
+        CallDeliveryFailureRecordObject callDeliveryFailureRecordObject1 = callDeliveryFailureRecordObjects.get(0);
+        assertEquals("msisdn1", callDeliveryFailureRecordObject1.getMsisdn());
+        assertEquals("subscriptionId1", callDeliveryFailureRecordObject1.getSubscriptionId());
+        assertEquals("campaignId1", callDeliveryFailureRecordObject1.getCampaignId());
+        assertEquals("DNP", callDeliveryFailureRecordObject1.getStatusCode());
+
+        CallDeliveryFailureRecordObject callDeliveryFailureRecordObject2 = callDeliveryFailureRecordObjects.get(1);
+        assertEquals("msisdn2", callDeliveryFailureRecordObject2.getMsisdn());
+        assertEquals("subscriptionId2", callDeliveryFailureRecordObject2.getSubscriptionId());
+        assertEquals("campaignId2", callDeliveryFailureRecordObject2.getCampaignId());
+        assertEquals("DNP", callDeliveryFailureRecordObject2.getStatusCode());
     }
 
     @Test
@@ -147,5 +182,10 @@ public class OBDControllerTest {
     private String createInvalidCallRecordJSON(String msisdn, String subscriptionId, String campaignId, String operator, String description) {
         String jsonTemplate = "{\"msisdn\":\"%s\", \"subscriptionId\":\"%s\",\"campaignId\":\"%s\",\"operator\":\"%s\",\"description\":\"%s\"}";
         return String.format(jsonTemplate, msisdn, subscriptionId, campaignId, operator, description);
+    }
+
+    private String createCallDeliveryFailureRecordJSON(String subscriptionId, String msisdn, String campaignId, String statusCode) {
+        String jsonTemplate = "{ \"subscriptionId\":\"%s\",\"msisdn\":\"%s\",\"campaignId\":\"%s\",\"statusCode\":\"%s\"}";
+        return String.format(jsonTemplate, subscriptionId, msisdn, campaignId, statusCode);
     }
 }

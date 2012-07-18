@@ -6,6 +6,8 @@ import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequestMapper;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
@@ -115,11 +117,14 @@ public class KilkariCampaignService {
 
     public void processInvalidCallRecordsRequest(InvalidCallRecordsRequest invalidCallRecordsRequest) {
         obdRequestPublisher.publishInvalidCallRecordsRequest(invalidCallRecordsRequest);
-
     }
 
     public void processSuccessfulCallRequest(OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper) {
         obdRequestPublisher.publishSuccessfulCallRequest(successfulCallRequestWrapper);
+    }
+
+    public void processCallDeliveryFailureRequest(CallDeliveryFailureRecord callDeliveryFailureRecord) {
+        obdRequestPublisher.publishCallDeliveryFailureRecord(callDeliveryFailureRecord);
     }
 
     private void processExistingCampaignMessageAlert(Subscription subscription, String messageId, boolean renewed, CampaignMessageAlert campaignMessageAlert) {

@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.obd.gateway;
 
+import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
 import org.motechproject.ananya.kilkari.obd.profile.OBDTestProfile;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class StubOnMobileOBDGateway implements OnMobileOBDGateway {
 
     private OnMobileOBDGateway behavior;
+    private boolean invalidFailureRecordCalled;
 
     @Override
     public void sendNewMessages(String content) {
@@ -23,6 +25,14 @@ public class StubOnMobileOBDGateway implements OnMobileOBDGateway {
         }
     }
 
+    @Override
+    public void sendInvalidFailureRecord(InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord) {
+        if(verify()) {
+            behavior.sendInvalidFailureRecord(invalidCallDeliveryFailureRecord);
+            invalidFailureRecordCalled = true;
+        }
+    }
+
     private boolean verify() {
         if (behavior == null) {
             System.err.println("WARNING: You need to set behavior before calling this method. Use setBehavior method.");
@@ -33,5 +43,9 @@ public class StubOnMobileOBDGateway implements OnMobileOBDGateway {
 
     public void setBehavior(OnMobileOBDGateway behavior) {
         this.behavior = behavior;
+    }
+
+    public boolean isInvalidFailureRecordCalled() {
+        return invalidFailureRecordCalled;
     }
 }

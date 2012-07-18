@@ -28,4 +28,6 @@
     </bean>
 
     <bean id="obdHttpClient" class="org.apache.http.impl.client.DefaultHttpClient" />
+
+    <bean id="kilkariRestTemplate" class="org.springframework.web.client.RestTemplate" autowire="byName"/>
 </beans>

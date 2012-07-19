@@ -8,16 +8,20 @@ public class SubscriptionUtils {
     public static boolean hasPackBeenCompleted(Subscription subscription) {
         int startWeek = subscription.getPack().getStartWeek();
         int totalWeeks = subscription.getPack().getTotalWeeks();
-        int currentWeek = currentWeek(subscription);
+        int currentWeek = currentSubscriptionPackWeek(subscription);
 
         return currentWeek >= totalWeeks + startWeek;
     }
 
-    public static int currentWeek(Subscription subscription) {
-        int weeksDifference = Weeks.weeksBetween(subscription.getCreationDate(), DateTime.now()).getWeeks();
+    public static int currentSubscriptionPackWeek(Subscription subscription) {
+        int weeksDifference = currentWeek(subscription);
         weeksDifference = adjustPackStartWeek(weeksDifference, subscription);
 
         return weeksDifference + 1;
+    }
+
+    public static int currentWeek(Subscription subscription) {
+        return Weeks.weeksBetween(subscription.getCreationDate(), DateTime.now()).getWeeks();
     }
 
     private static int adjustPackStartWeek(int weeksDifference, Subscription subscription) {

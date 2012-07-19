@@ -13,13 +13,13 @@ public class SubscriptionUtilsTest {
     @Test
     public void shouldReturnCurrentWeekNumberBasedOnSubscriptionCreationDateAndPack() {
         Subscription fifteenMonthSubscription = new Subscription("9999999999", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(2));
-        assertEquals(3, SubscriptionUtils.currentWeek(fifteenMonthSubscription));
+        assertEquals(3, SubscriptionUtils.currentSubscriptionPackWeek(fifteenMonthSubscription));
 
         Subscription twelveMonthSubscription = new Subscription("9999999999", SubscriptionPack.TWELVE_MONTHS, DateTime.now().minusWeeks(2));
-        assertEquals(15, SubscriptionUtils.currentWeek(twelveMonthSubscription));
+        assertEquals(15, SubscriptionUtils.currentSubscriptionPackWeek(twelveMonthSubscription));
         
         Subscription sevenMonthSubscription = new Subscription("9999999999", SubscriptionPack.SEVEN_MONTHS, DateTime.now().minusWeeks(2));
-        assertEquals(35, SubscriptionUtils.currentWeek(sevenMonthSubscription));
+        assertEquals(35, SubscriptionUtils.currentSubscriptionPackWeek(sevenMonthSubscription));
     }
     
     @Test

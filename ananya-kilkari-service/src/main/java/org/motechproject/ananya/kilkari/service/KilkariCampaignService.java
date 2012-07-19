@@ -70,12 +70,12 @@ public class KilkariCampaignService {
             CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
 
             if (campaignMessageAlert == null) {
-                processNewCampaignMessageAlert(subscriptionId, messageId, false);
+                processNewCampaignMessageAlert(subscriptionId, messageId, false, calculateMessageExpiryTime(subscription));
                 return;
             }
 
             boolean renewed = campaignMessageAlert.isRenewed();
-            processExistingCampaignMessageAlert(subscription, messageId, renewed, campaignMessageAlert);
+            processExistingCampaignMessageAlert(subscription, messageId, renewed, campaignMessageAlert, calculateMessageExpiryTime(subscription));
 
             if (SubscriptionUtils.hasPackBeenCompleted(subscription))
                 kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(subscription);
@@ -88,18 +88,19 @@ public class KilkariCampaignService {
             CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
 
             if (campaignMessageAlert == null) {
-                processNewCampaignMessageAlert(subscriptionId, null, true);
+                processNewCampaignMessageAlert(subscriptionId, null, true, null);
                 return;
             }
 
             String messageId = campaignMessageAlert.getMessageId();
-            processExistingCampaignMessageAlert(subscription, messageId, true, campaignMessageAlert);
+            DateTime messageExpiryTime = campaignMessageAlert.getMessageExpiryTime();
+            processExistingCampaignMessageAlert(subscription, messageId, true, campaignMessageAlert, messageExpiryTime);
         }
     }
 
     public void processSuccessfulMessageDelivery(OBDSuccessfulCallRequestWrapper obdRequestWrapper) {
         CampaignMessage campaignMessage = campaignMessageService.find(obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId());
-        if(campaignMessage == null) {
+        if (campaignMessage == null) {
             logger.error(String.format("Campaign Message not present for subscriptionId[%s] and campaignId[%s].",
                     obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId()));
             return;
@@ -122,8 +123,9 @@ public class KilkariCampaignService {
         obdRequestPublisher.publishCallDeliveryFailureRecord(callDeliveryFailureRecord);
     }
 
-    private void processExistingCampaignMessageAlert(Subscription subscription, String messageId, boolean renewed, CampaignMessageAlert campaignMessageAlert) {
-        campaignMessageAlert.updateWith(messageId, renewed);
+    private void processExistingCampaignMessageAlert(Subscription subscription, String messageId, boolean renewed,
+                                                     CampaignMessageAlert campaignMessageAlert, DateTime messageExpiryTime) {
+        campaignMessageAlert.updateWith(messageId, renewed, messageExpiryTime);
 
         if (!campaignMessageAlert.canBeScheduled()) {
             allCampaignMessageAlerts.update(campaignMessageAlert);
@@ -134,8 +136,17 @@ public class KilkariCampaignService {
         allCampaignMessageAlerts.remove(campaignMessageAlert);
     }
 
-    private void processNewCampaignMessageAlert(String subscriptionId, String messageId, boolean renew) {
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, renew);
+    private DateTime calculateMessageExpiryTime(Subscription subscription) {
+        int currentWeek = SubscriptionUtils.currentWeek(subscription);
+        return isActivationWeek(currentWeek) ? null : subscription.getCreationDate().plusWeeks(currentWeek + 1);
+    }
+
+    private boolean isActivationWeek(int currentWeek) {
+        return currentWeek == 0;
+    }
+
+    private void processNewCampaignMessageAlert(String subscriptionId, String messageId, boolean renew, DateTime messageExpiryTime) {
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, renew, messageExpiryTime);
         allCampaignMessageAlerts.add(campaignMessageAlert);
         return;
     }

@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.domain;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
+import org.joda.time.DateTime;
 import org.motechproject.model.MotechBaseDataObject;
 import org.motechproject.util.StringUtil;
 
@@ -17,6 +18,9 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
     @JsonProperty
     private boolean renewed;
 
+    @JsonProperty
+    private DateTime messageExpiryTime;
+
     public CampaignMessageAlert() {
     }
 
@@ -29,6 +33,11 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
         this.subscriptionId = subscriptionId;
         this.messageId = messageId;
         this.renewed = renewed;
+    }
+
+    public CampaignMessageAlert(String subscriptionId, String messageId, boolean renew, DateTime messageExpiryTime) {
+        this(subscriptionId, messageId, renew);
+        this.messageExpiryTime = messageExpiryTime;
     }
 
     public String getSubscriptionId() {
@@ -44,11 +53,16 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
     }
 
     public boolean canBeScheduled() {
-        return renewed && !StringUtil.isNullOrEmpty(messageId);
+        return renewed && !StringUtil.isNullOrEmpty(messageId) && (messageExpiryTime == null || messageExpiryTime.isAfter(DateTime.now()));
     }
 
-    public void updateWith(String messageId, boolean renewed) {
+    public void updateWith(String messageId, boolean renewed, DateTime messageExpiryTime) {
         this.messageId = messageId;
         this.renewed = renewed;
+        this.messageExpiryTime = messageExpiryTime;
+    }
+
+    public DateTime getMessageExpiryTime() {
+        return messageExpiryTime;
     }
 }

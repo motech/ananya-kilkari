@@ -9,6 +9,6 @@ public class CampaignMessageIdStrategy {
     private static final String MESSAGE_ID_FORMAT = "WEEK%s";
 
     public String createMessageId(Subscription subscription) {
-        return String.format(CampaignMessageIdStrategy.MESSAGE_ID_FORMAT, SubscriptionUtils.currentWeek(subscription));
+        return String.format(CampaignMessageIdStrategy.MESSAGE_ID_FORMAT, SubscriptionUtils.currentSubscriptionPackWeek(subscription));
     }
 }

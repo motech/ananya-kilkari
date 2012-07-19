@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class SubscriptionTest {
 
@@ -122,5 +123,41 @@ public class SubscriptionTest {
 
         subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
         assertFalse(subscription.isInProgress());
+    }
+
+    @Test
+    public void shouldReturnTrueIfThePackHasBeenCompleted() {
+        Subscription fifteenMonthSubscription = new Subscription("9999999999", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(59));
+        assertTrue(fifteenMonthSubscription.hasPackBeenCompleted());
+
+        Subscription twelveMonthSubscription = new Subscription("9999999999", SubscriptionPack.TWELVE_MONTHS, DateTime.now().minusWeeks(47));
+        assertTrue(twelveMonthSubscription.hasPackBeenCompleted());
+
+        Subscription sevenMonthSubscription = new Subscription("9999999999", SubscriptionPack.SEVEN_MONTHS, DateTime.now().minusWeeks(27));
+        assertTrue(sevenMonthSubscription.hasPackBeenCompleted());
+    }
+
+    @Test
+    public void shouldReturnFalseIfThePackHasNotBeenCompleted() {
+        Subscription fifteenMonthSubscription = new Subscription("9999999999", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(58));
+        assertFalse(fifteenMonthSubscription.hasPackBeenCompleted());
+
+        Subscription twelveMonthSubscription = new Subscription("9999999999", SubscriptionPack.TWELVE_MONTHS, DateTime.now().minusWeeks(46));
+        assertFalse(twelveMonthSubscription.hasPackBeenCompleted());
+
+        Subscription sevenMonthSubscription = new Subscription("9999999999", SubscriptionPack.SEVEN_MONTHS, DateTime.now().minusWeeks(26));
+        assertFalse(sevenMonthSubscription.hasPackBeenCompleted());
+    }
+
+    @Test
+    public void shouldReturnCurrentWeekNumberBasedOnSubscriptionCreationDateAndPack() {
+        Subscription fifteenMonthSubscription = new Subscription("9999999999", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(2));
+        assertEquals(3, fifteenMonthSubscription.currentWeek());
+
+        Subscription twelveMonthSubscription = new Subscription("9999999999", SubscriptionPack.TWELVE_MONTHS, DateTime.now().minusWeeks(2));
+        assertEquals(15, twelveMonthSubscription.currentWeek());
+
+        Subscription sevenMonthSubscription = new Subscription("9999999999", SubscriptionPack.SEVEN_MONTHS, DateTime.now().minusWeeks(2));
+        assertEquals(35, sevenMonthSubscription.currentWeek());
     }
 }

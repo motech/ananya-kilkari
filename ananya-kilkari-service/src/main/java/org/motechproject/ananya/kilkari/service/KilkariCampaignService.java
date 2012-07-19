@@ -13,7 +13,6 @@ import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
-import org.motechproject.ananya.kilkari.utils.SubscriptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +66,9 @@ public class KilkariCampaignService {
         synchronized (getLockName(subscriptionId)) {
             Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
             String messageId = campaignMessageIdStrategy.createMessageId(subscription);
+
+            logger.info(String.format("Processing weekly message alert for subscriptionId: %s, messageId: %s", subscriptionId, messageId));
+
             CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
 
             if (campaignMessageAlert == null) {
@@ -77,13 +79,15 @@ public class KilkariCampaignService {
             boolean renewed = campaignMessageAlert.isRenewed();
             processExistingCampaignMessageAlert(subscription, messageId, renewed, campaignMessageAlert, calculateMessageExpiryTime(subscription));
 
-            if (SubscriptionUtils.hasPackBeenCompleted(subscription))
+            if (subscription.hasPackBeenCompleted())
                 kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(subscription);
         }
     }
 
     public void renewSchedule(String subscriptionId) {
         synchronized (getLockName(subscriptionId)) {
+            logger.info("Processing renew schedule for subscriptionId: %s");
+
             Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
             CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
 
@@ -125,19 +129,22 @@ public class KilkariCampaignService {
 
     private void processExistingCampaignMessageAlert(Subscription subscription, String messageId, boolean renewed,
                                                      CampaignMessageAlert campaignMessageAlert, DateTime messageExpiryTime) {
-        campaignMessageAlert.updateWith(messageId, renewed, messageExpiryTime);
+            campaignMessageAlert.updateWith(messageId, renewed, messageExpiryTime);
+            logger.info(String.format("Found campaign message. Renewed: %s, messageId: %s", campaignMessageAlert.isRenewed(), campaignMessageAlert.getMessageId()));
 
         if (!campaignMessageAlert.canBeScheduled()) {
+            logger.info("Campaign message can be scheduled. Moving it to obd module.");
             allCampaignMessageAlerts.update(campaignMessageAlert);
             return;
         }
 
+        logger.info(String.format("Campaign message can not be scheduled. Updating it with: Renewed: %s, messageId: %s", renewed, messageId));
         campaignMessageService.scheduleCampaignMessage(subscription.getSubscriptionId(), messageId, subscription.getMsisdn(), subscription.getOperator().name());
         allCampaignMessageAlerts.remove(campaignMessageAlert);
     }
 
     private DateTime calculateMessageExpiryTime(Subscription subscription) {
-        int currentWeek = SubscriptionUtils.currentWeek(subscription);
+        int currentWeek = subscription.currentWeek();
         return isActivationWeek(currentWeek) ? null : subscription.getCreationDate().plusWeeks(currentWeek + 1);
     }
 
@@ -146,6 +153,7 @@ public class KilkariCampaignService {
     }
 
     private void processNewCampaignMessageAlert(String subscriptionId, String messageId, boolean renew, DateTime messageExpiryTime) {
+        logger.info(String.format("Creating a new record for campaign message alert - subscriptionId: %s, messageId: %s, renew: %s",subscriptionId,messageId,renew));
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, renew, messageExpiryTime);
         allCampaignMessageAlerts.add(campaignMessageAlert);
         return;

@@ -8,6 +8,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
+import org.joda.time.Weeks;
 import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
 
@@ -163,4 +164,24 @@ public class Subscription extends MotechBaseDataObject {
     public DateTime endDate() {
         return getCreationDate().plusWeeks(getPack().getTotalWeeks());
     }
+
+    public boolean hasPackBeenCompleted() {
+        int startWeek = pack.getStartWeek();
+        int totalWeeks = pack.getTotalWeeks();
+        int currentWeek = currentWeek();
+
+        return currentWeek >= totalWeeks + startWeek;
+    }
+
+    public int currentWeek() {
+        int weeksDifference = Weeks.weeksBetween(creationDate, DateTime.now()).getWeeks();
+        weeksDifference = adjustPackStartWeek(weeksDifference);
+
+        return weeksDifference + 1;
+    }
+
+    private int adjustPackStartWeek(int weeksDifference) {
+        return weeksDifference + pack.getStartWeek();
+    }
+
 }

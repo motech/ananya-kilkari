@@ -144,7 +144,7 @@ public class KilkariCampaignService {
     }
 
     private DateTime calculateMessageExpiryTime(Subscription subscription) {
-        int currentWeek = subscription.currentWeek();
+        int currentWeek = subscription.getWeeksElapsedAfterCreationDate();
         return isActivationWeek(currentWeek) ? null : subscription.getCreationDate().plusWeeks(currentWeek + 1);
     }
 

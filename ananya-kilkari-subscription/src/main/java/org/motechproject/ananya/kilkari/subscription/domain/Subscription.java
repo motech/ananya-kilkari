@@ -166,22 +166,17 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     public boolean hasPackBeenCompleted() {
-        int startWeek = pack.getStartWeek();
-        int totalWeeks = pack.getTotalWeeks();
-        int currentWeek = currentWeek();
-
-        return currentWeek >= totalWeeks + startWeek;
+        int currentWeek = getCurrentWeek();
+        return currentWeek >= pack.getTotalWeeks() + pack.getStartWeek();
     }
 
-    public int currentWeek() {
-        int weeksDifference = Weeks.weeksBetween(creationDate, DateTime.now()).getWeeks();
-        weeksDifference = adjustPackStartWeek(weeksDifference);
-
-        return weeksDifference + 1;
+    public int getCurrentWeek() {
+        int weeksDifference = getWeeksElapsedAfterCreationDate();
+        return weeksDifference + getPack().getStartWeek() + 1;
     }
 
-    private int adjustPackStartWeek(int weeksDifference) {
-        return weeksDifference + pack.getStartWeek();
+    public int getWeeksElapsedAfterCreationDate() {
+        return Weeks.weeksBetween(getCreationDate(), DateTime.now()).getWeeks();
     }
 
 }

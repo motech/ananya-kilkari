@@ -7,11 +7,16 @@
     <script src="../js/utils/raphael-min.js" type="text/javascript"></script>
     <script src="../js/utils/message_campaign.js" type="text/javascript"></script>
     <script type="text/javascript">
-        function doAjax() {
+
+        var schedule;
+
+        function drawSchedule() {
             $.ajax({
                 url:'/ananya-kilkari/messagecampaign/visualize?msisdn=' + $("#msisdn").val(),
                 success:function (data) {
-                    new Schedule(new Date(data.startDate), 3).draw(data);
+                    if(schedule !=null ) schedule.clear();
+                    schedule = new Schedule(new Date(data.startDate), 3);
+                    schedule.draw(data);
                 }
             });
         }
@@ -19,7 +24,8 @@
 </head>
 <body>
 <label for="msisdn">MSISDN</label><input type="text" name="msisdn" id="msisdn"/>
-<button id="visualize" name="visualize" onclick="doAjax()" title="Visualize">Get Message Timings!</button>
+<button id="visualize" name="visualize" onclick="drawSchedule()" title="Visualize">Get Message Timings!</button>
+
 <div id="time">
 </div>
 </body>

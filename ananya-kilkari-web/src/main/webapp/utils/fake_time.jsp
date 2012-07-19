@@ -76,7 +76,14 @@
 </head>
 
 <body>
-Current Time : <%= new Date()%>
+
+<div>
+
+    <form action="fake_time.jsp" method="get">
+        Current Time : <%= new Date()%><input type="submit" value="Refresh"/>
+    </form>
+</div>
+
 <div>
 
     <form action="fake_time.jsp" method="post">

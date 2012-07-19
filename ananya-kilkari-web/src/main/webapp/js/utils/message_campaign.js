@@ -18,13 +18,15 @@ function Schedule(startDate, numberOfTimelinesToDraw) {
   var leftMargin = 25;
   var numberOfWeeksPerTimeline = 20;
   var widthOfEachWeek = 60;
-  var heigthOfEachTimeline = 250;
+  var heigthOfEachTimeline = 200;
 
   var MILLIS_PER_DAY = 86400 * 1000;
   var MILLIS_PER_TIMELINE = (MILLIS_PER_DAY * 7 * numberOfWeeksPerTimeline);
 
   var colors = new Colors();
-  var paper = Raphael(0, 0, leftMargin + (numberOfWeeksPerTimeline * widthOfEachWeek) + 100, numberOfTimelinesToDraw * heigthOfEachTimeline + 300);
+
+  var paper = Raphael(0, 40, leftMargin + (numberOfWeeksPerTimeline * widthOfEachWeek) + 100, numberOfTimelinesToDraw * heigthOfEachTimeline + 300);
+
 
 
   var previouslySeenIdentifier = "";
@@ -38,10 +40,10 @@ function Schedule(startDate, numberOfTimelinesToDraw) {
   };
 
   var drawTimeline = function(weekOffset, yOffset) {
-    var xEndOfTimeline = leftMargin + (numberOfWeeksPerTimeline * widthOfEachWeek);
+    var xEndOfTimeline = leftMargin + (numberOfWeeksPerTimeline * widthOfEachWeek) - widthOfEachWeek;
     paper.path("M " + leftMargin + " " + yOffset + " H " + xEndOfTimeline);
 
-    for(var i = 0; i <= numberOfWeeksPerTimeline; i++) {
+    for(var i = 0; i < numberOfWeeksPerTimeline; i++) {
       var xPosition = (leftMargin + (i * widthOfEachWeek));
       var yPosition = yOffset - 10;
 
@@ -52,7 +54,7 @@ function Schedule(startDate, numberOfTimelinesToDraw) {
       var textBox = text.getBBox(1);
       text.rotate(-30, textBox.x, textBox.y);
 
-      var weeksAfterLMP = paper.text(xPosition, yPosition + 30, i + weekOffset);
+      var weeksAfterLMP = paper.text(xPosition, yPosition + 30, i + weekOffset + 1);
     };
   };
 
@@ -100,6 +102,11 @@ function Schedule(startDate, numberOfTimelinesToDraw) {
   };
 
   return {
+
+    clear: function() {
+        paper.clear();
+    },
+
     draw: function(campaign) {
       for (var i = 0; i < numberOfTimelinesToDraw; i++) {
         drawTimeline(20 * i, (heigthOfEachTimeline / 2) * ((2 * i) + 1));

@@ -31,7 +31,7 @@ public class StubOnMobileSubscriptionGateway implements OnMobileSubscriptionGate
 
     private boolean verify() {
         if (behavior == null) {
-            System.err.println("WARNING: You need to set behavior before calling this method. Use setBehavior method.");
+            System.err.println(String.format("WARNING: %s: You need to set behavior before calling this method. Use setBehavior method.", StubOnMobileSubscriptionGateway.class.getCanonicalName()));
             return false;
         }
         return true;

@@ -1,14 +1,13 @@
-package org.motechproject.ananya.kilkari.smoke;
+package org.motechproject.ananya.kilkari.functional;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
+import org.motechproject.ananya.kilkari.repository.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
-import org.motechproject.ananya.kilkari.smoke.utils.TimedRunner;
 import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -16,18 +15,14 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
+import org.motechproject.ananya.kilkari.utils.TimedRunner;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:applicationKilkariSmokeWithStubsContext.xml")
-public class SubscriptionSmokeTest {
+public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest {
 
     @Autowired
     private AllSubscriptions allSubscriptions;
@@ -60,11 +55,11 @@ public class SubscriptionSmokeTest {
 
     private Subscription waitForSubscriptionToChangeToPendingCompletionStatus(final String subscriptionId) {
         return new TimedRunner<Subscription>(40, 3000) {
-                public Subscription run() {
-                    Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-                    return subscription.getStatus()== SubscriptionStatus.PENDING_COMPLETION? subscription : null;
-                }
-            }.executeWithTimeout();
+            public Subscription run() {
+                Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+                return subscription.getStatus()== SubscriptionStatus.PENDING_COMPLETION? subscription : null;
+            }
+        }.executeWithTimeout();
     }
 
     private void resetCurrentDateToSystemDate() {
@@ -81,4 +76,6 @@ public class SubscriptionSmokeTest {
         allSubscriptions.add(subscription);
         return subscription;
     }
+
+
 }

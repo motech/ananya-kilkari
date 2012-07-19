@@ -20,24 +20,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-config</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-service</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-subscription</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
         </dependency>

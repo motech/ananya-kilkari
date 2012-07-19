@@ -45,6 +45,10 @@ public class StubOnMobileOBDGateway implements OnMobileOBDGateway {
         this.behavior = behavior;
     }
 
+    public void setInvalidFailureRecordCalled(boolean invalidFailureRecordCalled) {
+        this.invalidFailureRecordCalled = invalidFailureRecordCalled;
+    }
+
     public boolean isInvalidFailureRecordCalled() {
         return invalidFailureRecordCalled;
     }

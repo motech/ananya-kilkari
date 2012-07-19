@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 public class StubReportingService implements ReportingService {
 
     private ReportingService behavior;
+    private boolean reportCampaignMessageDeliveryCalled;
 
     @Override
     public SubscriberLocation getLocation(String district, String block, String panchayat) {
@@ -39,11 +40,20 @@ public class StubReportingService implements ReportingService {
     public void reportCampaignMessageDeliveryStatus(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
         if (verify()) {
             behavior.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
+            reportCampaignMessageDeliveryCalled = true;
         }
     }
 
     public void setBehavior(ReportingService behavior) {
         this.behavior = behavior;
+    }
+
+    public boolean isReportCampaignMessageDeliveryCalled() {
+        return reportCampaignMessageDeliveryCalled;
+    }
+
+    public void setReportCampaignMessageDeliveryCalled(boolean reportCampaignMessageDeliveryCalled) {
+        this.reportCampaignMessageDeliveryCalled = reportCampaignMessageDeliveryCalled;
     }
 
     private boolean verify() {

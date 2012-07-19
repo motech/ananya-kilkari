@@ -116,5 +116,11 @@ public class SubscriptionTest {
 
         subscription.setStatus(SubscriptionStatus.DEACTIVATED);
         assertFalse(subscription.isInProgress());
+
+        subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
+        assertFalse(subscription.isInProgress());
+
+        subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
+        assertFalse(subscription.isInProgress());
     }
 }

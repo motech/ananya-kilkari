@@ -113,7 +113,10 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public boolean isInProgress() {
-        return status != SubscriptionStatus.COMPLETED && status != SubscriptionStatus.DEACTIVATED;
+        return status != SubscriptionStatus.COMPLETED &&
+                status != SubscriptionStatus.DEACTIVATED &&
+                status != SubscriptionStatus.PENDING_DEACTIVATION &&
+                status != SubscriptionStatus.PENDING_COMPLETION;
     }
 
     public void activateOnRenewal() {

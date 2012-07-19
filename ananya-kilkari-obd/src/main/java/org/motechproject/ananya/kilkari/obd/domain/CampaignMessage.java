@@ -6,7 +6,7 @@ import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
 
 @TypeDiscriminator("doc.type === 'CampaignMessage'")
-public class CampaignMessage extends MotechBaseDataObject {
+public class CampaignMessage extends MotechBaseDataObject implements Comparable<CampaignMessage> {
 
     @JsonProperty
     private String subscriptionId;
@@ -81,5 +81,10 @@ public class CampaignMessage extends MotechBaseDataObject {
 
     public int getRetryCount() {
         return retryCount;
+    }
+
+    @Override
+    public int compareTo(CampaignMessage message) {
+        return (this.retryCount > message.retryCount ? -1 : (this.retryCount == message.retryCount ? 0 : 1));
     }
 }

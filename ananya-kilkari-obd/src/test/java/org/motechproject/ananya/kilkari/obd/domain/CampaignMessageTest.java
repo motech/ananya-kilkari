@@ -1,6 +1,10 @@
 package org.motechproject.ananya.kilkari.obd.domain;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -64,5 +68,34 @@ public class CampaignMessageTest {
         campaignMessage.markDidNotCall();
         campaignMessage.markSent();
         assertEquals(2, campaignMessage.getRetryCount());
+    }
+
+    @Test
+    public void shouldSortBasedOnRetryCount() {
+        CampaignMessage campaignMessage1 = new CampaignMessage();
+        campaignMessage1.markSent();
+        campaignMessage1.markDidNotPickup();
+        campaignMessage1.markSent();
+        campaignMessage1.markDidNotPickup();
+        campaignMessage1.markSent();
+        assertEquals(2, campaignMessage1.getRetryCount());
+
+        CampaignMessage campaignMessage2 = new CampaignMessage();
+        campaignMessage2.markSent();
+        campaignMessage2.markDidNotPickup();
+        campaignMessage2.markSent();
+        assertEquals(1, campaignMessage2.getRetryCount());
+
+        ArrayList<CampaignMessage> campaignMessages = new ArrayList<>();
+        campaignMessages.add(campaignMessage2);
+        campaignMessages.add(campaignMessage1);
+
+        assertEquals(campaignMessage2, campaignMessages.get(0));
+        assertEquals(campaignMessage1, campaignMessages.get(1));
+
+        Collections.sort(campaignMessages);
+
+        assertEquals(campaignMessage1, campaignMessages.get(0));
+        assertEquals(campaignMessage2, campaignMessages.get(1));
     }
 }

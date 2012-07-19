@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -27,7 +28,9 @@ public class AllCampaignMessages extends MotechBaseRepository<CampaignMessage> {
 
     @View(name = "all_unsent_retry_messages", map = "function(doc) {if(doc.type == 'CampaignMessage' && doc.status == 'DNP' && !doc.sent) {emit([doc.subscriptionId, doc.messageId]);}}")
     public List<CampaignMessage> getAllUnsentRetryMessages() {
-        return queryView("all_unsent_retry_messages");
+        List<CampaignMessage> all_unsent_retry_messages = queryView("all_unsent_retry_messages");
+        Collections.sort(all_unsent_retry_messages);
+        return all_unsent_retry_messages;
     }
 
     @View(name = "find_by_subscriptionId_and_messageId", map = "function(doc) {if(doc.type === 'CampaignMessage') emit([doc.subscriptionId, doc.messageId]);}")

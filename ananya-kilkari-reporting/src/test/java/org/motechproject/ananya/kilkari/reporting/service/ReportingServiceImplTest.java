@@ -62,8 +62,8 @@ public class ReportingServiceImplTest {
     @Test
     public void shouldReportASuccessfulCampaignMessageDelivery() {
         CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = mock(CampaignMessageDeliveryReportRequest.class);
-        reportingServiceImpl.reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
+        reportingServiceImpl.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
 
-        verify(reportingPublisher).reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
+        verify(reportingPublisher).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
     }
 }

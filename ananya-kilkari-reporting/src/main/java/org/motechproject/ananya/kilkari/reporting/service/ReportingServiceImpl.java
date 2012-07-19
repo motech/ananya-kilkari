@@ -38,7 +38,7 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public void reportCampaignMessageDelivered(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
-        reportingPublisher.reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
+    public void reportCampaignMessageDeliveryStatus(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
+        reportingPublisher.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
     }
 }

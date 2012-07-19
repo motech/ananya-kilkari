@@ -263,7 +263,7 @@ public class KilkariCampaignServiceTest {
         inOrder.verify(campaignMessageService).find(subscriptionId, campaignId);
 
         ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
-        inOrder.verify(reportingService).reportCampaignMessageDelivered(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
+        inOrder.verify(reportingService).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
         CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
         inOrder.verify(campaignMessageService).deleteCampaignMessage(campaignMessage);

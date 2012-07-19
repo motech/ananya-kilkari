@@ -81,7 +81,7 @@ public class ReportingPublisherTest {
         String serviceOption = "HELP";
         CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(subscriptionId, msisdn, campaignId, serviceOption, retryCount, callDetailsReportRequest);
 
-        reportingPublisher.reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
+        reportingPublisher.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
 
         ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
         ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -90,7 +90,7 @@ public class ReportingPublisherTest {
         CampaignMessageDeliveryReportRequest actualCampaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
         String eventName = eventArgumentCaptor.getValue();
 
-        assertEquals(ReportingEventKeys.REPORT_CAMPAIGN_MESSAGE_DELIVERED, eventName);
+        assertEquals(ReportingEventKeys.REPORT_CAMPAIGN_MESSAGE_DELIVERY_STATUS, eventName);
         assertEquals(subscriptionId, actualCampaignMessageDeliveryReportRequest.getSubscriptionId());
         assertEquals(msisdn, actualCampaignMessageDeliveryReportRequest.getMsisdn());
         assertEquals(campaignId, actualCampaignMessageDeliveryReportRequest.getCampaignId());

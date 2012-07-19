@@ -109,7 +109,7 @@ public class ReportingServiceImplIT {
         ReportingGateway reportingGateway = mock(ReportingGateway.class);
         stubReportingGateway.setBehavior(reportingGateway);
 
-        reportingService.reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
+        reportingService.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
 
         new TimedRunner(20, 1000) {
             @Override

@@ -36,9 +36,9 @@ public class StubReportingService implements ReportingService {
     }
 
     @Override
-    public void reportCampaignMessageDelivered(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
+    public void reportCampaignMessageDeliveryStatus(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
         if (verify()) {
-            behavior.reportCampaignMessageDelivered(campaignMessageDeliveryReportRequest);
+            behavior.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
         }
     }
 

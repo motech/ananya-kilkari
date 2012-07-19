@@ -21,8 +21,8 @@ public class CallDetailsReportHandler {
         this.reportingGateway = reportingGateway;
     }
 
-    @MotechListener(subjects = {ReportingEventKeys.REPORT_CAMPAIGN_MESSAGE_DELIVERED})
-    public void handleSuccessfulMessageDelivery(MotechEvent event) {
+    @MotechListener(subjects = {ReportingEventKeys.REPORT_CAMPAIGN_MESSAGE_DELIVERY_STATUS})
+    public void handleCampaignMessageDelivery(MotechEvent event) {
         CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = (CampaignMessageDeliveryReportRequest) event.getParameters().get("0");
         logger.info(String.format("Handling report sucessful campaign message delivery event for subscriptionId: %s, msisdn: %s, campaignId: %s, retryCount: %s",
                 campaignMessageDeliveryReportRequest.getSubscriptionId(), campaignMessageDeliveryReportRequest.getMsisdn(),

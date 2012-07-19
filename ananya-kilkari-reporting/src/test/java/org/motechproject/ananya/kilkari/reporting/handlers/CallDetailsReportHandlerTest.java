@@ -30,7 +30,7 @@ public class CallDetailsReportHandlerTest {
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("0", campaignMessageDeliveryReportRequest);
 
-        new CallDetailsReportHandler(reportingGateway).handleSuccessfulMessageDelivery(new MotechEvent(ReportingEventKeys.REPORT_CAMPAIGN_MESSAGE_DELIVERED, parameters));
+        new CallDetailsReportHandler(reportingGateway).handleCampaignMessageDelivery(new MotechEvent(ReportingEventKeys.REPORT_CAMPAIGN_MESSAGE_DELIVERY_STATUS, parameters));
 
         verify(reportingGateway).reportCampaignMessageDelivery(campaignMessageDeliveryReportRequest);
     }
@@ -43,6 +43,6 @@ public class CallDetailsReportHandlerTest {
 
         doThrow(new RuntimeException()).when(reportingGateway).reportCampaignMessageDelivery(any(CampaignMessageDeliveryReportRequest.class));
 
-        new CallDetailsReportHandler(reportingGateway).handleSuccessfulMessageDelivery(new MotechEvent(ReportingEventKeys.REPORT_CAMPAIGN_MESSAGE_DELIVERED, parameters));
+        new CallDetailsReportHandler(reportingGateway).handleCampaignMessageDelivery(new MotechEvent(ReportingEventKeys.REPORT_CAMPAIGN_MESSAGE_DELIVERY_STATUS, parameters));
     }
 }

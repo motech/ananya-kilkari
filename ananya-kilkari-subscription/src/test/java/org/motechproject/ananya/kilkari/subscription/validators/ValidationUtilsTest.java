@@ -83,7 +83,7 @@ public class ValidationUtilsTest {
 
     @Test
     public void assertDateShouldNotReturnFalseForValidDateTimeString() {
-        assertTrue(ValidationUtils.assertDateTimeFormat("21-01-2012 23:56:56"));
+        assertTrue(ValidationUtils.assertDateTimeFormat("21-01-2012 23-56-56"));
     }
 
     @Test

@@ -37,8 +37,8 @@ public class SuccessfulCallRequestValidatorTest {
         successfulCallRequest.setMsisdn("9876543211");
         successfulCallRequest.setServiceOption("UNSUBSCRIBE");
         CallDetailRecord callDetailRecord = new CallDetailRecord();
-        callDetailRecord.setStartTime("25-12-2012 23:56:56");
-        callDetailRecord.setEndTime("25-12-2012 23:57:56");
+        callDetailRecord.setStartTime("25-12-2012 23-56-56");
+        callDetailRecord.setEndTime("25-12-2012 23-57-56");
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
@@ -79,8 +79,8 @@ public class SuccessfulCallRequestValidatorTest {
         successfulCallRequest.setMsisdn("1234567890");
         successfulCallRequest.setServiceOption("");
         CallDetailRecord callDetailRecord = new CallDetailRecord();
-        callDetailRecord.setStartTime("25-12-2012 20:20:20");
-        callDetailRecord.setEndTime("27-12-2012 20:25:20");
+        callDetailRecord.setStartTime("25-12-2012 20-20-20");
+        callDetailRecord.setEndTime("27-12-2012 20-25-20");
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
@@ -97,8 +97,8 @@ public class SuccessfulCallRequestValidatorTest {
         successfulCallRequest.setMsisdn("1234567890");
         successfulCallRequest.setServiceOption(null);
         CallDetailRecord callDetailRecord = new CallDetailRecord();
-        callDetailRecord.setStartTime("25-12-2012 20:20:20");
-        callDetailRecord.setEndTime("27-12-2012 20:25:20");
+        callDetailRecord.setStartTime("25-12-2012 20-20-20");
+        callDetailRecord.setEndTime("27-12-2012 20-25-20");
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
@@ -115,15 +115,15 @@ public class SuccessfulCallRequestValidatorTest {
         successfulCallRequest.setMsisdn("1234567890");
         successfulCallRequest.setServiceOption(null);
         CallDetailRecord callDetailRecord = new CallDetailRecord();
-        callDetailRecord.setStartTime("27-12-2012 21:20:20");
-        callDetailRecord.setEndTime("27-12-2012 20:20:20");
+        callDetailRecord.setStartTime("27-12-2012 21-20-20");
+        callDetailRecord.setEndTime("27-12-2012 20-20-20");
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
         List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
         assertEquals(1,errors.size());
-        assertEquals("Start DateTime[27-12-2012 21:20:20] should not be greater than End DateTime[27-12-2012 20:20:20]",errors.get(0));
+        assertEquals("Start DateTime[27-12-2012 21-20-20] should not be greater than End DateTime[27-12-2012 20-20-20]",errors.get(0));
     }
 
     @Test
@@ -134,8 +134,8 @@ public class SuccessfulCallRequestValidatorTest {
         successfulCallRequest.setMsisdn("9876543211");
         successfulCallRequest.setServiceOption("UNSUBSCRIBE");
         CallDetailRecord callDetailRecord = new CallDetailRecord();
-        callDetailRecord.setStartTime("25-12-2012 23:56:56");
-        callDetailRecord.setEndTime("25-12-2012 23:57:56");
+        callDetailRecord.setStartTime("25-12-2012 23-56-56");
+        callDetailRecord.setEndTime("25-12-2012 23-57-56");
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 

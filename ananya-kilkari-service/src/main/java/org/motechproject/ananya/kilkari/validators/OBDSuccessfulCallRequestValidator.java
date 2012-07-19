@@ -56,7 +56,7 @@ public class OBDSuccessfulCallRequestValidator {
     }
 
     private DateTime parseDateTime(String time) {
-        return DateTimeFormat.forPattern("dd-MM-yyyy HH:mm:ss").parseDateTime(time);
+        return DateTimeFormat.forPattern("dd-MM-yyyy HH-mm-ss").parseDateTime(time);
     }
 
     private void validateCampaignId(String campaignId, List errors) {

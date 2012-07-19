@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.obd.domain;
 import org.apache.commons.lang.StringUtils;
 
 public enum CampaignMessageStatus {
-    NEW, DNP, DNC;
+    NEW, DNP, DNC, SUCCESS;
 
     public static CampaignMessageStatus getFor(String statusCode) {
         final String standardizedStatusCode = StringUtils.trimToEmpty(statusCode).toUpperCase();

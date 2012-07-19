@@ -49,7 +49,7 @@ public class ValidCallDeliveryFailureRecordHandler {
     private void reportCampaignMessageStatus(ValidCallDeliveryFailureRecordObject recordObject, CampaignMessage campaignMessage) {
         String retryCount = ((Integer) campaignMessage.getRetryCount()).toString();
         CallDetailsReportRequest callDetailRecord = new CallDetailsReportRequest(format(recordObject.getCreatedAt()), format(recordObject.getCreatedAt()));
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(recordObject.getSubscriptionId(), recordObject.getMsisdn(), recordObject.getCampaignId(), null, retryCount, callDetailRecord);
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(recordObject.getSubscriptionId(), recordObject.getMsisdn(), recordObject.getCampaignId(), null, retryCount, recordObject.getStatusCode().name(), callDetailRecord);
 
         reportingService.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
     }
@@ -64,7 +64,7 @@ public class ValidCallDeliveryFailureRecordHandler {
     }
 
     private String format(DateTime dateTime) {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy HH-mm-ss");
         return formatter.print(dateTime);
     }
 }

@@ -105,7 +105,7 @@ public class ReportingServiceImplIT {
 
     @Test
     public void shouldReportCampaignMessageDelivery() {
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest("subscriptionId", "msisdn", "campaignId", "serviceOption", "3", new CallDetailsReportRequest("25-12-2012", "27-12-2012"));
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest("subscriptionId", "msisdn", "campaignId", "serviceOption", "3", "SUCCESS", new CallDetailsReportRequest("25-12-2012", "27-12-2012"));
         ReportingGateway reportingGateway = mock(ReportingGateway.class);
         stubReportingGateway.setBehavior(reportingGateway);
 

@@ -106,7 +106,8 @@ public class ValidCallDeliveryFailureRecordHandlerTest {
         String campaignId = "WEEK13";
         String msisdn = "msisdn";
         DateTime createdAt = new DateTime(2012, 12, 25, 23, 23, 23);
-        ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, msisdn, campaignId, CampaignMessageStatus.DNP, createdAt);
+        CampaignMessageStatus status = CampaignMessageStatus.DNP;
+        ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, msisdn, campaignId, status, createdAt);
         parameters.put("0", recordObject);
 
         CampaignMessage campaignMessage = new CampaignMessage();
@@ -125,14 +126,14 @@ public class ValidCallDeliveryFailureRecordHandlerTest {
         verify(campaignMessageService).update(campaignMessageArgumentCaptor.capture());
         CampaignMessage actualCampaignMessage = campaignMessageArgumentCaptor.getValue();
 
-        assertEquals(CampaignMessageStatus.DNP, actualCampaignMessage.getStatus());
+        assertEquals(status, actualCampaignMessage.getStatus());
         assertEquals(msisdn, reportRequest.getMsisdn());
         assertEquals(subscriptionId, reportRequest.getSubscriptionId());
         assertEquals(campaignId, reportRequest.getCampaignId());
         assertEquals("0", reportRequest.getRetryCount());
-        assertEquals("25-12-2012 23:23:23", reportRequest.getCallDetailRecord().getStartTime());
-        assertEquals("25-12-2012 23:23:23", reportRequest.getCallDetailRecord().getEndTime());
+        assertEquals(status.name(), reportRequest.getStatus());
+        assertEquals("25-12-2012 23-23-23", reportRequest.getCallDetailRecord().getStartTime());
+        assertEquals("25-12-2012 23-23-23", reportRequest.getCallDetailRecord().getEndTime());
         assertNull(reportRequest.getServiceOption());
     }
-
 }

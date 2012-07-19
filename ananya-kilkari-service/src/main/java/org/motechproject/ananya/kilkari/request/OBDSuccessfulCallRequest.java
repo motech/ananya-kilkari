@@ -17,6 +17,8 @@ public class OBDSuccessfulCallRequest implements Serializable {
     private String serviceOption;
     @JsonProperty
     private CallDetailRecord callDetailRecord;
+    @JsonProperty
+    private String status;
 
     public void setMsisdn(String msisdn) {
         this.msisdn = msisdn;
@@ -52,6 +54,11 @@ public class OBDSuccessfulCallRequest implements Serializable {
     @JsonIgnore
     public CallDetailRecord getCallDetailRecord() {
         return callDetailRecord;
+    }
+
+    @JsonIgnore
+    public String getStatus() {
+        return status;
     }
 
     @Override

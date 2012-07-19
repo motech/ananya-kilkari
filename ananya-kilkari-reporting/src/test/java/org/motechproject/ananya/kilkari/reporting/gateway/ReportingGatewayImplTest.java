@@ -215,7 +215,8 @@ public class ReportingGatewayImplTest {
         String startTime = "25-12-2012";
         String endTime = "27-12-2012";
         String serviceOption = "HELP";
-        new ReportingGatewayImpl(restTemplate, kilkariProperties).reportCampaignMessageDelivery(new CampaignMessageDeliveryReportRequest(subscriptionId, msisdn, campaignId, serviceOption, retryCount, new CallDetailsReportRequest(startTime, endTime)));
+        String status = "NEW";
+        new ReportingGatewayImpl(restTemplate, kilkariProperties).reportCampaignMessageDelivery(new CampaignMessageDeliveryReportRequest(subscriptionId, msisdn, campaignId, serviceOption, retryCount, status, new CallDetailsReportRequest(startTime, endTime)));
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);

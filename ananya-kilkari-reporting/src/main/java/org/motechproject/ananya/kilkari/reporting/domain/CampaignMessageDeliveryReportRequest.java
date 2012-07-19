@@ -7,14 +7,16 @@ public class CampaignMessageDeliveryReportRequest  implements Serializable {
     private String msisdn;
     private String campaignId;
     private String retryCount;
+    private String status;
     private CallDetailsReportRequest callDetailRecord;
     private String serviceOption;
 
-    public CampaignMessageDeliveryReportRequest(String subscriptionId, String msisdn, String campaignId, String serviceOption, String retryCount, CallDetailsReportRequest callDetailRecord) {
+    public CampaignMessageDeliveryReportRequest(String subscriptionId, String msisdn, String campaignId, String serviceOption, String retryCount, String status, CallDetailsReportRequest callDetailRecord) {
         this.subscriptionId = subscriptionId;
         this.msisdn = msisdn;
         this.campaignId = campaignId;
         this.retryCount = retryCount;
+        this.status = status;
         this.callDetailRecord = callDetailRecord;
         this.serviceOption = serviceOption;
     }
@@ -41,5 +43,9 @@ public class CampaignMessageDeliveryReportRequest  implements Serializable {
 
     public CallDetailsReportRequest getCallDetailRecord() {
         return callDetailRecord;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

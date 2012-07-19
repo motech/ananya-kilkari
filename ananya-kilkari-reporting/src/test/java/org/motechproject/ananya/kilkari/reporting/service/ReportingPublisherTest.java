@@ -79,7 +79,8 @@ public class ReportingPublisherTest {
         String endTime = "27-12-2012";
         CallDetailsReportRequest callDetailsReportRequest = new CallDetailsReportRequest(startTime, endTime);
         String serviceOption = "HELP";
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(subscriptionId, msisdn, campaignId, serviceOption, retryCount, callDetailsReportRequest);
+        String status = "SUCCESS";
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(subscriptionId, msisdn, campaignId, serviceOption, retryCount, status, callDetailsReportRequest);
 
         reportingPublisher.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
 

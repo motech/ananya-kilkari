@@ -8,9 +8,9 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
-import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
+import org.motechproject.ananya.kilkari.obd.contract.*;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
@@ -22,6 +22,7 @@ import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
+import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,13 +53,17 @@ public class KilkariCampaignServiceTest {
     @Mock
     private ReportingService reportingService;
     @Mock
-    private OBDRequestPublisher obdRequestsPublisher;
+    private OBDRequestPublisher obdRequestPublisher;
+    @Mock
+    private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
+    @Mock
+    private ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper;
 
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestsPublisher);
+        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, validCallDeliveryFailureRecordObjectMapper);
     }
 
     @Test
@@ -229,9 +234,9 @@ public class KilkariCampaignServiceTest {
     public void shouldPublishObdCallbackRequest() {
         OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(new OBDSuccessfulCallRequest(), "subscriptionId", DateTime.now(), Channel.IVR);
 
-        kilkariCampaignService.processSuccessfulCallRequest(successfulCallRequestWrapper);
+        kilkariCampaignService.publishSuccessfulCallRequest(successfulCallRequestWrapper);
 
-        verify(obdRequestsPublisher).publishSuccessfulCallRequest(successfulCallRequestWrapper);
+        verify(obdRequestPublisher).publishSuccessfulCallRequest(successfulCallRequestWrapper);
     }
 
     @Test
@@ -308,9 +313,9 @@ public class KilkariCampaignServiceTest {
     public void shouldProcessInvalidCallRecords() {
         InvalidCallRecordsRequest invalidCallRecordsRequest = new InvalidCallRecordsRequest();
 
-        kilkariCampaignService.processInvalidCallRecordsRequest(invalidCallRecordsRequest);
+        kilkariCampaignService.publishInvalidCallRecordsRequest(invalidCallRecordsRequest);
 
-        verify(obdRequestsPublisher).publishInvalidCallRecordsRequest(invalidCallRecordsRequest);
+        verify(obdRequestPublisher).publishInvalidCallRecordsRequest(invalidCallRecordsRequest);
     }
 
     @Test
@@ -330,8 +335,8 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldPublishCallDeliveryFailureRecords() {
         CallDeliveryFailureRecord callDeliveryFailureRecord = Mockito.mock(CallDeliveryFailureRecord.class);
-        kilkariCampaignService.processCallDeliveryFailureRequest(callDeliveryFailureRecord);
-        verify(obdRequestsPublisher).publishCallDeliveryFailureRecord(callDeliveryFailureRecord);
+        kilkariCampaignService.publishCallDeliveryFailureRequest(callDeliveryFailureRecord);
+        verify(obdRequestPublisher).publishCallDeliveryFailureRecord(callDeliveryFailureRecord);
     }
 
     @Test
@@ -444,5 +449,109 @@ public class KilkariCampaignServiceTest {
 
         CampaignMessageAlert campaignMessageAlertArgumentCaptorValue = campaignMessageAlertArgumentCaptor.getValue();
         assertNull(campaignMessageAlertArgumentCaptorValue.getMessageExpiryTime());
+    }
+
+    @Test
+    public void shouldHandleCallDeliveryFailureRecord() {
+        CallDeliveryFailureRecord callDeliveryFailureRecord = new CallDeliveryFailureRecord();
+
+        ArrayList<CallDeliveryFailureRecordObject> callDeliveryFailureRecordObjects = new ArrayList<>();
+        callDeliveryFailureRecordObjects.add(mock(CallDeliveryFailureRecordObject.class));
+        callDeliveryFailureRecord.setCallDeliveryFailureRecordObjects(callDeliveryFailureRecordObjects);
+
+
+        kilkariCampaignService.processCallDeliveryFailureRecord(callDeliveryFailureRecord);
+
+        verify(callDeliveryFailureRecordValidator, times(1)).validate(any(CallDeliveryFailureRecordObject.class));
+    }
+
+    @Test
+    public void shouldPublishErroredOutCallDeliveryFailureRecords() {
+        String msisdn = "12345";
+        String subscriptionId = "abcd";
+        CallDeliveryFailureRecord callDeliveryFailureRecord = new CallDeliveryFailureRecord();
+
+        ArrayList<CallDeliveryFailureRecordObject> callDeliveryFailureRecordObjects = new ArrayList<>();
+        CallDeliveryFailureRecordObject erroredOutCallDeliveryFailureRecordObject = mock(CallDeliveryFailureRecordObject.class);
+        when(erroredOutCallDeliveryFailureRecordObject.getMsisdn()).thenReturn(msisdn);
+        when(erroredOutCallDeliveryFailureRecordObject.getSubscriptionId()).thenReturn(subscriptionId);
+        CallDeliveryFailureRecordObject successfulCallDeliveryFailureRecordObject = mock(CallDeliveryFailureRecordObject.class);
+        callDeliveryFailureRecordObjects.add(erroredOutCallDeliveryFailureRecordObject);
+        callDeliveryFailureRecordObjects.add(successfulCallDeliveryFailureRecordObject);
+        callDeliveryFailureRecord.setCallDeliveryFailureRecordObjects(callDeliveryFailureRecordObjects);
+
+        when(callDeliveryFailureRecordValidator.validate(successfulCallDeliveryFailureRecordObject)).thenReturn(new ArrayList<String>());
+
+        ArrayList<String> errors = new ArrayList<>();
+        errors.add("Some error description");
+        when(callDeliveryFailureRecordValidator.validate(erroredOutCallDeliveryFailureRecordObject)).thenReturn(errors);
+
+        kilkariCampaignService.processCallDeliveryFailureRecord(callDeliveryFailureRecord);
+
+        verify(callDeliveryFailureRecordValidator, times(2)).validate(any(CallDeliveryFailureRecordObject.class));
+
+        ArgumentCaptor<InvalidCallDeliveryFailureRecord> invalidCallDeliveryFailureRecordArgumentCaptor = ArgumentCaptor.forClass(InvalidCallDeliveryFailureRecord.class);
+        verify(obdRequestPublisher).publishInvalidCallDeliveryFailureRecord(invalidCallDeliveryFailureRecordArgumentCaptor.capture());
+        InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord = invalidCallDeliveryFailureRecordArgumentCaptor.getValue();
+        List<InvalidCallDeliveryFailureRecordObject> recordObjects = invalidCallDeliveryFailureRecord.getRecordObjects();
+
+        assertEquals(1, recordObjects.size());
+        assertEquals("Some error description", recordObjects.get(0).getDescription());
+        assertEquals(msisdn, recordObjects.get(0).getMsisdn());
+        assertEquals(subscriptionId, recordObjects.get(0).getSubscriptionId());
+    }
+
+    @Test
+    public void shouldNotPublishToErrorQueueIfErroredOutCallDeliveryFailureRecordsAreEmpty() {
+        CallDeliveryFailureRecord callDeliveryFailureRecord = new CallDeliveryFailureRecord();
+
+        ArrayList<CallDeliveryFailureRecordObject> callDeliveryFailureRecordObjects = new ArrayList<>();
+        CallDeliveryFailureRecordObject successfulCallDeliveryFailureRecordObject = mock(CallDeliveryFailureRecordObject.class);
+        callDeliveryFailureRecordObjects.add(successfulCallDeliveryFailureRecordObject);
+        callDeliveryFailureRecord.setCallDeliveryFailureRecordObjects(callDeliveryFailureRecordObjects);
+
+        when(callDeliveryFailureRecordValidator.validate(successfulCallDeliveryFailureRecordObject)).thenReturn(new ArrayList<String>());
+
+        kilkariCampaignService.processCallDeliveryFailureRecord(callDeliveryFailureRecord);
+
+        verify(callDeliveryFailureRecordValidator, times(1)).validate(any(CallDeliveryFailureRecordObject.class));
+        verify(obdRequestPublisher, never()).publishInvalidCallDeliveryFailureRecord(any(InvalidCallDeliveryFailureRecord.class));
+    }
+
+    @Test
+    public void shouldPublishSuccessfulCallDeliveryFailureRecords() {
+        String msisdn = "12345";
+        String subscriptionId = "abcd";
+        CallDeliveryFailureRecord callDeliveryFailureRecord = new CallDeliveryFailureRecord();
+
+        ArrayList<CallDeliveryFailureRecordObject> callDeliveryFailureRecordObjects = new ArrayList<>();
+        CallDeliveryFailureRecordObject erroredOutCallDeliveryFailureRecordObject = mock(CallDeliveryFailureRecordObject.class);
+        when(erroredOutCallDeliveryFailureRecordObject.getMsisdn()).thenReturn(msisdn);
+        when(erroredOutCallDeliveryFailureRecordObject.getSubscriptionId()).thenReturn(subscriptionId);
+        CallDeliveryFailureRecordObject successfulCallDeliveryFailureRecordObject1 = mock(CallDeliveryFailureRecordObject.class);
+        CallDeliveryFailureRecordObject successfulCallDeliveryFailureRecordObject2 = mock(CallDeliveryFailureRecordObject.class);
+        callDeliveryFailureRecordObjects.add(erroredOutCallDeliveryFailureRecordObject);
+        callDeliveryFailureRecordObjects.add(successfulCallDeliveryFailureRecordObject1);
+        callDeliveryFailureRecordObjects.add(successfulCallDeliveryFailureRecordObject2);
+        callDeliveryFailureRecord.setCallDeliveryFailureRecordObjects(callDeliveryFailureRecordObjects);
+
+        when(callDeliveryFailureRecordValidator.validate(successfulCallDeliveryFailureRecordObject1)).thenReturn(new ArrayList<String>());
+        when(callDeliveryFailureRecordValidator.validate(successfulCallDeliveryFailureRecordObject2)).thenReturn(new ArrayList<String>());
+
+        ValidCallDeliveryFailureRecordObject validCallDeliveryFailureRecordObject1 = mock(ValidCallDeliveryFailureRecordObject.class);
+        ValidCallDeliveryFailureRecordObject validCallDeliveryFailureRecordObject2 = mock(ValidCallDeliveryFailureRecordObject.class);
+        when(validCallDeliveryFailureRecordObjectMapper.mapFrom(successfulCallDeliveryFailureRecordObject1, callDeliveryFailureRecord)).thenReturn(validCallDeliveryFailureRecordObject1);
+        when(validCallDeliveryFailureRecordObjectMapper.mapFrom(successfulCallDeliveryFailureRecordObject2, callDeliveryFailureRecord)).thenReturn(validCallDeliveryFailureRecordObject2);
+
+        ArrayList<String> errors = new ArrayList<>();
+        errors.add("Some error description");
+        when(callDeliveryFailureRecordValidator.validate(erroredOutCallDeliveryFailureRecordObject)).thenReturn(errors);
+
+        kilkariCampaignService.processCallDeliveryFailureRecord(callDeliveryFailureRecord);
+
+        verify(callDeliveryFailureRecordValidator, times(3)).validate(any(CallDeliveryFailureRecordObject.class));
+
+        verify(obdRequestPublisher).publishValidCallDeliveryFailureRecord(validCallDeliveryFailureRecordObject1);
+        verify(obdRequestPublisher).publishValidCallDeliveryFailureRecord(validCallDeliveryFailureRecordObject2);
     }
 }

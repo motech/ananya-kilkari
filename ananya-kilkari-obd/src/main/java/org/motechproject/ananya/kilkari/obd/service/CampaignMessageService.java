@@ -1,11 +1,19 @@
 package org.motechproject.ananya.kilkari.obd.service;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
+import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
+import org.motechproject.ananya.kilkari.obd.gateway.OBDEndPoints;
 import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.AllInvalidCallRecords;
+import org.motechproject.ananya.kilkari.reporting.domain.CallDetailsReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
+import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +29,19 @@ public class CampaignMessageService {
     private OnMobileOBDGateway onMobileOBDGateway;
     private CampaignMessageCSVBuilder campaignMessageCSVBuilder;
     private AllInvalidCallRecords allInvalidCallRecords;
+    private final ReportingService reportingService;
+    private final OBDEndPoints obdEndPoints;
 
     private static final Logger logger = LoggerFactory.getLogger(CampaignMessageService.class);
 
     @Autowired
-    public CampaignMessageService(AllCampaignMessages allCampaignMessages, OnMobileOBDGateway onMobileOBDGateway, CampaignMessageCSVBuilder campaignMessageCSVBuilder, AllInvalidCallRecords allInvalidCallRecords) {
+    public CampaignMessageService(AllCampaignMessages allCampaignMessages, OnMobileOBDGateway onMobileOBDGateway, CampaignMessageCSVBuilder campaignMessageCSVBuilder, AllInvalidCallRecords allInvalidCallRecords, ReportingService reportingService, OBDEndPoints obdEndPoints) {
         this.allCampaignMessages = allCampaignMessages;
         this.onMobileOBDGateway = onMobileOBDGateway;
         this.campaignMessageCSVBuilder = campaignMessageCSVBuilder;
         this.allInvalidCallRecords = allInvalidCallRecords;
+        this.reportingService = reportingService;
+        this.obdEndPoints = obdEndPoints;
     }
 
     public void scheduleCampaignMessage(String subscriptionId, String messageId, String msisdn, String operator) {
@@ -49,7 +61,7 @@ public class CampaignMessageService {
 
     public void sendRetryMessages() {
         List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentRetryMessages();
-        GatewayAction gatewayAction =   new GatewayAction() {
+        GatewayAction gatewayAction = new GatewayAction() {
             @Override
             public void send(String content) {
                 onMobileOBDGateway.sendRetryMessages(content);
@@ -60,7 +72,7 @@ public class CampaignMessageService {
 
     private void sendMessagesToOBD(List<CampaignMessage> messages, GatewayAction gatewayAction) {
         logger.info(String.format("Sending %s campaign messages to obd", messages.size()));
-        if(messages.isEmpty())
+        if (messages.isEmpty())
             return;
         String campaignMessageCSVContent = campaignMessageCSVBuilder.getCSV(messages);
         gatewayAction.send(campaignMessageCSVContent);
@@ -72,7 +84,7 @@ public class CampaignMessageService {
 
     public void deleteCampaignMessageIfExists(String subscriptionId, String messageId) {
         CampaignMessage campaignMessage = find(subscriptionId, messageId);
-        if(campaignMessage != null)
+        if (campaignMessage != null)
             deleteCampaignMessage(campaignMessage);
     }
 
@@ -85,17 +97,50 @@ public class CampaignMessageService {
     }
 
     public void processInvalidCallRecords(ArrayList<InvalidCallRecord> invalidCallRecords) {
-        if(invalidCallRecords.isEmpty()) {
+        if (invalidCallRecords.isEmpty()) {
             return;
         }
         logger.error(String.format("Received obd callback for %s invalid call records.", invalidCallRecords.size()));
-        for(InvalidCallRecord record : invalidCallRecords){
+        for (InvalidCallRecord record : invalidCallRecords) {
             allInvalidCallRecords.add(record);
         }
     }
 
     public void update(CampaignMessage campaignMessage) {
         allCampaignMessages.update(campaignMessage);
+    }
+
+    public void processValidCallDeliveryFailureRecords(ValidCallDeliveryFailureRecordObject recordObject) {
+        CampaignMessage campaignMessage = allCampaignMessages.find(recordObject.getSubscriptionId(), recordObject.getCampaignId());
+        if (campaignMessage == null) {
+            logger.error(String.format("Campaign Message not present for subscriptionId[%s] and campaignId[%s].",
+                    recordObject.getSubscriptionId(), recordObject.getCampaignId()));
+            return;
+        }
+        updateCampaignMessageStatus(campaignMessage);
+        reportCampaignMessageStatus(recordObject, campaignMessage);
+    }
+
+    private void updateCampaignMessageStatus(CampaignMessage campaignMessage) {
+        if (campaignMessage.getRetryCount() == obdEndPoints.getMaximumRetryCount())
+            allCampaignMessages.delete(campaignMessage);
+        else {
+            campaignMessage.markDidNotPickup();
+            allCampaignMessages.update(campaignMessage);
+        }
+    }
+
+    private void reportCampaignMessageStatus(ValidCallDeliveryFailureRecordObject recordObject, CampaignMessage campaignMessage) {
+        String retryCount = ((Integer) campaignMessage.getRetryCount()).toString();
+        CallDetailsReportRequest callDetailRecord = new CallDetailsReportRequest(format(recordObject.getCreatedAt()), format(recordObject.getCreatedAt()));
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(recordObject.getSubscriptionId(), recordObject.getMsisdn(), recordObject.getCampaignId(), null, retryCount, recordObject.getStatusCode().name(), callDetailRecord);
+
+        reportingService.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
+    }
+
+    private String format(DateTime dateTime) {
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy HH-mm-ss");
+        return formatter.print(dateTime);
     }
 
     private interface GatewayAction {

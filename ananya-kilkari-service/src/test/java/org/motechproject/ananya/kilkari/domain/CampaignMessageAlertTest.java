@@ -9,46 +9,20 @@ public class CampaignMessageAlertTest {
 
     @Test
     public void shouldConstructCampaignMessageAlert() {
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true);
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true, DateTime.now().plusWeeks(1));
         assertEquals("subscriptionId", campaignMessageAlert.getSubscriptionId());
         assertEquals("messageId", campaignMessageAlert.getMessageId());
         assertTrue(campaignMessageAlert.isRenewed());
 
-        campaignMessageAlert = new CampaignMessageAlert("", "", false);
+        campaignMessageAlert = new CampaignMessageAlert("", "", false, DateTime.now().plusWeeks(1));
         assertEquals("", campaignMessageAlert.getSubscriptionId());
         assertEquals("", campaignMessageAlert.getMessageId());
         assertFalse(campaignMessageAlert.isRenewed());
-
-        campaignMessageAlert = new CampaignMessageAlert(null, null);
-        assertNull(campaignMessageAlert.getSubscriptionId());
-        assertNull(campaignMessageAlert.getMessageId());
-        assertFalse(campaignMessageAlert.isRenewed());
-    }
-
-    @Test
-    public void shouldBeScheduledIfMessageIdIsPresentAndRenewed() {
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true);
-        assertTrue(campaignMessageAlert.canBeScheduled());
-    }
-
-    @Test
-    public void shouldNotBeScheduledIfNotRenewed() {
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", false);
-        assertFalse(campaignMessageAlert.canBeScheduled());
-    }
-
-    @Test
-    public void shouldNotBeScheduledIfMessageIdIsNotPresent() {
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "", true);
-        assertFalse(campaignMessageAlert.canBeScheduled());
-
-        campaignMessageAlert = new CampaignMessageAlert("subscriptionId", null, true);
-        assertFalse(campaignMessageAlert.canBeScheduled());
     }
 
     @Test
     public void shouldUpdateWithMessageIdSetRenewStatusAndMessageExpiryTime() {
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true);
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true, DateTime.now().plusWeeks(1));
         String expectedMessageId = "newMessageId";
         boolean expectedRenew = false;
         DateTime expectedMessageExpiryTime = DateTime.now().minusWeeks(1);
@@ -57,36 +31,41 @@ public class CampaignMessageAlertTest {
 
         assertEquals(expectedMessageId, campaignMessageAlert.getMessageId());
         assertEquals(expectedRenew, campaignMessageAlert.isRenewed());
-        assertEquals(expectedMessageExpiryTime, campaignMessageAlert.getMessageExpiryTime());
+        assertEquals(expectedMessageExpiryTime, campaignMessageAlert.getMessageExpiryDate());
     }
 
     @Test
-    public void shouldScheduleWhenMessageAlertHasNotExpired() {
+    public void canBeScheduled_IfAlertRaisedAndTriggeredForActivation() {
         DateTime messageExpiryTime = DateTime.now().plusDays(1);
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true, messageExpiryTime);
-
-        boolean canBeScheduled = campaignMessageAlert.canBeScheduled();
-
-        assertTrue(canBeScheduled);
+        assertTrue(campaignMessageAlert.canBeScheduled(CampaignTriggerType.ACTIVATION));
+    }
+    
+    @Test
+    public void canBeScheduled_IfAlertRaisedIsExpiredAndActivated() {
+        DateTime messageExpiryTime = DateTime.now().minusDays(1);
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true, messageExpiryTime);
+        assertTrue(campaignMessageAlert.canBeScheduled(CampaignTriggerType.ACTIVATION));
     }
 
     @Test
-    public void shouldNotScheduleWhenMessageAlertHasExpired() {
-        DateTime messageExpiryTime = DateTime.now().minusHours(1);
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true, messageExpiryTime);
-
-        boolean canBeScheduled = campaignMessageAlert.canBeScheduled();
-
-        assertFalse(canBeScheduled);
+    public void canNotBeScheduled_IfAlertIsNotRaisedAndActivated() {
+        DateTime messageExpiryTime = DateTime.now().plusDays(1);
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", null, true, messageExpiryTime);
+        assertFalse(campaignMessageAlert.canBeScheduled(CampaignTriggerType.ACTIVATION));
     }
 
     @Test
-    public void shouldScheduleWhenMessageExpiryDateHasNotBeenSet() {
-        DateTime messageExpiryTime = null;
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true, messageExpiryTime);
+    public void canNotBeScheduled_IfAlertIsRaisedAndNotActivatedOrRenewed() {
+        DateTime messageExpiryTime = DateTime.now().plusDays(1);
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "WEEK1", false, messageExpiryTime);
+        assertFalse(campaignMessageAlert.canBeScheduled(CampaignTriggerType.WEEKLY_MESSAGE));
+    }
 
-        boolean canBeScheduled = campaignMessageAlert.canBeScheduled();
-
-        assertTrue(canBeScheduled);
+    @Test
+    public void canNotBeScheduled_IfAlertIsRaisedAndRenewedButMessageExpired() {
+        DateTime messageExpiryTime = DateTime.now().minusDays(1);
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "WEEK1", true, messageExpiryTime);
+        assertFalse(campaignMessageAlert.canBeScheduled(CampaignTriggerType.WEEKLY_MESSAGE));
     }
 }

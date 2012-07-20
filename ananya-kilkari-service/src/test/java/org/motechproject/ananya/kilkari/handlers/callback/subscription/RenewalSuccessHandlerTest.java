@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.handlers.callback.subscription.RenewalSuccessHandler;
+import org.motechproject.ananya.kilkari.domain.CampaignTriggerType;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
@@ -37,6 +37,6 @@ public class RenewalSuccessHandlerTest {
         renewalSuccessHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now));
 
         verify(subscriptionService).renewSubscription(subscriptionId, now, Integer.valueOf(graceCount));
-        verify(kilkariCampaignService).renewSchedule(subscriptionId);
+        verify(kilkariCampaignService).activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
     }
 }

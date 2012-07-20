@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.repository;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class AllCampaignMessageAlertsIT extends SpringIntegrationTest {
     public void shouldReturnTheCampaignMessageAlertIfExists() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
-        CampaignMessageAlert actualCampaignMessage = new CampaignMessageAlert(subscriptionId, messageId, true);
+        CampaignMessageAlert actualCampaignMessage = new CampaignMessageAlert(subscriptionId, messageId, true, DateTime.now().plusWeeks(1));
         kilkariDbConnector.create(actualCampaignMessage);
         markForDeletion(actualCampaignMessage);
 

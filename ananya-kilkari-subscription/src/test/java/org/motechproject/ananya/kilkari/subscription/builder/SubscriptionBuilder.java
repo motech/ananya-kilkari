@@ -11,10 +11,11 @@ public class SubscriptionBuilder {
     private SubscriptionPack pack;
     private Operator operator;
     private SubscriptionStatus status;
+    private DateTime creationDate;
 
     public SubscriptionBuilder withDefaults() {
         return withMsisdn("9876543210").withOperator(Operator.AIRTEL)
-                .withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.FIFTEEN_MONTHS);
+                .withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now());
     }
 
     public SubscriptionBuilder withStatus(SubscriptionStatus status) {
@@ -39,11 +40,15 @@ public class SubscriptionBuilder {
 
 
     public Subscription build() {
-        Subscription subscription = new Subscription(msisdn, pack, DateTime.now());
+        Subscription subscription = new Subscription(msisdn, pack, creationDate);
         subscription.setStatus(status);
         subscription.setOperator(operator);
         
         return subscription;
     }
 
+    public SubscriptionBuilder withCreationDate(DateTime creationDate) {
+        this.creationDate = creationDate;
+        return this;
+    }
 }

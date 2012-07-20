@@ -2,7 +2,9 @@ package org.motechproject.ananya.kilkari.subscription.domain;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
@@ -159,5 +161,15 @@ public class SubscriptionTest {
 
         Subscription sevenMonthSubscription = new Subscription("9999999999", SubscriptionPack.SEVEN_MONTHS, DateTime.now().minusWeeks(2));
         assertEquals(35, sevenMonthSubscription.getCurrentWeek());
+    }
+
+
+    @Test
+    public void expiryDateShouldBeEndDateOfTheCurrentWeek() {
+        DateTime creationDate = DateTime.now().minusDays(3);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withCreationDate(creationDate).build();
+
+        DateTime expiryDate = subscription.expiryDate();
+        assertThat(expiryDate, is(subscription.getCreationDate().plusWeeks(1)));
     }
 }

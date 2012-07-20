@@ -1,10 +1,12 @@
 package org.motechproject.ananya.kilkari.domain;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
 import org.motechproject.model.MotechBaseDataObject;
-import org.motechproject.util.StringUtil;
 
 @TypeDiscriminator("doc.type === 'CampaignMessageAlert'")
 public class CampaignMessageAlert extends MotechBaseDataObject {
@@ -19,26 +21,18 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
     private boolean renewed;
 
     @JsonProperty
-    private DateTime messageExpiryTime;
+    private DateTime messageExpiryDate;
 
-    public CampaignMessageAlert() {
+    CampaignMessageAlert() {
     }
 
-    public CampaignMessageAlert(String subscriptionId, String messageId) {
-        this.subscriptionId = subscriptionId;
-        this.messageId = messageId;
-    }
-
-    public CampaignMessageAlert(String subscriptionId, String messageId, boolean renewed) {
+    public CampaignMessageAlert(String subscriptionId, String messageId, boolean renewed, DateTime messageExpiryDate) {
+        this.messageExpiryDate = messageExpiryDate;
         this.subscriptionId = subscriptionId;
         this.messageId = messageId;
         this.renewed = renewed;
     }
 
-    public CampaignMessageAlert(String subscriptionId, String messageId, boolean renew, DateTime messageExpiryTime) {
-        this(subscriptionId, messageId, renew);
-        this.messageExpiryTime = messageExpiryTime;
-    }
 
     public String getSubscriptionId() {
         return subscriptionId;
@@ -52,17 +46,37 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
         return renewed;
     }
 
-    public boolean canBeScheduled() {
-        return renewed && !StringUtil.isNullOrEmpty(messageId) && (messageExpiryTime == null || messageExpiryTime.isAfter(DateTime.now()));
-    }
-
     public void updateWith(String messageId, boolean renewed, DateTime messageExpiryTime) {
         this.messageId = messageId;
         this.renewed = renewed;
-        this.messageExpiryTime = messageExpiryTime;
+        this.messageExpiryDate = messageExpiryTime;
     }
 
-    public DateTime getMessageExpiryTime() {
-        return messageExpiryTime;
+    public DateTime getMessageExpiryDate() {
+        return messageExpiryDate;
     }
+
+    public boolean canBeScheduled(CampaignTriggerType campaignTriggerType) {
+        boolean alertRaisedAndRenewed = renewed && !StringUtils.isEmpty(messageId);
+
+        if (campaignTriggerType.isNotActivation()) {
+            return alertRaisedAndRenewed && hasNotExpired();
+        }
+        return alertRaisedAndRenewed;
+    }
+
+    private boolean hasNotExpired() {
+        return messageExpiryDate.isAfterNow();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append("subscriptionId", subscriptionId)
+                .append("messageId", messageId)
+                .append("renewed", renewed)
+                .append("messageExpiryDate", messageExpiryDate)
+                .toString();
+    }
+
 }

@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequestMapper;
+import org.motechproject.ananya.kilkari.domain.CampaignTriggerType;
 import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.contract.*;
@@ -80,25 +81,23 @@ public class KilkariCampaignService {
         synchronized (getLockName(subscriptionId)) {
             Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
             String messageId = campaignMessageIdStrategy.createMessageId(subscription);
-
             logger.info(String.format("Processing weekly message alert for subscriptionId: %s, messageId: %s", subscriptionId, messageId));
 
             CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
-
             if (campaignMessageAlert == null) {
-                processNewCampaignMessageAlert(subscriptionId, messageId, false, calculateMessageExpiryTime(subscription));
+                processNewCampaignMessageAlert(subscriptionId, messageId, false, subscription.expiryDate());
                 return;
             }
 
             boolean renewed = campaignMessageAlert.isRenewed();
-            processExistingCampaignMessageAlert(subscription, messageId, renewed, campaignMessageAlert, calculateMessageExpiryTime(subscription));
+            processExistingCampaignMessageAlert(subscription, messageId, renewed, campaignMessageAlert, subscription.expiryDate(), CampaignTriggerType.WEEKLY_MESSAGE);
 
             if (subscription.hasPackBeenCompleted())
                 kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(subscription);
         }
     }
 
-    public void renewSchedule(String subscriptionId) {
+    public void activateOrRenewSchedule(String subscriptionId, CampaignTriggerType campaignTriggerType) {
         synchronized (getLockName(subscriptionId)) {
             logger.info("Processing renew schedule for subscriptionId: %s");
 
@@ -111,8 +110,8 @@ public class KilkariCampaignService {
             }
 
             String messageId = campaignMessageAlert.getMessageId();
-            DateTime messageExpiryTime = campaignMessageAlert.getMessageExpiryTime();
-            processExistingCampaignMessageAlert(subscription, messageId, true, campaignMessageAlert, messageExpiryTime);
+            DateTime messageExpiryTime = campaignMessageAlert.getMessageExpiryDate();
+            processExistingCampaignMessageAlert(subscription, messageId, true, campaignMessageAlert, messageExpiryTime, campaignTriggerType);
         }
     }
 
@@ -151,35 +150,27 @@ public class KilkariCampaignService {
     }
 
     private void processExistingCampaignMessageAlert(Subscription subscription, String messageId, boolean renewed,
-                                                     CampaignMessageAlert campaignMessageAlert, DateTime messageExpiryTime) {
+                                                     CampaignMessageAlert campaignMessageAlert, DateTime messageExpiryTime,
+                                                     CampaignTriggerType campaignTriggerType) {
         campaignMessageAlert.updateWith(messageId, renewed, messageExpiryTime);
-        logger.info(String.format("Found campaign message. Renewed: %s, messageId: %s", campaignMessageAlert.isRenewed(), campaignMessageAlert.getMessageId()));
+        logger.info("Found campaign message: %s", campaignMessageAlert);
 
-        if (!campaignMessageAlert.canBeScheduled()) {
-            logger.info("Campaign message can be scheduled. Moving it to obd module.");
+
+        if (!campaignMessageAlert.canBeScheduled(campaignTriggerType)) {
+            logger.info("Campaign message can not be scheduled");
             allCampaignMessageAlerts.update(campaignMessageAlert);
             return;
         }
 
-        logger.info(String.format("Campaign message can not be scheduled. Updating it with: Renewed: %s, messageId: %s", renewed, messageId));
+        logger.info(String.format("Campaign message can be scheduled. Updating it with: Renewed: %s, messageId: %s", renewed, messageId));
         campaignMessageService.scheduleCampaignMessage(subscription.getSubscriptionId(), messageId, subscription.getMsisdn(), subscription.getOperator().name());
         allCampaignMessageAlerts.remove(campaignMessageAlert);
-    }
-
-    private DateTime calculateMessageExpiryTime(Subscription subscription) {
-        int currentWeek = subscription.getWeeksElapsedAfterCreationDate();
-        return isActivationWeek(currentWeek) ? null : subscription.getCreationDate().plusWeeks(currentWeek + 1);
-    }
-
-    private boolean isActivationWeek(int currentWeek) {
-        return currentWeek == 0;
     }
 
     private void processNewCampaignMessageAlert(String subscriptionId, String messageId, boolean renew, DateTime messageExpiryTime) {
         logger.info(String.format("Creating a new record for campaign message alert - subscriptionId: %s, messageId: %s, renew: %s", subscriptionId, messageId, renew));
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, renew, messageExpiryTime);
         allCampaignMessageAlerts.add(campaignMessageAlert);
-        return;
     }
 
     private String getLockName(String subscriptionId) {

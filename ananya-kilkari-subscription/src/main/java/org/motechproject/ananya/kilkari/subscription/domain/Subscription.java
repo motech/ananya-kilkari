@@ -178,8 +178,11 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     @JsonIgnore
-    public int getWeeksElapsedAfterCreationDate() {
-        return Weeks.weeksBetween(getCreationDate(), DateTime.now()).getWeeks();
+    public DateTime expiryDate() {
+        return getCreationDate().plusWeeks(getWeeksElapsedAfterCreationDate() + 1);
     }
 
+    private int getWeeksElapsedAfterCreationDate() {
+        return Weeks.weeksBetween(getCreationDate(), DateTime.now()).getWeeks();
+    }
 }

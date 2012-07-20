@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.handlers.callback.subscription;
 
+import org.motechproject.ananya.kilkari.domain.CampaignTriggerType;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -20,6 +21,6 @@ public class ActivateHandler implements SubscriptionStateHandler {
     public void perform(CallbackRequestWrapper callbackRequestWrapper) {
         String subscriptionId = callbackRequestWrapper.getSubscriptionId();
         subscriptionService.activate(subscriptionId, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getOperator());
-        kilkariCampaignService.renewSchedule(subscriptionId);
+        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.ACTIVATION);
     }
 }

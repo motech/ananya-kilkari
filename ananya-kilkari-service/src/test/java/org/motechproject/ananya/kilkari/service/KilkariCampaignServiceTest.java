@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
+import org.motechproject.ananya.kilkari.domain.CampaignTriggerType;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.contract.*;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
@@ -143,7 +144,7 @@ public class KilkariCampaignServiceTest {
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
 
-        kilkariCampaignService.renewSchedule(subscriptionId);
+        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
 
         ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
         verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
@@ -163,12 +164,12 @@ public class KilkariCampaignServiceTest {
         subscription.setOperator(operator);
         String subscriptionId = subscription.getSubscriptionId();
 
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, true);
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, true, DateTime.now().plusWeeks(1));
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        kilkariCampaignService.renewSchedule(subscriptionId);
+        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
         verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator.name());
@@ -187,7 +188,7 @@ public class KilkariCampaignServiceTest {
         subscription.setOperator(operator);
         String subscriptionId = subscription.getSubscriptionId();
 
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId", true);
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId", true, DateTime.now().plusWeeks(1));
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
@@ -209,7 +210,7 @@ public class KilkariCampaignServiceTest {
         String subscriptionId = "mysubscriptionid";
         String messageId = "mymessageid";
         Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId");
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId", false, DateTime.now().plusWeeks(1));
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
@@ -373,8 +374,8 @@ public class KilkariCampaignServiceTest {
         verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
 
         CampaignMessageAlert campaignMessageAlertArgumentCaptorValue = campaignMessageAlertArgumentCaptor.getValue();
-        assertNotNull(campaignMessageAlertArgumentCaptorValue.getMessageExpiryTime());
-        assertEquals(createdAt.plusWeeks(3), campaignMessageAlertArgumentCaptorValue.getMessageExpiryTime());
+        assertNotNull(campaignMessageAlertArgumentCaptorValue.getMessageExpiryDate());
+        assertEquals(createdAt.plusWeeks(3), campaignMessageAlertArgumentCaptorValue.getMessageExpiryDate());
     }
 
     @Test
@@ -390,9 +391,9 @@ public class KilkariCampaignServiceTest {
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(mockedCampaignMessageAlert);
         when(mockedCampaignMessageAlert.getMessageId()).thenReturn(messageId);
-        when(mockedCampaignMessageAlert.getMessageExpiryTime()).thenReturn(actualExpiryDate);
+        when(mockedCampaignMessageAlert.getMessageExpiryDate()).thenReturn(actualExpiryDate);
 
-        kilkariCampaignService.renewSchedule(subscriptionId);
+        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
 
         verify(mockedCampaignMessageAlert).updateWith(messageId, true, actualExpiryDate);
     }
@@ -407,48 +408,13 @@ public class KilkariCampaignServiceTest {
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
 
-        kilkariCampaignService.renewSchedule(subscriptionId);
+        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
 
         ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
         verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
 
         CampaignMessageAlert campaignMessageAlertArgumentCaptorValue = campaignMessageAlertArgumentCaptor.getValue();
-        assertNull(campaignMessageAlertArgumentCaptorValue.getMessageExpiryTime());
-    }
-
-    @Test
-    public void shouldNotSetExpiryDateToMessageBeingSentToANewlyActivatedSubscription_whenActivationHasAlreadyHappened() {
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusHours(2));
-        String subscriptionId = subscription.getSubscriptionId();
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
-        String messageId = "week2";
-        CampaignMessageAlert mockedCampaignMessageAlert = mock(CampaignMessageAlert.class);
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(mockedCampaignMessageAlert);
-        when(campaignMessageIdStrategy.createMessageId(subscription)).thenReturn(messageId);
-
-        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
-
-        verify(mockedCampaignMessageAlert).updateWith(messageId, false, null);
-    }
-
-    @Test
-    public void shouldNotSetExpiryDateToMessageBeingSentToANewlyActivatedSubscription_whenActivationHasNotHappened() {
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusHours(2));
-        String subscriptionId = subscription.getSubscriptionId();
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
-
-        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
-
-        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
-        verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
-
-        CampaignMessageAlert campaignMessageAlertArgumentCaptorValue = campaignMessageAlertArgumentCaptor.getValue();
-        assertNull(campaignMessageAlertArgumentCaptorValue.getMessageExpiryTime());
+        assertNull(campaignMessageAlertArgumentCaptorValue.getMessageExpiryDate());
     }
 
     @Test

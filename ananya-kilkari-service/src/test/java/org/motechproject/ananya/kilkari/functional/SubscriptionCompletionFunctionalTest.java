@@ -40,7 +40,7 @@ public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest 
         stubOnMobileSubscriptionGateway.setBehavior(onMobileSubscriptionGatewayMock);
         Subscription subscription = addASubscriptionWithCreationDate15MonthsBack();
         final String subscriptionId = subscription.getSubscriptionId();
-        allCampaignMessageAlerts.add(new CampaignMessageAlert(subscriptionId, "week59"));
+        allCampaignMessageAlerts.add(new CampaignMessageAlert(subscriptionId, "week59", false, DateTime.now().plusWeeks(1)));
 
         //When
         setCurrentDateToTheFutureToTriggerSubscriptionCompletionEvent();

@@ -41,4 +41,8 @@ public class OBDSuccessfulCallRequestWrapper implements Serializable {
     public Channel getChannel() {
         return channel;
     }
+
+    public CampaignMessageStatus getStatus() {
+        return status;
+    }
 }

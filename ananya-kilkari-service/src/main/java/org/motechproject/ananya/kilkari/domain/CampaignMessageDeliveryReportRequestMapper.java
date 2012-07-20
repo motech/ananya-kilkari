@@ -11,6 +11,6 @@ public class CampaignMessageDeliveryReportRequestMapper {
         OBDSuccessfulCallRequest successfulCallRequest = successfulCallRequestWrapper.getSuccessfulCallRequest();
         CallDetailRecord callDetailRecord = successfulCallRequest.getCallDetailRecord();
         CallDetailsReportRequest callDetailsReportRequest = new CallDetailsReportRequest(callDetailRecord.getStartTime(), callDetailRecord.getEndTime());
-        return new CampaignMessageDeliveryReportRequest(successfulCallRequestWrapper.getSubscriptionId(), successfulCallRequest.getMsisdn(), successfulCallRequest.getCampaignId(), successfulCallRequest.getServiceOption(), retryCount.toString(), successfulCallRequest.getStatus(), callDetailsReportRequest);
+        return new CampaignMessageDeliveryReportRequest(successfulCallRequestWrapper.getSubscriptionId(), successfulCallRequest.getMsisdn(), successfulCallRequest.getCampaignId(), successfulCallRequest.getServiceOption(), retryCount.toString(), successfulCallRequestWrapper.getStatus().name(), callDetailsReportRequest);
     }
 }

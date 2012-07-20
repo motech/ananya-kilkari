@@ -37,7 +37,7 @@ public class CampaignMessageDeliveryReportRequestMapperTest {
         assertEquals(successfulCallRequest.getMsisdn(), actualDeliveryReportRequest.getMsisdn());
         assertEquals(successfulCallRequest.getCampaignId(), actualDeliveryReportRequest.getCampaignId());
         assertEquals(successfulCallRequest.getServiceOption(), actualDeliveryReportRequest.getServiceOption());
-        assertEquals(successfulCallRequest.getStatus(), actualDeliveryReportRequest.getStatus());
+        assertEquals(successfulCallRequestWrapper.getStatus().name(), actualDeliveryReportRequest.getStatus());
         assertEquals(retryCount.toString(), actualDeliveryReportRequest.getRetryCount());
         assertEquals(startTime.toString(), successfulCallRequest.getCallDetailRecord().getStartTime());
         assertEquals(endTime.toString(), successfulCallRequest.getCallDetailRecord().getEndTime());

@@ -468,32 +468,11 @@ public class KilkariCampaignServiceTest {
     }
 
     @Test
-    public void shouldNotPublishToErrorQueueIfErroredOutCallDeliveryFailureRecordsAreEmpty() {
-        CallDeliveryFailureRecord callDeliveryFailureRecord = new CallDeliveryFailureRecord();
-
-        ArrayList<CallDeliveryFailureRecordObject> callDeliveryFailureRecordObjects = new ArrayList<>();
-        CallDeliveryFailureRecordObject successfulCallDeliveryFailureRecordObject = mock(CallDeliveryFailureRecordObject.class);
-        callDeliveryFailureRecordObjects.add(successfulCallDeliveryFailureRecordObject);
-        callDeliveryFailureRecord.setCallDeliveryFailureRecordObjects(callDeliveryFailureRecordObjects);
-
-        when(callDeliveryFailureRecordValidator.validate(successfulCallDeliveryFailureRecordObject)).thenReturn(new ArrayList<String>());
-
-        kilkariCampaignService.processCallDeliveryFailureRecord(callDeliveryFailureRecord);
-
-        verify(callDeliveryFailureRecordValidator, times(1)).validate(any(CallDeliveryFailureRecordObject.class));
-        verify(obdRequestPublisher, never()).publishInvalidCallDeliveryFailureRecord(any(InvalidCallDeliveryFailureRecord.class));
-    }
-
-    @Test
     public void shouldPublishSuccessfulCallDeliveryFailureRecords() {
-        String msisdn = "12345";
-        String subscriptionId = "abcd";
         CallDeliveryFailureRecord callDeliveryFailureRecord = new CallDeliveryFailureRecord();
 
         ArrayList<CallDeliveryFailureRecordObject> callDeliveryFailureRecordObjects = new ArrayList<>();
         CallDeliveryFailureRecordObject erroredOutCallDeliveryFailureRecordObject = mock(CallDeliveryFailureRecordObject.class);
-        when(erroredOutCallDeliveryFailureRecordObject.getMsisdn()).thenReturn(msisdn);
-        when(erroredOutCallDeliveryFailureRecordObject.getSubscriptionId()).thenReturn(subscriptionId);
         CallDeliveryFailureRecordObject successfulCallDeliveryFailureRecordObject1 = mock(CallDeliveryFailureRecordObject.class);
         CallDeliveryFailureRecordObject successfulCallDeliveryFailureRecordObject2 = mock(CallDeliveryFailureRecordObject.class);
         callDeliveryFailureRecordObjects.add(erroredOutCallDeliveryFailureRecordObject);
@@ -519,5 +498,22 @@ public class KilkariCampaignServiceTest {
 
         verify(obdRequestPublisher).publishValidCallDeliveryFailureRecord(validCallDeliveryFailureRecordObject1);
         verify(obdRequestPublisher).publishValidCallDeliveryFailureRecord(validCallDeliveryFailureRecordObject2);
+    }
+
+    @Test
+    public void shouldNotPublishToErrorQueueIfErroredOutCallDeliveryFailureRecordsAreEmpty() {
+        CallDeliveryFailureRecord callDeliveryFailureRecord = new CallDeliveryFailureRecord();
+
+        ArrayList<CallDeliveryFailureRecordObject> callDeliveryFailureRecordObjects = new ArrayList<>();
+        CallDeliveryFailureRecordObject successfulCallDeliveryFailureRecordObject = mock(CallDeliveryFailureRecordObject.class);
+        callDeliveryFailureRecordObjects.add(successfulCallDeliveryFailureRecordObject);
+        callDeliveryFailureRecord.setCallDeliveryFailureRecordObjects(callDeliveryFailureRecordObjects);
+
+        when(callDeliveryFailureRecordValidator.validate(successfulCallDeliveryFailureRecordObject)).thenReturn(new ArrayList<String>());
+
+        kilkariCampaignService.processCallDeliveryFailureRecord(callDeliveryFailureRecord);
+
+        verify(callDeliveryFailureRecordValidator, times(1)).validate(any(CallDeliveryFailureRecordObject.class));
+        verify(obdRequestPublisher, never()).publishInvalidCallDeliveryFailureRecord(any(InvalidCallDeliveryFailureRecord.class));
     }
 }

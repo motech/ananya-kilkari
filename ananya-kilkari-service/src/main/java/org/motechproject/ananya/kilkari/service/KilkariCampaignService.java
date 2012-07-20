@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +41,9 @@ public class KilkariCampaignService {
     private ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariCampaignService.class);
+
+    KilkariCampaignService() {
+    }
 
     @Autowired
     public KilkariCampaignService(KilkariMessageCampaignService kilkariMessageCampaignService,
@@ -140,6 +144,7 @@ public class KilkariCampaignService {
         obdRequestPublisher.publishCallDeliveryFailureRecord(callDeliveryFailureRecord);
     }
 
+    @Transactional
     public void processCallDeliveryFailureRecord(CallDeliveryFailureRecord callDeliveryFailureRecord) {
         List<InvalidCallDeliveryFailureRecordObject> invalidCallDeliveryFailureRecordObjects = new ArrayList<>();
         List<ValidCallDeliveryFailureRecordObject> validCallDeliveryFailureRecordObjects = new ArrayList<>();

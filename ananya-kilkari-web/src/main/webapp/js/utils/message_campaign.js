@@ -11,7 +11,6 @@ function Colors() {
         }
     }
 }
-;
 
 function Schedule(startDate, numberOfTimelinesToDraw) {
     var firstDay = startDate.getTime();
@@ -23,9 +22,6 @@ function Schedule(startDate, numberOfTimelinesToDraw) {
 
     var MILLIS_PER_DAY = 86400 * 1000;
     var MILLIS_PER_TIMELINE = (MILLIS_PER_DAY * 7 * numberOfWeeksPerTimeline);
-
-    var circles = new Array();
-    var circleIndex = 0;
 
     var colors = new Colors();
 
@@ -75,9 +71,8 @@ function Schedule(startDate, numberOfTimelinesToDraw) {
     var addMessage = function (date, color) {
         var position = messagePosition(date);
         var circle = paper.circle(position.x, position.y + ((stepNumber - 1) * 14), 7);
-        circle.attr("fill", color).attr("stroke", "#fff");
-        circle.data("timing", date);
-        circles[circleIndex++] = circle;
+        var dateString  = date.toString();
+        circle.attr("fill", color).attr("stroke", "#fff").attr("title", dateString);
     };
 
 
@@ -107,15 +102,6 @@ function Schedule(startDate, numberOfTimelinesToDraw) {
         }
     };
 
-    var attachMessageTimings = function () {
-
-        for (var index in circles) {
-            circles[index].mouseover(function () {
-                $("#time").text(this.data("timing"));
-            });
-        }
-    };
-
     return {
 
         clear:function () {
@@ -137,7 +123,6 @@ function Schedule(startDate, numberOfTimelinesToDraw) {
 
                 addMessages(schedule.mid, schedule.mid, dates);
             }
-            attachMessageTimings();
             return this;
         }
     };

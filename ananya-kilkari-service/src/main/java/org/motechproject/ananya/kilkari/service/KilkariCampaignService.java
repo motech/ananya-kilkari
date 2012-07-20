@@ -37,7 +37,12 @@ public class KilkariCampaignService {
 
     @Autowired
     public KilkariCampaignService(KilkariMessageCampaignService kilkariMessageCampaignService,
-                                  KilkariSubscriptionService kilkariSubscriptionService, CampaignMessageIdStrategy campaignMessageIdStrategy, AllCampaignMessageAlerts allCampaignMessageAlerts, CampaignMessageService campaignMessageService, ReportingService reportingService, OBDRequestPublisher obdRequestPublisher) {
+                                  KilkariSubscriptionService kilkariSubscriptionService,
+                                  CampaignMessageIdStrategy campaignMessageIdStrategy,
+                                  AllCampaignMessageAlerts allCampaignMessageAlerts,
+                                  CampaignMessageService campaignMessageService,
+                                  ReportingService reportingService,
+                                  OBDRequestPublisher obdRequestPublisher) {
         this.kilkariMessageCampaignService = kilkariMessageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.campaignMessageIdStrategy = campaignMessageIdStrategy;

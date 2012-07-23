@@ -125,6 +125,9 @@ public class SubscriptionTest {
 
         subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
         assertFalse(subscription.isInProgress());
+
+        subscription.setStatus(SubscriptionStatus.ACTIVATION_FAILED);
+        assertFalse(subscription.isInProgress());
     }
 
     @Test

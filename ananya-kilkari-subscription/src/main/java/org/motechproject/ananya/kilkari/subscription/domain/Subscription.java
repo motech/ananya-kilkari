@@ -117,7 +117,8 @@ public class Subscription extends MotechBaseDataObject {
         return status != SubscriptionStatus.COMPLETED &&
                 status != SubscriptionStatus.DEACTIVATED &&
                 status != SubscriptionStatus.PENDING_DEACTIVATION &&
-                status != SubscriptionStatus.PENDING_COMPLETION;
+                status != SubscriptionStatus.PENDING_COMPLETION &&
+                status != SubscriptionStatus.ACTIVATION_FAILED;
     }
 
     public void activateOnRenewal() {

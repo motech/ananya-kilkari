@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.repository;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static junit.framework.Assert.assertEquals;

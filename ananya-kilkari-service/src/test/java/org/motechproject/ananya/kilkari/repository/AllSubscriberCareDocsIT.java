@@ -1,12 +1,12 @@
 package org.motechproject.ananya.kilkari.repository;
 
 import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class AllSubscriberCareDocsIT extends SpringIntegrationTest{
+public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
     @Autowired
     private AllSubscriberCareDocs allSubscriberCareDocs;
 

@@ -16,6 +16,7 @@ import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -29,8 +30,10 @@ public class KilkariSubscriptionService {
     private KilkariMessageCampaignService kilkariMessageCampaignService;
     private MotechSchedulerService motechSchedulerService;
 
-    public static final int BUFFER_DAYS_TO_ALLOW_RENEWAL = 3;
     private final Logger LOGGER = LoggerFactory.getLogger(KilkariSubscriptionService.class);
+
+    @Value("#{kilkariProperties['buffer.days.to.allow.renewal.for.pack.completion']}")
+    protected int bufferDaysToAllowRenewalForPackCompletion;
 
     @Autowired
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
@@ -74,7 +77,7 @@ public class KilkariSubscriptionService {
     }
 
     public void scheduleSubscriptionPackCompletionEvent(Subscription subscription) {
-        Date startDate = DateTime.now().plusDays(BUFFER_DAYS_TO_ALLOW_RENEWAL).toDate();
+        Date startDate = DateTime.now().plusDays(bufferDaysToAllowRenewalForPackCompletion).toDate();
 
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put(MotechSchedulerService.JOB_ID_KEY, subscription.getSubscriptionId());

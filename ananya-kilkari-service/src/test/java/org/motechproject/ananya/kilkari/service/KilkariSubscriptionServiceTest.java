@@ -113,6 +113,7 @@ public class KilkariSubscriptionServiceTest {
         DateTime now = DateTime.now();
         Subscription mockedSubscription = mock(Subscription.class);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+        kilkariSubscriptionService.bufferDaysToAllowRenewalForPackCompletion = 3;
 
         kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(mockedSubscription);
 

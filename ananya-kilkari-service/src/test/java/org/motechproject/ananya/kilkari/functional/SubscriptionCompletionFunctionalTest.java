@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
-import org.motechproject.ananya.kilkari.repository.SpringIntegrationTest;
+import org.motechproject.ananya.kilkari.utils.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;

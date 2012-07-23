@@ -10,7 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 
 public class AllCampaignMessagesIT extends SpringIntegrationTest {
 
@@ -18,6 +19,8 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
     private AllCampaignMessages allCampaignMessages;
     private CampaignMessage newCampaignMessage;
     private CampaignMessage dncCampaignMessage;
+    private CampaignMessage dncCampaignMessageWithoutRetryCount;
+    private CampaignMessage dncCampaignMessageWithGreaterRetry;
     private CampaignMessage newCampaignMessageSent;
     private CampaignMessage dncCampaignMessageSent;
     private CampaignMessage dnpCampaignMessage;
@@ -30,9 +33,19 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
 
         newCampaignMessage = new CampaignMessage("subscriptionId1", "messageId1", "1234657980", "operator1", DateTime.now().plusDays(2));
 
-        dncCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", "912134567890", "operator2", DateTime.now().plusDays(2));
+        dncCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", "912134567890", "operator2", DateTime.now().minusDays(2));
+        dncCampaignMessage.setStatusCode(CampaignMessageStatus.DNC);
         dncCampaignMessage.markSent();
         dncCampaignMessage.setStatusCode(CampaignMessageStatus.DNC);
+
+        dncCampaignMessageWithoutRetryCount = new CampaignMessage("subscriptionId13", "messageId2", "912134567890", "operator2", DateTime.now().plusDays(2));
+        dncCampaignMessageWithoutRetryCount.setStatusCode(CampaignMessageStatus.DNC);
+
+        dncCampaignMessageWithGreaterRetry = new CampaignMessage("subscriptionId12", "messageId2", "912134567890", "operator2", DateTime.now().minusDays(2));
+        dncCampaignMessageWithGreaterRetry.setStatusCode(CampaignMessageStatus.DNC);
+        dncCampaignMessageWithGreaterRetry.markSent();
+        dncCampaignMessageWithGreaterRetry.markSent();
+        dncCampaignMessageWithGreaterRetry.setStatusCode(CampaignMessageStatus.DNC);
 
         newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3", "3124567890", "operator3", DateTime.now().plusDays(2));
         newCampaignMessageSent.markSent();
@@ -40,6 +53,7 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
         dncCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4", "004123567890", "operator4", DateTime.now().plusDays(2));
         dncCampaignMessageSent.markSent();
         dncCampaignMessage.setStatusCode(CampaignMessageStatus.DNC);
+
         dncCampaignMessageSent.markSent();
 
         dnpCampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", "5123467890", "operator5", DateTime.now().plusDays(2));
@@ -64,27 +78,42 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
         obdDbConnector.create(newCampaignMessageSent);
         obdDbConnector.create(dncCampaignMessage);
         obdDbConnector.create(dncCampaignMessageSent);
+        obdDbConnector.create(dncCampaignMessageWithGreaterRetry);
+        obdDbConnector.create(dncCampaignMessageWithoutRetryCount);
         obdDbConnector.create(dnpCampaignMessage);
         obdDbConnector.create(dnpCampaignMessageSent);
 
         markForDeletion(newCampaignMessage);
         markForDeletion(newCampaignMessageSent);
         markForDeletion(dncCampaignMessage);
+        markForDeletion(dncCampaignMessageWithGreaterRetry);
         markForDeletion(dncCampaignMessageSent);
+        markForDeletion(dncCampaignMessageWithoutRetryCount);
         markForDeletion(dnpCampaignMessage);
         markForDeletion(dnpCampaignMessageSent);
 
         List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
 
-        assertEquals(2, allNewMessages.size());
+        assertEquals(4, allNewMessages.size());
         CampaignMessage actualCampaignMessage1 = allNewMessages.get(0);
         CampaignMessage actualCampaignMessage2 = allNewMessages.get(1);
+        CampaignMessage actualCampaignMessage3 = allNewMessages.get(2);
+        CampaignMessage actualCampaignMessage4 = allNewMessages.get(3);
 
         assertFalse(actualCampaignMessage1.isSent());
-        assertTrue(CampaignMessageStatus.DNP != actualCampaignMessage1.getStatus());
+        assertEquals(CampaignMessageStatus.DNC, actualCampaignMessage1.getStatus());
+        assertEquals(2, actualCampaignMessage1.getDncRetryCount());
 
         assertFalse(actualCampaignMessage2.isSent());
-        assertTrue(CampaignMessageStatus.DNP != actualCampaignMessage2.getStatus());
+        assertEquals(CampaignMessageStatus.DNC, actualCampaignMessage2.getStatus());
+        assertEquals(1, actualCampaignMessage2.getDncRetryCount());
+
+        assertFalse(actualCampaignMessage3.isSent());
+        assertEquals(CampaignMessageStatus.DNC, actualCampaignMessage2.getStatus());
+        assertEquals(0, actualCampaignMessage3.getDncRetryCount());
+
+        assertFalse(actualCampaignMessage4.isSent());
+        assertEquals(CampaignMessageStatus.NEW, actualCampaignMessage4.getStatus());
     }
 
     @Test

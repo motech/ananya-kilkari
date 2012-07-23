@@ -8,7 +8,7 @@ import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
 
 @TypeDiscriminator("doc.type === 'CampaignMessage'")
-public class CampaignMessage extends MotechBaseDataObject implements Comparable<CampaignMessage> {
+public class CampaignMessage extends MotechBaseDataObject {
 
     @JsonProperty
     private String subscriptionId;
@@ -98,8 +98,8 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
         this.sent = false;
     }
 
-    @Override
-    public int compareTo(CampaignMessage message) {
-        return (this.dnpRetryCount > message.dnpRetryCount ? -1 : (this.dnpRetryCount == message.dnpRetryCount ? 0 : 1));
+    public boolean hasFailed() {
+        return status == CampaignMessageStatus.DNP || status == CampaignMessageStatus.DNC;
     }
 }
+

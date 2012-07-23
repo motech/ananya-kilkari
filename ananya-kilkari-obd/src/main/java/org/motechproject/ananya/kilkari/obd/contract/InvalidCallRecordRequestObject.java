@@ -2,7 +2,9 @@ package org.motechproject.ananya.kilkari.obd.contract;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class InvalidCallRecordRequestObject {
+import java.io.Serializable;
+
+public class InvalidCallRecordRequestObject implements Serializable {
     @JsonProperty
     private String msisdn;
     @JsonProperty

@@ -7,17 +7,13 @@ import java.io.Serializable;
 
 public class UnsubscriptionRequest implements Serializable {
     @JsonProperty
-    private String msisdn;
+    private String channel;
     @JsonProperty
     private String reason;
-    @JsonProperty
-    private String subscriptionId;
-    @JsonProperty
-    private String pack;
 
     @JsonIgnore
-    public String getMsisdn() {
-        return msisdn;
+    public String getChannel() {
+        return channel;
     }
 
     @JsonIgnore
@@ -25,26 +21,8 @@ public class UnsubscriptionRequest implements Serializable {
         return reason;
     }
 
-    @JsonIgnore
-    public String getSubscriptionId() {
-        return subscriptionId;
-    }
-
-    @JsonIgnore
-    public String getPack() {
-        return pack;
-    }
-
-    public void setMsisdn(String msisdn) {
-        this.msisdn = msisdn;
-    }
-
-    public void setSubscriptionId(String subscriptionId) {
-        this.subscriptionId = subscriptionId;
-    }
-
-    public void setPack(String pack) {
-        this.pack = pack;
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     public void setReason(String reason) {
@@ -53,6 +31,6 @@ public class UnsubscriptionRequest implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("msisdn: %s; subscriptionId: %s; pack: %s; reason: %s", msisdn, subscriptionId, pack, reason);
+        return String.format("reason: %s; channel: %s", reason, channel);
     }
 }

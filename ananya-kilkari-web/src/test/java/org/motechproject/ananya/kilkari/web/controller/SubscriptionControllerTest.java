@@ -317,46 +317,42 @@ public class SubscriptionControllerTest {
     public void shouldUnsubscribeAUserGivenValidDetails() throws Exception {
         String subscriptionId = "abcd1234";
         UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
-        unsubscriptionRequest.setMsisdn("1234567890");
-        unsubscriptionRequest.setSubscriptionId(subscriptionId);
-        unsubscriptionRequest.setPack(SubscriptionPack.FIFTEEN_MONTHS.name());
         unsubscriptionRequest.setReason("reason");
+        unsubscriptionRequest.setChannel(Channel.CALL_CENTER.name());
         byte[] requestBody = TestUtils.toJson(unsubscriptionRequest).getBytes();
 
         mockMvc(subscriptionController)
-                .perform(delete("/subscription")
+                .perform(delete("/subscription/" + subscriptionId)
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription unsubscribed successfully")));
 
         ArgumentCaptor<UnsubscriptionRequest> unsubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(UnsubscriptionRequest.class);
-        ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);
-        verify(kilkariSubscriptionService).requestDeactivation(unsubscriptionRequestArgumentCaptor.capture(), channelArgumentCaptor.capture());
-        UnsubscriptionRequest actualUnSubscriptionRequest = unsubscriptionRequestArgumentCaptor.getValue();
-        Channel actualChannel = channelArgumentCaptor.getValue();
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(kilkariSubscriptionService).requestDeactivation(stringArgumentCaptor.capture(), unsubscriptionRequestArgumentCaptor.capture());
 
-        assertEquals(subscriptionId, actualUnSubscriptionRequest.getSubscriptionId());
-        assertEquals(Channel.CALL_CENTER, actualChannel);
+        UnsubscriptionRequest actualUnsubscriptionRequest = unsubscriptionRequestArgumentCaptor.getValue();
+        String actualSubscriptionId = stringArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, actualSubscriptionId);
+        assertEquals(Channel.CALL_CENTER.name(), actualUnsubscriptionRequest.getChannel());
     }
 
     @Test
     public void shouldValidateUnsubscriptionRequestDetails() throws Exception {
         String subscriptionId = "abcd1234";
         UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
-        unsubscriptionRequest.setMsisdn("1234567890");
-        unsubscriptionRequest.setSubscriptionId(subscriptionId);
-        unsubscriptionRequest.setPack(SubscriptionPack.FIFTEEN_MONTHS.name());
         unsubscriptionRequest.setReason("reason");
         byte[] requestBody = TestUtils.toJson(unsubscriptionRequest).getBytes();
 
         ArrayList<String> errors = new ArrayList<>();
         errors.add("some error description1");
         errors.add("some error description2");
-        when(unsubscriptionRequestValidator.validate(any(UnsubscriptionRequest.class))).thenReturn(errors);
+        when(unsubscriptionRequestValidator.validate(anyString())).thenReturn(errors);
 
         mockMvc(subscriptionController)
-                .perform(delete("/subscription")
+                .perform(delete("/subscription/" + subscriptionId )
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))

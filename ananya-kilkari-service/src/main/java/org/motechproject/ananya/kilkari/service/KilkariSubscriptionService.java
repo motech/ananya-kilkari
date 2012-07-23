@@ -4,10 +4,6 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
@@ -92,7 +88,7 @@ public class KilkariSubscriptionService {
         motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
     }
 
-    public void requestDeactivation(UnsubscriptionRequest unsubscriptionRequest, Channel channel) {
-        subscriptionService.requestDeactivation(new DeactivationRequest(unsubscriptionRequest.getSubscriptionId(), channel));
+    public void requestDeactivation(String subscriptionId, UnsubscriptionRequest unsubscriptionRequest) {
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.from(unsubscriptionRequest.getChannel())));
     }
 }

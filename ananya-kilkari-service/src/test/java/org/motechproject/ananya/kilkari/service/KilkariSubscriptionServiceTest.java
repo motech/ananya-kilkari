@@ -131,11 +131,11 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldDeactivateSubscription() {
-        UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
         String subscriptionId = "abcd1234";
-        unsubscriptionRequest.setSubscriptionId(subscriptionId);
+        UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
+        unsubscriptionRequest.setChannel(Channel.CALL_CENTER.name());
 
-        kilkariSubscriptionService.requestDeactivation(unsubscriptionRequest, Channel.CALL_CENTER);
+        kilkariSubscriptionService.requestDeactivation(subscriptionId, unsubscriptionRequest);
 
         ArgumentCaptor<DeactivationRequest> deactivationRequestArgumentCaptor = ArgumentCaptor.forClass(DeactivationRequest.class);
         verify(subscriptionService).requestDeactivation(deactivationRequestArgumentCaptor.capture());

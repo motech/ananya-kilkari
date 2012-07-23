@@ -85,13 +85,13 @@ public class SubscriptionController {
         return subscriberResponse;
     }
 
-    @RequestMapping(value = "/subscription", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public BaseResponse removeSubscription(@RequestBody UnsubscriptionRequest unsubscriptionRequest) {
-        List<String> validationErrors = unsubscriptionRequestValidator.validate(unsubscriptionRequest);
+    public BaseResponse removeSubscription(@RequestBody UnsubscriptionRequest unsubscriptionRequest, @PathVariable String subscriptionId) {
+        List<String> validationErrors = unsubscriptionRequestValidator.validate(subscriptionId);
         raiseExceptionIfThereAreErrors(validationErrors);
 
-        kilkariSubscriptionService.requestDeactivation(unsubscriptionRequest, Channel.CALL_CENTER);
+        kilkariSubscriptionService.requestDeactivation(subscriptionId, unsubscriptionRequest);
         return BaseResponse.success("Subscription unsubscribed successfully");
     }
 

@@ -82,41 +82,37 @@ public class KilkariCampaignService {
     }
 
     public void scheduleWeeklyMessage(String subscriptionId) {
-        synchronized (getLockName(subscriptionId)) {
-            Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
-            String messageId = campaignMessageIdStrategy.createMessageId(subscription);
-            logger.info(String.format("Processing weekly message alert for subscriptionId: %s, messageId: %s", subscriptionId, messageId));
+        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
+        String messageId = campaignMessageIdStrategy.createMessageId(subscription);
+        logger.info(String.format("Processing weekly message alert for subscriptionId: %s, messageId: %s", subscriptionId, messageId));
 
-            CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
+        CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
 
 
-            if (campaignMessageAlert == null)
-                processNewCampaignMessageAlert(subscriptionId, messageId, false, subscription.expiryDate());
+        if (campaignMessageAlert == null)
+            processNewCampaignMessageAlert(subscriptionId, messageId, false, subscription.expiryDate());
 
-            else
-                processExistingCampaignMessageAlert(subscription, messageId, campaignMessageAlert.isRenewed(), campaignMessageAlert, subscription.expiryDate(),CampaignTriggerType.WEEKLY_MESSAGE);
+        else
+            processExistingCampaignMessageAlert(subscription, messageId, campaignMessageAlert.isRenewed(), campaignMessageAlert, subscription.expiryDate(), CampaignTriggerType.WEEKLY_MESSAGE);
 
-            if (subscription.hasPackBeenCompleted())
-                kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(subscription);
-        }
+        if (subscription.hasPackBeenCompleted())
+            kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(subscription);
     }
 
     public void activateOrRenewSchedule(String subscriptionId, CampaignTriggerType campaignTriggerType) {
-        synchronized (getLockName(subscriptionId)) {
-            logger.info("Processing renew schedule for subscriptionId: %s");
+        logger.info("Processing renew schedule for subscriptionId: %s");
 
-            Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
-            CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
+        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
+        CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
 
-            if (campaignMessageAlert == null) {
-                processNewCampaignMessageAlert(subscriptionId, null, true, null);
-                return;
-            }
-
-            String messageId = campaignMessageAlert.getMessageId();
-            DateTime messageExpiryTime = campaignMessageAlert.getMessageExpiryDate();
-            processExistingCampaignMessageAlert(subscription, messageId, true, campaignMessageAlert, messageExpiryTime, campaignTriggerType);
+        if (campaignMessageAlert == null) {
+            processNewCampaignMessageAlert(subscriptionId, null, true, null);
+            return;
         }
+
+        String messageId = campaignMessageAlert.getMessageId();
+        DateTime messageExpiryTime = campaignMessageAlert.getMessageExpiryDate();
+        processExistingCampaignMessageAlert(subscription, messageId, true, campaignMessageAlert, messageExpiryTime, campaignTriggerType);
     }
 
     public void processSuccessfulMessageDelivery(OBDSuccessfulCallRequestWrapper obdRequestWrapper) {
@@ -176,11 +172,6 @@ public class KilkariCampaignService {
         logger.info(String.format("Creating a new record for campaign message alert - subscriptionId: %s, messageId: %s, renew: %s", subscriptionId, messageId, renew));
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, renew, messageExpiryTime);
         allCampaignMessageAlerts.add(campaignMessageAlert);
-    }
-
-    private String getLockName(String subscriptionId) {
-        String lockName = getClass().getCanonicalName() + ":" + subscriptionId;
-        return lockName.intern();
     }
 
     private void validate(CallDeliveryFailureRecord callDeliveryFailureRecord, List<ValidCallDeliveryFailureRecordObject> validCallDeliveryFailureRecordObjects, List<InvalidCallDeliveryFailureRecordObject> invalidCallDeliveryFailureRecordObjects) {

@@ -1,11 +1,11 @@
 package org.motechproject.ananya.kilkari.obd.gateway;
 
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.profile.OBDTestProfile;
+import org.motechproject.ananya.kilkari.obd.profile.TestProfile;
 import org.springframework.stereotype.Component;
 
 @Component
-@OBDTestProfile
+@TestProfile
 public class StubOnMobileOBDGateway implements OnMobileOBDGateway {
 
     private OnMobileOBDGateway behavior;

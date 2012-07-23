@@ -16,7 +16,7 @@ import java.util.ArrayList;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationKilkariSubscriptionContext.xml")
 @ActiveProfiles("test")
-public abstract class SubscriptionBaseIT {
+public abstract class SpringIntegrationTest {
 
     @Qualifier("kilkariSubscriptionDbConnector")
     @Autowired
@@ -26,7 +26,7 @@ public abstract class SubscriptionBaseIT {
 
     @Before
     public void before() {
-        toDelete = new ArrayList<BulkDeleteDocument>();
+        toDelete = new ArrayList<>();
     }
 
     @After

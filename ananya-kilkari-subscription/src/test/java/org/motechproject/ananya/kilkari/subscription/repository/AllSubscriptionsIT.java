@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class AllSubscriptionsIT extends SubscriptionBaseIT {
+public class AllSubscriptionsIT extends SpringIntegrationTest {
     @Autowired
     private AllSubscriptions allSubscriptions;
 

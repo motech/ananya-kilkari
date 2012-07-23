@@ -12,7 +12,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.profile.OBDProductionProfile;
+import org.motechproject.ananya.kilkari.obd.profile.ProductionProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 @Component
-@OBDProductionProfile
+@ProductionProfile
 public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
 
     private HttpClient obdHttpClient;

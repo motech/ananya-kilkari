@@ -40,8 +40,12 @@ public class OBDProperties {
         return obdProperties.getProperty("obd.retry.message.delivery.url.query.string");
     }
 
-    public Integer getMaximumRetryCount() {
-        return Integer.parseInt(obdProperties.getProperty("obd.message.max.retry.count"));
+    public Integer getMaximumDNPRetryCount() {
+        return Integer.parseInt(obdProperties.getProperty("obd.dnp.message.max.retry.count"));
+    }
+
+    public Integer getMaximumDNCRetryCount() {
+        return Integer.parseInt(obdProperties.getProperty("obd.dnc.message.max.retry.count"));
     }
 }
 

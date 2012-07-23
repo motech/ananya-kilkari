@@ -96,7 +96,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, messageId, "1234567890", null);
         allCampaignMessages.add(campaignMessage);
         assertEquals(CampaignMessageStatus.NEW, campaignMessage.getStatus());
-        campaignMessage.markDidNotPickup();
+        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
 
         campaignMessageService.update(campaignMessage);
 
@@ -162,7 +162,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
 
         campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator);
         CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
-        campaignMessage.markDidNotPickup();
+        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
         allCampaignMessages.update(campaignMessage);
 
         markForDeletion(campaignMessage);

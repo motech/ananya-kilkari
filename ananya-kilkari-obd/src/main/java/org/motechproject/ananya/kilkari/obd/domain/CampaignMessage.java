@@ -77,11 +77,14 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
     public void markSent() {
         if(this.status == CampaignMessageStatus.DNP)
             this.dnpRetryCount++;
+        if(this.status == CampaignMessageStatus.DNC)
+            this.dncRetryCount++;
+
         this.sent = true;
     }
 
-    public void markDidNotPickup() {
-        this.status = CampaignMessageStatus.DNP;
+    public void setStatusCode(CampaignMessageStatus statusCode) {
+        this.status = statusCode;
         this.sent = false;
     }
 

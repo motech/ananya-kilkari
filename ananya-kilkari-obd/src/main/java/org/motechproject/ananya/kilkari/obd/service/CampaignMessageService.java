@@ -6,6 +6,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
 import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
+import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.gateway.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
@@ -70,18 +71,6 @@ public class CampaignMessageService {
         sendMessagesToOBD(allRetryMessages, gatewayAction);
     }
 
-    private void sendMessagesToOBD(List<CampaignMessage> messages, GatewayAction gatewayAction) {
-        logger.info(String.format("Sending %s campaign messages to obd", messages.size()));
-        if (messages.isEmpty())
-            return;
-        String campaignMessageCSVContent = campaignMessageCSVBuilder.getCSV(messages);
-        gatewayAction.send(campaignMessageCSVContent);
-        for (CampaignMessage message : messages) {
-            message.markSent();
-            allCampaignMessages.update(message);
-        }
-    }
-
     public void deleteCampaignMessageIfExists(String subscriptionId, String messageId) {
         CampaignMessage campaignMessage = find(subscriptionId, messageId);
         if (campaignMessage != null)
@@ -117,25 +106,47 @@ public class CampaignMessageService {
                     recordObject.getSubscriptionId(), recordObject.getCampaignId()));
             return;
         }
-        updateCampaignMessageStatus(campaignMessage);
+        updateCampaignMessageStatus(campaignMessage, recordObject.getStatusCode());
         reportCampaignMessageStatus(recordObject, campaignMessage);
     }
 
-    private void updateCampaignMessageStatus(CampaignMessage campaignMessage) {
-        if (campaignMessage.getDnpRetryCount() == obdProperties.getMaximumRetryCount())
+    private void updateCampaignMessageStatus(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
+        if (hasReachedMaximumRetries(campaignMessage))
             allCampaignMessages.delete(campaignMessage);
         else {
-            campaignMessage.markDidNotPickup();
+            campaignMessage.setStatusCode(statusCode);
             allCampaignMessages.update(campaignMessage);
         }
     }
 
+    private boolean hasReachedMaximumRetries(CampaignMessage campaignMessage) {
+        return campaignMessage.getDnpRetryCount() == obdProperties.getMaximumDNPRetryCount() ||
+                campaignMessage.getDncRetryCount() == obdProperties.getMaximumDNCRetryCount();
+    }
+
+    private void sendMessagesToOBD(List<CampaignMessage> messages, GatewayAction gatewayAction) {
+        logger.info(String.format("Sending %s campaign messages to obd", messages.size()));
+        if (messages.isEmpty())
+            return;
+        String campaignMessageCSVContent = campaignMessageCSVBuilder.getCSV(messages);
+        gatewayAction.send(campaignMessageCSVContent);
+        for (CampaignMessage message : messages) {
+            message.markSent();
+            allCampaignMessages.update(message);
+        }
+    }
+
     private void reportCampaignMessageStatus(ValidCallDeliveryFailureRecordObject recordObject, CampaignMessage campaignMessage) {
-        String retryCount = ((Integer) campaignMessage.getDnpRetryCount()).toString();
+        String retryCount = getRetryCount(campaignMessage);
         CallDetailsReportRequest callDetailRecord = new CallDetailsReportRequest(format(recordObject.getCreatedAt()), format(recordObject.getCreatedAt()));
         CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(recordObject.getSubscriptionId(), recordObject.getMsisdn(), recordObject.getCampaignId(), null, retryCount, recordObject.getStatusCode().name(), callDetailRecord);
 
         reportingService.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
+    }
+
+    private String getRetryCount(CampaignMessage campaignMessage) {
+        return campaignMessage.getStatus() == CampaignMessageStatus.DNP ? String.valueOf(campaignMessage.getDnpRetryCount())
+                : String.valueOf(campaignMessage.getDncRetryCount());
     }
 
     private String format(DateTime dateTime) {

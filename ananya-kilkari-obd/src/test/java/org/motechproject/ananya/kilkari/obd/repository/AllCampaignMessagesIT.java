@@ -43,17 +43,17 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
 
         dnpCampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", "5123467890", "operator5");
         dnpCampaignMessage.markSent();
-        dnpCampaignMessage.markDidNotPickup();
+        dnpCampaignMessage.setStatusCode(CampaignMessageStatus.DNP);
 
         dnpCampaignMessageUnsentWithMoreRetryCount = new CampaignMessage("subscriptionId7", "messageId7", "5128467890", "operator7");
         dnpCampaignMessageUnsentWithMoreRetryCount.markSent();
-        dnpCampaignMessageUnsentWithMoreRetryCount.markDidNotPickup();
+        dnpCampaignMessageUnsentWithMoreRetryCount.setStatusCode(CampaignMessageStatus.DNP);
         dnpCampaignMessageUnsentWithMoreRetryCount.markSent();
-        dnpCampaignMessageUnsentWithMoreRetryCount.markDidNotPickup();
+        dnpCampaignMessageUnsentWithMoreRetryCount.setStatusCode(CampaignMessageStatus.DNP);
 
         dnpCampaignMessageSent = new CampaignMessage("subscriptionId6", "messageId6", "6123457890", "operator6");
         dnpCampaignMessageSent.markSent();
-        dnpCampaignMessageSent.markDidNotPickup();
+        dnpCampaignMessageSent.setStatusCode(CampaignMessageStatus.DNP);
         dnpCampaignMessageSent.markSent();
     }
 

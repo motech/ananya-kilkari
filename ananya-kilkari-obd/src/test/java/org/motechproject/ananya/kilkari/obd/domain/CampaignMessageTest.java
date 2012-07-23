@@ -37,7 +37,7 @@ public class CampaignMessageTest {
     public void shouldMarkDidNotPickup() {
         CampaignMessage campaignMessage = new CampaignMessage();
         campaignMessage.markSent();
-        campaignMessage.markDidNotPickup();
+        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
 
         assertFalse(campaignMessage.isSent());
         assertEquals(CampaignMessageStatus.DNP, campaignMessage.getStatus());
@@ -58,10 +58,10 @@ public class CampaignMessageTest {
         CampaignMessage campaignMessage = new CampaignMessage();
         campaignMessage.markSent();
         assertEquals(0, campaignMessage.getDnpRetryCount());
-        campaignMessage.markDidNotPickup();
+        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
         campaignMessage.markSent();
         assertEquals(1, campaignMessage.getDnpRetryCount());
-        campaignMessage.markDidNotPickup();
+        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
         campaignMessage.markSent();
         assertEquals(2, campaignMessage.getDnpRetryCount());
         campaignMessage.markDidNotCall();
@@ -70,18 +70,33 @@ public class CampaignMessageTest {
     }
 
     @Test
+    public void markSentShouldIncrementRetryCountForDNC() {
+        CampaignMessage campaignMessage = new CampaignMessage();
+        campaignMessage.markSent();
+        assertEquals(0, campaignMessage.getDnpRetryCount());
+        campaignMessage.setStatusCode(CampaignMessageStatus.DNC);
+        campaignMessage.markSent();
+        assertEquals(0, campaignMessage.getDnpRetryCount());
+        assertEquals(1, campaignMessage.getDncRetryCount());
+        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
+        campaignMessage.markSent();
+        assertEquals(1, campaignMessage.getDncRetryCount());
+        assertEquals(1, campaignMessage.getDnpRetryCount());
+    }
+
+    @Test
     public void shouldSortBasedOnRetryCount() {
         CampaignMessage campaignMessage1 = new CampaignMessage();
         campaignMessage1.markSent();
-        campaignMessage1.markDidNotPickup();
+        campaignMessage1.setStatusCode(CampaignMessageStatus.DNP);
         campaignMessage1.markSent();
-        campaignMessage1.markDidNotPickup();
+        campaignMessage1.setStatusCode(CampaignMessageStatus.DNP);
         campaignMessage1.markSent();
         assertEquals(2, campaignMessage1.getDnpRetryCount());
 
         CampaignMessage campaignMessage2 = new CampaignMessage();
         campaignMessage2.markSent();
-        campaignMessage2.markDidNotPickup();
+        campaignMessage2.setStatusCode(CampaignMessageStatus.DNP);
         campaignMessage2.markSent();
         assertEquals(1, campaignMessage2.getDnpRetryCount());
 

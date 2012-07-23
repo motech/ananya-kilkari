@@ -88,13 +88,13 @@ public class KilkariCampaignService {
             logger.info(String.format("Processing weekly message alert for subscriptionId: %s, messageId: %s", subscriptionId, messageId));
 
             CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
-            if (campaignMessageAlert == null) {
-                processNewCampaignMessageAlert(subscriptionId, messageId, false, subscription.expiryDate());
-                return;
-            }
 
-            boolean renewed = campaignMessageAlert.isRenewed();
-            processExistingCampaignMessageAlert(subscription, messageId, renewed, campaignMessageAlert, subscription.expiryDate(), CampaignTriggerType.WEEKLY_MESSAGE);
+
+            if (campaignMessageAlert == null)
+                processNewCampaignMessageAlert(subscriptionId, messageId, false, subscription.expiryDate());
+
+            else
+                processExistingCampaignMessageAlert(subscription, messageId, campaignMessageAlert.isRenewed(), campaignMessageAlert, subscription.expiryDate(),CampaignTriggerType.WEEKLY_MESSAGE);
 
             if (subscription.hasPackBeenCompleted())
                 kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(subscription);

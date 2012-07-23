@@ -320,7 +320,21 @@ public class KilkariCampaignServiceTest {
     }
 
     @Test
-    public void shouldScheduleUnsubscriptionWhenPackIsCompleted() {
+    public void shouldScheduleUnsubscriptionWhenPackIsCompletedWhenCampaignAlertDoesNotExist() {
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(59));
+        String subscriptionId = subscription.getSubscriptionId();
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
+
+        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
+
+        verify(kilkariSubscriptionService).scheduleSubscriptionPackCompletionEvent(subscription);
+        verify(allCampaignMessageAlerts).add(any(CampaignMessageAlert.class));
+    }
+
+    @Test
+    public void shouldScheduleUnsubscriptionWhenPackIsCompletedWhenCampaignAlertDoesExist() {
         Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(59));
         String subscriptionId = subscription.getSubscriptionId();
         CampaignMessageAlert mockedCampaignMessageAlert = mock(CampaignMessageAlert.class);

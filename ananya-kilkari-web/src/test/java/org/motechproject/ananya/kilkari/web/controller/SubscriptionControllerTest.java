@@ -24,6 +24,7 @@ import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionRequ
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.TestUtils;
+import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
@@ -60,13 +61,15 @@ public class SubscriptionControllerTest {
     private CallbackRequestValidator callbackRequestValidator;
     @Mock
     private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
+    @Mock
+    private SubscriptionDetailsMapper mockedSubscriptionDetailsMapper;
 
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, subscriptionRequestValidator, callbackRequestValidator, unsubscriptionRequestValidator);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService, subscriptionRequestValidator, callbackRequestValidator, unsubscriptionRequestValidator, mockedSubscriptionDetailsMapper);
     }
 
     @Test
@@ -365,10 +368,16 @@ public class SubscriptionControllerTest {
     }
 
     private void mockSubscription(String msisdn) {
+        String subscriptionId = "subscription-id";
+        SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
+        SubscriptionStatus subscriptionStatus = SubscriptionStatus.NEW;
+
         when(mockedSubscription.getMsisdn()).thenReturn(msisdn);
-        when(mockedSubscription.getPack()).thenReturn(SubscriptionPack.FIFTEEN_MONTHS);
-        when(mockedSubscription.getStatus()).thenReturn(SubscriptionStatus.NEW);
-        when(mockedSubscription.getSubscriptionId()).thenReturn("subscription-id");
+        when(mockedSubscription.getPack()).thenReturn(subscriptionPack);
+        when(mockedSubscription.getStatus()).thenReturn(subscriptionStatus);
+        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+
+        when(mockedSubscriptionDetailsMapper.mapFrom(mockedSubscription)).thenReturn(new SubscriptionDetails(subscriptionId, subscriptionPack.name(), subscriptionStatus.name(), null));
     }
 
     private void assertCreatedAt(DateTime beforeCreate, SubscriptionRequest subscriptionRequest) {

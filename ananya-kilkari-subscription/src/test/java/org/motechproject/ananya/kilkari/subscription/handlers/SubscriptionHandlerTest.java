@@ -25,10 +25,12 @@ public class SubscriptionHandlerTest {
     private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
     @Mock
     private SubscriptionService subscriptionService;
+    private SubscriptionHandler subscriptionHandler;
 
     @Before
     public void setUp() {
         initMocks(this);
+        subscriptionHandler = new SubscriptionHandler(onMobileSubscriptionGateway, subscriptionService);
     }
 
     @Test
@@ -39,7 +41,8 @@ public class SubscriptionHandlerTest {
         final String subscriptionId = "abcd1234";
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, channel, subscriptionId));}};
 
-        new SubscriptionHandler(onMobileSubscriptionGateway, subscriptionService).handleSubscriptionActivation(new MotechEvent(SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION, parameters));
+
+        subscriptionHandler.handleSubscriptionActivation(new MotechEvent(SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION, parameters));
 
         ArgumentCaptor<ProcessSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
         verify(onMobileSubscriptionGateway).activateSubscription(subscriptionActivationRequestArgumentCaptor.capture());
@@ -62,7 +65,7 @@ public class SubscriptionHandlerTest {
         final String subscriptionId = "abcd1234";
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, channel, subscriptionId));}};
 
-        new SubscriptionHandler(onMobileSubscriptionGateway, subscriptionService).handleSubscriptionDeactivation(new MotechEvent(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, parameters));
+        subscriptionHandler.handleSubscriptionDeactivation(new MotechEvent(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, parameters));
 
         ArgumentCaptor<ProcessSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
         verify(onMobileSubscriptionGateway).deactivateSubscription(processSubscriptionRequestArgumentCaptor.capture());
@@ -84,7 +87,7 @@ public class SubscriptionHandlerTest {
         final String subscriptionId = "abcd1234";
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
 
-        new SubscriptionHandler(onMobileSubscriptionGateway, subscriptionService).handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
+        subscriptionHandler.handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
 
         ArgumentCaptor<ProcessSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
         verify(onMobileSubscriptionGateway).deactivateSubscription(processSubscriptionRequestArgumentCaptor.capture());
@@ -98,13 +101,25 @@ public class SubscriptionHandlerTest {
         verify(subscriptionService).subscriptionComplete(subscriptionId);
     }
 
+    @Test
+    public void shouldHandleInboxDeletion() {
+        final String msisdn = "9988776655";
+        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        final String subscriptionId = "abcd1234";
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
+
+        subscriptionHandler.handleInboxDeletion(new MotechEvent(SubscriptionEventKeys.DELETE_INBOX, parameters));
+
+        verify(subscriptionService).deleteInbox(subscriptionId);
+    }
+
     @Test(expected = RuntimeException.class)
     public void shouldThrowExceptionsRaisedByOnMobileSubscriptionServiceToCreateAnActivationRequest() {
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", null);}};
 
         doThrow(new RuntimeException()).when(onMobileSubscriptionGateway).activateSubscription(any(ProcessSubscriptionRequest.class));
 
-        new SubscriptionHandler(onMobileSubscriptionGateway, subscriptionService).handleSubscriptionActivation(new MotechEvent(SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION, parameters));
+        subscriptionHandler.handleSubscriptionActivation(new MotechEvent(SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION, parameters));
     }
 
     @Test(expected = RuntimeException.class)
@@ -113,6 +128,6 @@ public class SubscriptionHandlerTest {
 
         doThrow(new RuntimeException()).when(onMobileSubscriptionGateway).deactivateSubscription(any(ProcessSubscriptionRequest.class));
 
-        new SubscriptionHandler(onMobileSubscriptionGateway, subscriptionService).handleSubscriptionDeactivation(new MotechEvent(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, parameters));
+        subscriptionHandler.handleSubscriptionDeactivation(new MotechEvent(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, parameters));
     }
 }

@@ -22,6 +22,7 @@ import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
 
@@ -59,12 +60,14 @@ public class KilkariCampaignServiceTest {
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
     @Mock
     private ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper;
+    @Mock
+    private KilkariInboxService kilkariInboxService;
 
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, validCallDeliveryFailureRecordObjectMapper);
+        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, kilkariInboxService, validCallDeliveryFailureRecordObjectMapper);
     }
 
     @Test
@@ -338,7 +341,7 @@ public class KilkariCampaignServiceTest {
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
 
-        verify(kilkariSubscriptionService).scheduleSubscriptionPackCompletionEvent(subscription);
+        verify(kilkariSubscriptionService).processSubscriptionCompletion(subscription);
         verify(allCampaignMessageAlerts).add(any(CampaignMessageAlert.class));
     }
 
@@ -353,7 +356,7 @@ public class KilkariCampaignServiceTest {
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
 
-        verify(kilkariSubscriptionService).scheduleSubscriptionPackCompletionEvent(subscription);
+        verify(kilkariSubscriptionService).processSubscriptionCompletion(subscription);
     }
 
     @Test
@@ -539,4 +542,65 @@ public class KilkariCampaignServiceTest {
         verify(callDeliveryFailureRecordValidator, times(1)).validate(any(CallDeliveryFailureRecordObject.class));
         verify(obdRequestPublisher, never()).publishInvalidCallDeliveryFailureRecord(any(InvalidCallDeliveryFailureRecord.class));
     }
+
+    @Test
+    public void shouldUpdateInboxToHoldLastScheduledMessage(){
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        String messageId = "week10";
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(campaignMessageIdStrategy.createMessageId(subscription)).thenReturn(messageId);
+
+        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
+
+        verify(kilkariInboxService).newMessage(subscriptionId, messageId);
+    }
+
+    @Test
+    public void shouldNotUpdateInboxWhenSubscriptionIsNotActive(){
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+        String subscriptionId = subscription.getSubscriptionId();
+        String messageId = "week10";
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(campaignMessageIdStrategy.createMessageId(subscription)).thenReturn(messageId);
+
+        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
+
+        verify(kilkariInboxService, never()).newMessage(subscriptionId, messageId);
+    }
+
+    @Test
+    public void shouldNotUpdateInboxDuringRenewal(){
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        subscription.setOperator(Operator.AIRTEL);
+        String messageId = "WEEK13";
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, false, DateTime.now().plusWeeks(1));
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
+
+        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
+
+        verify(kilkariInboxService, never()).newMessage(subscriptionId, messageId);
+    }
+
+    @Test
+    public void shouldNotUpdateInboxWhenMessageHasNotAlreadyBeenScheduled(){
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        subscription.setOperator(Operator.AIRTEL);
+        CampaignMessageAlert campaignMessageAlert = null;
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
+
+        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.ACTIVATION);
+
+        verify(kilkariInboxService, never()).newMessage(anyString(), anyString());
+    }
+
 }

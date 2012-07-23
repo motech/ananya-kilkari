@@ -8,6 +8,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.mappers.SubscriptionRequestMapper;
+import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionRequestValidator;
 import org.motechproject.common.domain.PhoneNumber;
@@ -22,13 +23,15 @@ public class SubscriptionService {
     private OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher;
     private SubscriptionRequestValidator subscriptionRequestValidator;
     private ReportingService reportingService;
+    private AllInboxMessages allInboxMessages;
 
     @Autowired
-    public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher, SubscriptionRequestValidator subscriptionRequestValidator, ReportingService reportingService) {
+    public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher, SubscriptionRequestValidator subscriptionRequestValidator, ReportingService reportingService, AllInboxMessages allInboxMessages) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionRequestValidator = subscriptionRequestValidator;
         this.reportingService = reportingService;
+        this.allInboxMessages = allInboxMessages;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest) {
@@ -139,6 +142,10 @@ public class SubscriptionService {
         });
     }
 
+    public void deleteInbox(String subscriptionId) {
+        allInboxMessages.deleteFor(subscriptionId);
+    }
+
     public Subscription findBySubscriptionId(String subscriptionId) {
         return allSubscriptions.findBySubscriptionId(subscriptionId);
     }
@@ -149,7 +156,6 @@ public class SubscriptionService {
         allSubscriptions.update(subscription);
         reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscription.getSubscriptionId(), subscription.getStatus().name(), updatedOn, reason, operator, graceCount));
     }
-
 
     private void sendProcessSubscriptionEvent(ProcessSubscriptionRequest processSubscriptionRequest) {
         onMobileSubscriptionManagerPublisher.processActivation(processSubscriptionRequest);

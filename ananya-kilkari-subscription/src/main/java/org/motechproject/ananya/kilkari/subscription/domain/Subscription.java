@@ -186,4 +186,9 @@ public class Subscription extends MotechBaseDataObject {
     private int getWeeksElapsedAfterCreationDate() {
         return Weeks.weeksBetween(getCreationDate(), DateTime.now()).getWeeks();
     }
+
+    @JsonIgnore
+    public boolean isActive() {
+        return !(status.equals(SubscriptionStatus.PENDING_ACTIVATION) || status.equals(SubscriptionStatus.ACTIVATION_FAILED));
+    }
 }

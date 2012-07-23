@@ -175,4 +175,25 @@ public class SubscriptionTest {
         DateTime expiryDate = subscription.currentWeeksMessageExpiryDate();
         assertThat(expiryDate, is(subscription.getCreationDate().plusWeeks(1)));
     }
+
+    @Test
+    public void shouldReturnFalseForIsActiveWhenTheStatusIsPendingActivation(){
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
+
+        assertFalse(subscription.isActive());
+    }
+
+    @Test
+    public void shouldReturnFalseForIsActiveWhenTheStatusIsActivationFailed(){
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVATION_FAILED).build();
+
+        assertFalse(subscription.isActive());
+    }
+
+    @Test
+    public void shouldReturnTrueForIsActiveForAnyOtherStatus(){
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).build();
+
+        assertTrue(subscription.isActive());
+    }
 }

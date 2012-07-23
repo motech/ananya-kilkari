@@ -15,6 +15,7 @@ import org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionRequestValidator;
 
@@ -44,11 +45,13 @@ public class SubscriptionServiceTest {
     private SubscriptionRequestValidator subscriptionRequestValidator;
     @Mock
     private ReportingServiceImpl reportingServiceImpl;
+    @Mock
+    private AllInboxMessages allInboxMessages;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionRequestValidator, reportingServiceImpl);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionRequestValidator, reportingServiceImpl, allInboxMessages);
     }
 
     @Test
@@ -406,6 +409,15 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(SubscriptionStatus.PENDING_COMPLETION.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals("Subscription completed", subscriptionStateChangeReportRequest.getReason());
+    }
+
+    @Test
+    public void shouldDeleteInbox(){
+        String subscriptionId = "subscriptionId";
+
+        subscriptionService.deleteInbox(subscriptionId);
+
+        verify(allInboxMessages).deleteFor(subscriptionId);
     }
 
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {

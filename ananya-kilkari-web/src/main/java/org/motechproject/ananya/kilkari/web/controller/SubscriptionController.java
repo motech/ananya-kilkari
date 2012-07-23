@@ -29,13 +29,14 @@ public class SubscriptionController {
     private SubscriptionRequestValidator subscriptionRequestValidator;
     private CallbackRequestValidator callbackRequestValidator;
     private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
-
+    private SubscriptionDetailsMapper subscriptionDetailsMapper;
     @Autowired
-    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, SubscriptionRequestValidator subscriptionRequestValidator, CallbackRequestValidator callbackRequestValidator, UnsubscriptionRequestValidator unsubscriptionRequestValidator) {
+    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, SubscriptionRequestValidator subscriptionRequestValidator, CallbackRequestValidator callbackRequestValidator, UnsubscriptionRequestValidator unsubscriptionRequestValidator, SubscriptionDetailsMapper subscriptionDetailsMapper) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.subscriptionRequestValidator = subscriptionRequestValidator;
         this.callbackRequestValidator = callbackRequestValidator;
         this.unsubscriptionRequestValidator = unsubscriptionRequestValidator;
+        this.subscriptionDetailsMapper = subscriptionDetailsMapper;
     }
 
 
@@ -79,7 +80,7 @@ public class SubscriptionController {
 
         if (subscriptions != null) {
             for (Subscription subscription : subscriptions)
-                subscriberResponse.addSubscriptionDetail(SubscriptionDetailsMapper.mapFrom(subscription));
+                subscriberResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscription));
         }
 
         return subscriberResponse;
@@ -101,4 +102,3 @@ public class SubscriptionController {
         }
     }
 }
-

@@ -14,6 +14,7 @@ import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
 import org.slf4j.Logger;
@@ -38,8 +39,9 @@ public class KilkariCampaignService {
     private ReportingService reportingService;
     private OBDRequestPublisher obdRequestPublisher;
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
-    private ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper;
+    private KilkariInboxService kilkariInboxService;
 
+    private ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper;
     private final Logger logger = LoggerFactory.getLogger(KilkariCampaignService.class);
 
     KilkariCampaignService() {
@@ -54,6 +56,7 @@ public class KilkariCampaignService {
                                   ReportingService reportingService,
                                   OBDRequestPublisher obdRequestPublisher,
                                   CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator,
+                                  KilkariInboxService kilkariInboxService,
                                   ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper) {
         this.kilkariMessageCampaignService = kilkariMessageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
@@ -63,6 +66,7 @@ public class KilkariCampaignService {
         this.reportingService = reportingService;
         this.obdRequestPublisher = obdRequestPublisher;
         this.callDeliveryFailureRecordValidator = callDeliveryFailureRecordValidator;
+        this.kilkariInboxService = kilkariInboxService;
         this.validCallDeliveryFailureRecordObjectMapper = validCallDeliveryFailureRecordObjectMapper;
     }
 
@@ -91,12 +95,14 @@ public class KilkariCampaignService {
 
         if (campaignMessageAlert == null)
             processNewCampaignMessageAlert(subscriptionId, messageId, false, subscription.currentWeeksMessageExpiryDate());
-
         else
             processExistingCampaignMessageAlert(subscription, messageId, campaignMessageAlert.isRenewed(), campaignMessageAlert, subscription.currentWeeksMessageExpiryDate(), CampaignTriggerType.WEEKLY_MESSAGE);
 
+        if (subscription.isActive())
+            kilkariInboxService.newMessage(subscriptionId, messageId);
+
         if (subscription.hasPackBeenCompleted())
-            kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(subscription);
+            kilkariSubscriptionService.processSubscriptionCompletion(subscription);
     }
 
     public void activateOrRenewSchedule(String subscriptionId, CampaignTriggerType campaignTriggerType) {
@@ -110,7 +116,11 @@ public class KilkariCampaignService {
             return;
         }
 
-        processExistingCampaignMessageAlert(subscription, campaignMessageAlert.getMessageId(), true, campaignMessageAlert, campaignMessageAlert.getMessageExpiryDate(), campaignTriggerType);
+        String messageId = campaignMessageAlert.getMessageId();
+        processExistingCampaignMessageAlert(subscription, messageId, true, campaignMessageAlert, campaignMessageAlert.getMessageExpiryDate(), campaignTriggerType);
+
+        if(CampaignTriggerType.ACTIVATION.equals(campaignTriggerType))
+            kilkariInboxService.newMessage(subscriptionId, messageId);
     }
 
     public void processSuccessfulMessageDelivery(OBDSuccessfulCallRequestWrapper obdRequestWrapper) {

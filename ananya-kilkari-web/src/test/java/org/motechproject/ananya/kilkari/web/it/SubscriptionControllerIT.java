@@ -57,6 +57,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     @Autowired
     private StubOnMobileSubscriptionGateway onMobileSubscriptionService;
 
+    @Autowired
+    private SubscriptionDetailsMapper subscriptionDetailsMapper;
+
     @Before
     public void setUp() {
         allSubscriptions.removeAll();
@@ -79,8 +82,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         markForDeletion(subscription2);
 
         SubscriberResponse subscriberResponse = new SubscriberResponse();
-        subscriberResponse.addSubscriptionDetail(SubscriptionDetailsMapper.mapFrom(subscription1));
-        subscriberResponse.addSubscriptionDetail(SubscriptionDetailsMapper.mapFrom(subscription2));
+        subscriberResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscription1));
+        subscriberResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscription2));
 
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 

@@ -32,14 +32,14 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
 
         dncCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", "912134567890", "operator2", DateTime.now().plusDays(2));
         dncCampaignMessage.markSent();
-        dncCampaignMessage.markDidNotCall();
+        dncCampaignMessage.setStatusCode(CampaignMessageStatus.DNC);
 
         newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3", "3124567890", "operator3", DateTime.now().plusDays(2));
         newCampaignMessageSent.markSent();
 
         dncCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4", "004123567890", "operator4", DateTime.now().plusDays(2));
         dncCampaignMessageSent.markSent();
-        dncCampaignMessageSent.markDidNotCall();
+        dncCampaignMessage.setStatusCode(CampaignMessageStatus.DNC);
         dncCampaignMessageSent.markSent();
 
         dnpCampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", "5123467890", "operator5", DateTime.now().plusDays(2));

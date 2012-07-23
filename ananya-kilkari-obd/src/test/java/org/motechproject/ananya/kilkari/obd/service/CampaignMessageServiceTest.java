@@ -411,15 +411,15 @@ public class CampaignMessageServiceTest {
     public void shouldReportDNCCampaignMessageStatus() {
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK13";
-        String msisdn = "msisdn";
+        String msisdn = "1234567890";
         DateTime createdAt = new DateTime(2012, 12, 25, 23, 23, 23);
         CampaignMessageStatus status = CampaignMessageStatus.DNC;
         ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, msisdn, campaignId, status, createdAt);
 
-        CampaignMessage campaignMessage = new CampaignMessage();
+        CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, campaignId, msisdn, "airtel", DateTime.now().minusDays(1));
         campaignMessage.setStatusCode(CampaignMessageStatus.DNC);
         campaignMessage.markSent();
-        assertEquals(1,campaignMessage.getDncRetryCount());
+        assertEquals(1, campaignMessage.getDncRetryCount());
         when(obdProperties.getMaximumDNPRetryCount()).thenReturn(MAX_DNP_RETRY_COUNT);
         when(obdProperties.getMaximumDNCRetryCount()).thenReturn(MAX_DNC_RETRY_COUNT);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);

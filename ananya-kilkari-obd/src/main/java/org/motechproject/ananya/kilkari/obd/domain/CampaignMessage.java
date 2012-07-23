@@ -85,9 +85,9 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
     }
 
     public void markSent() {
-        if(this.status == CampaignMessageStatus.DNP)
+        if (this.status == CampaignMessageStatus.DNP)
             this.dnpRetryCount++;
-        if(this.status == CampaignMessageStatus.DNC)
+        else if (this.status == CampaignMessageStatus.DNC && weekEndingDate.isBeforeNow())
             this.dncRetryCount++;
 
         this.sent = true;
@@ -95,11 +95,6 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
 
     public void setStatusCode(CampaignMessageStatus statusCode) {
         this.status = statusCode;
-        this.sent = false;
-    }
-
-    public void markDidNotCall() {
-        this.status = CampaignMessageStatus.DNC;
         this.sent = false;
     }
 

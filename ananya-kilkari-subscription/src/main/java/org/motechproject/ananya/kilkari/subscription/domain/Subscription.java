@@ -179,7 +179,7 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     @JsonIgnore
-    public DateTime expiryDate() {
+    public DateTime currentWeeksMessageExpiryDate() {
         return getCreationDate().plusWeeks(getWeeksElapsedAfterCreationDate() + 1);
     }
 

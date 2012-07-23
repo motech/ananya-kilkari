@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.obd.domain;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -21,9 +22,9 @@ public class CampaignMessageTest {
     @Test
     public void shouldReturn10DigitPhoneNumberWhenGivenANumber() {
         String expectedNumber = "1234567890";
-        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "1234567890", "operator1").getMsisdn());
-        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "911234567890", "operator1").getMsisdn());
-        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "001234567890", "operator1").getMsisdn());
+        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2)).getMsisdn());
+        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "911234567890", "operator1", DateTime.now().plusDays(2)).getMsisdn());
+        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "001234567890", "operator1", DateTime.now().plusDays(2)).getMsisdn());
     }
 
     @Test

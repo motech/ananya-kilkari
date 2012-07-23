@@ -160,19 +160,23 @@ public class KilkariCampaignServiceTest {
         String messageId = "mymessageid";
         String msisdn = "1234567890";
         Operator operator = Operator.AIRTEL;
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
-        subscription.setOperator(operator);
-        String subscriptionId = subscription.getSubscriptionId();
+        Subscription mockSubscription = mock(Subscription.class);
+        String subscriptionId = "subscriptionId";
+        when(mockSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+        when(mockSubscription.getMsisdn()).thenReturn(msisdn);
+        when(mockSubscription.getOperator()).thenReturn(operator);
+        DateTime messageExpiryDate = DateTime.now().plusWeeks(1);
+        when(mockSubscription.currentWeeksMessageExpiryDate()).thenReturn(messageExpiryDate);
 
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, true, DateTime.now().plusWeeks(1));
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, true, messageExpiryDate);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
 
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(mockSubscription);
 
         kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator.name());
+        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator.name(), messageExpiryDate);
         ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
         verify(allCampaignMessageAlerts).remove(captor.capture());
         CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
@@ -184,20 +188,25 @@ public class KilkariCampaignServiceTest {
         String messageId = "mymessageid";
         String msisdn = "1234567890";
         Operator operator = Operator.AIRTEL;
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
-        subscription.setOperator(operator);
-        String subscriptionId = subscription.getSubscriptionId();
 
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId", true, DateTime.now().plusWeeks(1));
+        Subscription mockSubscription = mock(Subscription.class);
+        String subscriptionId = "subscriptionId";
+        when(mockSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+        when(mockSubscription.getMsisdn()).thenReturn(msisdn);
+        when(mockSubscription.getOperator()).thenReturn(operator);
+        DateTime messageExpiryDate = DateTime.now().plusWeeks(1);
+        when(mockSubscription.currentWeeksMessageExpiryDate()).thenReturn(messageExpiryDate);
 
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId", true, messageExpiryDate);
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(mockSubscription);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
-        when(campaignMessageIdStrategy.createMessageId(subscription)).thenReturn(messageId);
+        when(campaignMessageIdStrategy.createMessageId(mockSubscription)).thenReturn(messageId);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator.name());
+        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator.name(), messageExpiryDate);
         ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
         verify(allCampaignMessageAlerts).remove(captor.capture());
         CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();

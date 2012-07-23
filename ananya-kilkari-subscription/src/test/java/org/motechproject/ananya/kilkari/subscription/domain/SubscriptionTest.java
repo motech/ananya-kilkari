@@ -172,7 +172,7 @@ public class SubscriptionTest {
         DateTime creationDate = DateTime.now().minusDays(3);
         Subscription subscription = new SubscriptionBuilder().withDefaults().withCreationDate(creationDate).build();
 
-        DateTime expiryDate = subscription.expiryDate();
+        DateTime expiryDate = subscription.currentWeeksMessageExpiryDate();
         assertThat(expiryDate, is(subscription.getCreationDate().plusWeeks(1)));
     }
 }

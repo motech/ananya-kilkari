@@ -67,7 +67,7 @@ public class CampaignMessageServiceTest {
     public void shouldSaveTheCampaignMessageToDB() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
-        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, "1234567890", null);
+        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, "1234567890", null, DateTime.now().plusDays(2));
         ArgumentCaptor<CampaignMessage> captor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages).add(captor.capture());
 
@@ -92,8 +92,8 @@ public class CampaignMessageServiceTest {
 
     @Test
     public void sendNewMessagesShouldFetchNewAndDidNotCallMessages() {
-        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1");
-        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2");
+        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
+        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(campaignMessages);
         String csvContent = "csvContent";
@@ -125,8 +125,8 @@ public class CampaignMessageServiceTest {
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("myruntimeexception");
 
-        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1");
-        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2");
+        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
+        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(campaignMessages);
 
@@ -141,8 +141,8 @@ public class CampaignMessageServiceTest {
 
     @Test
     public void sendRetryMessagesShouldFetchRetryMessages() {
-        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1");
-        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2");
+        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
+        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(campaignMessages);
         String csvContent = "csvContent";
@@ -177,8 +177,8 @@ public class CampaignMessageServiceTest {
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("myruntimeexception");
 
-        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1");
-        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2");
+        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
+        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(campaignMessages);
 
@@ -216,7 +216,7 @@ public class CampaignMessageServiceTest {
         String subscriptionId = "subscriptionId";
         String campaignId = "campaignId";
 
-        when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(new CampaignMessage(subscriptionId, campaignId, "1234567890", null));
+        when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(new CampaignMessage(subscriptionId, campaignId, "1234567890", null, DateTime.now().plusDays(2)));
 
         campaignMessageService.deleteCampaignMessageIfExists(subscriptionId, campaignId);
 

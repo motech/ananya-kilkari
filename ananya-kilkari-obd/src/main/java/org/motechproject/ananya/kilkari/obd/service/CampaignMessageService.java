@@ -45,8 +45,8 @@ public class CampaignMessageService {
         this.obdProperties = obdProperties;
     }
 
-    public void scheduleCampaignMessage(String subscriptionId, String messageId, String msisdn, String operator) {
-        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, msisdn, operator));
+    public void scheduleCampaignMessage(String subscriptionId, String messageId, String msisdn, String operator, DateTime messageExpiryDate) {
+        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, msisdn, operator, messageExpiryDate));
     }
 
     public void sendNewMessages() {

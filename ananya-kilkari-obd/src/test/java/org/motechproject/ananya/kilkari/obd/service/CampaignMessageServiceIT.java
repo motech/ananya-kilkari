@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.obd.service;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,8 +43,9 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         String messageId = "messageId";
         String msisdn = "1234567890";
         String operator = "airtel";
-        allCampaignMessages.add(new CampaignMessage("subscriptionId2", "messageId2", "9876543210", "operator2"));
-        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, msisdn, operator));
+        allCampaignMessages.add(new CampaignMessage("subscriptionId2", "messageId2", "9876543210", "operator2", DateTime.now().plusDays(3)));
+        DateTime weekEndingDate = DateTime.now().plusDays(2);
+        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, msisdn, operator, weekEndingDate));
 
         CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
 
@@ -51,13 +54,14 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         assertEquals(messageId, campaignMessage.getMessageId());
         assertEquals(msisdn, campaignMessage.getMsisdn());
         assertEquals(operator, campaignMessage.getOperator());
+        assertEquals(weekEndingDate, campaignMessage.getWeekEndingDate());
     }
 
     @Test
     public void shouldDeleteTheCampaignMessage() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
-        CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, messageId, "1234567890", null);
+        CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, messageId, "1234567890", null, DateTime.now().plusDays(2));
         allCampaignMessages.add(campaignMessage);
 
         campaignMessageService.deleteCampaignMessage(campaignMessage);
@@ -69,7 +73,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
     public void shouldDeleteTheCampaignMessageIfItExists() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
-        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, "1234567890", null));
+        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, "1234567890", null, DateTime.now().plusDays(2)));
 
         campaignMessageService.deleteCampaignMessageIfExists(subscriptionId, messageId);
 
@@ -81,7 +85,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
     public void shouldNotDeleteTheCampaignMessageIfItDoesNotExists() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
-        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, "1234567890", null));
+        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, "1234567890", null, DateTime.now().plusDays(2)));
 
         campaignMessageService.deleteCampaignMessageIfExists("subscriptionId2", messageId);
 
@@ -93,7 +97,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
     public void shouldUpdateTheCampaignMessage() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
-        CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, messageId, "1234567890", null);
+        CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, messageId, "1234567890", null, DateTime.now().plusDays(2));
         allCampaignMessages.add(campaignMessage);
         assertEquals(CampaignMessageStatus.NEW, campaignMessage.getStatus());
         campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
@@ -111,11 +115,11 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         String operator = "airtel";
         String msisdn = "1234567890";
 
-        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator);
+        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, DateTime.now().plusDays(2));
 
         List<CampaignMessage> all = allCampaignMessages.getAll();
         for (CampaignMessage campaignMessage : all) {
-            if (equals(new CampaignMessage(subscriptionId, messageId, msisdn, operator), campaignMessage)) {
+            if (equals(new CampaignMessage(subscriptionId, messageId, msisdn, operator, DateTime.now().plusDays(2)), campaignMessage)) {
                 markForDeletion(campaignMessage);
                 return;
             }
@@ -142,7 +146,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         String operator = "airtel";
         String msisdn = "1234567890";
 
-        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator);
+        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, DateTime.now().plusDays(2));
         markForDeletion(allCampaignMessages.find(subscriptionId, messageId));
 
         OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
@@ -160,7 +164,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         String operator = "airtel";
         String msisdn = "1234567890";
 
-        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator);
+        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, DateTime.now().plusDays(2));
         CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
         campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
         allCampaignMessages.update(campaignMessage);

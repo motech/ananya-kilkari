@@ -2,6 +2,8 @@ package org.motechproject.ananya.kilkari.obd.domain;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
 
@@ -13,6 +15,9 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
 
     @JsonProperty
     private String messageId;
+
+    @JsonProperty
+    private DateTime weekEndingDate;
 
     @JsonProperty
     private String msisdn;
@@ -35,11 +40,16 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
     public CampaignMessage() {
     }
 
-    public CampaignMessage(String subscriptionId, String messageId, String msisdn, String operator) {
+    public CampaignMessage(String subscriptionId, String messageId, String msisdn, String operator, DateTime weekEndingDate) {
         this.subscriptionId = subscriptionId;
         this.messageId = messageId;
+        this.weekEndingDate = weekEndingDate;
         this.msisdn = PhoneNumber.formatPhoneNumberTo10Digits(msisdn).toString();
         this.operator = operator;
+    }
+
+    public DateTime getWeekEndingDate() {
+        return weekEndingDate.withZone(DateTimeZone.getDefault());
     }
 
     public String getSubscriptionId() {

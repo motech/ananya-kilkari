@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.obd.repository;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
@@ -27,31 +28,31 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
     public void setUp() {
         allCampaignMessages.removeAll();
 
-        newCampaignMessage = new CampaignMessage("subscriptionId1", "messageId1", "1234657980", "operator1");
+        newCampaignMessage = new CampaignMessage("subscriptionId1", "messageId1", "1234657980", "operator1", DateTime.now().plusDays(2));
 
-        dncCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", "912134567890", "operator2");
+        dncCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", "912134567890", "operator2", DateTime.now().plusDays(2));
         dncCampaignMessage.markSent();
         dncCampaignMessage.markDidNotCall();
 
-        newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3", "3124567890", "operator3");
+        newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3", "3124567890", "operator3", DateTime.now().plusDays(2));
         newCampaignMessageSent.markSent();
 
-        dncCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4", "004123567890", "operator4");
+        dncCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4", "004123567890", "operator4", DateTime.now().plusDays(2));
         dncCampaignMessageSent.markSent();
         dncCampaignMessageSent.markDidNotCall();
         dncCampaignMessageSent.markSent();
 
-        dnpCampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", "5123467890", "operator5");
+        dnpCampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", "5123467890", "operator5", DateTime.now().plusDays(2));
         dnpCampaignMessage.markSent();
         dnpCampaignMessage.setStatusCode(CampaignMessageStatus.DNP);
 
-        dnpCampaignMessageUnsentWithMoreRetryCount = new CampaignMessage("subscriptionId7", "messageId7", "5128467890", "operator7");
+        dnpCampaignMessageUnsentWithMoreRetryCount = new CampaignMessage("subscriptionId7", "messageId7", "5128467890", "operator7", DateTime.now().plusDays(2));
         dnpCampaignMessageUnsentWithMoreRetryCount.markSent();
         dnpCampaignMessageUnsentWithMoreRetryCount.setStatusCode(CampaignMessageStatus.DNP);
         dnpCampaignMessageUnsentWithMoreRetryCount.markSent();
         dnpCampaignMessageUnsentWithMoreRetryCount.setStatusCode(CampaignMessageStatus.DNP);
 
-        dnpCampaignMessageSent = new CampaignMessage("subscriptionId6", "messageId6", "6123457890", "operator6");
+        dnpCampaignMessageSent = new CampaignMessage("subscriptionId6", "messageId6", "6123457890", "operator6", DateTime.now().plusDays(2));
         dnpCampaignMessageSent.markSent();
         dnpCampaignMessageSent.setStatusCode(CampaignMessageStatus.DNP);
         dnpCampaignMessageSent.markSent();

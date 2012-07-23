@@ -90,10 +90,10 @@ public class KilkariCampaignService {
 
 
         if (campaignMessageAlert == null)
-            processNewCampaignMessageAlert(subscriptionId, messageId, false, subscription.expiryDate());
+            processNewCampaignMessageAlert(subscriptionId, messageId, false, subscription.currentWeeksMessageExpiryDate());
 
         else
-            processExistingCampaignMessageAlert(subscription, messageId, campaignMessageAlert.isRenewed(), campaignMessageAlert, subscription.expiryDate(), CampaignTriggerType.WEEKLY_MESSAGE);
+            processExistingCampaignMessageAlert(subscription, messageId, campaignMessageAlert.isRenewed(), campaignMessageAlert, subscription.currentWeeksMessageExpiryDate(), CampaignTriggerType.WEEKLY_MESSAGE);
 
         if (subscription.hasPackBeenCompleted())
             kilkariSubscriptionService.scheduleSubscriptionPackCompletionEvent(subscription);
@@ -110,9 +110,7 @@ public class KilkariCampaignService {
             return;
         }
 
-        String messageId = campaignMessageAlert.getMessageId();
-        DateTime messageExpiryTime = campaignMessageAlert.getMessageExpiryDate();
-        processExistingCampaignMessageAlert(subscription, messageId, true, campaignMessageAlert, messageExpiryTime, campaignTriggerType);
+        processExistingCampaignMessageAlert(subscription, campaignMessageAlert.getMessageId(), true, campaignMessageAlert, campaignMessageAlert.getMessageExpiryDate(), campaignTriggerType);
     }
 
     public void processSuccessfulMessageDelivery(OBDSuccessfulCallRequestWrapper obdRequestWrapper) {
@@ -164,7 +162,7 @@ public class KilkariCampaignService {
         }
 
         logger.info(String.format("Campaign message can be scheduled. Updating it with: Renewed: %s, messageId: %s", renewed, messageId));
-        campaignMessageService.scheduleCampaignMessage(subscription.getSubscriptionId(), messageId, subscription.getMsisdn(), subscription.getOperator().name());
+        campaignMessageService.scheduleCampaignMessage(subscription.getSubscriptionId(), messageId, subscription.getMsisdn(), subscription.getOperator().name(), messageExpiryTime);
         allCampaignMessageAlerts.remove(campaignMessageAlert);
     }
 

@@ -12,8 +12,6 @@ import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.gateway.StubOnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
-import org.motechproject.ananya.kilkari.reporting.gateway.ReportingGateway;
-import org.motechproject.ananya.kilkari.reporting.gateway.StubReportingGateway;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
@@ -66,7 +64,7 @@ public class OBDControllerIT extends SpringIntegrationTest {
         allSubscriptions.add(subscription2);
         markForDeletion(subscription1);
         markForDeletion(subscription2);
-        CampaignMessage campaignMessage = new CampaignMessage(subscription1.getSubscriptionId(), "WEEK13", msisdn, Operator.AIRTEL.name());
+        CampaignMessage campaignMessage = new CampaignMessage(subscription1.getSubscriptionId(), "WEEK13", msisdn, Operator.AIRTEL.name(), DateTime.now().plusDays(2));
         allCampaignMessages.add(campaignMessage);
         markForDeletion(campaignMessage);
 

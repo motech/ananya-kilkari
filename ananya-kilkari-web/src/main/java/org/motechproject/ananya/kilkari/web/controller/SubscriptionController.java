@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -14,6 +15,7 @@ import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
+import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +28,14 @@ public class SubscriptionController {
     private KilkariSubscriptionService kilkariSubscriptionService;
     private SubscriptionRequestValidator subscriptionRequestValidator;
     private CallbackRequestValidator callbackRequestValidator;
+    private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
 
     @Autowired
-    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, SubscriptionRequestValidator subscriptionRequestValidator, CallbackRequestValidator callbackRequestValidator) {
+    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, SubscriptionRequestValidator subscriptionRequestValidator, CallbackRequestValidator callbackRequestValidator, UnsubscriptionRequestValidator unsubscriptionRequestValidator) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.subscriptionRequestValidator = subscriptionRequestValidator;
         this.callbackRequestValidator = callbackRequestValidator;
+        this.unsubscriptionRequestValidator = unsubscriptionRequestValidator;
     }
 
 
@@ -59,9 +63,7 @@ public class SubscriptionController {
     public BaseResponse subscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
         final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
         List<String> validationErrors = callbackRequestValidator.validate(callbackRequestWrapper);
-        if (!(validationErrors.isEmpty())) {
-            throw new ValidationException(StringUtils.join(validationErrors, ","));
-        }
+        raiseExceptionIfThereAreErrors(validationErrors);
 
         kilkariSubscriptionService.processCallbackRequest(callbackRequestWrapper);
 
@@ -81,6 +83,22 @@ public class SubscriptionController {
         }
 
         return subscriberResponse;
+    }
+
+    @RequestMapping(value = "/subscription", method = RequestMethod.DELETE)
+    @ResponseBody
+    public BaseResponse removeSubscription(@RequestBody UnsubscriptionRequest unsubscriptionRequest) {
+        List<String> validationErrors = unsubscriptionRequestValidator.validate(unsubscriptionRequest);
+        raiseExceptionIfThereAreErrors(validationErrors);
+
+        kilkariSubscriptionService.requestDeactivation(unsubscriptionRequest, Channel.CALL_CENTER);
+        return BaseResponse.success("Subscription unsubscribed successfully");
+    }
+
+    private void raiseExceptionIfThereAreErrors(List<String> validationErrors) {
+        if (!(validationErrors.isEmpty())) {
+            throw new ValidationException(StringUtils.join(validationErrors, ","));
+        }
     }
 }
 

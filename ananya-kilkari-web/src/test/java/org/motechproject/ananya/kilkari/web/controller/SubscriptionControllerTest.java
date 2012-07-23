@@ -14,6 +14,7 @@ import org.motechproject.ananya.kilkari.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
@@ -27,6 +28,7 @@ import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
+import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
@@ -55,13 +57,15 @@ public class SubscriptionControllerTest {
     private SubscriptionService subscriptionService;
     @Mock
     private CallbackRequestValidator callbackRequestValidator;
+    @Mock
+    private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
 
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, subscriptionRequestValidator, callbackRequestValidator);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService, subscriptionRequestValidator, callbackRequestValidator, unsubscriptionRequestValidator);
     }
 
     @Test
@@ -307,6 +311,56 @@ public class SubscriptionControllerTest {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withChannel("xyz").build();
 
         subscriptionController.createSubscription(subscriptionRequest);
+    }
+
+    @Test
+    public void shouldUnsubscribeAUserGivenValidDetails() throws Exception {
+        String subscriptionId = "abcd1234";
+        UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
+        unsubscriptionRequest.setMsisdn("1234567890");
+        unsubscriptionRequest.setSubscriptionId(subscriptionId);
+        unsubscriptionRequest.setPack(SubscriptionPack.FIFTEEN_MONTHS.name());
+        unsubscriptionRequest.setReason("reason");
+        byte[] requestBody = TestUtils.toJson(unsubscriptionRequest).getBytes();
+
+        mockMvc(subscriptionController)
+                .perform(delete("/subscription")
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription unsubscribed successfully")));
+
+        ArgumentCaptor<UnsubscriptionRequest> unsubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(UnsubscriptionRequest.class);
+        ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);
+        verify(kilkariSubscriptionService).requestDeactivation(unsubscriptionRequestArgumentCaptor.capture(), channelArgumentCaptor.capture());
+        UnsubscriptionRequest actualUnSubscriptionRequest = unsubscriptionRequestArgumentCaptor.getValue();
+        Channel actualChannel = channelArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, actualUnSubscriptionRequest.getSubscriptionId());
+        assertEquals(Channel.CALL_CENTER, actualChannel);
+    }
+
+    @Test
+    public void shouldValidateUnsubscriptionRequestDetails() throws Exception {
+        String subscriptionId = "abcd1234";
+        UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
+        unsubscriptionRequest.setMsisdn("1234567890");
+        unsubscriptionRequest.setSubscriptionId(subscriptionId);
+        unsubscriptionRequest.setPack(SubscriptionPack.FIFTEEN_MONTHS.name());
+        unsubscriptionRequest.setReason("reason");
+        byte[] requestBody = TestUtils.toJson(unsubscriptionRequest).getBytes();
+
+        ArrayList<String> errors = new ArrayList<>();
+        errors.add("some error description1");
+        errors.add("some error description2");
+        when(unsubscriptionRequestValidator.validate(any(UnsubscriptionRequest.class))).thenReturn(errors);
+
+        mockMvc(subscriptionController)
+                .perform(delete("/subscription")
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andExpect(content().string(baseResponseMatcher("ERROR", "some error description1,some error description2")));
     }
 
     private void mockSubscription(String msisdn) {

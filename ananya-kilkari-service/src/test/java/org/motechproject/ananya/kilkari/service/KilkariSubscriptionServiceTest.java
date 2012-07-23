@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
@@ -126,5 +127,21 @@ public class KilkariSubscriptionServiceTest {
         assertEquals(ProcessSubscriptionRequest.class, processSubscriptionRequest.getClass());
         assertEquals(now.plusDays(3).toDate(), runOnceSchedulableJob.getStartDate());
         assertEquals(Channel.MOTECH,processSubscriptionRequest.getChannel());
+    }
+
+    @Test
+    public void shouldDeactivateSubscription() {
+        UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
+        String subscriptionId = "abcd1234";
+        unsubscriptionRequest.setSubscriptionId(subscriptionId);
+
+        kilkariSubscriptionService.requestDeactivation(unsubscriptionRequest, Channel.CALL_CENTER);
+
+        ArgumentCaptor<DeactivationRequest> deactivationRequestArgumentCaptor = ArgumentCaptor.forClass(DeactivationRequest.class);
+        verify(subscriptionService).requestDeactivation(deactivationRequestArgumentCaptor.capture());
+        DeactivationRequest deactivationRequest = deactivationRequestArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, deactivationRequest.getSubscriptionId());
+        assertEquals(Channel.CALL_CENTER, deactivationRequest.getChannel());
     }
 }

@@ -8,6 +8,8 @@ import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -88,5 +90,9 @@ public class KilkariSubscriptionService {
         RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);
 
         motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+    }
+
+    public void requestDeactivation(UnsubscriptionRequest unsubscriptionRequest, Channel channel) {
+        subscriptionService.requestDeactivation(new DeactivationRequest(unsubscriptionRequest.getSubscriptionId(), channel));
     }
 }

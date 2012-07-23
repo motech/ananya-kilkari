@@ -22,6 +22,10 @@ public class ChannelTest {
         assertFalse(Channel.isValid(" "));
         assertFalse(Channel.isValid(null));
     }
+    @Test
+    public void shouldReturnFalseIfChannelIsMotech() {
+        assertFalse(Channel.isValid("motech"));
+    }
 
     @Test
     public void shouldReturnTrueIfChannelIsValid() {

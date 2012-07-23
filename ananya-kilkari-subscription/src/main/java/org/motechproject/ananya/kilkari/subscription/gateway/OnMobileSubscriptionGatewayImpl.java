@@ -40,8 +40,7 @@ public class OnMobileSubscriptionGatewayImpl implements OnMobileSubscriptionGate
         Map<String, String> urlVariables = new HashMap<>();
         urlVariables.put("msisdn", processSubscriptionRequest.getMsisdn());
         urlVariables.put("srvkey", processSubscriptionRequest.getPack().name());
-        if (processSubscriptionRequest.getChannel() != null)
-            urlVariables.put("mode", processSubscriptionRequest.getChannel().name());
+        urlVariables.put("mode", processSubscriptionRequest.getChannel().name());
         urlVariables.put("refid", processSubscriptionRequest.getSubscriptionId());
         urlVariables.put("user", onMobileEndpoints.username());
         urlVariables.put("pass", onMobileEndpoints.password());

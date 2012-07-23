@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.subscription.domain;
 import org.apache.commons.lang.StringUtils;
 
 public enum Channel {
-    IVR, CALL_CENTER;
+    IVR, CALL_CENTER, MOTECH;
 
     public static boolean isIVR(String channel) {
         return Channel.IVR.name().equalsIgnoreCase(StringUtils.trim(channel));
@@ -19,11 +19,11 @@ public enum Channel {
 
     public static boolean isValid(String channel) {
         try {
-            from(channel);
+            Channel channelValue = from(channel);
+            return channelValue != MOTECH;
         } catch (Exception e) {
             return false;
         }
-        return true;
     }
 }
 

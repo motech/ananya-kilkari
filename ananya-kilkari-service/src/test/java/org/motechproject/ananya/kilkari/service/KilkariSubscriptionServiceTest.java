@@ -122,7 +122,9 @@ public class KilkariSubscriptionServiceTest {
         RunOnceSchedulableJob runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
         assertEquals(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, runOnceSchedulableJob.getMotechEvent().getSubject());
         assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
-        assertEquals(ProcessSubscriptionRequest.class, runOnceSchedulableJob.getMotechEvent().getParameters().get("0").getClass());
+        ProcessSubscriptionRequest processSubscriptionRequest = (ProcessSubscriptionRequest) runOnceSchedulableJob.getMotechEvent().getParameters().get("0");
+        assertEquals(ProcessSubscriptionRequest.class, processSubscriptionRequest.getClass());
         assertEquals(now.plusDays(3).toDate(), runOnceSchedulableJob.getStartDate());
+        assertEquals(Channel.MOTECH,processSubscriptionRequest.getChannel());
     }
 }

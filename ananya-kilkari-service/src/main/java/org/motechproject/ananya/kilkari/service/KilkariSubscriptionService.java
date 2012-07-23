@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
@@ -81,7 +82,7 @@ public class KilkariSubscriptionService {
 
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put(MotechSchedulerService.JOB_ID_KEY, subscription.getSubscriptionId());
-        parameters.put("0", SubscriptionMapper.mapFrom(subscription, null));
+        parameters.put("0", SubscriptionMapper.mapFrom(subscription, Channel.MOTECH));
 
         MotechEvent motechEvent = new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters);
         RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);

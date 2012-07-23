@@ -38,7 +38,7 @@ public class OnMobileOBDGatewayImplTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
-    private OBDEndPoints obdEndPoints;
+    private OBDProperties obdProperties;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -47,14 +47,14 @@ public class OnMobileOBDGatewayImplTest {
     @Before
     public void setUp() {
         initMocks(this);
-        when(obdEndPoints.getMessageDeliveryBaseUrl()).thenReturn("mybaseurl");
-        when(obdEndPoints.getMessageDeliveryFileName()).thenReturn("myfile.txt");
-        when(obdEndPoints.getMessageDeliveryFile()).thenReturn("myfile");
-        when(obdEndPoints.getNewMessageDeliveryUrlQueryString()).thenReturn("?startDate=%s130000&endDate=%s160000");
-        when(obdEndPoints.getRetryMessageDeliveryUrlQueryString()).thenReturn("?startDate=%s180000&endDate=%s200000");
-        when(obdEndPoints.getFailureReportUrl()).thenReturn("failureUrl");
+        when(obdProperties.getMessageDeliveryBaseUrl()).thenReturn("mybaseurl");
+        when(obdProperties.getMessageDeliveryFileName()).thenReturn("myfile.txt");
+        when(obdProperties.getMessageDeliveryFile()).thenReturn("myfile");
+        when(obdProperties.getNewMessageDeliveryUrlQueryString()).thenReturn("?startDate=%s130000&endDate=%s160000");
+        when(obdProperties.getRetryMessageDeliveryUrlQueryString()).thenReturn("?startDate=%s180000&endDate=%s200000");
+        when(obdProperties.getFailureReportUrl()).thenReturn("failureUrl");
 
-        onMobileOBDGateway = new OnMobileOBDGatewayImpl(httpClient, obdEndPoints, restTemplate);
+        onMobileOBDGateway = new OnMobileOBDGatewayImpl(httpClient, obdProperties, restTemplate);
     }
 
     @Test

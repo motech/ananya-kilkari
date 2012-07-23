@@ -112,11 +112,11 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
         CampaignMessage actualCampaignMessage1 = allRetryMessages.get(0);
         assertFalse(actualCampaignMessage1.isSent());
         assertEquals(CampaignMessageStatus.DNP, actualCampaignMessage1.getStatus());
-        assertEquals(1, actualCampaignMessage1.getRetryCount());
+        assertEquals(1, actualCampaignMessage1.getDnpRetryCount());
 
         CampaignMessage actualCampaignMessage2 = allRetryMessages.get(1);
         assertFalse(actualCampaignMessage2.isSent());
         assertEquals(CampaignMessageStatus.DNP, actualCampaignMessage2.getStatus());
-        assertEquals(0, actualCampaignMessage2.getRetryCount());
+        assertEquals(0, actualCampaignMessage2.getDnpRetryCount());
     }
 }

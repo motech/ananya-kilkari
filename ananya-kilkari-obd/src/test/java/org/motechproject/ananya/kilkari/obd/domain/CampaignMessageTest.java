@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.obd.domain;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -58,16 +57,16 @@ public class CampaignMessageTest {
     public void markSentShouldIncrementRetryCountForDNP() {
         CampaignMessage campaignMessage = new CampaignMessage();
         campaignMessage.markSent();
-        assertEquals(0, campaignMessage.getRetryCount());
+        assertEquals(0, campaignMessage.getDnpRetryCount());
         campaignMessage.markDidNotPickup();
         campaignMessage.markSent();
-        assertEquals(1, campaignMessage.getRetryCount());
+        assertEquals(1, campaignMessage.getDnpRetryCount());
         campaignMessage.markDidNotPickup();
         campaignMessage.markSent();
-        assertEquals(2, campaignMessage.getRetryCount());
+        assertEquals(2, campaignMessage.getDnpRetryCount());
         campaignMessage.markDidNotCall();
         campaignMessage.markSent();
-        assertEquals(2, campaignMessage.getRetryCount());
+        assertEquals(2, campaignMessage.getDnpRetryCount());
     }
 
     @Test
@@ -78,13 +77,13 @@ public class CampaignMessageTest {
         campaignMessage1.markSent();
         campaignMessage1.markDidNotPickup();
         campaignMessage1.markSent();
-        assertEquals(2, campaignMessage1.getRetryCount());
+        assertEquals(2, campaignMessage1.getDnpRetryCount());
 
         CampaignMessage campaignMessage2 = new CampaignMessage();
         campaignMessage2.markSent();
         campaignMessage2.markDidNotPickup();
         campaignMessage2.markSent();
-        assertEquals(1, campaignMessage2.getRetryCount());
+        assertEquals(1, campaignMessage2.getDnpRetryCount());
 
         ArrayList<CampaignMessage> campaignMessages = new ArrayList<>();
         campaignMessages.add(campaignMessage2);

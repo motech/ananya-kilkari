@@ -27,7 +27,10 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
     private CampaignMessageStatus status = CampaignMessageStatus.NEW;
 
     @JsonProperty
-    private int retryCount;
+    private int dnpRetryCount;
+
+    @JsonProperty
+    private int dncRetryCount;
 
     public CampaignMessage() {
     }
@@ -63,9 +66,17 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
         return status;
     }
 
+    public int getDnpRetryCount() {
+        return dnpRetryCount;
+    }
+
+    public int getDncRetryCount() {
+        return dncRetryCount;
+    }
+
     public void markSent() {
         if(this.status == CampaignMessageStatus.DNP)
-            this.retryCount++;
+            this.dnpRetryCount++;
         this.sent = true;
     }
 
@@ -79,12 +90,8 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
         this.sent = false;
     }
 
-    public int getRetryCount() {
-        return retryCount;
-    }
-
     @Override
     public int compareTo(CampaignMessage message) {
-        return (this.retryCount > message.retryCount ? -1 : (this.retryCount == message.retryCount ? 0 : 1));
+        return (this.dnpRetryCount > message.dnpRetryCount ? -1 : (this.dnpRetryCount == message.dnpRetryCount ? 0 : 1));
     }
 }

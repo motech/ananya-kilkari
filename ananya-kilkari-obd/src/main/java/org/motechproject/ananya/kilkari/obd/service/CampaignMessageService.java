@@ -7,7 +7,7 @@ import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
 import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
-import org.motechproject.ananya.kilkari.obd.gateway.OBDEndPoints;
+import org.motechproject.ananya.kilkari.obd.gateway.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.AllInvalidCallRecords;
@@ -30,18 +30,18 @@ public class CampaignMessageService {
     private CampaignMessageCSVBuilder campaignMessageCSVBuilder;
     private AllInvalidCallRecords allInvalidCallRecords;
     private final ReportingService reportingService;
-    private final OBDEndPoints obdEndPoints;
+    private final OBDProperties obdProperties;
 
     private static final Logger logger = LoggerFactory.getLogger(CampaignMessageService.class);
 
     @Autowired
-    public CampaignMessageService(AllCampaignMessages allCampaignMessages, OnMobileOBDGateway onMobileOBDGateway, CampaignMessageCSVBuilder campaignMessageCSVBuilder, AllInvalidCallRecords allInvalidCallRecords, ReportingService reportingService, OBDEndPoints obdEndPoints) {
+    public CampaignMessageService(AllCampaignMessages allCampaignMessages, OnMobileOBDGateway onMobileOBDGateway, CampaignMessageCSVBuilder campaignMessageCSVBuilder, AllInvalidCallRecords allInvalidCallRecords, ReportingService reportingService, OBDProperties obdProperties) {
         this.allCampaignMessages = allCampaignMessages;
         this.onMobileOBDGateway = onMobileOBDGateway;
         this.campaignMessageCSVBuilder = campaignMessageCSVBuilder;
         this.allInvalidCallRecords = allInvalidCallRecords;
         this.reportingService = reportingService;
-        this.obdEndPoints = obdEndPoints;
+        this.obdProperties = obdProperties;
     }
 
     public void scheduleCampaignMessage(String subscriptionId, String messageId, String msisdn, String operator) {
@@ -122,7 +122,7 @@ public class CampaignMessageService {
     }
 
     private void updateCampaignMessageStatus(CampaignMessage campaignMessage) {
-        if (campaignMessage.getRetryCount() == obdEndPoints.getMaximumRetryCount())
+        if (campaignMessage.getDnpRetryCount() == obdProperties.getMaximumRetryCount())
             allCampaignMessages.delete(campaignMessage);
         else {
             campaignMessage.markDidNotPickup();
@@ -131,7 +131,7 @@ public class CampaignMessageService {
     }
 
     private void reportCampaignMessageStatus(ValidCallDeliveryFailureRecordObject recordObject, CampaignMessage campaignMessage) {
-        String retryCount = ((Integer) campaignMessage.getRetryCount()).toString();
+        String retryCount = ((Integer) campaignMessage.getDnpRetryCount()).toString();
         CallDetailsReportRequest callDetailRecord = new CallDetailsReportRequest(format(recordObject.getCreatedAt()), format(recordObject.getCreatedAt()));
         CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(recordObject.getSubscriptionId(), recordObject.getMsisdn(), recordObject.getCampaignId(), null, retryCount, recordObject.getStatusCode().name(), callDetailRecord);
 

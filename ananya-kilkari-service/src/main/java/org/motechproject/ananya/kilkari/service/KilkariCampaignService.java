@@ -122,7 +122,7 @@ public class KilkariCampaignService {
                     obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId()));
             return;
         }
-        int retryCount = campaignMessage.getRetryCount();
+        int retryCount = campaignMessage.getDnpRetryCount();
 
         reportingService.reportCampaignMessageDeliveryStatus(new CampaignMessageDeliveryReportRequestMapper().mapFrom(obdRequestWrapper, retryCount));
         campaignMessageService.deleteCampaignMessage(campaignMessage);

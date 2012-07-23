@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 import java.util.Properties;
 
 @Component
-public class OBDEndPoints {
+public class OBDProperties {
 
     private Properties obdProperties;
 
     @Autowired
-    public OBDEndPoints(@Qualifier("obdProperties") Properties obdProperties) {
+    public OBDProperties(@Qualifier("obdProperties") Properties obdProperties) {
         this.obdProperties = obdProperties;
     }
 

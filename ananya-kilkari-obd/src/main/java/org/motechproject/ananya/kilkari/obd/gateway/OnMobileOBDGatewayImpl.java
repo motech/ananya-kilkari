@@ -28,40 +28,40 @@ import java.io.InputStreamReader;
 public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
 
     private HttpClient obdHttpClient;
-    private OBDEndPoints obdEndPoints;
+    private OBDProperties obdProperties;
     private RestTemplate restTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(OnMobileOBDGatewayImpl.class);
 
     @Autowired
-    public OnMobileOBDGatewayImpl(HttpClient obdHttpClient, OBDEndPoints obdEndPoints, RestTemplate kilkariRestTemplate) {
+    public OnMobileOBDGatewayImpl(HttpClient obdHttpClient, OBDProperties obdProperties, RestTemplate kilkariRestTemplate) {
         this.obdHttpClient = obdHttpClient;
-        this.obdEndPoints = obdEndPoints;
+        this.obdProperties = obdProperties;
         this.restTemplate = kilkariRestTemplate;
     }
 
     @Override
     public void sendNewMessages(String content) {
-        String url = getUrl(obdEndPoints.getNewMessageDeliveryUrlQueryString());
+        String url = getUrl(obdProperties.getNewMessageDeliveryUrlQueryString());
         send(content, url);
     }
 
     @Override
     public void sendRetryMessages(String content) {
-        String url = getUrl(obdEndPoints.getRetryMessageDeliveryUrlQueryString());
+        String url = getUrl(obdProperties.getRetryMessageDeliveryUrlQueryString());
         send(content, url);
     }
 
     @Override
     public void sendInvalidFailureRecord(InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord) {
-        restTemplate.postForLocation(obdEndPoints.getFailureReportUrl(), invalidCallDeliveryFailureRecord);
+        restTemplate.postForLocation(obdProperties.getFailureReportUrl(), invalidCallDeliveryFailureRecord);
     }
 
     private void send(String content, String url) {
         logger.info(String.format("Uploading the campaign messages to url: %s\nContent:\n%s", url, content));
 
-        String fileName = obdEndPoints.getMessageDeliveryFileName();
-        String file = obdEndPoints.getMessageDeliveryFile();
+        String fileName = obdProperties.getMessageDeliveryFileName();
+        String file = obdProperties.getMessageDeliveryFile();
 
         HttpPost httpPost = new HttpPost(url);
         MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
@@ -79,7 +79,7 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     }
 
     private String getUrl(String queryString) {
-        String baseUrl = obdEndPoints.getMessageDeliveryBaseUrl();
+        String baseUrl = obdProperties.getMessageDeliveryBaseUrl();
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
         String date = dateTimeFormatter.print(DateTime.now());
         return String.format(baseUrl + queryString, date, date);

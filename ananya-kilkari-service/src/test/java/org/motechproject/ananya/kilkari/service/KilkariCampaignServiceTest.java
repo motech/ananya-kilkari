@@ -260,7 +260,7 @@ public class KilkariCampaignServiceTest {
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, DateTime.now(), Channel.IVR);
         CampaignMessage campaignMessage = mock(CampaignMessage.class);
-        when(campaignMessage.getRetryCount()).thenReturn(retryCount);
+        when(campaignMessage.getDnpRetryCount()).thenReturn(retryCount);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
         kilkariCampaignService.processSuccessfulMessageDelivery(successfulCallRequestWrapper);

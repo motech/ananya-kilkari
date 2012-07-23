@@ -12,7 +12,7 @@ import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRec
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
-import org.motechproject.ananya.kilkari.obd.gateway.OBDEndPoints;
+import org.motechproject.ananya.kilkari.obd.gateway.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.AllInvalidCallRecords;
@@ -48,7 +48,7 @@ public class CampaignMessageServiceTest {
     private AllInvalidCallRecords allInvalidCallRecords;
 
     @Mock
-    private OBDEndPoints obdEndPoints;
+    private OBDProperties obdProperties;
 
     @Mock
     private ReportingService reportingService;
@@ -59,7 +59,7 @@ public class CampaignMessageServiceTest {
     @Before
     public void setUp() {
         initMocks(this);
-        campaignMessageService = new CampaignMessageService(allCampaignMessages, onMobileOBDGateway, campaignMessageCSVBuilder, allInvalidCallRecords, reportingService, obdEndPoints);
+        campaignMessageService = new CampaignMessageService(allCampaignMessages, onMobileOBDGateway, campaignMessageCSVBuilder, allInvalidCallRecords, reportingService, obdProperties);
     }
 
     @Test
@@ -277,7 +277,7 @@ public class CampaignMessageServiceTest {
         ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNP, DateTime.now());
 
         CampaignMessage campaignMessage = new CampaignMessage();
-        when(obdEndPoints.getMaximumRetryCount()).thenReturn(MAX_RETRY_COUNT);
+        when(obdProperties.getMaximumRetryCount()).thenReturn(MAX_RETRY_COUNT);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
         campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);
@@ -299,8 +299,8 @@ public class CampaignMessageServiceTest {
         ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNP, DateTime.now());
 
         CampaignMessage campaignMessage = mock(CampaignMessage.class);
-        when(obdEndPoints.getMaximumRetryCount()).thenReturn(MAX_RETRY_COUNT);
-        when(campaignMessage.getRetryCount()).thenReturn(MAX_RETRY_COUNT);
+        when(obdProperties.getMaximumRetryCount()).thenReturn(MAX_RETRY_COUNT);
+        when(campaignMessage.getDnpRetryCount()).thenReturn(MAX_RETRY_COUNT);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
         campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);
@@ -335,7 +335,7 @@ public class CampaignMessageServiceTest {
         ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, msisdn, campaignId, status, createdAt);
 
         CampaignMessage campaignMessage = new CampaignMessage();
-        when(obdEndPoints.getMaximumRetryCount()).thenReturn(MAX_RETRY_COUNT);
+        when(obdProperties.getMaximumRetryCount()).thenReturn(MAX_RETRY_COUNT);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
         campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);

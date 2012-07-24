@@ -50,8 +50,10 @@ public class OnMobileOBDGatewayImplTest {
         when(obdProperties.getMessageDeliveryBaseUrl()).thenReturn("mybaseurl");
         when(obdProperties.getMessageDeliveryFileName()).thenReturn("myfile.txt");
         when(obdProperties.getMessageDeliveryFile()).thenReturn("myfile");
-        when(obdProperties.getNewMessageDeliveryUrlQueryString()).thenReturn("?startDate=%s130000&endDate=%s160000");
-        when(obdProperties.getRetryMessageDeliveryUrlQueryString()).thenReturn("?startDate=%s180000&endDate=%s200000");
+        when(obdProperties.getNewMessageSlotStartTime()).thenReturn("130000");
+        when(obdProperties.getNewMessageSlotEndTime()).thenReturn("160000");
+        when(obdProperties.getRetryMessageSlotStartTime()).thenReturn("180000");
+        when(obdProperties.getRetryMessageSlotEndTime()).thenReturn("200000");
         when(obdProperties.getFailureReportUrl()).thenReturn("failureUrl");
 
         onMobileOBDGateway = new OnMobileOBDGatewayImpl(httpClient, obdProperties, restTemplate);
@@ -79,12 +81,14 @@ public class OnMobileOBDGatewayImplTest {
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
         String date = dateTimeFormatter.print(DateTime.now());
 
-        assertEquals(String.format("mybaseurl?startDate=%s%s&endDate=%s%s", date, "130000", date, "160000"), httpPost.getURI().toString());
+        assertEquals("mybaseurl", httpPost.getURI().toString());
 
         String actualContent = readRequest(multipartEntity);
 
         assertTrue(actualContent.contains(expectedContent));
         assertTrue(actualContent.contains("form-data; name=\"myfile\"; filename=\"myfile.txt\""));
+        assertTrue(actualContent.contains(String.format("form-data; name=\"%s\"%s%s", "startDate", date, "130000")));
+        assertTrue(actualContent.contains(String.format("form-data; name=\"%s\"%s%s", "endDate", date, "160000")));
     }
 
     @Test
@@ -109,12 +113,14 @@ public class OnMobileOBDGatewayImplTest {
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
         String date = dateTimeFormatter.print(DateTime.now());
 
-        assertEquals(String.format("mybaseurl?startDate=%s%s&endDate=%s%s", date, "180000", date, "200000"), httpPost.getURI().toString());
+        assertEquals("mybaseurl", httpPost.getURI().toString());
 
         String actualContent = readRequest(multipartEntity);
 
         assertTrue(actualContent.contains(expectedContent));
         assertTrue(actualContent.contains("form-data; name=\"myfile\"; filename=\"myfile.txt\""));
+        assertTrue(actualContent.contains(String.format("form-data; name=\"%s\"%s%s", "startDate", date, "180000")));
+        assertTrue(actualContent.contains(String.format("form-data; name=\"%s\"%s%s", "endDate", date, "200000")));
     }
 
     @Test

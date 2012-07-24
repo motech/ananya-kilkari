@@ -8,6 +8,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -27,6 +28,8 @@ import java.io.InputStreamReader;
 @ProductionProfile
 public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
 
+    public static final String START_DATE_PARAM_NAME = "startDate";
+    public static final String END_DATE_PARAM_NAME = "endDate";
     private HttpClient obdHttpClient;
     private OBDProperties obdProperties;
     private RestTemplate restTemplate;
@@ -42,14 +45,18 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
 
     @Override
     public void sendNewMessages(String content) {
-        String url = getUrl(obdProperties.getNewMessageDeliveryUrlQueryString());
-        send(content, url);
+        String url = obdProperties.getMessageDeliveryBaseUrl();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
+        String date = dateTimeFormatter.print(DateTime.now());
+        send(content, url, String.format("%s%s", date, obdProperties.getNewMessageSlotStartTime()), String.format("%s%s", date, obdProperties.getNewMessageSlotEndTime()));
     }
 
     @Override
     public void sendRetryMessages(String content) {
-        String url = getUrl(obdProperties.getRetryMessageDeliveryUrlQueryString());
-        send(content, url);
+        String url = obdProperties.getMessageDeliveryBaseUrl();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
+        String date = dateTimeFormatter.print(DateTime.now());
+        send(content, url, String.format("%s%s", date, obdProperties.getRetryMessageSlotStartTime()), String.format("%s%s", date, obdProperties.getRetryMessageSlotEndTime()));
     }
 
     @Override
@@ -57,7 +64,7 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
         restTemplate.postForLocation(obdProperties.getFailureReportUrl(), invalidFailedCallReports);
     }
 
-    private void send(String content, String url) {
+    private void send(String content, String url, String slotStartDate, String slotEndDate) {
         logger.info(String.format("Uploading the campaign messages to url: %s\nContent:\n%s", url, content));
 
         String fileName = obdProperties.getMessageDeliveryFileName();
@@ -66,8 +73,17 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
         HttpPost httpPost = new HttpPost(url);
         MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
         reqEntity.addPart(file, new ByteArrayBody(content.getBytes(), "text/plain", fileName));
-        httpPost.setEntity(reqEntity);
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
+        String date = dateTimeFormatter.print(DateTime.now());
+
+
         try {
+            reqEntity.addPart(START_DATE_PARAM_NAME, new StringBody(slotStartDate));
+            reqEntity.addPart(END_DATE_PARAM_NAME, new StringBody(slotEndDate));
+
+            httpPost.setEntity(reqEntity);
+
             HttpResponse response = obdHttpClient.execute(httpPost);
             String responseContent = readResponse(response); //Read the response from stream first thing. As it should be read completely before making any other request.
             validateResponse(response, responseContent);
@@ -76,13 +92,6 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
             logger.error("Sending messages to OBD failed", ex);
             throw new RuntimeException(ex);
         }
-    }
-
-    private String getUrl(String queryString) {
-        String baseUrl = obdProperties.getMessageDeliveryBaseUrl();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
-        String date = dateTimeFormatter.print(DateTime.now());
-        return String.format(baseUrl + queryString, date, date);
     }
 
     private void validateResponse(HttpResponse response, String responseContent) {

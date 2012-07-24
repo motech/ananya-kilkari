@@ -32,12 +32,12 @@ public class OBDProperties {
         return obdProperties.getProperty("obd.message.delivery.file");
     }
 
-    public String getNewMessageDeliveryUrlQueryString() {
-        return obdProperties.getProperty("obd.new.message.delivery.url.query.string");
+    public String getNewMessageSlotStartTime() {
+        return obdProperties.getProperty("obd.new.message.slot.start.time");
     }
 
-    public String getRetryMessageDeliveryUrlQueryString() {
-        return obdProperties.getProperty("obd.retry.message.delivery.url.query.string");
+    public String getNewMessageSlotEndTime() {
+        return obdProperties.getProperty("obd.new.message.slot.end.time");
     }
 
     public Integer getMaximumDNPRetryCount() {
@@ -46,6 +46,14 @@ public class OBDProperties {
 
     public Integer getMaximumDNCRetryCount() {
         return Integer.parseInt(obdProperties.getProperty("obd.dnc.message.max.retry.count"));
+    }
+
+    public String getRetryMessageSlotStartTime() {
+        return obdProperties.getProperty("obd.retry.message.slot.start.time");
+    }
+
+    public String getRetryMessageSlotEndTime() {
+        return obdProperties.getProperty("obd.retry.message.slot.end.time");
     }
 }
 

@@ -27,8 +27,8 @@ public class CallbackRequestValidator {
         this.subscriptionService = subscriptionService;
     }
 
-    public List<String> validate(CallbackRequestWrapper callbackRequestWrapper) {
-        List<String> errors = new ArrayList<>();
+    public Errors validate(CallbackRequestWrapper callbackRequestWrapper) {
+        Errors errors = new Errors();
         final boolean isValidCallbackAction = validateCallbackAction(callbackRequestWrapper.getAction(), errors);
         final boolean isValidCallbackStatus = validateCallbackStatus(callbackRequestWrapper.getStatus(), errors);
         if (isValidCallbackAction && isValidCallbackStatus) {
@@ -73,17 +73,17 @@ public class CallbackRequestValidator {
     }
 
 
-    private void validateOperator(String operator, List<String> errors) {
+    private void validateOperator(String operator, Errors errors) {
         if (!Operator.isValid(operator))
             errors.add(String.format("Invalid operator %s", operator));
     }
 
-    private void validateMsisdn(String msisdn, List<String> errors) {
+    private void validateMsisdn(String msisdn, Errors errors) {
         if (PhoneNumber.isNotValid(msisdn))
             errors.add(String.format("Invalid msisdn %s", msisdn));
     }
 
-    private boolean validateCallbackAction(String callbackAction, List<String> errors) {
+    private boolean validateCallbackAction(String callbackAction, Errors errors) {
         if (!CallbackAction.isValid(callbackAction)) {
             errors.add(String.format("Invalid callbackAction %s", callbackAction));
             return false;
@@ -91,7 +91,7 @@ public class CallbackRequestValidator {
         return true;
     }
 
-    private boolean validateCallbackStatus(String callbackStatus, List<String> errors) {
+    private boolean validateCallbackStatus(String callbackStatus, Errors errors) {
         if (!CallbackStatus.isValid(callbackStatus)) {
             errors.add(String.format("Invalid callbackStatus %s", callbackStatus));
             return false;

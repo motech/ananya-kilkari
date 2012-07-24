@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
-import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
@@ -15,6 +14,7 @@ import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
+import org.motechproject.ananya.kilkari.web.validators.Errors;
 import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -62,7 +62,7 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse subscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
         final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
-        List<String> validationErrors = callbackRequestValidator.validate(callbackRequestWrapper);
+        Errors validationErrors = callbackRequestValidator.validate(callbackRequestWrapper);
         raiseExceptionIfThereAreErrors(validationErrors);
 
         kilkariSubscriptionService.processCallbackRequest(callbackRequestWrapper);
@@ -88,16 +88,16 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.DELETE)
     @ResponseBody
     public BaseResponse removeSubscription(@RequestBody UnsubscriptionRequest unsubscriptionRequest, @PathVariable String subscriptionId) {
-        List<String> validationErrors = unsubscriptionRequestValidator.validate(subscriptionId);
+        Errors validationErrors = unsubscriptionRequestValidator.validate(subscriptionId);
         raiseExceptionIfThereAreErrors(validationErrors);
 
         kilkariSubscriptionService.requestDeactivation(subscriptionId, unsubscriptionRequest);
         return BaseResponse.success("Subscription unsubscribed successfully");
     }
 
-    private void raiseExceptionIfThereAreErrors(List<String> validationErrors) {
-        if (!(validationErrors.isEmpty())) {
-            throw new ValidationException(StringUtils.join(validationErrors, ","));
+    private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
+        if (validationErrors.hasErrors()) {
+            throw new ValidationException(validationErrors.allMessages());
         }
     }
 }

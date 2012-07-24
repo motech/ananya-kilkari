@@ -6,9 +6,7 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 
-import java.util.List;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -32,7 +30,7 @@ public class UnsubscriptionRequestValidatorTest {
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        assertTrue(unsubscriptionRequestValidator.validate(subscriptionId).isEmpty());
+        assertTrue(unsubscriptionRequestValidator.validate(subscriptionId).hasNoErrors());
     }
 
     @Test
@@ -41,9 +39,11 @@ public class UnsubscriptionRequestValidatorTest {
 
         when(subscriptionService.findBySubscriptionId(anyString())).thenReturn(null);
 
-        List<String> errors = unsubscriptionRequestValidator.validate(subscriptionId);
+        Errors errors = unsubscriptionRequestValidator.validate(subscriptionId);
 
-        assertFalse(errors.isEmpty());
-        assertEquals("Invalid subscriptionId " + subscriptionId, errors.get(0));
+        ErrorAsserter errorAsserter = new ErrorAsserter(errors);
+
+        errorAsserter.hasErrors();
+        errorAsserter.hasMessage("Invalid subscriptionId " + subscriptionId);
     }
 }

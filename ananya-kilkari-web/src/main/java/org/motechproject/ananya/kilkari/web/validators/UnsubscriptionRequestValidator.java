@@ -4,9 +4,6 @@ import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
 public class UnsubscriptionRequestValidator {
 
@@ -17,15 +14,15 @@ public class UnsubscriptionRequestValidator {
         this.subscriptionService = subscriptionService;
     }
 
-    public List<String> validate(String subscriptionId) {
-        List<String> errors = new ArrayList<>();
+    public Errors validate(String subscriptionId) {
+        Errors errors = new Errors();
         validateSubscription(subscriptionId, errors);
 
         return errors;
     }
 
-    private void validateSubscription(String subscriptionId, List<String> errors) {
+    private void validateSubscription(String subscriptionId, Errors errors) {
         if (subscriptionService.findBySubscriptionId(subscriptionId) == null)
-            errors.add(String.format("Invalid subscriptionId %s", subscriptionId));
+            errors.add("Invalid subscriptionId %s", subscriptionId);
     }
 }

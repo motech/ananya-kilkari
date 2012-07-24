@@ -28,6 +28,7 @@ import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
+import org.motechproject.ananya.kilkari.web.validators.Errors;
 import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
 import org.springframework.http.MediaType;
 
@@ -233,7 +234,7 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldGiveAnErrorMessageWhenCallBackRequestIsInvalid() throws Exception {
-        ArrayList<String> errors = new ArrayList<String>() {
+        ArrayList<String> errorsMessages = new ArrayList<String>() {
             {
                 add("Invalid msisdn invalidMsisdn");
                 add("Invalid operator invalidOperator");
@@ -242,6 +243,8 @@ public class SubscriptionControllerTest {
 
         byte[] requestBody = TestUtils.toJson(new CallbackRequest()).getBytes();
 
+        Errors errors = new Errors();
+        errors.addAll(errorsMessages);
         when(callbackRequestValidator.validate(any(CallbackRequestWrapper.class))).thenReturn(errors);
 
         mockMvc(subscriptionController)
@@ -266,7 +269,7 @@ public class SubscriptionControllerTest {
         callbackRequest.setOperator(Operator.AIRTEL.name());
         callbackRequest.setGraceCount("2");
         byte[] requestBody = TestUtils.toJson(callbackRequest).getBytes();
-        when(callbackRequestValidator.validate(any(CallbackRequestWrapper.class))).thenReturn(new ArrayList<String>());
+        when(callbackRequestValidator.validate(any(CallbackRequestWrapper.class))).thenReturn(new Errors());
 
         mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId)
@@ -321,6 +324,8 @@ public class SubscriptionControllerTest {
         unsubscriptionRequest.setChannel(Channel.CALL_CENTER.name());
         byte[] requestBody = TestUtils.toJson(unsubscriptionRequest).getBytes();
 
+        when(unsubscriptionRequestValidator.validate(subscriptionId)).thenReturn(new Errors());
+
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
@@ -346,7 +351,7 @@ public class SubscriptionControllerTest {
         unsubscriptionRequest.setReason("reason");
         byte[] requestBody = TestUtils.toJson(unsubscriptionRequest).getBytes();
 
-        ArrayList<String> errors = new ArrayList<>();
+        Errors errors = new Errors();
         errors.add("some error description1");
         errors.add("some error description2");
         when(unsubscriptionRequestValidator.validate(anyString())).thenReturn(errors);

@@ -10,14 +10,17 @@ public class SubscriptionDetails {
     private String pack;
     @JsonProperty
     private String status;
+    @JsonProperty
+    private String lastCampaignId;
 
     public SubscriptionDetails() {
     }
 
-    public SubscriptionDetails(String subscriptionId, String pack, String status) {
+    public SubscriptionDetails(String subscriptionId, String pack, String status, String lastCampaignId) {
         this.subscriptionId = subscriptionId;
         this.pack = pack;
         this.status = status;
+        this.lastCampaignId = lastCampaignId;
     }
 
     @JsonIgnore
@@ -33,5 +36,10 @@ public class SubscriptionDetails {
     @JsonIgnore
     public String getStatus() {
         return status;
+    }
+
+    @JsonIgnore
+    public String getLastCampaignId() {
+        return lastCampaignId;
     }
 }

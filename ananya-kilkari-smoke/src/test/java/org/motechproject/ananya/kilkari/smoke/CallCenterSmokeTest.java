@@ -4,10 +4,14 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.motechproject.ananya.kilkari.smoke.domain.kilkari.*;
+import org.motechproject.ananya.kilkari.smoke.domain.kilkari.BaseResponse;
+import org.motechproject.ananya.kilkari.smoke.domain.kilkari.SubscriberResponse;
+import org.motechproject.ananya.kilkari.smoke.domain.kilkari.SubscriptionDetails;
+import org.motechproject.ananya.kilkari.smoke.domain.kilkari.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.smoke.domain.report.SubscriptionStatusMeasure;
 import org.motechproject.ananya.kilkari.smoke.service.ReportService;
 import org.motechproject.ananya.kilkari.smoke.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.smoke.utils.SubscriptionRequestBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -18,7 +22,7 @@ import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.KILKARI_SUBSCRIPTION_POST_URL;
-import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.fromJson;
+import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.fromJsonWithResponse;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationKilkariSmokeContext.xml")
@@ -36,31 +40,23 @@ public class CallCenterSmokeTest {
         reportService.createNewLocation("D1", "B1", "P1");
     }
 
-    @Test(timeout = 20000)
-    public void shouldPostHttpRequestAndVerifyEntriesInReportDbAndCouchDb() throws InterruptedException, SQLException {
-        String channel = "CALL_CENTER";
-        String msisdn = "9000000002";
-        String pack = "FIFTEEN_MONTHS";
+    @Test
+    public void shouldPostHttpRequestAndVerifyEntriesInReportDbAndCouchDb() throws InterruptedException {
         String expectedStatus = "PENDING_ACTIVATION";
-        DateTime createdAt = DateTime.now();
-        String beneficiaryName = "John Doe";
-        String beneficiaryAge = "24";
-        String dateOfBirth = DateTime.now().minusYears(24).toString("dd-MM-yyyy");
-        String estimatedDateOfDelivery = DateTime.now().plusDays(20).toString("dd-MM-yyyy");
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, pack, channel, createdAt, beneficiaryName, beneficiaryAge, estimatedDateOfDelivery, dateOfBirth, new Location("D1", "B1", "P1"));
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().build();
 
         String responseEntity = restTemplate.postForObject(KILKARI_SUBSCRIPTION_POST_URL, subscriptionRequest, String.class);
 
-        BaseResponse baseResponse = fromJson(responseEntity.replace("var response = ", ""), BaseResponse.class);
+        BaseResponse baseResponse = fromJsonWithResponse(responseEntity, BaseResponse.class);
         assertEquals("SUCCESS", baseResponse.getStatus());
 
-        SubscriberResponse response = subscriptionService.getSubscriptionData(msisdn, channel, expectedStatus);
+        SubscriberResponse response = subscriptionService.getSubscriptionData(subscriptionRequest.getMsisdn(), subscriptionRequest.getChannel(), expectedStatus);
         assertEquals(1, response.getSubscriptionDetails().size());
-        assertKilkariData(pack, expectedStatus, response);
+        assertKilkariData(subscriptionRequest.getPack(), expectedStatus, response);
 
-        List<SubscriptionStatusMeasure> subscriptionStatusMeasures = reportService.getSubscriptionStatusMeasureForMsisdn(msisdn);
+        List<SubscriptionStatusMeasure> subscriptionStatusMeasures = reportService.getSubscriptionStatusMeasureForMsisdn(subscriptionRequest.getMsisdn());
         assertEquals(2, subscriptionStatusMeasures.size());
-        assertReportData(subscriptionStatusMeasures, channel, msisdn, pack, expectedStatus, beneficiaryName, beneficiaryAge, dateOfBirth, estimatedDateOfDelivery);
+        assertReportData(subscriptionStatusMeasures, subscriptionRequest.getChannel(), subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), expectedStatus, subscriptionRequest.getBeneficiaryName(), subscriptionRequest.getBeneficiaryAge(), subscriptionRequest.getDateOfBirth(), subscriptionRequest.getExpectedDateOfDelivery());
     }
 
     private void assertKilkariData(String pack, String expectedStatus, SubscriberResponse response) {
@@ -70,18 +66,21 @@ public class CallCenterSmokeTest {
     }
 
     private void assertReportData(List<SubscriptionStatusMeasure> subscriptionStatusMeasures, String channel, String msisdn, String pack, String expectedStatus, String beneficiaryName, String beneficiaryAge, String dateOfBirth, String estimatedDateOfDelivery) {
-        assertEquals(msisdn, subscriptionStatusMeasures.get(0).getMsisdn());
-        assertEquals(pack, subscriptionStatusMeasures.get(0).getPack().toUpperCase());
-        assertEquals(channel, subscriptionStatusMeasures.get(0).getChannel().toUpperCase());
-        assertEquals("NEW", subscriptionStatusMeasures.get(0).getStatus().toUpperCase());
-        assertEquals(beneficiaryName, subscriptionStatusMeasures.get(0).getName());
-        assertEquals(beneficiaryAge, subscriptionStatusMeasures.get(0).getAge());
-        assertEquals(dateOfBirth, new DateTime(subscriptionStatusMeasures.get(0).getDateOfBirth()).toString("dd-MM-yyyy"));
-        assertEquals(estimatedDateOfDelivery, new DateTime(subscriptionStatusMeasures.get(0).getEstimatedDateOfDelivery()).toString("dd-MM-yyyy"));
+        SubscriptionStatusMeasure subscriptionStatusMeasure0 = subscriptionStatusMeasures.get(0);
+        SubscriptionStatusMeasure subscriptionStatusMeasure1 = subscriptionStatusMeasures.get(1);
 
-        assertEquals(msisdn, subscriptionStatusMeasures.get(1).getMsisdn());
-        assertEquals(pack, subscriptionStatusMeasures.get(1).getPack().toUpperCase());
-        assertEquals(channel, subscriptionStatusMeasures.get(1).getChannel().toUpperCase());
-        assertEquals(expectedStatus, subscriptionStatusMeasures.get(1).getStatus().toUpperCase());
+        assertEquals(msisdn, subscriptionStatusMeasure0.getMsisdn());
+        assertEquals(pack, subscriptionStatusMeasure0.getPack().toUpperCase());
+        assertEquals(channel, subscriptionStatusMeasure0.getChannel().toUpperCase());
+        assertEquals("NEW", subscriptionStatusMeasure0.getStatus().toUpperCase());
+        assertEquals(beneficiaryName, subscriptionStatusMeasure0.getName());
+        assertEquals(beneficiaryAge, subscriptionStatusMeasure0.getAge());
+        assertEquals(dateOfBirth, new DateTime(subscriptionStatusMeasure0.getDateOfBirth()).toString("dd-MM-yyyy"));
+        assertEquals(estimatedDateOfDelivery, new DateTime(subscriptionStatusMeasure0.getEstimatedDateOfDelivery()).toString("dd-MM-yyyy"));
+
+        assertEquals(msisdn, subscriptionStatusMeasure1.getMsisdn());
+        assertEquals(pack, subscriptionStatusMeasure1.getPack().toUpperCase());
+        assertEquals(channel, subscriptionStatusMeasure1.getChannel().toUpperCase());
+        assertEquals(expectedStatus, subscriptionStatusMeasure1.getStatus().toUpperCase());
     }
 }

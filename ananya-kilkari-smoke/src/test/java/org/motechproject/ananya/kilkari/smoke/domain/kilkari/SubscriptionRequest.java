@@ -12,6 +12,10 @@ public class SubscriptionRequest {
     private String expectedDateOfDelivery;
     private String dateOfBirth;
     private Location location;
+    private String status;
+
+    public SubscriptionRequest() {
+    }
 
     public SubscriptionRequest(String msisdn, String pack, String channel, DateTime createdAt, String beneficiaryName, String beneficiaryAge, String expectedDateOfDelivery, String dateOfBirth, Location location) {
         this.msisdn = msisdn;
@@ -59,5 +63,57 @@ public class SubscriptionRequest {
 
     public Location getLocation() {
         return location;
+    }
+
+    public void setMsisdn(String msisdn) {
+        this.msisdn = msisdn;
+    }
+
+    public void setPack(String pack) {
+        this.pack = pack;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    public void setCreatedAt(DateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setBeneficiaryName(String beneficiaryName) {
+        this.beneficiaryName = beneficiaryName;
+    }
+
+    public void setBeneficiaryAge(String beneficiaryAge) {
+        this.beneficiaryAge = beneficiaryAge;
+    }
+
+    public void setExpectedDateOfDelivery(String expectedDateOfDelivery) {
+        this.expectedDateOfDelivery = expectedDateOfDelivery;
+    }
+
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public void setDistrict(String district) {
+        this.location.setDistrict(district);
+    }
+
+    public void setBlock(String block) {
+        this.location.setBlock(block);
+    }
+
+    public void setPanchayat(String panchayat) {
+        this.location.setPanchayat(panchayat);
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

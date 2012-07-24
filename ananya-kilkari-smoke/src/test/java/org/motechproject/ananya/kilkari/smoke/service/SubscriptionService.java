@@ -20,7 +20,7 @@ public class SubscriptionService {
                 parametersMap.put("channel", channel);
                 RestTemplate restTemplate = new RestTemplate();
                 ResponseEntity<String> subscriberResponseResponseEntity = restTemplate.getForEntity(constructUrl(KILKARI_URL, "subscriber", parametersMap), String.class);
-                SubscriberResponse subscriberResponse = fromJson(subscriberResponseResponseEntity.getBody().replace("var response = ", ""), SubscriberResponse.class);
+                SubscriberResponse subscriberResponse = fromJsonWithResponse(subscriberResponseResponseEntity.getBody(), SubscriberResponse.class);
                 return subscriberResponse.getSubscriptionDetails().isEmpty()
                         || !subscriberResponse.getSubscriptionDetails().get(0).getStatus().equals(status)
                         ? null : subscriberResponse;

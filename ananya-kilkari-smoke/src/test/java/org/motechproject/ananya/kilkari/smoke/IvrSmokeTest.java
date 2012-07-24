@@ -38,7 +38,7 @@ public class IvrSmokeTest {
         reportService.deleteAll();
     }
 
-    @Test(timeout = 20000)
+    @Test
     public void shouldPostHttpRequestAndVerifyEntriesInReportDbAndCouchDb() throws InterruptedException, SQLException {
         String channel = "IVR";
         String msisdn = "9000000001";
@@ -52,7 +52,7 @@ public class IvrSmokeTest {
 
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(constructUrl(KILKARI_URL, "subscription", parametersMap), String.class);
 
-        BaseResponse baseResponse = fromJson(responseEntity.getBody().replace("var response = ", ""), BaseResponse.class);
+        BaseResponse baseResponse = fromJsonWithResponse(responseEntity.getBody(), BaseResponse.class);
         assertEquals("SUCCESS", baseResponse.getStatus());
 
         SubscriberResponse response = subscriptionService.getSubscriptionData(msisdn, channel, expectedStatus);

@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
+import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -36,21 +37,21 @@ public class SubscriptionHandlerTest {
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         final Channel channel = Channel.IVR;
         final String subscriptionId = "abcd1234";
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, channel, subscriptionId));}};
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId));}};
 
 
         subscriptionHandler.handleSubscriptionActivation(new MotechEvent(SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION, parameters));
 
-        ArgumentCaptor<ProcessSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
+        ArgumentCaptor<OMSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         verify(onMobileSubscriptionGateway).activateSubscription(subscriptionActivationRequestArgumentCaptor.capture());
-        ProcessSubscriptionRequest processSubscriptionRequest = subscriptionActivationRequestArgumentCaptor.getValue();
+        OMSubscriptionRequest OMSubscriptionRequest = subscriptionActivationRequestArgumentCaptor.getValue();
 
-        assertEquals(msisdn, processSubscriptionRequest.getMsisdn());
-        assertEquals(channel, processSubscriptionRequest.getChannel());
-        assertEquals(pack, processSubscriptionRequest.getPack());
-        assertEquals(subscriptionId, processSubscriptionRequest.getSubscriptionId());
+        assertEquals(msisdn, OMSubscriptionRequest.getMsisdn());
+        assertEquals(channel, OMSubscriptionRequest.getChannel());
+        assertEquals(pack, OMSubscriptionRequest.getPack());
+        assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
 
-        verify(onMobileSubscriptionGateway).activateSubscription(processSubscriptionRequest);
+        verify(onMobileSubscriptionGateway).activateSubscription(OMSubscriptionRequest);
         verify(subscriptionService).activationRequested(subscriptionId);
     }
 
@@ -60,20 +61,20 @@ public class SubscriptionHandlerTest {
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         final Channel channel = Channel.IVR;
         final String subscriptionId = "abcd1234";
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, channel, subscriptionId));}};
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId));}};
 
         subscriptionHandler.handleSubscriptionDeactivation(new MotechEvent(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, parameters));
 
-        ArgumentCaptor<ProcessSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
+        ArgumentCaptor<OMSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         verify(onMobileSubscriptionGateway).deactivateSubscription(processSubscriptionRequestArgumentCaptor.capture());
-        ProcessSubscriptionRequest processSubscriptionRequest = processSubscriptionRequestArgumentCaptor.getValue();
+        OMSubscriptionRequest OMSubscriptionRequest = processSubscriptionRequestArgumentCaptor.getValue();
 
-        assertEquals(msisdn, processSubscriptionRequest.getMsisdn());
-        assertEquals(channel, processSubscriptionRequest.getChannel());
-        assertEquals(pack, processSubscriptionRequest.getPack());
-        assertEquals(subscriptionId, processSubscriptionRequest.getSubscriptionId());
+        assertEquals(msisdn, OMSubscriptionRequest.getMsisdn());
+        assertEquals(channel, OMSubscriptionRequest.getChannel());
+        assertEquals(pack, OMSubscriptionRequest.getPack());
+        assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
 
-        verify(onMobileSubscriptionGateway).deactivateSubscription(processSubscriptionRequest);
+        verify(onMobileSubscriptionGateway).deactivateSubscription(OMSubscriptionRequest);
         verify(subscriptionService).deactivationRequested(subscriptionId);
     }
 
@@ -82,20 +83,20 @@ public class SubscriptionHandlerTest {
         final String msisdn = "9988776655";
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         final String subscriptionId = "abcd1234";
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new OMSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
         Subscription subscription = new SubscriptionBuilder().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).build();
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         subscriptionHandler.handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
 
-        ArgumentCaptor<ProcessSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
+        ArgumentCaptor<OMSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         verify(onMobileSubscriptionGateway).deactivateSubscription(processSubscriptionRequestArgumentCaptor.capture());
-        ProcessSubscriptionRequest processSubscriptionRequest = processSubscriptionRequestArgumentCaptor.getValue();
+        OMSubscriptionRequest OMSubscriptionRequest = processSubscriptionRequestArgumentCaptor.getValue();
 
-        assertEquals(msisdn, processSubscriptionRequest.getMsisdn());
-        assertEquals(null, processSubscriptionRequest.getChannel());
-        assertEquals(pack, processSubscriptionRequest.getPack());
-        assertEquals(subscriptionId, processSubscriptionRequest.getSubscriptionId());
+        assertEquals(msisdn, OMSubscriptionRequest.getMsisdn());
+        assertEquals(null, OMSubscriptionRequest.getChannel());
+        assertEquals(pack, OMSubscriptionRequest.getPack());
+        assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
 
         verify(subscriptionService).subscriptionComplete(subscriptionId);
     }
@@ -107,11 +108,11 @@ public class SubscriptionHandlerTest {
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         Subscription subscription = new SubscriptionBuilder().withMsisdn(msisdn).withStatus(SubscriptionStatus.DEACTIVATED).build();
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new OMSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
 
         new SubscriptionHandler(onMobileSubscriptionGateway, subscriptionService).handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
 
-        verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(ProcessSubscriptionRequest.class));
+        verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
         verify(subscriptionService, never()).subscriptionComplete(subscriptionId);
     }
 
@@ -119,7 +120,7 @@ public class SubscriptionHandlerTest {
     public void shouldThrowExceptionsRaisedByOnMobileSubscriptionServiceToCreateAnActivationRequest() {
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", null);}};
 
-        doThrow(new RuntimeException()).when(onMobileSubscriptionGateway).activateSubscription(any(ProcessSubscriptionRequest.class));
+        doThrow(new RuntimeException()).when(onMobileSubscriptionGateway).activateSubscription(any(OMSubscriptionRequest.class));
 
         subscriptionHandler.handleSubscriptionActivation(new MotechEvent(SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION, parameters));
     }
@@ -128,7 +129,7 @@ public class SubscriptionHandlerTest {
     public void shouldThrowExceptionsRaisedByOnMobileSubscriptionServiceToCreateAnDeactivationRequest() {
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", null);}};
 
-        doThrow(new RuntimeException()).when(onMobileSubscriptionGateway).deactivateSubscription(any(ProcessSubscriptionRequest.class));
+        doThrow(new RuntimeException()).when(onMobileSubscriptionGateway).deactivateSubscription(any(OMSubscriptionRequest.class));
 
         subscriptionHandler.handleSubscriptionDeactivation(new MotechEvent(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, parameters));
     }

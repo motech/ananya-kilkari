@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CreateSubscriptionHandler {
 
-    private final static Logger logger = LoggerFactory.getLogger(CreateSubscriptionHandler.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(CreateSubscriptionHandler.class);
 
     @Autowired
     private KilkariSubscriptionService kilkariSubscriptionService;
@@ -27,9 +27,9 @@ public class CreateSubscriptionHandler {
     @MotechListener(subjects = {SubscriptionEventKeys.CREATE_SUBSCRIPTION})
     public void handleCreateSubscription(MotechEvent event) {
         SubscriptionRequest subscriptionRequest = (SubscriptionRequest) event.getParameters().get("0");
-        logger.info(String.format("Create subscription event for msisdn: %s, pack: %s, channel: %s",
+        LOGGER.info(String.format("Create subscription event for msisdn: %s, pack: %s, channel: %s",
                 subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), subscriptionRequest.getChannel()));
 
-        kilkariSubscriptionService.processSubscriptionRequest(subscriptionRequest);
+        kilkariSubscriptionService.createSubscription(subscriptionRequest);
     }
 }

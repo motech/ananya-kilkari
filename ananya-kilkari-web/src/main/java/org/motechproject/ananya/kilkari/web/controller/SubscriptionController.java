@@ -5,11 +5,9 @@ import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
@@ -26,14 +24,15 @@ import java.util.List;
 public class SubscriptionController {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
-    private SubscriptionRequestValidator subscriptionRequestValidator;
     private CallbackRequestValidator callbackRequestValidator;
     private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
     private SubscriptionDetailsMapper subscriptionDetailsMapper;
     @Autowired
-    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService, SubscriptionRequestValidator subscriptionRequestValidator, CallbackRequestValidator callbackRequestValidator, UnsubscriptionRequestValidator unsubscriptionRequestValidator, SubscriptionDetailsMapper subscriptionDetailsMapper) {
+    public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService,
+                                  CallbackRequestValidator callbackRequestValidator,
+                                  UnsubscriptionRequestValidator unsubscriptionRequestValidator,
+                                  SubscriptionDetailsMapper subscriptionDetailsMapper) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
-        this.subscriptionRequestValidator = subscriptionRequestValidator;
         this.callbackRequestValidator = callbackRequestValidator;
         this.unsubscriptionRequestValidator = unsubscriptionRequestValidator;
         this.subscriptionDetailsMapper = subscriptionDetailsMapper;
@@ -42,19 +41,16 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResponse createSubscriptionFromIVR(SubscriptionRequest subscriptionRequest) {
-        return createSubscription(subscriptionRequest);
+    public BaseResponse createSubscriptionForIVR(SubscriptionRequest subscriptionRequest) {
+        subscriptionRequest.validateChannel();
+        kilkariSubscriptionService.createSubscriptionAsync(subscriptionRequest);
+        return BaseResponse.success("Subscription request submitted successfully");
     }
 
     @RequestMapping(value = "/subscription", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse createSubscription(@RequestBody SubscriptionRequest subscriptionRequest) {
         subscriptionRequest.validateChannel();
-
-        if (Channel.isCallCenter(subscriptionRequest.getChannel())) {
-            subscriptionRequestValidator.validate(subscriptionRequest);
-        }
-
         kilkariSubscriptionService.createSubscription(subscriptionRequest);
         return BaseResponse.success("Subscription request submitted successfully");
     }

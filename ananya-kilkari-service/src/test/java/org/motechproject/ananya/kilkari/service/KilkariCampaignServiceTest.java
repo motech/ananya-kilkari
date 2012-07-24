@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.domain.CampaignTriggerType;
 import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
-import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.contract.*;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
@@ -45,7 +45,7 @@ public class KilkariCampaignServiceTest {
     private KilkariCampaignService kilkariCampaignService;
 
     @Mock
-    private KilkariMessageCampaignService kilkariMessageCampaignService;
+    private MessageCampaignService messageCampaignService;
     @Mock
     private KilkariSubscriptionService kilkariSubscriptionService;
     @Mock
@@ -69,7 +69,7 @@ public class KilkariCampaignServiceTest {
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(kilkariMessageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, kilkariInboxService, validCallDeliveryFailureRecordObjectMapper);
+        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, kilkariInboxService, validCallDeliveryFailureRecordObjectMapper);
     }
 
     @Test
@@ -86,11 +86,11 @@ public class KilkariCampaignServiceTest {
 
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
-        when(kilkariMessageCampaignService.getMessageTimings(
+        when(messageCampaignService.getMessageTimings(
                 subscription1.getSubscriptionId(),
                 subscription1.getPack().name(),
                 subscription1.getCreationDate(), subscription1.endDate())).thenReturn(dateTimes);
-        when(kilkariMessageCampaignService.getMessageTimings(
+        when(messageCampaignService.getMessageTimings(
                 subscription2.getSubscriptionId(),
                 subscription2.getPack().name(),
                 subscription2.getCreationDate(), subscription2.endDate())).thenReturn(dateTimes);
@@ -98,13 +98,13 @@ public class KilkariCampaignServiceTest {
 
         Map<String, List<DateTime>> messageTimings = kilkariCampaignService.getMessageTimings(msisdn);
 
-        verify(kilkariMessageCampaignService).getMessageTimings(
+        verify(messageCampaignService).getMessageTimings(
                 eq(subscription1.getSubscriptionId()),
                 eq(subscription1.getPack().name()),
                 eq(subscription1.getCreationDate()),
                 eq(subscription1.endDate()));
 
-        verify(kilkariMessageCampaignService).getMessageTimings(
+        verify(messageCampaignService).getMessageTimings(
                 eq(subscription2.getSubscriptionId()),
                 eq(subscription2.getPack().name()),
                 eq(subscription2.getCreationDate()),

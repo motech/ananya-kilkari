@@ -8,11 +8,11 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 import org.motechproject.common.domain.PhoneNumber;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class SubscriptionRequest implements Serializable {
 
@@ -145,7 +145,8 @@ public class SubscriptionRequest implements Serializable {
         this.msisdn = msisdn;
     }
 
-    public void validate(List<String> errors) {
+    public void validate(Errors errors) {
+
         validateMsisdn(errors);
         validatePack(errors);
         validateChannel(errors);
@@ -156,21 +157,21 @@ public class SubscriptionRequest implements Serializable {
         }
     }
 
-    private void validatePack(List<String> errors) {
+    private void validatePack(Errors errors) {
         if (!ValidationUtils.assertPack(pack)) {
-            errors.add(String.format("Invalid subscription pack %s", pack));
+            errors.add("Invalid subscription pack %s", pack);
         }
     }
 
-    private void validateMsisdn(List<String> errors) {
+    private void validateMsisdn(Errors errors) {
         if (PhoneNumber.isNotValid(msisdn)) {
-            errors.add(String.format("Invalid msisdn %s", msisdn));
+            errors.add("Invalid msisdn %s", msisdn);
         }
     }
 
-    public void validateChannel(List<String> errors) {
+    public void validateChannel(Errors errors) {
         if (!ValidationUtils.assertChannel(channel)) {
-            errors.add(String.format("Invalid channel %s", channel));
+            errors.add("Invalid channel %s", channel);
         }
     }
 
@@ -185,40 +186,40 @@ public class SubscriptionRequest implements Serializable {
         return getDistrict() == null && getBlock() == null && getPanchayat() == null;
     }
 
-    private void validateEDD(List<String> errors) {
+    private void validateEDD(Errors errors) {
         if (StringUtils.isNotEmpty(expectedDateOfDelivery)) {
             String errorMessage = "Invalid expected date of delivery %s";
 
             if (!ValidationUtils.assertDateFormat(expectedDateOfDelivery)) {
-                errors.add(String.format(errorMessage, expectedDateOfDelivery));
+                errors.add(errorMessage, expectedDateOfDelivery);
                 return;
             }
 
             if (!ValidationUtils.assertDateBefore(createdAt, parseDateTime(expectedDateOfDelivery))) {
-                errors.add(String.format(errorMessage, expectedDateOfDelivery));
+                errors.add(errorMessage, expectedDateOfDelivery);
             }
         }
     }
 
-    private void validateDOB(List<String> errors) {
+    private void validateDOB(Errors errors) {
         if (StringUtils.isNotEmpty(dateOfBirth)) {
             String errorMessage = "Invalid date of birth %s";
 
             if (!ValidationUtils.assertDateFormat(dateOfBirth)) {
-                errors.add(String.format(errorMessage, dateOfBirth));
+                errors.add(errorMessage, dateOfBirth);
                 return;
             }
 
             if (!ValidationUtils.assertDateBefore(parseDateTime(dateOfBirth), createdAt)) {
-                errors.add(String.format(errorMessage, dateOfBirth));
+                errors.add(errorMessage, dateOfBirth);
             }
         }
     }
 
-    private void validateAge(List<String> errors) {
+    private void validateAge(Errors errors) {
         if (StringUtils.isNotEmpty(beneficiaryAge)) {
             if (!ValidationUtils.assertNumeric(beneficiaryAge)) {
-                errors.add(String.format("Invalid beneficiary age %s", beneficiaryAge));
+                errors.add("Invalid beneficiary age %s", beneficiaryAge);
             }
         }
     }

@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.web.it;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
-import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
@@ -22,7 +22,7 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
     @Autowired
     private MessageCampaignVisualizationController messageCampaignVisualizationController;
     @Autowired
-    private KilkariMessageCampaignService kilkariMessageCampaignService;
+    private MessageCampaignService messageCampaignService;
     @Autowired
     private AllSubscriptions allSubscriptions;
 
@@ -36,7 +36,7 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 subscription.getSubscriptionId(), subscriptionPack.name(), subscription.getCreationDate());
-        kilkariMessageCampaignService.start(messageCampaignRequest);
+        messageCampaignService.start(messageCampaignRequest);
 
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()
                 .perform(get("/messagecampaign/visualize").param("msisdn", msisdn))
@@ -44,6 +44,6 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON));
 
 
-        kilkariMessageCampaignService.stop(messageCampaignRequest);
+        messageCampaignService.stop(messageCampaignRequest);
     }
 }

@@ -20,7 +20,7 @@ import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequest
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionRequestValidator;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.TestUtils;
@@ -29,7 +29,6 @@ import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
 import org.springframework.http.MediaType;
 
@@ -47,14 +46,13 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.s
 
 public class SubscriptionControllerTest {
     private SubscriptionController subscriptionController;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Mock
     private Subscription mockedSubscription;
     @Mock
     private KilkariSubscriptionService kilkariSubscriptionService;
-    @Mock
-    private SubscriptionRequestValidator subscriptionRequestValidator;
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
     @Mock
     private SubscriptionService subscriptionService;
     @Mock
@@ -69,7 +67,7 @@ public class SubscriptionControllerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, subscriptionRequestValidator, callbackRequestValidator, unsubscriptionRequestValidator, mockedSubscriptionDetailsMapper);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService, callbackRequestValidator, unsubscriptionRequestValidator, mockedSubscriptionDetailsMapper);
     }
 
     @Test
@@ -205,7 +203,7 @@ public class SubscriptionControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
 
         ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
-        verify(kilkariSubscriptionService).createSubscription(subscriptionRequestArgumentCaptor.capture());
+        verify(kilkariSubscriptionService).createSubscriptionAsync(subscriptionRequestArgumentCaptor.capture());
         SubscriptionRequest subscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
 
         assertEquals(msisdn, subscriptionRequest.getMsisdn());
@@ -292,21 +290,23 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void shouldValidateSubscriptionRequestIfCreateRequestIsCalledFromCallCenter() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withChannel(Channel.CALL_CENTER.toString()).build();
+    public void shouldValidateChannelOnSubscriptionCreationRequest_FromCC() {
+        SubscriptionRequest subscriptionRequest = mock(SubscriptionRequest.class);
+        when(subscriptionRequest.getChannel()).thenReturn("call_center");
 
         subscriptionController.createSubscription(subscriptionRequest);
 
-        verify(subscriptionRequestValidator).validate(subscriptionRequest);
+        verify(subscriptionRequest).validateChannel();
     }
 
     @Test
-    public void shouldNotValidateSubscriptionRequest_ForIVRChannel() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withChannel(Channel.IVR.toString()).build();
+    public void shouldValidateChannelOnSubscriptionCreationRequest_FromIVR() {
+        SubscriptionRequest subscriptionRequest = mock(SubscriptionRequest.class);
+        when(subscriptionRequest.getChannel()).thenReturn("ivr");
 
-        subscriptionController.createSubscription(subscriptionRequest);
+        subscriptionController.createSubscriptionForIVR(subscriptionRequest);
 
-        verify(subscriptionRequestValidator, never()).validate(subscriptionRequest);
+        verify(subscriptionRequest).validateChannel();
     }
 
     @Test
@@ -360,7 +360,7 @@ public class SubscriptionControllerTest {
         when(unsubscriptionRequestValidator.validate(anyString())).thenReturn(errors);
 
         mockMvc(subscriptionController)
-                .perform(delete("/subscription/" + subscriptionId )
+                .perform(delete("/subscription/" + subscriptionId)
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))

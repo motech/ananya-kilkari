@@ -3,16 +3,13 @@ package org.motechproject.ananya.kilkari.subscription.domain;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 
 import static org.junit.Assert.*;
 
@@ -20,18 +17,17 @@ public class SubscriptionRequestTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-    private List<String> errors = new ArrayList<>();
+    private Errors errors;
 
     @Before
-    @After
     public void tearDown() {
-        errors.clear();
+        errors = new Errors();
     }
 
     private void validateErrors(int size, String... msgs) {
-        assertEquals(size, errors.size());
+        assertEquals(size, errors.getCount());
         for (String msg : msgs) {
-            assertTrue(errors.contains(msg));
+            assertTrue(errors.hasMessage(msg));
         }
     }
 
@@ -238,17 +234,18 @@ public class SubscriptionRequestTest {
     @Test
     public void shouldAddMultipleErrorsIfMsisdnPackAndChannelAreInvalid() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withMsisdn("12345").withPack("invalid pack").withChannel("invalid channel").build();
-        
+
         subscriptionRequest.validate(errors);
 
         validateErrors(3, "Invalid msisdn 12345", "Invalid subscription pack invalid pack", "Invalid channel invalid channel");
     }
+
     @Test
     public void shouldThrowExceptionWhenChannelIsInvalid() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withChannel("invalid channel").build();
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid channel invalid channel");
-        
+
         subscriptionRequest.validateChannel();
     }
 

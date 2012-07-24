@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.mapper.MessageCampaignRequestMapper;
-import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
@@ -34,7 +34,7 @@ public class MessageCampaignRequestMapperTest {
         CampaignRequest campaignRequest = MessageCampaignRequestMapper.newRequestFrom(messageCampaignRequest, kilkariPropertiesData);
 
         assertEquals(messageCampaignRequest.getExternalId(), campaignRequest.externalId());
-        assertEquals(KilkariMessageCampaignService.TWELVE_MONTHS, campaignRequest.campaignName());
+        assertEquals(MessageCampaignService.TWELVE_MONTHS_CAMPAIGN_KEY, campaignRequest.campaignName());
         assertEquals(messageCampaignRequest.getSubscriptionCreationDate().plusDays(deltaDays).toLocalDate(), campaignRequest.referenceDate());
         assertEquals(new Time(messageCampaignRequest.getSubscriptionCreationDate().plusMinutes(deltaMinutes).toLocalTime()), campaignRequest.reminderTime());
         assertEquals(new Time(messageCampaignRequest.getSubscriptionCreationDate().plusMinutes(deltaMinutes).toLocalTime()), campaignRequest.deliverTime());

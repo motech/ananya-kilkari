@@ -4,19 +4,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.handlers.CreateSubscriptionHandler;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -24,9 +22,12 @@ public class CreateSubscriptionHandlerTest {
     @Mock
     private KilkariSubscriptionService kilkariSubscriptionService;
 
+    private CreateSubscriptionHandler createSubscriptionHandler;
+
     @Before
     public void setUp() {
         initMocks(this);
+        createSubscriptionHandler = new CreateSubscriptionHandler(kilkariSubscriptionService);
     }
 
     @Test
@@ -37,22 +38,16 @@ public class CreateSubscriptionHandlerTest {
         String channel = "ivr";
         parameters.put("0", createSubscriptionRequest(msisdn, pack, channel));
 
-        new CreateSubscriptionHandler(kilkariSubscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, parameters));
+        createSubscriptionHandler.handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, parameters));
 
         ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
-        verify(kilkariSubscriptionService).processSubscriptionRequest(subscriptionRequestArgumentCaptor.capture());
+        verify(kilkariSubscriptionService).createSubscription(subscriptionRequestArgumentCaptor.capture());
         SubscriptionRequest subscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
 
         assertEquals(msisdn, subscriptionRequest.getMsisdn());
         assertEquals(pack, subscriptionRequest.getPack());
         assertEquals(channel, subscriptionRequest.getChannel());
 
-    }
-
-    @Test(expected = ValidationException.class)
-    public void shouldThrowExceptionIfDetailsAreInvalidWhileHandlingCreateSubscriptionEvent() {
-        doThrow(new ValidationException("Invalid")).when(kilkariSubscriptionService).processSubscriptionRequest(any(SubscriptionRequest.class));
-        new CreateSubscriptionHandler(kilkariSubscriptionService).handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, new HashMap<String, Object>(){{put("0", createSubscriptionRequest("msisdn", "pack", "channel"));}}));
     }
 
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {

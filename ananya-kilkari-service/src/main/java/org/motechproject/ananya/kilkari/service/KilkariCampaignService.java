@@ -5,7 +5,7 @@ import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequestMapper;
 import org.motechproject.ananya.kilkari.domain.CampaignTriggerType;
 import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
-import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.contract.*;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
@@ -32,7 +32,7 @@ import java.util.Map;
 @Service
 public class KilkariCampaignService {
 
-    private KilkariMessageCampaignService kilkariMessageCampaignService;
+    private MessageCampaignService messageCampaignService;
     private KilkariSubscriptionService kilkariSubscriptionService;
     private CampaignMessageIdStrategy campaignMessageIdStrategy;
     private AllCampaignMessageAlerts allCampaignMessageAlerts;
@@ -49,7 +49,7 @@ public class KilkariCampaignService {
     }
 
     @Autowired
-    public KilkariCampaignService(KilkariMessageCampaignService kilkariMessageCampaignService,
+    public KilkariCampaignService(MessageCampaignService messageCampaignService,
                                   KilkariSubscriptionService kilkariSubscriptionService,
                                   CampaignMessageIdStrategy campaignMessageIdStrategy,
                                   AllCampaignMessageAlerts allCampaignMessageAlerts,
@@ -59,7 +59,7 @@ public class KilkariCampaignService {
                                   CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator,
                                   KilkariInboxService kilkariInboxService,
                                   ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper) {
-        this.kilkariMessageCampaignService = kilkariMessageCampaignService;
+        this.messageCampaignService = messageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.campaignMessageIdStrategy = campaignMessageIdStrategy;
         this.allCampaignMessageAlerts = allCampaignMessageAlerts;
@@ -77,7 +77,7 @@ public class KilkariCampaignService {
         for (Subscription subscription : subscriptionList) {
             String subscriptionId = subscription.getSubscriptionId();
 
-            List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
+            List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
                     subscriptionId, subscription.getPack().name(),
                     subscription.getCreationDate(), subscription.endDate());
 

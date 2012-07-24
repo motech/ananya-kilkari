@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,7 +38,7 @@ public class OnMobileSubscriptionGatewayImplTest {
         when(onMobileEndpoints.password()).thenReturn("password123");
         OnMobileSubscriptionGatewayImpl onMobileSubscriptionService = new OnMobileSubscriptionGatewayImpl(restTemplate, onMobileEndpoints);
 
-        onMobileSubscriptionService.activateSubscription(new ProcessSubscriptionRequest(msisdn, pack, channel, subscriptionId));
+        onMobileSubscriptionService.activateSubscription(new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId));
 
         HashMap<String, String> urlVariables = new HashMap<>();
         urlVariables.put("msisdn", msisdn);
@@ -64,7 +64,7 @@ public class OnMobileSubscriptionGatewayImplTest {
         when(onMobileEndpoints.password()).thenReturn("password123");
         OnMobileSubscriptionGatewayImpl onMobileSubscriptionService = new OnMobileSubscriptionGatewayImpl(restTemplate, onMobileEndpoints);
 
-        onMobileSubscriptionService.deactivateSubscription(new ProcessSubscriptionRequest(msisdn, pack, channel, subscriptionId));
+        onMobileSubscriptionService.deactivateSubscription(new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId));
 
         HashMap<String, String> urlVariables = new HashMap<>();
         urlVariables.put("msisdn", msisdn);

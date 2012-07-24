@@ -1,37 +1,43 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.joda.time.DateTimeUtils;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
-import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
-import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
+import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+
 public class KilkariSubscriptionServiceTest {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Mock
     private SubscriptionPublisher subscriptionPublisher;
     @Mock
     private SubscriptionService subscriptionService;
     @Mock
-    private KilkariMessageCampaignService kilkariMessageCampaignService;
+    private MessageCampaignService messageCampaignService;
     @Mock
     private SubscriptionStateHandlerFactory subscriptionStateHandlerFactory;
     @Mock
@@ -42,13 +48,19 @@ public class KilkariSubscriptionServiceTest {
     @Before
     public void setup() {
         initMocks(this);
-        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, kilkariMessageCampaignService, motechSchedulerService,kilkariPropertiesData);
+        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, messageCampaignService, motechSchedulerService, kilkariPropertiesData);
+        DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
+    }
+
+    @After
+    public void clear() {
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
     public void shouldCreateSubscription() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
-        kilkariSubscriptionService.createSubscription(subscriptionRequest);
+        kilkariSubscriptionService.createSubscriptionAsync(subscriptionRequest);
         verify(subscriptionPublisher).createSubscription(subscriptionRequest);
     }
 
@@ -60,36 +72,49 @@ public class KilkariSubscriptionServiceTest {
     }
 
     @Test
-    public void shouldProcessSubscriptionRequest() {
+    public void shouldCreateSubscriptionRequestAsynchronously() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
-        SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
         subscriptionRequest.setCreatedAt(DateTime.now());
-        subscriptionRequest.setPack(pack.name());
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
 
-        when(subscriptionService.createSubscription(subscriptionRequest)).thenReturn(subscription);
+        kilkariSubscriptionService.createSubscriptionAsync(subscriptionRequest);
 
-        kilkariSubscriptionService.processSubscriptionRequest(subscriptionRequest);
-
-        ArgumentCaptor<MessageCampaignRequest> captor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
-        verify(kilkariMessageCampaignService).start(captor.capture());
-        MessageCampaignRequest messageCampaignRequest = captor.getValue();
-        assertNotNull(messageCampaignRequest.getExternalId());
-        assertEquals(pack.name(), messageCampaignRequest.getSubscriptionPack());
-
-        assertEquals(subscriptionRequest.getCreatedAt().toLocalDate(), messageCampaignRequest.getSubscriptionCreationDate().toLocalDate());
+        verify(subscriptionPublisher).createSubscription(subscriptionRequest);
     }
 
     @Test
-    public void shouldNotScheduleMessageCampaignIfDuplicateSubscriptionIsRequested() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults()
-                .withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS.toString()).build();
+    public void shouldCreateSubscriptionSynchronously() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().build();
 
-        doThrow(new DuplicateSubscriptionException("")).when(subscriptionService).createSubscription(subscriptionRequest);
+        kilkariSubscriptionService.createSubscription(subscriptionRequest);
 
-        kilkariSubscriptionService.processSubscriptionRequest(subscriptionRequest);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
+        verify(subscriptionService).createSubscription(subscriptionArgumentCaptor.capture(), eq(Channel.CALL_CENTER));
+        Subscription actualSubscription = subscriptionArgumentCaptor.getValue();
+        assertEquals(subscriptionRequest.getMsisdn(), actualSubscription.getMsisdn());
+    }
 
-        verify(kilkariMessageCampaignService, never()).start(any(MessageCampaignRequest.class));
+    @Test
+    public void shouldValidateSubscriptionRequest() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withMsisdn("abcd").build();
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid msisdn abcd");
+
+        kilkariSubscriptionService.createSubscription(subscriptionRequest);
+
+        verify(subscriptionService, never()).createSubscription(any(Subscription.class), any(Channel.class));
+    }
+
+    @Test
+    public void shouldJustLogIfSubscriptionAlreadyExists() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().build();
+
+        when(subscriptionService.createSubscription(any(Subscription.class), any(Channel.class))).thenThrow(new DuplicateSubscriptionException(""));
+
+        try {
+            kilkariSubscriptionService.createSubscription(subscriptionRequest);
+        } catch (Exception e) {
+            Assert.fail("Unexpected Exception " + e.getMessage());
+        }
     }
 
     @Test
@@ -109,7 +134,7 @@ public class KilkariSubscriptionServiceTest {
         DateTime now = DateTime.now();
         Subscription mockedSubscription = mock(Subscription.class);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
-         when(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).thenReturn(3);
+        when(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).thenReturn(3);
 
         kilkariSubscriptionService.processSubscriptionCompletion(mockedSubscription);
 
@@ -118,10 +143,10 @@ public class KilkariSubscriptionServiceTest {
         RunOnceSchedulableJob runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
         assertEquals(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, runOnceSchedulableJob.getMotechEvent().getSubject());
         assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
-        ProcessSubscriptionRequest processSubscriptionRequest = (ProcessSubscriptionRequest) runOnceSchedulableJob.getMotechEvent().getParameters().get("0");
-        assertEquals(ProcessSubscriptionRequest.class, processSubscriptionRequest.getClass());
-        assertEquals(now.plusDays(3).toString("dd-mm-yyyy"), new DateTime(runOnceSchedulableJob.getStartDate()).toString("dd-mm-yyyy"));
-        assertEquals(Channel.MOTECH,processSubscriptionRequest.getChannel());
+        OMSubscriptionRequest OMSubscriptionRequest = (OMSubscriptionRequest) runOnceSchedulableJob.getMotechEvent().getParameters().get("0");
+        assertEquals(OMSubscriptionRequest.class, OMSubscriptionRequest.getClass());
+        assertEquals(now.plusDays(3).toDate(), runOnceSchedulableJob.getStartDate());
+        assertEquals(Channel.MOTECH, OMSubscriptionRequest.getChannel());
     }
 
     @Test

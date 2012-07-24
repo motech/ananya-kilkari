@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignEnrollment;
-import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
@@ -46,7 +46,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     private AllSubscriptions allSubscriptions;
 
     @Autowired
-    private KilkariMessageCampaignService kilkariMessageCampaignService;
+    private MessageCampaignService messageCampaignService;
 
     @Autowired
     private StubReportingService reportingService;
@@ -139,7 +139,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         MessageCampaignEnrollment campaignEnrollment = new TimedRunner<MessageCampaignEnrollment>(20, 1000) {
             @Override
             MessageCampaignEnrollment run() {
-                MessageCampaignEnrollment enrollment = kilkariMessageCampaignService.searchEnrollment(
+                MessageCampaignEnrollment enrollment = messageCampaignService.searchEnrollment(
                         subscription.getSubscriptionId(), SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME);
                 return enrollment;
             }
@@ -149,7 +149,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertNotNull(campaignEnrollment);
         assertEquals(subscription.getSubscriptionId(), campaignEnrollment.getExternalId());
         assertEquals(SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME, campaignEnrollment.getCampaignName());
-        List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
+        List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
                 subscription.getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
         assertEquals(48, messageTimings.size());
     }
@@ -199,7 +199,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         MessageCampaignEnrollment campaignEnrollment = new TimedRunner<MessageCampaignEnrollment>(20, 1000) {
             @Override
             MessageCampaignEnrollment run() {
-                return kilkariMessageCampaignService.searchEnrollment(
+                return messageCampaignService.searchEnrollment(
                         subscription.getSubscriptionId(), SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME);
 
             }
@@ -209,7 +209,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertNotNull(campaignEnrollment);
         assertEquals(subscription.getSubscriptionId(), campaignEnrollment.getExternalId());
         assertEquals(SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME, campaignEnrollment.getCampaignName());
-        List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
+        List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
                 subscription.getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
         assertEquals(60, messageTimings.size());
     }

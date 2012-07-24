@@ -46,8 +46,8 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
         return subscriptionsByPackAndMsisdn == null ? Collections.EMPTY_LIST : subscriptionsByPackAndMsisdn;
     }
 
-    public Subscription findSubscriptionInProgress(String msisdn, String pack) {
-        List<Subscription> allSubscriptionsByMsisdnAndPack = findByMsisdnAndPack(msisdn, SubscriptionPack.from(pack));
+    public Subscription findSubscriptionInProgress(String msisdn, SubscriptionPack pack) {
+        List<Subscription> allSubscriptionsByMsisdnAndPack = findByMsisdnAndPack(msisdn, pack);
         return new Subscriptions(allSubscriptionsByMsisdnAndPack).subscriptionInProgress();
     }
 

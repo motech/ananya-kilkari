@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.gateway;
 
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
-import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,7 @@ public class OnMobileSubscriptionGatewayImpl implements OnMobileSubscriptionGate
 
     private RestTemplate restTemplate;
     private OnMobileEndpoints onMobileEndpoints;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(OnMobileSubscriptionGatewayImpl.class);
 
     @Autowired
@@ -28,28 +29,33 @@ public class OnMobileSubscriptionGatewayImpl implements OnMobileSubscriptionGate
         this.onMobileEndpoints = onMobileEndpoints;
     }
 
-    public void activateSubscription(ProcessSubscriptionRequest processSubscriptionRequest) {
-        processSubscription(processSubscriptionRequest, onMobileEndpoints.activateSubscriptionURL());
+    public void activateSubscription(OMSubscriptionRequest omsubscriptionrequest) {
+        Map<String, String> urlVariables = constructRequestParams(omsubscriptionrequest);
+        sendRequest(onMobileEndpoints.activateSubscriptionURL(), urlVariables);
     }
 
-    public void deactivateSubscription(ProcessSubscriptionRequest processSubscriptionRequest) {
-        processSubscription(processSubscriptionRequest, onMobileEndpoints.deactivateSubscriptionURL());
+    public void deactivateSubscription(OMSubscriptionRequest omSubscriptionRequest) {
+        Map<String, String> urlVariables = constructRequestParams(omSubscriptionRequest);
+        sendRequest(onMobileEndpoints.deactivateSubscriptionURL(), urlVariables);
     }
 
-    private void processSubscription(ProcessSubscriptionRequest processSubscriptionRequest, String url) {
-        Map<String, String> urlVariables = new HashMap<>();
-        urlVariables.put("msisdn", processSubscriptionRequest.getMsisdn());
-        urlVariables.put("srvkey", processSubscriptionRequest.getPack().name());
-        urlVariables.put("mode", processSubscriptionRequest.getChannel().name());
-        urlVariables.put("refid", processSubscriptionRequest.getSubscriptionId());
-        urlVariables.put("user", onMobileEndpoints.username());
-        urlVariables.put("pass", onMobileEndpoints.password());
-
+    private void sendRequest(String url, Map<String, String> urlVariables) {
         try {
             restTemplate.getForEntity(url, String.class, urlVariables);
         } catch (HttpClientErrorException ex) {
             LOGGER.error(String.format("OnMobile subscription request failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
             throw ex;
         }
+    }
+
+    private Map<String, String> constructRequestParams(OMSubscriptionRequest omSubscriptionRequest) {
+        Map<String, String> urlVariables = new HashMap<>();
+        urlVariables.put("msisdn", omSubscriptionRequest.getMsisdn());
+        urlVariables.put("srvkey", omSubscriptionRequest.getPack().name());
+        urlVariables.put("mode", omSubscriptionRequest.getChannel().name());
+        urlVariables.put("refid", omSubscriptionRequest.getSubscriptionId());
+        urlVariables.put("user", onMobileEndpoints.username());
+        urlVariables.put("pass", onMobileEndpoints.password());
+        return urlVariables;
     }
 }

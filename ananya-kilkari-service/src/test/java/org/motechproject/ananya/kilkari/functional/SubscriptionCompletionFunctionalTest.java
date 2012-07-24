@@ -9,7 +9,7 @@ import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.utils.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
-import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
@@ -50,7 +50,7 @@ public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest 
 
         //Expect
         Subscription subscriptionWithPendingCompletedStatus = waitForSubscriptionToChangeToPendingCompletionStatus(subscriptionId);
-        verify(onMobileSubscriptionGatewayMock).deactivateSubscription(Matchers.<ProcessSubscriptionRequest>any());
+        verify(onMobileSubscriptionGatewayMock).deactivateSubscription(Matchers.<OMSubscriptionRequest>any());
         assertNotNull(subscriptionWithPendingCompletedStatus);
     }
 

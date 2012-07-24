@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.handlers;
 
-import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
@@ -29,32 +29,32 @@ public class SubscriptionHandler {
 
     @MotechListener(subjects = {SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION})
     public void handleSubscriptionActivation(MotechEvent event) {
-        ProcessSubscriptionRequest processSubscriptionRequest = (ProcessSubscriptionRequest) event.getParameters().get("0");
-        logger.info(String.format("Handling subscription activation event for subscriptionid: %s, msisdn: %s, pack: %s, channel: %s", processSubscriptionRequest.getSubscriptionId(), processSubscriptionRequest.getMsisdn(), processSubscriptionRequest.getPack(), processSubscriptionRequest.getChannel()));
-        onMobileSubscriptionGateway.activateSubscription(processSubscriptionRequest);
-        subscriptionService.activationRequested(processSubscriptionRequest.getSubscriptionId());
+        OMSubscriptionRequest OMSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
+        logger.info(String.format("Handling subscription activation event for subscriptionid: %s, msisdn: %s, pack: %s, channel: %s", OMSubscriptionRequest.getSubscriptionId(), OMSubscriptionRequest.getMsisdn(), OMSubscriptionRequest.getPack(), OMSubscriptionRequest.getChannel()));
+        onMobileSubscriptionGateway.activateSubscription(OMSubscriptionRequest);
+        subscriptionService.activationRequested(OMSubscriptionRequest.getSubscriptionId());
     }
 
     @MotechListener(subjects = {SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION})
     public void handleSubscriptionDeactivation(MotechEvent event) {
-        ProcessSubscriptionRequest processSubscriptionRequest = (ProcessSubscriptionRequest) event.getParameters().get("0");
-        logger.info(String.format("Handling subscription deactivation event for subscriptionid: %s, msisdn: %s, pack: %s, channel: %s", processSubscriptionRequest.getSubscriptionId(), processSubscriptionRequest.getMsisdn(), processSubscriptionRequest.getPack(), processSubscriptionRequest.getChannel()));
-        onMobileSubscriptionGateway.deactivateSubscription(processSubscriptionRequest);
-        subscriptionService.deactivationRequested(processSubscriptionRequest.getSubscriptionId());
+        OMSubscriptionRequest OMSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
+        logger.info(String.format("Handling subscription deactivation event for subscriptionid: %s, msisdn: %s, pack: %s, channel: %s", OMSubscriptionRequest.getSubscriptionId(), OMSubscriptionRequest.getMsisdn(), OMSubscriptionRequest.getPack(), OMSubscriptionRequest.getChannel()));
+        onMobileSubscriptionGateway.deactivateSubscription(OMSubscriptionRequest);
+        subscriptionService.deactivationRequested(OMSubscriptionRequest.getSubscriptionId());
     }
 
     @MotechListener(subjects = {SubscriptionEventKeys.SUBSCRIPTION_COMPLETE})
     public void handleSubscriptionComplete(MotechEvent event) {
-        ProcessSubscriptionRequest processSubscriptionRequest = (ProcessSubscriptionRequest) event.getParameters().get("0");
-        logger.info(String.format("Handling subscription completion event for subscriptionid: %s, msisdn: %s, pack: %s", processSubscriptionRequest.getSubscriptionId(), processSubscriptionRequest.getMsisdn(), processSubscriptionRequest.getPack()));
+        OMSubscriptionRequest OMSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
+        logger.info(String.format("Handling subscription completion event for subscriptionid: %s, msisdn: %s, pack: %s", OMSubscriptionRequest.getSubscriptionId(), OMSubscriptionRequest.getMsisdn(), OMSubscriptionRequest.getPack()));
 
-        Subscription subscription = subscriptionService.findBySubscriptionId(processSubscriptionRequest.getSubscriptionId());
+        Subscription subscription = subscriptionService.findBySubscriptionId(OMSubscriptionRequest.getSubscriptionId());
         if (subscription.isInDeactivatedState()) {
-            logger.info(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", processSubscriptionRequest.getSubscriptionId(), processSubscriptionRequest.getMsisdn(), subscription.getStatus()));
+            logger.info(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", OMSubscriptionRequest.getSubscriptionId(), OMSubscriptionRequest.getMsisdn(), subscription.getStatus()));
             return;
         }
 
-        onMobileSubscriptionGateway.deactivateSubscription(processSubscriptionRequest);
-        subscriptionService.subscriptionComplete(processSubscriptionRequest.getSubscriptionId());
+        onMobileSubscriptionGateway.deactivateSubscription(OMSubscriptionRequest);
+        subscriptionService.subscriptionComplete(OMSubscriptionRequest.getSubscriptionId());
     }
 }

@@ -9,15 +9,19 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
+import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
-import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionRequestValidator;
+import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,18 +46,20 @@ public class SubscriptionServiceTest {
     @Mock
     private SubscriptionRequest mockedSubscriptionRequest;
     @Mock
-    private SubscriptionRequestValidator subscriptionRequestValidator;
+    private SubscriptionValidator subscriptionValidator;
     @Mock
     private ReportingServiceImpl reportingServiceImpl;
     @Mock
     private AllInboxMessages allInboxMessages;
     @Mock
     private KilkariInboxService kilkariInboxService;
+    @Mock
+    private MessageCampaignService messageCampaignService;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionRequestValidator, reportingServiceImpl, allInboxMessages, kilkariInboxService);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, allInboxMessages, kilkariInboxService, messageCampaignService);
     }
 
     @Test
@@ -61,32 +67,74 @@ public class SubscriptionServiceTest {
         String msisdn = "1234567890";
         Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
-
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
-        ArgumentCaptor<ProcessSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
-        ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest(msisdn, subscriptionPack.name(), channel.name());
+        Subscription createdSubscription = subscriptionService.createSubscription(subscription, channel);
 
-        Subscription subscription = subscriptionService.createSubscription(subscriptionRequest);
-
-        assertNotNull(subscription);
-
+        assertNotNull(createdSubscription);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        verify(onMobileSubscriptionManagerPublisher).processActivation(subscriptionActivationRequestArgumentCaptor.capture());
-        verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
-
         Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();
-        Assert.assertEquals(subscription, subscriptionSaved);
-
         assertEquals(msisdn, subscriptionSaved.getMsisdn());
         assertEquals(subscriptionPack, subscriptionSaved.getPack());
+        assertEquals(createdSubscription, subscriptionSaved);
+    }
 
-        ProcessSubscriptionRequest actualProcessSubscriptionRequest = subscriptionActivationRequestArgumentCaptor.getValue();
-        assertEquals(msisdn, actualProcessSubscriptionRequest.getMsisdn());
-        assertEquals(subscriptionPack, actualProcessSubscriptionRequest.getPack());
-        assertEquals(channel, actualProcessSubscriptionRequest.getChannel());
+    @Test
+    public void shouldValidateSubscriptionRequestOnCreation() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
 
+        subscriptionService.createSubscription(subscription, Channel.CALL_CENTER);
+
+        verify(subscriptionValidator).validate(subscription);
+    }
+
+    @Test
+    public void shouldNotCreateSubscriptionIfValidationFails() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
+        doThrow(new ValidationException("")).when(subscriptionValidator).validate(subscription);
+
+        try {
+            subscriptionService.createSubscription(subscription, Channel.CALL_CENTER);
+        } catch (ValidationException e) {
+            //ignore
+        }
+
+        verify(allSubscriptions, never()).add(any(Subscription.class));
+        verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class));
+        verify(reportingServiceImpl, never()).reportSubscriptionCreation(any(SubscriptionCreationReportRequest.class));
+        verify(onMobileSubscriptionManagerPublisher, never()).sendActivationRequest(any(OMSubscriptionRequest.class));
+    }
+
+    @Test
+    public void shouldCreateCampaignOnCreatingSubscription() {
+        String msisdn = "1234567890";
+        Channel channel = Channel.IVR;
+        SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
+        ArgumentCaptor<MessageCampaignRequest> campaignRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
+        Subscription createdSubscription = subscriptionService.createSubscription(subscription, channel);
+
+        verify(messageCampaignService).start(campaignRequestArgumentCaptor.capture());
+
+        MessageCampaignRequest campaignRequest = campaignRequestArgumentCaptor.getValue();
+        assertNotNull(campaignRequest);
+        assertEquals(createdSubscription.getSubscriptionId(), campaignRequest.getExternalId());
+        assertEquals(createdSubscription.getPack().name(), campaignRequest.getSubscriptionPack());
+        assertEquals(createdSubscription.getCreationDate(), campaignRequest.getSubscriptionCreationDate());
+    }
+
+    @Test
+    public void shouldPublishReportingEventOnCreatingSubscription() {
+        String msisdn = "1234567890";
+        Channel channel = Channel.IVR;
+        SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
+        ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
+
+        subscriptionService.createSubscription(subscription, channel);
+
+        verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
         SubscriptionCreationReportRequest actualSubscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
         assertEquals(msisdn, actualSubscriptionCreationReportRequest.getMsisdn());
         assertEquals(subscriptionPack.name(), actualSubscriptionCreationReportRequest.getPack());
@@ -94,21 +142,21 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldValidateSubscriptionRequestOnlyForIVR() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withChannel(Channel.IVR.toString()).build();
+    public void shouldSendActivationRequestToOMSubscriptionManager_OnCreatingSubscription() {
+        String msisdn = "1234567890";
+        Channel channel = Channel.IVR;
+        SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
+        ArgumentCaptor<OMSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
-        subscriptionService.createSubscription(subscriptionRequest);
+        subscriptionService.createSubscription(subscription, channel);
 
-        verify(subscriptionRequestValidator).validate(subscriptionRequest);
-    }
+        verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(subscriptionActivationRequestArgumentCaptor.capture());
+        OMSubscriptionRequest actualOMSubscriptionRequest = subscriptionActivationRequestArgumentCaptor.getValue();
+        assertEquals(msisdn, actualOMSubscriptionRequest.getMsisdn());
+        assertEquals(subscriptionPack, actualOMSubscriptionRequest.getPack());
+        assertEquals(channel, actualOMSubscriptionRequest.getChannel());
 
-    @Test
-    public void shouldNotValidateSubscriptionRequest_ForChannelsOtherThanIVR() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withChannel(Channel.CALL_CENTER.toString()).build();
-
-        subscriptionService.createSubscription(subscriptionRequest);
-
-        verify(subscriptionRequestValidator, never()).validate(subscriptionRequest);
     }
 
     @Test
@@ -377,17 +425,17 @@ public class SubscriptionServiceTest {
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, channel, DateTime.now()));
 
         ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
-        ArgumentCaptor<ProcessSubscriptionRequest> captor1 = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
+        ArgumentCaptor<OMSubscriptionRequest> captor1 = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         verify(allSubscriptions).update(captor.capture());
         Subscription actualSubscription = captor.getValue();
         Assert.assertEquals(msisdn, actualSubscription.getMsisdn());
         Assert.assertEquals(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED, actualSubscription.getStatus());
 
         verify(onMobileSubscriptionManagerPublisher).processDeactivation(captor1.capture());
-        ProcessSubscriptionRequest actualProcessSubscriptionRequest = captor1.getValue();
-        assertEquals(msisdn, actualProcessSubscriptionRequest.getMsisdn());
-        assertEquals(channel, actualProcessSubscriptionRequest.getChannel());
-        assertEquals(subscription.getSubscriptionId(), actualProcessSubscriptionRequest.getSubscriptionId());
+        OMSubscriptionRequest actualOMSubscriptionRequest = captor1.getValue();
+        assertEquals(msisdn, actualOMSubscriptionRequest.getMsisdn());
+        assertEquals(channel, actualOMSubscriptionRequest.getChannel());
+        assertEquals(subscription.getSubscriptionId(), actualOMSubscriptionRequest.getSubscriptionId());
     }
 
     @Test
@@ -420,7 +468,7 @@ public class SubscriptionServiceTest {
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         subscriptionService.subscriptionComplete(subscriptionId);
-        
+
         verify(kilkariInboxService).scheduleInboxDeletion(subscription);
     }
 

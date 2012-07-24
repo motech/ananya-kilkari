@@ -121,7 +121,7 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         markForDeletion(subscription1);
         markForDeletion(subscription2);
 
-        Subscription actualSubscription = allSubscriptions.findSubscriptionInProgress(msisdn1, pack);
+        Subscription actualSubscription = allSubscriptions.findSubscriptionInProgress(msisdn1, SubscriptionPack.from(pack));
 
         assertEquals(subscription1, actualSubscription);
     }

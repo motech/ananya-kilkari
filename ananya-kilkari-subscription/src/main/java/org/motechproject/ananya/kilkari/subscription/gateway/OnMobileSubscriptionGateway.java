@@ -1,12 +1,10 @@
 package org.motechproject.ananya.kilkari.subscription.gateway;
 
-import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
 
 public interface OnMobileSubscriptionGateway {
 
-    public static final String ACTIVATE_SUBSCRIPTION_PATH = "ActivateSubscription";
+    void activateSubscription(OMSubscriptionRequest OMSubscriptionRequest);
 
-    void activateSubscription(ProcessSubscriptionRequest processSubscriptionRequest);
-
-    void deactivateSubscription(ProcessSubscriptionRequest processSubscriptionRequest);
+    void deactivateSubscription(OMSubscriptionRequest OMSubscriptionRequest);
 }

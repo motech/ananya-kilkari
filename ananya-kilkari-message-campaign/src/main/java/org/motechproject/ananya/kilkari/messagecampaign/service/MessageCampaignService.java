@@ -8,7 +8,6 @@ import org.motechproject.ananya.kilkari.messagecampaign.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
-import org.motechproject.server.messagecampaign.service.MessageCampaignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,19 +16,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-@Service
-public class KilkariMessageCampaignService {
+@Service("kilkariMessageCampaignService")
+public class MessageCampaignService {
 
-    public static final String FIFTEEN_MONTHS = "kilkari-mother-child-campaign-fifteen-months";
-    public static final String TWELVE_MONTHS = "kilkari-mother-child-campaign-twelve-months";
-    public static final String SEVEN_MONTHS = "kilkari-mother-child-campaign-seven-months";
+    public static final String FIFTEEN_MONTHS_CAMPAIGN_KEY = "kilkari-mother-child-campaign-fifteen-months";
+    public static final String TWELVE_MONTHS_CAMPAIGN_KEY = "kilkari-mother-child-campaign-twelve-months";
+    public static final String SEVEN_MONTHS_CAMPAIGN_KEY = "kilkari-mother-child-campaign-seven-months";
     public static final String CAMPAIGN_MESSAGE_NAME = "Mother Child Health Care";
 
-    private MessageCampaignService campaignService;
     private KilkariPropertiesData kilkariProperties;
+    private org.motechproject.server.messagecampaign.service.MessageCampaignService campaignService;
 
     @Autowired
-    public KilkariMessageCampaignService(MessageCampaignService campaignService, KilkariPropertiesData kilkariProperties) {
+    public MessageCampaignService(org.motechproject.server.messagecampaign.service.MessageCampaignService campaignService, KilkariPropertiesData kilkariProperties) {
         this.campaignService = campaignService;
         this.kilkariProperties = kilkariProperties;
     }

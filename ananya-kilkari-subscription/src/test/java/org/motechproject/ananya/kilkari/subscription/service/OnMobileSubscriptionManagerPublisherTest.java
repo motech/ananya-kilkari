@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.scheduler.context.EventContext;
@@ -29,37 +29,37 @@ public class OnMobileSubscriptionManagerPublisherTest {
     @Test
     public void shouldPublishProcessSubscriptionActivationEventIntoQueue() {
         String subscriptionId = "ABCD1234";
-        onMobileSubscriptionManagerPublisher.processActivation(new ProcessSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS, Channel.IVR, subscriptionId));
+        onMobileSubscriptionManagerPublisher.sendActivationRequest(new OMSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS, Channel.IVR, subscriptionId));
 
-        ArgumentCaptor<ProcessSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
+        ArgumentCaptor<OMSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(eventContext).send(eventArgumentCaptor.capture(), subscriptionActivationRequestArgumentCaptor.capture());
-        ProcessSubscriptionRequest processSubscriptionRequest = subscriptionActivationRequestArgumentCaptor.getValue();
+        OMSubscriptionRequest OMSubscriptionRequest = subscriptionActivationRequestArgumentCaptor.getValue();
         String eventName = eventArgumentCaptor.getValue();
 
         assertEquals(SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION, eventName);
-        assertEquals("1234567890", processSubscriptionRequest.getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS, processSubscriptionRequest.getPack());
-        assertEquals(Channel.IVR, processSubscriptionRequest.getChannel());
-        assertEquals(subscriptionId, processSubscriptionRequest.getSubscriptionId());
+        assertEquals("1234567890", OMSubscriptionRequest.getMsisdn());
+        assertEquals(SubscriptionPack.TWELVE_MONTHS, OMSubscriptionRequest.getPack());
+        assertEquals(Channel.IVR, OMSubscriptionRequest.getChannel());
+        assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
     }
 
     @Test
     public void shouldPublishProcessSubscriptionDeactivationEventIntoQueue() {
         String subscriptionId = "ABCD1234";
-        onMobileSubscriptionManagerPublisher.processDeactivation(new ProcessSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS, Channel.IVR, subscriptionId));
+        onMobileSubscriptionManagerPublisher.processDeactivation(new OMSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS, Channel.IVR, subscriptionId));
 
-        ArgumentCaptor<ProcessSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(ProcessSubscriptionRequest.class);
+        ArgumentCaptor<OMSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(eventContext).send(eventArgumentCaptor.capture(), processSubscriptionRequestArgumentCaptor.capture());
-        ProcessSubscriptionRequest processSubscriptionRequest = processSubscriptionRequestArgumentCaptor.getValue();
+        OMSubscriptionRequest OMSubscriptionRequest = processSubscriptionRequestArgumentCaptor.getValue();
         String eventName = eventArgumentCaptor.getValue();
 
         assertEquals(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, eventName);
-        assertEquals("1234567890", processSubscriptionRequest.getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS, processSubscriptionRequest.getPack());
-        assertEquals(Channel.IVR, processSubscriptionRequest.getChannel());
-        assertEquals(subscriptionId, processSubscriptionRequest.getSubscriptionId());
+        assertEquals("1234567890", OMSubscriptionRequest.getMsisdn());
+        assertEquals(SubscriptionPack.TWELVE_MONTHS, OMSubscriptionRequest.getPack());
+        assertEquals(Channel.IVR, OMSubscriptionRequest.getChannel());
+        assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
     }
 }
 

@@ -34,6 +34,12 @@ public class Subscription extends MotechBaseDataObject {
     @JsonProperty
     private SubscriptionPack pack;
 
+    @JsonIgnore
+    private Location location;
+
+    @JsonIgnore
+    private Subscriber subscriber;
+
     public Subscription() {
     }
 
@@ -162,7 +168,6 @@ public class Subscription extends MotechBaseDataObject {
         return getCreationDate().plusWeeks(getPack().getTotalWeeks());
     }
 
-    @JsonIgnore
     public boolean hasPackBeenCompleted() {
         int currentWeek = getCurrentWeek();
         return currentWeek >= pack.getTotalWeeks() + pack.getStartWeek();
@@ -179,7 +184,6 @@ public class Subscription extends MotechBaseDataObject {
         return weeksDifference + getPack().getStartWeek() + 1;
     }
 
-    @JsonIgnore
     public DateTime currentWeeksMessageExpiryDate() {
         return getCreationDate().plusWeeks(getWeeksElapsedAfterCreationDate() + 1);
     }
@@ -188,8 +192,29 @@ public class Subscription extends MotechBaseDataObject {
         return Weeks.weeksBetween(getCreationDate(), DateTime.now()).getWeeks();
     }
 
-    @JsonIgnore
     public boolean hasBeenActivated() {
         return status.hasBeenActivated();
+    }
+
+    public boolean hasLocation() {
+        return !Location.NULL.equals(getLocation());
+    }
+
+    @JsonIgnore
+    public Location getLocation() {
+        return location == null ? Location.NULL : location;
+    }
+
+    @JsonIgnore
+    public Subscriber getSubscriber() {
+        return subscriber == null ? Subscriber.NULL : subscriber;
+    }
+
+    public void setSubscriber(Subscriber subscriber) {
+        this.subscriber = subscriber;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

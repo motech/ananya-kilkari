@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service.stub;
 
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
-import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.springframework.stereotype.Service;
 
@@ -13,16 +13,16 @@ public class StubOnMobileSubscriptionGateway implements OnMobileSubscriptionGate
     private boolean isDeactivateSubscriptionCalled;
 
     @Override
-    public void activateSubscription(ProcessSubscriptionRequest processSubscriptionRequest) {
+    public void activateSubscription(OMSubscriptionRequest OMSubscriptionRequest) {
         if (verify()) {
-            behavior.activateSubscription(processSubscriptionRequest);
+            behavior.activateSubscription(OMSubscriptionRequest);
         }
     }
 
     @Override
-    public void deactivateSubscription(ProcessSubscriptionRequest processSubscriptionRequest) {
+    public void deactivateSubscription(OMSubscriptionRequest OMSubscriptionRequest) {
         if (verify()) {
-            behavior.deactivateSubscription(processSubscriptionRequest);
+            behavior.deactivateSubscription(OMSubscriptionRequest);
             isDeactivateSubscriptionCalled = true;
         }
     }

@@ -1,12 +1,12 @@
 package org.motechproject.ananya.kilkari.messagecampaign.domain;
 
 import org.apache.commons.lang.StringUtils;
-import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 
 public enum SubscriptionPack {
-    FIFTEEN_MONTHS(KilkariMessageCampaignService.FIFTEEN_MONTHS),
-    TWELVE_MONTHS(KilkariMessageCampaignService.TWELVE_MONTHS),
-    SEVEN_MONTHS(KilkariMessageCampaignService.SEVEN_MONTHS);
+    FIFTEEN_MONTHS(MessageCampaignService.FIFTEEN_MONTHS_CAMPAIGN_KEY),
+    TWELVE_MONTHS(MessageCampaignService.TWELVE_MONTHS_CAMPAIGN_KEY),
+    SEVEN_MONTHS(MessageCampaignService.SEVEN_MONTHS_CAMPAIGN_KEY);
 
     private String campaignName;
 

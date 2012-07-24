@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
-import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.scheduler.context.EventContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +17,11 @@ public class OnMobileSubscriptionManagerPublisher {
         this.eventContext = eventContext;
     }
 
-    public void processActivation(ProcessSubscriptionRequest processSubscriptionRequest) {
-        eventContext.send(SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION, processSubscriptionRequest);
+    public void sendActivationRequest(OMSubscriptionRequest OMSubscriptionRequest) {
+        eventContext.send(SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION, OMSubscriptionRequest);
     }
 
-    public void processDeactivation(ProcessSubscriptionRequest processSubscriptionRequest) {
-        eventContext.send(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, processSubscriptionRequest);
+    public void processDeactivation(OMSubscriptionRequest OMSubscriptionRequest) {
+        eventContext.send(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, OMSubscriptionRequest);
     }
 }

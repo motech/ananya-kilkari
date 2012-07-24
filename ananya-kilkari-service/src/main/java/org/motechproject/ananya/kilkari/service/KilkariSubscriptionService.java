@@ -1,15 +1,17 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
-import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
@@ -22,11 +24,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+
 @Service
 public class KilkariSubscriptionService {
     private SubscriptionPublisher subscriptionPublisher;
     private SubscriptionService subscriptionService;
-    private KilkariMessageCampaignService kilkariMessageCampaignService;
+    private MessageCampaignService messageCampaignService;
     private MotechSchedulerService motechSchedulerService;
     private KilkariPropertiesData kilkariProperties;
 
@@ -35,18 +38,39 @@ public class KilkariSubscriptionService {
     @Autowired
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
                                       SubscriptionService subscriptionService,
-                                      KilkariMessageCampaignService kilkariMessageCampaignService,
+                                      MessageCampaignService messageCampaignService,
                                       MotechSchedulerService motechSchedulerService, KilkariPropertiesData kilkariProperties) {
         this.subscriptionPublisher = subscriptionPublisher;
         this.subscriptionService = subscriptionService;
-        this.kilkariMessageCampaignService = kilkariMessageCampaignService;
+        this.messageCampaignService = messageCampaignService;
         this.motechSchedulerService = motechSchedulerService;
         this.kilkariProperties = kilkariProperties;
     }
 
-    public void createSubscription(SubscriptionRequest subscriptionRequest) {
+    public void createSubscriptionAsync(SubscriptionRequest subscriptionRequest) {
         subscriptionPublisher.createSubscription(subscriptionRequest);
     }
+
+    public void createSubscription(SubscriptionRequest subscriptionRequest) {
+        validateSubscriptionRequest(subscriptionRequest);
+        //TODO use domain requests instead of domain itself
+        Subscription subscription = new SubscriptionRequestMapper().createSubscription(subscriptionRequest);
+        try {
+            subscriptionService.createSubscription(subscription, Channel.from(subscriptionRequest.getChannel()));
+        } catch (DuplicateSubscriptionException e) {
+            LOGGER.warn(String.format("Subscription for msisdn[%s] and pack[%s] already exists.",
+                    subscriptionRequest.getMsisdn(), subscriptionRequest.getPack()));
+        }
+    }
+
+    private void validateSubscriptionRequest(SubscriptionRequest subscriptionRequest) {
+        Errors errors = new Errors();
+        subscriptionRequest.validate(errors);
+        if (errors.hasErrors()) {
+            throw new ValidationException(errors.allMessages());
+        }
+    }
+
 
     public void processCallbackRequest(CallbackRequestWrapper callbackRequestWrapper) {
         subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
@@ -60,26 +84,12 @@ public class KilkariSubscriptionService {
         return subscriptionService.findBySubscriptionId(subscriptionId);
     }
 
-    public void processSubscriptionRequest(SubscriptionRequest subscriptionRequest) {
-        try {
-            Subscription subscription = subscriptionService.createSubscription(subscriptionRequest);
-
-            MessageCampaignRequest campaignRequest = new MessageCampaignRequest(
-                    subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getCreationDate());
-
-            kilkariMessageCampaignService.start(campaignRequest);
-        } catch (DuplicateSubscriptionException e) {
-            LOGGER.warn(String.format("Subscription for msisdn[%s] and pack[%s] already exists.",
-                    subscriptionRequest.getMsisdn(), subscriptionRequest.getPack()));
-        }
-    }
-
     public void processSubscriptionCompletion(Subscription subscription) {
         String subjectKey = SubscriptionEventKeys.SUBSCRIPTION_COMPLETE;
         Date startDate = DateTime.now().plusDays(kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put(MotechSchedulerService.JOB_ID_KEY, subscription.getSubscriptionId());
-        parameters.put("0", SubscriptionMapper.mapFrom(subscription, Channel.MOTECH));
+        parameters.put("0", new SubscriptionMapper().createOMSubscriptionRequest(subscription, Channel.MOTECH));
 
         MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
         RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);

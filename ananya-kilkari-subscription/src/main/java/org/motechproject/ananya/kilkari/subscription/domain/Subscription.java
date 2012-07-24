@@ -193,7 +193,7 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     @JsonIgnore
-    public boolean isActive() {
+    public boolean hasBeenActivated() {
         return !(status.equals(SubscriptionStatus.PENDING_ACTIVATION) || status.equals(SubscriptionStatus.ACTIVATION_FAILED));
     }
 }

@@ -180,21 +180,21 @@ public class SubscriptionTest {
     public void shouldReturnFalseForIsActiveWhenTheStatusIsPendingActivation(){
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
 
-        assertFalse(subscription.isActive());
+        assertFalse(subscription.hasBeenActivated());
     }
 
     @Test
     public void shouldReturnFalseForIsActiveWhenTheStatusIsActivationFailed(){
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVATION_FAILED).build();
 
-        assertFalse(subscription.isActive());
+        assertFalse(subscription.hasBeenActivated());
     }
 
     @Test
     public void shouldReturnTrueForIsActiveForAnyOtherStatus(){
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).build();
 
-        assertTrue(subscription.isActive());
+        assertTrue(subscription.hasBeenActivated());
     }
 
     @Test

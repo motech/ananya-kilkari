@@ -98,7 +98,7 @@ public class KilkariCampaignService {
         else
             processExistingCampaignMessageAlert(subscription, messageId, campaignMessageAlert.isRenewed(), campaignMessageAlert, subscription.currentWeeksMessageExpiryDate(), CampaignTriggerType.WEEKLY_MESSAGE);
 
-        if (subscription.isActive())
+        if (subscription.hasBeenActivated())
             kilkariInboxService.newMessage(subscriptionId, messageId);
 
         if (subscription.hasPackBeenCompleted() && !subscription.isInDeactivatedState())

@@ -89,6 +89,6 @@ public class KilkariSubscriptionService {
     }
 
     public void requestDeactivation(String subscriptionId, UnsubscriptionRequest unsubscriptionRequest) {
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.from(unsubscriptionRequest.getChannel())));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.from(unsubscriptionRequest.getChannel()), unsubscriptionRequest.getCreatedAt()));
     }
 }

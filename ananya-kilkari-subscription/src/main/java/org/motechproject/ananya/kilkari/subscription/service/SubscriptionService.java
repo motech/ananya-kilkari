@@ -89,7 +89,7 @@ public class SubscriptionService {
 
     public void requestDeactivation(DeactivationRequest deactivationRequest) {
         String subscriptionId = deactivationRequest.getSubscriptionId();
-        updateStatusAndReport(subscriptionId, DateTime.now(), null, null, null, new Action<Subscription>() {
+        updateStatusAndReport(subscriptionId, deactivationRequest.getCreatedAt(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.deactivationRequestReceived();

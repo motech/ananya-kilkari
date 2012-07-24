@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.request;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
@@ -10,6 +11,12 @@ public class UnsubscriptionRequest implements Serializable {
     private String channel;
     @JsonProperty
     private String reason;
+    @JsonIgnore
+    private DateTime createdAt;
+
+    public UnsubscriptionRequest() {
+        this.createdAt = DateTime.now();
+    }
 
     @JsonIgnore
     public String getChannel() {
@@ -19,6 +26,11 @@ public class UnsubscriptionRequest implements Serializable {
     @JsonIgnore
     public String getReason() {
         return reason;
+    }
+
+    @JsonIgnore
+    public DateTime getCreatedAt() {
+        return createdAt;
     }
 
     public void setChannel(String channel) {

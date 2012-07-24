@@ -19,5 +19,6 @@ public class OBDRequestMapperTest {
 
         assertEquals(successfulCallRequestWrapper.getSubscriptionId(), deactivationRequest.getSubscriptionId());
         assertEquals(successfulCallRequestWrapper.getChannel(), deactivationRequest.getChannel());
+        assertEquals(successfulCallRequestWrapper.getCreatedAt(), deactivationRequest.getCreatedAt());
     }
 }

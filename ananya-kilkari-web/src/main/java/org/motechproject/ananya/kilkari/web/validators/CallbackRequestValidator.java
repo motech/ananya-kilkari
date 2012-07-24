@@ -53,19 +53,20 @@ public class CallbackRequestValidator {
         Subscription subscription = subscriptionService.findBySubscriptionId(callbackRequestWrapper.getSubscriptionId());
         if (CallbackAction.REN.name().equals(requestAction)) {
             final SubscriptionStatus subscriptionStatus = subscription.getStatus();
-            if (!(subscriptionStatus.equals(SubscriptionStatus.ACTIVE) || subscriptionStatus.equals(SubscriptionStatus.SUSPENDED)))
+            if(!subscriptionStatus.canRenew()) {
                 errors.add(String.format("Cannot renew. Subscription in %s status", subscriptionStatus));
+            }
         }
 
         if (CallbackAction.DCT.name().equals(requestAction) && CallbackStatus.BAL_LOW.name().equals(requestStatus)) {
             final SubscriptionStatus subscriptionStatus = subscription.getStatus();
-            if (!subscriptionStatus.equals(SubscriptionStatus.SUSPENDED))
+            if (!subscriptionStatus.canDeactivate())
                 errors.add(String.format("Cannot deactivate on renewal. Subscription in %s status", subscriptionStatus));
         }
 
         if (CallbackAction.ACT.name().equals(requestAction) && (CallbackStatus.SUCCESS.name().equals(requestStatus) || CallbackStatus.BAL_LOW.name().equals(requestStatus))) {
             final SubscriptionStatus subscriptionStatus = subscription.getStatus();
-            if (!subscriptionStatus.equals(SubscriptionStatus.PENDING_ACTIVATION))
+            if (!subscriptionStatus.canActivate())
                 errors.add(String.format("Cannot activate. Subscription in %s status", subscriptionStatus));
         }
 

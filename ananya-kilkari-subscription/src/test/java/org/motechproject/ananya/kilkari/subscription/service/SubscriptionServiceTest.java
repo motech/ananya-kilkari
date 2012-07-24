@@ -156,7 +156,7 @@ public class SubscriptionServiceTest {
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
-        order.verify(mockedSubscription).activationRequested();
+        order.verify(mockedSubscription).activationRequestSent();
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
@@ -181,7 +181,7 @@ public class SubscriptionServiceTest {
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
-        order.verify(mockedSubscription).requestDeactivation();
+        order.verify(mockedSubscription).deactivationRequestReceived();
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
@@ -195,7 +195,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldUpdateTheSubscriptionStatusToPendingDeactivation_WhenDeactivationRequestedIsComplete() {
         String subscriptionId = "abcd1234";
-        SubscriptionStatus status = SubscriptionStatus.DEACTIVATION_REQUESTED;
+        SubscriptionStatus status = SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED;
         Subscription mockedSubscription = mock(Subscription.class);
 
         when(mockedSubscription.getStatus()).thenReturn(status);
@@ -206,7 +206,7 @@ public class SubscriptionServiceTest {
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
-        order.verify(mockedSubscription).deactivationRequested();
+        order.verify(mockedSubscription).deactivationRequestSent();
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
@@ -379,7 +379,7 @@ public class SubscriptionServiceTest {
         verify(allSubscriptions).update(captor.capture());
         Subscription actualSubscription = captor.getValue();
         Assert.assertEquals(msisdn, actualSubscription.getMsisdn());
-        Assert.assertEquals(SubscriptionStatus.DEACTIVATION_REQUESTED, actualSubscription.getStatus());
+        Assert.assertEquals(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED, actualSubscription.getStatus());
 
         verify(onMobileSubscriptionManagerPublisher).processDeactivation(captor1.capture());
         ProcessSubscriptionRequest actualProcessSubscriptionRequest = captor1.getValue();

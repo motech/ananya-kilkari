@@ -80,7 +80,7 @@ public class SubscriptionService {
         updateStatusAndReport(subscriptionId, DateTime.now(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
-                subscription.activationRequested();
+                subscription.activationRequestSent();
             }
         });
     }
@@ -90,7 +90,7 @@ public class SubscriptionService {
         updateStatusAndReport(subscriptionId, DateTime.now(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
-                subscription.requestDeactivation();
+                subscription.deactivationRequestReceived();
             }
         });
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
@@ -101,7 +101,7 @@ public class SubscriptionService {
         updateStatusAndReport(subscriptionId, DateTime.now(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
-                subscription.deactivationRequested();
+                subscription.deactivationRequestSent();
             }
         });
     }

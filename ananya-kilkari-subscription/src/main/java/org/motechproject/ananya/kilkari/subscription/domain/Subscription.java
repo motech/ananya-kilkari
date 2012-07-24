@@ -114,11 +114,7 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public boolean isInProgress() {
-        return status != SubscriptionStatus.COMPLETED &&
-                status != SubscriptionStatus.DEACTIVATED &&
-                status != SubscriptionStatus.PENDING_DEACTIVATION &&
-                status != SubscriptionStatus.PENDING_COMPLETION &&
-                status != SubscriptionStatus.ACTIVATION_FAILED;
+        return status.isInProgress();
     }
 
     public void activateOnRenewal() {
@@ -139,20 +135,20 @@ public class Subscription extends MotechBaseDataObject {
         setOperator(Operator.getFor(operator));
     }
 
-    public void activationRequested() {
+    public void activationRequestSent() {
         setStatus(SubscriptionStatus.PENDING_ACTIVATION);
     }
 
-    public void deactivationRequested() {
+    public void deactivationRequestSent() {
         setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
     }
 
-    public void requestDeactivation() {
-        setStatus(SubscriptionStatus.DEACTIVATION_REQUESTED);
+    public void deactivationRequestReceived() {
+        setStatus(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED);
     }
 
     public void deactivate() {
-        if (SubscriptionStatus.PENDING_COMPLETION.equals(status))
+        if (status.hasCompletionRequestSent())
             setStatus(SubscriptionStatus.COMPLETED);
         else
             setStatus(SubscriptionStatus.DEACTIVATED);
@@ -173,8 +169,8 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     @JsonIgnore
-    public boolean isInDeactivatedState(){
-        return SubscriptionStatus.getDeactivatedStates().contains(status);
+    public boolean isInDeactivatedState() {
+        return status.isInDeactivatedState();
     }
 
     @JsonIgnore
@@ -194,6 +190,6 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public boolean hasBeenActivated() {
-        return !(status.equals(SubscriptionStatus.PENDING_ACTIVATION) || status.equals(SubscriptionStatus.ACTIVATION_FAILED));
+        return status.hasBeenActivated();
     }
 }

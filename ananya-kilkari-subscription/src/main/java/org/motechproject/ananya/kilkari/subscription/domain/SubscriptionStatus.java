@@ -4,9 +4,41 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum SubscriptionStatus {
-    NEW, PENDING_ACTIVATION, ACTIVATION_FAILED, COMPLETED, ACTIVE, DEACTIVATION_REQUESTED, PENDING_DEACTIVATION, DEACTIVATED, SUSPENDED, PENDING_COMPLETION;
+    NEW, PENDING_ACTIVATION, ACTIVATION_FAILED, COMPLETED, ACTIVE, DEACTIVATION_REQUEST_RECEIVED, PENDING_DEACTIVATION, DEACTIVATED, SUSPENDED, PENDING_COMPLETION;
 
-    public static List<SubscriptionStatus> getDeactivatedStates(){
-        return Arrays.asList(PENDING_DEACTIVATION,DEACTIVATED,DEACTIVATION_REQUESTED);
+    public boolean canRenew() {
+        return this == ACTIVE || this == SUSPENDED;
+    }
+
+    public boolean canDeactivate() {
+        return equals(SUSPENDED);
+    }
+
+    public boolean canActivate() {
+        return equals(PENDING_ACTIVATION);
+    }
+
+    boolean isInProgress() {
+        return this != COMPLETED &&
+                this != DEACTIVATED &&
+                this != PENDING_DEACTIVATION &&
+                this != PENDING_COMPLETION &&
+                this != ACTIVATION_FAILED;
+    }
+
+    boolean hasCompletionRequestSent() {
+        return PENDING_COMPLETION.equals(this);
+    }
+
+    public boolean isInDeactivatedState() {
+        return getDeactivatedStates().contains(this);
+    }
+
+    public boolean hasBeenActivated() {
+        return !(this == SubscriptionStatus.PENDING_ACTIVATION || this == SubscriptionStatus.ACTIVATION_FAILED);
+    }
+
+    private static List<SubscriptionStatus> getDeactivatedStates() {
+        return Arrays.asList(PENDING_DEACTIVATION, DEACTIVATED, DEACTIVATION_REQUEST_RECEIVED);
     }
 }

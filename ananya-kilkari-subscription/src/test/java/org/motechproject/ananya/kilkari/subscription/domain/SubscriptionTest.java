@@ -31,7 +31,7 @@ public class SubscriptionTest {
     @Test
     public void shouldChangeStatusOfSubscriptionToPendingDuringActivationRequest() {
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
-        subscription.activationRequested();
+        subscription.activationRequestSent();
 
         assertEquals(SubscriptionStatus.PENDING_ACTIVATION, subscription.getStatus());
         assertNull(subscription.getOperator());
@@ -205,7 +205,7 @@ public class SubscriptionTest {
         subscription.setStatus(SubscriptionStatus.DEACTIVATED);
         assertTrue(subscription.isInDeactivatedState());
 
-        subscription.setStatus(SubscriptionStatus.DEACTIVATION_REQUESTED);
+        subscription.setStatus(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED);
         assertTrue(subscription.isInDeactivatedState());
     }
 

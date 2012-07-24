@@ -17,12 +17,12 @@ public class BaseResponse {
     @JsonProperty
     protected String description;
 
-    public BaseResponse(String status, String description) {
+    private BaseResponse(String status, String description) {
         this.status = status;
         this.description = description;
     }
 
-    public BaseResponse() {
+    BaseResponse() {
     }
 
     public static BaseResponse failure(String description) {

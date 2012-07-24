@@ -103,7 +103,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final String msisdn = "9876543210";
         String channelString = Channel.IVR.toString();
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
-        BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
+        BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         reportingService.setBehavior(mock(ReportingService.class));
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
@@ -159,7 +159,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final String msisdn = "9876543210";
         String channelString = Channel.CALL_CENTER.toString();
         final SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
-        BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription request submitted successfully");
+        BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
         when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
@@ -219,7 +219,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final String msisdn = "1111111111";
         String channelString = Channel.CALL_CENTER.toString();
         final SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
-        BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription unsubscribed successfully");
+        BaseResponse expectedResponse = BaseResponse.success("Subscription unsubscribed successfully");
 
         reportingService.setBehavior(Mockito.mock(ReportingService.class));
         OnMobileSubscriptionGateway onMobileSubscriptionGateway = mock(OnMobileSubscriptionGateway.class);

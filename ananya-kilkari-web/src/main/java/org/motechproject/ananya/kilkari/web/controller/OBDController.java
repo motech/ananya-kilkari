@@ -28,20 +28,20 @@ public class OBDController {
     @ResponseBody
     public BaseResponse handleSuccessfulResponse(@RequestBody OBDSuccessfulCallRequest successfulCallRequest, @PathVariable String subscriptionId) {
         kilkariCampaignService.publishSuccessfulCallRequest(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, DateTime.now(), Channel.IVR));
-        return new BaseResponse("SUCCESS", "OBD call details received successfully for subscriptionId : " + subscriptionId);
+        return BaseResponse.success("OBD call details received successfully for subscriptionId : " + subscriptionId);
     }
 
     @RequestMapping(value = "/obd/calldetails", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse handleCallDeliveryFailureRecords(@RequestBody CallDeliveryFailureRecord callDeliveryFailureRecord) {
         kilkariCampaignService.publishCallDeliveryFailureRequest(callDeliveryFailureRecord);
-        return new BaseResponse("SUCCESS", "OBD call delivery failure records received successfully");
+        return BaseResponse.success("OBD call delivery failure records received successfully");
     }
 
     @RequestMapping(value = "/obd/invalidcallrecords", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse handleInvalidCallRecords(@RequestBody InvalidCallRecordsRequest invalidRecordsRequest) {
         kilkariCampaignService.publishInvalidCallRecordsRequest(invalidRecordsRequest);
-        return new BaseResponse("SUCCESS", "OBD invalid call records received successfully");
+        return BaseResponse.success("OBD invalid call records received successfully");
     }
 }

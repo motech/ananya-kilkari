@@ -4,10 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
+import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -16,8 +14,7 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SubscriptionHandlerTest {
@@ -86,6 +83,8 @@ public class SubscriptionHandlerTest {
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         final String subscriptionId = "abcd1234";
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
+        Subscription subscription = new SubscriptionBuilder().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).build();
+        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         subscriptionHandler.handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
 
@@ -111,6 +110,21 @@ public class SubscriptionHandlerTest {
         subscriptionHandler.handleInboxDeletion(new MotechEvent(SubscriptionEventKeys.DELETE_INBOX, parameters));
 
         verify(subscriptionService).deleteInbox(subscriptionId);
+    }
+
+    @Test
+    public void shouldNotSendDeactivationRequestAgainIfTheExistingSubscriptionIsAlreadyInDeactivatedState() {
+        final String msisdn = "9988776655";
+        final String subscriptionId = "abcd1234";
+        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        Subscription subscription = new SubscriptionBuilder().withMsisdn(msisdn).withStatus(SubscriptionStatus.DEACTIVATED).build();
+        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
+
+        new SubscriptionHandler(onMobileSubscriptionGateway, subscriptionService).handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
+
+        verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(ProcessSubscriptionRequest.class));
+        verify(subscriptionService, never()).subscriptionComplete(subscriptionId);
     }
 
     @Test(expected = RuntimeException.class)

@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.handlers;
 
 import org.motechproject.ananya.kilkari.subscription.domain.ProcessSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -46,6 +47,13 @@ public class SubscriptionHandler {
     public void handleSubscriptionComplete(MotechEvent event) {
         ProcessSubscriptionRequest processSubscriptionRequest = (ProcessSubscriptionRequest) event.getParameters().get("0");
         logger.info(String.format("Handling subscription completion event for subscriptionid: %s, msisdn: %s, pack: %s", processSubscriptionRequest.getSubscriptionId(), processSubscriptionRequest.getMsisdn(), processSubscriptionRequest.getPack()));
+
+        Subscription subscription = subscriptionService.findBySubscriptionId(processSubscriptionRequest.getSubscriptionId());
+        if (subscription.isInDeactivatedState()) {
+            logger.info(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", processSubscriptionRequest.getSubscriptionId(), processSubscriptionRequest.getMsisdn(), subscription.getStatus()));
+            return;
+        }
+
         onMobileSubscriptionGateway.deactivateSubscription(processSubscriptionRequest);
         subscriptionService.subscriptionComplete(processSubscriptionRequest.getSubscriptionId());
     }

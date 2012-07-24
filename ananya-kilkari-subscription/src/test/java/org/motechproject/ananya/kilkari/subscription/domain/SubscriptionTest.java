@@ -196,4 +196,37 @@ public class SubscriptionTest {
 
         assertTrue(subscription.isActive());
     }
+
+    @Test
+    public void shouldReturnTrueIfTheSubscriptionIsInAnyOfTheDeactivatedStates() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_DEACTIVATION).build();
+        assertTrue(subscription.isInDeactivatedState());
+
+        subscription.setStatus(SubscriptionStatus.DEACTIVATED);
+        assertTrue(subscription.isInDeactivatedState());
+
+        subscription.setStatus(SubscriptionStatus.DEACTIVATION_REQUESTED);
+        assertTrue(subscription.isInDeactivatedState());
+    }
+
+    @Test
+    public void shouldReturnFalseIfTheSubscriptionIsNotInTheDeactivatedState() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVATION_FAILED).build();
+        assertFalse(subscription.isInDeactivatedState());
+
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        assertFalse(subscription.isInDeactivatedState());
+
+        subscription.setStatus(SubscriptionStatus.NEW);
+        assertFalse(subscription.isInDeactivatedState());
+
+        subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+        assertFalse(subscription.isInDeactivatedState());
+
+        subscription.setStatus(SubscriptionStatus.COMPLETED);
+        assertFalse(subscription.isInDeactivatedState());
+
+        subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
+        assertFalse(subscription.isInDeactivatedState());
+    }
 }

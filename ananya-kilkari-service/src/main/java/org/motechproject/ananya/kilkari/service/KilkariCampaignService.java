@@ -101,7 +101,7 @@ public class KilkariCampaignService {
         if (subscription.isActive())
             kilkariInboxService.newMessage(subscriptionId, messageId);
 
-        if (subscription.hasPackBeenCompleted())
+        if (subscription.hasPackBeenCompleted() && !subscription.isInDeactivatedState())
             kilkariSubscriptionService.processSubscriptionCompletion(subscription);
     }
 

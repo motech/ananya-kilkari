@@ -173,6 +173,11 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     @JsonIgnore
+    public boolean isInDeactivatedState(){
+        return SubscriptionStatus.getDeactivatedStates().contains(status);
+    }
+
+    @JsonIgnore
     public int getCurrentWeek() {
         int weeksDifference = getWeeksElapsedAfterCreationDate();
         return weeksDifference + getPack().getStartWeek() + 1;

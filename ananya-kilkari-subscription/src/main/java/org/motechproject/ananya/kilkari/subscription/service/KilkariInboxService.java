@@ -46,6 +46,7 @@ public class KilkariInboxService {
 
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put(MotechSchedulerService.JOB_ID_KEY, subscription.getSubscriptionId());
+        parameters.put("0", subscription.getSubscriptionId());
         MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
 
         RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);

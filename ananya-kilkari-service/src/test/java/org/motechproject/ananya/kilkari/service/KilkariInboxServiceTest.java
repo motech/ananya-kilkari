@@ -102,6 +102,7 @@ public class KilkariInboxServiceTest {
         RunOnceSchedulableJob runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
         Assert.assertEquals(SubscriptionEventKeys.DELETE_INBOX, runOnceSchedulableJob.getMotechEvent().getSubject());
         Assert.assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
+        Assert.assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get("0"));
         Assert.assertEquals(messageExpiryDate.toDate(), runOnceSchedulableJob.getStartDate());
     }
 

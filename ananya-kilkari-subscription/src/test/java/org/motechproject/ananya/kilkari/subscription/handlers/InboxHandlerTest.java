@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
-import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;
@@ -30,7 +29,7 @@ public class InboxHandlerTest {
         final String subscriptionId = "abcd1234";
         HashMap<String, Object> parameters = new HashMap<String, Object>(){
             {
-                put(MotechSchedulerService.JOB_ID_KEY, subscriptionId);
+                put("0", subscriptionId);
             }
         };
 

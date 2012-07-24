@@ -2,7 +2,6 @@ package org.motechproject.ananya.kilkari.subscription.handlers;
 
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
-import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
 import org.slf4j.Logger;
@@ -23,7 +22,7 @@ public class InboxHandler {
 
     @MotechListener(subjects = {SubscriptionEventKeys.DELETE_INBOX})
     public void handleInboxDeletion(MotechEvent event) {
-        String subscriptionId = (String) event.getParameters().get(MotechSchedulerService.JOB_ID_KEY);
+        String subscriptionId = (String) event.getParameters().get("0");
         logger.info(String.format("Handling inbox deletion event for subscriptionid: %s", subscriptionId));
         kilkariInboxService.deleteInbox(subscriptionId);
     }

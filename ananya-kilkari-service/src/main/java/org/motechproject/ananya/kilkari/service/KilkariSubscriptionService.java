@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.service;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
+import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
@@ -15,7 +16,6 @@ import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -28,21 +28,20 @@ public class KilkariSubscriptionService {
     private SubscriptionService subscriptionService;
     private KilkariMessageCampaignService kilkariMessageCampaignService;
     private MotechSchedulerService motechSchedulerService;
+    private KilkariPropertiesData kilkariProperties;
 
     private final Logger LOGGER = LoggerFactory.getLogger(KilkariSubscriptionService.class);
-
-    @Value("#{kilkariProperties['buffer.days.to.allow.renewal.for.pack.completion']}")
-    protected int bufferDaysToAllowRenewalForPackCompletion;
 
     @Autowired
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
                                       SubscriptionService subscriptionService,
                                       KilkariMessageCampaignService kilkariMessageCampaignService,
-                                      MotechSchedulerService motechSchedulerService) {
+                                      MotechSchedulerService motechSchedulerService,KilkariPropertiesData kilkariProperties) {
         this.subscriptionPublisher = subscriptionPublisher;
         this.subscriptionService = subscriptionService;
         this.kilkariMessageCampaignService = kilkariMessageCampaignService;
         this.motechSchedulerService = motechSchedulerService;
+        this.kilkariProperties = kilkariProperties;
     }
 
     public void createSubscription(SubscriptionRequest subscriptionRequest) {
@@ -76,16 +75,32 @@ public class KilkariSubscriptionService {
     }
 
     public void processSubscriptionCompletion(Subscription subscription) {
+        scheduleSubscriptionCompletionEvent(subscription);
+        scheduleInboxDeletionEvent(subscription);
+    }
+
+    private void scheduleSubscriptionCompletionEvent(Subscription subscription) {
         String subjectKey = SubscriptionEventKeys.SUBSCRIPTION_COMPLETE;
-        Date startDate = DateTime.now().plusDays(bufferDaysToAllowRenewalForPackCompletion).toDate();
+        Date startDate = DateTime.now().plusDays(kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
+        RunOnceSchedulableJob runOnceSchedulableJob = createRunOnceSchedulableJob(subscription, startDate, subjectKey);
+
+        motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+    }
+
+    private void scheduleInboxDeletionEvent(Subscription subscription) {
+        String subjectKey = SubscriptionEventKeys.DELETE_INBOX;
+        Date startDate = DateTime.now().plusDays(kilkariProperties.getBufferDaysToAllowInboxAccess() + 1).toDate();
+        RunOnceSchedulableJob runOnceSchedulableJob = createRunOnceSchedulableJob(subscription, startDate, subjectKey);
+        motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+    }
+
+    private RunOnceSchedulableJob createRunOnceSchedulableJob(Subscription subscription, Date startDate, String subjectKey) {
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put(MotechSchedulerService.JOB_ID_KEY, subscription.getSubscriptionId());
         parameters.put("0", SubscriptionMapper.mapFrom(subscription, Channel.MOTECH));
 
         MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
-        RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);
-
-        motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+        return new RunOnceSchedulableJob(motechEvent, startDate);
     }
 
     public void requestDeactivation(String subscriptionId, UnsubscriptionRequest unsubscriptionRequest) {

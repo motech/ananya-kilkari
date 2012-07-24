@@ -3,10 +3,13 @@ package org.motechproject.ananya.kilkari.messagecampaign.service;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
 import org.motechproject.server.messagecampaign.service.MessageCampaignService;
@@ -19,8 +22,8 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 
+@RunWith(MockitoJUnitRunner.class)
 public class KilkariMessageCampaignServiceTest {
 
     private KilkariMessageCampaignService kilkariMessageCampaignService;
@@ -28,10 +31,13 @@ public class KilkariMessageCampaignServiceTest {
     @Mock
     private MessageCampaignService messageCampaignService;
 
+    @Mock
+    private KilkariPropertiesData kilkariProperties;
+
+
     @Before
     public void setUp() {
-        initMocks(this);
-        kilkariMessageCampaignService = new KilkariMessageCampaignService(messageCampaignService);
+        kilkariMessageCampaignService = new KilkariMessageCampaignService(messageCampaignService,kilkariProperties);
     }
 
     @Test

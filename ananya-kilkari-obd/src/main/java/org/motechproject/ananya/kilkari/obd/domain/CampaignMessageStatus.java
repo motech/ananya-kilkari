@@ -2,6 +2,9 @@ package org.motechproject.ananya.kilkari.obd.domain;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum CampaignMessageStatus {
     NEW, DNP, DNC, SUCCESS;
 
@@ -12,6 +15,11 @@ public enum CampaignMessageStatus {
 
     public static boolean isValid(String statusCode) {
         return (statusCode != null && CampaignMessageStatus.contains(statusCode));
+    }
+    
+    public static List<CampaignMessageStatus> getFailedStatusCodes(){
+        return Arrays.asList(DNC,DNP);
+
     }
 
     private static boolean contains(String value) {

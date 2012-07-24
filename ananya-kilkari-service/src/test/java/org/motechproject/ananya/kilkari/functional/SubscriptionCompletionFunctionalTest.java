@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.functional;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
@@ -22,6 +23,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+@Ignore
 public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest {
 
     @Autowired

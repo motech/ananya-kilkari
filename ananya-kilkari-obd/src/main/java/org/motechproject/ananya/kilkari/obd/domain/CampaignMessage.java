@@ -98,7 +98,7 @@ public class CampaignMessage extends MotechBaseDataObject {
     }
 
     public boolean hasFailed() {
-        return status == CampaignMessageStatus.DNP || status == CampaignMessageStatus.DNC;
+        return CampaignMessageStatus.getFailedStatusCodes().contains(status);
     }
 }
 

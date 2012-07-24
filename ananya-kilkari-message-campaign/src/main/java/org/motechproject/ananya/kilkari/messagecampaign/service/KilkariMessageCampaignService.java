@@ -5,11 +5,11 @@ import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaign
 import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.mapper.MessageCampaignRequestMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
 import org.motechproject.server.messagecampaign.service.MessageCampaignService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,32 +24,22 @@ public class KilkariMessageCampaignService {
     public static final String TWELVE_MONTHS = "kilkari-mother-child-campaign-twelve-months";
     public static final String SEVEN_MONTHS = "kilkari-mother-child-campaign-seven-months";
     public static final String CAMPAIGN_MESSAGE_NAME = "Mother Child Health Care";
-    public int campaignScheduleDeltaDays;
-    public int campaignScheduleDeltaMinutes;
-
-    @Value("#{kilkariProperties['kilkari.campaign.schedule.delta.days']}")
-    public void setCampaignScheduleDeltaDays(int campaignScheduleDeltaDays) {
-        this.campaignScheduleDeltaDays = campaignScheduleDeltaDays;
-    }
-
-    @Value("#{kilkariProperties['kilkari.campaign.schedule.delta.minutes']}")
-    public void setCampaignScheduleDeltaMinutes(int campaignScheduleDeltaMinutes) {
-        this.campaignScheduleDeltaMinutes = campaignScheduleDeltaMinutes;
-    }
 
     private MessageCampaignService campaignService;
+    private KilkariPropertiesData kilkariProperties;
 
     @Autowired
-    public KilkariMessageCampaignService(MessageCampaignService campaignService) {
+    public KilkariMessageCampaignService(MessageCampaignService campaignService, KilkariPropertiesData kilkariProperties) {
         this.campaignService = campaignService;
+        this.kilkariProperties = kilkariProperties;
     }
 
     public void start(MessageCampaignRequest campaignRequest) {
-        campaignService.startFor(MessageCampaignRequestMapper.newRequestFrom(campaignRequest, campaignScheduleDeltaDays, campaignScheduleDeltaMinutes));
+        campaignService.startFor(MessageCampaignRequestMapper.newRequestFrom(campaignRequest, kilkariProperties));
     }
 
     public boolean stop(MessageCampaignRequest enrollRequest) {
-        campaignService.stopAll(MessageCampaignRequestMapper.newRequestFrom(enrollRequest, campaignScheduleDeltaDays, campaignScheduleDeltaMinutes));
+        campaignService.stopAll(MessageCampaignRequestMapper.newRequestFrom(enrollRequest,kilkariProperties));
         return true;
     }
 

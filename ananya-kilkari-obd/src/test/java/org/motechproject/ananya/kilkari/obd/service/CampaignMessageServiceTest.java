@@ -8,7 +8,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
-import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
+import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.gateway.OBDProperties;
@@ -256,14 +256,14 @@ public class CampaignMessageServiceTest {
     public void shouldUpdateCampaignMessageStatus() {
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK13";
-        ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNP, DateTime.now());
+        ValidFailedCallReport failedCallReport = new ValidFailedCallReport(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNP, DateTime.now());
 
         CampaignMessage campaignMessage = new CampaignMessage();
         when(obdProperties.getMaximumDNPRetryCount()).thenReturn(MAX_DNP_RETRY_COUNT);
         when(obdProperties.getMaximumDNCRetryCount()).thenReturn(MAX_DNC_RETRY_COUNT);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);
+        campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
         verify(reportingService).reportCampaignMessageDeliveryStatus(any(CampaignMessageDeliveryReportRequest.class));
@@ -279,14 +279,14 @@ public class CampaignMessageServiceTest {
     public void shouldUpdateCampaignMessageStatusWithDNCBasedOnTheFailureRecordSentFromOBD() {
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK13";
-        ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNC, DateTime.now());
+        ValidFailedCallReport failedCallReport = new ValidFailedCallReport(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNC, DateTime.now());
 
         CampaignMessage campaignMessage = new CampaignMessage();
         when(obdProperties.getMaximumDNPRetryCount()).thenReturn(MAX_DNP_RETRY_COUNT);
         when(obdProperties.getMaximumDNCRetryCount()).thenReturn(MAX_DNC_RETRY_COUNT);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);
+        campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
         verify(reportingService).reportCampaignMessageDeliveryStatus(any(CampaignMessageDeliveryReportRequest.class));
@@ -302,14 +302,14 @@ public class CampaignMessageServiceTest {
     public void shouldDeleteCampaignMessageIfDNPRetryCountHasReachedItsMaximumValue() {
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK13";
-        ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNP, DateTime.now());
+        ValidFailedCallReport failedCallReport = new ValidFailedCallReport(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNP, DateTime.now());
 
         CampaignMessage campaignMessage = mock(CampaignMessage.class);
         when(obdProperties.getMaximumDNPRetryCount()).thenReturn(MAX_DNP_RETRY_COUNT);
         when(campaignMessage.getDnpRetryCount()).thenReturn(MAX_DNP_RETRY_COUNT);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);
+        campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
         verify(reportingService).reportCampaignMessageDeliveryStatus(any(CampaignMessageDeliveryReportRequest.class));
@@ -320,7 +320,7 @@ public class CampaignMessageServiceTest {
     public void shouldNotDeleteCampaignMessageIfDNPRetryCountHasReachedItsMaximumValueAndTheNewStatusCodeIsNotDNP() {
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK13";
-        ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNC, DateTime.now());
+        ValidFailedCallReport failedCallReport = new ValidFailedCallReport(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNC, DateTime.now());
 
         CampaignMessage campaignMessage = mock(CampaignMessage.class);
         when(obdProperties.getMaximumDNPRetryCount()).thenReturn(MAX_DNP_RETRY_COUNT);
@@ -329,7 +329,7 @@ public class CampaignMessageServiceTest {
         when(campaignMessage.getDncRetryCount()).thenReturn(0);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);
+        campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages, never()).delete(campaignMessage);
     }
@@ -338,7 +338,7 @@ public class CampaignMessageServiceTest {
     public void shouldDeleteCampaignMessageIfDNCRetryCountHasReachedItsMaximumValue() {
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK13";
-        ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNC, DateTime.now());
+        ValidFailedCallReport failedCallReport = new ValidFailedCallReport(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNC, DateTime.now());
 
         CampaignMessage campaignMessage = mock(CampaignMessage.class);
         when(obdProperties.getMaximumDNPRetryCount()).thenReturn(MAX_DNP_RETRY_COUNT);
@@ -347,7 +347,7 @@ public class CampaignMessageServiceTest {
         when(campaignMessage.getDnpRetryCount()).thenReturn(0);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);
+        campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
         verify(reportingService).reportCampaignMessageDeliveryStatus(any(CampaignMessageDeliveryReportRequest.class));
@@ -358,7 +358,7 @@ public class CampaignMessageServiceTest {
     public void shouldNotDeleteCampaignMessageIfDNCRetryCountHAsReachedItsMaximumValueButTheNewStatusCodeIsDNP() {
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK13";
-        ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNP, DateTime.now());
+        ValidFailedCallReport failedCallReport = new ValidFailedCallReport(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNP, DateTime.now());
 
         CampaignMessage campaignMessage = mock(CampaignMessage.class);
         when(obdProperties.getMaximumDNPRetryCount()).thenReturn(MAX_DNP_RETRY_COUNT);
@@ -367,7 +367,7 @@ public class CampaignMessageServiceTest {
         when(campaignMessage.getDnpRetryCount()).thenReturn(0);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);
+        campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages, never()).delete(campaignMessage);
     }
@@ -376,11 +376,11 @@ public class CampaignMessageServiceTest {
     public void shouldNotUpdateCampaignMessageStatusIfCampaignMessageIsNull() {
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK13";
-        ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNP, DateTime.now());
+        ValidFailedCallReport failedCallReport = new ValidFailedCallReport(subscriptionId, "msisdn", campaignId, CampaignMessageStatus.DNP, DateTime.now());
 
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(null);
 
-        campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);
+        campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
         verify(reportingService, never()).reportCampaignMessageDeliveryStatus(any(CampaignMessageDeliveryReportRequest.class));
@@ -394,14 +394,14 @@ public class CampaignMessageServiceTest {
         String msisdn = "msisdn";
         DateTime createdAt = new DateTime(2012, 12, 25, 23, 23, 23);
         CampaignMessageStatus status = CampaignMessageStatus.DNP;
-        ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, msisdn, campaignId, status, createdAt);
+        ValidFailedCallReport failedCallReport = new ValidFailedCallReport(subscriptionId, msisdn, campaignId, status, createdAt);
 
         CampaignMessage campaignMessage = new CampaignMessage();
         when(obdProperties.getMaximumDNPRetryCount()).thenReturn(MAX_DNP_RETRY_COUNT);
         when(obdProperties.getMaximumDNCRetryCount()).thenReturn(MAX_DNC_RETRY_COUNT);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);
+        campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
 
@@ -431,7 +431,7 @@ public class CampaignMessageServiceTest {
         String msisdn = "1234567890";
         DateTime createdAt = new DateTime(2012, 12, 25, 23, 23, 23);
         CampaignMessageStatus status = CampaignMessageStatus.DNC;
-        ValidCallDeliveryFailureRecordObject recordObject = new ValidCallDeliveryFailureRecordObject(subscriptionId, msisdn, campaignId, status, createdAt);
+        ValidFailedCallReport failedCallReport = new ValidFailedCallReport(subscriptionId, msisdn, campaignId, status, createdAt);
 
         CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, campaignId, msisdn, "airtel", DateTime.now().minusDays(1));
         campaignMessage.setStatusCode(CampaignMessageStatus.DNC);
@@ -441,7 +441,7 @@ public class CampaignMessageServiceTest {
         when(obdProperties.getMaximumDNCRetryCount()).thenReturn(MAX_DNC_RETRY_COUNT);
         when(allCampaignMessages.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        campaignMessageService.processValidCallDeliveryFailureRecords(recordObject);
+        campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
 

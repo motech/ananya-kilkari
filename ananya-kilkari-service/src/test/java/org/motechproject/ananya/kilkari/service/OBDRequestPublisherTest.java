@@ -6,10 +6,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
-import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
+import org.motechproject.ananya.kilkari.obd.contract.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntries;
+import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
@@ -42,33 +42,33 @@ public class OBDRequestPublisherTest {
 
     @Test
     public void shouldPublishInvalidCallRecordsRequest() {
-        InvalidCallRecordsRequest invalidCallRecordsRequest = new InvalidCallRecordsRequest();
-        obdRequestPublisher.publishInvalidCallRecordsRequest(invalidCallRecordsRequest);
+        InvalidOBDRequestEntries invalidOBDRequestEntries = new InvalidOBDRequestEntries();
+        obdRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
 
-        verify(eventContext).send(OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, invalidCallRecordsRequest);
+        verify(eventContext).send(OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, invalidOBDRequestEntries);
     }
 
     @Test
     public void shouldPublishCallDeliveryFailureRecord() {
-        CallDeliveryFailureRecord callDeliveryFailureRecord = mock(CallDeliveryFailureRecord.class);
-        obdRequestPublisher.publishCallDeliveryFailureRecord(callDeliveryFailureRecord);
+        FailedCallReports failedCallReports = mock(FailedCallReports.class);
+        obdRequestPublisher.publishCallDeliveryFailureRecord(failedCallReports);
 
-        verify(eventContext).send(OBDEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, callDeliveryFailureRecord);
+        verify(eventContext).send(OBDEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, failedCallReports);
     }
 
     @Test
     public void shouldPublishInvalidCallDeliveryFailureRecord() {
-        InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord = mock(InvalidCallDeliveryFailureRecord.class);
-        obdRequestPublisher.publishInvalidCallDeliveryFailureRecord(invalidCallDeliveryFailureRecord);
+        InvalidFailedCallReports invalidFailedCallReports = mock(InvalidFailedCallReports.class);
+        obdRequestPublisher.publishInvalidCallDeliveryFailureRecord(invalidFailedCallReports);
 
-        verify(eventContext).send(OBDEventKeys.PROCESS_INVALID_CALL_DELIVERY_FAILURE_RECORD, invalidCallDeliveryFailureRecord);
+        verify(eventContext).send(OBDEventKeys.PROCESS_INVALID_CALL_DELIVERY_FAILURE_RECORD, invalidFailedCallReports);
     }
 
     @Test
     public void shouldPublishValidCallDeliveryFailureRecord() {
-        ValidCallDeliveryFailureRecordObject validCallDeliveryFailureRecordObject = mock(ValidCallDeliveryFailureRecordObject.class);
-        obdRequestPublisher.publishValidCallDeliveryFailureRecord(validCallDeliveryFailureRecordObject);
+        ValidFailedCallReport validFailedCallReport = mock(ValidFailedCallReport.class);
+        obdRequestPublisher.publishValidCallDeliveryFailureRecord(validFailedCallReport);
 
-        verify(eventContext).send(OBDEventKeys.PROCESS_VALID_CALL_DELIVERY_FAILURE_RECORD, validCallDeliveryFailureRecordObject);
+        verify(eventContext).send(OBDEventKeys.PROCESS_VALID_CALL_DELIVERY_FAILURE_RECORD, validFailedCallReport);
     }
 }

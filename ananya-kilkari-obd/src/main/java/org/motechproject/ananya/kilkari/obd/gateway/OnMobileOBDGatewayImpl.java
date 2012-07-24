@@ -11,7 +11,7 @@ import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.profile.ProductionProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +53,8 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     }
 
     @Override
-    public void sendInvalidFailureRecord(InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord) {
-        restTemplate.postForLocation(obdProperties.getFailureReportUrl(), invalidCallDeliveryFailureRecord);
+    public void sendInvalidFailureRecord(InvalidFailedCallReports invalidFailedCallReports) {
+        restTemplate.postForLocation(obdProperties.getFailureReportUrl(), invalidFailedCallReports);
     }
 
     private void send(String content, String url) {

@@ -3,8 +3,8 @@ package org.motechproject.ananya.kilkari.handlers;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntry;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
@@ -62,12 +62,12 @@ public class OBDRequestHandler {
 
     @MotechListener(subjects = {OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT})
     public void handleInvalidCallRecordsRequest(MotechEvent event) {
-        InvalidCallRecordsRequest invalidCallRecordsRequest = (InvalidCallRecordsRequest) event.getParameters().get("0");
-        ArrayList<InvalidCallRecordRequestObject> requestCallRecords = invalidCallRecordsRequest.getCallrecords();
-        ArrayList<InvalidCallRecord> invalidCallRecords = new ArrayList<>();
-        for (InvalidCallRecordRequestObject requestObject : requestCallRecords) {
-            invalidCallRecords.add(new InvalidCallRecord(requestObject.getMsisdn(), requestObject.getSubscriptionId(),
-                    requestObject.getCampaignId(), requestObject.getOperator(), requestObject.getDescription()));
+        InvalidOBDRequestEntries invalidOBDRequestEntries = (InvalidOBDRequestEntries) event.getParameters().get("0");
+        List<InvalidOBDRequestEntry> requestOBDs = invalidOBDRequestEntries.getInvalidOBDRequestEntryList();
+        List<InvalidCallRecord> invalidCallRecords = new ArrayList<>();
+        for (InvalidOBDRequestEntry requestEntry : requestOBDs) {
+            invalidCallRecords.add(new InvalidCallRecord(requestEntry.getMsisdn(), requestEntry.getSubscriptionId(),
+                    requestEntry.getCampaignId(), requestEntry.getOperator(), requestEntry.getDescription()));
         }
         callRecordsService.processInvalidCallRecords(invalidCallRecords);
     }

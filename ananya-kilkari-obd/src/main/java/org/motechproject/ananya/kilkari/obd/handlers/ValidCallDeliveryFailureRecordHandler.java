@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.handlers;
 
 import org.apache.log4j.Logger;
-import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
+import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -22,9 +22,9 @@ public class ValidCallDeliveryFailureRecordHandler {
 
     @MotechListener(subjects = {OBDEventKeys.PROCESS_VALID_CALL_DELIVERY_FAILURE_RECORD})
     public void handleValidCallDeliveryFailureRecord(MotechEvent motechEvent) {
-        ValidCallDeliveryFailureRecordObject validCallDeliveryFailureRecordObject = (ValidCallDeliveryFailureRecordObject) motechEvent.getParameters().get("0");
+        ValidFailedCallReport validFailedCallReport = (ValidFailedCallReport) motechEvent.getParameters().get("0");
         logger.info("Handling OBD invalid call delivery failure records");
-        campaignMessageService.processValidCallDeliveryFailureRecords(validCallDeliveryFailureRecordObject);
+        campaignMessageService.processValidCallDeliveryFailureRecords(validFailedCallReport);
 
     }
 }

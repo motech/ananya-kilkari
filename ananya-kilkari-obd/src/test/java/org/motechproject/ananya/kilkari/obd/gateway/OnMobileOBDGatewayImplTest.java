@@ -16,8 +16,8 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecordObject;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReport;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReports;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
@@ -150,27 +150,27 @@ public class OnMobileOBDGatewayImplTest {
 
     @Test
     public void shouldSendInvalidFailureRecordsToObd() {
-        InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord = new InvalidCallDeliveryFailureRecord();
-        ArrayList<InvalidCallDeliveryFailureRecordObject> recordObjects = new ArrayList<>();
-        recordObjects.add(new InvalidCallDeliveryFailureRecordObject("msisdn1", "subscriptionId1", "description1"));
-        recordObjects.add(new InvalidCallDeliveryFailureRecordObject("msisdn2", "subscriptionId2", "description2"));
-        invalidCallDeliveryFailureRecord.setRecordObjects(recordObjects);
+        InvalidFailedCallReports invalidFailedCallReports = new InvalidFailedCallReports();
+        ArrayList<InvalidFailedCallReport> recordObjectFaileds = new ArrayList<>();
+        recordObjectFaileds.add(new InvalidFailedCallReport("msisdn1", "subscriptionId1", "description1"));
+        recordObjectFaileds.add(new InvalidFailedCallReport("msisdn2", "subscriptionId2", "description2"));
+        invalidFailedCallReports.setRecordObjectFaileds(recordObjectFaileds);
 
-        onMobileOBDGateway.sendInvalidFailureRecord(invalidCallDeliveryFailureRecord);
+        onMobileOBDGateway.sendInvalidFailureRecord(invalidFailedCallReports);
 
-        ArgumentCaptor<InvalidCallDeliveryFailureRecord> invalidCallDeliveryFailureRecordArgumentCaptor = ArgumentCaptor.forClass(InvalidCallDeliveryFailureRecord.class);
+        ArgumentCaptor<InvalidFailedCallReports> invalidCallDeliveryFailureRecordArgumentCaptor = ArgumentCaptor.forClass(InvalidFailedCallReports.class);
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), invalidCallDeliveryFailureRecordArgumentCaptor.capture());
         String actualUrl = urlArgumentCaptor.getValue();
-        List<InvalidCallDeliveryFailureRecordObject> actualRecordObjects = invalidCallDeliveryFailureRecordArgumentCaptor.getValue().getRecordObjects();
+        List<InvalidFailedCallReport> actualRecordObjectFaileds = invalidCallDeliveryFailureRecordArgumentCaptor.getValue().getRecordObjectFaileds();
 
         assertEquals("failureUrl", actualUrl);
-        assertEquals(2, actualRecordObjects.size());
-        assertEquals("msisdn1",actualRecordObjects.get(0).getMsisdn());
-        assertEquals("subscriptionId1",actualRecordObjects.get(0).getSubscriptionId());
-        assertEquals("description1",actualRecordObjects.get(0).getDescription());
-        assertEquals("msisdn2",actualRecordObjects.get(1).getMsisdn());
-        assertEquals("subscriptionId2",actualRecordObjects.get(1).getSubscriptionId());
-        assertEquals("description2",actualRecordObjects.get(1).getDescription());
+        assertEquals(2, actualRecordObjectFaileds.size());
+        assertEquals("msisdn1", actualRecordObjectFaileds.get(0).getMsisdn());
+        assertEquals("subscriptionId1", actualRecordObjectFaileds.get(0).getSubscriptionId());
+        assertEquals("description1", actualRecordObjectFaileds.get(0).getDescription());
+        assertEquals("msisdn2", actualRecordObjectFaileds.get(1).getMsisdn());
+        assertEquals("subscriptionId2", actualRecordObjectFaileds.get(1).getSubscriptionId());
+        assertEquals("description2", actualRecordObjectFaileds.get(1).getDescription());
     }
 }

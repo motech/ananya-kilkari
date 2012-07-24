@@ -4,8 +4,8 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecordObject;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReport;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
@@ -99,18 +99,18 @@ public class OBDControllerIT extends SpringIntegrationTest {
         }.execute();
         stubReportingService.setReportCampaignMessageDeliveryCalled(false);
 
-        ArgumentCaptor<InvalidCallDeliveryFailureRecord> invalidCallDeliveryFailureRecordArgumentCaptor = ArgumentCaptor.forClass(InvalidCallDeliveryFailureRecord.class);
+        ArgumentCaptor<InvalidFailedCallReports> invalidCallDeliveryFailureRecordArgumentCaptor = ArgumentCaptor.forClass(InvalidFailedCallReports.class);
         verify(onMobileOBDGateway).sendInvalidFailureRecord(invalidCallDeliveryFailureRecordArgumentCaptor.capture());
-        List<InvalidCallDeliveryFailureRecordObject> recordObjects = invalidCallDeliveryFailureRecordArgumentCaptor.getValue().getRecordObjects();
+        List<InvalidFailedCallReport> recordObjectFaileds = invalidCallDeliveryFailureRecordArgumentCaptor.getValue().getRecordObjectFaileds();
 
         ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
         verify(reportingService).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
         CampaignMessageDeliveryReportRequest reportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
-        assertEquals(1, recordObjects.size());
-        assertEquals(msisdn, recordObjects.get(0).getMsisdn());
-        assertEquals(subscription2.getSubscriptionId(), recordObjects.get(0).getSubscriptionId());
-        assertEquals("Invalid campaign id WEEK", recordObjects.get(0).getDescription());
+        assertEquals(1, recordObjectFaileds.size());
+        assertEquals(msisdn, recordObjectFaileds.get(0).getMsisdn());
+        assertEquals(subscription2.getSubscriptionId(), recordObjectFaileds.get(0).getSubscriptionId());
+        assertEquals("Invalid campaign id WEEK", recordObjectFaileds.get(0).getDescription());
 
         assertEquals(CampaignMessageStatus.DNP.name(), reportRequest.getStatus());
         assertEquals("0", reportRequest.getRetryCount());

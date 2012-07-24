@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
-import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
+import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.gateway.OBDProperties;
@@ -32,7 +32,9 @@ public class CampaignMessageService {
     private static final Logger logger = LoggerFactory.getLogger(CampaignMessageService.class);
 
     @Autowired
-    public CampaignMessageService(AllCampaignMessages allCampaignMessages, OnMobileOBDGateway onMobileOBDGateway, CampaignMessageCSVBuilder campaignMessageCSVBuilder, ReportingService reportingService, OBDProperties obdProperties) {
+    public CampaignMessageService(AllCampaignMessages allCampaignMessages, OnMobileOBDGateway onMobileOBDGateway,
+                                  CampaignMessageCSVBuilder campaignMessageCSVBuilder, ReportingService reportingService,
+                                  OBDProperties obdProperties) {
         this.allCampaignMessages = allCampaignMessages;
         this.onMobileOBDGateway = onMobileOBDGateway;
         this.campaignMessageCSVBuilder = campaignMessageCSVBuilder;
@@ -84,15 +86,15 @@ public class CampaignMessageService {
         allCampaignMessages.update(campaignMessage);
     }
 
-    public void processValidCallDeliveryFailureRecords(ValidCallDeliveryFailureRecordObject recordObject) {
-        CampaignMessage campaignMessage = allCampaignMessages.find(recordObject.getSubscriptionId(), recordObject.getCampaignId());
+    public void processValidCallDeliveryFailureRecords(ValidFailedCallReport failedCallReport) {
+        CampaignMessage campaignMessage = allCampaignMessages.find(failedCallReport.getSubscriptionId(), failedCallReport.getCampaignId());
         if (campaignMessage == null) {
             logger.error(String.format("Campaign Message not present for subscriptionId[%s] and campaignId[%s].",
-                    recordObject.getSubscriptionId(), recordObject.getCampaignId()));
+                    failedCallReport.getSubscriptionId(), failedCallReport.getCampaignId()));
             return;
         }
-        updateCampaignMessageStatus(campaignMessage, recordObject.getStatusCode());
-        reportCampaignMessageStatus(recordObject, campaignMessage);
+        updateCampaignMessageStatus(campaignMessage, failedCallReport.getStatusCode());
+        reportCampaignMessageStatus(failedCallReport, campaignMessage);
     }
 
     private void updateCampaignMessageStatus(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
@@ -121,10 +123,10 @@ public class CampaignMessageService {
         }
     }
 
-    private void reportCampaignMessageStatus(ValidCallDeliveryFailureRecordObject recordObject, CampaignMessage campaignMessage) {
+    private void reportCampaignMessageStatus(ValidFailedCallReport failedCallReport, CampaignMessage campaignMessage) {
         String retryCount = getRetryCount(campaignMessage);
-        CallDetailsReportRequest callDetailRecord = new CallDetailsReportRequest(format(recordObject.getCreatedAt()), format(recordObject.getCreatedAt()));
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(recordObject.getSubscriptionId(), recordObject.getMsisdn(), recordObject.getCampaignId(), null, retryCount, recordObject.getStatusCode().name(), callDetailRecord);
+        CallDetailsReportRequest callDetailRecord = new CallDetailsReportRequest(format(failedCallReport.getCreatedAt()), format(failedCallReport.getCreatedAt()));
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(), null, retryCount, failedCallReport.getStatusCode().name(), callDetailRecord);
 
         reportingService.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
     }

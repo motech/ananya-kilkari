@@ -10,8 +10,8 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntry;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
@@ -123,24 +123,24 @@ public class OBDRequestHandlerTest {
         String operator1 = "operator1";
         String sub1 = "sub1";
 
-        InvalidCallRecordsRequest invalidCallRecordsRequest = Mockito.mock(InvalidCallRecordsRequest.class);
-        ArrayList<InvalidCallRecordRequestObject> invalidCallRecordRequestObjects = new ArrayList<InvalidCallRecordRequestObject>();
-        InvalidCallRecordRequestObject invalidCallRecordRequestObject1 = Mockito.mock(InvalidCallRecordRequestObject.class);
-        when(invalidCallRecordRequestObject1.getMsisdn()).thenReturn(msisdn1);
-        when(invalidCallRecordRequestObject1.getCampaignId()).thenReturn(campaign1);
-        when(invalidCallRecordRequestObject1.getDescription()).thenReturn(desc1);
-        when(invalidCallRecordRequestObject1.getOperator()).thenReturn(operator1);
-        when(invalidCallRecordRequestObject1.getSubscriptionId()).thenReturn(sub1);
+        InvalidOBDRequestEntries invalidOBDRequestEntries = Mockito.mock(InvalidOBDRequestEntries.class);
+        ArrayList<InvalidOBDRequestEntry> invalidCallRecordRequestObjects = new ArrayList<InvalidOBDRequestEntry>();
+        InvalidOBDRequestEntry invalidOBDRequestEntry1 = Mockito.mock(InvalidOBDRequestEntry.class);
+        when(invalidOBDRequestEntry1.getMsisdn()).thenReturn(msisdn1);
+        when(invalidOBDRequestEntry1.getCampaignId()).thenReturn(campaign1);
+        when(invalidOBDRequestEntry1.getDescription()).thenReturn(desc1);
+        when(invalidOBDRequestEntry1.getOperator()).thenReturn(operator1);
+        when(invalidOBDRequestEntry1.getSubscriptionId()).thenReturn(sub1);
 
-        InvalidCallRecordRequestObject invalidCallRecordRequestObject2 = Mockito.mock(InvalidCallRecordRequestObject.class);
-        invalidCallRecordRequestObjects.add(invalidCallRecordRequestObject1);
-        invalidCallRecordRequestObjects.add(invalidCallRecordRequestObject2);
+        InvalidOBDRequestEntry invalidOBDRequestEntry2 = Mockito.mock(InvalidOBDRequestEntry.class);
+        invalidCallRecordRequestObjects.add(invalidOBDRequestEntry1);
+        invalidCallRecordRequestObjects.add(invalidOBDRequestEntry2);
 
 
-        when(invalidCallRecordsRequest.getCallrecords()).thenReturn(invalidCallRecordRequestObjects);
+        when(invalidOBDRequestEntries.getInvalidOBDRequestEntryList()).thenReturn(invalidCallRecordRequestObjects);
 
         HashMap<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("0", invalidCallRecordsRequest);
+        parameters.put("0", invalidOBDRequestEntries);
 
         obdRequestHandler.handleInvalidCallRecordsRequest(new MotechEvent(OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, parameters));
 

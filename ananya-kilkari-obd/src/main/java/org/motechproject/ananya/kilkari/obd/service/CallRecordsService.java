@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CallRecordsService {
@@ -20,7 +21,7 @@ public class CallRecordsService {
         this.allInvalidCallRecords = allInvalidCallRecords;
     }
 
-    public void processInvalidCallRecords(ArrayList<InvalidCallRecord> invalidCallRecords) {
+    public void processInvalidCallRecords(List<InvalidCallRecord> invalidCallRecords) {
         if (invalidCallRecords.isEmpty()) {
             return;
         }

@@ -4,17 +4,26 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
 
-public class InvalidCallRecordRequestObject implements Serializable {
-    @JsonProperty
-    private String msisdn;
+public class FailedCallReport implements Serializable {
+
     @JsonProperty
     private String subscriptionId;
     @JsonProperty
-    private String operator;
+    private String msisdn;
     @JsonProperty
     private String campaignId;
     @JsonProperty
-    private String description;
+    private String statusCode;
+
+    public FailedCallReport() {
+    }
+
+    public FailedCallReport(String subscriptionId, String msisdn, String campaignId, String statusCode) {
+        this.subscriptionId = subscriptionId;
+        this.msisdn = msisdn;
+        this.campaignId = campaignId;
+        this.statusCode = statusCode;
+    }
 
     public String getMsisdn() {
         return msisdn;
@@ -24,15 +33,11 @@ public class InvalidCallRecordRequestObject implements Serializable {
         return subscriptionId;
     }
 
-    public String getOperator() {
-        return operator;
-    }
-
     public String getCampaignId() {
         return campaignId;
     }
 
-    public String getDescription() {
-        return description;
+    public String getStatusCode() {
+        return statusCode;
     }
 }

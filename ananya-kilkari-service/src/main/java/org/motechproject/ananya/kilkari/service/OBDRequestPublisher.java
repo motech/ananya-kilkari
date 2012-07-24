@@ -1,9 +1,9 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
-import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
+import org.motechproject.ananya.kilkari.obd.contract.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntries;
+import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.scheduler.context.EventContext;
@@ -24,19 +24,19 @@ public class OBDRequestPublisher {
         eventContext.send(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, successfulCallRequestWrapper);
     }
 
-    public void publishInvalidCallRecordsRequest(InvalidCallRecordsRequest invalidCallRecordsRequest) {
-        eventContext.send(OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, invalidCallRecordsRequest);
+    public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntries invalidOBDRequestEntries) {
+        eventContext.send(OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, invalidOBDRequestEntries);
     }
 
-    public void publishCallDeliveryFailureRecord(CallDeliveryFailureRecord callDeliveryFailureRecord) {
-        eventContext.send(OBDEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, callDeliveryFailureRecord);
+    public void publishCallDeliveryFailureRecord(FailedCallReports failedCallReports) {
+        eventContext.send(OBDEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, failedCallReports);
     }
 
-    public void publishInvalidCallDeliveryFailureRecord(InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord) {
-        eventContext.send(OBDEventKeys.PROCESS_INVALID_CALL_DELIVERY_FAILURE_RECORD, invalidCallDeliveryFailureRecord);
+    public void publishInvalidCallDeliveryFailureRecord(InvalidFailedCallReports invalidFailedCallReports) {
+        eventContext.send(OBDEventKeys.PROCESS_INVALID_CALL_DELIVERY_FAILURE_RECORD, invalidFailedCallReports);
     }
 
-    public void publishValidCallDeliveryFailureRecord(ValidCallDeliveryFailureRecordObject validCallDeliveryFailureRecordObject) {
-        eventContext.send(OBDEventKeys.PROCESS_VALID_CALL_DELIVERY_FAILURE_RECORD, validCallDeliveryFailureRecordObject);
+    public void publishValidCallDeliveryFailureRecord(ValidFailedCallReport validFailedCallReport) {
+        eventContext.send(OBDEventKeys.PROCESS_VALID_CALL_DELIVERY_FAILURE_RECORD, validFailedCallReport);
     }
 }

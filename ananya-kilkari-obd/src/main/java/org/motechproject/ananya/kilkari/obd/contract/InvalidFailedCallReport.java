@@ -5,7 +5,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
 
-public class InvalidCallDeliveryFailureRecordObject  implements Serializable {
+public class InvalidFailedCallReport implements Serializable {
     @JsonProperty("mdn")
     private final String msisdn;
     @JsonProperty("subscriptionId")
@@ -13,7 +13,7 @@ public class InvalidCallDeliveryFailureRecordObject  implements Serializable {
     @JsonProperty("description")
     private final String description;
 
-    public InvalidCallDeliveryFailureRecordObject(String msisdn, String subscriptionId, String description) {
+    public InvalidFailedCallReport(String msisdn, String subscriptionId, String description) {
         this.msisdn = msisdn;
         this.subscriptionId = subscriptionId;
         this.description = description;

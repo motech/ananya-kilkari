@@ -9,6 +9,7 @@ import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObj
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.contract.*;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
+import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
@@ -136,26 +137,26 @@ public class KilkariCampaignService {
         campaignMessageService.deleteCampaignMessage(campaignMessage);
     }
 
-    public void publishInvalidCallRecordsRequest(InvalidCallRecordsRequest invalidCallRecordsRequest) {
-        obdRequestPublisher.publishInvalidCallRecordsRequest(invalidCallRecordsRequest);
+    public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntries invalidOBDRequestEntries) {
+        obdRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
     }
 
     public void publishSuccessfulCallRequest(OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper) {
         obdRequestPublisher.publishSuccessfulCallRequest(successfulCallRequestWrapper);
     }
 
-    public void publishCallDeliveryFailureRequest(CallDeliveryFailureRecord callDeliveryFailureRecord) {
-        obdRequestPublisher.publishCallDeliveryFailureRecord(callDeliveryFailureRecord);
+    public void publishCallDeliveryFailureRequest(FailedCallReports failedCallReports) {
+        obdRequestPublisher.publishCallDeliveryFailureRecord(failedCallReports);
     }
 
     @Transactional
-    public void processCallDeliveryFailureRecord(CallDeliveryFailureRecord callDeliveryFailureRecord) {
-        List<InvalidCallDeliveryFailureRecordObject> invalidCallDeliveryFailureRecordObjects = new ArrayList<>();
-        List<ValidCallDeliveryFailureRecordObject> validCallDeliveryFailureRecordObjects = new ArrayList<>();
-        validate(callDeliveryFailureRecord, validCallDeliveryFailureRecordObjects, invalidCallDeliveryFailureRecordObjects);
+    public void processCallDeliveryFailureRecord(FailedCallReports failedCallReports) {
+        List<InvalidFailedCallReport> invalidFailedCallReports = new ArrayList<>();
+        List<ValidFailedCallReport> validFailedCallReports = new ArrayList<>();
+        validate(failedCallReports, validFailedCallReports, invalidFailedCallReports);
 
-        publishErrorRecords(invalidCallDeliveryFailureRecordObjects);
-        publishValidRecords(validCallDeliveryFailureRecordObjects);
+        publishErrorRecords(invalidFailedCallReports);
+        publishValidRecords(validFailedCallReports);
     }
 
     private void processExistingCampaignMessageAlert(Subscription subscription, String messageId, boolean renewed,
@@ -182,33 +183,33 @@ public class KilkariCampaignService {
         allCampaignMessageAlerts.add(campaignMessageAlert);
     }
 
-    private void validate(CallDeliveryFailureRecord callDeliveryFailureRecord, List<ValidCallDeliveryFailureRecordObject> validCallDeliveryFailureRecordObjects, List<InvalidCallDeliveryFailureRecordObject> invalidCallDeliveryFailureRecordObjects) {
-        for (CallDeliveryFailureRecordObject callDeliveryFailureRecordObject : callDeliveryFailureRecord.getCallrecords()) {
-            List<String> errors = callDeliveryFailureRecordValidator.validate(callDeliveryFailureRecordObject);
+    private void validate(FailedCallReports failedCallReports, List<ValidFailedCallReport> validFailedCallReports, List<InvalidFailedCallReport> invalidFailedCallReports) {
+        for (FailedCallReport failedCallReport : failedCallReports.getCallrecords()) {
+            List<String> errors = callDeliveryFailureRecordValidator.validate(failedCallReport);
             if (!errors.isEmpty()) {
-                InvalidCallDeliveryFailureRecordObject invalidCallDeliveryFailureRecordObject = new InvalidCallDeliveryFailureRecordObject(callDeliveryFailureRecordObject.getMsisdn(),
-                        callDeliveryFailureRecordObject.getSubscriptionId(), StringUtils.join(errors, ","));
-                invalidCallDeliveryFailureRecordObjects.add(invalidCallDeliveryFailureRecordObject);
+                InvalidFailedCallReport invalidFailedCallReport = new InvalidFailedCallReport(failedCallReport.getMsisdn(),
+                        failedCallReport.getSubscriptionId(), StringUtils.join(errors, ","));
+                invalidFailedCallReports.add(invalidFailedCallReport);
                 continue;
             }
 
-            ValidCallDeliveryFailureRecordObject validCallDeliveryFailureRecordObject = validCallDeliveryFailureRecordObjectMapper.mapFrom(callDeliveryFailureRecordObject, callDeliveryFailureRecord);
-            validCallDeliveryFailureRecordObjects.add(validCallDeliveryFailureRecordObject);
+            ValidFailedCallReport validFailedCallReport = validCallDeliveryFailureRecordObjectMapper.mapFrom(failedCallReport, failedCallReports);
+            validFailedCallReports.add(validFailedCallReport);
         }
     }
 
-    private void publishErrorRecords(List<InvalidCallDeliveryFailureRecordObject> invalidCallDeliveryFailureRecordObjects) {
+    private void publishErrorRecords(List<InvalidFailedCallReport> invalidCallDeliveryFailureRecordObjects) {
         if (invalidCallDeliveryFailureRecordObjects.isEmpty())
             return;
-        InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord = new InvalidCallDeliveryFailureRecord();
-        invalidCallDeliveryFailureRecord.setRecordObjects(invalidCallDeliveryFailureRecordObjects);
+        InvalidFailedCallReports invalidFailedCallReports = new InvalidFailedCallReports();
+        invalidFailedCallReports.setRecordObjectFaileds(invalidCallDeliveryFailureRecordObjects);
 
-        obdRequestPublisher.publishInvalidCallDeliveryFailureRecord(invalidCallDeliveryFailureRecord);
+        obdRequestPublisher.publishInvalidCallDeliveryFailureRecord(invalidFailedCallReports);
     }
 
-    private void publishValidRecords(List<ValidCallDeliveryFailureRecordObject> validCallDeliveryFailureRecordObjects) {
-        for (ValidCallDeliveryFailureRecordObject recordObject : validCallDeliveryFailureRecordObjects) {
-            obdRequestPublisher.publishValidCallDeliveryFailureRecord(recordObject);
+    private void publishValidRecords(List<ValidFailedCallReport> validFailedCallReports) {
+        for (ValidFailedCallReport failedCallReport : validFailedCallReports) {
+            obdRequestPublisher.publishValidCallDeliveryFailureRecord(failedCallReport);
         }
     }
 }

@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.handlers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
+import org.motechproject.ananya.kilkari.obd.contract.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -29,11 +29,11 @@ public class CallDeliveryFailureRecordHandlerTest {
     @Test
     public void shouldInvokeKilkariCampaignServiceToProcessCallDeliveryFailureRecords() {
         HashMap<String, Object> parameters = new HashMap<>();
-        CallDeliveryFailureRecord failureRecord = mock(CallDeliveryFailureRecord.class);
-        parameters.put("0", failureRecord);
+        FailedCallReports failureRecordFailed = mock(FailedCallReports.class);
+        parameters.put("0", failureRecordFailed);
 
         callDeliveryFailureRecordHandler.handleCallDeliveryFailureRecord(new MotechEvent(OBDEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, parameters));
 
-        verify(kilkariCampaignService).processCallDeliveryFailureRecord(failureRecord);
+        verify(kilkariCampaignService).processCallDeliveryFailureRecord(failureRecordFailed);
     }
 }

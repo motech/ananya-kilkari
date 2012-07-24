@@ -1,9 +1,9 @@
 package org.motechproject.ananya.kilkari.mapper;
 
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecordObject;
-import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
+import org.motechproject.ananya.kilkari.obd.contract.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.contract.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 
 import static org.junit.Assert.assertEquals;
@@ -12,15 +12,15 @@ public class ValidCallDeliveryFailureRecordObjectMapperTest {
     @Test
     public void shouldMapFromCallDeliveryFailureRecordObjectToValidCallDeliveryFailureRecordObject() {
         ValidCallDeliveryFailureRecordObjectMapper mapper = new ValidCallDeliveryFailureRecordObjectMapper();
-        CallDeliveryFailureRecordObject callDeliveryFailureRecordObject = new CallDeliveryFailureRecordObject("subscriptionId", "msisdn", "WEEK13", "DNP");
-        CallDeliveryFailureRecord callDeliveryFailureRecord = new CallDeliveryFailureRecord();
+        FailedCallReport failedCallReport = new FailedCallReport("subscriptionId", "msisdn", "WEEK13", "DNP");
+        FailedCallReports failedCallReports = new FailedCallReports();
 
-        ValidCallDeliveryFailureRecordObject validCallDeliveryFailureRecordObject = mapper.mapFrom(callDeliveryFailureRecordObject, callDeliveryFailureRecord);
+        ValidFailedCallReport validFailedCallReport = mapper.mapFrom(failedCallReport, failedCallReports);
 
-        assertEquals("subscriptionId",validCallDeliveryFailureRecordObject.getSubscriptionId());
-        assertEquals("msisdn",validCallDeliveryFailureRecordObject.getMsisdn());
-        assertEquals(CampaignMessageStatus.DNP,validCallDeliveryFailureRecordObject.getStatusCode());
-        assertEquals("WEEK13",validCallDeliveryFailureRecordObject.getCampaignId());
-        assertEquals(callDeliveryFailureRecord.getCreatedAt(),validCallDeliveryFailureRecordObject.getCreatedAt());
+        assertEquals("subscriptionId", validFailedCallReport.getSubscriptionId());
+        assertEquals("msisdn", validFailedCallReport.getMsisdn());
+        assertEquals(CampaignMessageStatus.DNP, validFailedCallReport.getStatusCode());
+        assertEquals("WEEK13", validFailedCallReport.getCampaignId());
+        assertEquals(failedCallReports.getCreatedAt(), validFailedCallReport.getCreatedAt());
     }
 }

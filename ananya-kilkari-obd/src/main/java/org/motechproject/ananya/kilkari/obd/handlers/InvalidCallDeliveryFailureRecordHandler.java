@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.handlers;
 
 import org.apache.log4j.Logger;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -22,8 +22,8 @@ public class InvalidCallDeliveryFailureRecordHandler {
 
     @MotechListener(subjects = {OBDEventKeys.PROCESS_INVALID_CALL_DELIVERY_FAILURE_RECORD})
     public void handleInvalidCallDeliveryFailureRecord(MotechEvent motechEvent) {
-        InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord = (InvalidCallDeliveryFailureRecord) motechEvent.getParameters().get("0");
+        InvalidFailedCallReports invalidFailedCallReports = (InvalidFailedCallReports) motechEvent.getParameters().get("0");
         logger.info("Handling OBD invalid call delivery failure records");
-        onMobileOBDGateway.sendInvalidFailureRecord(invalidCallDeliveryFailureRecord);
+        onMobileOBDGateway.sendInvalidFailureRecord(invalidFailedCallReports);
     }
 }

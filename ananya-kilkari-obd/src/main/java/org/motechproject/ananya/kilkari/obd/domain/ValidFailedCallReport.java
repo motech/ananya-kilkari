@@ -1,21 +1,21 @@
-package org.motechproject.ananya.kilkari.obd.contract;
+package org.motechproject.ananya.kilkari.obd.domain;
 
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 
 import java.io.Serializable;
 
-public class ValidCallDeliveryFailureRecordObject implements Serializable {
+public class ValidFailedCallReport implements Serializable {
     private CampaignMessageStatus statusCode;
     private String subscriptionId;
     private String msisdn;
     private String campaignId;
     private DateTime createdAt;
 
-    public ValidCallDeliveryFailureRecordObject() {
+    public ValidFailedCallReport() {
     }
 
-    public ValidCallDeliveryFailureRecordObject(String subscriptionId, String msisdn, String campaignId, CampaignMessageStatus statusCode, DateTime createdAt) {
+    public ValidFailedCallReport(String subscriptionId, String msisdn, String campaignId, CampaignMessageStatus statusCode, DateTime createdAt) {
         this.statusCode = statusCode;
         this.subscriptionId = subscriptionId;
         this.msisdn = msisdn;

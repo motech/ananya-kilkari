@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.obd.gateway;
 
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallDeliveryFailureRecord;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.profile.TestProfile;
 import org.springframework.stereotype.Component;
 
@@ -26,9 +26,9 @@ public class StubOnMobileOBDGateway implements OnMobileOBDGateway {
     }
 
     @Override
-    public void sendInvalidFailureRecord(InvalidCallDeliveryFailureRecord invalidCallDeliveryFailureRecord) {
+    public void sendInvalidFailureRecord(InvalidFailedCallReports invalidFailedCallReports) {
         if(verify()) {
-            behavior.sendInvalidFailureRecord(invalidCallDeliveryFailureRecord);
+            behavior.sendInvalidFailureRecord(invalidFailedCallReports);
             invalidFailureRecordCalled = true;
         }
     }

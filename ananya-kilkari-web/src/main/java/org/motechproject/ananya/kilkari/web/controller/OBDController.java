@@ -1,8 +1,8 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
+import org.motechproject.ananya.kilkari.obd.contract.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
@@ -33,15 +33,15 @@ public class OBDController {
 
     @RequestMapping(value = "/obd/calldetails", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResponse handleCallDeliveryFailureRecords(@RequestBody CallDeliveryFailureRecord callDeliveryFailureRecord) {
-        kilkariCampaignService.publishCallDeliveryFailureRequest(callDeliveryFailureRecord);
+    public BaseResponse handleCallDeliveryFailureRecords(@RequestBody FailedCallReports failedCallReports) {
+        kilkariCampaignService.publishCallDeliveryFailureRequest(failedCallReports);
         return BaseResponse.success("OBD call delivery failure records received successfully");
     }
 
     @RequestMapping(value = "/obd/invalidcallrecords", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResponse handleInvalidCallRecords(@RequestBody InvalidCallRecordsRequest invalidRecordsRequest) {
-        kilkariCampaignService.publishInvalidCallRecordsRequest(invalidRecordsRequest);
+    public BaseResponse handleInvalidCallRecords(@RequestBody InvalidOBDRequestEntries invalidRecordsRequestEntries) {
+        kilkariCampaignService.publishInvalidCallRecordsRequest(invalidRecordsRequestEntries);
         return BaseResponse.success("OBD invalid call records received successfully");
     }
 }

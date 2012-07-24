@@ -4,10 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecord;
-import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecordObject;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordRequestObject;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
+import org.motechproject.ananya.kilkari.obd.contract.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.contract.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntry;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
@@ -81,24 +81,24 @@ public class OBDControllerTest {
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD call delivery failure records received successfully")));
 
-        ArgumentCaptor<CallDeliveryFailureRecord> captor = ArgumentCaptor.forClass(CallDeliveryFailureRecord.class);
+        ArgumentCaptor<FailedCallReports> captor = ArgumentCaptor.forClass(FailedCallReports.class);
         verify(kilkariCampaignService).publishCallDeliveryFailureRequest(captor.capture());
-        CallDeliveryFailureRecord callDeliveryFailureRecord = captor.getValue();
-        List<CallDeliveryFailureRecordObject> callDeliveryFailureRecordObjects = callDeliveryFailureRecord.getCallrecords();
+        FailedCallReports failedCallReports = captor.getValue();
+        List<FailedCallReport> callDeliveryFailureRecordObjects = failedCallReports.getCallrecords();
         assertEquals(2, callDeliveryFailureRecordObjects.size());
 
-        assertNotNull(callDeliveryFailureRecord.getCreatedAt());
-        CallDeliveryFailureRecordObject callDeliveryFailureRecordObject1 = callDeliveryFailureRecordObjects.get(0);
-        assertEquals("msisdn1", callDeliveryFailureRecordObject1.getMsisdn());
-        assertEquals("subscriptionId1", callDeliveryFailureRecordObject1.getSubscriptionId());
-        assertEquals("campaignId1", callDeliveryFailureRecordObject1.getCampaignId());
-        assertEquals("DNP", callDeliveryFailureRecordObject1.getStatusCode());
+        assertNotNull(failedCallReports.getCreatedAt());
+        FailedCallReport failedCallReport1 = callDeliveryFailureRecordObjects.get(0);
+        assertEquals("msisdn1", failedCallReport1.getMsisdn());
+        assertEquals("subscriptionId1", failedCallReport1.getSubscriptionId());
+        assertEquals("campaignId1", failedCallReport1.getCampaignId());
+        assertEquals("DNP", failedCallReport1.getStatusCode());
 
-        CallDeliveryFailureRecordObject callDeliveryFailureRecordObject2 = callDeliveryFailureRecordObjects.get(1);
-        assertEquals("msisdn2", callDeliveryFailureRecordObject2.getMsisdn());
-        assertEquals("subscriptionId2", callDeliveryFailureRecordObject2.getSubscriptionId());
-        assertEquals("campaignId2", callDeliveryFailureRecordObject2.getCampaignId());
-        assertEquals("DNP", callDeliveryFailureRecordObject2.getStatusCode());
+        FailedCallReport failedCallReport2 = callDeliveryFailureRecordObjects.get(1);
+        assertEquals("msisdn2", failedCallReport2.getMsisdn());
+        assertEquals("subscriptionId2", failedCallReport2.getSubscriptionId());
+        assertEquals("campaignId2", failedCallReport2.getCampaignId());
+        assertEquals("DNP", failedCallReport2.getStatusCode());
     }
 
     @Test
@@ -141,25 +141,25 @@ public class OBDControllerTest {
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD invalid call records received successfully")));
 
-        ArgumentCaptor<InvalidCallRecordsRequest> captor = ArgumentCaptor.forClass(InvalidCallRecordsRequest.class);
+        ArgumentCaptor<InvalidOBDRequestEntries> captor = ArgumentCaptor.forClass(InvalidOBDRequestEntries.class);
         verify(kilkariCampaignService).publishInvalidCallRecordsRequest(captor.capture());
-        InvalidCallRecordsRequest actualRequest = captor.getValue();
-        ArrayList<InvalidCallRecordRequestObject> callrecords = actualRequest.getCallrecords();
+        InvalidOBDRequestEntries actualRequestEntries = captor.getValue();
+        List<InvalidOBDRequestEntry> callrecords = actualRequestEntries.getInvalidOBDRequestEntryList();
         assertEquals(2, callrecords.size());
 
-        InvalidCallRecordRequestObject invalidCallRecordRequestObject1 = callrecords.get(0);
-        assertEquals("msisdn1", invalidCallRecordRequestObject1.getMsisdn());
-        assertEquals("subscriptionId1", invalidCallRecordRequestObject1.getSubscriptionId());
-        assertEquals("campaignId1", invalidCallRecordRequestObject1.getCampaignId());
-        assertEquals("operator1", invalidCallRecordRequestObject1.getOperator());
-        assertEquals("description1", invalidCallRecordRequestObject1.getDescription());
+        InvalidOBDRequestEntry invalidOBDRequestEntry1 = callrecords.get(0);
+        assertEquals("msisdn1", invalidOBDRequestEntry1.getMsisdn());
+        assertEquals("subscriptionId1", invalidOBDRequestEntry1.getSubscriptionId());
+        assertEquals("campaignId1", invalidOBDRequestEntry1.getCampaignId());
+        assertEquals("operator1", invalidOBDRequestEntry1.getOperator());
+        assertEquals("description1", invalidOBDRequestEntry1.getDescription());
 
-        InvalidCallRecordRequestObject invalidCallRecordRequestObject2 = callrecords.get(0);
-        assertEquals("msisdn1", invalidCallRecordRequestObject2.getMsisdn());
-        assertEquals("subscriptionId1", invalidCallRecordRequestObject2.getSubscriptionId());
-        assertEquals("campaignId1", invalidCallRecordRequestObject2.getCampaignId());
-        assertEquals("operator1", invalidCallRecordRequestObject2.getOperator());
-        assertEquals("description1", invalidCallRecordRequestObject2.getDescription());
+        InvalidOBDRequestEntry invalidOBDRequestEntry2 = callrecords.get(0);
+        assertEquals("msisdn1", invalidOBDRequestEntry2.getMsisdn());
+        assertEquals("subscriptionId1", invalidOBDRequestEntry2.getSubscriptionId());
+        assertEquals("campaignId1", invalidOBDRequestEntry2.getCampaignId());
+        assertEquals("operator1", invalidOBDRequestEntry2.getOperator());
+        assertEquals("description1", invalidOBDRequestEntry2.getDescription());
     }
 
     @Test
@@ -171,10 +171,10 @@ public class OBDControllerTest {
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD invalid call records received successfully")));
 
-        ArgumentCaptor<InvalidCallRecordsRequest> captor = ArgumentCaptor.forClass(InvalidCallRecordsRequest.class);
+        ArgumentCaptor<InvalidOBDRequestEntries> captor = ArgumentCaptor.forClass(InvalidOBDRequestEntries.class);
         verify(kilkariCampaignService).publishInvalidCallRecordsRequest(captor.capture());
-        InvalidCallRecordsRequest actualRequest = captor.getValue();
-        ArrayList<InvalidCallRecordRequestObject> callrecords = actualRequest.getCallrecords();
+        InvalidOBDRequestEntries actualRequestEntries = captor.getValue();
+        List<InvalidOBDRequestEntry> callrecords = actualRequestEntries.getInvalidOBDRequestEntryList();
         assertTrue(callrecords.isEmpty());
     }
 

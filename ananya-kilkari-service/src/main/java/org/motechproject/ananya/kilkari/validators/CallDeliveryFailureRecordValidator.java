@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.validators;
 
 import org.apache.commons.lang.StringUtils;
-import org.motechproject.ananya.kilkari.obd.contract.CallDeliveryFailureRecordObject;
+import org.motechproject.ananya.kilkari.obd.contract.FailedCallReport;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignCode;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
@@ -24,12 +24,12 @@ public class CallDeliveryFailureRecordValidator {
         this.subscriptionService = subscriptionService;
     }
 
-    public List<String> validate(CallDeliveryFailureRecordObject callDeliveryFailureRecordObject) {
+    public List<String> validate(FailedCallReport failedCallReport) {
         List<String> errors = new ArrayList<>();
-        validateMsisdn(callDeliveryFailureRecordObject.getMsisdn(), errors);
-        validateCampaignId(callDeliveryFailureRecordObject.getCampaignId(), errors);
-        validateSubscription(callDeliveryFailureRecordObject.getSubscriptionId(), errors);
-        validateStatusCode(callDeliveryFailureRecordObject.getStatusCode(), errors);
+        validateMsisdn(failedCallReport.getMsisdn(), errors);
+        validateCampaignId(failedCallReport.getCampaignId(), errors);
+        validateSubscription(failedCallReport.getSubscriptionId(), errors);
+        validateStatusCode(failedCallReport.getStatusCode(), errors);
         return errors;
     }
 

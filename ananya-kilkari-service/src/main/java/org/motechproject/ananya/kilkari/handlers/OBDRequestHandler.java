@@ -61,7 +61,8 @@ public class OBDRequestHandler {
     }
 
     @MotechListener(subjects = {OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT})
-    public void handleInvalidCallRecordsRequest(InvalidCallRecordsRequest invalidCallRecordsRequest) {
+    public void handleInvalidCallRecordsRequest(MotechEvent event) {
+        InvalidCallRecordsRequest invalidCallRecordsRequest = (InvalidCallRecordsRequest) event.getParameters().get("0");
         ArrayList<InvalidCallRecordRequestObject> requestCallRecords = invalidCallRecordsRequest.getCallrecords();
         ArrayList<InvalidCallRecord> invalidCallRecords = new ArrayList<>();
         for (InvalidCallRecordRequestObject requestObject : requestCallRecords) {

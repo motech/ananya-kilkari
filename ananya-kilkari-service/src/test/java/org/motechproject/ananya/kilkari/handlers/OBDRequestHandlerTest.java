@@ -139,7 +139,10 @@ public class OBDRequestHandlerTest {
 
         when(invalidCallRecordsRequest.getCallrecords()).thenReturn(invalidCallRecordRequestObjects);
 
-        obdRequestHandler.handleInvalidCallRecordsRequest(invalidCallRecordsRequest);
+        HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("0", invalidCallRecordsRequest);
+
+        obdRequestHandler.handleInvalidCallRecordsRequest(new MotechEvent(OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, parameters));
 
         ArgumentCaptor<ArrayList> captor = ArgumentCaptor.forClass(ArrayList.class);
         verify(callRecordsService).processInvalidCallRecords(captor.capture());

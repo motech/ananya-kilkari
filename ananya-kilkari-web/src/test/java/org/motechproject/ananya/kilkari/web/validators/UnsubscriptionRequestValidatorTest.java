@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
@@ -41,9 +42,7 @@ public class UnsubscriptionRequestValidatorTest {
 
         Errors errors = unsubscriptionRequestValidator.validate(subscriptionId);
 
-        ErrorAsserter errorAsserter = new ErrorAsserter(errors);
-
-        errorAsserter.hasErrors();
-        errorAsserter.hasMessage("Invalid subscriptionId " + subscriptionId);
+        assertTrue(errors.hasErrors());
+        assertTrue(errors.hasMessage("Invalid subscriptionId " + subscriptionId));
     }
 }

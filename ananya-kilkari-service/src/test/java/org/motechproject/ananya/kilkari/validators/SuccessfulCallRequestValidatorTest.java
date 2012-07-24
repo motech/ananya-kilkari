@@ -8,8 +8,7 @@ import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
-
-import java.util.List;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -42,9 +41,9 @@ public class SuccessfulCallRequestValidatorTest {
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
+        Errors errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
-        assertTrue(errors.isEmpty());
+        assertTrue(errors.hasNoErrors());
     }
 
     @Test
@@ -59,16 +58,16 @@ public class SuccessfulCallRequestValidatorTest {
         callDetailRecord.setEndTime("27-12-2012");
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
 
-        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
+        Errors errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
-        assertEquals(6, errors.size());
-        assertTrue(errors.contains("Invalid msisdn 123"));
-        assertTrue(errors.contains("Invalid service option invalid"));
-        assertTrue(errors.contains("Invalid campaign id "));
-        assertTrue(errors.contains("Invalid start time format 25-12-2012"));
-        assertTrue(errors.contains("Invalid end time format 27-12-2012"));
-        assertTrue(errors.contains("Invalid campaign id "));
-        assertTrue(errors.contains("Invalid subscription id sub001"));
+        assertEquals(6, errors.getCount());
+        assertTrue(errors.hasMessage("Invalid msisdn 123"));
+        assertTrue(errors.hasMessage("Invalid service option invalid"));
+        assertTrue(errors.hasMessage("Invalid campaign id "));
+        assertTrue(errors.hasMessage("Invalid start time format 25-12-2012"));
+        assertTrue(errors.hasMessage("Invalid end time format 27-12-2012"));
+        assertTrue(errors.hasMessage("Invalid campaign id "));
+        assertTrue(errors.hasMessage("Invalid subscription id sub001"));
     }
 
     @Test
@@ -84,9 +83,9 @@ public class SuccessfulCallRequestValidatorTest {
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
+        Errors errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
-        assertTrue(errors.isEmpty());
+        assertTrue(errors.hasNoErrors());
     }
 
     @Test
@@ -102,9 +101,9 @@ public class SuccessfulCallRequestValidatorTest {
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
+        Errors errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
-        assertTrue(errors.isEmpty());
+        assertTrue(errors.hasNoErrors());
     }
 
     @Test
@@ -120,10 +119,10 @@ public class SuccessfulCallRequestValidatorTest {
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
+        Errors errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
-        assertEquals(1,errors.size());
-        assertEquals("Start DateTime[27-12-2012 21-20-20] should not be greater than End DateTime[27-12-2012 20-20-20]",errors.get(0));
+        assertEquals(1,errors.getCount());
+        assertTrue(errors.hasMessage("Start DateTime[27-12-2012 21-20-20] should not be greater than End DateTime[27-12-2012 20-20-20]"));
     }
 
     @Test
@@ -139,9 +138,9 @@ public class SuccessfulCallRequestValidatorTest {
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
-        List<String> errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
+        Errors errors = successfulCallRequestValidator.validate(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, null, null));
 
-        assertEquals(1, errors.size());
-        assertTrue(errors.contains("Invalid campaign id WEEK33WEEK"));
+        assertEquals(1, errors.getCount());
+        assertTrue(errors.hasMessage("Invalid campaign id WEEK33WEEK"));
     }
 }

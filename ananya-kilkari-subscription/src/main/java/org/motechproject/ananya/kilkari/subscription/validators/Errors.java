@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.validators;
+package org.motechproject.ananya.kilkari.subscription.validators;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -30,5 +30,9 @@ public class Errors {
 
     public int getCount() {
         return errorMessages.size();
+    }
+
+    public boolean hasMessage(String message) {
+        return errorMessages.contains(message);
     }
 }

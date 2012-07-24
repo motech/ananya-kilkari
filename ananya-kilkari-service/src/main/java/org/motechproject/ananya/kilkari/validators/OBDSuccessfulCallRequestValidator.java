@@ -9,13 +9,12 @@ import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +28,8 @@ public class OBDSuccessfulCallRequestValidator {
         this.subscriptionService = subscriptionService;
     }
 
-    public List<String> validate(OBDSuccessfulCallRequestWrapper obdRequestWrapper) {
-        List<String> errors = new ArrayList<>();
+    public Errors validate(OBDSuccessfulCallRequestWrapper obdRequestWrapper) {
+        Errors errors = new Errors();
         OBDSuccessfulCallRequest successfulCallRequest = obdRequestWrapper.getSuccessfulCallRequest();
         validateMsisdn(successfulCallRequest.getMsisdn(), errors);
         validateServiceOption(successfulCallRequest.getServiceOption(), errors);
@@ -41,7 +40,7 @@ public class OBDSuccessfulCallRequestValidator {
         return errors;
     }
 
-    private void validateDateFormat(CallDetailRecord callDetailRecord, List<String> errors) {
+    private void validateDateFormat(CallDetailRecord callDetailRecord, Errors errors) {
         boolean formatInvalid = false;
         if (!ValidationUtils.assertDateTimeFormat(callDetailRecord.getStartTime())) {
             errors.add(String.format("Invalid start time format %s", callDetailRecord.getStartTime()));
@@ -59,7 +58,7 @@ public class OBDSuccessfulCallRequestValidator {
         return DateTimeFormat.forPattern("dd-MM-yyyy HH-mm-ss").parseDateTime(time);
     }
 
-    private void validateCampaignId(String campaignId, List errors) {
+    private void validateCampaignId(String campaignId, Errors errors) {
         if (StringUtils.isEmpty(campaignId))
             errors.add(String.format("Invalid campaign id %s", campaignId));
         else {
@@ -71,17 +70,17 @@ public class OBDSuccessfulCallRequestValidator {
         }
     }
 
-    private void validateSubscription(String subscriptionId, List<String> errors) {
+    private void validateSubscription(String subscriptionId, Errors errors) {
         if (subscriptionService.findBySubscriptionId(subscriptionId) == null)
             errors.add(String.format("Invalid subscription id %s", subscriptionId));
     }
 
-    private void validateServiceOption(String serviceOption, List<String> errors) {
+    private void validateServiceOption(String serviceOption, Errors errors) {
         if (!StringUtils.isEmpty(serviceOption) && !ServiceOption.isValid(serviceOption))
             errors.add(String.format("Invalid service option %s", serviceOption));
     }
 
-    private void validateMsisdn(String msisdn, List<String> errors) {
+    private void validateMsisdn(String msisdn, Errors errors) {
         if (PhoneNumber.isNotValid(msisdn))
             errors.add(String.format("Invalid msisdn %s", msisdn));
     }

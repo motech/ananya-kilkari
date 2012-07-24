@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequestMapper;
@@ -16,6 +15,7 @@ import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
 import org.slf4j.Logger;
@@ -185,11 +185,11 @@ public class KilkariCampaignService {
 
     private void validate(FailedCallReports failedCallReports, List<ValidFailedCallReport> validFailedCallReports, List<InvalidFailedCallReport> invalidFailedCallReports) {
         for (FailedCallReport failedCallReport : failedCallReports.getCallrecords()) {
-            List<String> errors = callDeliveryFailureRecordValidator.validate(failedCallReport);
-            if (!errors.isEmpty()) {
-                InvalidFailedCallReport invalidFailedCallReport = new InvalidFailedCallReport(failedCallReport.getMsisdn(),
-                        failedCallReport.getSubscriptionId(), StringUtils.join(errors, ","));
-                invalidFailedCallReports.add(invalidFailedCallReport);
+            Errors errors = callDeliveryFailureRecordValidator.validate(failedCallReport);
+            if (errors.hasErrors()) {
+                InvalidFailedCallReport invalidCallDeliveryFailureRecordObject = new InvalidFailedCallReport(failedCallReport.getMsisdn(),
+                        failedCallReport.getSubscriptionId(), errors.allMessages());
+                invalidFailedCallReports.add(invalidCallDeliveryFailureRecordObject);
                 continue;
             }
 
@@ -198,11 +198,11 @@ public class KilkariCampaignService {
         }
     }
 
-    private void publishErrorRecords(List<InvalidFailedCallReport> invalidCallDeliveryFailureRecordObjects) {
-        if (invalidCallDeliveryFailureRecordObjects.isEmpty())
+    private void publishErrorRecords(List<InvalidFailedCallReport> invalidFailedCallReport) {
+        if (invalidFailedCallReport.isEmpty())
             return;
         InvalidFailedCallReports invalidFailedCallReports = new InvalidFailedCallReports();
-        invalidFailedCallReports.setRecordObjectFaileds(invalidCallDeliveryFailureRecordObjects);
+        invalidFailedCallReports.setRecordObjectFaileds(invalidFailedCallReport);
 
         obdRequestPublisher.publishInvalidCallDeliveryFailureRecord(invalidFailedCallReports);
     }

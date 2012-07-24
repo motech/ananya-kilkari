@@ -24,6 +24,7 @@ import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
 
@@ -463,10 +464,12 @@ public class KilkariCampaignServiceTest {
     public void shouldHandleCallDeliveryFailureRecord() {
         FailedCallReports failedCallReports = new FailedCallReports();
 
-        ArrayList<FailedCallReport> callDeliveryFailureRecordObjects = new ArrayList<>();
-        callDeliveryFailureRecordObjects.add(mock(FailedCallReport.class));
-        failedCallReports.setFailedCallReports(callDeliveryFailureRecordObjects);
+        ArrayList<FailedCallReport> reportArrayList = new ArrayList<>();
+        FailedCallReport failedCallReport = mock(FailedCallReport.class);
+        reportArrayList.add(failedCallReport);
+        failedCallReports.setFailedCallReports(reportArrayList);
 
+        when(callDeliveryFailureRecordValidator.validate(failedCallReport)).thenReturn(new Errors());
 
         kilkariCampaignService.processCallDeliveryFailureRecord(failedCallReports);
 
@@ -488,9 +491,9 @@ public class KilkariCampaignServiceTest {
         callDeliveryFailureRecordObjects.add(successfulFailedCallReport);
         failedCallReports.setFailedCallReports(callDeliveryFailureRecordObjects);
 
-        when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport)).thenReturn(new ArrayList<String>());
+        when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport)).thenReturn(new Errors());
 
-        ArrayList<String> errors = new ArrayList<>();
+        Errors errors = new Errors();
         errors.add("Some error description");
         when(callDeliveryFailureRecordValidator.validate(erroredOutFailedCallReport)).thenReturn(errors);
 
@@ -522,15 +525,15 @@ public class KilkariCampaignServiceTest {
         callDeliveryFailureRecordObjects.add(successfulFailedCallReport2);
         failedCallReports.setFailedCallReports(callDeliveryFailureRecordObjects);
 
-        when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport1)).thenReturn(new ArrayList<String>());
-        when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport2)).thenReturn(new ArrayList<String>());
+        when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport1)).thenReturn(new Errors());
+        when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport2)).thenReturn(new Errors());
 
         ValidFailedCallReport validFailedCallReport1 = mock(ValidFailedCallReport.class);
         ValidFailedCallReport validFailedCallReport2 = mock(ValidFailedCallReport.class);
         when(validCallDeliveryFailureRecordObjectMapper.mapFrom(successfulFailedCallReport1, failedCallReports)).thenReturn(validFailedCallReport1);
         when(validCallDeliveryFailureRecordObjectMapper.mapFrom(successfulFailedCallReport2, failedCallReports)).thenReturn(validFailedCallReport2);
 
-        ArrayList<String> errors = new ArrayList<>();
+        Errors errors = new Errors();
         errors.add("Some error description");
         when(callDeliveryFailureRecordValidator.validate(erroredOutFailedCallReport)).thenReturn(errors);
 
@@ -551,7 +554,7 @@ public class KilkariCampaignServiceTest {
         callDeliveryFailureRecordObjects.add(successfulFailedCallReport);
         failedCallReports.setFailedCallReports(callDeliveryFailureRecordObjects);
 
-        when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport)).thenReturn(new ArrayList<String>());
+        when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport)).thenReturn(new Errors());
 
         kilkariCampaignService.processCallDeliveryFailureRecord(failedCallReports);
 
@@ -618,5 +621,4 @@ public class KilkariCampaignServiceTest {
 
         verify(kilkariInboxService, never()).newMessage(anyString(), anyString());
     }
-
 }

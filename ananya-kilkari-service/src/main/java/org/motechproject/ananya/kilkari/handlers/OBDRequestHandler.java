@@ -1,10 +1,9 @@
 package org.motechproject.ananya.kilkari.handlers;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntries;
+import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
@@ -12,6 +11,7 @@ import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.validators.OBDSuccessfulCallRequestValidator;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
@@ -54,9 +54,9 @@ public class OBDRequestHandler {
     }
 
     private void validateSuccessfulCallRequest(OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper) {
-        List<String> validationErrors = successfulCallRequestValidator.validate(successfulCallRequestWrapper);
-        if (!(validationErrors.isEmpty())) {
-            throw new ValidationException(String.format("OBD Request Invalid: %s", StringUtils.join(validationErrors.toArray(), ",")));
+        Errors validationErrors = successfulCallRequestValidator.validate(successfulCallRequestWrapper);
+        if (validationErrors.hasErrors()) {
+            throw new ValidationException(String.format("OBD Request Invalid: %s", validationErrors.allMessages()));
         }
     }
 

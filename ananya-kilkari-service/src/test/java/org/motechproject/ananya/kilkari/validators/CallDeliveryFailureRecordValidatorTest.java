@@ -6,10 +6,10 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.contract.FailedCallReport;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -33,16 +33,16 @@ public class CallDeliveryFailureRecordValidatorTest {
         Subscription subscription = mock(Subscription.class);
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        List<String> errors1 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport1);
-        List<String> errors2 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport2);
-        List<String> errors3 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport3);
+        Errors errors1 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport1);
+        Errors errors2 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport2);
+        Errors errors3 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport3);
 
-        assertEquals(1, errors1.size());
-        assertEquals("Invalid msisdn 12345", errors1.get(0));
-        assertEquals(1, errors2.size());
-        assertEquals("Invalid msisdn 123a", errors2.get(0));
-        assertEquals(1, errors3.size());
-        assertEquals("Invalid msisdn null", errors3.get(0));
+        assertEquals(1, errors1.getCount());
+        assertTrue(errors1.hasMessage("Invalid msisdn 12345"));
+        assertEquals(1, errors2.getCount());
+        assertTrue(errors2.hasMessage("Invalid msisdn 123a"));
+        assertEquals(1, errors2.getCount());
+        assertTrue(errors3.hasMessage("Invalid msisdn null"));
     }
 
     @Test
@@ -54,41 +54,42 @@ public class CallDeliveryFailureRecordValidatorTest {
         Subscription subscription = mock(Subscription.class);
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        List<String> errors1 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport1);
-        List<String> errors2 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport2);
-        List<String> errors3 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport3);
+        Errors errors1 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport1);
+        Errors errors2 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport2);
+        Errors errors3 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport3);
 
-        assertEquals(1, errors1.size());
-        assertEquals("Invalid campaign id WEEK", errors1.get(0));
-        assertEquals(1, errors2.size());
-        assertEquals("Invalid campaign id WEEKS13", errors2.get(0));
-        assertEquals(1, errors3.size());
-        assertEquals("Invalid campaign id WEEK132", errors3.get(0));
+        assertEquals(1, errors1.getCount());
+        assertTrue(errors1.hasMessage("Invalid campaign id WEEK"));
+        assertEquals(1, errors2.getCount());
+        assertTrue(errors2.hasMessage("Invalid campaign id WEEKS13"));
+        assertEquals(1, errors2.getCount());
+        assertTrue(errors3.hasMessage("Invalid campaign id WEEK132"));
     }
 
     @Test
     public void shouldValidateCallDeliveryFailureRecordForSubscriptionId() {
         String subscriptionId = "subscriptionId";
-        FailedCallReport failedCallReport1 = new FailedCallReport(subscriptionId, "1234567890", "WEEK13", "DNP");
-        Subscription subscription = mock(Subscription.class);
+        FailedCallReport failedCallReport = new FailedCallReport(subscriptionId, "1234567890", "WEEK13", "DNP");
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(null);
 
-        List<String> errors1 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport1);
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(null);
 
-        assertEquals(1, errors1.size());
-        assertEquals("Invalid subscription id subscriptionId", errors1.get(0));
+        Errors errors = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport);
+
+        assertEquals(1, errors.getCount());
+        assertTrue(errors.hasMessage("Invalid subscription id subscriptionId"));
     }
 
     @Test
     public void shouldValidateCallDeliveryFailureRecordForStatusCode() {
         String subscriptionId = "subscriptionId";
-        FailedCallReport failedCallReport1 = new FailedCallReport(subscriptionId, "1234567890", "WEEK13", "DNP1");
+        FailedCallReport failedCallReport = new FailedCallReport(subscriptionId, "1234567890", "WEEK13", "DNP1");
         Subscription subscription = mock(Subscription.class);
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        List<String> errors1 = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport1);
+        Errors errors = new CallDeliveryFailureRecordValidator(kilkariSubscriptionService).validate(failedCallReport);
 
-        assertEquals(1, errors1.size());
-        assertEquals("Invalid status code DNP1", errors1.get(0));
+        assertEquals(1, errors.getCount());
+        assertTrue(errors.hasMessage("Invalid status code DNP1"));
     }
 }

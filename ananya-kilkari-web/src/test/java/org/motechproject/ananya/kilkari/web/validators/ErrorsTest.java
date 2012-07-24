@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.web.validators;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 
 import java.util.ArrayList;
 import java.util.List;

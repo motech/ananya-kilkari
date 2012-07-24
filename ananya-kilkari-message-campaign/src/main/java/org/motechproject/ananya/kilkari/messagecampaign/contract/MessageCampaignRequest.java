@@ -1,14 +1,14 @@
-package org.motechproject.ananya.kilkari.messagecampaign.request;
+package org.motechproject.ananya.kilkari.messagecampaign.contract;
 
 import org.joda.time.DateTime;
 
-public class KilkariMessageCampaignRequest {
+public class MessageCampaignRequest {
 
     private String externalId;
     private String subscriptionPack;
     private DateTime subscriptionCreationDate;
 
-    public KilkariMessageCampaignRequest(String externalId, String subscriptionPack, DateTime subscriptionCreationDate) {
+    public MessageCampaignRequest(String externalId, String subscriptionPack, DateTime subscriptionCreationDate) {
         this.externalId = externalId;
         this.subscriptionPack = subscriptionPack;
         this.subscriptionCreationDate = subscriptionCreationDate;

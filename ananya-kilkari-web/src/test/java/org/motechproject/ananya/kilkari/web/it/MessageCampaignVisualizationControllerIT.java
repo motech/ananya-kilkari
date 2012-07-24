@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.web.it;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
+import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -34,7 +34,7 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
         allSubscriptions.add(subscription);
         markForDeletion(subscription);
 
-        KilkariMessageCampaignRequest messageCampaignRequest = new KilkariMessageCampaignRequest(
+        MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 subscription.getSubscriptionId(), subscriptionPack.name(), subscription.getCreationDate());
         kilkariMessageCampaignService.start(messageCampaignRequest);
 

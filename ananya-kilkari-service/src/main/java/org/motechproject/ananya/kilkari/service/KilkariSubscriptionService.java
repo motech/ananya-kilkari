@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
+import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
@@ -66,7 +66,7 @@ public class KilkariSubscriptionService {
         try {
             Subscription subscription = subscriptionService.createSubscription(subscriptionRequest);
 
-            KilkariMessageCampaignRequest campaignRequest = new KilkariMessageCampaignRequest(
+            MessageCampaignRequest campaignRequest = new MessageCampaignRequest(
                     subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getCreationDate());
 
             kilkariMessageCampaignService.start(campaignRequest);

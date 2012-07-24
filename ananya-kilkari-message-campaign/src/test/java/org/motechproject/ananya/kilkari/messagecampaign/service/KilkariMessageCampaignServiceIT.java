@@ -5,8 +5,8 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -31,7 +31,7 @@ public class KilkariMessageCampaignServiceIT {
     public void shouldCreateMessageCampaignForSevenMonthCampaign() {
         DateTime referenceDate = DateTime.now().plusDays(1);
 
-        KilkariMessageCampaignRequest messageCampaignRequest = new KilkariMessageCampaignRequest(
+        MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 "my_id", SubscriptionPack.SEVEN_MONTHS.name(), referenceDate);
 
         kilkariMessageCampaignService.start(messageCampaignRequest);
@@ -54,7 +54,7 @@ public class KilkariMessageCampaignServiceIT {
     public void shouldCreateMessageCampaignForTwelveMonthCampaign() {
         DateTime referenceDate = DateTime.now().plusDays(1);
 
-        KilkariMessageCampaignRequest messageCampaignRequest = new KilkariMessageCampaignRequest(
+        MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 "my_id", SubscriptionPack.TWELVE_MONTHS.name(), referenceDate);
 
         kilkariMessageCampaignService.start(messageCampaignRequest);
@@ -78,7 +78,7 @@ public class KilkariMessageCampaignServiceIT {
     public void shouldCreateMessageCampaignForFifteenMonthCampaign() {
         DateTime referenceDate = DateTime.now().plusDays(1);
 
-        KilkariMessageCampaignRequest messageCampaignRequest = new KilkariMessageCampaignRequest(
+        MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 "my_id", SubscriptionPack.FIFTEEN_MONTHS.name(), referenceDate);
 
         kilkariMessageCampaignService.start(messageCampaignRequest);

@@ -1,11 +1,10 @@
 package org.motechproject.ananya.kilkari.messagecampaign.service;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignEnrollment;
+import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
+import org.motechproject.ananya.kilkari.messagecampaign.contract.mapper.MessageCampaignRequestMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.messagecampaign.mapper.KilkariMessageCampaignEnrollmentRecordMapper;
-import org.motechproject.ananya.kilkari.messagecampaign.mapper.KilkariMessageCampaignRequestMapper;
-import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
-import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
 import org.motechproject.server.messagecampaign.service.MessageCampaignService;
@@ -25,8 +24,8 @@ public class KilkariMessageCampaignService {
     public static final String TWELVE_MONTHS = "kilkari-mother-child-campaign-twelve-months";
     public static final String SEVEN_MONTHS = "kilkari-mother-child-campaign-seven-months";
     public static final String CAMPAIGN_MESSAGE_NAME = "Mother Child Health Care";
-    public static int campaignScheduleDeltaDays;
-    public static int campaignScheduleDeltaMinutes;
+    public int campaignScheduleDeltaDays;
+    public int campaignScheduleDeltaMinutes;
 
     @Value("#{kilkariProperties['kilkari.campaign.schedule.delta.days']}")
     public void setCampaignScheduleDeltaDays(int campaignScheduleDeltaDays) {
@@ -45,21 +44,24 @@ public class KilkariMessageCampaignService {
         this.campaignService = campaignService;
     }
 
-    public void start(KilkariMessageCampaignRequest campaignRequest) {
-        campaignService.startFor(KilkariMessageCampaignRequestMapper.newRequestFrom(campaignRequest));
+    public void start(MessageCampaignRequest campaignRequest) {
+        campaignService.startFor(MessageCampaignRequestMapper.newRequestFrom(campaignRequest, campaignScheduleDeltaDays, campaignScheduleDeltaMinutes));
     }
 
-    public boolean stop(KilkariMessageCampaignRequest enrollRequest) {
-        campaignService.stopAll(KilkariMessageCampaignRequestMapper.newRequestFrom(enrollRequest));
+    public boolean stop(MessageCampaignRequest enrollRequest) {
+        campaignService.stopAll(MessageCampaignRequestMapper.newRequestFrom(enrollRequest, campaignScheduleDeltaDays, campaignScheduleDeltaMinutes));
         return true;
     }
 
-    public KilkariMessageCampaignEnrollmentRecord searchEnrollment(String externalId, String campaignName) {
+    public MessageCampaignEnrollment searchEnrollment(String externalId, String campaignName) {
         List<CampaignEnrollmentRecord> enrollmentRecords = campaignService.search(
                 new CampaignEnrollmentsQuery().withExternalId(externalId).withCampaignName(campaignName));
 
+        CampaignEnrollmentRecord campaignEnrollmentRecord = enrollmentRecords.get(0);
         return enrollmentRecords.size() > 0
-                ? KilkariMessageCampaignEnrollmentRecordMapper.map(enrollmentRecords.get(0))
+                ? new MessageCampaignEnrollment(campaignEnrollmentRecord.getExternalId(),
+                campaignEnrollmentRecord.getCampaignName(), campaignEnrollmentRecord.getStartDate(),
+                campaignEnrollmentRecord.getStatus())
                 : null;
     }
 

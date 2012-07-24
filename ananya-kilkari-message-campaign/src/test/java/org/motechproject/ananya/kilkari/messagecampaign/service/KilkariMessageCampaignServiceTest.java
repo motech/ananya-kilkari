@@ -5,8 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
 import org.motechproject.server.messagecampaign.service.MessageCampaignService;
@@ -39,10 +39,10 @@ public class KilkariMessageCampaignServiceTest {
         String externalId = "externalId";
         String subscriptionPack = SubscriptionPack.TWELVE_MONTHS.name();
         DateTime subscriptionCreationDate = DateTime.now();
-        KilkariMessageCampaignRequest kilkariMessageCampaignRequest = new KilkariMessageCampaignRequest(
+        MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 externalId, subscriptionPack, subscriptionCreationDate);
 
-        kilkariMessageCampaignService.start(kilkariMessageCampaignRequest);
+        kilkariMessageCampaignService.start(messageCampaignRequest);
 
         ArgumentCaptor<CampaignRequest> campaignRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignRequest.class);
         verify(messageCampaignService).startFor(campaignRequestArgumentCaptor.capture());
@@ -59,10 +59,10 @@ public class KilkariMessageCampaignServiceTest {
         String externalId = "externalId";
         String subscriptionPack = SubscriptionPack.TWELVE_MONTHS.name();
         DateTime subscriptionCreationDate = DateTime.now();
-        KilkariMessageCampaignRequest kilkariMessageCampaignRequest = new KilkariMessageCampaignRequest(
+        MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 externalId, subscriptionPack, subscriptionCreationDate);
 
-        kilkariMessageCampaignService.stop(kilkariMessageCampaignRequest);
+        kilkariMessageCampaignService.stop(messageCampaignRequest);
 
         ArgumentCaptor<CampaignRequest> campaignRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignRequest.class);
         verify(messageCampaignService).stopAll(campaignRequestArgumentCaptor.capture());

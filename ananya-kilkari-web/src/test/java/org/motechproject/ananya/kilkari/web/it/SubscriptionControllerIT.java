@@ -5,7 +5,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignEnrollmentRecord;
+import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignEnrollment;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
@@ -136,19 +136,19 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertFalse(StringUtils.isBlank(subscription.getSubscriptionId()));
 
 
-        KilkariMessageCampaignEnrollmentRecord campaignEnrollmentRecord = new TimedRunner<KilkariMessageCampaignEnrollmentRecord>(20, 1000) {
+        MessageCampaignEnrollment campaignEnrollment = new TimedRunner<MessageCampaignEnrollment>(20, 1000) {
             @Override
-            KilkariMessageCampaignEnrollmentRecord run() {
-                KilkariMessageCampaignEnrollmentRecord enrollmentRecord = kilkariMessageCampaignService.searchEnrollment(
+            MessageCampaignEnrollment run() {
+                MessageCampaignEnrollment enrollment = kilkariMessageCampaignService.searchEnrollment(
                         subscription.getSubscriptionId(), SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME);
-                return enrollmentRecord;
+                return enrollment;
             }
         }.execute();
 
 
-        assertNotNull(campaignEnrollmentRecord);
-        assertEquals(subscription.getSubscriptionId(), campaignEnrollmentRecord.getExternalId());
-        assertEquals(SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord.getCampaignName());
+        assertNotNull(campaignEnrollment);
+        assertEquals(subscription.getSubscriptionId(), campaignEnrollment.getExternalId());
+        assertEquals(SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME, campaignEnrollment.getCampaignName());
         List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
                 subscription.getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
         assertEquals(48, messageTimings.size());
@@ -196,9 +196,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertFalse(StringUtils.isBlank(subscription.getSubscriptionId()));
 
 
-        KilkariMessageCampaignEnrollmentRecord campaignEnrollmentRecord = new TimedRunner<KilkariMessageCampaignEnrollmentRecord>(20, 1000) {
+        MessageCampaignEnrollment campaignEnrollment = new TimedRunner<MessageCampaignEnrollment>(20, 1000) {
             @Override
-            KilkariMessageCampaignEnrollmentRecord run() {
+            MessageCampaignEnrollment run() {
                 return kilkariMessageCampaignService.searchEnrollment(
                         subscription.getSubscriptionId(), SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME);
 
@@ -206,9 +206,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         }.execute();
 
 
-        assertNotNull(campaignEnrollmentRecord);
-        assertEquals(subscription.getSubscriptionId(), campaignEnrollmentRecord.getExternalId());
-        assertEquals(SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME, campaignEnrollmentRecord.getCampaignName());
+        assertNotNull(campaignEnrollment);
+        assertEquals(subscription.getSubscriptionId(), campaignEnrollment.getExternalId());
+        assertEquals(SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME, campaignEnrollment.getCampaignName());
         List<DateTime> messageTimings = kilkariMessageCampaignService.getMessageTimings(
                 subscription.getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
         assertEquals(60, messageTimings.size());

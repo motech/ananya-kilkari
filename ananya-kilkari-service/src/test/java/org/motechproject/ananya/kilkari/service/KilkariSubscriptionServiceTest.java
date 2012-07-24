@@ -7,9 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.verification.VerificationMode;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
-import org.motechproject.ananya.kilkari.messagecampaign.request.KilkariMessageCampaignRequest;
+import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
@@ -77,13 +76,13 @@ public class KilkariSubscriptionServiceTest {
 
         kilkariSubscriptionService.processSubscriptionRequest(subscriptionRequest);
 
-        ArgumentCaptor<KilkariMessageCampaignRequest> captor = ArgumentCaptor.forClass(KilkariMessageCampaignRequest.class);
+        ArgumentCaptor<MessageCampaignRequest> captor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
         verify(kilkariMessageCampaignService).start(captor.capture());
-        KilkariMessageCampaignRequest kilkariMessageCampaignRequest = captor.getValue();
-        assertNotNull(kilkariMessageCampaignRequest.getExternalId());
-        assertEquals(pack.name(), kilkariMessageCampaignRequest.getSubscriptionPack());
+        MessageCampaignRequest messageCampaignRequest = captor.getValue();
+        assertNotNull(messageCampaignRequest.getExternalId());
+        assertEquals(pack.name(), messageCampaignRequest.getSubscriptionPack());
 
-        assertEquals(subscriptionRequest.getCreatedAt().toLocalDate(), kilkariMessageCampaignRequest.getSubscriptionCreationDate().toLocalDate());
+        assertEquals(subscriptionRequest.getCreatedAt().toLocalDate(), messageCampaignRequest.getSubscriptionCreationDate().toLocalDate());
     }
 
     @Test
@@ -95,7 +94,7 @@ public class KilkariSubscriptionServiceTest {
 
         kilkariSubscriptionService.processSubscriptionRequest(subscriptionRequest);
 
-        verify(kilkariMessageCampaignService, never()).start(any(KilkariMessageCampaignRequest.class));
+        verify(kilkariMessageCampaignService, never()).start(any(MessageCampaignRequest.class));
     }
 
     @Test

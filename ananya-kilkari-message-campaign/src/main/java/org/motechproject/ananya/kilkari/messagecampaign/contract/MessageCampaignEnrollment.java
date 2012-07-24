@@ -1,18 +1,18 @@
-package org.motechproject.ananya.kilkari.messagecampaign.request;
+package org.motechproject.ananya.kilkari.messagecampaign.contract;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
 
-public class KilkariMessageCampaignEnrollmentRecord {
+public class MessageCampaignEnrollment {
 
     private String externalId;
     private String campaignName;
     private DateTime startDate;
     private String status;
 
-    public KilkariMessageCampaignEnrollmentRecord(String externalId, String campaignName,
-                                                  LocalDate startDate, CampaignEnrollmentStatus status) {
+    public MessageCampaignEnrollment(String externalId, String campaignName,
+                                     LocalDate startDate, CampaignEnrollmentStatus status) {
 
         this.externalId = externalId;
         this.campaignName = campaignName;

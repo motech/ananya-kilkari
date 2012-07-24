@@ -8,7 +8,7 @@ import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
-import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -28,14 +28,14 @@ public class OBDRequestHandler {
     private OBDServiceOptionFactory obdServiceOptionFactory;
     private KilkariCampaignService kilkariCampaignService;
     private OBDSuccessfulCallRequestValidator successfulCallRequestValidator;
-    private CampaignMessageService campaignMessageService;
+    private CallRecordsService callRecordsService;
 
     @Autowired
-    public OBDRequestHandler(OBDServiceOptionFactory obdServiceOptionFactory, KilkariCampaignService kilkariCampaignService, OBDSuccessfulCallRequestValidator successfulCallRequestValidator, CampaignMessageService campaignMessageService) {
+    public OBDRequestHandler(OBDServiceOptionFactory obdServiceOptionFactory, KilkariCampaignService kilkariCampaignService, OBDSuccessfulCallRequestValidator successfulCallRequestValidator, CallRecordsService callRecordsService) {
         this.obdServiceOptionFactory = obdServiceOptionFactory;
         this.kilkariCampaignService = kilkariCampaignService;
         this.successfulCallRequestValidator = successfulCallRequestValidator;
-        this.campaignMessageService = campaignMessageService;
+        this.callRecordsService = callRecordsService;
     }
 
     @MotechListener(subjects = {OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT})
@@ -68,6 +68,6 @@ public class OBDRequestHandler {
             invalidCallRecords.add(new InvalidCallRecord(requestObject.getMsisdn(), requestObject.getSubscriptionId(),
                     requestObject.getCampaignId(), requestObject.getOperator(), requestObject.getDescription()));
         }
-        campaignMessageService.processInvalidCallRecords(invalidCallRecords);
+        callRecordsService.processInvalidCallRecords(invalidCallRecords);
     }
 }

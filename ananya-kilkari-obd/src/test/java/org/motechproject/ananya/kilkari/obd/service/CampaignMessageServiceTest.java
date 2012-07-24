@@ -11,11 +11,9 @@ import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
 import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
-import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.gateway.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
-import org.motechproject.ananya.kilkari.obd.repository.AllInvalidCallRecords;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 
@@ -46,9 +44,6 @@ public class CampaignMessageServiceTest {
     private CampaignMessageCSVBuilder campaignMessageCSVBuilder;
 
     @Mock
-    private AllInvalidCallRecords allInvalidCallRecords;
-
-    @Mock
     private OBDProperties obdProperties;
 
     @Mock
@@ -60,7 +55,7 @@ public class CampaignMessageServiceTest {
     @Before
     public void setUp() {
         initMocks(this);
-        campaignMessageService = new CampaignMessageService(allCampaignMessages, onMobileOBDGateway, campaignMessageCSVBuilder, allInvalidCallRecords, reportingService, obdProperties);
+        campaignMessageService = new CampaignMessageService(allCampaignMessages, onMobileOBDGateway, campaignMessageCSVBuilder, reportingService, obdProperties);
     }
 
     @Test
@@ -238,20 +233,6 @@ public class CampaignMessageServiceTest {
         campaignMessageService.deleteCampaignMessageIfExists(subscriptionId, campaignId);
 
         verify(allCampaignMessages, never()).delete(any(CampaignMessage.class));
-    }
-
-    @Test
-    public void shouldSaveInvalidCallRecords() {
-        ArrayList<InvalidCallRecord> invalidCallRecords = new ArrayList<>();
-        InvalidCallRecord invalidCallRecord1 = new InvalidCallRecord("msisdn1", "subscription1", "campaign1", "operator1", "description1");
-        InvalidCallRecord invalidCallRecord2 = new InvalidCallRecord("msisdn2", "subscription2", "campaign2", "operator2", "description2");
-        invalidCallRecords.add(invalidCallRecord1);
-        invalidCallRecords.add(invalidCallRecord2);
-
-        campaignMessageService.processInvalidCallRecords(invalidCallRecords);
-
-        verify(allInvalidCallRecords).add(invalidCallRecord1);
-        verify(allInvalidCallRecords).add(invalidCallRecord2);
     }
 
     @Test

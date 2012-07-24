@@ -7,11 +7,9 @@ import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
 import org.motechproject.ananya.kilkari.obd.contract.ValidCallDeliveryFailureRecordObject;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
-import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.gateway.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
-import org.motechproject.ananya.kilkari.obd.repository.AllInvalidCallRecords;
 import org.motechproject.ananya.kilkari.reporting.domain.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
@@ -20,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,18 +26,16 @@ public class CampaignMessageService {
     private AllCampaignMessages allCampaignMessages;
     private OnMobileOBDGateway onMobileOBDGateway;
     private CampaignMessageCSVBuilder campaignMessageCSVBuilder;
-    private AllInvalidCallRecords allInvalidCallRecords;
     private final ReportingService reportingService;
     private final OBDProperties obdProperties;
 
     private static final Logger logger = LoggerFactory.getLogger(CampaignMessageService.class);
 
     @Autowired
-    public CampaignMessageService(AllCampaignMessages allCampaignMessages, OnMobileOBDGateway onMobileOBDGateway, CampaignMessageCSVBuilder campaignMessageCSVBuilder, AllInvalidCallRecords allInvalidCallRecords, ReportingService reportingService, OBDProperties obdProperties) {
+    public CampaignMessageService(AllCampaignMessages allCampaignMessages, OnMobileOBDGateway onMobileOBDGateway, CampaignMessageCSVBuilder campaignMessageCSVBuilder, ReportingService reportingService, OBDProperties obdProperties) {
         this.allCampaignMessages = allCampaignMessages;
         this.onMobileOBDGateway = onMobileOBDGateway;
         this.campaignMessageCSVBuilder = campaignMessageCSVBuilder;
-        this.allInvalidCallRecords = allInvalidCallRecords;
         this.reportingService = reportingService;
         this.obdProperties = obdProperties;
     }
@@ -83,16 +78,6 @@ public class CampaignMessageService {
 
     public void deleteCampaignMessage(CampaignMessage campaignMessage) {
         allCampaignMessages.delete(campaignMessage);
-    }
-
-    public void processInvalidCallRecords(ArrayList<InvalidCallRecord> invalidCallRecords) {
-        if (invalidCallRecords.isEmpty()) {
-            return;
-        }
-        logger.error(String.format("Received obd callback for %s invalid call records.", invalidCallRecords.size()));
-        for (InvalidCallRecord record : invalidCallRecords) {
-            allInvalidCallRecords.add(record);
-        }
     }
 
     public void update(CampaignMessage campaignMessage) {

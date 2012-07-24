@@ -15,6 +15,7 @@ import org.motechproject.ananya.kilkari.obd.contract.InvalidCallRecordsRequest;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
+import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
@@ -44,12 +45,14 @@ public class OBDRequestHandlerTest {
     private OBDSuccessfulCallRequestValidator successfulCallRequestValidator;
     @Mock
     private CampaignMessageService campaignMessageService;
-    
+    @Mock
+    private CallRecordsService callRecordsService;
+
     private OBDRequestHandler obdRequestHandler;
 
     @Before
     public void setUp() {
-        obdRequestHandler = new OBDRequestHandler(obdServiceOptionFactory, kilkariCampaignService, successfulCallRequestValidator, campaignMessageService);
+        obdRequestHandler = new OBDRequestHandler(obdServiceOptionFactory, kilkariCampaignService, successfulCallRequestValidator, callRecordsService);
     }
 
     @Test
@@ -139,7 +142,7 @@ public class OBDRequestHandlerTest {
         obdRequestHandler.handleInvalidCallRecordsRequest(invalidCallRecordsRequest);
 
         ArgumentCaptor<ArrayList> captor = ArgumentCaptor.forClass(ArrayList.class);
-        verify(campaignMessageService).processInvalidCallRecords(captor.capture());
+        verify(callRecordsService).processInvalidCallRecords(captor.capture());
 
         ArrayList actualInvalidCallRecords = captor.getValue();
         assertEquals(2, actualInvalidCallRecords.size());
@@ -150,5 +153,4 @@ public class OBDRequestHandlerTest {
         assertEquals(operator1, actualInvalidCallRecord1.getOperator());
         assertEquals(desc1, actualInvalidCallRecord1.getDescription());
     }
-
 }

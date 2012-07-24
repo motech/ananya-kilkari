@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.domain;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
@@ -40,7 +41,7 @@ public class SubscriberCareDoc extends MotechBaseDataObject {
     }
 
     public DateTime getCreatedAt() {
-        return createdAt;
+        return createdAt == null ? null : createdAt.withZone(DateTimeZone.getDefault());
     }
 
     public Channel getChannel() {

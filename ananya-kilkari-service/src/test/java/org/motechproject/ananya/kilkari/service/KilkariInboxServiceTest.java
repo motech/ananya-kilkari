@@ -1,12 +1,18 @@
 package org.motechproject.ananya.kilkari.service;
 
+import junit.framework.Assert;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.subscription.domain.InboxMessage;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
+import org.motechproject.scheduler.MotechSchedulerService;
+import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -18,11 +24,13 @@ public class KilkariInboxServiceTest {
     private KilkariInboxService kilkariInboxService;
     @Mock
     private AllInboxMessages allInboxMessages;
+    @Mock
+    private MotechSchedulerService motechSchedulerService;
 
     @Before
     public void setup(){
         initMocks(this);
-        kilkariInboxService = new KilkariInboxService(allInboxMessages);
+        kilkariInboxService = new KilkariInboxService(allInboxMessages, motechSchedulerService);
     }
 
     @Test
@@ -51,7 +59,7 @@ public class KilkariInboxServiceTest {
 
         kilkariInboxService.newMessage(subscriptionId, messageId);
 
-        verify(inboxMessage).setMessageId(messageId);
+        verify(inboxMessage).update(messageId);
         verify(allInboxMessages).update(inboxMessage);
     }
     
@@ -76,5 +84,33 @@ public class KilkariInboxServiceTest {
         String actualMessageId = kilkariInboxService.getMessageFor(subscriptionId);
 
         assertNull(actualMessageId);
+    }
+
+    @Test
+    public void shouldScheduleInboxDeletionEvent() {
+        String subscriptionId = "subscriptionId";
+        DateTime messageExpiryDate = DateTime.now().plusWeeks(1);
+        Subscription mockedSubscription = mock(Subscription.class);
+
+        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+        when(mockedSubscription.currentWeeksMessageExpiryDate()).thenReturn(messageExpiryDate);
+
+        kilkariInboxService.scheduleInboxDeletion(mockedSubscription);
+
+        ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
+        verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
+        RunOnceSchedulableJob runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
+        Assert.assertEquals(SubscriptionEventKeys.DELETE_INBOX, runOnceSchedulableJob.getMotechEvent().getSubject());
+        Assert.assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
+        Assert.assertEquals(messageExpiryDate.toDate(), runOnceSchedulableJob.getStartDate());
+    }
+
+    @Test
+    public void shouldDeleteInbox(){
+        String subscriptionId = "subscriptionId";
+
+        kilkariInboxService.deleteInbox(subscriptionId);
+
+        verify(allInboxMessages).deleteFor(subscriptionId);
     }
 }

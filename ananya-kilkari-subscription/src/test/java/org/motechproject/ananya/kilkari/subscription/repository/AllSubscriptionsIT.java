@@ -19,8 +19,9 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
     @Test
     public void shouldAddASubscriptionIntoDb() {
         String msisdn = "1234567890";
+        DateTime createdAt = DateTime.now();
 
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, createdAt);
         allSubscriptions.add(subscription);
 
         markForDeletion(subscription);
@@ -30,10 +31,10 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         assertEquals(1, allSubscriptionsList.size());
         Subscription subscriptionFromDb = allSubscriptionsList.get(0);
         assertEquals(msisdn, subscriptionFromDb.getMsisdn());
-        assertNotNull(subscriptionFromDb.getCreationDate());
         assertNotNull(subscriptionFromDb.getSubscriptionId());
         assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptionFromDb.getPack());
         assertEquals(SubscriptionStatus.NEW, subscriptionFromDb.getStatus());
+        assertEquals(createdAt, subscriptionFromDb.getCreationDate());
     }
 
     @Test

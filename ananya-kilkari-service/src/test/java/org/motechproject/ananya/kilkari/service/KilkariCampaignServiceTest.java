@@ -8,8 +8,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
-import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
 import org.motechproject.ananya.kilkari.domain.CampaignTriggerType;
+import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.contract.*;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
@@ -559,7 +559,7 @@ public class KilkariCampaignServiceTest {
     }
 
     @Test
-    public void shouldUpdateInboxToHoldLastScheduledMessage(){
+    public void shouldUpdateInboxToHoldLastScheduledMessage() {
         Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         String messageId = "week10";
@@ -573,7 +573,7 @@ public class KilkariCampaignServiceTest {
     }
 
     @Test
-    public void shouldNotUpdateInboxWhenSubscriptionIsNotActive(){
+    public void shouldNotUpdateInboxWhenSubscriptionIsNotActive() {
         Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
         String subscriptionId = subscription.getSubscriptionId();
@@ -588,7 +588,7 @@ public class KilkariCampaignServiceTest {
     }
 
     @Test
-    public void shouldNotUpdateInboxDuringRenewal(){
+    public void shouldNotUpdateInboxDuringRenewal() {
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         subscription.setOperator(Operator.AIRTEL);
@@ -604,7 +604,7 @@ public class KilkariCampaignServiceTest {
     }
 
     @Test
-    public void shouldNotUpdateInboxWhenMessageHasNotAlreadyBeenScheduled(){
+    public void shouldNotUpdateInboxWhenMessageHasNotAlreadyBeenScheduled() {
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         subscription.setOperator(Operator.AIRTEL);

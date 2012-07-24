@@ -101,18 +101,6 @@ public class SubscriptionHandlerTest {
     }
 
     @Test
-    public void shouldHandleInboxDeletion() {
-        final String msisdn = "9988776655";
-        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
-        final String subscriptionId = "abcd1234";
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new ProcessSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
-
-        subscriptionHandler.handleInboxDeletion(new MotechEvent(SubscriptionEventKeys.DELETE_INBOX, parameters));
-
-        verify(subscriptionService).deleteInbox(subscriptionId);
-    }
-
-    @Test
     public void shouldNotSendDeactivationRequestAgainIfTheExistingSubscriptionIsAlreadyInDeactivatedState() {
         final String msisdn = "9988776655";
         final String subscriptionId = "abcd1234";

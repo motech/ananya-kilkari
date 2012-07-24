@@ -24,14 +24,16 @@ public class SubscriptionService {
     private SubscriptionRequestValidator subscriptionRequestValidator;
     private ReportingService reportingService;
     private AllInboxMessages allInboxMessages;
+    private KilkariInboxService kilkariInboxService;
 
     @Autowired
-    public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher, SubscriptionRequestValidator subscriptionRequestValidator, ReportingService reportingService, AllInboxMessages allInboxMessages) {
+    public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher, SubscriptionRequestValidator subscriptionRequestValidator, ReportingService reportingService, AllInboxMessages allInboxMessages, KilkariInboxService kilkariInboxService) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionRequestValidator = subscriptionRequestValidator;
         this.reportingService = reportingService;
         this.allInboxMessages = allInboxMessages;
+        this.kilkariInboxService = kilkariInboxService;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest) {
@@ -129,6 +131,7 @@ public class SubscriptionService {
             @Override
             public void perform(Subscription subscription) {
                 subscription.deactivate();
+                kilkariInboxService.scheduleInboxDeletion(subscription);
             }
         });
     }
@@ -138,12 +141,9 @@ public class SubscriptionService {
             @Override
             public void perform(Subscription subscription) {
                 subscription.complete();
+                kilkariInboxService.scheduleInboxDeletion(subscription);
             }
         });
-    }
-
-    public void deleteInbox(String subscriptionId) {
-        allInboxMessages.deleteFor(subscriptionId);
     }
 
     public Subscription findBySubscriptionId(String subscriptionId) {

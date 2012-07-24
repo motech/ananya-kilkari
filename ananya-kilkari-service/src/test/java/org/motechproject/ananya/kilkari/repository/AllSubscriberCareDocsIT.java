@@ -27,14 +27,17 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
     public void shouldFindSubscriberCareDoc() {
         String msisdn = "9876543211";
         SubscriberCareReasons reason = SubscriberCareReasons.HELP;
-        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc(msisdn, reason, DateTime.now(), Channel.IVR);
+        DateTime createdAt = DateTime.now();
+        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc(msisdn, reason, createdAt, Channel.IVR);
         allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
         markForDeletion(subscriberCareDoc);
 
         SubscriberCareDoc subscriberCareDocs = allSubscriberCareDocs.find(msisdn, reason.name());
+        
         assertNotNull(subscriberCareDocs);
         assertEquals(msisdn, subscriberCareDocs.getMsisdn());
         assertEquals(reason, subscriberCareDocs.getReason());
+        assertEquals(createdAt, subscriberCareDocs.getCreatedAt());
     }
 
     @Test
@@ -59,6 +62,6 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
 
         List<SubscriberCareDoc> subscriberCareDocs = allSubscriberCareDocs.getAll();
         assertEquals(1, subscriberCareDocs.size());
-        assertEquals(createdAt.getDayOfYear(), subscriberCareDocs.get(0).getCreatedAt().getDayOfYear());
+        assertEquals(createdAt, subscriberCareDocs.get(0).getCreatedAt());
     }
 }

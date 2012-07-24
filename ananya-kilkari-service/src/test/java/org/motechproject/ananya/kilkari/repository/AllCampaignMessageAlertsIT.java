@@ -18,13 +18,15 @@ public class AllCampaignMessageAlertsIT extends SpringIntegrationTest {
     public void shouldReturnTheCampaignMessageAlertIfExists() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
-        CampaignMessageAlert actualCampaignMessage = new CampaignMessageAlert(subscriptionId, messageId, true, DateTime.now().plusWeeks(1));
+        DateTime messageExpiryDate = DateTime.now().plusWeeks(1);
+        CampaignMessageAlert actualCampaignMessage = new CampaignMessageAlert(subscriptionId, messageId, true, messageExpiryDate);
         kilkariDbConnector.create(actualCampaignMessage);
         markForDeletion(actualCampaignMessage);
 
         CampaignMessageAlert expectedCampaignMessage = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
         assertEquals(subscriptionId, expectedCampaignMessage.getSubscriptionId());
         assertEquals(messageId, expectedCampaignMessage.getMessageId());
+        assertEquals(messageExpiryDate, expectedCampaignMessage.getMessageExpiryDate());
         assertTrue(expectedCampaignMessage.isRenewed());
     }
 }

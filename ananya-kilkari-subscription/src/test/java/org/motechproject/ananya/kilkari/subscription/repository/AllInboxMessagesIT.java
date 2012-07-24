@@ -23,8 +23,5 @@ public class AllInboxMessagesIT extends SpringIntegrationTest {
 
         assertEquals(subscriptionId, actualInboxMessage.getSubscriptionId());
         assertEquals(messageId, actualInboxMessage.getMessageId());
-
     }
-
-    // TODO write a test for deletion
 }

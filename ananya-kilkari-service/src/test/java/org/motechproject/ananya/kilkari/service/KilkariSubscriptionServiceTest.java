@@ -119,8 +119,8 @@ public class KilkariSubscriptionServiceTest {
         kilkariSubscriptionService.processSubscriptionCompletion(mockedSubscription);
 
         ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
-        verify(motechSchedulerService, times(2)).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
-        RunOnceSchedulableJob runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getAllValues().get(0);
+        verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
+        RunOnceSchedulableJob runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
         assertEquals(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, runOnceSchedulableJob.getMotechEvent().getSubject());
         assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
         ProcessSubscriptionRequest processSubscriptionRequest = (ProcessSubscriptionRequest) runOnceSchedulableJob.getMotechEvent().getParameters().get("0");
@@ -143,23 +143,5 @@ public class KilkariSubscriptionServiceTest {
 
         assertEquals(subscriptionId, deactivationRequest.getSubscriptionId());
         assertEquals(Channel.CALL_CENTER, deactivationRequest.getChannel());
-    }
-
-    @Test
-    public void shouldScheduleAInboxDeletionEvent() {
-        String subscriptionId = "subscriptionId";
-        DateTime now = DateTime.now();
-        Subscription mockedSubscription = mock(Subscription.class);
-        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
-
-        kilkariSubscriptionService.processSubscriptionCompletion(mockedSubscription);
-
-        ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
-        verify(motechSchedulerService, times(2)).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
-        RunOnceSchedulableJob runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getAllValues().get(1);
-        assertEquals(SubscriptionEventKeys.DELETE_INBOX, runOnceSchedulableJob.getMotechEvent().getSubject());
-        assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
-        assertEquals(ProcessSubscriptionRequest.class, runOnceSchedulableJob.getMotechEvent().getParameters().get("0").getClass());
-        assertEquals(now.plusDays(8).toDate(), runOnceSchedulableJob.getStartDate());
     }
 }

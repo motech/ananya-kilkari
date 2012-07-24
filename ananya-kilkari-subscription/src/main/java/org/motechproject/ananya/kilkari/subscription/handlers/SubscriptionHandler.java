@@ -57,11 +57,4 @@ public class SubscriptionHandler {
         onMobileSubscriptionGateway.deactivateSubscription(processSubscriptionRequest);
         subscriptionService.subscriptionComplete(processSubscriptionRequest.getSubscriptionId());
     }
-
-    @MotechListener(subjects = {SubscriptionEventKeys.DELETE_INBOX})
-    public void handleInboxDeletion(MotechEvent event) {
-        ProcessSubscriptionRequest processSubscriptionRequest = (ProcessSubscriptionRequest) event.getParameters().get("0");
-        logger.info(String.format("Handling inbox deletion event for subscriptionid: %s, msisdn: %s, pack: %s", processSubscriptionRequest.getSubscriptionId(), processSubscriptionRequest.getMsisdn(), processSubscriptionRequest.getPack()));
-        subscriptionService.deleteInbox(processSubscriptionRequest.getSubscriptionId());
-    }
 }

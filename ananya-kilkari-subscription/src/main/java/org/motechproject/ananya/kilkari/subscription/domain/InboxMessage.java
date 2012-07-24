@@ -31,7 +31,7 @@ public class InboxMessage extends MotechBaseDataObject {
     }
 
     @JsonIgnore
-    public void setMessageId(String messageId) {
+    public void update(String messageId) {
         this.messageId = messageId;
     }
 }

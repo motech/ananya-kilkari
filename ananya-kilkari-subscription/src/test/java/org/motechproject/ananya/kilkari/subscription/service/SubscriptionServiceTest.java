@@ -47,11 +47,13 @@ public class SubscriptionServiceTest {
     private ReportingServiceImpl reportingServiceImpl;
     @Mock
     private AllInboxMessages allInboxMessages;
+    @Mock
+    private KilkariInboxService kilkariInboxService;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionRequestValidator, reportingServiceImpl, allInboxMessages);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionRequestValidator, reportingServiceImpl, allInboxMessages, kilkariInboxService);
     }
 
     @Test
@@ -412,12 +414,25 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldDeleteInbox(){
-        String subscriptionId = "subscriptionId";
+    public void shouldScheduleInboxDeletionUponSubscriptionCompletion() {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.SEVEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.deleteInbox(subscriptionId);
+        subscriptionService.subscriptionComplete(subscriptionId);
+        
+        verify(kilkariInboxService).scheduleInboxDeletion(subscription);
+    }
 
-        verify(allInboxMessages).deleteFor(subscriptionId);
+    @Test
+    public void shouldScheduleInboxDeletionUponSubscriptionDeactivation() {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.SEVEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.deactivateSubscription(subscriptionId, DateTime.now(), null, null);
+
+        verify(kilkariInboxService).scheduleInboxDeletion(subscription);
     }
 
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {

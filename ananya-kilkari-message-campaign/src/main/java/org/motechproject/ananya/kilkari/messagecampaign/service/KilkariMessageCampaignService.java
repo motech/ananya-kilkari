@@ -57,12 +57,13 @@ public class KilkariMessageCampaignService {
         List<CampaignEnrollmentRecord> enrollmentRecords = campaignService.search(
                 new CampaignEnrollmentsQuery().withExternalId(externalId).withCampaignName(campaignName));
 
+        if (enrollmentRecords.isEmpty())
+            return null;
+
         CampaignEnrollmentRecord campaignEnrollmentRecord = enrollmentRecords.get(0);
-        return enrollmentRecords.size() > 0
-                ? new MessageCampaignEnrollment(campaignEnrollmentRecord.getExternalId(),
+        return new MessageCampaignEnrollment(campaignEnrollmentRecord.getExternalId(),
                 campaignEnrollmentRecord.getCampaignName(), campaignEnrollmentRecord.getStartDate(),
-                campaignEnrollmentRecord.getStatus())
-                : null;
+                campaignEnrollmentRecord.getStatus());
     }
 
     public List<DateTime> getMessageTimings(String subscriptionId, String packName, DateTime startDate, DateTime endDate) {

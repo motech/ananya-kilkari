@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.repository;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.utils.SpringIntegrationTest;
@@ -26,7 +27,7 @@ public class AllCampaignMessageAlertsIT extends SpringIntegrationTest {
         CampaignMessageAlert expectedCampaignMessage = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
         assertEquals(subscriptionId, expectedCampaignMessage.getSubscriptionId());
         assertEquals(messageId, expectedCampaignMessage.getMessageId());
-        assertEquals(messageExpiryDate, expectedCampaignMessage.getMessageExpiryDate());
+        assertEquals(messageExpiryDate.withZone(DateTimeZone.UTC), expectedCampaignMessage.getMessageExpiryDate());
         assertTrue(expectedCampaignMessage.isRenewed());
     }
 }

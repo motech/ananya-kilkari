@@ -32,4 +32,15 @@ public class CallbackRequestWrapperTest {
         Integer graceCount = callbackRequestWrapper.getGraceCount();
         assertNull(graceCount);
     }
+
+    @Test
+    public void shouldReturnNullGraceCountIfEmpty() {
+        String graceCountString = "";
+        CallbackRequest callbackRequest = mock(CallbackRequest.class);
+        when(callbackRequest.getGraceCount()).thenReturn(graceCountString);
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now());
+
+        Integer graceCount = callbackRequestWrapper.getGraceCount();
+        assertNull(graceCount);
+    }
 }

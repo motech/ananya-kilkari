@@ -6,7 +6,6 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.motechproject.model.MotechBaseDataObject;
 
 @TypeDiscriminator("doc.type === 'CampaignMessageAlert'")
@@ -54,7 +53,7 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
     }
 
     public DateTime getMessageExpiryDate() {
-        return messageExpiryDate == null ? null : messageExpiryDate.withZone(DateTimeZone.getDefault());
+        return messageExpiryDate;
     }
 
     public boolean canBeScheduled(CampaignTriggerType campaignTriggerType) {

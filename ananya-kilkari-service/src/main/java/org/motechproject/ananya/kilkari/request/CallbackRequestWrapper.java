@@ -46,6 +46,8 @@ public class CallbackRequestWrapper implements Serializable {
     }
 
     public Integer getGraceCount() {
-        return StringUtils.isNumeric(callbackRequest.getGraceCount()) ? Integer.valueOf(callbackRequest.getGraceCount()) : null;
+        return (StringUtils.isNotBlank(callbackRequest.getGraceCount()) && StringUtils.isNumeric(callbackRequest.getGraceCount()))
+                ? Integer.valueOf(callbackRequest.getGraceCount())
+                : null;
     }
 }

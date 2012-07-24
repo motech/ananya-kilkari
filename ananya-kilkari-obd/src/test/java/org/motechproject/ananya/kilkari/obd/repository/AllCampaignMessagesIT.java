@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.repository;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
@@ -33,8 +34,8 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
     public void setUp() {
         allCampaignMessages.removeAll();
 
-        weekEndingDate1 = DateTime.now().plusDays(2);
-        weekEndingDate2 = DateTime.now().minusDays(2);
+        weekEndingDate1 = DateTime.now().withZone(DateTimeZone.UTC).plusDays(2);
+        weekEndingDate2 = DateTime.now().withZone(DateTimeZone.UTC).minusDays(2);
         
         newCampaignMessage = new CampaignMessage("subscriptionId1", "messageId1", "1234657980", "operator1", weekEndingDate1);
 

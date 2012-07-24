@@ -54,7 +54,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         assertEquals(messageId, campaignMessage.getMessageId());
         assertEquals(msisdn, campaignMessage.getMsisdn());
         assertEquals(operator, campaignMessage.getOperator());
-        assertEquals(weekEndingDate, campaignMessage.getWeekEndingDate());
+        assertEquals(weekEndingDate.withZone(DateTimeZone.UTC), campaignMessage.getWeekEndingDate());
     }
 
     @Test

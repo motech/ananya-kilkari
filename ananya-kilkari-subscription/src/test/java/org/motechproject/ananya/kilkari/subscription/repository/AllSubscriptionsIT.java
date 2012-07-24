@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.repository;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -34,7 +35,7 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         assertNotNull(subscriptionFromDb.getSubscriptionId());
         assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptionFromDb.getPack());
         assertEquals(SubscriptionStatus.NEW, subscriptionFromDb.getStatus());
-        assertEquals(createdAt, subscriptionFromDb.getCreationDate());
+        assertEquals(createdAt.withZone(DateTimeZone.UTC), subscriptionFromDb.getCreationDate());
     }
 
     @Test

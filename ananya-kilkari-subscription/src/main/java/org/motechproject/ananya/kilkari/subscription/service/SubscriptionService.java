@@ -104,6 +104,7 @@ public class SubscriptionService {
             @Override
             public void perform(Subscription subscription) {
                 subscription.deactivationRequestSent();
+                kilkariInboxService.scheduleInboxDeletion(subscription);
             }
         });
     }

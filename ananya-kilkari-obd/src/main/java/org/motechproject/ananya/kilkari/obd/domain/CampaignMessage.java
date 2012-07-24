@@ -3,7 +3,6 @@ package org.motechproject.ananya.kilkari.obd.domain;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
 
@@ -49,7 +48,7 @@ public class CampaignMessage extends MotechBaseDataObject {
     }
 
     public DateTime getWeekEndingDate() {
-        return weekEndingDate.withZone(DateTimeZone.getDefault());
+        return weekEndingDate;
     }
 
     public String getSubscriptionId() {

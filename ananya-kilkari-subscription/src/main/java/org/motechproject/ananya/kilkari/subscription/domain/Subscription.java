@@ -8,7 +8,6 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Weeks;
 import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
@@ -55,7 +54,7 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     public DateTime getCreationDate() {
-        return creationDate == null ? null : creationDate.withZone(DateTimeZone.getDefault());
+        return creationDate;
     }
 
     public SubscriptionStatus getStatus() {

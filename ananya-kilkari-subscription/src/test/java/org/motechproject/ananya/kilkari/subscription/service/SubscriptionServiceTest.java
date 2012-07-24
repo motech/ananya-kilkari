@@ -435,6 +435,17 @@ public class SubscriptionServiceTest {
         verify(kilkariInboxService).scheduleInboxDeletion(subscription);
     }
 
+    @Test
+    public void shouldScheduleInboxDeletionWhenDeactivationOfSubscriptionWasRequested() {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.SEVEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.deactivationRequested(subscriptionId);
+
+        verify(kilkariInboxService).scheduleInboxDeletion(subscription);
+    }
+
     private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {
         return new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).build();
     }

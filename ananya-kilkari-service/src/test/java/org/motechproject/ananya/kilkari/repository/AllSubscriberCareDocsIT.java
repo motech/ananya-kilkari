@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.repository;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareDoc;
@@ -37,7 +38,7 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
         assertNotNull(subscriberCareDocs);
         assertEquals(msisdn, subscriberCareDocs.getMsisdn());
         assertEquals(reason, subscriberCareDocs.getReason());
-        assertEquals(createdAt, subscriberCareDocs.getCreatedAt());
+        assertEquals(createdAt.withZone(DateTimeZone.UTC), subscriberCareDocs.getCreatedAt());
     }
 
     @Test
@@ -62,6 +63,6 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
 
         List<SubscriberCareDoc> subscriberCareDocs = allSubscriberCareDocs.getAll();
         assertEquals(1, subscriberCareDocs.size());
-        assertEquals(createdAt, subscriberCareDocs.get(0).getCreatedAt());
+        assertEquals(createdAt.withZone(DateTimeZone.UTC), subscriberCareDocs.get(0).getCreatedAt());
     }
 }

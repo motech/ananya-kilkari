@@ -27,7 +27,10 @@
         <constructor-arg ref="obdDbInstance"/>
     </bean>
 
-    <bean id="obdHttpClient" class="org.apache.http.impl.client.DefaultHttpClient" />
+    <bean id="obdHttpClientConnectionManager" class="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager"/>
+    <bean id="obdHttpClient" class="org.apache.http.impl.client.DefaultHttpClient">
+        <constructor-arg ref="obdHttpClientConnectionManager" />
+    </bean>
 
     <bean id="kilkariRestTemplate" class="org.springframework.web.client.RestTemplate" autowire="byName"/>
 </beans>

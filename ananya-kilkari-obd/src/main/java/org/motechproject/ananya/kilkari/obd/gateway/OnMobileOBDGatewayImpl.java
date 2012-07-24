@@ -46,17 +46,20 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     @Override
     public void sendNewMessages(String content) {
         String url = obdProperties.getMessageDeliveryBaseUrl();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
-        String date = dateTimeFormatter.print(DateTime.now());
+        String date = getCurrentDate();
         send(content, url, String.format("%s%s", date, obdProperties.getNewMessageSlotStartTime()), String.format("%s%s", date, obdProperties.getNewMessageSlotEndTime()));
     }
 
     @Override
     public void sendRetryMessages(String content) {
         String url = obdProperties.getMessageDeliveryBaseUrl();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
-        String date = dateTimeFormatter.print(DateTime.now());
+        String date = getCurrentDate();
         send(content, url, String.format("%s%s", date, obdProperties.getRetryMessageSlotStartTime()), String.format("%s%s", date, obdProperties.getRetryMessageSlotEndTime()));
+    }
+
+    private String getCurrentDate() {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
+        return dateTimeFormatter.print(DateTime.now());
     }
 
     @Override
@@ -73,10 +76,6 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
         HttpPost httpPost = new HttpPost(url);
         MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
         reqEntity.addPart(file, new ByteArrayBody(content.getBytes(), "text/plain", fileName));
-
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
-        String date = dateTimeFormatter.print(DateTime.now());
-
 
         try {
             reqEntity.addPart(START_DATE_PARAM_NAME, new StringBody(slotStartDate));

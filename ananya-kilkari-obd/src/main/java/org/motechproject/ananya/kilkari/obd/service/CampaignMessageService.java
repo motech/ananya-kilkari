@@ -96,7 +96,7 @@ public class CampaignMessageService {
     }
 
     private void updateCampaignMessageStatus(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
-        if (hasReachedMaximumRetries(campaignMessage))
+        if (hasReachedMaximumRetries(campaignMessage, statusCode))
             allCampaignMessages.delete(campaignMessage);
         else {
             campaignMessage.setStatusCode(statusCode);
@@ -104,9 +104,9 @@ public class CampaignMessageService {
         }
     }
 
-    private boolean hasReachedMaximumRetries(CampaignMessage campaignMessage) {
-        return campaignMessage.getDnpRetryCount() == obdProperties.getMaximumDNPRetryCount() ||
-                campaignMessage.getDncRetryCount() == obdProperties.getMaximumDNCRetryCount();
+    private boolean hasReachedMaximumRetries(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
+        return (campaignMessage.getDnpRetryCount() == obdProperties.getMaximumDNPRetryCount() && statusCode == CampaignMessageStatus.DNP) ||
+                (campaignMessage.getDncRetryCount() == obdProperties.getMaximumDNCRetryCount() && statusCode == CampaignMessageStatus.DNC);
     }
 
     private void sendMessagesToOBD(List<CampaignMessage> messages, GatewayAction gatewayAction) {

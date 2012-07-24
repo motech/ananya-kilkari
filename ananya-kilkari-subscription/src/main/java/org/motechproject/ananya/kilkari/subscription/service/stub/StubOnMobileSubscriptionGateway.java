@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 public class StubOnMobileSubscriptionGateway implements OnMobileSubscriptionGateway {
 
     private OnMobileSubscriptionGateway behavior;
+    private boolean isDeactivateSubscriptionCalled;
 
     @Override
     public void activateSubscription(ProcessSubscriptionRequest processSubscriptionRequest) {
@@ -22,6 +23,7 @@ public class StubOnMobileSubscriptionGateway implements OnMobileSubscriptionGate
     public void deactivateSubscription(ProcessSubscriptionRequest processSubscriptionRequest) {
         if (verify()) {
             behavior.deactivateSubscription(processSubscriptionRequest);
+            isDeactivateSubscriptionCalled = true;
         }
     }
 
@@ -35,5 +37,9 @@ public class StubOnMobileSubscriptionGateway implements OnMobileSubscriptionGate
             return false;
         }
         return true;
+    }
+
+    public boolean isDeactivateSubscriptionCalled() {
+        return isDeactivateSubscriptionCalled;
     }
 }

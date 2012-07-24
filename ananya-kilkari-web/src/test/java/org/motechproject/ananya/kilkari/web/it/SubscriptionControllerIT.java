@@ -10,21 +10,19 @@ import org.motechproject.ananya.kilkari.messagecampaign.service.KilkariMessageCa
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
+import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.TestUtils;
+import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
-import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.server.MvcResult;
@@ -35,8 +33,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.motechproject.ananya.kilkari.web.MVCTestUtils.mockMvc;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.server.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 
@@ -216,6 +213,63 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
                 subscription.getSubscriptionId(), pack.name(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
         assertEquals(60, messageTimings.size());
     }
+
+    @Test
+    public void shouldDeactivateSubscriptionForTheGivenMsisdnForTheCallCentreChannel() throws Exception {
+        final String msisdn = "1111111111";
+        String channelString = Channel.CALL_CENTER.toString();
+        final SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
+        BaseResponse expectedResponse = new BaseResponse("SUCCESS", "Subscription unsubscribed successfully");
+
+        reportingService.setBehavior(Mockito.mock(ReportingService.class));
+        OnMobileSubscriptionGateway onMobileSubscriptionGateway = mock(OnMobileSubscriptionGateway.class);
+        onMobileSubscriptionService.setBehavior(onMobileSubscriptionGateway);
+
+        UnsubscriptionRequest expectedUnsubscriptionRequest = new UnsubscriptionRequest();
+        expectedUnsubscriptionRequest.setChannel(Channel.CALL_CENTER.name());
+        expectedUnsubscriptionRequest.setReason("Reason for deactivation");
+
+        Subscription expectedSubscription = new Subscription(msisdn, pack, DateTime.now().minusMonths(15));
+        expectedSubscription.setStatus(SubscriptionStatus.ACTIVE);
+        allSubscriptions.add(expectedSubscription);
+        markForDeletion(expectedSubscription);
+
+        final String subscriptionId = expectedSubscription.getSubscriptionId();
+
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(delete("/subscription/" + subscriptionId).body(TestUtils.toJson(expectedUnsubscriptionRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andReturn();
+
+
+        String responseString = result.getResponse().getContentAsString();
+        responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
+
+        BaseResponse actualResponse =  TestUtils.fromJson(responseString, BaseResponse.class);
+        assertTrue(expectedResponse.equals(actualResponse));
+
+        Boolean statusChanged = new TimedRunner<Boolean>(20, 1000) {
+            @Override
+            Boolean run() {
+                Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+                return subscription.getStatus() == SubscriptionStatus.PENDING_DEACTIVATION ? Boolean.TRUE : null;
+
+            }
+        }.execute();
+
+        Boolean deactivationRequested = new TimedRunner<Boolean>(20, 1000) {
+            @Override
+            Boolean run() {
+                return onMobileSubscriptionService.isDeactivateSubscriptionCalled() ? Boolean.TRUE : null;
+
+            }
+        }.execute();
+
+        assertNotNull(statusChanged);
+        assertNotNull(deactivationRequested);
+    }
+
 
     private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {
         if (Channel.isIVR(channel)) {

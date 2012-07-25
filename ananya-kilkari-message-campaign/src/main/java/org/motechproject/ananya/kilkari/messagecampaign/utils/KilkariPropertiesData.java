@@ -31,8 +31,4 @@ public class KilkariPropertiesData {
 
     }
 
-    public int getBufferDaysToAllowInboxAccess() {
-        return Integer.parseInt(kilkariProperties.getProperty("buffer.days.to.allow.inbox.access"));
-
-    }
 }

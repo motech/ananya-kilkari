@@ -23,7 +23,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-@Ignore
 public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest {
 
     @Autowired

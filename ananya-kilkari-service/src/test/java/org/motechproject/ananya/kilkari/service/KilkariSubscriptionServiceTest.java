@@ -1,8 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -18,8 +16,6 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscri
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
-
-import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -40,20 +36,13 @@ public class KilkariSubscriptionServiceTest {
     private SubscriptionStateHandlerFactory subscriptionStateHandlerFactory;
     @Mock
     private MotechSchedulerService motechSchedulerService;
-
     @Mock
-    private KilkariPropertiesData kilkariProperties;
+    private KilkariPropertiesData kilkariPropertiesData;
 
     @Before
     public void setup() {
         initMocks(this);
-        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, kilkariMessageCampaignService, motechSchedulerService,kilkariProperties);
-        DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
-    }
-
-    @After
-    public void clear() {
-        DateTimeUtils.setCurrentMillisSystem();
+        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, kilkariMessageCampaignService, motechSchedulerService,kilkariPropertiesData);
     }
 
     @Test
@@ -120,25 +109,19 @@ public class KilkariSubscriptionServiceTest {
         DateTime now = DateTime.now();
         Subscription mockedSubscription = mock(Subscription.class);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
-        when(kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion()).thenReturn(3);
+         when(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).thenReturn(3);
 
         kilkariSubscriptionService.processSubscriptionCompletion(mockedSubscription);
 
         ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
-        verify(motechSchedulerService,times(2)).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
-        List<RunOnceSchedulableJob> runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getAllValues();
-
-        RunOnceSchedulableJob subscriptionCompletionJob = runOnceSchedulableJob.get(0);
-        RunOnceSchedulableJob inboxDeletionJob = runOnceSchedulableJob.get(1);
-
-        assertEquals(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, subscriptionCompletionJob.getMotechEvent().getSubject());
-        assertEquals(subscriptionId, subscriptionCompletionJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
-        ProcessSubscriptionRequest processSubscriptionRequest = (ProcessSubscriptionRequest) subscriptionCompletionJob.getMotechEvent().getParameters().get("0");
+        verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
+        RunOnceSchedulableJob runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
+        assertEquals(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, runOnceSchedulableJob.getMotechEvent().getSubject());
+        assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
+        ProcessSubscriptionRequest processSubscriptionRequest = (ProcessSubscriptionRequest) runOnceSchedulableJob.getMotechEvent().getParameters().get("0");
         assertEquals(ProcessSubscriptionRequest.class, processSubscriptionRequest.getClass());
-        assertEquals(now.plusDays(3).toDate(), subscriptionCompletionJob.getStartDate());
+        assertEquals(now.plusDays(3).toString("dd-mm-yyyy"), new DateTime(runOnceSchedulableJob.getStartDate()).toString("dd-mm-yyyy"));
         assertEquals(Channel.MOTECH,processSubscriptionRequest.getChannel());
-
-        assertEquals(SubscriptionEventKeys.DELETE_INBOX, inboxDeletionJob.getMotechEvent().getSubject());
     }
 
     @Test

@@ -19,7 +19,6 @@ public class KilkariPropertiesDataIT {
         assertEquals(3,kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion());
         assertEquals(2,kilkariProperties.getCampaignScheduleDeltaDays());
         assertEquals(30,kilkariProperties.getCampaignScheduleDeltaMinutes());
-        assertEquals(7,kilkariProperties.getBufferDaysToAllowInboxAccess());
 
     }
 

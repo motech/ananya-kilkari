@@ -12,10 +12,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.domain.CallbackStatus;
-import org.motechproject.ananya.kilkari.request.CallbackRequest;
-import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
-import org.motechproject.ananya.kilkari.request.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
+import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -30,6 +27,7 @@ import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
+import org.motechproject.ananya.kilkari.web.validators.CampaignChangeRequestValidator;
 import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
 import org.springframework.http.MediaType;
 
@@ -62,13 +60,15 @@ public class SubscriptionControllerTest {
     private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
     @Mock
     private SubscriptionDetailsMapper mockedSubscriptionDetailsMapper;
+    @Mock
+    private CampaignChangeRequestValidator campaignChangeRequestValidator;
 
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, callbackRequestValidator, unsubscriptionRequestValidator, mockedSubscriptionDetailsMapper);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService, callbackRequestValidator, unsubscriptionRequestValidator, mockedSubscriptionDetailsMapper, campaignChangeRequestValidator);
     }
 
     @Test
@@ -362,6 +362,43 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andExpect(content().string(baseResponseMatcher("ERROR", "some error description1,some error description2")));
+    }
+
+    @Test
+    public void shouldProcessValidCampaignChangeRequest() throws Exception {
+        CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
+        campaignChangeRequest.setSubscriptionId("subscriptionId");
+        campaignChangeRequest.setReason("ID");
+        byte[] requestBody = TestUtils.toJson(campaignChangeRequest).getBytes();
+
+        when(campaignChangeRequestValidator.validate(any(CampaignChangeRequest.class))).thenReturn(new Errors());
+
+        mockMvc(subscriptionController)
+                .perform(post("/subscription/changecampaign")
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Campaign Change request submitted successfully")));
+    }
+
+    @Test
+    public void shouldValidateCampaignChangeRequest() throws Exception {
+        CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
+        campaignChangeRequest.setSubscriptionId("subscriptionId");
+        campaignChangeRequest.setReason("reason");
+        byte[] requestBody = TestUtils.toJson(campaignChangeRequest).getBytes();
+
+        Errors errors = new Errors();
+        errors.add("some error description1");
+        errors.add("some error description2");
+        when(campaignChangeRequestValidator.validate(any(CampaignChangeRequest.class))).thenReturn(errors);
+
+        mockMvc(subscriptionController)
+                .perform(post("/subscription/changecampaign")
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))

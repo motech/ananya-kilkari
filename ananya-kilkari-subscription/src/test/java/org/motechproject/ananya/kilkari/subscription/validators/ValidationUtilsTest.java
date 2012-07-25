@@ -137,4 +137,14 @@ public class ValidationUtilsTest {
     public void shouldNotReturnFalseWhenDateBeforeNow() {
         assertTrue(ValidationUtils.assertDateBefore(DateTime.now().minusDays(4), DateTime.now()));
     }
+
+    @Test
+    public void shouldReturnFalseWhenInvalidReasonIsGivenToChangeCampaign() {
+        assertFalse(ValidationUtils.assertCampaignChangeReason("Invalid-Reason"));
+    }
+
+    @Test
+    public void shouldReturnTrueWhenValidReasonIsGivenToChangeCampaign() {
+        assertTrue(ValidationUtils.assertCampaignChangeReason("ID"));
+    }
 }

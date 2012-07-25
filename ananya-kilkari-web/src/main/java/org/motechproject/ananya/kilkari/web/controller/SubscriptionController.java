@@ -1,18 +1,16 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.request.CallbackRequest;
-import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
-import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
+import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
+import org.motechproject.ananya.kilkari.web.validators.CampaignChangeRequestValidator;
 import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,15 +25,18 @@ public class SubscriptionController {
     private CallbackRequestValidator callbackRequestValidator;
     private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
     private SubscriptionDetailsMapper subscriptionDetailsMapper;
+    private CampaignChangeRequestValidator campaignChangeRequestValidator;
+
     @Autowired
     public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService,
                                   CallbackRequestValidator callbackRequestValidator,
                                   UnsubscriptionRequestValidator unsubscriptionRequestValidator,
-                                  SubscriptionDetailsMapper subscriptionDetailsMapper) {
+                                  SubscriptionDetailsMapper subscriptionDetailsMapper, CampaignChangeRequestValidator campaignChangeRequestValidator) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.callbackRequestValidator = callbackRequestValidator;
         this.unsubscriptionRequestValidator = unsubscriptionRequestValidator;
         this.subscriptionDetailsMapper = subscriptionDetailsMapper;
+        this.campaignChangeRequestValidator = campaignChangeRequestValidator;
     }
 
 
@@ -90,6 +91,15 @@ public class SubscriptionController {
 
         kilkariSubscriptionService.requestDeactivation(subscriptionId, unsubscriptionRequest);
         return BaseResponse.success("Subscription unsubscribed successfully");
+    }
+
+    @RequestMapping(value = "/subscription/changecampaign", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseResponse changeCampaign(@RequestBody CampaignChangeRequest campaignChangeRequest) {
+        Errors validationErrors = campaignChangeRequestValidator.validate(campaignChangeRequest);
+        raiseExceptionIfThereAreErrors(validationErrors);
+
+        return BaseResponse.success("Campaign Change request submitted successfully");
     }
 
     private void raiseExceptionIfThereAreErrors(Errors validationErrors) {

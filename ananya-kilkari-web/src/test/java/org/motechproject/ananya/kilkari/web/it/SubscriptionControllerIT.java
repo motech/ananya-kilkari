@@ -10,7 +10,7 @@ import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignS
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
-import org.motechproject.ananya.kilkari.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -19,7 +19,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
-import org.motechproject.ananya.kilkari.utils.SubscriptionRequestBuilder;
+import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.TestUtils;
@@ -170,9 +170,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         reportingService.setBehavior(mockedReportingService);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 
-        SubscriptionRequest expectedRequest = new SubscriptionRequestBuilder().withDefaults().build();
+        SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().build();
         MvcResult result = mockMvc(subscriptionController)
-                .perform(post("/subscription").body(TestUtils.toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .perform(post("/subscription").body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andReturn();

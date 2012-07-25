@@ -8,12 +8,13 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
-import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.domain.Location;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -38,7 +39,7 @@ public class SubscriptionValidatorTest {
 
     @Test
     public void shouldValidateIfLocationDoesNotExist() {
-        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
+        SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().build();
         Location location = subscription.getLocation();
         when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(null);
 
@@ -50,7 +51,7 @@ public class SubscriptionValidatorTest {
 
     @Test
     public void shouldValidateIfSubscriptionAlreadyExists() {
-        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
+        SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().build();
 
         SubscriberLocation existingLocation = new SubscriberLocation();
         Location location = subscription.getLocation();
@@ -67,7 +68,7 @@ public class SubscriptionValidatorTest {
 
     @Test
     public void shouldNotValidateLocationIfLocationIsCompletelyEmptyForCC() {
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withDistrict(null).withBlock(null).withPanchayat(null).build();
+        SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withDistrict(null).withBlock(null).withPanchayat(null).build();
 
         try {
             subscriptionValidator.validate(subscription);

@@ -5,11 +5,11 @@ import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.web.validators.CampaignChangeRequestValidator;
 import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,17 +42,17 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResponse createSubscriptionForIVR(SubscriptionRequest subscriptionRequest) {
-        subscriptionRequest.validateChannel();
-        kilkariSubscriptionService.createSubscriptionAsync(subscriptionRequest);
+    public BaseResponse createSubscriptionForIVR(SubscriptionWebRequest subscriptionWebRequest) {
+        subscriptionWebRequest.validateChannel();
+        kilkariSubscriptionService.createSubscriptionAsync(subscriptionWebRequest);
         return BaseResponse.success("Subscription request submitted successfully");
     }
 
     @RequestMapping(value = "/subscription", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResponse createSubscription(@RequestBody SubscriptionRequest subscriptionRequest) {
-        subscriptionRequest.validateChannel();
-        kilkariSubscriptionService.createSubscription(subscriptionRequest);
+    public BaseResponse createSubscription(@RequestBody SubscriptionWebRequest subscriptionWebRequest) {
+        subscriptionWebRequest.validateChannel();
+        kilkariSubscriptionService.createSubscription(subscriptionWebRequest);
         return BaseResponse.success("Subscription request submitted successfully");
     }
 

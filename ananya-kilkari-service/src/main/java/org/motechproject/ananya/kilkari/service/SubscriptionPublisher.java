@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.service;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.scheduler.context.EventContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,8 +18,8 @@ public class SubscriptionPublisher {
         this.eventContext = eventContext;
     }
 
-    public void createSubscription(SubscriptionRequest subscriptionRequest) {
-        eventContext.send(SubscriptionEventKeys.CREATE_SUBSCRIPTION, subscriptionRequest);
+    public void createSubscription(SubscriptionWebRequest subscriptionWebRequest) {
+        eventContext.send(SubscriptionEventKeys.CREATE_SUBSCRIPTION, subscriptionWebRequest);
     }
 
     public void processCallbackRequest(CallbackRequestWrapper callbackRequestWrapper) {

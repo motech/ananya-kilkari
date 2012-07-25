@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.utils;
+package org.motechproject.ananya.kilkari;
 
 import org.ektorp.BulkDeleteDocument;
 import org.ektorp.CouchDbConnector;

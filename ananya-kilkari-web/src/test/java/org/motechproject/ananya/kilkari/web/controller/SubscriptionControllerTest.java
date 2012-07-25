@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.request.*;
@@ -18,7 +19,6 @@ import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.utils.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.TestUtils;
@@ -203,35 +203,35 @@ public class SubscriptionControllerTest {
                 .andExpect(content().type(HttpHeaders.APPLICATION_JAVASCRIPT))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
 
-        ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
+        ArgumentCaptor<SubscriptionWebRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionWebRequest.class);
         verify(kilkariSubscriptionService).createSubscriptionAsync(subscriptionRequestArgumentCaptor.capture());
-        SubscriptionRequest subscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
+        SubscriptionWebRequest subscriptionWebRequest = subscriptionRequestArgumentCaptor.getValue();
 
-        assertEquals(msisdn, subscriptionRequest.getMsisdn());
-        assertEquals(pack, subscriptionRequest.getPack());
-        assertEquals(channel, subscriptionRequest.getChannel());
+        assertEquals(msisdn, subscriptionWebRequest.getMsisdn());
+        assertEquals(pack, subscriptionWebRequest.getPack());
+        assertEquals(channel, subscriptionWebRequest.getChannel());
 
-        assertCreatedAt(beforeCreate, subscriptionRequest);
+        assertCreatedAt(beforeCreate, subscriptionWebRequest);
     }
 
     @Test
     public void shouldCreateNewSubscriptionEventForCC() throws Exception {
         DateTime createdAt = DateTime.now();
 
-        SubscriptionRequest expectedRequest = new SubscriptionRequestBuilder().withDefaults().withCreatedAt(createdAt).build();
+        SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withCreatedAt(createdAt).build();
 
         mockMvc(subscriptionController)
-                .perform(post("/subscription").body(TestUtils.toJson(expectedRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .perform(post("/subscription").body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
 
-        ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
+        ArgumentCaptor<SubscriptionWebRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionWebRequest.class);
         verify(kilkariSubscriptionService).createSubscription(subscriptionRequestArgumentCaptor.capture());
-        SubscriptionRequest subscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
+        SubscriptionWebRequest subscriptionWebRequest = subscriptionRequestArgumentCaptor.getValue();
 
-        assertTrue(expectedRequest.equals(subscriptionRequest));
-        assertCreatedAt(createdAt, subscriptionRequest);
+        assertTrue(expectedWebRequest.equals(subscriptionWebRequest));
+        assertCreatedAt(createdAt, subscriptionWebRequest);
     }
 
     @Test
@@ -292,22 +292,22 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldValidateChannelOnSubscriptionCreationRequest_FromCC() {
-        SubscriptionRequest subscriptionRequest = mock(SubscriptionRequest.class);
-        when(subscriptionRequest.getChannel()).thenReturn("call_center");
+        SubscriptionWebRequest subscriptionWebRequest = mock(SubscriptionWebRequest.class);
+        when(subscriptionWebRequest.getChannel()).thenReturn("call_center");
 
-        subscriptionController.createSubscription(subscriptionRequest);
+        subscriptionController.createSubscription(subscriptionWebRequest);
 
-        verify(subscriptionRequest).validateChannel();
+        verify(subscriptionWebRequest).validateChannel();
     }
 
     @Test
     public void shouldValidateChannelOnSubscriptionCreationRequest_FromIVR() {
-        SubscriptionRequest subscriptionRequest = mock(SubscriptionRequest.class);
-        when(subscriptionRequest.getChannel()).thenReturn("ivr");
+        SubscriptionWebRequest subscriptionWebRequest = mock(SubscriptionWebRequest.class);
+        when(subscriptionWebRequest.getChannel()).thenReturn("ivr");
 
-        subscriptionController.createSubscriptionForIVR(subscriptionRequest);
+        subscriptionController.createSubscriptionForIVR(subscriptionWebRequest);
 
-        verify(subscriptionRequest).validateChannel();
+        verify(subscriptionWebRequest).validateChannel();
     }
 
     @Test
@@ -315,9 +315,9 @@ public class SubscriptionControllerTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid channel xyz");
 
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withChannel("xyz").build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withChannel("xyz").build();
 
-        subscriptionController.createSubscription(subscriptionRequest);
+        subscriptionController.createSubscription(subscriptionWebRequest);
     }
 
     @Test
@@ -418,8 +418,8 @@ public class SubscriptionControllerTest {
         when(mockedSubscriptionDetailsMapper.mapFrom(mockedSubscription)).thenReturn(new SubscriptionDetails(subscriptionId, subscriptionPack.name(), subscriptionStatus.name(), null));
     }
 
-    private void assertCreatedAt(DateTime beforeCreate, SubscriptionRequest subscriptionRequest) {
-        DateTime createdAt = subscriptionRequest.getCreatedAt();
+    private void assertCreatedAt(DateTime beforeCreate, SubscriptionWebRequest subscriptionWebRequest) {
+        DateTime createdAt = subscriptionWebRequest.getCreatedAt();
         DateTime afterCreate = DateTime.now();
         assertTrue(createdAt.isEqual(beforeCreate) || createdAt.isAfter(beforeCreate));
         assertTrue(createdAt.isEqual(afterCreate) || createdAt.isBefore(afterCreate));

@@ -8,9 +8,9 @@ import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
-import org.motechproject.ananya.kilkari.utils.SubscriptionRequestBuilder;
+import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
+import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.request.SubscriptionRequest;
 import org.motechproject.scheduler.context.EventContext;
 
 import static org.mockito.Mockito.verify;
@@ -32,11 +32,11 @@ public class SubscriptionPublisherTest {
 
     @Test
     public void shouldPublishSubscriptionCreationDataIntoQueue() {
-        SubscriptionRequest subscriptionRequest = createSubscriptionRequest("1234567890", "twelve-months", "ivr");
+        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", "twelve-months", "ivr");
 
-        subscriptionPublisher.createSubscription(subscriptionRequest);
+        subscriptionPublisher.createSubscription(subscriptionWebRequest);
 
-        verify(eventContext).send(SubscriptionEventKeys.CREATE_SUBSCRIPTION, subscriptionRequest);
+        verify(eventContext).send(SubscriptionEventKeys.CREATE_SUBSCRIPTION, subscriptionWebRequest);
     }
 
     @Test
@@ -57,8 +57,8 @@ public class SubscriptionPublisherTest {
         verify(eventContext).send(SubscriptionEventKeys.PROCESS_SUBSCRIBER_CARE_REQUEST, subscriberCareRequest);
     }
 
-    private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {
-        return new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).build();
+    private SubscriptionWebRequest createSubscriptionRequest(String msisdn, String pack, String channel) {
+        return new SubscriptionWebRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).build();
     }
 }
 

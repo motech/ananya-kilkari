@@ -5,13 +5,17 @@ import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
-import org.motechproject.ananya.kilkari.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.mappers.SubscriptionMapper;
+import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -48,25 +52,24 @@ public class KilkariSubscriptionService {
         this.kilkariProperties = kilkariProperties;
     }
 
-    public void createSubscriptionAsync(SubscriptionRequest subscriptionRequest) {
-        subscriptionPublisher.createSubscription(subscriptionRequest);
+    public void createSubscriptionAsync(SubscriptionWebRequest subscriptionWebRequest) {
+        subscriptionPublisher.createSubscription(subscriptionWebRequest);
     }
 
-    public void createSubscription(SubscriptionRequest subscriptionRequest) {
-        validateSubscriptionRequest(subscriptionRequest);
-        //TODO use domain requests instead of domain itself
-        Subscription subscription = new SubscriptionRequestMapper().createSubscription(subscriptionRequest);
+    public void createSubscription(SubscriptionWebRequest subscriptionWebRequest) {
+        validateSubscriptionRequest(subscriptionWebRequest);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestMapper().createSubscriptionDomainRequest(subscriptionWebRequest);
         try {
-            subscriptionService.createSubscription(subscription, Channel.from(subscriptionRequest.getChannel()));
+            subscriptionService.createSubscription(subscriptionRequest, Channel.from(subscriptionWebRequest.getChannel()));
         } catch (DuplicateSubscriptionException e) {
             LOGGER.warn(String.format("Subscription for msisdn[%s] and pack[%s] already exists.",
-                    subscriptionRequest.getMsisdn(), subscriptionRequest.getPack()));
+                    subscriptionWebRequest.getMsisdn(), subscriptionWebRequest.getPack()));
         }
     }
 
-    private void validateSubscriptionRequest(SubscriptionRequest subscriptionRequest) {
+    private void validateSubscriptionRequest(SubscriptionWebRequest subscriptionWebRequest) {
         Errors errors = new Errors();
-        subscriptionRequest.validate(errors);
+        subscriptionWebRequest.validate(errors);
         if (errors.hasErrors()) {
             throw new ValidationException(errors.allMessages());
         }

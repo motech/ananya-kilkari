@@ -4,10 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.utils.SubscriptionRequestBuilder;
+import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.request.SubscriptionRequest;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;
@@ -40,17 +40,17 @@ public class CreateSubscriptionHandlerTest {
 
         createSubscriptionHandler.handleCreateSubscription(new MotechEvent(SubscriptionEventKeys.CREATE_SUBSCRIPTION, parameters));
 
-        ArgumentCaptor<SubscriptionRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
+        ArgumentCaptor<SubscriptionWebRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionWebRequest.class);
         verify(kilkariSubscriptionService).createSubscription(subscriptionRequestArgumentCaptor.capture());
-        SubscriptionRequest subscriptionRequest = subscriptionRequestArgumentCaptor.getValue();
+        SubscriptionWebRequest subscriptionWebRequest = subscriptionRequestArgumentCaptor.getValue();
 
-        assertEquals(msisdn, subscriptionRequest.getMsisdn());
-        assertEquals(pack, subscriptionRequest.getPack());
-        assertEquals(channel, subscriptionRequest.getChannel());
+        assertEquals(msisdn, subscriptionWebRequest.getMsisdn());
+        assertEquals(pack, subscriptionWebRequest.getPack());
+        assertEquals(channel, subscriptionWebRequest.getChannel());
 
     }
 
-    private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {
-        return new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).build();
+    private SubscriptionWebRequest createSubscriptionRequest(String msisdn, String pack, String channel) {
+        return new SubscriptionWebRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).build();
     }
 }

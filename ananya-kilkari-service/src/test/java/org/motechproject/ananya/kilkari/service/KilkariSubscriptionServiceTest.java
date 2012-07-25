@@ -9,14 +9,15 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
-import org.motechproject.ananya.kilkari.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
-import org.motechproject.ananya.kilkari.utils.SubscriptionRequestBuilder;
+import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
@@ -60,9 +61,9 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldCreateSubscription() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
-        kilkariSubscriptionService.createSubscriptionAsync(subscriptionRequest);
-        verify(subscriptionPublisher).createSubscription(subscriptionRequest);
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequest();
+        kilkariSubscriptionService.createSubscriptionAsync(subscriptionWebRequest);
+        verify(subscriptionPublisher).createSubscription(subscriptionWebRequest);
     }
 
     @Test
@@ -74,45 +75,45 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldCreateSubscriptionRequestAsynchronously() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
-        subscriptionRequest.setCreatedAt(DateTime.now());
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequest();
+        subscriptionWebRequest.setCreatedAt(DateTime.now());
 
-        kilkariSubscriptionService.createSubscriptionAsync(subscriptionRequest);
+        kilkariSubscriptionService.createSubscriptionAsync(subscriptionWebRequest);
 
-        verify(subscriptionPublisher).createSubscription(subscriptionRequest);
+        verify(subscriptionPublisher).createSubscription(subscriptionWebRequest);
     }
 
     @Test
     public void shouldCreateSubscriptionSynchronously() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().build();
 
-        kilkariSubscriptionService.createSubscription(subscriptionRequest);
+        kilkariSubscriptionService.createSubscription(subscriptionWebRequest);
 
-        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
+        ArgumentCaptor<SubscriptionRequest> subscriptionArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
         verify(subscriptionService).createSubscription(subscriptionArgumentCaptor.capture(), eq(Channel.CALL_CENTER));
-        Subscription actualSubscription = subscriptionArgumentCaptor.getValue();
-        assertEquals(subscriptionRequest.getMsisdn(), actualSubscription.getMsisdn());
+        SubscriptionRequest actualSubscription = subscriptionArgumentCaptor.getValue();
+        assertEquals(subscriptionWebRequest.getMsisdn(), actualSubscription.getMsisdn());
     }
 
     @Test
     public void shouldValidateSubscriptionRequest() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withMsisdn("abcd").build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withMsisdn("abcd").build();
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid msisdn abcd");
 
-        kilkariSubscriptionService.createSubscription(subscriptionRequest);
+        kilkariSubscriptionService.createSubscription(subscriptionWebRequest);
 
-        verify(subscriptionService, never()).createSubscription(any(Subscription.class), any(Channel.class));
+        verify(subscriptionService, never()).createSubscription(any(SubscriptionRequest.class), any(Channel.class));
     }
 
     @Test
     public void shouldJustLogIfSubscriptionAlreadyExists() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().build();
 
-        when(subscriptionService.createSubscription(any(Subscription.class), any(Channel.class))).thenThrow(new DuplicateSubscriptionException(""));
+        when(subscriptionService.createSubscription(any(SubscriptionRequest.class), any(Channel.class))).thenThrow(new DuplicateSubscriptionException(""));
 
         try {
-            kilkariSubscriptionService.createSubscription(subscriptionRequest);
+            kilkariSubscriptionService.createSubscription(subscriptionWebRequest);
         } catch (Exception e) {
             Assert.fail("Unexpected Exception " + e.getMessage());
         }

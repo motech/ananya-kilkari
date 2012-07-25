@@ -14,12 +14,13 @@ import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignS
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl;
-import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class SubscriptionServiceTest {
         Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
+        SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
         Subscription createdSubscription = subscriptionService.createSubscription(subscription, channel);
 
@@ -79,17 +80,17 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldValidateSubscriptionRequestOnCreation() {
-        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().build();
 
-        subscriptionService.createSubscription(subscription, Channel.CALL_CENTER);
+        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
-        verify(subscriptionValidator).validate(subscription);
+        verify(subscriptionValidator).validate(any(SubscriptionRequest.class));
     }
 
     @Test
     public void shouldNotCreateSubscriptionIfValidationFails() {
-        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
-        doThrow(new ValidationException("")).when(subscriptionValidator).validate(subscription);
+        SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().build();
+        doThrow(new ValidationException("")).when(subscriptionValidator).validate(any(SubscriptionRequest.class));
 
         try {
             subscriptionService.createSubscription(subscription, Channel.CALL_CENTER);
@@ -109,7 +110,7 @@ public class SubscriptionServiceTest {
         Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
         ArgumentCaptor<MessageCampaignRequest> campaignRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
+        SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
         Subscription createdSubscription = subscriptionService.createSubscription(subscription, channel);
 
         verify(messageCampaignService).start(campaignRequestArgumentCaptor.capture());
@@ -127,7 +128,7 @@ public class SubscriptionServiceTest {
         Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
+        SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
         subscriptionService.createSubscription(subscription, channel);
 
@@ -144,7 +145,7 @@ public class SubscriptionServiceTest {
         Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
         ArgumentCaptor<OMSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
+        SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
         subscriptionService.createSubscription(subscription, channel);
 

@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.subscription.mappers;
+package org.motechproject.ananya.kilkari.subscription.service.mapper;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -6,10 +6,12 @@ import org.junit.Test;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -37,7 +39,7 @@ public class SubscriptionMapperTest {
 
     @Test
     public void shouldCreateReportingRequest() {
-        SubscriptionCreationReportRequest request = new SubscriptionMapper().createSubscriptionCreationReportRequest(subscription, channel);
+        SubscriptionCreationReportRequest request = new SubscriptionMapper().createSubscriptionCreationReportRequest(subscription, channel, Location.NULL, Subscriber.NULL);
 
         assertEquals(subscription.getMsisdn(), request.getMsisdn());
         assertEquals(subscription.getPack().name(), request.getPack());
@@ -47,33 +49,17 @@ public class SubscriptionMapperTest {
 
     @Test
     public void shouldCreateReportingRequest_WithLocation() {
-        subscription = new SubscriptionBuilder().withDefaults().withDistrict("district")
-                .withPanchayat("panchayat").withBlock("block").build();
+        subscription = new SubscriptionBuilder().withDefaults().build();
+        String panchayat = "panchayat";
+        String block = "block";
+        String district = "district";
+        Location location = new Location(district, block, panchayat);
 
-        SubscriptionCreationReportRequest request = new SubscriptionMapper().createSubscriptionCreationReportRequest(subscription, channel);
+        SubscriptionCreationReportRequest request = new SubscriptionMapper().createSubscriptionCreationReportRequest(subscription, channel, location, Subscriber.NULL);
 
-        SubscriberLocation location = request.getLocation();
-        assertEquals("panchayat", location.getPanchayat());
-        assertEquals("block", location.getBlock());
-        assertEquals("district", location.getDistrict());
-    }
-
-    @Test
-    public void shouldCreateReportingRequest_WithSubscriberDetails() {
-        DateTime dob = DateTime.now();
-        DateTime edd = DateTime.now().minusDays(10);
-
-        subscription = new SubscriptionBuilder().withDefaults().withBeneficiaryName("name")
-                .withBeneficiaryAge(10)
-                .withDateOfBirth(dob)
-                .withExpectedDateOfDelivery(edd)
-                .build();
-
-        SubscriptionCreationReportRequest request = new SubscriptionMapper().createSubscriptionCreationReportRequest(subscription, channel);
-
-        assertEquals("name", request.getName());
-        assertEquals(10, request.getAgeOfBeneficiary());
-        assertEquals(dob, request.getDob());
-        assertEquals(edd, request.getEdd());
+        SubscriberLocation actualLocation = request.getLocation();
+        assertEquals(panchayat, actualLocation.getPanchayat());
+        assertEquals(block, actualLocation.getBlock());
+        assertEquals(district, actualLocation.getDistrict());
     }
 }

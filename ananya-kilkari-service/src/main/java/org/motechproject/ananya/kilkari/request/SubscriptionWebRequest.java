@@ -16,8 +16,7 @@ import org.motechproject.common.domain.PhoneNumber;
 
 import java.io.Serializable;
 
-public class SubscriptionRequest implements Serializable {
-
+public class SubscriptionWebRequest implements Serializable {
     @JsonProperty
     private String msisdn;
     @JsonProperty
@@ -37,7 +36,7 @@ public class SubscriptionRequest implements Serializable {
     @JsonProperty
     private LocationRequest location;
 
-    public SubscriptionRequest() {
+    public SubscriptionWebRequest() {
         this.location = new LocationRequest();
         this.createdAt = DateTime.now();
     }
@@ -101,7 +100,6 @@ public class SubscriptionRequest implements Serializable {
     public LocationRequest getLocation() {
         return location;
     }
-
 
     public void setDistrict(String district) {
         location.setDistrict(district);
@@ -233,9 +231,9 @@ public class SubscriptionRequest implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SubscriptionRequest)) return false;
+        if (!(o instanceof SubscriptionWebRequest)) return false;
 
-        SubscriptionRequest that = (SubscriptionRequest) o;
+        SubscriptionWebRequest that = (SubscriptionWebRequest) o;
 
         return new EqualsBuilder()
                 .append(this.msisdn, that.msisdn)

@@ -9,9 +9,10 @@ import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.mappers.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +43,17 @@ public class SubscriptionService {
         this.messageCampaignService = messageCampaignService;
     }
 
-    public Subscription createSubscription(Subscription subscription, Channel channel) {
-        subscriptionValidator.validate(subscription);
+    public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
+        subscriptionValidator.validate(subscriptionRequest);
+        Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), subscriptionRequest.getCreationDate());
         allSubscriptions.add(subscription);
 
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper();
 
         scheduleCampaign(subscription);
         onMobileSubscriptionManagerPublisher.sendActivationRequest(subscriptionMapper.createOMSubscriptionRequest(subscription, channel));
-        reportingService.reportSubscriptionCreation(subscriptionMapper.createSubscriptionCreationReportRequest(subscription, channel));
+        reportingService.reportSubscriptionCreation(
+                subscriptionMapper.createSubscriptionCreationReportRequest(subscription, channel, subscriptionRequest.getLocation(), subscriptionRequest.getSubscriber()));
 
         return subscription;
     }

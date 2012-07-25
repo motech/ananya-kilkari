@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.subscription.domain;
+package org.motechproject.ananya.kilkari.subscription.service.request;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -9,10 +9,10 @@ public class Location {
     private String district;
     public static final Location NULL = new Location();
 
-    public Location(String panchayat, String block, String district) {
-        this.panchayat = panchayat;
-        this.block = block;
+    public Location(String district, String block, String panchayat) {
         this.district = district;
+        this.block = block;
+        this.panchayat = panchayat;
     }
 
     private Location() {

@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.utils.SpringIntegrationTest;
+import org.motechproject.ananya.kilkari.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

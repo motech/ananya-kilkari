@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.subscription.domain;
+package org.motechproject.ananya.kilkari.subscription.service.request;
 
 import org.joda.time.DateTime;
 

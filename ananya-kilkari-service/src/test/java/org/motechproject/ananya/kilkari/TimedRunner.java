@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.utils;
+package org.motechproject.ananya.kilkari;
 
 public abstract class TimedRunner<T> {
 

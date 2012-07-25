@@ -34,12 +34,6 @@ public class Subscription extends MotechBaseDataObject {
     @JsonProperty
     private SubscriptionPack pack;
 
-    @JsonIgnore
-    private Location location;
-
-    @JsonIgnore
-    private Subscriber subscriber;
-
     public Subscription() {
     }
 
@@ -194,27 +188,5 @@ public class Subscription extends MotechBaseDataObject {
 
     public boolean hasBeenActivated() {
         return status.hasBeenActivated();
-    }
-
-    public boolean hasLocation() {
-        return !Location.NULL.equals(getLocation());
-    }
-
-    @JsonIgnore
-    public Location getLocation() {
-        return location == null ? Location.NULL : location;
-    }
-
-    @JsonIgnore
-    public Subscriber getSubscriber() {
-        return subscriber == null ? Subscriber.NULL : subscriber;
-    }
-
-    public void setSubscriber(Subscriber subscriber) {
-        this.subscriber = subscriber;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
     }
 }

@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.gateway;
 
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
-import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

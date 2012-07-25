@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service.stub;
 
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
-import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.springframework.stereotype.Service;
 

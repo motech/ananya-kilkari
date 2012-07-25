@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.subscription.domain;
+package org.motechproject.ananya.kilkari.request;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -7,9 +7,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
+import org.motechproject.ananya.kilkari.utils.SubscriptionRequestBuilder;
 
 import static org.junit.Assert.*;
 

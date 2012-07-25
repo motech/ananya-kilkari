@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.mapper;
 
+import org.motechproject.ananya.kilkari.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 
 public class SubscriptionRequestMapper {

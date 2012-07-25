@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.subscription.mappers;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionDetails;
-import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Location;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscriber;

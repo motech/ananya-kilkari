@@ -28,7 +28,7 @@
                         <configuration>
                             <target>
                                 <copy todir="${project.build.outputDirectory}">
-                                    <fileset dir="${project.basedir}/../ananya-kilkari-config/src/main/resources" />
+                                    <fileset dir="${project.basedir}/../ananya-kilkari-config/src/main/resources"/>
                                 </copy>
                             </target>
                         </configuration>
@@ -78,6 +78,13 @@
             <groupId>org.motechproject.ananya.kilkari</groupId>
             <artifactId>ananya-kilkari-service</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
+            <artifactId>ananya-kilkari-service</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

@@ -15,8 +15,7 @@ import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationRep
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
-import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
@@ -43,8 +42,6 @@ public class SubscriptionServiceTest {
     private AllSubscriptions allSubscriptions;
     @Mock
     private OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher;
-    @Mock
-    private SubscriptionRequest mockedSubscriptionRequest;
     @Mock
     private SubscriptionValidator subscriptionValidator;
     @Mock
@@ -492,10 +489,6 @@ public class SubscriptionServiceTest {
         subscriptionService.deactivationRequested(subscriptionId);
 
         verify(kilkariInboxService).scheduleInboxDeletion(subscription);
-    }
-
-    private SubscriptionRequest createSubscriptionRequest(String msisdn, String pack, String channel) {
-        return new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).withChannel(channel).build();
     }
 }
 

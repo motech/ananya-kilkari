@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.handlers;
 
-import org.motechproject.ananya.kilkari.subscription.contract.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;

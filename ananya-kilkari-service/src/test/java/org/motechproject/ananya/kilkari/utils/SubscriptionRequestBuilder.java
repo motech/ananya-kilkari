@@ -1,9 +1,9 @@
-package org.motechproject.ananya.kilkari.subscription.builder;
+package org.motechproject.ananya.kilkari.utils;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionRequest;
 
 public class SubscriptionRequestBuilder {
 

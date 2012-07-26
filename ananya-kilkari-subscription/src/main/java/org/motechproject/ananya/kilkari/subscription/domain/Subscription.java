@@ -162,20 +162,9 @@ public class Subscription extends MotechBaseDataObject {
         return getCreationDate().plusWeeks(getPack().getTotalWeeks());
     }
 
-    public boolean hasPackBeenCompleted() {
-        int currentWeek = getCurrentWeek();
-        return currentWeek >= pack.getTotalWeeks() + pack.getStartWeek();
-    }
-
     @JsonIgnore
     public boolean isInDeactivatedState() {
         return status.isInDeactivatedState();
-    }
-
-    @JsonIgnore
-    public int getCurrentWeek() {
-        int weeksDifference = getWeeksElapsedAfterCreationDate();
-        return weeksDifference + getPack().getStartWeek() + 1;
     }
 
     public DateTime currentWeeksMessageExpiryDate() {

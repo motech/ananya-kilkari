@@ -2,62 +2,44 @@ package org.motechproject.ananya.kilkari.utils;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 public class CampaignMessageIdStrategyTest {
 
     @Test
     public void shouldCreateMessageIdIfPackWasSubscribed2DaysBack() {
-        Subscription subscription = new Subscription("7676767678",SubscriptionPack.FIFTEEN_MONTHS,DateTime.now().minusDays(2));
+        String campaignName = "kilkari-mother-child-campaign-fifteen-months";
 
-        String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
+        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now().minusDays(2));
 
         assertEquals("WEEK1", messageId);
     }
 
     @Test
     public void shouldCreateMessageIdIfPackWasSubscribedToday() {
-        Subscription subscription = new Subscription("7676767678",SubscriptionPack.FIFTEEN_MONTHS,DateTime.now());
-        String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
+        String campaignName = "kilkari-mother-child-campaign-fifteen-months";
+
+        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now());
 
         assertEquals("WEEK1", messageId);
     }
 
     @Test
-    public void shouldCreateMessageIdForThisWeekIfPackWasSubscribedLessThanAWeekBack() {
-        Subscription subscription = new Subscription("7676767678",SubscriptionPack.FIFTEEN_MONTHS,DateTime.now().minusDays(7).plusHours(2));
+    public void shouldCreateMessageIdForInfantDeathCampaign(){
+        String campaignName = "kilkari-mother-child-campaign-infant-death";
 
-        String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
+        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now());
 
-        assertEquals("WEEK1", messageId);
+        assertEquals("ID1", messageId);
     }
 
     @Test
-    public void shouldCreateMessageIdForNextWeekIfPackWasSubscribedMoreThanAWeekBack() {
-        Subscription subscription = new Subscription("7676767678",SubscriptionPack.FIFTEEN_MONTHS,DateTime.now().minusDays(7).minusHours(2));
-        String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
+    public void shouldCreateMessageIdForMiscarriageCampaign(){
+        String campaignName = "kilkari-mother-child-campaign-miscarriage";
 
-        assertEquals("WEEK2", messageId);
-    }
+        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now());
 
-    @Test
-         public void shouldCreateMessageIdForNextWeekIfPackWasSubscribedMoreThanAWeekBackAndThePackIsTwelveMonthsPack() {
-        Subscription subscription = new Subscription("7676767678",SubscriptionPack.TWELVE_MONTHS,DateTime.now().minusDays(7).minusHours(2));
-        String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
-
-        assertEquals("WEEK14", messageId);
-    }
-
-    @Test
-    public void shouldCreateMessageIdForNextWeekIfPackWasSubscribedMoreThanAWeekBackAndThePackIsSevenMonthsPack() {
-        Subscription subscription = new Subscription("7676767678",SubscriptionPack.SEVEN_MONTHS,DateTime.now().minusDays(7).minusHours(2));
-        String messageId = new CampaignMessageIdStrategy().createMessageId(subscription);
-
-        assertEquals("WEEK34", messageId);
+        assertEquals("MC1", messageId);
     }
 }

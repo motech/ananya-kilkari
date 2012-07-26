@@ -10,6 +10,10 @@ import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPa
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
+import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollment;
+import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
+import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
+import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -93,12 +98,30 @@ public class MessageCampaignServiceTest {
         when(platformMessageCampaignService.getCampaignTimings(subscriptionId, messageCampaignPack.getCampaignName(),
                 startDate.toDate(), endDate.toDate())).thenReturn(campaignTimings);
 
+        ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<CampaignEnrollmentRecord>();
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(subscriptionId, messageCampaignPack.getCampaignName(), startDate.toLocalDate(), CampaignEnrollmentStatus.COMPLETED));
+        when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(campaignEnrollmentRecords);
+
         List<DateTime> messageTimings = this.messageCampaignService.getMessageTimings(
-                subscriptionId, messageCampaignPack.name(), startDate, endDate);
+                subscriptionId, startDate, endDate);
 
         verify(platformMessageCampaignService).getCampaignTimings(subscriptionId, messageCampaignPack.getCampaignName(),
                 startDate.toDate(), endDate.toDate());
 
         assertEquals(new DateTime(messageTime), messageTimings.get(0));
+    }
+
+    @Test
+    public void shouldGetCampaignStartDateForASubscription() {
+        String subscriptionId = "abcd1234";
+        DateTime startDate = DateTime.now();
+
+        ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<>();
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, null, startDate.toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
+        when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(campaignEnrollmentRecords);
+
+        DateTime campaignStartDate = this.messageCampaignService.getCampaignStartDate(subscriptionId);
+
+        assertEquals(startDate.toLocalDate(), campaignStartDate.toLocalDate());
     }
 }

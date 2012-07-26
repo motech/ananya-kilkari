@@ -131,43 +131,6 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldReturnTrueIfThePackHasBeenCompleted() {
-        Subscription fifteenMonthSubscription = new Subscription("9999999999", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(59));
-        assertTrue(fifteenMonthSubscription.hasPackBeenCompleted());
-
-        Subscription twelveMonthSubscription = new Subscription("9999999999", SubscriptionPack.TWELVE_MONTHS, DateTime.now().minusWeeks(47));
-        assertTrue(twelveMonthSubscription.hasPackBeenCompleted());
-
-        Subscription sevenMonthSubscription = new Subscription("9999999999", SubscriptionPack.SEVEN_MONTHS, DateTime.now().minusWeeks(27));
-        assertTrue(sevenMonthSubscription.hasPackBeenCompleted());
-    }
-
-    @Test
-    public void shouldReturnFalseIfThePackHasNotBeenCompleted() {
-        Subscription fifteenMonthSubscription = new Subscription("9999999999", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(58));
-        assertFalse(fifteenMonthSubscription.hasPackBeenCompleted());
-
-        Subscription twelveMonthSubscription = new Subscription("9999999999", SubscriptionPack.TWELVE_MONTHS, DateTime.now().minusWeeks(46));
-        assertFalse(twelveMonthSubscription.hasPackBeenCompleted());
-
-        Subscription sevenMonthSubscription = new Subscription("9999999999", SubscriptionPack.SEVEN_MONTHS, DateTime.now().minusWeeks(26));
-        assertFalse(sevenMonthSubscription.hasPackBeenCompleted());
-    }
-
-    @Test
-    public void shouldReturnCurrentWeekNumberBasedOnSubscriptionCreationDateAndPack() {
-        Subscription fifteenMonthSubscription = new Subscription("9999999999", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(2));
-        assertEquals(3, fifteenMonthSubscription.getCurrentWeek());
-
-        Subscription twelveMonthSubscription = new Subscription("9999999999", SubscriptionPack.TWELVE_MONTHS, DateTime.now().minusWeeks(2));
-        assertEquals(15, twelveMonthSubscription.getCurrentWeek());
-
-        Subscription sevenMonthSubscription = new Subscription("9999999999", SubscriptionPack.SEVEN_MONTHS, DateTime.now().minusWeeks(2));
-        assertEquals(35, sevenMonthSubscription.getCurrentWeek());
-    }
-
-
-    @Test
     public void expiryDateShouldBeEndDateOfTheCurrentWeek() {
         DateTime creationDate = DateTime.now().minusDays(3);
         Subscription subscription = new SubscriptionBuilder().withDefaults().withCreationDate(creationDate).build();

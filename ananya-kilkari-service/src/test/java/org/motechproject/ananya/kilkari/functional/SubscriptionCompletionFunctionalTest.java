@@ -4,18 +4,16 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.Test;
 import org.mockito.Matchers;
-import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
-import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.SpringIntegrationTest;
+import org.motechproject.ananya.kilkari.TimedRunner;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
-import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
-import org.motechproject.ananya.kilkari.TimedRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertNotNull;
@@ -29,8 +27,6 @@ public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest 
     @Autowired
     private KilkariCampaignService kilkariCampaignService;
     @Autowired
-    private AllCampaignMessageAlerts allCampaignMessageAlerts;
-    @Autowired
     private StubOnMobileSubscriptionGateway stubOnMobileSubscriptionGateway;
 
     @Test
@@ -40,11 +36,10 @@ public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest 
         stubOnMobileSubscriptionGateway.setBehavior(onMobileSubscriptionGatewayMock);
         Subscription subscription = addASubscriptionWithCreationDate15MonthsBack();
         final String subscriptionId = subscription.getSubscriptionId();
-        allCampaignMessageAlerts.add(new CampaignMessageAlert(subscriptionId, "week59", false, DateTime.now().plusWeeks(1)));
 
         //When
-        setCurrentDateToTheFutureToTriggerSubscriptionCompletionEvent();
-        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId);
+        setCurrentDateToThePastToTriggerSubscriptionCompletionEvent();
+        kilkariCampaignService.processCampaignCompletion(subscriptionId);
         resetCurrentDateToSystemDate();
 
         //Expect
@@ -66,7 +61,7 @@ public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest 
         DateTimeUtils.setCurrentMillisSystem();
     }
 
-    private void setCurrentDateToTheFutureToTriggerSubscriptionCompletionEvent() {
+    private void setCurrentDateToThePastToTriggerSubscriptionCompletionEvent() {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().minusDays(3).minusMinutes(1).getMillis());
     }
 
@@ -76,6 +71,4 @@ public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest 
         allSubscriptions.add(subscription);
         return subscription;
     }
-
-
 }

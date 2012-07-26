@@ -44,9 +44,9 @@ public class MessageCampaignService {
         return true;
     }
 
-    public MessageCampaignEnrollment searchEnrollment(String externalId, String campaignName) {
+    public MessageCampaignEnrollment searchEnrollment(String externalId) {
         List<CampaignEnrollmentRecord> enrollmentRecords = campaignService.search(
-                new CampaignEnrollmentsQuery().withExternalId(externalId).withCampaignName(campaignName));
+                new CampaignEnrollmentsQuery().withExternalId(externalId));
 
         if (enrollmentRecords.isEmpty())
             return null;
@@ -57,8 +57,8 @@ public class MessageCampaignService {
                 campaignEnrollmentRecord.getStatus());
     }
 
-    public List<DateTime> getMessageTimings(String subscriptionId, String packName, DateTime startDate, DateTime endDate) {
-        String campaignName = MessageCampaignPack.from(packName).getCampaignName();
+    public List<DateTime> getMessageTimings(String subscriptionId, DateTime startDate, DateTime endDate) {
+        String campaignName = searchEnrollment(subscriptionId).getCampaignName();
         Map<String, List<Date>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
                 startDate.toDate(), endDate.toDate());
         List<Date> campaignMessageTimings = campaignTimings.get(CAMPAIGN_MESSAGE_NAME);
@@ -71,5 +71,9 @@ public class MessageCampaignService {
             alertTimings.add(new DateTime(date));
         }
         return alertTimings;
+    }
+
+    public DateTime getCampaignStartDate(String externalId) {
+        return searchEnrollment(externalId).getStartDate();
     }
 }

@@ -79,7 +79,7 @@ public class KilkariCampaignService {
             String subscriptionId = subscription.getSubscriptionId();
 
             List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
-                    subscriptionId, subscription.getPack().name(),
+                    subscriptionId,
                     subscription.getCreationDate(), subscription.getEndDate());
 
             campaignMessageMap.put(subscriptionId, messageTimings);
@@ -87,9 +87,9 @@ public class KilkariCampaignService {
         return campaignMessageMap;
     }
 
-    public void scheduleWeeklyMessage(String subscriptionId) {
+    public void scheduleWeeklyMessage(String subscriptionId, String campaignName) {
         Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
-        String messageId = campaignMessageIdStrategy.createMessageId(subscription);
+        String messageId = campaignMessageIdStrategy.createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId));
         logger.info(String.format("Processing weekly message alert for subscriptionId: %s, messageId: %s", subscriptionId, messageId));
 
         CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
@@ -102,9 +102,6 @@ public class KilkariCampaignService {
 
         if (subscription.hasBeenActivated())
             kilkariInboxService.newMessage(subscriptionId, messageId);
-
-        if (subscription.hasPackBeenCompleted() && !subscription.isInDeactivatedState())
-            kilkariSubscriptionService.processSubscriptionCompletion(subscription);
     }
 
     public void activateOrRenewSchedule(String subscriptionId, CampaignTriggerType campaignTriggerType) {
@@ -158,6 +155,12 @@ public class KilkariCampaignService {
 
         publishErrorRecords(invalidFailedCallReports);
         publishValidRecords(validFailedCallReports);
+    }
+
+    public void processCampaignCompletion(String subscriptionId) {
+        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
+        if (!subscription.isInDeactivatedState())
+            kilkariSubscriptionService.processSubscriptionCompletion(subscription);
     }
 
     private void processExistingCampaignMessageAlert(Subscription subscription, String messageId, boolean renewed,

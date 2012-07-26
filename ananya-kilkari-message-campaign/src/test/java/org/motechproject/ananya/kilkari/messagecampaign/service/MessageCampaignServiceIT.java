@@ -3,10 +3,13 @@ package org.motechproject.ananya.kilkari.messagecampaign.service;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
+import org.motechproject.server.messagecampaign.dao.AllCampaignEnrollments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -25,20 +28,28 @@ public class MessageCampaignServiceIT {
     public static final int CONFIGURED_DELTA_DAYS = 2;
 
     @Autowired
+    private AllCampaignEnrollments allCampaignEnrollments;
+
+    @Autowired
     private MessageCampaignService messageCampaignService;
+
+    @Before
+    @After
+    public void setUp() {
+        allCampaignEnrollments.removeAll();
+    }
 
     @Test
     public void shouldCreateMessageCampaignForSevenMonthCampaign() {
         DateTime referenceDate = DateTime.now().plusDays(1);
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                "my_id", MessageCampaignPack.SEVEN_MONTHS.name(), referenceDate);
+                "my_id1", MessageCampaignPack.SEVEN_MONTHS.name(), referenceDate);
 
         messageCampaignService.start(messageCampaignRequest);
 
         List<DateTime> dateTimeList = messageCampaignService.getMessageTimings(
                 messageCampaignRequest.getExternalId(),
-                MessageCampaignPack.SEVEN_MONTHS.name(),
                 referenceDate.minusDays(2), referenceDate.plusYears(4));
 
         DateTime referenceDateWithDelta = referenceDate.plusDays(CONFIGURED_DELTA_DAYS);
@@ -55,13 +66,12 @@ public class MessageCampaignServiceIT {
         DateTime referenceDate = DateTime.now().plusDays(1);
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                "my_id", MessageCampaignPack.TWELVE_MONTHS.name(), referenceDate);
+                "my_id2", MessageCampaignPack.TWELVE_MONTHS.name(), referenceDate);
 
         messageCampaignService.start(messageCampaignRequest);
 
         List<DateTime> dateTimeList = messageCampaignService.getMessageTimings(
                 messageCampaignRequest.getExternalId(),
-                MessageCampaignPack.TWELVE_MONTHS.name(),
                 referenceDate.minusDays(2), referenceDate.plusYears(4));
 
         LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(CONFIGURED_DELTA_DAYS);
@@ -79,13 +89,12 @@ public class MessageCampaignServiceIT {
         DateTime referenceDate = DateTime.now().plusDays(1);
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                "my_id", MessageCampaignPack.FIFTEEN_MONTHS.name(), referenceDate);
+                "my_id3", MessageCampaignPack.FIFTEEN_MONTHS.name(), referenceDate);
 
         messageCampaignService.start(messageCampaignRequest);
 
         List<DateTime> dateTimeList = messageCampaignService.getMessageTimings(
                 messageCampaignRequest.getExternalId(),
-                MessageCampaignPack.FIFTEEN_MONTHS.name(),
                 referenceDate.minusDays(2), referenceDate.plusYears(4));
 
         LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(CONFIGURED_DELTA_DAYS);

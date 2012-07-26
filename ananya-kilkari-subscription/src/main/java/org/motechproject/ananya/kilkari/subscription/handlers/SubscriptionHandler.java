@@ -1,9 +1,8 @@
 package org.motechproject.ananya.kilkari.subscription.handlers;
 
-import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
@@ -14,11 +13,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SubscriptionHandler {
-
     private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
-
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionHandler.class);
-
     private SubscriptionService subscriptionService;
 
     @Autowired
@@ -48,13 +44,8 @@ public class SubscriptionHandler {
         OMSubscriptionRequest OMSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
         logger.info(String.format("Handling subscription completion event for subscriptionid: %s, msisdn: %s, pack: %s", OMSubscriptionRequest.getSubscriptionId(), OMSubscriptionRequest.getMsisdn(), OMSubscriptionRequest.getPack()));
 
-        Subscription subscription = subscriptionService.findBySubscriptionId(OMSubscriptionRequest.getSubscriptionId());
-        if (subscription.isInDeactivatedState()) {
-            logger.info(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", OMSubscriptionRequest.getSubscriptionId(), OMSubscriptionRequest.getMsisdn(), subscription.getStatus()));
-            return;
-        }
-
-        onMobileSubscriptionGateway.deactivateSubscription(OMSubscriptionRequest);
-        subscriptionService.subscriptionComplete(OMSubscriptionRequest.getSubscriptionId());
+        subscriptionService.subscriptionComplete(OMSubscriptionRequest);
     }
+
+
 }

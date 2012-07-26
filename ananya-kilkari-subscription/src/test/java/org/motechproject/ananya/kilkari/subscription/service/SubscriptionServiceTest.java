@@ -18,6 +18,7 @@ import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
@@ -55,11 +56,13 @@ public class SubscriptionServiceTest {
     private KilkariInboxService kilkariInboxService;
     @Mock
     private MessageCampaignService messageCampaignService;
+    @Mock
+    private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService, onMobileSubscriptionGateway);
     }
 
     @Test
@@ -440,12 +443,14 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldProcessSubscriptionCompletion() {
-        String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.SEVEN_MONTHS, DateTime.now());
-        String subscriptionId = subscription.getSubscriptionId();
+        final String msisdn = "9988776655";
+        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        Subscription subscription = new SubscriptionBuilder().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).build();
+        final String subscriptionId = subscription.getSubscriptionId();
+        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.subscriptionComplete(subscriptionId);
+        subscriptionService.subscriptionComplete(omSubscriptionRequest);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).update(subscriptionArgumentCaptor.capture());
@@ -459,17 +464,45 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(SubscriptionStatus.PENDING_COMPLETION.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals("Subscription completed", subscriptionStateChangeReportRequest.getReason());
+
+        ArgumentCaptor<OMSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
+        verify(onMobileSubscriptionGateway).deactivateSubscription(processSubscriptionRequestArgumentCaptor.capture());
+        OMSubscriptionRequest OMSubscriptionRequest = processSubscriptionRequestArgumentCaptor.getValue();
+
+        assertEquals(msisdn, OMSubscriptionRequest.getMsisdn());
+        assertEquals(null, OMSubscriptionRequest.getChannel());
+        assertEquals(pack, OMSubscriptionRequest.getPack());
+        assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
     }
 
     @Test
     public void shouldScheduleInboxDeletionUponSubscriptionCompletion() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.SEVEN_MONTHS, DateTime.now());
+        String msisdn = "1234567890";
+        SubscriptionPack pack = SubscriptionPack.SEVEN_MONTHS;
+        Subscription subscription = new Subscription(msisdn, pack, DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.subscriptionComplete(subscriptionId);
+        subscriptionService.subscriptionComplete(new OMSubscriptionRequest(msisdn, pack, Channel.IVR, subscriptionId));
 
         verify(kilkariInboxService).scheduleInboxDeletion(subscription);
+    }
+
+
+    @Test
+    public void shouldNotSendDeactivationRequestAgainIfTheExistingSubscriptionIsAlreadyInDeactivatedState() {
+        final String msisdn = "9988776655";
+        final Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.DEACTIVATED).build();
+        final String subscriptionId = subscription.getSubscriptionId();
+        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        OMSubscriptionRequest value = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.subscriptionComplete(value);
+
+        verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
+        verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
+        verify(kilkariInboxService, never()).scheduleInboxDeletion(any(Subscription.class));
     }
 
     @Test
@@ -495,7 +528,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldUnScheduleCurrentCampaignAndScheduleNewCampaignForMCOrID(){
+    public void shouldUnScheduleCurrentCampaignAndScheduleNewCampaignForMCOrID() {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
         SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;

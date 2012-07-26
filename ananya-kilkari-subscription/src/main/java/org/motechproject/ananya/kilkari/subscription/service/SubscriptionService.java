@@ -10,12 +10,16 @@ import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.common.domain.PhoneNumber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,17 +34,20 @@ public class SubscriptionService {
     private ReportingService reportingService;
     private KilkariInboxService kilkariInboxService;
     private MessageCampaignService messageCampaignService;
+    private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
+    private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
     @Autowired
     public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher,
                                SubscriptionValidator subscriptionValidator, ReportingService reportingService,
-                               KilkariInboxService kilkariInboxService, MessageCampaignService messageCampaignService) {
+                               KilkariInboxService kilkariInboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
         this.reportingService = reportingService;
         this.kilkariInboxService = kilkariInboxService;
         this.messageCampaignService = messageCampaignService;
+        this.onMobileSubscriptionGateway = onMobileSubscriptionGateway;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
@@ -150,8 +157,15 @@ public class SubscriptionService {
         });
     }
 
-    public void subscriptionComplete(String subscriptionId) {
-        updateStatusAndReport(subscriptionId, DateTime.now(), "Subscription completed", null, null, new Action<Subscription>() {
+    public void subscriptionComplete(OMSubscriptionRequest omSubscriptionRequest) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
+        if (subscription.isInDeactivatedState()) {
+            logger.info(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), subscription.getStatus()));
+            return;
+        }
+        onMobileSubscriptionGateway.deactivateSubscription(omSubscriptionRequest);
+
+        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), "Subscription completed", null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.complete();
@@ -165,7 +179,7 @@ public class SubscriptionService {
     }
 
     public void rescheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
-        Subscription subscription = findBySubscriptionId(campaignRescheduleRequest.getSubscriptionId());
+        Subscription subscription = allSubscriptions.findBySubscriptionId(campaignRescheduleRequest.getSubscriptionId());
         unScheduleCampaign(subscription);
         scheduleCampaign(campaignRescheduleRequest);
     }

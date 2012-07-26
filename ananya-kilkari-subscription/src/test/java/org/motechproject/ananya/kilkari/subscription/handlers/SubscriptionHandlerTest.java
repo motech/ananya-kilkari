@@ -4,10 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.scheduler.domain.MotechEvent;
 
@@ -15,7 +16,8 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SubscriptionHandlerTest {
@@ -83,37 +85,13 @@ public class SubscriptionHandlerTest {
         final String msisdn = "9988776655";
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         final String subscriptionId = "abcd1234";
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new OMSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
-        Subscription subscription = new SubscriptionBuilder().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).build();
-        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+            put("0", omSubscriptionRequest);}};
 
         subscriptionHandler.handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
 
-        ArgumentCaptor<OMSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
-        verify(onMobileSubscriptionGateway).deactivateSubscription(processSubscriptionRequestArgumentCaptor.capture());
-        OMSubscriptionRequest OMSubscriptionRequest = processSubscriptionRequestArgumentCaptor.getValue();
-
-        assertEquals(msisdn, OMSubscriptionRequest.getMsisdn());
-        assertEquals(null, OMSubscriptionRequest.getChannel());
-        assertEquals(pack, OMSubscriptionRequest.getPack());
-        assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
-
-        verify(subscriptionService).subscriptionComplete(subscriptionId);
-    }
-
-    @Test
-    public void shouldNotSendDeactivationRequestAgainIfTheExistingSubscriptionIsAlreadyInDeactivatedState() {
-        final String msisdn = "9988776655";
-        final String subscriptionId = "abcd1234";
-        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
-        Subscription subscription = new SubscriptionBuilder().withMsisdn(msisdn).withStatus(SubscriptionStatus.DEACTIVATED).build();
-        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{put("0", new OMSubscriptionRequest(msisdn, pack, null, subscriptionId));}};
-
-        new SubscriptionHandler(onMobileSubscriptionGateway, subscriptionService).handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
-
-        verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
-        verify(subscriptionService, never()).subscriptionComplete(subscriptionId);
+        verify(subscriptionService).subscriptionComplete(omSubscriptionRequest);
     }
 
     @Test(expected = RuntimeException.class)

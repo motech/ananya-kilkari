@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.utils;
 import org.joda.time.DateTime;
 import org.joda.time.Weeks;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -18,14 +19,20 @@ public class CampaignMessageIdStrategy {
         put(MessageCampaignService.MISCARRIAGE_CAMPAIGN_KEY, "MC%s");
     }};
 
-    public String createMessageId(String campaignName, DateTime campaignStartDate) {
-        int weekNumber = getWeekNumber(campaignStartDate);
+    public String createMessageId(String campaignName, DateTime campaignStartDate, SubscriptionPack pack) {
+        int weekNumber = getWeekNumber(campaignStartDate, campaignName, pack);
         return String.format(CampaignMessageIdStrategy.CAMPAIGN_NAME_CODE_MAPPING.get(campaignName), weekNumber);
     }
 
-    public int getWeekNumber(DateTime campaignStartDate) {
+    public int getWeekNumber(DateTime campaignStartDate, String campaignName, SubscriptionPack pack) {
         int weeksDifference = getWeeksElapsedAfterCampaignCreationDate(campaignStartDate);
-        return weeksDifference + 1;
+        return weeksDifference + getPackStartingWeek(campaignName, pack) + 1;
+    }
+
+    private int getPackStartingWeek(String campaignName, SubscriptionPack pack) {
+        if(!campaignName.equals(MessageCampaignService.INFANT_DEATH_CAMPAIGN_KEY) && !campaignName.equals(MessageCampaignService.MISCARRIAGE_CAMPAIGN_KEY))
+            return pack.getStartWeek();
+        return 0;
     }
 
     private int getWeeksElapsedAfterCampaignCreationDate(DateTime campaignStartDate) {

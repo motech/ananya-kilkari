@@ -126,7 +126,7 @@ public class KilkariCampaignServiceTest {
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
         when(messageCampaignService.getCampaignStartDate(subscriptionId)).thenReturn(campaignCreatedDate);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, campaignCreatedDate)).thenReturn(messageId);
+        when(campaignMessageIdStrategy.createMessageId(campaignName, campaignCreatedDate, subscription.getPack())).thenReturn(messageId);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 
@@ -197,12 +197,14 @@ public class KilkariCampaignServiceTest {
         Operator operator = Operator.AIRTEL;
         String campaignName = "campaignName";
         DateTime creationDate = DateTime.now();
+        SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
 
         Subscription mockSubscription = mock(Subscription.class);
         String subscriptionId = "subscriptionId";
         when(mockSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(mockSubscription.getMsisdn()).thenReturn(msisdn);
         when(mockSubscription.getOperator()).thenReturn(operator);
+        when(mockSubscription.getPack()).thenReturn(subscriptionPack);
         DateTime messageExpiryDate = creationDate.plusWeeks(1);
         when(mockSubscription.currentWeeksMessageExpiryDate()).thenReturn(messageExpiryDate);
 
@@ -211,7 +213,7 @@ public class KilkariCampaignServiceTest {
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(mockSubscription);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
         when(messageCampaignService.getCampaignStartDate(subscriptionId)).thenReturn(creationDate);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, creationDate)).thenReturn(messageId);
+        when(campaignMessageIdStrategy.createMessageId(campaignName, creationDate, subscriptionPack)).thenReturn(messageId);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 
@@ -236,7 +238,7 @@ public class KilkariCampaignServiceTest {
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
         when(messageCampaignService.getCampaignStartDate(subscriptionId)).thenReturn(creationDate);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, creationDate)).thenReturn(messageId);
+        when(campaignMessageIdStrategy.createMessageId(campaignName, creationDate, subscription.getPack())).thenReturn(messageId);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 
@@ -386,7 +388,7 @@ public class KilkariCampaignServiceTest {
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(mockedCampaignMessageAlert);
         when(messageCampaignService.getCampaignStartDate(subscriptionId)).thenReturn(createdAt);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, createdAt)).thenReturn(messageId);
+        when(campaignMessageIdStrategy.createMessageId(campaignName, createdAt, subscription.getPack())).thenReturn(messageId);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 
@@ -565,7 +567,7 @@ public class KilkariCampaignServiceTest {
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getCampaignStartDate(subscriptionId)).thenReturn(creationDate);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, creationDate)).thenReturn(messageId);
+        when(campaignMessageIdStrategy.createMessageId(campaignName, creationDate, subscription.getPack())).thenReturn(messageId);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 
@@ -581,7 +583,7 @@ public class KilkariCampaignServiceTest {
         String campaignName = "campaignName";
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, subscription.getCreationDate())).thenReturn(messageId);
+        when(campaignMessageIdStrategy.createMessageId(campaignName, subscription.getCreationDate(), subscription.getPack())).thenReturn(messageId);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 

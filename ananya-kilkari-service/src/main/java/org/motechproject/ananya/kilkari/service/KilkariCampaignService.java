@@ -87,7 +87,7 @@ public class KilkariCampaignService {
 
     public void scheduleWeeklyMessage(String subscriptionId, String campaignName) {
         ISubscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
-        String messageId = campaignMessageIdStrategy.createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId));
+        String messageId = campaignMessageIdStrategy.createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId), subscription.getPack());
         logger.info(String.format("Processing weekly message alert for subscriptionId: %s, messageId: %s", subscriptionId, messageId));
 
         CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);

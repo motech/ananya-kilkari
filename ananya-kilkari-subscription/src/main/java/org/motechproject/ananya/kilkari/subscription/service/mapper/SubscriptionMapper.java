@@ -8,10 +8,11 @@ import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
 
 public class SubscriptionMapper {
 
-    public OMSubscriptionRequest createOMSubscriptionRequest(Subscription subscription, Channel channel) {
+    public OMSubscriptionRequest createOMSubscriptionRequest(ISubscription subscription, Channel channel) {
         return new OMSubscriptionRequest(subscription.getMsisdn(), subscription.getPack(), channel, subscription.getSubscriptionId());
     }
 

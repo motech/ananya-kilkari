@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
+import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
@@ -73,10 +73,10 @@ public class SubscriptionController {
     public SubscriptionWebResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
         SubscriptionWebResponse subscriptionWebResponse = new SubscriptionWebResponse();
 
-        List<SubscriptionResponse> subscriptionResponses = kilkariSubscriptionService.findByMsisdn(msisdn);
+        List<ISubscription> subscriptionResponses = kilkariSubscriptionService.findByMsisdn(msisdn);
 
         if (subscriptionResponses != null) {
-            for (SubscriptionResponse subscriptionResponse : subscriptionResponses)
+            for (ISubscription subscriptionResponse : subscriptionResponses)
                 subscriptionWebResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscriptionResponse));
         }
 

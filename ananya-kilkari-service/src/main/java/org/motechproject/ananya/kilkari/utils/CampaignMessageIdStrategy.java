@@ -10,7 +10,7 @@ import java.util.HashMap;
 @Component
 public class CampaignMessageIdStrategy {
 
-    private static final HashMap<String, String> CAMPAIGN_NAME_CODE_MAPPING = new HashMap<String, String>(){{
+    private static final HashMap<String, String> CAMPAIGN_NAME_CODE_MAPPING = new HashMap<String, String>() {{
         put(MessageCampaignService.FIFTEEN_MONTHS_CAMPAIGN_KEY, "WEEK%s");
         put(MessageCampaignService.TWELVE_MONTHS_CAMPAIGN_KEY, "WEEK%s");
         put(MessageCampaignService.SEVEN_MONTHS_CAMPAIGN_KEY, "WEEK%s");

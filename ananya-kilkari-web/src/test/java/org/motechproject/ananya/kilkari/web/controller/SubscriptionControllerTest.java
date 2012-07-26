@@ -21,7 +21,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
+import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
@@ -53,7 +53,7 @@ public class SubscriptionControllerTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private SubscriptionResponse mockedSubscription;
+    private ISubscription mockedSubscription;
     @Mock
     private KilkariSubscriptionService kilkariSubscriptionService;
     @Mock
@@ -81,7 +81,7 @@ public class SubscriptionControllerTest {
         String channel = "ivr";
 
         mockSubscription(msisdn);
-        ArrayList<SubscriptionResponse> subscriptions = new ArrayList<>();
+        ArrayList<ISubscription> subscriptions = new ArrayList<>();
         subscriptions.add(mockedSubscription);
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
@@ -98,7 +98,7 @@ public class SubscriptionControllerTest {
         String channel = "call_center";
 
         mockSubscription(msisdn);
-        ArrayList<SubscriptionResponse> subscriptions = new ArrayList<>();
+        ArrayList<ISubscription> subscriptions = new ArrayList<>();
         subscriptions.add(mockedSubscription);
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 

@@ -22,9 +22,10 @@ import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
+import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
@@ -76,9 +77,10 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldGetMessageTimings() {
         String msisdn = "1234567890";
-        List<SubscriptionResponse> subscriptions = new ArrayList<>();
-        SubscriptionResponse subscription1 = new SubscriptionResponse(msisdn, Operator.AIRTEL, "sub1", DateTime.now(), DateTime.now().plusWeeks(60), SubscriptionStatus.PENDING_ACTIVATION, SubscriptionPack.FIFTEEN_MONTHS);
-        SubscriptionResponse subscription2 = new SubscriptionResponse(msisdn, Operator.AIRTEL, "sub2", DateTime.now(), DateTime.now().plusWeeks(48), SubscriptionStatus.PENDING_ACTIVATION, SubscriptionPack.TWELVE_MONTHS);
+        List<ISubscription> subscriptions = new ArrayList<>();
+
+        ISubscription subscription1 = new SubscriptionBuilder().withDefaults().withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
+        ISubscription subscription2 = new SubscriptionBuilder().withDefaults().withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
         subscriptions.add(subscription1);
         subscriptions.add(subscription2);
 
@@ -89,22 +91,24 @@ public class KilkariCampaignServiceTest {
 
         when(messageCampaignService.getMessageTimings(
                 subscription1.getSubscriptionId(),
-                subscription1.getCreationDate(), subscription1.getEndDate())).thenReturn(dateTimes);
+                subscription1.getCreationDate(),
+                subscription1.endDate())).thenReturn(dateTimes);
         when(messageCampaignService.getMessageTimings(
                 subscription2.getSubscriptionId(),
-                subscription2.getCreationDate(), subscription2.getEndDate())).thenReturn(dateTimes);
+                subscription2.getCreationDate(),
+                subscription2.endDate())).thenReturn(dateTimes);
 
         Map<String, List<DateTime>> messageTimings = kilkariCampaignService.getMessageTimings(msisdn);
 
         verify(messageCampaignService).getMessageTimings(
                 eq(subscription1.getSubscriptionId()),
                 eq(subscription1.getCreationDate()),
-                eq(subscription1.getEndDate()));
+                eq(subscription1.endDate()));
 
         verify(messageCampaignService).getMessageTimings(
                 eq(subscription2.getSubscriptionId()),
                 eq(subscription2.getCreationDate()),
-                eq(subscription2.getEndDate()));
+                eq(subscription2.endDate()));
 
         assertThat(messageTimings.size(), is(2));
         assertThat(messageTimings, hasEntry(subscription1.getSubscriptionId(), dateTimes));
@@ -113,7 +117,6 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldSaveCampaignMessageAlertIfDoesNotExist() {
-
         String subscriptionId = "mysubscriptionid";
         String messageId = "mymessageid";
         String campaignName = "campaignName";

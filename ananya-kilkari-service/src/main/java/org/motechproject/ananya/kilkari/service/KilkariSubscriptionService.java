@@ -13,7 +13,7 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationExcept
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
+import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -75,15 +75,15 @@ public class KilkariSubscriptionService {
         subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
     }
 
-    public List<SubscriptionResponse> findByMsisdn(String msisdn) {
+    public List<ISubscription> findByMsisdn(String msisdn) {
         return subscriptionService.findByMsisdn(msisdn);
     }
 
-    public Subscription findBySubscriptionId(String subscriptionId) {
+    public ISubscription findBySubscriptionId(String subscriptionId) {
         return subscriptionService.findBySubscriptionId(subscriptionId);
     }
 
-    public void processSubscriptionCompletion(Subscription subscription) {
+    public void processSubscriptionCompletion(ISubscription subscription) {
         String subjectKey = SubscriptionEventKeys.SUBSCRIPTION_COMPLETE;
         Date startDate = DateTime.now().plusDays(kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
         HashMap<String, Object> parameters = new HashMap<>();

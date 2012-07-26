@@ -4,10 +4,10 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionResponseBuilder;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
+import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 
 import static org.junit.Assert.assertEquals;
@@ -27,7 +27,7 @@ public class SubscriptionDetailsMapperTest {
 
     @Test
     public void shouldMapFromSubscriptionToSubscriptionDetails() {
-        SubscriptionResponse subscriptionResponse = new SubscriptionResponseBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now()).build();
+        ISubscription subscriptionResponse = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now()).build();
 
         SubscriptionDetails subscriptionDetails = subscriptionDetailsMapper.mapFrom(subscriptionResponse);
 
@@ -39,7 +39,7 @@ public class SubscriptionDetailsMapperTest {
     @Test
     public void shouldIncludeLastCampaignIdInTheSubscriptionDetails() {
         String messageId = "week3";
-        SubscriptionResponse subscriptionResponse = new SubscriptionResponseBuilder().withDefaults().withMsisdn("9988776655").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now().minusWeeks(3)).build();
+        ISubscription subscriptionResponse = new SubscriptionBuilder().withDefaults().withMsisdn("9988776655").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now().minusWeeks(3)).build();
         when(kilkariInboxService.getMessageFor(subscriptionResponse.getSubscriptionId())).thenReturn(messageId);
 
         SubscriptionDetails subscriptionDetails = subscriptionDetailsMapper.mapFrom(subscriptionResponse);

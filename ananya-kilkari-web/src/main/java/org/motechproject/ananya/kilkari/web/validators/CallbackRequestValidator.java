@@ -5,9 +5,9 @@ import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class CallbackRequestValidator {
             errors.add(String.format("Invalid status %s for action %s", requestStatus, requestAction));
         }
 
-        Subscription subscription = subscriptionService.findBySubscriptionId(callbackRequestWrapper.getSubscriptionId());
+        ISubscription subscription = subscriptionService.findBySubscriptionId(callbackRequestWrapper.getSubscriptionId());
         if (CallbackAction.REN.name().equals(requestAction)) {
             final SubscriptionStatus subscriptionStatus = subscription.getStatus();
             if(!subscriptionStatus.canRenew()) {

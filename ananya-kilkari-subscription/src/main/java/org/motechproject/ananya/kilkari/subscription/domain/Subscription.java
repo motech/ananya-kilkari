@@ -9,13 +9,14 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
 import org.joda.time.Weeks;
+import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
 import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
 
 import java.util.UUID;
 
 @TypeDiscriminator("doc.type === 'Subscription'")
-public class Subscription extends MotechBaseDataObject {
+public class Subscription extends MotechBaseDataObject implements ISubscription {
     @JsonProperty
     private String msisdn;
 

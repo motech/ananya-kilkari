@@ -23,7 +23,7 @@ import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
+import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 
 import java.util.ArrayList;
@@ -170,7 +170,7 @@ public class SubscriptionServiceTest {
         subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now()));
         when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionsToBeReturned);
 
-        List<SubscriptionResponse> subscriptionResponses = subscriptionService.findByMsisdn(msisdn);
+        List<ISubscription> subscriptionResponses = subscriptionService.findByMsisdn(msisdn);
 
         assertEquals(2, subscriptionResponses.size());
         assertEquals(msisdn, subscriptionResponses.get(0).getMsisdn());

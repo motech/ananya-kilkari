@@ -13,14 +13,12 @@ import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionResponseBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
@@ -84,11 +82,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         markForDeletion(subscription1);
         markForDeletion(subscription2);
 
-        SubscriptionResponse subscriptionResponse1 = new SubscriptionResponseBuilder().withStatus(subscription1.getStatus()).withMsisdn(msisdn).withPack(SubscriptionPack.TWELVE_MONTHS).withCreationDate(DateTime.now()).withSubscriptionId(subscription1.getSubscriptionId()).build();
-        SubscriptionResponse subscriptionResponse2 = new SubscriptionResponseBuilder().withStatus(subscription2.getStatus()).withMsisdn(msisdn).withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now()).withSubscriptionId(subscription2.getSubscriptionId()).build();
         SubscriptionWebResponse subscriptionWebResponse = new SubscriptionWebResponse();
-        subscriptionWebResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscriptionResponse1));
-        subscriptionWebResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscriptionResponse2));
+        subscriptionWebResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscription1));
+        subscriptionWebResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscription2));
 
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 

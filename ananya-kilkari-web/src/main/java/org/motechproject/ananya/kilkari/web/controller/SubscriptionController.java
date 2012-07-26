@@ -3,12 +3,12 @@ package org.motechproject.ananya.kilkari.web.controller;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
+import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
 import org.motechproject.ananya.kilkari.web.validators.CampaignChangeRequestValidator;
 import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
@@ -70,17 +70,17 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscriber", method = RequestMethod.GET)
     @ResponseBody
-    public SubscriberResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
-        SubscriberResponse subscriberResponse = new SubscriberResponse();
+    public SubscriptionWebResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
+        SubscriptionWebResponse subscriptionWebResponse = new SubscriptionWebResponse();
 
-        List<Subscription> subscriptions = kilkariSubscriptionService.findByMsisdn(msisdn);
+        List<SubscriptionResponse> subscriptionResponses = kilkariSubscriptionService.findByMsisdn(msisdn);
 
-        if (subscriptions != null) {
-            for (Subscription subscription : subscriptions)
-                subscriberResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscription));
+        if (subscriptionResponses != null) {
+            for (SubscriptionResponse subscriptionResponse : subscriptionResponses)
+                subscriptionWebResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscriptionResponse));
         }
 
-        return subscriberResponse;
+        return subscriptionWebResponse;
     }
 
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.DELETE)

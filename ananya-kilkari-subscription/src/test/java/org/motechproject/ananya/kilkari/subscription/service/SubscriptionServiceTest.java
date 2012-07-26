@@ -22,6 +22,7 @@ import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 
 import java.util.ArrayList;
@@ -159,20 +160,20 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldGetSubscriptionsForAGivenMsisdn() {
+    public void shouldGetSubscriptionsResponseForAGivenMsisdn() {
         String msisdn = "1234567890";
         ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
         subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now()));
         subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now()));
         when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionsToBeReturned);
 
-        List<Subscription> subscriptions = subscriptionService.findByMsisdn(msisdn);
+        List<SubscriptionResponse> subscriptionResponses = subscriptionService.findByMsisdn(msisdn);
 
-        assertEquals(2, subscriptions.size());
-        assertEquals(msisdn, subscriptions.get(0).getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptions.get(0).getPack());
-        assertEquals(msisdn, subscriptions.get(1).getMsisdn());
-        assertEquals(SubscriptionPack.FIFTEEN_MONTHS, subscriptions.get(1).getPack());
+        assertEquals(2, subscriptionResponses.size());
+        assertEquals(msisdn, subscriptionResponses.get(0).getMsisdn());
+        assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptionResponses.get(0).getPack());
+        assertEquals(msisdn, subscriptionResponses.get(1).getMsisdn());
+        assertEquals(SubscriptionPack.FIFTEEN_MONTHS, subscriptionResponses.get(1).getPack());
     }
 
     @Test

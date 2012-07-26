@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignEnrollment;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
@@ -12,21 +13,22 @@ import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionResponseBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.gateway.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
-import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
+import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.server.MvcResult;
@@ -82,9 +84,11 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         markForDeletion(subscription1);
         markForDeletion(subscription2);
 
-        SubscriberResponse subscriberResponse = new SubscriberResponse();
-        subscriberResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscription1));
-        subscriberResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscription2));
+        SubscriptionResponse subscriptionResponse1 = new SubscriptionResponseBuilder().withStatus(subscription1.getStatus()).withMsisdn(msisdn).withPack(SubscriptionPack.TWELVE_MONTHS).withCreationDate(DateTime.now()).withSubscriptionId(subscription1.getSubscriptionId()).build();
+        SubscriptionResponse subscriptionResponse2 = new SubscriptionResponseBuilder().withStatus(subscription2.getStatus()).withMsisdn(msisdn).withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now()).withSubscriptionId(subscription2.getSubscriptionId()).build();
+        SubscriptionWebResponse subscriptionWebResponse = new SubscriptionWebResponse();
+        subscriptionWebResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscriptionResponse1));
+        subscriptionWebResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscriptionResponse2));
 
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 
@@ -97,8 +101,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
-        SubscriberResponse actualResponse = TestUtils.fromJson(responseString, SubscriberResponse.class);
-        assertEquals(subscriberResponse, actualResponse);
+        SubscriptionWebResponse actualResponse = TestUtils.fromJson(responseString, SubscriptionWebResponse.class);
+        assertEquals(subscriptionWebResponse, actualResponse);
     }
 
     @Test
@@ -122,7 +126,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
-        BaseResponse actualResponse =  TestUtils.fromJson(responseString, BaseResponse.class);
+        BaseResponse actualResponse = TestUtils.fromJson(responseString, BaseResponse.class);
         assertEquals(expectedResponse, actualResponse);
 
         final Subscription subscription = new TimedRunner<Subscription>(20, 1000) {
@@ -181,7 +185,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
-        BaseResponse actualResponse =  TestUtils.fromJson(responseString, BaseResponse.class);
+        BaseResponse actualResponse = TestUtils.fromJson(responseString, BaseResponse.class);
         assertEquals(expectedResponse, actualResponse);
 
         final Subscription subscription = new TimedRunner<Subscription>(20, 1000) {
@@ -250,7 +254,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
-        BaseResponse actualResponse =  TestUtils.fromJson(responseString, BaseResponse.class);
+        BaseResponse actualResponse = TestUtils.fromJson(responseString, BaseResponse.class);
         assertTrue(expectedResponse.equals(actualResponse));
 
         Boolean statusChanged = new TimedRunner<Boolean>(20, 1000) {

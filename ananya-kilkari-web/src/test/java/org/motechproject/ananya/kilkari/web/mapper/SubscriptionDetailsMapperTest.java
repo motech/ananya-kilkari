@@ -4,9 +4,10 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionResponseBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 
 import static org.junit.Assert.assertEquals;
@@ -26,22 +27,22 @@ public class SubscriptionDetailsMapperTest {
 
     @Test
     public void shouldMapFromSubscriptionToSubscriptionDetails() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        SubscriptionResponse subscriptionResponse = new SubscriptionResponseBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now()).build();
 
-        SubscriptionDetails subscriptionDetails = subscriptionDetailsMapper.mapFrom(subscription);
+        SubscriptionDetails subscriptionDetails = subscriptionDetailsMapper.mapFrom(subscriptionResponse);
 
-        assertEquals(subscription.getSubscriptionId(), subscriptionDetails.getSubscriptionId());
-        assertEquals(subscription.getPack().name(), subscriptionDetails.getPack());
-        assertEquals(subscription.getStatus().name(), subscriptionDetails.getStatus());
+        assertEquals(subscriptionResponse.getSubscriptionId(), subscriptionDetails.getSubscriptionId());
+        assertEquals(subscriptionResponse.getPack().name(), subscriptionDetails.getPack());
+        assertEquals(subscriptionResponse.getStatus().name(), subscriptionDetails.getStatus());
     }
 
     @Test
     public void shouldIncludeLastCampaignIdInTheSubscriptionDetails() {
         String messageId = "week3";
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(3));
-        when(kilkariInboxService.getMessageFor(subscription.getSubscriptionId())).thenReturn(messageId);
+        SubscriptionResponse subscriptionResponse = new SubscriptionResponseBuilder().withDefaults().withMsisdn("9988776655").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now().minusWeeks(3)).build();
+        when(kilkariInboxService.getMessageFor(subscriptionResponse.getSubscriptionId())).thenReturn(messageId);
 
-        SubscriptionDetails subscriptionDetails = subscriptionDetailsMapper.mapFrom(subscription);
+        SubscriptionDetails subscriptionDetails = subscriptionDetailsMapper.mapFrom(subscriptionResponse);
 
         assertEquals(messageId, subscriptionDetails.getLastCampaignId());
     }

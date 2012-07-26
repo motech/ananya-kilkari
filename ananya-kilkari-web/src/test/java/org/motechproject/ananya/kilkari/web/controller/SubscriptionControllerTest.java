@@ -15,17 +15,21 @@ import org.motechproject.ananya.kilkari.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.domain.Operator;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
+import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
 import org.motechproject.ananya.kilkari.web.validators.CampaignChangeRequestValidator;
 import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
@@ -49,7 +53,7 @@ public class SubscriptionControllerTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private Subscription mockedSubscription;
+    private SubscriptionResponse mockedSubscription;
     @Mock
     private KilkariSubscriptionService kilkariSubscriptionService;
     @Mock
@@ -77,7 +81,7 @@ public class SubscriptionControllerTest {
         String channel = "ivr";
 
         mockSubscription(msisdn);
-        ArrayList<Subscription> subscriptions = new ArrayList<>();
+        ArrayList<SubscriptionResponse> subscriptions = new ArrayList<>();
         subscriptions.add(mockedSubscription);
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
@@ -94,7 +98,7 @@ public class SubscriptionControllerTest {
         String channel = "call_center";
 
         mockSubscription(msisdn);
-        ArrayList<Subscription> subscriptions = new ArrayList<>();
+        ArrayList<SubscriptionResponse> subscriptions = new ArrayList<>();
         subscriptions.add(mockedSubscription);
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
@@ -517,8 +521,8 @@ public class SubscriptionControllerTest {
     private boolean assertSubscriberResponse(String jsonContent, String channel) {
         jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
 
-        SubscriberResponse subscriberResponse = TestUtils.fromJson(jsonContent, SubscriberResponse.class);
-        SubscriptionDetails subscriptionDetails = subscriberResponse.getSubscriptionDetails().get(0);
+        SubscriptionWebResponse subscriptionWebResponse = TestUtils.fromJson(jsonContent, SubscriptionWebResponse.class);
+        SubscriptionDetails subscriptionDetails = subscriptionWebResponse.getSubscriptionDetails().get(0);
 
         return subscriptionDetails.getPack().equals(mockedSubscription.getPack().name())
                 && subscriptionDetails.getStatus().equals(mockedSubscription.getStatus().name())
@@ -528,8 +532,8 @@ public class SubscriptionControllerTest {
     private boolean assertSubscriberResponseWithNoSubscriptions(String jsonContent, String channel) {
         jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
 
-        SubscriberResponse subscriberResponse = TestUtils.fromJson(jsonContent, SubscriberResponse.class);
+        SubscriptionWebResponse subscriptionWebResponse = TestUtils.fromJson(jsonContent, SubscriptionWebResponse.class);
 
-        return subscriberResponse.getSubscriptionDetails().size() == 0;
+        return subscriptionWebResponse.getSubscriptionDetails().size() == 0;
     }
 }

@@ -15,6 +15,7 @@ import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
@@ -72,14 +73,14 @@ public class KilkariCampaignService {
     }
 
     public Map<String, List<DateTime>> getMessageTimings(String msisdn) {
-        List<Subscription> subscriptionList = kilkariSubscriptionService.findByMsisdn(msisdn);
+        List<SubscriptionResponse> subscriptionList = kilkariSubscriptionService.findByMsisdn(msisdn);
         Map<String, List<DateTime>> campaignMessageMap = new HashMap<>();
-        for (Subscription subscription : subscriptionList) {
+        for (SubscriptionResponse subscription : subscriptionList) {
             String subscriptionId = subscription.getSubscriptionId();
 
             List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
                     subscriptionId, subscription.getPack().name(),
-                    subscription.getCreationDate(), subscription.endDate());
+                    subscription.getCreationDate(), subscription.getEndDate());
 
             campaignMessageMap.put(subscriptionId, messageTimings);
         }

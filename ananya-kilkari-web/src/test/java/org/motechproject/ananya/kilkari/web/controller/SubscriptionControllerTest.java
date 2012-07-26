@@ -371,8 +371,10 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldProcessValidCampaignChangeRequest() throws Exception {
         CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
-        campaignChangeRequest.setSubscriptionId("subscriptionId");
-        campaignChangeRequest.setReason("ID");
+        String subscriptionId = "subscriptionId";
+        String reason = "INFANT_DEATH";
+        campaignChangeRequest.setSubscriptionId(subscriptionId);
+        campaignChangeRequest.setReason(reason);
         byte[] requestBody = TestUtils.toJson(campaignChangeRequest).getBytes();
 
         when(campaignChangeRequestValidator.validate(any(CampaignChangeRequest.class))).thenReturn(new Errors());
@@ -383,6 +385,13 @@ public class SubscriptionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Campaign Change request submitted successfully")));
+
+        ArgumentCaptor<CampaignChangeRequest> campaignChangeRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignChangeRequest.class);
+        verify(kilkariSubscriptionService).processCampaignChange(campaignChangeRequestArgumentCaptor.capture());
+        CampaignChangeRequest changeRequest = campaignChangeRequestArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, changeRequest.getSubscriptionId());
+        assertEquals(reason, changeRequest.getReason());
     }
 
     @Test

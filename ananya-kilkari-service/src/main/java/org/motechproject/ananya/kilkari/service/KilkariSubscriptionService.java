@@ -2,19 +2,16 @@ package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
-import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.request.CampaignChangeRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
+import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -34,7 +31,6 @@ import java.util.List;
 public class KilkariSubscriptionService {
     private SubscriptionPublisher subscriptionPublisher;
     private SubscriptionService subscriptionService;
-    private MessageCampaignService messageCampaignService;
     private MotechSchedulerService motechSchedulerService;
     private KilkariPropertiesData kilkariProperties;
 
@@ -43,11 +39,9 @@ public class KilkariSubscriptionService {
     @Autowired
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
                                       SubscriptionService subscriptionService,
-                                      MessageCampaignService messageCampaignService,
                                       MotechSchedulerService motechSchedulerService, KilkariPropertiesData kilkariProperties) {
         this.subscriptionPublisher = subscriptionPublisher;
         this.subscriptionService = subscriptionService;
-        this.messageCampaignService = messageCampaignService;
         this.motechSchedulerService = motechSchedulerService;
         this.kilkariProperties = kilkariProperties;
     }
@@ -103,5 +97,10 @@ public class KilkariSubscriptionService {
 
     public void requestDeactivation(String subscriptionId, UnsubscriptionRequest unsubscriptionRequest) {
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.from(unsubscriptionRequest.getChannel()), unsubscriptionRequest.getCreatedAt()));
+    }
+
+    public void processCampaignChange(CampaignChangeRequest campaignChangeRequest) {
+        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(campaignChangeRequest.getSubscriptionId(),
+                CampaignChangeReason.from(campaignChangeRequest.getReason()), campaignChangeRequest.getCreatedAt()));
     }
 }

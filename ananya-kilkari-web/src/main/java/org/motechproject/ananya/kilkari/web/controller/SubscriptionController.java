@@ -99,6 +99,7 @@ public class SubscriptionController {
         Errors validationErrors = campaignChangeRequestValidator.validate(campaignChangeRequest);
         raiseExceptionIfThereAreErrors(validationErrors);
 
+        kilkariSubscriptionService.processCampaignChange(campaignChangeRequest);
         return BaseResponse.success("Campaign Change request submitted successfully");
     }
 

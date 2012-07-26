@@ -43,5 +43,35 @@
                 "repeatInterval" : "1 week"
             }
         ]
+    },
+    {
+        "name" : "kilkari-mother-child-campaign-infant-death",
+        "type" : "REPEATING",
+        "maxDuration" : "2 Weeks",
+        "messages" : [
+            {
+                "name" : "Mother Child Health Care",
+                "formats" : ["IVR"],
+                "languages" : ["en"],
+                "messageKey": "PREGNANCY",
+                "deliverTime" : "13:00",
+                "repeatInterval" : "1 week"
+            }
+        ]
+    },
+    {
+        "name" : "kilkari-mother-child-campaign-miscarriage",
+        "type" : "REPEATING",
+        "maxDuration" : "3 Weeks",
+        "messages" : [
+            {
+                "name" : "Mother Child Health Care",
+                "formats" : ["IVR"],
+                "languages" : ["en"],
+                "messageKey": "PREGNANCY",
+                "deliverTime" : "13:00",
+                "repeatInterval" : "1 week"
+            }
+        ]
     }
 ]

@@ -145,6 +145,6 @@ public class ValidationUtilsTest {
 
     @Test
     public void shouldReturnTrueWhenValidReasonIsGivenToChangeCampaign() {
-        assertTrue(ValidationUtils.assertCampaignChangeReason("ID"));
+        assertTrue(ValidationUtils.assertCampaignChangeReason("INFANT_DEATH"));
     }
 }

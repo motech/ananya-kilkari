@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
-import org.motechproject.ananya.kilkari.messagecampaign.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
@@ -41,7 +41,7 @@ public class MessageCampaignServiceTest {
     @Test
     public void shouldStartNewCampaignForTheGivenRequest() {
         String externalId = "externalId";
-        String subscriptionPack = SubscriptionPack.TWELVE_MONTHS.name();
+        String subscriptionPack = MessageCampaignPack.TWELVE_MONTHS.name();
         DateTime subscriptionCreationDate = DateTime.now();
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 externalId, subscriptionPack, subscriptionCreationDate);
@@ -53,7 +53,7 @@ public class MessageCampaignServiceTest {
         CampaignRequest campaignRequest = campaignRequestArgumentCaptor.getValue();
 
         assertEquals(externalId, campaignRequest.externalId());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS.getCampaignName(), campaignRequest.campaignName());
+        assertEquals(MessageCampaignPack.TWELVE_MONTHS.getCampaignName(), campaignRequest.campaignName());
         assertEquals(subscriptionCreationDate.toLocalDate(), campaignRequest.referenceDate());
         assertEquals(new Time(subscriptionCreationDate.toLocalTime()), campaignRequest.reminderTime());
     }
@@ -61,7 +61,7 @@ public class MessageCampaignServiceTest {
     @Test
     public void shouldStop() {
         String externalId = "externalId";
-        String subscriptionPack = SubscriptionPack.TWELVE_MONTHS.name();
+        String subscriptionPack = MessageCampaignPack.TWELVE_MONTHS.name();
         DateTime subscriptionCreationDate = DateTime.now();
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 externalId, subscriptionPack, subscriptionCreationDate);
@@ -73,7 +73,7 @@ public class MessageCampaignServiceTest {
         CampaignRequest campaignRequest = campaignRequestArgumentCaptor.getValue();
 
         assertEquals(externalId, campaignRequest.externalId());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS.getCampaignName(), campaignRequest.campaignName());
+        assertEquals(MessageCampaignPack.TWELVE_MONTHS.getCampaignName(), campaignRequest.campaignName());
         assertEquals(subscriptionCreationDate.toLocalDate(), campaignRequest.referenceDate());
         assertEquals(new Time(subscriptionCreationDate.toLocalTime()), campaignRequest.reminderTime());
     }
@@ -82,7 +82,7 @@ public class MessageCampaignServiceTest {
     public void shouldGetMessageTimingsForASubscription() {
         DateTime startDate = DateTime.now();
         String subscriptionId = "abcd1234";
-        SubscriptionPack subscriptionPack = SubscriptionPack.SEVEN_MONTHS;
+        MessageCampaignPack messageCampaignPack = MessageCampaignPack.SEVEN_MONTHS;
         DateTime endDate = startDate.plusYears(2);
         Date messageTime = DateTime.now().toDate();
 
@@ -90,13 +90,13 @@ public class MessageCampaignServiceTest {
         ArrayList<Date> dates = new ArrayList<Date>();
         dates.add(messageTime);
         campaignTimings.put(MessageCampaignService.CAMPAIGN_MESSAGE_NAME, dates);
-        when(platformMessageCampaignService.getCampaignTimings(subscriptionId, subscriptionPack.getCampaignName(),
+        when(platformMessageCampaignService.getCampaignTimings(subscriptionId, messageCampaignPack.getCampaignName(),
                 startDate.toDate(), endDate.toDate())).thenReturn(campaignTimings);
 
         List<DateTime> messageTimings = this.messageCampaignService.getMessageTimings(
-                subscriptionId, subscriptionPack.name(), startDate, endDate);
+                subscriptionId, messageCampaignPack.name(), startDate, endDate);
 
-        verify(platformMessageCampaignService).getCampaignTimings(subscriptionId, subscriptionPack.getCampaignName(),
+        verify(platformMessageCampaignService).getCampaignTimings(subscriptionId, messageCampaignPack.getCampaignName(),
                 startDate.toDate(), endDate.toDate());
 
         assertEquals(new DateTime(messageTime), messageTimings.get(0));

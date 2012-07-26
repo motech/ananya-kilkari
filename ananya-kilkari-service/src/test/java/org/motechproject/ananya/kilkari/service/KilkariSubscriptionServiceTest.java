@@ -6,16 +6,17 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
+import org.motechproject.ananya.kilkari.request.CampaignChangeRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
-import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
-import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -50,7 +51,7 @@ public class KilkariSubscriptionServiceTest {
     @Before
     public void setup() {
         initMocks(this);
-        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, messageCampaignService, motechSchedulerService, kilkariPropertiesData);
+        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, kilkariPropertiesData);
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
     }
 
@@ -165,5 +166,25 @@ public class KilkariSubscriptionServiceTest {
 
         assertEquals(subscriptionId, deactivationRequest.getSubscriptionId());
         assertEquals(Channel.CALL_CENTER, deactivationRequest.getChannel());
+    }
+
+    @Test
+    public void shouldProcessCampaignChange(){
+        CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
+        String subscriptionId = "subscriptionId";
+        String reason = "MISCARRIAGE";
+        DateTime createdAt = DateTime.now();
+        campaignChangeRequest.setSubscriptionId(subscriptionId);
+        campaignChangeRequest.setReason(reason);
+        campaignChangeRequest.setCreatedAt(createdAt);
+
+        kilkariSubscriptionService.processCampaignChange(campaignChangeRequest);
+
+        ArgumentCaptor<CampaignRescheduleRequest> campaignRescheduleRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignRescheduleRequest.class);
+        verify(subscriptionService).rescheduleCampaign(campaignRescheduleRequestArgumentCaptor.capture());
+        CampaignRescheduleRequest campaignRescheduleRequest = campaignRescheduleRequestArgumentCaptor.getValue();
+        assertEquals(subscriptionId, campaignRescheduleRequest.getSubscriptionId());
+        assertEquals(reason, campaignRescheduleRequest.getReason().name());
+        assertEquals(createdAt, campaignRescheduleRequest.getCreatedAt());
     }
 }

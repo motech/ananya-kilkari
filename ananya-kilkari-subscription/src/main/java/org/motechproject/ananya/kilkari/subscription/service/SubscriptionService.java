@@ -5,11 +5,11 @@ import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaign
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
+import org.motechproject.ananya.kilkari.subscription.domain.CampaignRescheduleRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
@@ -26,19 +26,17 @@ public class SubscriptionService {
     private OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher;
     private SubscriptionValidator subscriptionValidator;
     private ReportingService reportingService;
-    private AllInboxMessages allInboxMessages;
     private KilkariInboxService kilkariInboxService;
     private MessageCampaignService messageCampaignService;
 
     @Autowired
     public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher,
                                SubscriptionValidator subscriptionValidator, ReportingService reportingService,
-                               AllInboxMessages allInboxMessages, KilkariInboxService kilkariInboxService, MessageCampaignService messageCampaignService) {
+                               KilkariInboxService kilkariInboxService, MessageCampaignService messageCampaignService) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
         this.reportingService = reportingService;
-        this.allInboxMessages = allInboxMessages;
         this.kilkariInboxService = kilkariInboxService;
         this.messageCampaignService = messageCampaignService;
     }
@@ -56,12 +54,6 @@ public class SubscriptionService {
                 subscriptionMapper.createSubscriptionCreationReportRequest(subscription, channel, subscriptionRequest.getLocation(), subscriptionRequest.getSubscriber()));
 
         return subscription;
-    }
-
-    private void scheduleCampaign(Subscription subscription) {
-        MessageCampaignRequest campaignRequest = new MessageCampaignRequest(
-                subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getCreationDate());
-        messageCampaignService.start(campaignRequest);
     }
 
     public List<Subscription> findByMsisdn(String msisdn) {
@@ -158,6 +150,28 @@ public class SubscriptionService {
 
     public Subscription findBySubscriptionId(String subscriptionId) {
         return allSubscriptions.findBySubscriptionId(subscriptionId);
+    }
+
+    public void rescheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
+        Subscription subscription = findBySubscriptionId(campaignRescheduleRequest.getSubscriptionId());
+        unScheduleCampaign(subscription);
+        scheduleCampaign(campaignRescheduleRequest);
+    }
+
+    private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
+        MessageCampaignRequest enrollRequest = new MessageCampaignRequest(campaignRescheduleRequest.getSubscriptionId(), campaignRescheduleRequest.getReason().name(), campaignRescheduleRequest.getCreatedAt());
+        messageCampaignService.start(enrollRequest);
+    }
+
+    private void scheduleCampaign(Subscription subscription) {
+        MessageCampaignRequest campaignRequest = new MessageCampaignRequest(
+                subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getCreationDate());
+        messageCampaignService.start(campaignRequest);
+    }
+
+    private void unScheduleCampaign(Subscription subscription) {
+        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getCreationDate());
+        messageCampaignService.stop(unEnrollRequest);
     }
 
     private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Integer graceCount, Action<Subscription> action) {

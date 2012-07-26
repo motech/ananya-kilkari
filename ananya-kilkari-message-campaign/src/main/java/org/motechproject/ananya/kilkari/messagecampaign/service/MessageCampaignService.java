@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignEnrollment;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.contract.mapper.MessageCampaignRequestMapper;
-import org.motechproject.ananya.kilkari.messagecampaign.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
@@ -22,8 +22,10 @@ public class MessageCampaignService {
     public static final String FIFTEEN_MONTHS_CAMPAIGN_KEY = "kilkari-mother-child-campaign-fifteen-months";
     public static final String TWELVE_MONTHS_CAMPAIGN_KEY = "kilkari-mother-child-campaign-twelve-months";
     public static final String SEVEN_MONTHS_CAMPAIGN_KEY = "kilkari-mother-child-campaign-seven-months";
-    public static final String CAMPAIGN_MESSAGE_NAME = "Mother Child Health Care";
+    public static final String INFANT_DEATH_CAMPAIGN_KEY = "kilkari-mother-child-campaign-infant-death";
+    public static final String MISCARRIAGE_CAMPAIGN_KEY = "kilkari-mother-child-campaign-miscarriage";
 
+    public static final String CAMPAIGN_MESSAGE_NAME = "Mother Child Health Care";
     private KilkariPropertiesData kilkariProperties;
     private org.motechproject.server.messagecampaign.service.MessageCampaignService campaignService;
 
@@ -56,7 +58,7 @@ public class MessageCampaignService {
     }
 
     public List<DateTime> getMessageTimings(String subscriptionId, String packName, DateTime startDate, DateTime endDate) {
-        String campaignName = SubscriptionPack.from(packName).getCampaignName();
+        String campaignName = MessageCampaignPack.from(packName).getCampaignName();
         Map<String, List<Date>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
                 startDate.toDate(), endDate.toDate());
         List<Date> campaignMessageTimings = campaignTimings.get(CAMPAIGN_MESSAGE_NAME);

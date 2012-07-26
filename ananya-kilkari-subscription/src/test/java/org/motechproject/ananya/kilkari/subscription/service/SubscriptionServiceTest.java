@@ -14,6 +14,7 @@ import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignS
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -57,7 +58,7 @@ public class SubscriptionServiceTest {
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, allInboxMessages, kilkariInboxService, messageCampaignService);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService);
     }
 
     @Test
@@ -490,6 +491,34 @@ public class SubscriptionServiceTest {
         subscriptionService.deactivationRequested(subscriptionId);
 
         verify(kilkariInboxService).scheduleInboxDeletion(subscription);
+    }
+
+    @Test
+    public void shouldUnScheduleCurrentCampaignAndScheduleNewCampaignForMCOrID(){
+        String subscriptionId = "subscriptionId";
+        String msisdn = "1234567890";
+        SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
+        DateTime creationDate = DateTime.now();
+        CampaignChangeReason campaignChangeReason = CampaignChangeReason.MISCARRIAGE;
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).withCreationDate(creationDate).build();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId, campaignChangeReason, creationDate));
+
+        InOrder order = inOrder(messageCampaignService);
+        ArgumentCaptor<MessageCampaignRequest> campaignUnEnrollmentRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
+        order.verify(messageCampaignService).stop(campaignUnEnrollmentRequestArgumentCaptor.capture());
+        MessageCampaignRequest campaignRequest = campaignUnEnrollmentRequestArgumentCaptor.getValue();
+        assertEquals(subscription.getSubscriptionId(), campaignRequest.getExternalId());
+        assertEquals(subscription.getPack().name(), campaignRequest.getSubscriptionPack());
+        assertEquals(subscription.getCreationDate(), campaignRequest.getSubscriptionCreationDate());
+
+        ArgumentCaptor<MessageCampaignRequest> campaignEnrollmentRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
+        order.verify(messageCampaignService).start(campaignEnrollmentRequestArgumentCaptor.capture());
+        MessageCampaignRequest campaignEnrollmentRequest = campaignEnrollmentRequestArgumentCaptor.getValue();
+        assertEquals(subscriptionId, campaignEnrollmentRequest.getExternalId());
+        assertEquals(campaignChangeReason.name(), campaignEnrollmentRequest.getSubscriptionPack());
+        assertEquals(creationDate, campaignEnrollmentRequest.getSubscriptionCreationDate());
     }
 }
 

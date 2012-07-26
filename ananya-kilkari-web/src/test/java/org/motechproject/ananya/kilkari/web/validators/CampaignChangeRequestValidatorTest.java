@@ -31,7 +31,7 @@ public class CampaignChangeRequestValidatorTest {
         String subscriptionId = "abcd1234";
         CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
         campaignChangeRequest.setSubscriptionId(subscriptionId);
-        campaignChangeRequest.setReason("MC");
+        campaignChangeRequest.setReason("MISCARRIAGE");
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
@@ -43,7 +43,7 @@ public class CampaignChangeRequestValidatorTest {
         String subscriptionId = "abcd1234";
         CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
         campaignChangeRequest.setSubscriptionId(subscriptionId);
-        campaignChangeRequest.setReason("MC");
+        campaignChangeRequest.setReason("MISCARRIAGE");
 
         when(subscriptionService.findBySubscriptionId(anyString())).thenReturn(null);
 

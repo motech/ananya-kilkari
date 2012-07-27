@@ -4,20 +4,24 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequestMapper;
 import org.motechproject.ananya.kilkari.domain.CampaignTriggerType;
+import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
+import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.*;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
+import org.motechproject.ananya.kilkari.validators.OBDSuccessfulCallRequestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,8 @@ public class KilkariCampaignService {
     private OBDRequestPublisher obdRequestPublisher;
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
     private KilkariInboxService kilkariInboxService;
+    private OBDServiceOptionFactory obdServiceOptionFactory;
+    private OBDSuccessfulCallRequestValidator successfulCallRequestValidator;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariCampaignService.class);
 
@@ -56,7 +62,9 @@ public class KilkariCampaignService {
                                   ReportingService reportingService,
                                   OBDRequestPublisher obdRequestPublisher,
                                   CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator,
-                                  KilkariInboxService kilkariInboxService) {
+                                  KilkariInboxService kilkariInboxService,
+                                  OBDServiceOptionFactory obdServiceOptionFactory,
+                                  OBDSuccessfulCallRequestValidator successfulCallRequestValidator) {
         this.messageCampaignService = messageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.campaignMessageIdStrategy = campaignMessageIdStrategy;
@@ -66,6 +74,8 @@ public class KilkariCampaignService {
         this.obdRequestPublisher = obdRequestPublisher;
         this.callDeliveryFailureRecordValidator = callDeliveryFailureRecordValidator;
         this.kilkariInboxService = kilkariInboxService;
+        this.obdServiceOptionFactory = obdServiceOptionFactory;
+        this.successfulCallRequestValidator = successfulCallRequestValidator;
     }
 
     public Map<String, List<DateTime>> getMessageTimings(String msisdn) {
@@ -125,6 +135,8 @@ public class KilkariCampaignService {
     }
 
     public void processSuccessfulMessageDelivery(OBDSuccessfulCallRequestWrapper obdRequestWrapper) {
+        validateSuccessfulCallRequest(obdRequestWrapper);
+
         CampaignMessage campaignMessage = campaignMessageService.find(obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId());
         if (campaignMessage == null) {
             logger.error(String.format("Campaign Message not present for subscriptionId[%s] and campaignId[%s].",
@@ -135,6 +147,11 @@ public class KilkariCampaignService {
 
         reportingService.reportCampaignMessageDeliveryStatus(new CampaignMessageDeliveryReportRequestMapper().mapFrom(obdRequestWrapper, retryCount));
         campaignMessageService.deleteCampaignMessage(campaignMessage);
+
+        ServiceOption serviceOption = ServiceOption.getFor(obdRequestWrapper.getSuccessfulCallRequest().getServiceOption());
+        if (obdServiceOptionFactory.getHandler(serviceOption) != null) {
+            obdServiceOptionFactory.getHandler(serviceOption).process(obdRequestWrapper);
+        }
     }
 
     public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntries invalidOBDRequestEntries) {
@@ -210,6 +227,13 @@ public class KilkariCampaignService {
     private void publishValidRecords(List<ValidFailedCallReport> validFailedCallReports) {
         for (ValidFailedCallReport failedCallReport : validFailedCallReports) {
             obdRequestPublisher.publishValidCallDeliveryFailureRecord(failedCallReport);
+        }
+    }
+
+    private void validateSuccessfulCallRequest(OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper) {
+        Errors validationErrors = successfulCallRequestValidator.validate(successfulCallRequestWrapper);
+        if (validationErrors.hasErrors()) {
+            throw new ValidationException(String.format("OBD Request Invalid: %s", validationErrors.allMessages()));
         }
     }
 }

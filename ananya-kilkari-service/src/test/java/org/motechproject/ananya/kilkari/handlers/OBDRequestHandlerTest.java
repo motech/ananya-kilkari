@@ -10,18 +10,17 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
+import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
+import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.validators.OBDSuccessfulCallRequestValidator;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -31,7 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OBDRequestHandlerTest {
@@ -53,7 +53,7 @@ public class OBDRequestHandlerTest {
 
     @Before
     public void setUp() {
-        obdRequestHandler = new OBDRequestHandler(obdServiceOptionFactory, kilkariCampaignService, successfulCallRequestValidator, callRecordsService);
+        obdRequestHandler = new OBDRequestHandler(kilkariCampaignService, callRecordsService);
     }
 
     @Test
@@ -63,13 +63,10 @@ public class OBDRequestHandlerTest {
         successfulCallRequest.setServiceOption(ServiceOption.HELP.name());
         OBDSuccessfulCallRequestWrapper expectedObdRequest = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, "subscriptionId", DateTime.now(), Channel.IVR);
         stringObjectHashMap.put("0", expectedObdRequest);
-        when(obdServiceOptionFactory.getHandler(ServiceOption.HELP)).thenReturn(serviceOptionHandler);
-        when(successfulCallRequestValidator.validate(expectedObdRequest)).thenReturn(new Errors());
 
         obdRequestHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, stringObjectHashMap));
 
         verify(kilkariCampaignService).processSuccessfulMessageDelivery(expectedObdRequest);
-        verify(serviceOptionHandler).process(expectedObdRequest);
     }
 
     @Test
@@ -79,32 +76,10 @@ public class OBDRequestHandlerTest {
         successfulCallRequest.setServiceOption(ServiceOption.UNSUBSCRIBE.name());
         OBDSuccessfulCallRequestWrapper expectedObdRequest = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, "subscriptionId", DateTime.now(), Channel.IVR);
         stringObjectHashMap.put("0", expectedObdRequest);
-        when(obdServiceOptionFactory.getHandler(ServiceOption.UNSUBSCRIBE)).thenReturn(serviceOptionHandler);
-        when(successfulCallRequestValidator.validate(expectedObdRequest)).thenReturn(new Errors());
 
         obdRequestHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, stringObjectHashMap));
 
         verify(kilkariCampaignService).processSuccessfulMessageDelivery(expectedObdRequest);
-        verify(serviceOptionHandler).process(expectedObdRequest);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void shouldInvalidateTheOBDRquest() {
-        HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
-        successfulCallRequest.setServiceOption("Random");
-        OBDSuccessfulCallRequestWrapper expectedObdRequest = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, "subscriptionId", DateTime.now(), Channel.IVR);
-        stringObjectHashMap.put("0", expectedObdRequest);
-        when(obdServiceOptionFactory.getHandler(ServiceOption.HELP)).thenReturn(serviceOptionHandler);
-        Errors errors = new Errors() {{
-            add("Invalid service option");
-        }};
-        when(successfulCallRequestValidator.validate(expectedObdRequest)).thenReturn(errors);
-
-        obdRequestHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, stringObjectHashMap));
-
-        verify(kilkariCampaignService, never()).processSuccessfulMessageDelivery(expectedObdRequest);
-        verify(serviceOptionHandler, never()).process(expectedObdRequest);
     }
 
     @Test

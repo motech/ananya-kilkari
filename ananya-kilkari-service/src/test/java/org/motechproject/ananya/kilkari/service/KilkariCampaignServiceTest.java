@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.domain.CampaignTriggerType;
+import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
+import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
@@ -28,6 +30,7 @@ import org.motechproject.ananya.kilkari.subscription.service.response.Subscripti
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
+import org.motechproject.ananya.kilkari.validators.OBDSuccessfulCallRequestValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,12 +66,18 @@ public class KilkariCampaignServiceTest {
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
     @Mock
     private KilkariInboxService kilkariInboxService;
+    @Mock
+    private OBDServiceOptionFactory obdServiceOptionFactory;
+    @Mock
+    private ServiceOptionHandler serviceOptionHandler;
+    @Mock
+    private OBDSuccessfulCallRequestValidator successfulCallRequestValidator;
 
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, kilkariInboxService);
+        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, kilkariInboxService, obdServiceOptionFactory, successfulCallRequestValidator);
     }
 
     @Test
@@ -284,6 +293,9 @@ public class KilkariCampaignServiceTest {
         when(campaignMessage.getDnpRetryCount()).thenReturn(retryCount);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
+        when(successfulCallRequestValidator.validate(successfulCallRequestWrapper)).thenReturn(new Errors());
+        when(obdServiceOptionFactory.getHandler(ServiceOption.HELP)).thenReturn(serviceOptionHandler);
+
         kilkariCampaignService.processSuccessfulMessageDelivery(successfulCallRequestWrapper);
 
         InOrder inOrder = Mockito.inOrder(campaignMessageService, reportingService);
@@ -302,6 +314,8 @@ public class KilkariCampaignServiceTest {
         assertEquals(serviceOption, campaignMessageDeliveryReportRequest.getServiceOption());
         assertEquals(startTime, campaignMessageDeliveryReportRequest.getCallDetailRecord().getStartTime());
         assertEquals(endTime, campaignMessageDeliveryReportRequest.getCallDetailRecord().getEndTime());
+
+        verify(serviceOptionHandler).process(successfulCallRequestWrapper);
     }
 
     @Test
@@ -323,6 +337,8 @@ public class KilkariCampaignServiceTest {
         successfulCallRequest.setCallDetailRecord(callDetailRecord);
         OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, DateTime.now(), Channel.IVR);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(null);
+
+        when(successfulCallRequestValidator.validate(successfulCallRequestWrapper)).thenReturn(new Errors());
 
         kilkariCampaignService.processSuccessfulMessageDelivery(successfulCallRequestWrapper);
 

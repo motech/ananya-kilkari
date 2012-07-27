@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.gateway;
+package org.motechproject.ananya.kilkari.obd.repository;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -14,6 +14,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.profile.ProductionProfile;
+import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

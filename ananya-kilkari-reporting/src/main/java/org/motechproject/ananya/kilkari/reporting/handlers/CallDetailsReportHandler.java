@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.reporting.handlers;
 
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.ReportingEventKeys;
-import org.motechproject.ananya.kilkari.reporting.gateway.ReportingGateway;
+import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
 import org.slf4j.Logger;

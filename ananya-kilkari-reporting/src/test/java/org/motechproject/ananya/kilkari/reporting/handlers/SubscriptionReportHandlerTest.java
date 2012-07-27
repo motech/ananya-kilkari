@@ -8,7 +8,7 @@ import org.motechproject.ananya.kilkari.reporting.domain.ReportingEventKeys;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
-import org.motechproject.ananya.kilkari.reporting.gateway.ReportingGateway;
+import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;

@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
-import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
+import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.ArrayList;

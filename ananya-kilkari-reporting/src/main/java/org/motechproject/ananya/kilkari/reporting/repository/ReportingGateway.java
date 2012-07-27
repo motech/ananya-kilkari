@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.reporting.gateway;
+package org.motechproject.ananya.kilkari.reporting.repository;
 
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;

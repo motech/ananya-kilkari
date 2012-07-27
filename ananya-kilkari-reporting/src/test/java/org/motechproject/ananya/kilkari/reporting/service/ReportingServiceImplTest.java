@@ -7,7 +7,7 @@ import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDelivery
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
-import org.motechproject.ananya.kilkari.reporting.gateway.ReportingGateway;
+import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.*;

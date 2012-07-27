@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.reporting.gateway;
+package org.motechproject.ananya.kilkari.reporting.repository;
 
 import org.joda.time.DateTime;
 import org.junit.Before;

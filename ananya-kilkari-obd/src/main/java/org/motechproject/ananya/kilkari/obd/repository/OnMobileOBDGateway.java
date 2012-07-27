@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.gateway;
+package org.motechproject.ananya.kilkari.obd.repository;
 
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 

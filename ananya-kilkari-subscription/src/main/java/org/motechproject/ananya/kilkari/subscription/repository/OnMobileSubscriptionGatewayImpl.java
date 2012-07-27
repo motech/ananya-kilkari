@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.subscription.gateway;
+package org.motechproject.ananya.kilkari.subscription.repository;
 
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;

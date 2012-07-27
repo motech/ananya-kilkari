@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.gateway;
+package org.motechproject.ananya.kilkari.obd.repository;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;

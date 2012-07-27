@@ -4,7 +4,7 @@ import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDelivery
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
-import org.motechproject.ananya.kilkari.reporting.gateway.ReportingGateway;
+import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

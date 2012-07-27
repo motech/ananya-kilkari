@@ -1,11 +1,11 @@
-package org.motechproject.ananya.kilkari.subscription.gateway;
+package org.motechproject.ananya.kilkari.subscription.repository;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;

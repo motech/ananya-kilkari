@@ -7,8 +7,6 @@ public interface FlowSystem {
 
     FlowSystem nextFirstSlot();
 
-    FlowSystem assertHappens(FlowEvent flowEvent);
-
     FlowSystem activate() throws Exception;
 
     FlowSystem moveToFutureTime(DateTime dateTime);

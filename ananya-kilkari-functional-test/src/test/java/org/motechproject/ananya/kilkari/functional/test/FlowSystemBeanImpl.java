@@ -47,11 +47,6 @@ public class FlowSystemBeanImpl implements FlowSystem {
     }
 
     @Override
-    public FlowSystem assertHappens(FlowEvent flowEvent) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public FlowSystem activate() throws Exception {
         mockMvc(subscriptionController)
                 .perform(put(String.format("/subscription/%s", subscriptionData.getSubscriptionId()))

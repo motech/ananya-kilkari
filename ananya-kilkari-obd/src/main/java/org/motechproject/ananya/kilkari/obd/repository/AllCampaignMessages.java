@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.obd.repository;
 
 import org.ektorp.ComplexKey;
 import org.ektorp.CouchDbConnector;
+import org.ektorp.support.GenerateView;
 import org.ektorp.support.View;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.NewMessageComparator;
@@ -21,6 +22,11 @@ public class AllCampaignMessages extends MotechBaseRepository<CampaignMessage> {
     public AllCampaignMessages(@Qualifier("obdDbConnector") CouchDbConnector db) {
         super(CampaignMessage.class, db);
         initStandardDesignDocument();
+    }
+
+    @GenerateView
+    public List<CampaignMessage> findBySubscriptionId(String subscriptionId) {
+        return queryView("by_subscriptionId", subscriptionId);
     }
 
     @View(name = "all_unsent_new_messages", map = "function(doc) {if(doc.type == 'CampaignMessage' && (doc.status == 'NEW' || doc.status == 'DNC') && !doc.sent) {emit([doc.subscriptionId, doc.messageId]);}}")

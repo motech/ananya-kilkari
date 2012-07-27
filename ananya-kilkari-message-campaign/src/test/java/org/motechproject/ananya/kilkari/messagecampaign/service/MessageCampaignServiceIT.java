@@ -9,7 +9,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
+import org.motechproject.ananya.kilkari.messagecampaign.response.MessageCampaignEnrollment;
 import org.motechproject.server.messagecampaign.dao.AllCampaignEnrollments;
+import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollment;
+import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -26,6 +29,7 @@ public class MessageCampaignServiceIT {
 
     public static final int CONFIGURED_DELTA_MINUTES = 30;
     public static final int CONFIGURED_DELTA_DAYS = 2;
+    public static final int KILKARI_CAMPAIGN_SCHEDULE_DELTA_DAYS = 2;
 
     @Autowired
     private AllCampaignEnrollments allCampaignEnrollments;
@@ -106,5 +110,32 @@ public class MessageCampaignServiceIT {
 
         assertEquals(referenceDateWithDelta.plusWeeks(58), dateTimeList.get(58).toLocalDate());
         assertEquals(deliverTime, dateTimeList.get(58).toLocalTime());
+    }
+
+    @Test
+    public void shouldGetOnlyActiveEnrollments() {
+        DateTime referenceDate = DateTime.now().plusDays(1);
+
+        String externalId = "my_id4";
+        MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
+                externalId, MessageCampaignPack.FIFTEEN_MONTHS.name(), referenceDate);
+
+        messageCampaignService.start(messageCampaignRequest);
+        CampaignEnrollment enrollment = allCampaignEnrollments.findByExternalId(externalId).get(0);
+        enrollment.setStatus(CampaignEnrollmentStatus.INACTIVE);
+        allCampaignEnrollments.update(enrollment);
+
+        DateTime referenceDate2 = referenceDate.plusMonths(1);
+        MessageCampaignRequest messageCampaignRequest2 = new MessageCampaignRequest(
+                externalId, MessageCampaignPack.TWELVE_MONTHS.name(), referenceDate2);
+
+        messageCampaignService.start(messageCampaignRequest2);
+
+        MessageCampaignEnrollment messageCampaignEnrollment = messageCampaignService.searchEnrollment(externalId);
+
+        assertEquals(CampaignEnrollmentStatus.ACTIVE.name(), messageCampaignEnrollment.getStatus());
+        assertEquals(MessageCampaignService.TWELVE_MONTHS_CAMPAIGN_KEY, messageCampaignEnrollment.getCampaignName());
+        assertEquals(externalId, messageCampaignEnrollment.getExternalId());
+        assertEquals(referenceDate2.plusDays(KILKARI_CAMPAIGN_SCHEDULE_DELTA_DAYS).toLocalDate(), messageCampaignEnrollment.getStartDate().toLocalDate());
     }
 }

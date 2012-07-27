@@ -5,6 +5,7 @@ import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignR
 import org.motechproject.ananya.kilkari.messagecampaign.response.MessageCampaignEnrollment;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
+import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class MessageCampaignService {
 
     public MessageCampaignEnrollment searchEnrollment(String externalId) {
         List<CampaignEnrollmentRecord> enrollmentRecords = campaignService.search(
-                new CampaignEnrollmentsQuery().withExternalId(externalId));
+                new CampaignEnrollmentsQuery().withExternalId(externalId).havingState(CampaignEnrollmentStatus.ACTIVE));
 
         if (enrollmentRecords.isEmpty())
             return null;

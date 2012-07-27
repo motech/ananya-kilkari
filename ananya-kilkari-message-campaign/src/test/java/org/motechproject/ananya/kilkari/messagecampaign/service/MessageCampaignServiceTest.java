@@ -111,7 +111,7 @@ public class MessageCampaignServiceTest {
     }
 
     @Test
-    public void shouldGetCampaignStartDateForASubscription() {
+    public void shouldGetCampaignStartDateForActiveSubscription() {
         String subscriptionId = "abcd1234";
         DateTime startDate = DateTime.now();
 

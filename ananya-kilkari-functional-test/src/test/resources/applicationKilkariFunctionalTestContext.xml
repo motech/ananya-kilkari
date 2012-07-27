@@ -11,7 +11,7 @@
     <import resource="applicationContext.xml"/>
 
     <bean name="reportingService" class="org.motechproject.ananya.kilkari.reporting.service.StubReportingService"/>
-    <bean name="onMobileOBDGateway" class="org.motechproject.ananya.kilkari.obd.gateway.StubOnMobileOBDGateway"/>
+    <bean name="onMobileOBDGateway" class="org.motechproject.ananya.kilkari.obd.repository.StubOnMobileOBDGateway"/>
     <bean name="onMobileSubscriptionGateway" class="org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway"/>
-    <bean name="reportingGateway" class="org.motechproject.ananya.kilkari.reporting.gateway.StubReportingGateway"/>
+    <bean name="reportingGateway" class="org.motechproject.ananya.kilkari.reporting.repository.StubReportingGateway"/>
 </beans>

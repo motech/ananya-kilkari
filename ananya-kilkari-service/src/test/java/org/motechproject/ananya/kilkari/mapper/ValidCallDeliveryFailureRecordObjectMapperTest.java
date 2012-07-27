@@ -11,11 +11,10 @@ import static org.junit.Assert.assertEquals;
 public class ValidCallDeliveryFailureRecordObjectMapperTest {
     @Test
     public void shouldMapFromCallDeliveryFailureRecordObjectToValidCallDeliveryFailureRecordObject() {
-        ValidCallDeliveryFailureRecordObjectMapper mapper = new ValidCallDeliveryFailureRecordObjectMapper();
         FailedCallReport failedCallReport = new FailedCallReport("subscriptionId", "msisdn", "WEEK13", "DNP");
         FailedCallReports failedCallReports = new FailedCallReports();
 
-        ValidFailedCallReport validFailedCallReport = mapper.mapFrom(failedCallReport, failedCallReports);
+        ValidFailedCallReport validFailedCallReport = ValidCallDeliveryFailureRecordObjectMapper.mapFrom(failedCallReport, failedCallReports);
 
         assertEquals("subscriptionId", validFailedCallReport.getSubscriptionId());
         assertEquals("msisdn", validFailedCallReport.getMsisdn());

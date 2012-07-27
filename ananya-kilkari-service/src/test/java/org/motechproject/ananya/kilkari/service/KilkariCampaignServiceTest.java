@@ -63,15 +63,13 @@ public class KilkariCampaignServiceTest {
     @Mock
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
     @Mock
-    private ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper;
-    @Mock
     private KilkariInboxService kilkariInboxService;
 
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, kilkariInboxService, validCallDeliveryFailureRecordObjectMapper);
+        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, kilkariInboxService);
     }
 
     @Test
@@ -554,9 +552,7 @@ public class KilkariCampaignServiceTest {
 
         ValidFailedCallReport validFailedCallReport1 = mock(ValidFailedCallReport.class);
         ValidFailedCallReport validFailedCallReport2 = mock(ValidFailedCallReport.class);
-        when(validCallDeliveryFailureRecordObjectMapper.mapFrom(successfulFailedCallReport1, failedCallReports)).thenReturn(validFailedCallReport1);
-        when(validCallDeliveryFailureRecordObjectMapper.mapFrom(successfulFailedCallReport2, failedCallReports)).thenReturn(validFailedCallReport2);
-
+        
         Errors errors = new Errors();
         errors.add("Some error description");
         when(callDeliveryFailureRecordValidator.validate(erroredOutFailedCallReport)).thenReturn(errors);

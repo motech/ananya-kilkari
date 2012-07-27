@@ -42,7 +42,6 @@ public class KilkariCampaignService {
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
     private KilkariInboxService kilkariInboxService;
 
-    private ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper;
     private final Logger logger = LoggerFactory.getLogger(KilkariCampaignService.class);
 
     KilkariCampaignService() {
@@ -57,8 +56,7 @@ public class KilkariCampaignService {
                                   ReportingService reportingService,
                                   OBDRequestPublisher obdRequestPublisher,
                                   CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator,
-                                  KilkariInboxService kilkariInboxService,
-                                  ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper) {
+                                  KilkariInboxService kilkariInboxService) {
         this.messageCampaignService = messageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.campaignMessageIdStrategy = campaignMessageIdStrategy;
@@ -68,7 +66,6 @@ public class KilkariCampaignService {
         this.obdRequestPublisher = obdRequestPublisher;
         this.callDeliveryFailureRecordValidator = callDeliveryFailureRecordValidator;
         this.kilkariInboxService = kilkariInboxService;
-        this.validCallDeliveryFailureRecordObjectMapper = validCallDeliveryFailureRecordObjectMapper;
     }
 
     public Map<String, List<DateTime>> getMessageTimings(String msisdn) {
@@ -196,7 +193,7 @@ public class KilkariCampaignService {
                 continue;
             }
 
-            ValidFailedCallReport validFailedCallReport = validCallDeliveryFailureRecordObjectMapper.mapFrom(failedCallReport, failedCallReports);
+            ValidFailedCallReport validFailedCallReport = ValidCallDeliveryFailureRecordObjectMapper.mapFrom(failedCallReport, failedCallReports);
             validFailedCallReports.add(validFailedCallReport);
         }
     }

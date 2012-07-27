@@ -16,7 +16,7 @@
     </properties>
 
     <build>
-        <finalName>ananya-kilkari-web-${version}</finalName>
+        <finalName>ananya-kilkari-web</finalName>
         <plugins>
 
             <plugin>
@@ -87,7 +87,7 @@
                             <groupId>${project.groupId}</groupId>
                             <version>${project.version}</version>
                             <file>
-                                ${project.build.directory}/${project.artifactId}-${project.version}.jar
+                                ${project.build.directory}/${project.artifactId}.jar
                             </file>
                         </configuration>
                     </execution>

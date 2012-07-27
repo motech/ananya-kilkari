@@ -463,4 +463,12 @@ public class CampaignMessageServiceTest {
         assertNull(reportRequest.getServiceOption());
     }
 
+    @Test
+    public void shouldDeleteAllExistingMessagesForASubscription(){
+        String subscriptionId = "subscriptionId";
+
+        campaignMessageService.deleteCampaignMessagesFor(subscriptionId);
+
+        verify(allCampaignMessages).removeAll(subscriptionId);
+    }
 }

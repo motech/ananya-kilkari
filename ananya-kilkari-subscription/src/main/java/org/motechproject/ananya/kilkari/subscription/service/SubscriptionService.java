@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.subscription.service;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.CampaignRescheduleRequest;
@@ -34,12 +35,14 @@ public class SubscriptionService {
     private KilkariInboxService kilkariInboxService;
     private MessageCampaignService messageCampaignService;
     private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
+    private CampaignMessageService campaignMessageService;
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
     @Autowired
     public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher,
                                SubscriptionValidator subscriptionValidator, ReportingService reportingService,
-                               KilkariInboxService kilkariInboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway) {
+                               KilkariInboxService kilkariInboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
+                               CampaignMessageService campaignMessageService) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
@@ -47,6 +50,7 @@ public class SubscriptionService {
         this.kilkariInboxService = kilkariInboxService;
         this.messageCampaignService = messageCampaignService;
         this.onMobileSubscriptionGateway = onMobileSubscriptionGateway;
+        this.campaignMessageService = campaignMessageService;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
@@ -187,6 +191,11 @@ public class SubscriptionService {
     private void unScheduleCampaign(Subscription subscription) {
         MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getCreationDate());
         messageCampaignService.stop(unEnrollRequest);
+        removeScheduledMessagesFromOBD(subscription);
+    }
+
+    private void removeScheduledMessagesFromOBD(Subscription subscription) {
+        campaignMessageService.deleteCampaignMessagesFor(subscription.getSubscriptionId());
     }
 
     private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Integer graceCount, Action<Subscription> action) {

@@ -11,6 +11,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl;
@@ -58,11 +59,13 @@ public class SubscriptionServiceTest {
     private MessageCampaignService messageCampaignService;
     @Mock
     private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
+    @Mock
+    private CampaignMessageService campaignMessageService;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService, onMobileSubscriptionGateway);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService);
     }
 
     @Test
@@ -539,13 +542,14 @@ public class SubscriptionServiceTest {
 
         subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId, campaignChangeReason, creationDate));
 
-        InOrder order = inOrder(messageCampaignService);
+        InOrder order = inOrder(messageCampaignService, campaignMessageService);
         ArgumentCaptor<MessageCampaignRequest> campaignUnEnrollmentRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
         order.verify(messageCampaignService).stop(campaignUnEnrollmentRequestArgumentCaptor.capture());
         MessageCampaignRequest campaignRequest = campaignUnEnrollmentRequestArgumentCaptor.getValue();
         assertEquals(subscription.getSubscriptionId(), campaignRequest.getExternalId());
         assertEquals(subscription.getPack().name(), campaignRequest.getSubscriptionPack());
         assertEquals(subscription.getCreationDate(), campaignRequest.getSubscriptionCreationDate());
+        order.verify(campaignMessageService).deleteCampaignMessagesFor(subscription.getSubscriptionId());
 
         ArgumentCaptor<MessageCampaignRequest> campaignEnrollmentRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
         order.verify(messageCampaignService).start(campaignEnrollmentRequestArgumentCaptor.capture());

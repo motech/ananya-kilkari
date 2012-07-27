@@ -12,6 +12,7 @@
     <context:component-scan base-package="org.motechproject.ananya.kilkari"/>
 
     <import resource="applicationKilkariMessageCampaignContext.xml"/>
+    <import resource="applicationKilkariOBDContext.xml"/>
 
     <bean id="kilkariRestTemplate" class="org.springframework.web.client.RestTemplate" autowire="byName"/>
 

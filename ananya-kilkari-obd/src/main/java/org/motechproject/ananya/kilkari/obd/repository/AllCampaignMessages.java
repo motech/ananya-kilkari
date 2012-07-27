@@ -46,4 +46,8 @@ public class AllCampaignMessages extends MotechBaseRepository<CampaignMessage> {
     public void delete(CampaignMessage campaignMessage) {
         remove(campaignMessage);
     }
+
+    public void removeAll(String subscriptionId) {
+        removeAll("subscriptionId", subscriptionId);
+    }
 }

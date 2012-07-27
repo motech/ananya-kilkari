@@ -96,6 +96,10 @@ public class CampaignMessageService {
         reportCampaignMessageStatus(failedCallReport, campaignMessage);
     }
 
+    public void deleteCampaignMessagesFor(String subscriptionId) {
+        allCampaignMessages.removeAll(subscriptionId);
+    }
+
     private void updateCampaignMessageStatus(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
         if (hasReachedMaximumRetries(campaignMessage, statusCode))
             allCampaignMessages.delete(campaignMessage);

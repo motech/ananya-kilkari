@@ -25,6 +25,7 @@ public class SubscriptionHandler {
 
     @MotechListener(subjects = {SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION})
     public void handleSubscriptionActivation(MotechEvent event) {
+        System.out.println("hooooooooooooooooooooooooooooooooo");
         OMSubscriptionRequest OMSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
         logger.info(String.format("Handling subscription activation event for subscriptionid: %s, msisdn: %s, pack: %s, channel: %s", OMSubscriptionRequest.getSubscriptionId(), OMSubscriptionRequest.getMsisdn(), OMSubscriptionRequest.getPack(), OMSubscriptionRequest.getChannel()));
         onMobileSubscriptionGateway.activateSubscription(OMSubscriptionRequest);

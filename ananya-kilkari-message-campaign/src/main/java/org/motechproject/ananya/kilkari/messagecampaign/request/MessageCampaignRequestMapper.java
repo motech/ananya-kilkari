@@ -1,8 +1,7 @@
-package org.motechproject.ananya.kilkari.messagecampaign.contract.mapper;
+package org.motechproject.ananya.kilkari.messagecampaign.request;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.model.Time;

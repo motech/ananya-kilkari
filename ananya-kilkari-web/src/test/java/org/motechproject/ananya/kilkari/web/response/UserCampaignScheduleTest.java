@@ -1,9 +1,7 @@
-package org.motechproject.ananya.kilkari.web.contract.response;
+package org.motechproject.ananya.kilkari.web.response;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.web.response.CampaignSchedule;
-import org.motechproject.ananya.kilkari.web.response.UserCampaignSchedule;
 
 import java.util.Arrays;
 

@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.obd.gateway;
 
-import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 
 public interface OnMobileOBDGateway {
     void sendNewMessages(String content);

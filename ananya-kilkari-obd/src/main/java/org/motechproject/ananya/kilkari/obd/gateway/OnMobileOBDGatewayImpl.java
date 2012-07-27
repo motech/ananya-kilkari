@@ -12,7 +12,7 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.profile.ProductionProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

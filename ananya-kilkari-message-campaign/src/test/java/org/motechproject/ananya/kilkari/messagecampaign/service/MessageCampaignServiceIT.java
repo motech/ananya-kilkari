@@ -7,7 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
+import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
 import org.motechproject.server.messagecampaign.dao.AllCampaignEnrollments;
 import org.springframework.beans.factory.annotation.Autowired;

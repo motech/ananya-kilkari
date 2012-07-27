@@ -2,8 +2,8 @@ package org.motechproject.ananya.kilkari.handlers;
 
 import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntries;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntry;
+import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
+import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;

@@ -4,11 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.obd.contract.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.contract.FailedCallReport;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntry;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntries;
+import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
+import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
@@ -18,7 +18,6 @@ import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.springframework.http.MediaType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;

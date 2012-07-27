@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.web.it;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
+import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;

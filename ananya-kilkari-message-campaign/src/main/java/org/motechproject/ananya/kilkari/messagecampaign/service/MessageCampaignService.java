@@ -1,10 +1,9 @@
 package org.motechproject.ananya.kilkari.messagecampaign.service;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignEnrollment;
-import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignRequest;
-import org.motechproject.ananya.kilkari.messagecampaign.contract.mapper.MessageCampaignRequestMapper;
-import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
+import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequestMapper;
+import org.motechproject.ananya.kilkari.messagecampaign.response.MessageCampaignEnrollment;
+import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
@@ -40,7 +39,7 @@ public class MessageCampaignService {
     }
 
     public boolean stop(MessageCampaignRequest enrollRequest) {
-        campaignService.stopAll(MessageCampaignRequestMapper.newRequestFrom(enrollRequest,kilkariProperties));
+        campaignService.stopAll(MessageCampaignRequestMapper.newRequestFrom(enrollRequest, kilkariProperties));
         return true;
     }
 

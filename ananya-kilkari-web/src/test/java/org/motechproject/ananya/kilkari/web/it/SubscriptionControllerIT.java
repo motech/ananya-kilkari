@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
-import org.motechproject.ananya.kilkari.messagecampaign.contract.MessageCampaignEnrollment;
+import org.motechproject.ananya.kilkari.messagecampaign.response.MessageCampaignEnrollment;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;

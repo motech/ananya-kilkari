@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.handlers;
 
 import org.apache.log4j.Logger;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.gateway.OnMobileOBDGateway;
 import org.motechproject.scheduler.domain.MotechEvent;

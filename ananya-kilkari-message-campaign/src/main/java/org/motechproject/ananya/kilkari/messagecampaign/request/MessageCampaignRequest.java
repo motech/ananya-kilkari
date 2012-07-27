@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.messagecampaign.contract;
+package org.motechproject.ananya.kilkari.messagecampaign.request;
 
 import org.joda.time.DateTime;
 

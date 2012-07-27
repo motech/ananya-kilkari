@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.validators;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.obd.contract.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;

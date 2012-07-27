@@ -1,9 +1,9 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.motechproject.ananya.kilkari.obd.contract.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidFailedCallReports;
-import org.motechproject.ananya.kilkari.obd.contract.InvalidOBDRequestEntries;
+import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
+import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.scheduler.context.EventContext;

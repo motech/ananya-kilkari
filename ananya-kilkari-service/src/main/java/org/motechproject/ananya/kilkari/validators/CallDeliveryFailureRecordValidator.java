@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.validators;
 
 import org.apache.commons.lang.StringUtils;
-import org.motechproject.ananya.kilkari.obd.contract.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignCode;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;

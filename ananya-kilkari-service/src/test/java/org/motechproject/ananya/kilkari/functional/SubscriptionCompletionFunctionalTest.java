@@ -2,10 +2,13 @@ package org.motechproject.ananya.kilkari.functional;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.motechproject.ananya.kilkari.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.TimedRunner;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -14,6 +17,8 @@ import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscrip
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
+import org.motechproject.server.messagecampaign.dao.AllCampaignEnrollments;
+import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollment;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertNotNull;
@@ -25,9 +30,17 @@ public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest 
     @Autowired
     private AllSubscriptions allSubscriptions;
     @Autowired
+    private AllCampaignEnrollments allCampaignEnrollments;
+    @Autowired
     private KilkariCampaignService kilkariCampaignService;
     @Autowired
     private StubOnMobileSubscriptionGateway stubOnMobileSubscriptionGateway;
+
+    @Before
+    @After
+    public void setUp() {
+        allCampaignEnrollments.removeAll();
+    }
 
     @Test
     public void shouldMarkSubscriptionAsCompletedOnPackCompletion() {
@@ -39,7 +52,7 @@ public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest 
 
         //When
         setCurrentDateToThePastToTriggerSubscriptionCompletionEvent();
-        kilkariCampaignService.processCampaignCompletion(subscriptionId);
+        kilkariCampaignService.processCampaignCompletion(subscriptionId, MessageCampaignService.FIFTEEN_MONTHS_CAMPAIGN_KEY);
         resetCurrentDateToSystemDate();
 
         //Expect
@@ -66,9 +79,13 @@ public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest 
     }
 
     private Subscription addASubscriptionWithCreationDate15MonthsBack() {
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusMonths(15));
+        DateTime createdAt = DateTime.now().minusMonths(15);
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, createdAt);
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         allSubscriptions.add(subscription);
+        CampaignEnrollment campaignEnrollment = new CampaignEnrollment(subscription.getSubscriptionId(), MessageCampaignService.FIFTEEN_MONTHS_CAMPAIGN_KEY);
+        campaignEnrollment.setStartDate(createdAt.toLocalDate());
+        allCampaignEnrollments.add(campaignEnrollment);
         return subscription;
     }
 }

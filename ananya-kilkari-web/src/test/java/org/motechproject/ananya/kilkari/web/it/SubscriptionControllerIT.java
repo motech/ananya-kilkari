@@ -155,7 +155,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME, campaignEnrollment.getCampaignName());
         List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
                 subscription.getSubscriptionId(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
-        assertEquals(48, messageTimings.size());
+        assertEquals(47, messageTimings.size());
     }
 
     @Test
@@ -215,7 +215,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME, campaignEnrollment.getCampaignName());
         List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
                 subscription.getSubscriptionId(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
-        assertEquals(60, messageTimings.size());
+        assertEquals(59, messageTimings.size());
     }
 
     @Test

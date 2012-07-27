@@ -92,7 +92,6 @@ public class KilkariCampaignService {
 
         CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
 
-
         if (campaignMessageAlert == null)
             processNewCampaignMessageAlert(subscriptionId, messageId, false, subscriptionResponse.currentWeeksMessageExpiryDate());
         else
@@ -100,6 +99,14 @@ public class KilkariCampaignService {
 
         if (subscriptionResponse.hasBeenActivated())
             kilkariInboxService.newMessage(subscriptionId, messageId);
+    }
+
+    public void processCampaignCompletion(String subscriptionId, String campaignName) {
+        scheduleWeeklyMessage(subscriptionId, campaignName);
+
+        SubscriptionResponse subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
+        if (!subscription.isInDeactivatedState())
+            kilkariSubscriptionService.processSubscriptionCompletion(subscription);
     }
 
     public void activateOrRenewSchedule(String subscriptionId, CampaignTriggerType campaignTriggerType) {
@@ -153,12 +160,6 @@ public class KilkariCampaignService {
 
         publishErrorRecords(invalidFailedCallReports);
         publishValidRecords(validFailedCallReports);
-    }
-
-    public void processCampaignCompletion(String subscriptionId) {
-        SubscriptionResponse subscriptionResponse = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
-        if (!subscriptionResponse.isInDeactivatedState())
-            kilkariSubscriptionService.processSubscriptionCompletion(subscriptionResponse);
     }
 
     private void processExistingCampaignMessageAlert(SubscriptionResponse subscriptionResponse, String messageId, boolean renewed,

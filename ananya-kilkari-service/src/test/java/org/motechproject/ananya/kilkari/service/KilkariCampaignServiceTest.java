@@ -346,26 +346,55 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldScheduleUnsubscriptionWhenPackIsCompletedAndWhenStatusIsNotDeactivated() {
         String subscriptionId = "abcd1234";
-        Subscription subscription = mock(Subscription.class);
-        when(subscription.isInDeactivatedState()).thenReturn(false);
+        String messageId = "mymessageid";
+        String campaignName = "campaignName";
+        DateTime campaignCreatedDate = DateTime.now();
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1));
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
+        when(messageCampaignService.getCampaignStartDate(subscriptionId)).thenReturn(campaignCreatedDate);
+        when(campaignMessageIdStrategy.createMessageId(campaignName, campaignCreatedDate, subscription.getPack())).thenReturn(messageId);
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        kilkariCampaignService.processCampaignCompletion(subscriptionId);
+        kilkariCampaignService.processCampaignCompletion(subscriptionId, campaignName);
 
+        verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
         verify(kilkariSubscriptionService).processSubscriptionCompletion(subscription);
+
+        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
+        verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
+        CampaignMessageAlert campaignMessageAlert = campaignMessageAlertArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, campaignMessageAlert.getSubscriptionId());
+        assertEquals(messageId, campaignMessageAlert.getMessageId());
     }
 
     @Test
     public void shouldNotScheduleUnsubscriptionWhenPackIsCompletedAndStatusIsDeactivated() {
         String subscriptionId = "abcd1234";
-        Subscription subscription = mock(Subscription.class);
-        when(subscription.isInDeactivatedState()).thenReturn(true);
+        String messageId = "mymessageid";
+        String campaignName = "campaignName";
+        DateTime campaignCreatedDate = DateTime.now();
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1));
+        subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
 
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
+        when(messageCampaignService.getCampaignStartDate(subscriptionId)).thenReturn(campaignCreatedDate);
+        when(campaignMessageIdStrategy.createMessageId(campaignName, campaignCreatedDate, subscription.getPack())).thenReturn(messageId);
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        kilkariCampaignService.processCampaignCompletion(subscriptionId);
+        kilkariCampaignService.processCampaignCompletion(subscriptionId, campaignName);
 
+        verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
         verify(kilkariSubscriptionService, never()).processSubscriptionCompletion(subscription);
+
+        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
+        verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
+        CampaignMessageAlert campaignMessageAlert = campaignMessageAlertArgumentCaptor.getValue();
+
+        assertEquals(subscriptionId, campaignMessageAlert.getSubscriptionId());
+        assertEquals(messageId, campaignMessageAlert.getMessageId());
     }
 
     @Test

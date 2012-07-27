@@ -37,7 +37,8 @@ public class CampaignMessageAlertHandler {
         Map<String,Object> parameters = motechEvent.getParameters();
         CampaignEnrollment campaignEnrollment = (CampaignEnrollment) parameters.get(EventKeys.ENROLLMENT_KEY);
         String subscriptionId = campaignEnrollment.getExternalId();
+        String campaignName = campaignEnrollment.getCampaignName();
         logger.info("Handling campaign completion event for subscription id: " + subscriptionId);
-        kilkariCampaignService.processCampaignCompletion(subscriptionId);
+        kilkariCampaignService.processCampaignCompletion(subscriptionId, campaignName);
     }
 }

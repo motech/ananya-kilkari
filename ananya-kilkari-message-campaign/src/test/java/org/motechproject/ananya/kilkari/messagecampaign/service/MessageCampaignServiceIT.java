@@ -53,12 +53,12 @@ public class MessageCampaignServiceIT {
                 referenceDate.minusDays(2), referenceDate.plusYears(4));
 
         DateTime referenceDateWithDelta = referenceDate.plusDays(CONFIGURED_DELTA_DAYS);
-        assertThat(dateTimeList.size(), is(28));
+        assertThat(dateTimeList.size(), is(27));
         assertEquals(referenceDateWithDelta.toLocalDate(), dateTimeList.get(0).toLocalDate());
         LocalTime deliverTime = new LocalTime(referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getHourOfDay(), referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getMinuteOfHour());
         assertEquals(deliverTime, dateTimeList.get(0).toLocalTime());
-        assertEquals(referenceDateWithDelta.plusWeeks(27).toLocalDate(), dateTimeList.get(27).toLocalDate());
-        assertEquals(deliverTime, dateTimeList.get(27).toLocalTime());
+        assertEquals(referenceDateWithDelta.plusWeeks(26).toLocalDate(), dateTimeList.get(26).toLocalDate());
+        assertEquals(deliverTime, dateTimeList.get(26).toLocalTime());
     }
 
     @Test
@@ -76,12 +76,12 @@ public class MessageCampaignServiceIT {
 
         LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(CONFIGURED_DELTA_DAYS);
         LocalTime deliverTime = new LocalTime(referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getHourOfDay(), referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getMinuteOfHour());
-        assertThat(dateTimeList.size(), is(48));
+        assertThat(dateTimeList.size(), is(47));
         assertEquals(referenceDateWithDelta, dateTimeList.get(0).toLocalDate());
         assertEquals(deliverTime, dateTimeList.get(0).toLocalTime());
 
-        assertEquals(referenceDateWithDelta.plusWeeks(47), dateTimeList.get(47).toLocalDate());
-        assertEquals(deliverTime, dateTimeList.get(47).toLocalTime());
+        assertEquals(referenceDateWithDelta.plusWeeks(46), dateTimeList.get(46).toLocalDate());
+        assertEquals(deliverTime, dateTimeList.get(46).toLocalTime());
     }
 
     @Test
@@ -99,12 +99,12 @@ public class MessageCampaignServiceIT {
 
         LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(CONFIGURED_DELTA_DAYS);
         LocalTime deliverTime = new LocalTime(referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getHourOfDay(), referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getMinuteOfHour());
-        assertThat(dateTimeList.size(), is(60));
+        assertThat(dateTimeList.size(), is(59));
 
         assertEquals(referenceDateWithDelta, dateTimeList.get(0).toLocalDate());
         assertEquals(deliverTime, dateTimeList.get(0).toLocalTime());
 
-        assertEquals(referenceDateWithDelta.plusWeeks(59), dateTimeList.get(59).toLocalDate());
-        assertEquals(deliverTime, dateTimeList.get(59).toLocalTime());
+        assertEquals(referenceDateWithDelta.plusWeeks(58), dateTimeList.get(58).toLocalDate());
+        assertEquals(deliverTime, dateTimeList.get(58).toLocalTime());
     }
 }

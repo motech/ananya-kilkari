@@ -5,7 +5,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 
-public interface ISubscription {
+public interface SubscriptionResponse {
     String getMsisdn();
     String getSubscriptionId();
     DateTime getCreationDate();

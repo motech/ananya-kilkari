@@ -25,7 +25,7 @@ import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
-import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
@@ -77,42 +77,42 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldGetMessageTimings() {
         String msisdn = "1234567890";
-        List<ISubscription> subscriptions = new ArrayList<>();
+        List<SubscriptionResponse> subscriptionResponses = new ArrayList<>();
 
-        ISubscription subscription1 = new SubscriptionBuilder().withDefaults().withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
-        ISubscription subscription2 = new SubscriptionBuilder().withDefaults().withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
-        subscriptions.add(subscription1);
-        subscriptions.add(subscription2);
+        SubscriptionResponse subscriptionResponse1 = new SubscriptionBuilder().withDefaults().withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
+        SubscriptionResponse subscriptionResponse2 = new SubscriptionBuilder().withDefaults().withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
+        subscriptionResponses.add(subscriptionResponse1);
+        subscriptionResponses.add(subscriptionResponse2);
 
         List<DateTime> dateTimes = new ArrayList<>();
         dateTimes.add(DateTime.now());
 
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
+        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptionResponses);
 
         when(messageCampaignService.getMessageTimings(
-                subscription1.getSubscriptionId(),
-                subscription1.getCreationDate(),
-                subscription1.endDate())).thenReturn(dateTimes);
+                subscriptionResponse1.getSubscriptionId(),
+                subscriptionResponse1.getCreationDate(),
+                subscriptionResponse1.endDate())).thenReturn(dateTimes);
         when(messageCampaignService.getMessageTimings(
-                subscription2.getSubscriptionId(),
-                subscription2.getCreationDate(),
-                subscription2.endDate())).thenReturn(dateTimes);
+                subscriptionResponse2.getSubscriptionId(),
+                subscriptionResponse2.getCreationDate(),
+                subscriptionResponse2.endDate())).thenReturn(dateTimes);
 
         Map<String, List<DateTime>> messageTimings = kilkariCampaignService.getMessageTimings(msisdn);
 
         verify(messageCampaignService).getMessageTimings(
-                eq(subscription1.getSubscriptionId()),
-                eq(subscription1.getCreationDate()),
-                eq(subscription1.endDate()));
+                eq(subscriptionResponse1.getSubscriptionId()),
+                eq(subscriptionResponse1.getCreationDate()),
+                eq(subscriptionResponse1.endDate()));
 
         verify(messageCampaignService).getMessageTimings(
-                eq(subscription2.getSubscriptionId()),
-                eq(subscription2.getCreationDate()),
-                eq(subscription2.endDate()));
+                eq(subscriptionResponse2.getSubscriptionId()),
+                eq(subscriptionResponse2.getCreationDate()),
+                eq(subscriptionResponse2.endDate()));
 
         assertThat(messageTimings.size(), is(2));
-        assertThat(messageTimings, hasEntry(subscription1.getSubscriptionId(), dateTimes));
-        assertThat(messageTimings, hasEntry(subscription2.getSubscriptionId(), dateTimes));
+        assertThat(messageTimings, hasEntry(subscriptionResponse1.getSubscriptionId(), dateTimes));
+        assertThat(messageTimings, hasEntry(subscriptionResponse2.getSubscriptionId(), dateTimes));
     }
 
     @Test

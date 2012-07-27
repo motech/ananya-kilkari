@@ -19,7 +19,7 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationExcept
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
@@ -127,9 +127,9 @@ public class KilkariSubscriptionServiceTest {
         String susbscriptionid = "susbscriptionid";
         when(subscriptionService.findBySubscriptionId(susbscriptionid)).thenReturn(exptectedSubscription);
 
-        ISubscription subscription = kilkariSubscriptionService.findBySubscriptionId(susbscriptionid);
+        SubscriptionResponse subscriptionResponse = kilkariSubscriptionService.findBySubscriptionId(susbscriptionid);
 
-        assertEquals(exptectedSubscription, subscription);
+        assertEquals(exptectedSubscription, subscriptionResponse);
     }
 
     @Test

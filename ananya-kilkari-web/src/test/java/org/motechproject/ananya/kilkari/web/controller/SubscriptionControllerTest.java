@@ -21,7 +21,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
@@ -53,7 +53,7 @@ public class SubscriptionControllerTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private ISubscription mockedSubscription;
+    private SubscriptionResponse mockedSubscriptionResponse;
     @Mock
     private KilkariSubscriptionService kilkariSubscriptionService;
     @Mock
@@ -81,9 +81,9 @@ public class SubscriptionControllerTest {
         String channel = "ivr";
 
         mockSubscription(msisdn);
-        ArrayList<ISubscription> subscriptions = new ArrayList<>();
-        subscriptions.add(mockedSubscription);
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
+        ArrayList<SubscriptionResponse> subscriptionResponses = new ArrayList<>();
+        subscriptionResponses.add(mockedSubscriptionResponse);
+        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptionResponses);
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -98,9 +98,9 @@ public class SubscriptionControllerTest {
         String channel = "call_center";
 
         mockSubscription(msisdn);
-        ArrayList<ISubscription> subscriptions = new ArrayList<>();
-        subscriptions.add(mockedSubscription);
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
+        ArrayList<SubscriptionResponse> subscriptionResponses = new ArrayList<>();
+        subscriptionResponses.add(mockedSubscriptionResponse);
+        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptionResponses);
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -423,12 +423,12 @@ public class SubscriptionControllerTest {
         SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
         SubscriptionStatus subscriptionStatus = SubscriptionStatus.NEW;
 
-        when(mockedSubscription.getMsisdn()).thenReturn(msisdn);
-        when(mockedSubscription.getPack()).thenReturn(subscriptionPack);
-        when(mockedSubscription.getStatus()).thenReturn(subscriptionStatus);
-        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+        when(mockedSubscriptionResponse.getMsisdn()).thenReturn(msisdn);
+        when(mockedSubscriptionResponse.getPack()).thenReturn(subscriptionPack);
+        when(mockedSubscriptionResponse.getStatus()).thenReturn(subscriptionStatus);
+        when(mockedSubscriptionResponse.getSubscriptionId()).thenReturn(subscriptionId);
 
-        when(mockedSubscriptionDetailsMapper.mapFrom(mockedSubscription)).thenReturn(new SubscriptionDetails(subscriptionId, subscriptionPack.name(), subscriptionStatus.name(), null));
+        when(mockedSubscriptionDetailsMapper.mapFrom(mockedSubscriptionResponse)).thenReturn(new SubscriptionDetails(subscriptionId, subscriptionPack.name(), subscriptionStatus.name(), null));
     }
 
     private void assertCreatedAt(DateTime beforeCreate, SubscriptionWebRequest subscriptionWebRequest) {
@@ -524,9 +524,9 @@ public class SubscriptionControllerTest {
         SubscriptionWebResponse subscriptionWebResponse = TestUtils.fromJson(jsonContent, SubscriptionWebResponse.class);
         SubscriptionDetails subscriptionDetails = subscriptionWebResponse.getSubscriptionDetails().get(0);
 
-        return subscriptionDetails.getPack().equals(mockedSubscription.getPack().name())
-                && subscriptionDetails.getStatus().equals(mockedSubscription.getStatus().name())
-                && subscriptionDetails.getSubscriptionId().equals(mockedSubscription.getSubscriptionId());
+        return subscriptionDetails.getPack().equals(mockedSubscriptionResponse.getPack().name())
+                && subscriptionDetails.getStatus().equals(mockedSubscriptionResponse.getStatus().name())
+                && subscriptionDetails.getSubscriptionId().equals(mockedSubscriptionResponse.getSubscriptionId());
     }
 
     private boolean assertSubscriberResponseWithNoSubscriptions(String jsonContent, String channel) {

@@ -15,7 +15,7 @@ import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.service.response.ISubscription;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.common.domain.PhoneNumber;
 import org.slf4j.Logger;
@@ -64,9 +64,9 @@ public class SubscriptionService {
         return subscription;
     }
 
-    public List<ISubscription> findByMsisdn(String msisdn) {
+    public List<SubscriptionResponse> findByMsisdn(String msisdn) {
         validateMsisdn(msisdn);
-        return (List<ISubscription>) (List<? extends ISubscription>) allSubscriptions.findByMsisdn(msisdn);
+        return (List<SubscriptionResponse>) (List<? extends SubscriptionResponse>) allSubscriptions.findByMsisdn(msisdn);
     }
 
     public void activate(String subscriptionId, DateTime activatedOn, final String operator) {
@@ -163,7 +163,7 @@ public class SubscriptionService {
         });
     }
 
-    public ISubscription findBySubscriptionId(String subscriptionId) {
+    public SubscriptionResponse findBySubscriptionId(String subscriptionId) {
         return allSubscriptions.findBySubscriptionId(subscriptionId);
     }
 

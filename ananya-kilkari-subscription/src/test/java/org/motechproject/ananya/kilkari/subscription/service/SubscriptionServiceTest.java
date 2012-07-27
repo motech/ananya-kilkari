@@ -203,12 +203,12 @@ public class SubscriptionServiceTest {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.PENDING_ACTIVATION;
         Subscription mockedSubscription = mock(Subscription.class);
-
+        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS, Channel.IVR, subscriptionId);
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.activationRequested(subscriptionId);
+        subscriptionService.activationRequested(omSubscriptionRequest);
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
@@ -217,7 +217,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
-
+        verify(onMobileSubscriptionGateway).activateSubscription(omSubscriptionRequest);
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertNull(subscriptionStateChangeReportRequest.getOperator());
@@ -253,12 +253,12 @@ public class SubscriptionServiceTest {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED;
         Subscription mockedSubscription = mock(Subscription.class);
-
+        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS, Channel.IVR, subscriptionId);
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.deactivationRequested(subscriptionId);
+        subscriptionService.deactivationRequested(omSubscriptionRequest);
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
@@ -267,7 +267,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
         SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
-
+        verify(onMobileSubscriptionGateway).deactivateSubscription(omSubscriptionRequest);
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertNull(subscriptionStateChangeReportRequest.getOperator());
@@ -522,10 +522,11 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldScheduleInboxDeletionWhenDeactivationOfSubscriptionWasRequested() {
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.SEVEN_MONTHS, DateTime.now());
+        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.SEVEN_MONTHS, Channel.IVR, subscription.getSubscriptionId());
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.deactivationRequested(subscriptionId);
+        subscriptionService.deactivationRequested(omSubscriptionRequest);
 
         verify(kilkariInboxService).scheduleInboxDeletion(subscription);
     }

@@ -91,8 +91,9 @@ public class SubscriptionService {
         });
     }
 
-    public void activationRequested(String subscriptionId) {
-        updateStatusAndReport(subscriptionId, DateTime.now(), null, null, null, new Action<Subscription>() {
+    public void activationRequested(OMSubscriptionRequest omSubscriptionRequest) {
+        onMobileSubscriptionGateway.activateSubscription(omSubscriptionRequest);
+        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.activationRequestSent();
@@ -112,8 +113,9 @@ public class SubscriptionService {
         onMobileSubscriptionManagerPublisher.processDeactivation(new SubscriptionMapper().createOMSubscriptionRequest(subscription, deactivationRequest.getChannel()));
     }
 
-    public void deactivationRequested(String subscriptionId) {
-        updateStatusAndReport(subscriptionId, DateTime.now(), null, null, null, new Action<Subscription>() {
+    public void deactivationRequested(OMSubscriptionRequest omSubscriptionRequest) {
+        onMobileSubscriptionGateway.deactivateSubscription(omSubscriptionRequest);
+        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.deactivationRequestSent();

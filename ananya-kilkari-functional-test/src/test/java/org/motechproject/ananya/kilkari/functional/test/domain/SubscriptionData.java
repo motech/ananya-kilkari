@@ -1,19 +1,21 @@
-package org.motechproject.ananya.kilkari.functional.test;
+package org.motechproject.ananya.kilkari.functional.test.domain;
+
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 public class SubscriptionData {
 
     private String msisdn;
-    private String pack;
+    private SubscriptionPack pack;
     private String channel;
     private String subscriptionId;
 
-    public SubscriptionData(String pack, String channel, String msisdn) {
+    public SubscriptionData(SubscriptionPack pack, String channel, String msisdn) {
         this.pack = pack;
         this.channel = channel;
         this.msisdn = msisdn;
     }
 
-    public String getPack() {
+    public SubscriptionPack getPack() {
         return pack;
     }
 

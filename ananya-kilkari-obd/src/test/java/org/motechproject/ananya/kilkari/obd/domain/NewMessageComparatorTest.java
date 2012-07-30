@@ -89,6 +89,12 @@ public class NewMessageComparatorTest {
 
     @Test
     public void shouldReturnAnObjectWithDNCBeforeNew_AndHigherRetryCount_AndLowerCampaignMessageWeek() {
+        final CampaignMessage campaignMessageWithPriority6 = new CampaignMessage("subscripitonId6", "WEEK17", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
+        campaignMessageWithPriority6.setStatusCode(CampaignMessageStatus.NEW);
+
+        final CampaignMessage campaignMessageWithPriority7 = new CampaignMessage("subscripitonId7", "WEEK33", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
+        campaignMessageWithPriority7.setStatusCode(CampaignMessageStatus.NEW);
+
         final CampaignMessage campaignMessageWithPriority5 = new CampaignMessage("subscripitonId1", "WEEK12", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
         campaignMessageWithPriority5.setStatusCode(CampaignMessageStatus.NEW);
 
@@ -111,12 +117,15 @@ public class NewMessageComparatorTest {
         campaignMessageWithPriority1.markSent();
         campaignMessageWithPriority1.markSent();
 
+
         List<CampaignMessage> campaignMessages = new ArrayList<CampaignMessage>() {{
             add(campaignMessageWithPriority2);
             add(campaignMessageWithPriority5);
             add(campaignMessageWithPriority4);
             add(campaignMessageWithPriority1);
             add(campaignMessageWithPriority3);
+            add(campaignMessageWithPriority7);
+            add(campaignMessageWithPriority6);
         }};
 
         Collections.sort(campaignMessages, new NewMessageComparator());
@@ -126,5 +135,7 @@ public class NewMessageComparatorTest {
         assertEquals(campaignMessageWithPriority3, campaignMessages.get(2));
         assertEquals(campaignMessageWithPriority4, campaignMessages.get(3));
         assertEquals(campaignMessageWithPriority5, campaignMessages.get(4));
+        assertEquals(campaignMessageWithPriority6, campaignMessages.get(5));
+        assertEquals(campaignMessageWithPriority7, campaignMessages.get(6));
     }
 }

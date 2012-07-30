@@ -103,7 +103,6 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
     @Test
     public void shouldCreateSubscriptionForTheGivenMsisdnForTheIVRChannel() throws Exception {
-
         final String msisdn = "9876543210";
         String channelString = Channel.IVR.toString();
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;

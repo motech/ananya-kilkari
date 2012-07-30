@@ -36,6 +36,9 @@ public class SubscriptionWebRequest implements Serializable {
     @JsonProperty
     private LocationRequest location;
 
+    @JsonProperty
+    private String weekNumber;
+
     public SubscriptionWebRequest() {
         this.location = new LocationRequest();
         this.createdAt = DateTime.now();
@@ -101,6 +104,11 @@ public class SubscriptionWebRequest implements Serializable {
         return location;
     }
 
+    @JsonIgnore
+    public String getWeekNumber() {
+        return weekNumber;
+    }
+
     public void setDistrict(String district) {
         location.setDistrict(district);
     }
@@ -125,6 +133,10 @@ public class SubscriptionWebRequest implements Serializable {
         this.expectedDateOfDelivery = expectedDateOfDelivery;
     }
 
+    public void setWeekNumber(String weekNumber) {
+        this.weekNumber = weekNumber;
+    }
+
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
@@ -146,7 +158,6 @@ public class SubscriptionWebRequest implements Serializable {
     }
 
     public void validate(Errors errors) {
-
         validateMsisdn(errors);
         validatePack(errors);
         validateChannel(errors);
@@ -154,6 +165,15 @@ public class SubscriptionWebRequest implements Serializable {
             validateAge(errors);
             validateDOB(errors);
             validateEDD(errors);
+            validateWeekNumber(errors);
+        }
+    }
+
+    private void validateWeekNumber(Errors errors) {
+        if (StringUtils.isNotEmpty(weekNumber)) {
+            if (!ValidationUtils.assertNumeric(weekNumber)) {
+                errors.add("Invalid week number %s", weekNumber);
+            }
         }
     }
 
@@ -179,11 +199,6 @@ public class SubscriptionWebRequest implements Serializable {
         if (!ValidationUtils.assertChannel(channel)) {
             throw new ValidationException(String.format("Invalid channel %s", channel));
         }
-    }
-
-    @JsonIgnore
-    public boolean isLocationEmpty() {
-        return getDistrict() == null && getBlock() == null && getPanchayat() == null;
     }
 
     private void validateEDD(Errors errors) {

@@ -39,6 +39,11 @@ public class SubscriptionWebRequestBuilder {
         return this;
     }
 
+    public SubscriptionWebRequestBuilder withWeekNumber(String weekNumber) {
+        subscriptionWebRequest.setWeekNumber(weekNumber);
+        return this;
+    }
+
     public SubscriptionWebRequestBuilder withMsisdn(String msisdn) {
         subscriptionWebRequest.setMsisdn(msisdn);
         return this;

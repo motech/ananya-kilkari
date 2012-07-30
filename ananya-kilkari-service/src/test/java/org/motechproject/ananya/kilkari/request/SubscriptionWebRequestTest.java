@@ -7,11 +7,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 
 import static org.junit.Assert.*;
 
@@ -243,6 +243,24 @@ public class SubscriptionWebRequestTest {
     }
 
     @Test
+    public void shouldNotFailValidationIfWeekNumberIsBlank() {
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withWeekNumber("").build();
+
+        subscriptionWebRequest.validate(errors);
+
+        validateErrors(0);
+    }
+
+    @Test
+    public void shouldFailValidationIfWeekNumberIsNotANumber() {
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withWeekNumber("a").build();
+
+        subscriptionWebRequest.validate(errors);
+
+        validateErrors(1, "Invalid week number a");
+    }
+
+    @Test
     public void shouldThrowExceptionWhenChannelIsInvalid() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withChannel("invalid channel").build();
         expectedException.expect(ValidationException.class);
@@ -258,5 +276,4 @@ public class SubscriptionWebRequestTest {
 
         return subscriptionWebRequest;
     }
-
 }

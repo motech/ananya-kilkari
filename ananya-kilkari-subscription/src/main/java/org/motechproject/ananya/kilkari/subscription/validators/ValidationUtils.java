@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class ValidationUtils {
 
     public static boolean assertNumeric(String value) {
-        return !StringUtils.isEmpty(value) && StringUtils.isNumeric(value);
+        return StringUtils.isNotEmpty(value) && StringUtils.isNumeric(value);
     }
 
     public static boolean assertDateFormat(String value) {

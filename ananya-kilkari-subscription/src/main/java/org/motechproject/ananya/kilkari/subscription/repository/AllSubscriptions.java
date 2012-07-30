@@ -29,8 +29,7 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
     public List<Subscription> findByMsisdn(String msisdn) {
         ViewQuery viewQuery = createQuery("by_msisdn").key(msisdn).includeDocs(true);
         List<Subscription> subscriptions = db.queryView(viewQuery, Subscription.class);
-        if (subscriptions == null || subscriptions.isEmpty()) return null;
-        return subscriptions;
+        return subscriptions == null ? Collections.EMPTY_LIST : subscriptions;
     }
 
     @GenerateView

@@ -9,8 +9,10 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 public class AllSubscriptionsIT extends SpringIntegrationTest {
@@ -60,6 +62,14 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         assertEquals(msisdn, filteredSubscriptions.get(1).getMsisdn());
         assertTrue(Arrays.asList(new SubscriptionPack[]{SubscriptionPack.TWELVE_MONTHS, SubscriptionPack.FIFTEEN_MONTHS}).contains(filteredSubscriptions.get(0).getPack()));
         assertTrue(Arrays.asList(new SubscriptionPack[]{SubscriptionPack.TWELVE_MONTHS, SubscriptionPack.FIFTEEN_MONTHS}).contains(filteredSubscriptions.get(1).getPack()));
+    }
+
+    @Test
+    public void shouldReturnEmptyListIfTheSubscriptionListIsNull() {
+        List<Subscription> filteredSubscriptions = allSubscriptions.findByMsisdn("1001100110");
+
+        assertNotNull(filteredSubscriptions);
+        assertThat(filteredSubscriptions, is(Collections.<Subscription>emptyList()));
     }
 
     @Test

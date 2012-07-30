@@ -14,7 +14,6 @@
         <module>ananya-kilkari-service</module>
         <module>ananya-kilkari-smoke</module>
         <module>ananya-kilkari-reporting</module>
-        <module>ananya-kilkari-functional-test</module>
     </modules>
     <name>Ananya Kilkari</name>
     <url>http://www.motechproject.org</url>
@@ -431,5 +430,32 @@
             <artifactId>mail</artifactId>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>regression</id>
+            <modules>
+                <module>ananya-kilkari-functional-test</module>
+            </modules>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>true</skipTests>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <skipTests>true</skipTests>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

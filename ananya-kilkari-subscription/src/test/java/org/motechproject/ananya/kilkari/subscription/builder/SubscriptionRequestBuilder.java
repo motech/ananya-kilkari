@@ -21,6 +21,7 @@ public class SubscriptionRequestBuilder {
     private int beneficiaryAge;
     private DateTime dob;
     private DateTime edd;
+    private Integer week;
 
     public SubscriptionRequestBuilder withDefaults() {
         return withMsisdn("9876543210")
@@ -95,9 +96,14 @@ public class SubscriptionRequestBuilder {
         return this;
     }
 
+    public SubscriptionRequestBuilder withWeek(Integer week) {
+        this.week = week;
+        return this;
+    }
+
     public SubscriptionRequest build() {
         Location location = new Location(district, block, panchayat);
-        Subscriber subscriber = new Subscriber(beneficiaryName, beneficiaryAge, dob, edd);
+        Subscriber subscriber = new Subscriber(beneficiaryName, beneficiaryAge, dob, edd, week);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber);
         return subscriptionRequest;
     }

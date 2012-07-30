@@ -39,8 +39,8 @@ public class SubscriptionWebRequestBuilder {
         return this;
     }
 
-    public SubscriptionWebRequestBuilder withWeekNumber(String weekNumber) {
-        subscriptionWebRequest.setWeekNumber(weekNumber);
+    public SubscriptionWebRequestBuilder withWeek(String weekNumber) {
+        subscriptionWebRequest.setWeek(weekNumber);
         return this;
     }
 

@@ -29,4 +29,18 @@ public class SubscriptionPackTest {
         assertFalse(SubscriptionPack.isValid(null));
         assertFalse(SubscriptionPack.isValid("abcd"));
     }
+
+    @Test
+    public void shouldFailValidationIfWeekIsOutOfPacksRange() {
+        assertFalse(SubscriptionPack.FIFTEEN_MONTHS.isWeekWithinPackRange(-1));
+        assertTrue(SubscriptionPack.FIFTEEN_MONTHS.isWeekWithinPackRange(1));
+
+        assertFalse(SubscriptionPack.TWELVE_MONTHS.isWeekWithinPackRange(2));
+        assertTrue(SubscriptionPack.TWELVE_MONTHS.isWeekWithinPackRange(13));
+
+        assertFalse(SubscriptionPack.SEVEN_MONTHS.isWeekWithinPackRange(30));
+        assertTrue(SubscriptionPack.SEVEN_MONTHS.isWeekWithinPackRange(32));
+
+        assertFalse(SubscriptionPack.TWELVE_MONTHS.isWeekWithinPackRange(62));
+    }
 }

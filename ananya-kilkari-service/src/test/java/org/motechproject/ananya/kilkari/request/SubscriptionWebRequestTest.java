@@ -244,7 +244,7 @@ public class SubscriptionWebRequestTest {
 
     @Test
     public void shouldNotFailValidationIfWeekNumberIsBlank() {
-        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withWeekNumber("").build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withWeek("").build();
 
         subscriptionWebRequest.validate(errors);
 
@@ -253,7 +253,7 @@ public class SubscriptionWebRequestTest {
 
     @Test
     public void shouldFailValidationIfWeekNumberIsNotANumber() {
-        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withWeekNumber("a").build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withWeek("a").build();
 
         subscriptionWebRequest.validate(errors);
 

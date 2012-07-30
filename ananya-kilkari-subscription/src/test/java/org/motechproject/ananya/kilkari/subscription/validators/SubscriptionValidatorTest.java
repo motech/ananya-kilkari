@@ -10,7 +10,7 @@ import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
@@ -60,7 +60,7 @@ public class SubscriptionValidatorTest {
         Subscription existingActiveSubscription = new Subscription();
         when(allSubscriptions.findSubscriptionInProgress(subscription.getMsisdn(), subscription.getPack())).thenReturn(existingActiveSubscription);
 
-        expectedException.expect(DuplicateSubscriptionException.class);
+        expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Active subscription already exists for msisdn[9876543210] and pack[FIFTEEN_MONTHS]");
 
         subscriptionValidator.validate(subscription);
@@ -77,5 +77,43 @@ public class SubscriptionValidatorTest {
         }
 
         verify(reportingService, never()).getLocation(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void shouldFailValidationIfWeekNumberIsOutsidePacksRange() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(2).build();
+
+        Location location = subscriptionRequest.getLocation();
+        SubscriberLocation existingLocation = new SubscriberLocation();
+        when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(existingLocation);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Given week[2] is not within the pack[SEVEN_MONTHS] range");
+
+        subscriptionValidator.validate(subscriptionRequest);
+    }
+
+    @Test
+    public void shouldFailValidationAndAppendErrorMessagesIfThereAreMultipleFailures() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(2).build();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Location does not exist for District[district] Block[block] and Panchayat[panchayat],Given week[2] is not within the pack[SEVEN_MONTHS] range");
+
+        subscriptionValidator.validate(subscriptionRequest);
+    }
+
+    @Test
+    public void blankWeekNumberIsValid() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(null).build();
+
+        Location location = subscriptionRequest.getLocation();
+        SubscriberLocation existingLocation = new SubscriberLocation();
+        when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(existingLocation);
+        try {
+            subscriptionValidator.validate(subscriptionRequest);
+        } catch (ValidationException e) {
+            Assert.fail("Unexpected ValidationException");
+        }
     }
 }

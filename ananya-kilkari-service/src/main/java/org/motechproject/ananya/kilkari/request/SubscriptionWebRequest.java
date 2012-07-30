@@ -37,7 +37,7 @@ public class SubscriptionWebRequest implements Serializable {
     private LocationRequest location;
 
     @JsonProperty
-    private String weekNumber;
+    private String week;
 
     public SubscriptionWebRequest() {
         this.location = new LocationRequest();
@@ -105,8 +105,8 @@ public class SubscriptionWebRequest implements Serializable {
     }
 
     @JsonIgnore
-    public String getWeekNumber() {
-        return weekNumber;
+    public String getWeek() {
+        return week;
     }
 
     public void setDistrict(String district) {
@@ -133,8 +133,8 @@ public class SubscriptionWebRequest implements Serializable {
         this.expectedDateOfDelivery = expectedDateOfDelivery;
     }
 
-    public void setWeekNumber(String weekNumber) {
-        this.weekNumber = weekNumber;
+    public void setWeek(String week) {
+        this.week = week;
     }
 
     public void setDateOfBirth(String dateOfBirth) {
@@ -170,9 +170,9 @@ public class SubscriptionWebRequest implements Serializable {
     }
 
     private void validateWeekNumber(Errors errors) {
-        if (StringUtils.isNotEmpty(weekNumber)) {
-            if (!ValidationUtils.assertNumeric(weekNumber)) {
-                errors.add("Invalid week number %s", weekNumber);
+        if (StringUtils.isNotEmpty(week)) {
+            if (!ValidationUtils.assertNumeric(week)) {
+                errors.add("Invalid week number %s", week);
             }
         }
     }

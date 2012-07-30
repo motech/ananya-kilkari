@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 public class SubscriptionRequestMapperTest {
     @Test
     public void shouldMapFromWebRequestToSubscriptionRequest() {
-        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withWeek("2").build();
 
         SubscriptionRequest subscriptionDomainRequest = new SubscriptionRequestMapper().createSubscriptionDomainRequest(subscriptionWebRequest);
 
@@ -28,5 +28,6 @@ public class SubscriptionRequestMapperTest {
         assertEquals(subscriptionWebRequest.getBeneficiaryName(), subscriber.getBeneficiaryName());
         assertEquals(subscriptionWebRequest.getDateOfBirth(), subscriber.getDateOfBirth());
         assertEquals(subscriptionWebRequest.getExpectedDateOfDelivery(), subscriber.getExpectedDateOfDelivery());
+        assertEquals(subscriptionWebRequest.getWeek(), subscriber.getWeek().toString());
     }
 }

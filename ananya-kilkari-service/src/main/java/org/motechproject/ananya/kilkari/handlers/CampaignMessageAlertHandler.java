@@ -39,6 +39,6 @@ public class CampaignMessageAlertHandler {
         String subscriptionId = campaignEnrollment.getExternalId();
         String campaignName = campaignEnrollment.getCampaignName();
         logger.info("Handling campaign completion event for subscription id: " + subscriptionId);
-        kilkariCampaignService.processCampaignCompletion(subscriptionId, campaignName);
+        kilkariCampaignService.processCampaignCompletion(subscriptionId);
     }
 }

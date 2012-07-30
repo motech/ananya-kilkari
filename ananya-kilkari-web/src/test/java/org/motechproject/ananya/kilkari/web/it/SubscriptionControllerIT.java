@@ -143,8 +143,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         MessageCampaignEnrollment campaignEnrollment = new TimedRunner<MessageCampaignEnrollment>(20, 1000) {
             @Override
             MessageCampaignEnrollment run() {
-                MessageCampaignEnrollment enrollment = messageCampaignService.searchEnrollment(
-                        subscription.getSubscriptionId());
+                MessageCampaignEnrollment enrollment = messageCampaignService.searchEnrollments(
+                        subscription.getSubscriptionId()).get(0);
                 return enrollment;
             }
         }.execute();
@@ -155,7 +155,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME, campaignEnrollment.getCampaignName());
         List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
                 subscription.getSubscriptionId(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
-        assertEquals(47, messageTimings.size());
+        assertEquals(48, messageTimings.size());
     }
 
     @Test
@@ -203,8 +203,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         MessageCampaignEnrollment campaignEnrollment = new TimedRunner<MessageCampaignEnrollment>(20, 1000) {
             @Override
             MessageCampaignEnrollment run() {
-                return messageCampaignService.searchEnrollment(
-                        subscription.getSubscriptionId());
+                return messageCampaignService.searchEnrollments(
+                        subscription.getSubscriptionId()).get(0);
 
             }
         }.execute();
@@ -215,7 +215,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME, campaignEnrollment.getCampaignName());
         List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
                 subscription.getSubscriptionId(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
-        assertEquals(59, messageTimings.size());
+        assertEquals(60, messageTimings.size());
     }
 
     @Test

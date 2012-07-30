@@ -52,7 +52,7 @@ public class SubscriptionCompletionFunctionalTest extends SpringIntegrationTest 
 
         //When
         setCurrentDateToThePastToTriggerSubscriptionCompletionEvent();
-        kilkariCampaignService.processCampaignCompletion(subscriptionId, MessageCampaignService.FIFTEEN_MONTHS_CAMPAIGN_KEY);
+        kilkariCampaignService.processCampaignCompletion(subscriptionId);
         resetCurrentDateToSystemDate();
 
         //Expect

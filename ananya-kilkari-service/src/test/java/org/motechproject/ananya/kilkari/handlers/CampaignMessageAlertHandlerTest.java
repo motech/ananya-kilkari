@@ -51,6 +51,6 @@ public class CampaignMessageAlertHandlerTest {
 
         campaignMessageAlertHandler.handleCompletionEvent(motechEvent);
 
-        verify(kilkariCampaignService).processCampaignCompletion(subscriptionId, campaignName);
+        verify(kilkariCampaignService).processCampaignCompletion(subscriptionId);
     }
 }

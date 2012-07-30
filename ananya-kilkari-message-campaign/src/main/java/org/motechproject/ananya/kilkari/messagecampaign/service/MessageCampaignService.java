@@ -1,9 +1,11 @@
 package org.motechproject.ananya.kilkari.messagecampaign.service;
 
+import ch.lambdaj.Lambda;
+import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequestMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.response.MessageCampaignEnrollment;
-import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
@@ -15,6 +17,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
 
 @Service("kilkariMessageCampaignService")
 public class MessageCampaignService {
@@ -44,21 +49,24 @@ public class MessageCampaignService {
         return true;
     }
 
-    public MessageCampaignEnrollment searchEnrollment(String externalId) {
+    public List<MessageCampaignEnrollment> searchEnrollments(String externalId) {
         List<CampaignEnrollmentRecord> enrollmentRecords = campaignService.search(
-                new CampaignEnrollmentsQuery().withExternalId(externalId).havingState(CampaignEnrollmentStatus.ACTIVE));
+                new CampaignEnrollmentsQuery().withExternalId(externalId));
 
         if (enrollmentRecords.isEmpty())
             return null;
 
-        CampaignEnrollmentRecord campaignEnrollmentRecord = enrollmentRecords.get(0);
-        return new MessageCampaignEnrollment(campaignEnrollmentRecord.getExternalId(),
-                campaignEnrollmentRecord.getCampaignName(), campaignEnrollmentRecord.getStartDate(),
-                campaignEnrollmentRecord.getStatus());
+        List<MessageCampaignEnrollment> messageCampaignEnrollments = new ArrayList<>();
+        for (CampaignEnrollmentRecord campaignEnrollmentRecord : enrollmentRecords) {
+            messageCampaignEnrollments.add(new MessageCampaignEnrollment(campaignEnrollmentRecord.getExternalId(),
+                    campaignEnrollmentRecord.getCampaignName(), campaignEnrollmentRecord.getStartDate(),
+                    campaignEnrollmentRecord.getStatus()));
+        }
+        return messageCampaignEnrollments;
     }
 
     public List<DateTime> getMessageTimings(String subscriptionId, DateTime startDate, DateTime endDate) {
-        String campaignName = searchEnrollment(subscriptionId).getCampaignName();
+        String campaignName = getActiveCampaignName(subscriptionId);
         Map<String, List<Date>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
                 startDate.toDate(), endDate.toDate());
         List<Date> campaignMessageTimings = campaignTimings.get(CAMPAIGN_MESSAGE_NAME);
@@ -73,7 +81,17 @@ public class MessageCampaignService {
         return alertTimings;
     }
 
-    public DateTime getCampaignStartDate(String externalId) {
-        return searchEnrollment(externalId).getStartDate();
+    public DateTime getCampaignStartDate(String subscriptionId, String campaignName) {
+        List<MessageCampaignEnrollment> enrollmentsForCampaign = Lambda.select(searchEnrollments(subscriptionId),
+                having(on(MessageCampaignEnrollment.class).getCampaignName(),
+                        Matchers.is(campaignName)));
+        return enrollmentsForCampaign.get(0).getStartDate();
+    }
+
+    private String getActiveCampaignName(String subscriptionId) {
+        List<MessageCampaignEnrollment> activeEnrollment = Lambda.select(searchEnrollments(subscriptionId),
+                having(on(MessageCampaignEnrollment.class).getStatus(),
+                        Matchers.is(CampaignEnrollmentStatus.ACTIVE.name())));
+        return activeEnrollment.get(0).getCampaignName();
     }
 }

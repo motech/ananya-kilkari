@@ -94,7 +94,7 @@ public class KilkariCampaignService {
 
     public void scheduleWeeklyMessage(String subscriptionId, String campaignName) {
         SubscriptionResponse subscriptionResponse = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
-        String messageId = campaignMessageIdStrategy.createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId), subscriptionResponse.getPack());
+        String messageId = campaignMessageIdStrategy.createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId, campaignName), subscriptionResponse.getPack());
         logger.info(String.format("Processing weekly message alert for subscriptionId: %s, messageId: %s", subscriptionId, messageId));
 
         CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
@@ -108,9 +108,7 @@ public class KilkariCampaignService {
             kilkariInboxService.newMessage(subscriptionId, messageId);
     }
 
-    public void processCampaignCompletion(String subscriptionId, String campaignName) {
-        scheduleWeeklyMessage(subscriptionId, campaignName);
-
+    public void processCampaignCompletion(String subscriptionId) {
         SubscriptionResponse subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
         if (!subscription.isInDeactivatedState())
             kilkariSubscriptionService.processSubscriptionCompletion(subscription);

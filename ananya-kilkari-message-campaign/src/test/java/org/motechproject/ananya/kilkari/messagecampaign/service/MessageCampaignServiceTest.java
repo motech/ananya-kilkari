@@ -98,7 +98,8 @@ public class MessageCampaignServiceTest {
                 startDate.toDate(), endDate.toDate())).thenReturn(campaignTimings);
 
         ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<CampaignEnrollmentRecord>();
-        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(subscriptionId, messageCampaignPack.getCampaignName(), startDate.toLocalDate(), CampaignEnrollmentStatus.COMPLETED));
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(subscriptionId, MessageCampaignPack.FIFTEEN_MONTHS.getCampaignName(), startDate.toLocalDate(), CampaignEnrollmentStatus.COMPLETED));
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(subscriptionId, messageCampaignPack.getCampaignName(), startDate.toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
         when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(campaignEnrollmentRecords);
 
         List<DateTime> messageTimings = this.messageCampaignService.getMessageTimings(
@@ -111,15 +112,17 @@ public class MessageCampaignServiceTest {
     }
 
     @Test
-    public void shouldGetCampaignStartDateForActiveSubscription() {
+    public void shouldGetCampaignStartDateForGivenCampaignSubscription() {
         String subscriptionId = "abcd1234";
+        String campaignName = "twelve_months";
         DateTime startDate = DateTime.now();
 
         ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<>();
-        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, null, startDate.toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, "fifteen_months", startDate.minusYears(1).toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, campaignName, startDate.toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
         when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(campaignEnrollmentRecords);
 
-        DateTime campaignStartDate = this.messageCampaignService.getCampaignStartDate(subscriptionId);
+        DateTime campaignStartDate = this.messageCampaignService.getCampaignStartDate(subscriptionId, campaignName);
 
         assertEquals(startDate.toLocalDate(), campaignStartDate.toLocalDate());
     }

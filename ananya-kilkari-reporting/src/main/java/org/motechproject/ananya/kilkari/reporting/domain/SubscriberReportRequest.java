@@ -6,7 +6,6 @@ import java.io.Serializable;
 
 public class SubscriberReportRequest implements Serializable {
     private String subscriptionId;
-    private String channel;
     private DateTime createdAt;
     private String beneficiaryName;
     private String beneficiaryAge;
@@ -14,11 +13,10 @@ public class SubscriberReportRequest implements Serializable {
     private String dateOfBirth;
     private SubscriberLocation location;
 
-    public SubscriberReportRequest(String subscriptionId, String channel, DateTime createdAt,
+    public SubscriberReportRequest(String subscriptionId, DateTime createdAt,
                                    String beneficiaryName, String beneficiaryAge, String expectedDateOfDelivery,
                                    String dateOfBirth, SubscriberLocation location) {
         this.subscriptionId = subscriptionId;
-        this.channel = channel;
         this.createdAt = createdAt;
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
@@ -29,10 +27,6 @@ public class SubscriberReportRequest implements Serializable {
 
     public String getSubscriptionId() {
         return subscriptionId;
-    }
-
-    public String getChannel() {
-        return channel;
     }
 
     public DateTime getCreatedAt() {

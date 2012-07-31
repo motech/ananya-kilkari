@@ -227,7 +227,6 @@ public class ReportingGatewayImplTest {
         assertEquals(reportRequest.getBeneficiaryAge(), actualReportRequest.getBeneficiaryAge());
         assertEquals(reportRequest.getExpectedDateOfDelivery(), actualReportRequest.getExpectedDateOfDelivery());
         assertEquals(reportRequest.getBeneficiaryName(), actualReportRequest.getBeneficiaryName());
-        assertEquals(reportRequest.getChannel(), actualReportRequest.getChannel());
         assertEquals(reportRequest.getDateOfBirth(), actualReportRequest.getDateOfBirth());
         assertEquals(reportRequest.getLocation(), actualReportRequest.getLocation());
         assertEquals(reportRequest.getCreatedAt(), actualReportRequest.getCreatedAt());

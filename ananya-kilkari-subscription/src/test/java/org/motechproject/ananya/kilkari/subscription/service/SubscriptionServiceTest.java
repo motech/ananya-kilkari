@@ -592,7 +592,6 @@ public class SubscriptionServiceTest {
         SubscriberReportRequest reportRequest = captor.getValue();
 
         assertEquals(subscriptionId, reportRequest.getSubscriptionId());
-        assertEquals(Channel.CALL_CENTER.name(), reportRequest.getChannel());
         assertEquals("20-10-2038", reportRequest.getExpectedDateOfDelivery());
         assertEquals("20-10-1985", reportRequest.getDateOfBirth());
         assertEquals("23", reportRequest.getBeneficiaryAge());

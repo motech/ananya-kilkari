@@ -83,7 +83,7 @@ public class ReportingGatewayImpl implements ReportingGateway {
     public void updateSubscriberDetails(SubscriberReportRequest request) {
         String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIBER_UPDATE_PATH, request.getSubscriptionId());
         try {
-            SubscriberRequest subscriberRequest = new SubscriberRequest(request.getChannel(), request.getCreatedAt(), request.getBeneficiaryName(),
+            SubscriberRequest subscriberRequest = new SubscriberRequest(request.getCreatedAt(), request.getBeneficiaryName(),
                     request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(),
                     request.getDateOfBirth(), request.getLocation());
             restTemplate.put(url, subscriberRequest, new HashMap<String, String>());

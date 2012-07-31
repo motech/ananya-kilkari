@@ -106,8 +106,8 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscriber/update", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResponse updateSubscriberDetails(@RequestBody SubscriberUpdateWebRequest subscriberUpdateWebRequest) {
-        kilkariSubscriptionService.updateSubscriberDetails(subscriberUpdateWebRequest);
+    public BaseResponse updateSubscriberDetails(@RequestBody SubscriberWebRequest subscriberWebRequest) {
+        kilkariSubscriptionService.updateSubscriberDetails(subscriberWebRequest);
         return BaseResponse.success("Subscriber Update request submitted successfully");
     }
 

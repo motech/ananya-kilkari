@@ -1,14 +1,15 @@
 package org.motechproject.ananya.kilkari.validators;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.request.SubscriberUpdateWebRequest;
+import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SubscriberDetailsValidator {
-    public Errors validate(SubscriberUpdateWebRequest request) {
+    public Errors validate(SubscriberWebRequest request) {
         Errors errors = new Errors();
         validateChannel(request.getChannel(), errors);
         validateAge(request.getBeneficiaryAge(), errors);
@@ -18,7 +19,7 @@ public class SubscriberDetailsValidator {
     }
 
     private void validateChannel(String channel, Errors errors) {
-        if (!ValidationUtils.assertChannel(channel)) {
+        if (!ValidationUtils.assertChannel(channel) || !Channel.isCallCenter(channel)) {
             errors.add("Invalid channel %s", channel);
         }
     }

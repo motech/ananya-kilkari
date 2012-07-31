@@ -5,11 +5,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.request.LocationRequest;
 
 import java.io.Serializable;
 
-public class SubscriberUpdateWebRequest implements Serializable {
+public class SubscriberWebRequest implements Serializable {
     @JsonProperty
     private String subscriptionId;
     @JsonProperty
@@ -27,7 +26,7 @@ public class SubscriberUpdateWebRequest implements Serializable {
     @JsonProperty
     private LocationRequest location;
 
-    public SubscriberUpdateWebRequest() {
+    public SubscriberWebRequest() {
         this.location = new LocationRequest();
         this.createdAt = DateTime.now();
     }
@@ -130,9 +129,9 @@ public class SubscriberUpdateWebRequest implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SubscriberUpdateWebRequest)) return false;
+        if (!(o instanceof SubscriberWebRequest)) return false;
 
-        SubscriberUpdateWebRequest that = (SubscriberUpdateWebRequest) o;
+        SubscriberWebRequest that = (SubscriberWebRequest) o;
 
         return new EqualsBuilder()
                 .append(this.subscriptionId, that.subscriptionId)

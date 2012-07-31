@@ -109,7 +109,7 @@ public class KilkariSubscriptionService {
                 CampaignChangeReason.from(campaignChangeRequest.getReason()), campaignChangeRequest.getCreatedAt()));
     }
 
-    public void updateSubscriberDetails(SubscriberUpdateWebRequest request) {
+    public void updateSubscriberDetails(SubscriberWebRequest request) {
         Errors errors = subscriberDetailsValidator.validate(request);
         raiseExceptionIfThereAreErrors(errors);
 

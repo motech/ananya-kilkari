@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.validators;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.request.SubscriberUpdateWebRequest;
+import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 
 import java.text.SimpleDateFormat;
@@ -22,18 +22,18 @@ public class SubscriberDetailsValidatorTest {
 
     @Test
     public void shouldReturnErrorsForInvalidSubscriberDetailsRequest() {
-        SubscriberUpdateWebRequest subscriberUpdateWebRequest = new SubscriberUpdateWebRequest();
-        subscriberUpdateWebRequest.setBeneficiaryAge("23a");
-        subscriberUpdateWebRequest.setChannel("invalid-channel");
-        subscriberUpdateWebRequest.setCreatedAt(DateTime.now());
-        subscriberUpdateWebRequest.setDateOfBirth("20/10/1985");
+        SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
+        subscriberWebRequest.setBeneficiaryAge("23a");
+        subscriberWebRequest.setChannel("ivr");
+        subscriberWebRequest.setCreatedAt(DateTime.now());
+        subscriberWebRequest.setDateOfBirth("20/10/1985");
         String edd = getDate(DateTime.now().plusWeeks(1).toDate());
-        subscriberUpdateWebRequest.setExpectedDateOfDelivery(edd);
+        subscriberWebRequest.setExpectedDateOfDelivery(edd);
 
-        Errors errors = subscriberDetailsValidator.validate(subscriberUpdateWebRequest);
+        Errors errors = subscriberDetailsValidator.validate(subscriberWebRequest);
 
         assertEquals(4, errors.getCount());
-        assertTrue(errors.hasMessage("Invalid channel invalid-channel"));
+        assertTrue(errors.hasMessage("Invalid channel ivr"));
         assertTrue(errors.hasMessage("Invalid beneficiary age 23a"));
         assertTrue(errors.hasMessage("Invalid date of birth 20/10/1985"));
         assertTrue(errors.hasMessage("Invalid expected date of delivery " + edd));

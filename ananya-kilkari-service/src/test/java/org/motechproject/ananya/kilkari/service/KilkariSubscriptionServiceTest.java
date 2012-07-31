@@ -11,7 +11,7 @@ import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.request.CampaignChangeRequest;
-import org.motechproject.ananya.kilkari.request.SubscriberUpdateWebRequest;
+import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
@@ -197,7 +197,7 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldValidateSubscriptionWebRequest() {
-        SubscriberUpdateWebRequest request = new SubscriberUpdateWebRequest();
+        SubscriberWebRequest request = new SubscriberWebRequest();
         request.setBeneficiaryAge("23");
         request.setChannel(Channel.CALL_CENTER.name());
         request.setCreatedAt(DateTime.now());
@@ -206,7 +206,7 @@ public class KilkariSubscriptionServiceTest {
         request.setSubscriptionId("subscriptionId");
         Errors errors = new Errors();
         errors.add("some error");
-        when(subscriberDetailsValidator.validate(any(SubscriberUpdateWebRequest.class))).thenReturn(errors);
+        when(subscriberDetailsValidator.validate(any(SubscriberWebRequest.class))).thenReturn(errors);
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("some error");
 
@@ -215,7 +215,7 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldUpdateSubscriberDetails() {
-        SubscriberUpdateWebRequest request = new SubscriberUpdateWebRequest();
+        SubscriberWebRequest request = new SubscriberWebRequest();
         request.setBeneficiaryAge("23");
         request.setChannel(Channel.CALL_CENTER.name());
         request.setCreatedAt(DateTime.now());

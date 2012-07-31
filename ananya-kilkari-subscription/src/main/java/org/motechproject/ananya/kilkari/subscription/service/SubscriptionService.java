@@ -63,7 +63,6 @@ public class SubscriptionService {
 
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper();
 
-        scheduleCampaign(subscription);
         onMobileSubscriptionManagerPublisher.sendActivationRequest(subscriptionMapper.createOMSubscriptionRequest(subscription, channel));
         reportingService.reportSubscriptionCreation(
                 subscriptionMapper.createSubscriptionCreationReportRequest(subscription, channel, subscriptionRequest.getLocation(), subscriptionRequest.getSubscriber()));
@@ -99,6 +98,8 @@ public class SubscriptionService {
     }
 
     public void activate(String subscriptionId, DateTime activatedOn, final String operator) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        scheduleCampaign(subscription);
         updateStatusAndReport(subscriptionId, activatedOn, null, operator, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {

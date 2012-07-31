@@ -36,7 +36,7 @@ public class KilkariSubscriptionService {
     private KilkariPropertiesData kilkariProperties;
     private SubscriberDetailsValidator subscriberDetailsValidator;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(KilkariSubscriptionService.class);
+    private final Logger logger = LoggerFactory.getLogger(KilkariSubscriptionService.class);
 
     @Autowired
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
@@ -61,7 +61,7 @@ public class KilkariSubscriptionService {
         try {
             subscriptionService.createSubscription(subscriptionRequest, Channel.from(subscriptionWebRequest.getChannel()));
         } catch (DuplicateSubscriptionException e) {
-            LOGGER.warn(String.format("Subscription for msisdn[%s] and pack[%s] already exists.",
+            logger.warn(String.format("Subscription for msisdn[%s] and pack[%s] already exists.",
                     subscriptionWebRequest.getMsisdn(), subscriptionWebRequest.getPack()));
         }
     }

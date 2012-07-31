@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.messagecampaign.request;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.DateTime;
 
 public class MessageCampaignRequest {
@@ -24,5 +26,15 @@ public class MessageCampaignRequest {
 
     public DateTime getSubscriptionCreationDate() {
         return subscriptionCreationDate;
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        return EqualsBuilder.reflectionEquals(this,that);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 }

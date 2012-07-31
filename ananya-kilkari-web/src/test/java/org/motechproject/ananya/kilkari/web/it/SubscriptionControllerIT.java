@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
-import org.motechproject.ananya.kilkari.messagecampaign.response.MessageCampaignEnrollment;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
@@ -17,8 +16,8 @@ import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
-import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
@@ -137,24 +136,6 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(msisdn, subscription.getMsisdn());
         assertEquals(pack, subscription.getPack());
         assertFalse(StringUtils.isBlank(subscription.getSubscriptionId()));
-
-
-        MessageCampaignEnrollment campaignEnrollment = new TimedRunner<MessageCampaignEnrollment>(20, 1000) {
-            @Override
-            MessageCampaignEnrollment run() {
-                MessageCampaignEnrollment enrollment = messageCampaignService.searchEnrollments(
-                        subscription.getSubscriptionId()).get(0);
-                return enrollment;
-            }
-        }.execute();
-
-
-        assertNotNull(campaignEnrollment);
-        assertEquals(subscription.getSubscriptionId(), campaignEnrollment.getExternalId());
-        assertEquals(SubscriptionControllerIT.TWELVE_MONTH_CAMPAIGN_NAME, campaignEnrollment.getCampaignName());
-        List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
-                subscription.getSubscriptionId(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
-        assertEquals(48, messageTimings.size());
     }
 
     @Test
@@ -197,24 +178,6 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(msisdn, subscription.getMsisdn());
         assertEquals(pack, subscription.getPack());
         assertFalse(StringUtils.isBlank(subscription.getSubscriptionId()));
-
-
-        MessageCampaignEnrollment campaignEnrollment = new TimedRunner<MessageCampaignEnrollment>(20, 1000) {
-            @Override
-            MessageCampaignEnrollment run() {
-                return messageCampaignService.searchEnrollments(
-                        subscription.getSubscriptionId()).get(0);
-
-            }
-        }.execute();
-
-
-        assertNotNull(campaignEnrollment);
-        assertEquals(subscription.getSubscriptionId(), campaignEnrollment.getExternalId());
-        assertEquals(SubscriptionControllerIT.FIFTEEN_MONTH_CAMPAIGN_NAME, campaignEnrollment.getCampaignName());
-        List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
-                subscription.getSubscriptionId(), DateTime.now().minusDays(3), DateTime.now().plusYears(4));
-        assertEquals(60, messageTimings.size());
     }
 
     @Test

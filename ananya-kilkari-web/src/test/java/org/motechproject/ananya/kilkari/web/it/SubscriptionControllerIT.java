@@ -169,7 +169,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         reportingService.setBehavior(mockedReportingService);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 
-        SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().build();
+        SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withEDD(null).build();
         MvcResult result = mockMvc(subscriptionController)
                 .perform(post("/subscription").body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

@@ -8,7 +8,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.request.LocationRequest;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
@@ -34,10 +33,9 @@ public class SubscriptionWebRequest implements Serializable {
     @JsonProperty
     private String dateOfBirth;
     @JsonProperty
-    private LocationRequest location;
-
-    @JsonProperty
     private String week;
+    @JsonProperty
+    private LocationRequest location;
 
     public SubscriptionWebRequest() {
         this.location = new LocationRequest();

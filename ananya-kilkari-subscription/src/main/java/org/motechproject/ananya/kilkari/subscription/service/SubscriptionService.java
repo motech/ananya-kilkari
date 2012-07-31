@@ -36,6 +36,7 @@ public class SubscriptionService {
     private MessageCampaignService messageCampaignService;
     private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
     private CampaignMessageService campaignMessageService;
+
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
     @Autowired
@@ -55,7 +56,9 @@ public class SubscriptionService {
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
         subscriptionValidator.validate(subscriptionRequest);
-        Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), subscriptionRequest.getCreationDate());
+
+        DateTime creationDate = determineSubscriptionCreationDate(subscriptionRequest);
+        Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), creationDate);
         allSubscriptions.add(subscription);
 
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper();
@@ -66,6 +69,28 @@ public class SubscriptionService {
                 subscriptionMapper.createSubscriptionCreationReportRequest(subscription, channel, subscriptionRequest.getLocation(), subscriptionRequest.getSubscriber()));
 
         return subscription;
+    }
+
+    private DateTime determineSubscriptionCreationDate(SubscriptionRequest subscriptionRequest) {
+        DateTime creationDate = subscriptionRequest.getCreationDate();
+        SubscriptionPack subscriptionRequestPack = subscriptionRequest.getPack();
+
+        DateTime expectedDateOfDelivery = subscriptionRequest.getSubscriber().getExpectedDateOfDelivery();
+        if (expectedDateOfDelivery != null) {
+            return subscriptionRequestPack.adjustStartDate(expectedDateOfDelivery);
+        }
+
+        DateTime dateOfBirth = subscriptionRequest.getSubscriber().getDateOfBirth();
+        if (dateOfBirth != null) {
+            return subscriptionRequestPack.adjustStartDate(dateOfBirth);
+        }
+
+        Integer weekNumber = subscriptionRequest.getSubscriber().getWeek();
+        if (weekNumber != null) {
+            return subscriptionRequestPack.adjustStartDate(creationDate, weekNumber);
+        }
+        
+        return creationDate;
     }
 
     public List<SubscriptionResponse> findByMsisdn(String msisdn) {
@@ -104,7 +129,7 @@ public class SubscriptionService {
     public void requestDeactivation(DeactivationRequest deactivationRequest) {
         String subscriptionId = deactivationRequest.getSubscriptionId();
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        if(!subscription.isInProgress()){
+        if (!subscription.isInProgress()) {
             logger.debug(String.format("Cannot unsubscribe. Subscription in %s status", subscription.getStatus()));
             return;
         }

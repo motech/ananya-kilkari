@@ -27,7 +27,7 @@ public class SubscriberDetailsValidatorTest {
         subscriberWebRequest.setChannel("ivr");
         subscriberWebRequest.setCreatedAt(DateTime.now());
         subscriberWebRequest.setDateOfBirth("20/10/1985");
-        String edd = getDate(DateTime.now().plusWeeks(1).toDate());
+        String edd = getDate(DateTime.now().minusWeeks(1).toDate());
         subscriberWebRequest.setExpectedDateOfDelivery(edd);
 
         Errors errors = subscriberDetailsValidator.validate(subscriberWebRequest);

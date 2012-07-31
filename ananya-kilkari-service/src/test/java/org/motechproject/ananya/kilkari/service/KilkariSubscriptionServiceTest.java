@@ -11,6 +11,7 @@ import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.request.CampaignChangeRequest;
+import org.motechproject.ananya.kilkari.request.SubscriberUpdateWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
@@ -18,8 +19,11 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscri
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
+import org.motechproject.ananya.kilkari.validators.SubscriberDetailsValidator;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
@@ -48,11 +52,13 @@ public class KilkariSubscriptionServiceTest {
     private MotechSchedulerService motechSchedulerService;
     @Mock
     private KilkariPropertiesData kilkariPropertiesData;
+    @Mock
+    private SubscriberDetailsValidator subscriberDetailsValidator;
 
     @Before
     public void setup() {
         initMocks(this);
-        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, kilkariPropertiesData);
+        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, kilkariPropertiesData, subscriberDetailsValidator);
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
     }
 
@@ -170,7 +176,7 @@ public class KilkariSubscriptionServiceTest {
     }
 
     @Test
-    public void shouldProcessCampaignChange(){
+    public void shouldProcessCampaignChange() {
         CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
         String subscriptionId = "subscriptionId";
         String reason = "MISCARRIAGE";
@@ -187,5 +193,48 @@ public class KilkariSubscriptionServiceTest {
         assertEquals(subscriptionId, campaignRescheduleRequest.getSubscriptionId());
         assertEquals(reason, campaignRescheduleRequest.getReason().name());
         assertEquals(createdAt, campaignRescheduleRequest.getCreatedAt());
+    }
+
+    @Test
+    public void shouldValidateSubscriptionWebRequest() {
+        SubscriberUpdateWebRequest request = new SubscriberUpdateWebRequest();
+        request.setBeneficiaryAge("23");
+        request.setChannel(Channel.CALL_CENTER.name());
+        request.setCreatedAt(DateTime.now());
+        request.setDateOfBirth("20-10-1985");
+        request.setBlock("block");
+        request.setSubscriptionId("subscriptionId");
+        Errors errors = new Errors();
+        errors.add("some error");
+        when(subscriberDetailsValidator.validate(any(SubscriberUpdateWebRequest.class))).thenReturn(errors);
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("some error");
+
+        kilkariSubscriptionService.updateSubscriberDetails(request);
+    }
+
+    @Test
+    public void shouldUpdateSubscriberDetails() {
+        SubscriberUpdateWebRequest request = new SubscriberUpdateWebRequest();
+        request.setBeneficiaryAge("23");
+        request.setChannel(Channel.CALL_CENTER.name());
+        request.setCreatedAt(DateTime.now());
+        request.setDateOfBirth("20-10-1985");
+        request.setBlock("block");
+        request.setSubscriptionId("subscriptionId");
+        when(subscriberDetailsValidator.validate(request)).thenReturn(new Errors());
+
+        kilkariSubscriptionService.updateSubscriberDetails(request);
+
+        ArgumentCaptor<SubscriberUpdateRequest> captor = ArgumentCaptor.forClass(SubscriberUpdateRequest.class);
+        verify(subscriptionService).updateSubscriberDetails(captor.capture());
+        verify(subscriberDetailsValidator).validate(request);
+        SubscriberUpdateRequest subscriberUpdateRequest = captor.getValue();
+        assertEquals(request.getBeneficiaryAge(), subscriberUpdateRequest.getBeneficiaryAge());
+        assertEquals(request.getChannel(), subscriberUpdateRequest.getChannel());
+        assertEquals(request.getCreatedAt(), subscriberUpdateRequest.getCreatedAt());
+        assertEquals(request.getDateOfBirth(), subscriberUpdateRequest.getDateOfBirth());
+        assertEquals(request.getBlock(), subscriberUpdateRequest.getBlock());
+        assertEquals(request.getSubscriptionId(), subscriberUpdateRequest.getSubscriptionId());
     }
 }

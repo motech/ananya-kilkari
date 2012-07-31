@@ -6,6 +6,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,17 +24,33 @@ public class SubscriptionValidator {
 
     public void validate(SubscriptionRequest subscriptionRequest) {
         Errors errors = new Errors();
-        validateLocationExists(subscriptionRequest, errors);
+        if (subscriptionRequest.hasLocation())
+            validateLocationExists(subscriptionRequest.getLocation(), errors);
         validateWeek(subscriptionRequest, errors);
         validateActiveSubscriptionDoesNotExist(subscriptionRequest, errors);
-        if (errors.hasErrors())
-            throw new ValidationException(errors.allMessages());
+        raiseExceptionIfThereAreErrors(errors);
+    }
+
+    public void validateSubscriberDetails(SubscriberUpdateRequest updateRequest) {
+        Errors errors = new Errors();
+        if (updateRequest.hasLocation()) {
+            validateLocationExists(updateRequest.getLocation(), errors);
+        }
+        validateSubscriptionExists(updateRequest.getSubscriptionId(), errors);
+        raiseExceptionIfThereAreErrors(errors);
     }
 
     private void validateWeek(SubscriptionRequest subscriptionRequest, Errors errors) {
         if (subscriptionRequest.getSubscriber().getWeek() != null) {
             if (!subscriptionRequest.getPack().isWeekWithinPackRange(subscriptionRequest.getSubscriber().getWeek()))
                 errors.add(String.format("Given week[%s] is not within the pack[%s] range", subscriptionRequest.getSubscriber().getWeek(), subscriptionRequest.getPack().name()));
+        }
+    }
+
+    private void validateSubscriptionExists(String subscriptionId, Errors errors) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        if (subscription == null) {
+            errors.add(String.format("Subscription does not exist for subscriptionId %s", subscriptionId));
         }
     }
 
@@ -44,11 +61,7 @@ public class SubscriptionValidator {
         }
     }
 
-    private void validateLocationExists(SubscriptionRequest subscription, Errors errors) {
-        if (!subscription.hasLocation()) return;
-
-        Location location = subscription.getLocation();
-
+    private void validateLocationExists(Location location, Errors errors) {
         String district = location.getDistrict();
         String block = location.getBlock();
         String panchayat = location.getPanchayat();
@@ -56,6 +69,12 @@ public class SubscriptionValidator {
 
         if (!ValidationUtils.assertNotNull(existingLocation)) {
             errors.add(String.format("Location does not exist for District[%s] Block[%s] and Panchayat[%s]", district, block, panchayat));
+        }
+    }
+
+    private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
+        if (validationErrors.hasErrors()) {
+            throw new ValidationException(validationErrors.allMessages());
         }
     }
 }

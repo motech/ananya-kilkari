@@ -1,9 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,5 +37,10 @@ public class ReportingServiceImpl implements ReportingService {
     @Override
     public void reportCampaignMessageDeliveryStatus(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
         reportingPublisher.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
+    }
+
+    @Override
+    public void reportSubscriberDetailsChange(SubscriberUpdateReportRequest subscriberUpdateReportRequest) {
+        reportingPublisher.reportSubscriberDetailsChange(subscriberUpdateReportRequest);
     }
 }

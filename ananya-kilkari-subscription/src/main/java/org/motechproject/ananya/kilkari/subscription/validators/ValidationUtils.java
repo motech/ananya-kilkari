@@ -63,4 +63,38 @@ public class ValidationUtils {
     public static boolean assertCampaignChangeReason(String reason) {
         return CampaignChangeReason.isValid(reason);
     }
+
+    public static boolean assertEDD(String expectedDateOfDelivery, DateTime createdAt) {
+        if (StringUtils.isNotEmpty(expectedDateOfDelivery)) {
+            if (!ValidationUtils.assertDateFormat(expectedDateOfDelivery))
+                return false;
+
+            if (!ValidationUtils.assertDateBefore(createdAt, parseDateTime(expectedDateOfDelivery)))
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean assertDOB(String dateOfBirth, DateTime createdAt) {
+        if (StringUtils.isNotEmpty(dateOfBirth)) {
+            if (!ValidationUtils.assertDateFormat(dateOfBirth))
+                return false;
+
+            if (!ValidationUtils.assertDateBefore(parseDateTime(dateOfBirth), createdAt))
+                return false;
+        }
+        return true;
+    }
+
+    public static   boolean assertAge(String beneficiaryAge) {
+        if (StringUtils.isNotEmpty(beneficiaryAge)) {
+            if (!ValidationUtils.assertNumeric(beneficiaryAge))
+                return false;
+        }
+        return true;
+    }
+
+    private static DateTime parseDateTime(String dateTime) {
+        return StringUtils.isNotEmpty(dateTime) ? DateTimeFormat.forPattern("dd-MM-yyyy").parseDateTime(dateTime) : null;
+    }
 }

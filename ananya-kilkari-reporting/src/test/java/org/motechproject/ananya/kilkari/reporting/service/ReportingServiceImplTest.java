@@ -3,10 +3,7 @@ package org.motechproject.ananya.kilkari.reporting.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 
 import static junit.framework.Assert.assertEquals;
@@ -65,5 +62,13 @@ public class ReportingServiceImplTest {
         reportingServiceImpl.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
 
         verify(reportingPublisher).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
+    }
+
+    @Test
+    public void shouldReportASubscriberUpdate() {
+        SubscriberUpdateReportRequest subscriberUpdateReportRequest = mock(SubscriberUpdateReportRequest.class);
+        reportingServiceImpl.reportSubscriberDetailsChange(subscriberUpdateReportRequest);
+
+        verify(reportingPublisher).reportSubscriberDetailsChange(subscriberUpdateReportRequest);
     }
 }

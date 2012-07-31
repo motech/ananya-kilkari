@@ -4,17 +4,17 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
+import org.motechproject.ananya.kilkari.reporting.domain.SubscriberUpdateReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
-import org.motechproject.ananya.kilkari.subscription.domain.CampaignRescheduleRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
@@ -177,6 +177,14 @@ public class SubscriptionService {
         Subscription subscription = allSubscriptions.findBySubscriptionId(campaignRescheduleRequest.getSubscriptionId());
         unScheduleCampaign(subscription);
         scheduleCampaign(campaignRescheduleRequest);
+    }
+
+    public void updateSubscriberDetails(SubscriberUpdateRequest request) {
+        subscriptionValidator.validateSubscriberDetails(request);
+
+        SubscriberLocation subscriberLocation = new SubscriberLocation(request.getDistrict(), request.getBlock(), request.getPanchayat());
+        reportingService.reportSubscriberDetailsChange(new SubscriberUpdateReportRequest(request.getSubscriptionId(), request.getChannel(), request.getCreatedAt(),
+                request.getBeneficiaryName(), request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(), request.getDateOfBirth(), subscriberLocation));
     }
 
     private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {

@@ -1,9 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
 import org.springframework.stereotype.Service;
 
@@ -70,6 +67,13 @@ public class StubReportingGateway implements ReportingGateway {
         if (verify()) {
             behavior.reportCampaignMessageDelivery(campaignMessageDeliveryReportRequest);
             isReportCampaignMessageDeliveryCalled = true;
+        }
+    }
+
+    @Override
+    public void updateSubscriberDetails(SubscriberUpdateReportRequest subscriberUpdateReportRequest) {
+        if (verify()) {
+            behavior.updateSubscriberDetails(subscriberUpdateReportRequest);
         }
     }
 

@@ -147,4 +147,44 @@ public class ValidationUtilsTest {
     public void shouldReturnTrueWhenValidReasonIsGivenToChangeCampaign() {
         assertTrue(ValidationUtils.assertCampaignChangeReason("INFANT_DEATH"));
     }
+
+    @Test
+    public void shouldReturnFalseIfDOBDateFormatIsInvalid() {
+        assertFalse(ValidationUtils.assertDOB("25/11/1986", DateTime.now()));
+    }
+
+    @Test
+    public void shouldReturnFalseIfDOBDateIsAfterCreatedAt() {
+        assertFalse(ValidationUtils.assertDOB("25-11-1985", new DateTime(1984, 11, 25, 0, 0, 0)));
+    }
+
+    @Test
+    public void shouldReturnTrueIfDOBDateIsValid() {
+        assertTrue(ValidationUtils.assertDOB("25-11-1986", DateTime.now()));
+    }
+
+    @Test
+    public void shouldReturnFalseIfEDDDateFormatIsInvalid() {
+        assertFalse(ValidationUtils.assertEDD("25/11/1986", DateTime.now()));
+    }
+
+    @Test
+    public void shouldReturnFalseIfEDDDateIsBeforeCreatedAt() {
+        assertFalse(ValidationUtils.assertEDD("25-11-1984", new DateTime(1985, 11, 25, 0, 0, 0)));
+    }
+
+    @Test
+    public void shouldReturnTrueIfEDDDateIsValid() {
+        assertTrue(ValidationUtils.assertEDD("25-11-1985", new DateTime(1984, 11, 25, 0, 0, 0)));
+    }
+
+    @Test
+    public void shouldReturnTrueIfBeneficiaryAgeIsValid() {
+        assertTrue(ValidationUtils.assertAge("25"));
+    }
+
+    @Test
+    public void shouldReturnFalseIfBeneficiaryAgeIsNotNumeric() {
+        assertFalse(ValidationUtils.assertAge("25a"));
+    }
 }

@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.reporting.domain.SubscriberUpdateReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl;
@@ -23,6 +24,8 @@ import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscrip
 import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
@@ -558,6 +561,43 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, campaignEnrollmentRequest.getExternalId());
         assertEquals(campaignChangeReason.name(), campaignEnrollmentRequest.getSubscriptionPack());
         assertEquals(creationDate, campaignEnrollmentRequest.getSubscriptionCreationDate());
+    }
+
+    @Test
+    public void shouldThrowExceptionIfValidationFailsForUpdatingSubscriberDetails() {
+        SubscriberUpdateRequest request = mock(SubscriberUpdateRequest.class);
+        doThrow(new ValidationException("some error")).when(subscriptionValidator).validateSubscriberDetails(request);
+
+        try {
+            subscriptionService.updateSubscriberDetails(request);
+        } catch (ValidationException e) {
+            //ignore
+        }
+
+        verify(reportingServiceImpl, never()).reportSubscriberDetailsChange(any(SubscriberUpdateReportRequest.class));
+    }
+
+    @Test
+    public void shouldPublishASubscriberUpdateEvent() {
+        String subscriptionId = "subscriptionId";
+        Location location = new Location("district", "block", "panchayat");
+
+        subscriptionService.updateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", "23",
+                "20-10-2038", "20-10-1985", location));
+
+        ArgumentCaptor<SubscriberUpdateReportRequest> captor = ArgumentCaptor.forClass(SubscriberUpdateReportRequest.class);
+        verify(reportingServiceImpl).reportSubscriberDetailsChange(captor.capture());
+        SubscriberUpdateReportRequest reportRequest = captor.getValue();
+
+        assertEquals(subscriptionId, reportRequest.getSubscriptionId());
+        assertEquals(Channel.CALL_CENTER.name(), reportRequest.getChannel());
+        assertEquals("20-10-2038", reportRequest.getExpectedDateOfDelivery());
+        assertEquals("20-10-1985", reportRequest.getDateOfBirth());
+        assertEquals("23", reportRequest.getBeneficiaryAge());
+        assertEquals("name", reportRequest.getBeneficiaryName());
+        assertEquals("district", reportRequest.getLocation().getDistrict());
+        assertEquals("block", reportRequest.getLocation().getBlock());
+        assertEquals("panchayat", reportRequest.getLocation().getPanchayat());
     }
 }
 

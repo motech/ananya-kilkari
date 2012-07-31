@@ -1,9 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.ReportingEventKeys;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.scheduler.context.EventContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,5 +26,9 @@ public class ReportingPublisher {
 
     public void reportCampaignMessageDeliveryStatus(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
         eventContext.send(ReportingEventKeys.REPORT_CAMPAIGN_MESSAGE_DELIVERY_STATUS, campaignMessageDeliveryReportRequest);
+    }
+
+    public void reportSubscriberDetailsChange(SubscriberUpdateReportRequest subscriberUpdateReportRequest) {
+        eventContext.send(ReportingEventKeys.REPORT_SUBSCRIBER_DETAILS_UPDATE, subscriberUpdateReportRequest);
     }
 }

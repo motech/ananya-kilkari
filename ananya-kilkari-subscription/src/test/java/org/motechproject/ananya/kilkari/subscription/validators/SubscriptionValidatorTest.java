@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.validators;
 
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -9,11 +10,13 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 
 import static org.mockito.Matchers.anyString;
@@ -115,5 +118,33 @@ public class SubscriptionValidatorTest {
         } catch (ValidationException e) {
             Assert.fail("Unexpected ValidationException");
         }
+    }
+
+    @Test
+    public void shouldValidateInvalidLocationInSubscriberDetails() {
+        Location location = new Location("district", "block", "panchayat");
+        when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(null);
+        String subscriptionId = "subscriptionId";
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Location does not exist for District[district] Block[block] and Panchayat[panchayat]");
+
+        subscriptionValidator.validateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", "23",
+                "20-10-2038", "20-10-1985", location));
+    }
+
+    @Test
+    public void shouldValidateInvalidSubscriptionIdInSubscriberDetails() {
+        Location location = new Location("district", "block", "panchayat");
+        when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(new SubscriberLocation());
+        String subscriptionId = "subscriptionId";
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(null);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Subscription does not exist for subscriptionId subscriptionId");
+
+        subscriptionValidator.validateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", "23",
+                "20-10-2038", "20-10-1985", location));
     }
 }

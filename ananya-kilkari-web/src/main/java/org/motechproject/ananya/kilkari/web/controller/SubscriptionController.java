@@ -31,7 +31,8 @@ public class SubscriptionController {
     public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService,
                                   CallbackRequestValidator callbackRequestValidator,
                                   UnsubscriptionRequestValidator unsubscriptionRequestValidator,
-                                  SubscriptionDetailsMapper subscriptionDetailsMapper, CampaignChangeRequestValidator campaignChangeRequestValidator) {
+                                  SubscriptionDetailsMapper subscriptionDetailsMapper,
+                                  CampaignChangeRequestValidator campaignChangeRequestValidator) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.callbackRequestValidator = callbackRequestValidator;
         this.unsubscriptionRequestValidator = unsubscriptionRequestValidator;
@@ -101,6 +102,13 @@ public class SubscriptionController {
 
         kilkariSubscriptionService.processCampaignChange(campaignChangeRequest);
         return BaseResponse.success("Campaign Change request submitted successfully");
+    }
+
+    @RequestMapping(value = "/subscriber/update", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseResponse updateSubscriberDetails(@RequestBody SubscriberUpdateWebRequest subscriberUpdateWebRequest) {
+        kilkariSubscriptionService.updateSubscriberDetails(subscriberUpdateWebRequest);
+        return BaseResponse.success("Subscriber Update request submitted successfully");
     }
 
     private void raiseExceptionIfThereAreErrors(Errors validationErrors) {

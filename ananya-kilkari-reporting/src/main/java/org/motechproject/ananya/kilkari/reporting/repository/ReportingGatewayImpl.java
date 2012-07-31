@@ -1,9 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +49,6 @@ public class ReportingGatewayImpl implements ReportingGateway {
             logger.error(String.format("Reporting subscription state change failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
             throw ex;
         }
-
     }
 
     @Override
@@ -79,6 +75,17 @@ public class ReportingGatewayImpl implements ReportingGateway {
             restTemplate.postForLocation(url, campaignMessageDeliveryReportRequest, new HashMap<String, String>());
         } catch (HttpClientErrorException ex) {
             logger.error(String.format("Reporting campaign message delivery failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
+            throw ex;
+        }
+    }
+
+    @Override
+    public void updateSubscriberDetails(SubscriberUpdateReportRequest subscriberUpdateReportRequest) {
+        String url = String.format("%s%s", getBaseUrl(), SUBSCRIBER_UPDATE_PATH);
+        try {
+            restTemplate.postForLocation(url, subscriberUpdateReportRequest, new HashMap<String, String>());
+        } catch (HttpClientErrorException ex) {
+            logger.error(String.format("Updating subscriber details failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
             throw ex;
         }
     }

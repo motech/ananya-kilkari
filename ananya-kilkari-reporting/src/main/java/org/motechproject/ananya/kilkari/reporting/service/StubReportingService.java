@@ -1,9 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +38,13 @@ public class StubReportingService implements ReportingService {
         if (verify()) {
             behavior.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
             reportCampaignMessageDeliveryCalled = true;
+        }
+    }
+
+    @Override
+    public void reportSubscriberDetailsChange(SubscriberUpdateReportRequest subscriberUpdateReportRequest) {
+        if (verify()) {
+            behavior.reportSubscriberDetailsChange(subscriberUpdateReportRequest);
         }
     }
 

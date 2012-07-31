@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.LocationRequest;
+import org.motechproject.ananya.kilkari.request.LocationRequest;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
@@ -202,41 +202,18 @@ public class SubscriptionWebRequest implements Serializable {
     }
 
     private void validateEDD(Errors errors) {
-        if (StringUtils.isNotEmpty(expectedDateOfDelivery)) {
-            String errorMessage = "Invalid expected date of delivery %s";
-
-            if (!ValidationUtils.assertDateFormat(expectedDateOfDelivery)) {
-                errors.add(errorMessage, expectedDateOfDelivery);
-                return;
-            }
-
-            if (!ValidationUtils.assertDateBefore(createdAt, parseDateTime(expectedDateOfDelivery))) {
-                errors.add(errorMessage, expectedDateOfDelivery);
-            }
-        }
+        if (!ValidationUtils.assertEDD(expectedDateOfDelivery, createdAt))
+            errors.add("Invalid expected date of delivery %s", expectedDateOfDelivery);
     }
 
     private void validateDOB(Errors errors) {
-        if (StringUtils.isNotEmpty(dateOfBirth)) {
-            String errorMessage = "Invalid date of birth %s";
-
-            if (!ValidationUtils.assertDateFormat(dateOfBirth)) {
-                errors.add(errorMessage, dateOfBirth);
-                return;
-            }
-
-            if (!ValidationUtils.assertDateBefore(parseDateTime(dateOfBirth), createdAt)) {
-                errors.add(errorMessage, dateOfBirth);
-            }
-        }
+        if (!ValidationUtils.assertDOB(dateOfBirth, createdAt))
+            errors.add("Invalid date of birth %s", dateOfBirth);
     }
 
     private void validateAge(Errors errors) {
-        if (StringUtils.isNotEmpty(beneficiaryAge)) {
-            if (!ValidationUtils.assertNumeric(beneficiaryAge)) {
-                errors.add("Invalid beneficiary age %s", beneficiaryAge);
-            }
-        }
+        if (!ValidationUtils.assertAge(beneficiaryAge))
+            errors.add("Invalid beneficiary age %s", beneficiaryAge);
     }
 
     private DateTime parseDateTime(String dateTime) {

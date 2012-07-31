@@ -418,6 +418,21 @@ public class SubscriptionControllerTest {
                 .andExpect(content().string(baseResponseMatcher("ERROR", "some error description1,some error description2")));
     }
 
+    @Test
+    public void shouldUpdateSubscriberDetails() throws Exception {
+        SubscriberUpdateWebRequest subscriberUpdateWebRequest = new SubscriberUpdateWebRequest();
+        byte[] requestBody = TestUtils.toJson(subscriberUpdateWebRequest).getBytes();
+
+        mockMvc(subscriptionController)
+                .perform(post("/subscriber/update")
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber Update request submitted successfully")));
+
+        verify(kilkariSubscriptionService).updateSubscriberDetails(subscriberUpdateWebRequest);
+    }
+
     private void mockSubscription(String msisdn) {
         String subscriptionId = "subscription-id";
         SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;

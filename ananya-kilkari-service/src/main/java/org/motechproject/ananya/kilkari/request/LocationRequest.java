@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.subscription.domain;
+package org.motechproject.ananya.kilkari.request;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -9,7 +9,6 @@ import java.io.Serializable;
 public class LocationRequest implements Serializable {
     @JsonProperty
     private String district;
-
     @JsonProperty
     private String block;
     @JsonProperty

@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,11 +18,11 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ReportingGatewayImplTest {
+    private ReportingGatewayImpl reportingGateway;
     @Mock
     private RestTemplate restTemplate;
     @Mock
@@ -39,33 +38,24 @@ public class ReportingGatewayImplTest {
     @Before
     public void setUp() {
         initMocks(this);
+        reportingGateway = new ReportingGatewayImpl(restTemplate, kilkariProperties);
     }
 
     @Test
     public void shouldInvokeReportingServiceWithSubscriptionDetails() {
-        String msisdn = "msisdn";
-        String pack = "TWELVE_MONTHS";
-        String channel = "IVR";
-        String subscriptionId = "abcd1234";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        SubscriptionCreationReportRequest creationReportRequest = mock(SubscriptionCreationReportRequest.class);
 
-        DateTime dob = DateTime.now().minusMonths(8);
-        DateTime edd = DateTime.now().plusMonths(3);
-        String name = "name";
-        SubscriptionDetails subscriptionDetails = new SubscriptionDetails(msisdn, pack, DateTime.now(),"ACTIVE", subscriptionId);
-        new ReportingGatewayImpl(restTemplate, kilkariProperties).createSubscription(new SubscriptionCreationReportRequest(subscriptionDetails,channel, 42, name, dob, edd, new SubscriberLocation("district", "block", "panchayat")));
+        reportingGateway.createSubscription(creationReportRequest);
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
         verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), subscriptionReportRequestArgumentCaptor.capture(), responseTypeArgumentCaptor.capture(), urlVariablesArgumentCaptor.capture());
-        SubscriptionCreationReportRequest subscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
+        SubscriptionCreationReportRequest actualCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         assertEquals("url/subscription", urlArgumentCaptor.getValue());
-        assertEquals(msisdn, subscriptionCreationReportRequest.getMsisdn());
-        assertEquals(pack, subscriptionCreationReportRequest.getPack());
-        assertEquals(channel, subscriptionCreationReportRequest.getChannel());
-        assertEquals(subscriptionDetails.getSubscriptionId(), subscriptionCreationReportRequest.getSubscriptionId());
+        assertEquals(creationReportRequest, actualCreationReportRequest);
     }
 
     @Test
@@ -74,7 +64,7 @@ public class ReportingGatewayImplTest {
         SubscriberLocation expectedLocation = new SubscriberLocation("mydistrict", "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        SubscriberLocation actualLocation = new ReportingGatewayImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
+        SubscriberLocation actualLocation = reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat");
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -97,7 +87,7 @@ public class ReportingGatewayImplTest {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        SubscriberLocation actualLocation = new ReportingGatewayImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
+        SubscriberLocation actualLocation = reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat");
 
         assertNull(actualLocation);
 
@@ -121,7 +111,7 @@ public class ReportingGatewayImplTest {
         expectedException.expect(HttpClientErrorException.class);
         expectedException.expectMessage("400 BAD_REQUEST");
 
-        new ReportingGatewayImpl(restTemplate, kilkariProperties).getLocation("mydistrict", "myblock", "mypanchayat");
+        reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat");
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
@@ -143,7 +133,7 @@ public class ReportingGatewayImplTest {
         SubscriberLocation expectedLocation = new SubscriberLocation(null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        SubscriberLocation actualLocation = new ReportingGatewayImpl(restTemplate, kilkariProperties).getLocation(null, "myblock", "mypanchayat");
+        SubscriberLocation actualLocation = reportingGateway.getLocation(null, "myblock", "mypanchayat");
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -166,7 +156,7 @@ public class ReportingGatewayImplTest {
         SubscriberLocation expectedLocation = new SubscriberLocation(null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        SubscriberLocation actualLocation = new ReportingGatewayImpl(restTemplate, kilkariProperties).getLocation(null, null, null);
+        SubscriberLocation actualLocation = reportingGateway.getLocation(null, null, null);
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -183,55 +173,54 @@ public class ReportingGatewayImplTest {
 
     @Test
     public void shouldInvokeUpdateOnReportingServiceWithSubscriptionStateChangeDetails() {
-        String subscriptionId = "abcd1234";
-        String subscriptionStatus = "ACTIVE";
-        String operator = "AIRTEL";
-        String reason = "my own error reason";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        SubscriptionStateChangeReportRequest stateChangeReportRequest = mock(SubscriptionStateChangeReportRequest.class);
+        when(stateChangeReportRequest.getSubscriptionId()).thenReturn("abcd1234");
 
-        new ReportingGatewayImpl(restTemplate, kilkariProperties).updateSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscriptionId, subscriptionStatus, DateTime.now(), reason, operator));
+        reportingGateway.updateSubscriptionStateChange(stateChangeReportRequest);
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         verify(restTemplate).put(urlArgumentCaptor.capture(), subscriptionStateChangeReportRequestArgumentCaptor.capture(), urlVariablesArgumentCaptor.capture());
-        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+        SubscriptionStateChangeReportRequest actualStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         assertEquals("url/updatesubscription/abcd1234", urlArgumentCaptor.getValue());
-        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(subscriptionStatus, subscriptionStateChangeReportRequest.getSubscriptionStatus());
-        assertEquals(reason, subscriptionStateChangeReportRequest.getReason());
-        assertEquals(operator, subscriptionStateChangeReportRequest.getOperator());
+        assertEquals(stateChangeReportRequest, actualStateChangeReportRequest);
     }
 
     @Test
     public void shouldInvokeReportingServiceWithCampaignMessageDeliveryDetails() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        CampaignMessageDeliveryReportRequest deliveryReportRequest = mock(CampaignMessageDeliveryReportRequest.class);
 
-        String msisdn = "1234567890";
-        String subscriptionId = "abcd1234";
-        String campaignId = "WEEK12";
-        String retryCount = "3";
-        String startTime = "25-12-2012";
-        String endTime = "27-12-2012";
-        String serviceOption = "HELP";
-        String status = "NEW";
-        new ReportingGatewayImpl(restTemplate, kilkariProperties).reportCampaignMessageDelivery(new CampaignMessageDeliveryReportRequest(subscriptionId, msisdn, campaignId, serviceOption, retryCount, status, new CallDetailsReportRequest(startTime, endTime)));
+        reportingGateway.reportCampaignMessageDelivery(deliveryReportRequest);
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
         verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), campaignMessageDeliveryReportRequestArgumentCaptor.capture(), urlVariablesArgumentCaptor.capture());
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
+        CampaignMessageDeliveryReportRequest actualDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         assertEquals("url/obd/callDetails", urlArgumentCaptor.getValue());
-        assertEquals(msisdn, campaignMessageDeliveryReportRequest.getMsisdn());
-        assertEquals(subscriptionId, campaignMessageDeliveryReportRequest.getSubscriptionId());
-        assertEquals(campaignId, campaignMessageDeliveryReportRequest.getCampaignId());
-        assertEquals(retryCount, campaignMessageDeliveryReportRequest.getRetryCount());
-        assertEquals(serviceOption, campaignMessageDeliveryReportRequest.getServiceOption());
-        CallDetailsReportRequest callDetailReportRequest = campaignMessageDeliveryReportRequest.getCallDetailRecord();
-        assertEquals(startTime, callDetailReportRequest.getStartTime());
-        assertEquals(endTime, callDetailReportRequest.getEndTime());
+        assertEquals(deliveryReportRequest, actualDeliveryReportRequest);
+    }
+
+    @Test
+    public void shouldInvokeReportingServiceWithSubscriberDetailsToUpdate() {
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        SubscriberUpdateReportRequest reportRequest = mock(SubscriberUpdateReportRequest.class);
+
+        reportingGateway.updateSubscriberDetails(reportRequest);
+
+        verify(kilkariProperties).getProperty("reporting.service.base.url");
+        ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<SubscriberUpdateReportRequest> requestArgumentCaptor = ArgumentCaptor.forClass(SubscriberUpdateReportRequest.class);
+        verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), requestArgumentCaptor.capture(), urlVariablesArgumentCaptor.capture());
+        String url = urlArgumentCaptor.getValue();
+        SubscriberUpdateReportRequest actualReportRequest = requestArgumentCaptor.getValue();
+
+        assertEquals("url/subscriber/update", url);
+        assertEquals(reportRequest, actualReportRequest);
     }
 }

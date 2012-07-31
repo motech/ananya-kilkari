@@ -42,9 +42,9 @@ public class StubReportingService implements ReportingService {
     }
 
     @Override
-    public void reportSubscriberDetailsChange(SubscriberUpdateReportRequest subscriberUpdateReportRequest) {
+    public void reportSubscriberDetailsChange(SubscriberReportRequest subscriberReportRequest) {
         if (verify()) {
-            behavior.reportSubscriberDetailsChange(subscriberUpdateReportRequest);
+            behavior.reportSubscriberDetailsChange(subscriberReportRequest);
         }
     }
 

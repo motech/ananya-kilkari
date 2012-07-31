@@ -80,10 +80,13 @@ public class ReportingGatewayImpl implements ReportingGateway {
     }
 
     @Override
-    public void updateSubscriberDetails(SubscriberUpdateReportRequest subscriberUpdateReportRequest) {
-        String url = String.format("%s%s", getBaseUrl(), SUBSCRIBER_UPDATE_PATH);
+    public void updateSubscriberDetails(SubscriberReportRequest request) {
+        String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIBER_UPDATE_PATH, request.getSubscriptionId());
         try {
-            restTemplate.postForLocation(url, subscriberUpdateReportRequest, new HashMap<String, String>());
+            SubscriberRequest subscriberRequest = new SubscriberRequest(request.getChannel(), request.getCreatedAt(), request.getBeneficiaryName(),
+                    request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(),
+                    request.getDateOfBirth(), request.getLocation());
+            restTemplate.put(url, subscriberRequest, new HashMap<String, String>());
         } catch (HttpClientErrorException ex) {
             logger.error(String.format("Updating subscriber details failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
             throw ex;

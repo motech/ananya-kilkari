@@ -40,7 +40,7 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public void reportSubscriberDetailsChange(SubscriberUpdateReportRequest subscriberUpdateReportRequest) {
-        reportingPublisher.reportSubscriberDetailsChange(subscriberUpdateReportRequest);
+    public void reportSubscriberDetailsChange(SubscriberReportRequest subscriberReportRequest) {
+        reportingPublisher.reportSubscriberDetailsChange(subscriberReportRequest);
     }
 }

@@ -51,11 +51,11 @@ public class ReportingPublisherTest {
 
     @Test
     public void shouldPublishSubscriberUpdateEventIntoQueue() {
-        SubscriberUpdateReportRequest subscriberUpdateReportRequest = mock(SubscriberUpdateReportRequest.class);
+        SubscriberReportRequest subscriberReportRequest = mock(SubscriberReportRequest.class);
 
-        reportingPublisher.reportSubscriberDetailsChange(subscriberUpdateReportRequest);
+        reportingPublisher.reportSubscriberDetailsChange(subscriberReportRequest);
 
-        verify(eventContext).send(ReportingEventKeys.REPORT_SUBSCRIBER_DETAILS_UPDATE, subscriberUpdateReportRequest);
+        verify(eventContext).send(ReportingEventKeys.REPORT_SUBSCRIBER_DETAILS_UPDATE, subscriberReportRequest);
     }
 }
 

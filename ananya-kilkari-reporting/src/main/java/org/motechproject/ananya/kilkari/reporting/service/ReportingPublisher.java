@@ -28,7 +28,7 @@ public class ReportingPublisher {
         eventContext.send(ReportingEventKeys.REPORT_CAMPAIGN_MESSAGE_DELIVERY_STATUS, campaignMessageDeliveryReportRequest);
     }
 
-    public void reportSubscriberDetailsChange(SubscriberUpdateReportRequest subscriberUpdateReportRequest) {
-        eventContext.send(ReportingEventKeys.REPORT_SUBSCRIBER_DETAILS_UPDATE, subscriberUpdateReportRequest);
+    public void reportSubscriberDetailsChange(SubscriberReportRequest subscriberReportRequest) {
+        eventContext.send(ReportingEventKeys.REPORT_SUBSCRIBER_DETAILS_UPDATE, subscriberReportRequest);
     }
 }

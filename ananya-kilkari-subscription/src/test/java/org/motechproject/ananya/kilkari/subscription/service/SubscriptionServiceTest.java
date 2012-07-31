@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberUpdateReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl;
@@ -576,7 +576,7 @@ public class SubscriptionServiceTest {
             //ignore
         }
 
-        verify(reportingServiceImpl, never()).reportSubscriberDetailsChange(any(SubscriberUpdateReportRequest.class));
+        verify(reportingServiceImpl, never()).reportSubscriberDetailsChange(any(SubscriberReportRequest.class));
     }
 
     @Test
@@ -587,9 +587,9 @@ public class SubscriptionServiceTest {
         subscriptionService.updateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", "23",
                 "20-10-2038", "20-10-1985", location));
 
-        ArgumentCaptor<SubscriberUpdateReportRequest> captor = ArgumentCaptor.forClass(SubscriberUpdateReportRequest.class);
+        ArgumentCaptor<SubscriberReportRequest> captor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
         verify(reportingServiceImpl).reportSubscriberDetailsChange(captor.capture());
-        SubscriberUpdateReportRequest reportRequest = captor.getValue();
+        SubscriberReportRequest reportRequest = captor.getValue();
 
         assertEquals(subscriptionId, reportRequest.getSubscriptionId());
         assertEquals(Channel.CALL_CENTER.name(), reportRequest.getChannel());

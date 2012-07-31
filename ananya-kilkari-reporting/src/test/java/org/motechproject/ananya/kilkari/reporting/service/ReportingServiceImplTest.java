@@ -66,9 +66,9 @@ public class ReportingServiceImplTest {
 
     @Test
     public void shouldReportASubscriberUpdate() {
-        SubscriberUpdateReportRequest subscriberUpdateReportRequest = mock(SubscriberUpdateReportRequest.class);
-        reportingServiceImpl.reportSubscriberDetailsChange(subscriberUpdateReportRequest);
+        SubscriberReportRequest subscriberReportRequest = mock(SubscriberReportRequest.class);
+        reportingServiceImpl.reportSubscriberDetailsChange(subscriberReportRequest);
 
-        verify(reportingPublisher).reportSubscriberDetailsChange(subscriberUpdateReportRequest);
+        verify(reportingPublisher).reportSubscriberDetailsChange(subscriberReportRequest);
     }
 }

@@ -71,9 +71,9 @@ public class StubReportingGateway implements ReportingGateway {
     }
 
     @Override
-    public void updateSubscriberDetails(SubscriberUpdateReportRequest subscriberUpdateReportRequest) {
+    public void updateSubscriberDetails(SubscriberReportRequest subscriberReportRequest) {
         if (verify()) {
-            behavior.updateSubscriberDetails(subscriberUpdateReportRequest);
+            behavior.updateSubscriberDetails(subscriberReportRequest);
         }
     }
 

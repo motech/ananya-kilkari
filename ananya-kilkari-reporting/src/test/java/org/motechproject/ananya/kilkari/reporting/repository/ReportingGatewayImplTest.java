@@ -30,7 +30,7 @@ public class ReportingGatewayImplTest {
     @Captor
     private ArgumentCaptor<Class<String>> responseTypeArgumentCaptor;
     @Captor
-    private ArgumentCaptor<HashMap<String,String>> urlVariablesArgumentCaptor;
+    private ArgumentCaptor<HashMap<String, String>> urlVariablesArgumentCaptor;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -104,6 +104,7 @@ public class ReportingGatewayImplTest {
         assertTrue(url.contains("block=myblock"));
         assertTrue(url.contains("panchayat=mypanchayat"));
     }
+
     @Test
     public void shouldRethrowAnyOtherExceptionOnGetLocation() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
@@ -209,18 +210,26 @@ public class ReportingGatewayImplTest {
     @Test
     public void shouldInvokeReportingServiceWithSubscriberDetailsToUpdate() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        SubscriberUpdateReportRequest reportRequest = mock(SubscriberUpdateReportRequest.class);
+        SubscriberReportRequest reportRequest = mock(SubscriberReportRequest.class);
+        String subscriptionId = "abcd1234";
+        when(reportRequest.getSubscriptionId()).thenReturn(subscriptionId);
 
         reportingGateway.updateSubscriberDetails(reportRequest);
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<SubscriberUpdateReportRequest> requestArgumentCaptor = ArgumentCaptor.forClass(SubscriberUpdateReportRequest.class);
-        verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), requestArgumentCaptor.capture(), urlVariablesArgumentCaptor.capture());
+        ArgumentCaptor<SubscriberRequest> requestArgumentCaptor = ArgumentCaptor.forClass(SubscriberRequest.class);
+        verify(restTemplate).put(urlArgumentCaptor.capture(), requestArgumentCaptor.capture(), urlVariablesArgumentCaptor.capture());
         String url = urlArgumentCaptor.getValue();
-        SubscriberUpdateReportRequest actualReportRequest = requestArgumentCaptor.getValue();
+        SubscriberRequest actualReportRequest = requestArgumentCaptor.getValue();
 
-        assertEquals("url/subscriber/update", url);
-        assertEquals(reportRequest, actualReportRequest);
+        assertEquals("url/subscriber/" + subscriptionId, url);
+        assertEquals(reportRequest.getBeneficiaryAge(), actualReportRequest.getBeneficiaryAge());
+        assertEquals(reportRequest.getExpectedDateOfDelivery(), actualReportRequest.getExpectedDateOfDelivery());
+        assertEquals(reportRequest.getBeneficiaryName(), actualReportRequest.getBeneficiaryName());
+        assertEquals(reportRequest.getChannel(), actualReportRequest.getChannel());
+        assertEquals(reportRequest.getDateOfBirth(), actualReportRequest.getDateOfBirth());
+        assertEquals(reportRequest.getLocation(), actualReportRequest.getLocation());
+        assertEquals(reportRequest.getCreatedAt(), actualReportRequest.getCreatedAt());
     }
 }

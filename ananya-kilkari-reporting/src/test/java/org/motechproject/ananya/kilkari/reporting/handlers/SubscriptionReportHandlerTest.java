@@ -71,13 +71,13 @@ public class SubscriptionReportHandlerTest {
 
     @Test
     public void shouldInvokeReportingServiceToUpdateASubscriber() {
-        SubscriberUpdateReportRequest subscriberUpdateReportRequest = mock(SubscriberUpdateReportRequest.class);
+        SubscriberReportRequest subscriberReportRequest = mock(SubscriberReportRequest.class);
         HashMap<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("0", subscriberUpdateReportRequest);
+        parameters.put("0", subscriberReportRequest);
 
         new SubscriptionReportHandler(reportingGateway).updateSubscriberDetails(new MotechEvent(ReportingEventKeys.REPORT_SUBSCRIBER_DETAILS_UPDATE, parameters));
 
-        verify(reportingGateway).updateSubscriberDetails(subscriberUpdateReportRequest);
+        verify(reportingGateway).updateSubscriberDetails(subscriberReportRequest);
     }
 
     @Test(expected = RuntimeException.class)
@@ -86,7 +86,7 @@ public class SubscriptionReportHandlerTest {
             put("0", null);
         }};
 
-        doThrow(new RuntimeException()).when(reportingGateway).updateSubscriberDetails(any(SubscriberUpdateReportRequest.class));
+        doThrow(new RuntimeException()).when(reportingGateway).updateSubscriberDetails(any(SubscriberReportRequest.class));
 
         new SubscriptionReportHandler(reportingGateway).updateSubscriberDetails(new MotechEvent(ReportingEventKeys.REPORT_SUBSCRIBER_DETAILS_UPDATE, parameters));
     }

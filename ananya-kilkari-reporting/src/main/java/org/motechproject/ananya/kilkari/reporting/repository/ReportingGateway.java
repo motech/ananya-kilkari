@@ -7,7 +7,7 @@ public interface ReportingGateway {
     String SUBSCRIPTION_STATE_CHANGE_PATH = "updatesubscription";
     String GET_LOCATION_PATH = "location";
     String OBD_CALL_DETAILS_PATH = "obd/callDetails";
-    String SUBSCRIBER_UPDATE_PATH = "subscriber/update";
+    String SUBSCRIBER_UPDATE_PATH = "subscriber";
 
     void createSubscription(SubscriptionCreationReportRequest subscriptionCreationReportRequest);
 
@@ -17,5 +17,5 @@ public interface ReportingGateway {
 
     void reportCampaignMessageDelivery(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest);
 
-    void updateSubscriberDetails(SubscriberUpdateReportRequest subscriberUpdateReportRequest);
+    void updateSubscriberDetails(SubscriberReportRequest subscriberReportRequest);
 }

@@ -11,5 +11,5 @@ public interface ReportingService {
 
     void reportCampaignMessageDeliveryStatus(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest);
 
-    void reportSubscriberDetailsChange(SubscriberUpdateReportRequest subscriberUpdateReportRequest);
+    void reportSubscriberDetailsChange(SubscriberReportRequest subscriberReportRequest);
 }

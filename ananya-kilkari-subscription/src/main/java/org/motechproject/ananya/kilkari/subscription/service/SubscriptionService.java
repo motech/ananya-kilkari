@@ -5,7 +5,7 @@ import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignR
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberUpdateReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
@@ -187,7 +187,7 @@ public class SubscriptionService {
         subscriptionValidator.validateSubscriberDetails(request);
 
         SubscriberLocation subscriberLocation = new SubscriberLocation(request.getDistrict(), request.getBlock(), request.getPanchayat());
-        reportingService.reportSubscriberDetailsChange(new SubscriberUpdateReportRequest(request.getSubscriptionId(), request.getChannel(), request.getCreatedAt(),
+        reportingService.reportSubscriberDetailsChange(new SubscriberReportRequest(request.getSubscriptionId(), request.getChannel(), request.getCreatedAt(),
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(), request.getDateOfBirth(), subscriberLocation));
     }
 

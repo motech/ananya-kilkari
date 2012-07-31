@@ -568,13 +568,12 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldThrowExceptionIfValidationFailsForUpdatingSubscriberDetails() {
         SubscriberUpdateRequest request = mock(SubscriberUpdateRequest.class);
-        doThrow(new ValidationException("some error")).when(subscriptionValidator).validateSubscriberDetails(request);
+        String message = "some error";
+        doThrow(new ValidationException(message)).when(subscriptionValidator).validateSubscriberDetails(request);
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(message);
 
-        try {
-            subscriptionService.updateSubscriberDetails(request);
-        } catch (ValidationException e) {
-            //ignore
-        }
+        subscriptionService.updateSubscriberDetails(request);
 
         verify(reportingServiceImpl, never()).reportSubscriberDetailsChange(any(SubscriberReportRequest.class));
     }
@@ -612,7 +611,7 @@ public class SubscriptionServiceTest {
         verify(mockedSubscription, never()).deactivationRequestReceived();
         verify(onMobileSubscriptionManagerPublisher, never()).processDeactivation(Matchers.<OMSubscriptionRequest>any());
         verify(reportingServiceImpl, never()).reportSubscriptionStateChange(Matchers.<SubscriptionStateChangeReportRequest>any());
-        verify(allSubscriptions,never()).update(mockedSubscription);
+        verify(allSubscriptions, never()).update(mockedSubscription);
     }
 }
 

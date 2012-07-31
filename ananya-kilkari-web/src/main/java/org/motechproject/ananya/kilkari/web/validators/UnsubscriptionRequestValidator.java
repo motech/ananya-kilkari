@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.web.validators;
 
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,14 @@ public class UnsubscriptionRequestValidator {
     }
 
     private void validateSubscription(String subscriptionId, Errors errors) {
-        if (subscriptionService.findBySubscriptionId(subscriptionId) == null)
+        SubscriptionResponse subscriptionResponse = subscriptionService.findBySubscriptionId(subscriptionId);
+
+        if (subscriptionResponse == null) {
             errors.add("Invalid subscriptionId %s", subscriptionId);
+            return;
+        }
+
+        if (!subscriptionResponse.isInProgress())
+            errors.add(String.format("Cannot unsubscribe. Subscription in %s status", subscriptionResponse.getStatus()));
     }
 }

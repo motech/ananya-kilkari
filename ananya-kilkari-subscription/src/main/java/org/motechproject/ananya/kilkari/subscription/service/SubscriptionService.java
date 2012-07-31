@@ -103,13 +103,17 @@ public class SubscriptionService {
 
     public void requestDeactivation(DeactivationRequest deactivationRequest) {
         String subscriptionId = deactivationRequest.getSubscriptionId();
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        if(!subscription.isInProgress()){
+            logger.debug(String.format("Cannot unsubscribe. Subscription in %s status", subscription.getStatus()));
+            return;
+        }
         updateStatusAndReport(subscriptionId, deactivationRequest.getCreatedAt(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.deactivationRequestReceived();
             }
         });
-        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         onMobileSubscriptionManagerPublisher.processDeactivation(new SubscriptionMapper().createOMSubscriptionRequest(subscription, deactivationRequest.getChannel()));
     }
 

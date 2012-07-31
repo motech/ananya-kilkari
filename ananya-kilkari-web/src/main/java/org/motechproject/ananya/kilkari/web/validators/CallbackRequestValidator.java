@@ -61,7 +61,7 @@ public class CallbackRequestValidator {
 
         if (CallbackAction.DCT.name().equals(requestAction) && CallbackStatus.BAL_LOW.name().equals(requestStatus)) {
             final SubscriptionStatus subscriptionStatus = subscriptionResponse.getStatus();
-            if (!subscriptionStatus.canDeactivate())
+            if (!subscriptionStatus.canDeactivateOnRenewal())
                 errors.add(String.format("Cannot deactivate on renewal. Subscription in %s status", subscriptionStatus));
         }
 

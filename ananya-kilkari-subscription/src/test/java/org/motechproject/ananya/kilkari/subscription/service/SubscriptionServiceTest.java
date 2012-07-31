@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
@@ -234,6 +235,7 @@ public class SubscriptionServiceTest {
 
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+        when(mockedSubscription.isInProgress()).thenReturn(true);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now()));
@@ -598,6 +600,20 @@ public class SubscriptionServiceTest {
         assertEquals("district", reportRequest.getLocation().getDistrict());
         assertEquals("block", reportRequest.getLocation().getBlock());
         assertEquals("panchayat", reportRequest.getLocation().getPanchayat());
+    }
+
+    @Test
+    public void shouldNotProcessDeactivationRequestWhenSubscriptionIsNotInProgress() {
+        String subscriptionId = "subsId";
+        Subscription mockedSubscription = mock(Subscription.class);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
+
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now()));
+
+        verify(mockedSubscription, never()).deactivationRequestReceived();
+        verify(onMobileSubscriptionManagerPublisher, never()).processDeactivation(Matchers.<OMSubscriptionRequest>any());
+        verify(reportingServiceImpl, never()).reportSubscriptionStateChange(Matchers.<SubscriptionStateChangeReportRequest>any());
+        verify(allSubscriptions,never()).update(mockedSubscription);
     }
 }
 

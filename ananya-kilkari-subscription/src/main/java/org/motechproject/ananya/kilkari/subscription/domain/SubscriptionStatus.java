@@ -10,7 +10,7 @@ public enum SubscriptionStatus {
         return this == ACTIVE || this == SUSPENDED;
     }
 
-    public boolean canDeactivate() {
+    public boolean canDeactivateOnRenewal() {
         return equals(SUSPENDED);
     }
 

@@ -4,11 +4,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -28,8 +32,10 @@ public class UnsubscriptionRequestValidatorTest {
     @Test
     public void shouldReturnValidIfUnsubscriptionRequestDetailsAreCorrect() {
         String subscriptionId = "abcd1234";
+        Subscription subscription = new Subscription();
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
 
-        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
+        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         assertTrue(unsubscriptionRequestValidator.validate(subscriptionId).hasNoErrors());
     }
@@ -44,5 +50,36 @@ public class UnsubscriptionRequestValidatorTest {
 
         assertTrue(errors.hasErrors());
         assertTrue(errors.hasMessage("Invalid subscriptionId " + subscriptionId));
+    }
+
+    @Test
+    public void shouldReturnInvalidIfSubscriptionNotInProgress() {
+        String subscriptionId = "abcd";
+
+        SubscriptionResponse mockedSubscriptionResponse = mock(SubscriptionResponse.class);
+        when(subscriptionService.findBySubscriptionId(anyString())).thenReturn(mockedSubscriptionResponse);
+        when(mockedSubscriptionResponse.isInProgress()).thenReturn(false);
+        when(mockedSubscriptionResponse.getStatus()).thenReturn(SubscriptionStatus.COMPLETED);
+
+        Errors errors = unsubscriptionRequestValidator.validate(subscriptionId);
+
+        assertTrue(errors.hasErrors());
+        assertTrue(errors.hasMessage("Cannot unsubscribe. Subscription in COMPLETED status"));
+
+    }
+
+    @Test
+    public void shouldReturnValidIfSubscriptionIsInProgress() {
+        String subscriptionId = "abcd";
+
+        SubscriptionResponse mockedSubscriptionResponse = mock(SubscriptionResponse.class);
+        when(subscriptionService.findBySubscriptionId(anyString())).thenReturn(mockedSubscriptionResponse);
+        when(mockedSubscriptionResponse.isInProgress()).thenReturn(true);
+        when(mockedSubscriptionResponse.getStatus()).thenReturn(SubscriptionStatus.ACTIVE);
+
+        Errors errors = unsubscriptionRequestValidator.validate(subscriptionId);
+
+        assertFalse(errors.hasErrors());
+
     }
 }

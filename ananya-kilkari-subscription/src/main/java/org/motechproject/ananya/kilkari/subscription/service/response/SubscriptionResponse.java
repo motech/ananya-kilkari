@@ -18,4 +18,5 @@ public interface SubscriptionResponse {
     DateTime currentWeeksMessageExpiryDate();
     boolean hasBeenActivated();
     boolean isInDeactivatedState();
+    boolean isInProgress();
 }

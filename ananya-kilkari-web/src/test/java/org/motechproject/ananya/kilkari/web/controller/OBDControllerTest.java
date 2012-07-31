@@ -45,7 +45,7 @@ public class OBDControllerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        obdController = new OBDController(subscriptionService, kilkariCampaignService);
+        obdController = new OBDController(kilkariCampaignService);
     }
 
     @Test

@@ -11,8 +11,8 @@ import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChange
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
@@ -92,7 +92,7 @@ public class SubscriptionService {
         if (weekNumber != null) {
             return subscriptionRequestPack.adjustStartDate(creationDate, weekNumber);
         }
-        
+
         return creationDate;
     }
 
@@ -103,7 +103,7 @@ public class SubscriptionService {
 
     public void activate(String subscriptionId, DateTime activatedOn, final String operator) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        scheduleCampaign(subscription);
+        scheduleCampaign(subscription, activatedOn);
         updateStatusAndReport(subscriptionId, activatedOn, null, operator, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
@@ -231,9 +231,9 @@ public class SubscriptionService {
         messageCampaignService.start(enrollRequest);
     }
 
-    private void scheduleCampaign(Subscription subscription) {
+    private void scheduleCampaign(Subscription subscription, DateTime activatedOn) {
         MessageCampaignRequest campaignRequest = new MessageCampaignRequest(
-                subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStartDate());
+                subscription.getSubscriptionId(), subscription.getPack().name(), activatedOn);
         messageCampaignService.start(campaignRequest);
     }
 

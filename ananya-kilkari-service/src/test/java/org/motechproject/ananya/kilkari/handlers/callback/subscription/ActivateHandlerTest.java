@@ -37,6 +37,6 @@ public class ActivateHandlerTest {
         activateHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now));
 
         verify(subscriptionService).activate(subscriptionId, now, operator);
-        verify(kilkariCampaignService).activateOrRenewSchedule(subscriptionId, CampaignTriggerType.ACTIVATION);
+        verify(kilkariCampaignService).activateSchedule(subscriptionId);
     }
 }

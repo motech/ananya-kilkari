@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.domain;
+package org.motechproject.ananya.kilkari.obd.domain;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -10,7 +10,6 @@ import org.motechproject.model.MotechBaseDataObject;
 
 @TypeDiscriminator("doc.type === 'CampaignMessageAlert'")
 public class CampaignMessageAlert extends MotechBaseDataObject {
-
     @JsonProperty
     private String subscriptionId;
 
@@ -56,10 +55,10 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
         return messageExpiryDate;
     }
 
-    public boolean canBeScheduled(CampaignTriggerType campaignTriggerType) {
+    public boolean canBeScheduled(boolean checkExpiry) {
         boolean alertRaisedAndRenewed = renewed && !StringUtils.isEmpty(messageId);
 
-        if (campaignTriggerType.isNotActivation()) {
+        if (checkExpiry) {
             return alertRaisedAndRenewed && hasNotExpired();
         }
         return alertRaisedAndRenewed;

@@ -1,7 +1,8 @@
-package org.motechproject.ananya.kilkari.domain;
+package org.motechproject.ananya.kilkari.obd.domain;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageAlert;
 
 import static org.junit.Assert.*;
 
@@ -38,34 +39,34 @@ public class CampaignMessageAlertTest {
     public void canBeScheduled_IfAlertRaisedAndTriggeredForActivation() {
         DateTime messageExpiryTime = DateTime.now().plusDays(1);
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true, messageExpiryTime);
-        assertTrue(campaignMessageAlert.canBeScheduled(CampaignTriggerType.ACTIVATION));
+        assertTrue(campaignMessageAlert.canBeScheduled(false));
     }
     
     @Test
     public void canBeScheduled_IfAlertRaisedIsExpiredAndActivated() {
         DateTime messageExpiryTime = DateTime.now().minusDays(1);
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true, messageExpiryTime);
-        assertTrue(campaignMessageAlert.canBeScheduled(CampaignTriggerType.ACTIVATION));
+        assertTrue(campaignMessageAlert.canBeScheduled(false));
     }
 
     @Test
     public void canNotBeScheduled_IfAlertIsNotRaisedAndActivated() {
         DateTime messageExpiryTime = DateTime.now().plusDays(1);
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", null, true, messageExpiryTime);
-        assertFalse(campaignMessageAlert.canBeScheduled(CampaignTriggerType.ACTIVATION));
+        assertFalse(campaignMessageAlert.canBeScheduled(false));
     }
 
     @Test
     public void canNotBeScheduled_IfAlertIsRaisedAndNotActivatedOrRenewed() {
         DateTime messageExpiryTime = DateTime.now().plusDays(1);
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "WEEK1", false, messageExpiryTime);
-        assertFalse(campaignMessageAlert.canBeScheduled(CampaignTriggerType.WEEKLY_MESSAGE));
+        assertFalse(campaignMessageAlert.canBeScheduled(true));
     }
 
     @Test
     public void canNotBeScheduled_IfAlertIsRaisedAndRenewedButMessageExpired() {
         DateTime messageExpiryTime = DateTime.now().minusDays(1);
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "WEEK1", true, messageExpiryTime);
-        assertFalse(campaignMessageAlert.canBeScheduled(CampaignTriggerType.WEEKLY_MESSAGE));
+        assertFalse(campaignMessageAlert.canBeScheduled(true));
     }
 }

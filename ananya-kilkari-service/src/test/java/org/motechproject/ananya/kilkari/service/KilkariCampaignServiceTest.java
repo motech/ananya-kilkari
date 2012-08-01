@@ -7,8 +7,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
-import org.motechproject.ananya.kilkari.domain.CampaignTriggerType;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
@@ -17,10 +15,10 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.*;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
-import org.motechproject.ananya.kilkari.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
@@ -39,7 +37,7 @@ import java.util.Map;
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -52,8 +50,6 @@ public class KilkariCampaignServiceTest {
     private MessageCampaignService messageCampaignService;
     @Mock
     private KilkariSubscriptionService kilkariSubscriptionService;
-    @Mock
-    private AllCampaignMessageAlerts allCampaignMessageAlerts;
     @Mock
     private CampaignMessageIdStrategy campaignMessageIdStrategy;
     @Mock
@@ -72,12 +68,14 @@ public class KilkariCampaignServiceTest {
     private ServiceOptionHandler serviceOptionHandler;
     @Mock
     private OBDSuccessfulCallRequestValidator successfulCallRequestValidator;
+    @Mock
+    private CampaignMessageAlertService campaignMessageAlertService;
 
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, allCampaignMessageAlerts, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, kilkariInboxService, obdServiceOptionFactory, successfulCallRequestValidator);
+        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, campaignMessageAlertService, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, kilkariInboxService, obdServiceOptionFactory, successfulCallRequestValidator);
     }
 
     @Test
@@ -119,146 +117,6 @@ public class KilkariCampaignServiceTest {
         assertThat(messageTimings.size(), is(2));
         assertThat(messageTimings, hasEntry(subscriptionResponse1.getSubscriptionId(), dateTimes));
         assertThat(messageTimings, hasEntry(subscriptionResponse2.getSubscriptionId(), dateTimes));
-    }
-
-    @Test
-    public void shouldSaveCampaignMessageAlertIfDoesNotExist() {
-        String subscriptionId = "mysubscriptionid";
-        String messageId = "mymessageid";
-        String campaignName = "campaignName";
-        DateTime campaignCreatedDate = DateTime.now();
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1));
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
-        when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(campaignCreatedDate);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, campaignCreatedDate, subscription.getPack())).thenReturn(messageId);
-
-        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
-
-
-        verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
-        verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
-        CampaignMessageAlert campaignMessageAlert = campaignMessageAlertArgumentCaptor.getValue();
-        assertEquals(subscriptionId, campaignMessageAlert.getSubscriptionId());
-        assertEquals(messageId, campaignMessageAlert.getMessageId());
-        assertFalse(campaignMessageAlert.isRenewed());
-
-        verifyZeroInteractions(campaignMessageService);
-        verify(allCampaignMessageAlerts, never()).remove(any(CampaignMessageAlert.class));
-    }
-
-    @Test
-    public void shouldAddCampaignMessageAlertOnRenewIfItDoesNotExist() {
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(3));
-        String subscriptionId = subscription.getSubscriptionId();
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
-
-        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
-
-        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
-        verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
-        CampaignMessageAlert value = campaignMessageAlertArgumentCaptor.getValue();
-
-        assertEquals(subscriptionId, value.getSubscriptionId());
-        assertNull(value.getMessageId());
-        assertTrue(value.isRenewed());
-    }
-
-    @Test
-    public void shouldRenewCampaignMessageAlertAndScheduleCampaignMessageIfMessageIdExists() {
-        String messageId = "mymessageid";
-        String msisdn = "1234567890";
-        Operator operator = Operator.AIRTEL;
-        Subscription mockSubscription = mock(Subscription.class);
-        String subscriptionId = "subscriptionId";
-        when(mockSubscription.getSubscriptionId()).thenReturn(subscriptionId);
-        when(mockSubscription.getMsisdn()).thenReturn(msisdn);
-        when(mockSubscription.getOperator()).thenReturn(operator);
-        DateTime messageExpiryDate = DateTime.now().plusWeeks(1);
-        when(mockSubscription.currentWeeksMessageExpiryDate()).thenReturn(messageExpiryDate);
-
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, true, messageExpiryDate);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(mockSubscription);
-
-        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
-
-        verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator.name(), messageExpiryDate);
-        ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
-        verify(allCampaignMessageAlerts).remove(captor.capture());
-        CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
-        assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
-    }
-
-    @Test
-    public void shouldRemoveCampaignMessageAlertIfAlreadyExistsAndScheduleCampaignMessageIfRenewed() {
-        String messageId = "mymessageid";
-        String msisdn = "1234567890";
-        Operator operator = Operator.AIRTEL;
-        String campaignName = "campaignName";
-        DateTime creationDate = DateTime.now();
-        SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
-
-        Subscription mockSubscription = mock(Subscription.class);
-        String subscriptionId = "subscriptionId";
-        when(mockSubscription.getSubscriptionId()).thenReturn(subscriptionId);
-        when(mockSubscription.getMsisdn()).thenReturn(msisdn);
-        when(mockSubscription.getOperator()).thenReturn(operator);
-        when(mockSubscription.getPack()).thenReturn(subscriptionPack);
-        DateTime messageExpiryDate = creationDate.plusWeeks(1);
-        when(mockSubscription.currentWeeksMessageExpiryDate()).thenReturn(messageExpiryDate);
-
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId", true, messageExpiryDate);
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(mockSubscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
-        when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(creationDate);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, creationDate, subscriptionPack)).thenReturn(messageId);
-
-        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
-
-        verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator.name(), messageExpiryDate);
-        ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
-        verify(allCampaignMessageAlerts).remove(captor.capture());
-        CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
-        assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
-    }
-
-    @Test
-    public void shouldUpdateCampaignMessageAlertIfAlreadyExistsButShouldNotScheduleCampaignMessageIfNotRenewed() {
-
-        String subscriptionId = "mysubscriptionid";
-        String messageId = "mymessageid";
-        String campaignName = "campaignName";
-        DateTime creationDate = DateTime.now();
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, creationDate);
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "previousMessageId", false, creationDate.plusWeeks(1));
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
-        when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(creationDate);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, creationDate, subscription.getPack())).thenReturn(messageId);
-
-        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
-
-        verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-
-        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
-        verify(allCampaignMessageAlerts).update(campaignMessageAlertArgumentCaptor.capture());
-        CampaignMessageAlert actualCampaignMessageAlert = campaignMessageAlertArgumentCaptor.getValue();
-        assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
-        assertEquals(messageId, actualCampaignMessageAlert.getMessageId());
-        assertFalse(actualCampaignMessageAlert.isRenewed());
-
-        verifyZeroInteractions(campaignMessageService);
-        verify(allCampaignMessageAlerts, never()).remove(any(CampaignMessageAlert.class));
     }
 
     @Test
@@ -359,7 +217,6 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldScheduleUnsubscriptionWhenPackIsCompletedAndWhenStatusIsNotDeactivated() {
         String subscriptionId = "abcd1234";
-        String campaignName = "campaignName";
         Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1));
         subscription.setStatus(SubscriptionStatus.ACTIVE);
 
@@ -373,7 +230,6 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldNotScheduleUnsubscriptionWhenPackIsCompletedAndStatusIsDeactivated() {
         String subscriptionId = "abcd1234";
-        String campaignName = "campaignName";
         Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1));
         subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
 
@@ -389,86 +245,6 @@ public class KilkariCampaignServiceTest {
         FailedCallReports failedCallReports = Mockito.mock(FailedCallReports.class);
         kilkariCampaignService.publishCallDeliveryFailureRequest(failedCallReports);
         verify(obdRequestPublisher).publishCallDeliveryFailureRecord(failedCallReports);
-    }
-
-    @Test
-    public void shouldAssignAExpiryDateToWeeklyScheduledMessageWhichIsNWeeksFromCreationDate_whenRenewalHasHappened() {
-        DateTime createdAt = DateTime.now().minusWeeks(2);
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.SEVEN_MONTHS, createdAt);
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
-        String subscriptionId = subscription.getSubscriptionId();
-        String messageId = "week2";
-        String campaignName = "campaignName";
-        CampaignMessageAlert mockedCampaignMessageAlert = mock(CampaignMessageAlert.class);
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(mockedCampaignMessageAlert);
-        when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(createdAt);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, createdAt, subscription.getPack())).thenReturn(messageId);
-
-        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
-
-        verify(mockedCampaignMessageAlert).updateWith(messageId, false, createdAt.plusWeeks(3));
-    }
-
-    @Test
-    public void shouldAssignAExpiryDateToWeeklyScheduledMessageWhichIsNWeeksFromCreationDate_WhenRenewalHasNotHappened() {
-        DateTime createdAt = DateTime.now().minusWeeks(2);
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.SEVEN_MONTHS, createdAt);
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
-        String subscriptionId = subscription.getSubscriptionId();
-        String campaignName = "campaignName";
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
-
-        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
-
-        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
-        verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
-
-        CampaignMessageAlert campaignMessageAlertArgumentCaptorValue = campaignMessageAlertArgumentCaptor.getValue();
-        assertNotNull(campaignMessageAlertArgumentCaptorValue.getMessageExpiryDate());
-        assertEquals(createdAt.plusWeeks(3), campaignMessageAlertArgumentCaptorValue.getMessageExpiryDate());
-    }
-
-    @Test
-    public void shouldNotUpdateExpiryDateWhenTryingToScheduleViaRenewal_whenCampaignMessageAlertAlreadyExist() {
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(3));
-        subscription.setOperator(Operator.AIRTEL);
-        String subscriptionId = subscription.getSubscriptionId();
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
-        String messageId = "week2";
-        CampaignMessageAlert mockedCampaignMessageAlert = mock(CampaignMessageAlert.class);
-        DateTime actualExpiryDate = DateTime.now().plusWeeks(1);
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(mockedCampaignMessageAlert);
-        when(mockedCampaignMessageAlert.getMessageId()).thenReturn(messageId);
-        when(mockedCampaignMessageAlert.getMessageExpiryDate()).thenReturn(actualExpiryDate);
-
-        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
-
-        verify(mockedCampaignMessageAlert).updateWith(messageId, true, actualExpiryDate);
-    }
-
-    @Test
-    public void shouldNotSetExpiryDateWhenTryingToScheduleViaRenewal_whenCampaignMessageAlertDoesNotAlreadyExist() {
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(3));
-        subscription.setOperator(Operator.AIRTEL);
-        String subscriptionId = subscription.getSubscriptionId();
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
-
-        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
-
-        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
-        verify(allCampaignMessageAlerts).add(campaignMessageAlertArgumentCaptor.capture());
-
-        CampaignMessageAlert campaignMessageAlertArgumentCaptorValue = campaignMessageAlertArgumentCaptor.getValue();
-        assertNull(campaignMessageAlertArgumentCaptorValue.getMessageExpiryDate());
     }
 
     @Test
@@ -572,12 +348,17 @@ public class KilkariCampaignServiceTest {
     }
 
     @Test
-    public void shouldUpdateInboxToHoldLastScheduledMessage() {
+    public void shouldCallCampaignMessageAlertServiceAndUpdateInboxToHoldLastScheduledMessage() {
         DateTime creationDate = DateTime.now();
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, creationDate);
-        String subscriptionId = subscription.getSubscriptionId();
         String messageId = "week10";
         String campaignName = "campaignName";
+        Operator operator = Operator.AIRTEL;
+        String msisdn = "9988776655";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, creationDate);
+        subscription.setOperator(operator);
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        String subscriptionId = subscription.getSubscriptionId();
+        DateTime expiryDate = creationDate.plusWeeks(1);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(creationDate);
@@ -585,53 +366,122 @@ public class KilkariCampaignServiceTest {
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 
+        verify(campaignMessageAlertService).scheduleCampaignMessageAlert(subscriptionId, messageId, expiryDate, msisdn, operator.name());
         verify(kilkariInboxService).newMessage(subscriptionId, messageId);
     }
 
     @Test
-    public void shouldNotUpdateInboxWhenSubscriptionIsNotActive() {
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+    public void shouldCallCampaignMessageAlertServiceAndNotUpdateInboxWhenSubscriptionIsNotActive() {
+        DateTime creationDate = DateTime.now();
+        String msisdn = "9988776655";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, creationDate);
+        Operator operator = Operator.AIRTEL;
+        subscription.setOperator(operator);
         subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
         String subscriptionId = subscription.getSubscriptionId();
         String messageId = "week10";
         String campaignName = "campaignName";
+        DateTime expiryDate = creationDate.plusWeeks(1);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(creationDate);
         when(campaignMessageIdStrategy.createMessageId(campaignName, subscription.getCreationDate(), subscription.getPack())).thenReturn(messageId);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 
+        verify(campaignMessageAlertService).scheduleCampaignMessageAlert(subscriptionId, messageId, expiryDate, msisdn, operator.name());
         verify(kilkariInboxService, never()).newMessage(subscriptionId, messageId);
     }
 
     @Test
-    public void shouldNotUpdateInboxDuringRenewal() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+    public void shouldNotUpdateInboxDuringActivationWhenMessageHasNotAlreadyBeenScheduled() {
+        String msisdn = "1234567890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
-        subscription.setOperator(Operator.AIRTEL);
-        String messageId = "WEEK13";
-        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, false, DateTime.now().plusWeeks(1));
+        Operator operator = Operator.AIRTEL;
+        subscription.setOperator(operator);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
 
-        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.RENEWAL);
-
-        verify(kilkariInboxService, never()).newMessage(subscriptionId, messageId);
-    }
-
-    @Test
-    public void shouldNotUpdateInboxWhenMessageHasNotAlreadyBeenScheduled() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
-        String subscriptionId = subscription.getSubscriptionId();
-        subscription.setOperator(Operator.AIRTEL);
-        CampaignMessageAlert campaignMessageAlert = null;
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
-
-        kilkariCampaignService.activateOrRenewSchedule(subscriptionId, CampaignTriggerType.ACTIVATION);
+        kilkariCampaignService.activateSchedule(subscriptionId);
 
         verify(kilkariInboxService, never()).newMessage(anyString(), anyString());
+    }
+
+    @Test
+    public void shouldUpdateInboxDuringActivationWhenMessageHasAlreadyBeenScheduled() {
+        String msisdn = "1234567890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        Operator operator = Operator.AIRTEL;
+        subscription.setOperator(operator);
+        String messageId = "mesasgeId";
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, msisdn, operator.name())).thenReturn(messageId);
+
+        kilkariCampaignService.activateSchedule(subscriptionId);
+
+        verify(kilkariInboxService).newMessage(subscriptionId, messageId);
+    }
+
+    @Test
+    public void shouldNotUpdateInboxDuringRenewalWhenMessageHasNotAlreadyBeenScheduled() {
+        String msisdn = "1234567890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        Operator operator = Operator.AIRTEL;
+        subscription.setOperator(operator);
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        kilkariCampaignService.renewSchedule(subscriptionId);
+
+        verify(kilkariInboxService, never()).newMessage(anyString(), anyString());
+    }
+
+    @Test
+    public void shouldNotUpdateInboxDuringRenewalnWhenMessageHasAlreadyBeenScheduled() {
+        String msisdn = "1234567890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        Operator operator = Operator.AIRTEL;
+        subscription.setOperator(operator);
+        String messageId = "mesasgeId";
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, msisdn, operator.name())).thenReturn(messageId);
+
+        kilkariCampaignService.renewSchedule(subscriptionId);
+
+        verify(kilkariInboxService, never()).newMessage(anyString(), anyString());
+    }
+
+    @Test
+    public void shouldCallCampaignMessageAlertServiceOnActivation(){
+        String msisdn = "1234567890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        Operator operator = Operator.AIRTEL;
+        subscription.setOperator(operator);
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        kilkariCampaignService.activateSchedule(subscriptionId);
+
+        verify(campaignMessageAlertService).scheduleCampaignMessageAlertForActivation(subscriptionId, msisdn, operator.name());
+    }
+
+    @Test
+    public void shouldCallCampaignMessageAlertServiceOnRenewal(){
+        String msisdn = "1234567890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        Operator operator = Operator.AIRTEL;
+        subscription.setOperator(operator);
+
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        kilkariCampaignService.renewSchedule(subscriptionId);
+
+        verify(campaignMessageAlertService).scheduleCampaignMessageAlertForRenewal(subscriptionId, msisdn, operator.name());
     }
 }

@@ -1,10 +1,10 @@
-package org.motechproject.ananya.kilkari.repository;
+package org.motechproject.ananya.kilkari.obd.repository;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.domain.CampaignMessageAlert;
-import org.motechproject.ananya.kilkari.SpringIntegrationTest;
+import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.obd.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static junit.framework.Assert.assertEquals;
@@ -21,7 +21,7 @@ public class AllCampaignMessageAlertsIT extends SpringIntegrationTest {
         String messageId = "messageId";
         DateTime messageExpiryDate = DateTime.now().plusWeeks(1);
         CampaignMessageAlert actualCampaignMessage = new CampaignMessageAlert(subscriptionId, messageId, true, messageExpiryDate);
-        kilkariDbConnector.create(actualCampaignMessage);
+        obdDbConnector.create(actualCampaignMessage);
         markForDeletion(actualCampaignMessage);
 
         CampaignMessageAlert expectedCampaignMessage = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);

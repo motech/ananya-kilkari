@@ -78,6 +78,21 @@ public class SubscriptionHandlerTest {
         verify(subscriptionService).subscriptionComplete(omSubscriptionRequest);
     }
 
+    @Test
+    public void shouldHandleEarlySubscription() {
+        final String msisdn = "9988776655";
+        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        final String subscriptionId = "abcd1234";
+        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
+            put("0", omSubscriptionRequest);
+        }};
+
+        subscriptionHandler.handleEarlySubscription(new MotechEvent(SubscriptionEventKeys.EARLY_SUBSCRIPTION, parameters));
+
+        verify(subscriptionService).initiateActivationRequest(omSubscriptionRequest);
+    }
+
     @Test(expected = RuntimeException.class)
     public void shouldThrowExceptionsRaisedByOnMobileSubscriptionServiceToCreateAnActivationRequest() {
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{

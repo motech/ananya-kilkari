@@ -36,8 +36,15 @@ public class SubscriptionHandler {
 
     @MotechListener(subjects = {SubscriptionEventKeys.SUBSCRIPTION_COMPLETE})
     public void handleSubscriptionComplete(MotechEvent event) {
-        OMSubscriptionRequest OMSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
-        logger.info(String.format("Handling subscription completion event for subscriptionid: %s, msisdn: %s, pack: %s", OMSubscriptionRequest.getSubscriptionId(), OMSubscriptionRequest.getMsisdn(), OMSubscriptionRequest.getPack()));
-        subscriptionService.subscriptionComplete(OMSubscriptionRequest);
+        OMSubscriptionRequest omSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
+        logger.info(String.format("Handling subscription completion event for subscriptionid: %s, msisdn: %s, pack: %s", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
+        subscriptionService.subscriptionComplete(omSubscriptionRequest);
+    }
+
+    @MotechListener(subjects = {SubscriptionEventKeys.EARLY_SUBSCRIPTION})
+    public void handleEarlySubscription(MotechEvent event) {
+        OMSubscriptionRequest omSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
+        logger.info(String.format("Handling early subscription for subscriptionid: %s, msisdn: %s, pack: %s", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
+        subscriptionService.initiateActivationRequest(omSubscriptionRequest);
     }
 }

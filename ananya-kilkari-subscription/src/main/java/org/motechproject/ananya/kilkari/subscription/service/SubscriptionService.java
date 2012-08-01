@@ -1,9 +1,9 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
-import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
@@ -21,11 +21,15 @@ import org.motechproject.ananya.kilkari.subscription.service.request.Subscriptio
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.common.domain.PhoneNumber;
+import org.motechproject.scheduler.MotechSchedulerService;
+import org.motechproject.scheduler.domain.MotechEvent;
+import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -40,6 +44,7 @@ public class SubscriptionService {
     private CampaignMessageService campaignMessageService;
     private CampaignMessageAlertService campaignMessageAlertService;
     private KilkariPropertiesData kilkariPropertiesData;
+    private MotechSchedulerService motechSchedulerService;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
@@ -47,7 +52,7 @@ public class SubscriptionService {
     public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher,
                                SubscriptionValidator subscriptionValidator, ReportingService reportingService,
                                KilkariInboxService kilkariInboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
-                               CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData) {
+                               CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData, MotechSchedulerService motechSchedulerService) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
@@ -58,6 +63,7 @@ public class SubscriptionService {
         this.campaignMessageService = campaignMessageService;
         this.campaignMessageAlertService = campaignMessageAlertService;
         this.kilkariPropertiesData = kilkariPropertiesData;
+        this.motechSchedulerService = motechSchedulerService;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
@@ -70,20 +76,40 @@ public class SubscriptionService {
 
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper();
 
-        onMobileSubscriptionManagerPublisher.sendActivationRequest(subscriptionMapper.createOMSubscriptionRequest(subscription, channel));
+        OMSubscriptionRequest omSubscriptionRequest = subscriptionMapper.createOMSubscriptionRequest(subscription, channel);
+        if (startDate.isAfter(subscriptionRequest.getCreationDate())) {
+            scheduleEarlySubscription(startDate, omSubscriptionRequest);
+            return subscription;
+        }
+
+        initiateActivationRequest(omSubscriptionRequest);
         reportingService.reportSubscriptionCreation(
                 subscriptionMapper.createSubscriptionCreationReportRequest(subscription, channel, subscriptionRequest.getLocation(), subscriptionRequest.getSubscriber()));
 
         return subscription;
     }
 
+    private void scheduleEarlySubscription(DateTime startDate, OMSubscriptionRequest omSubscriptionRequest) {
+
+        String subjectKey = SubscriptionEventKeys.EARLY_SUBSCRIPTION;
+
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put(MotechSchedulerService.JOB_ID_KEY, omSubscriptionRequest.getSubscriptionId());
+        parameters.put("0", omSubscriptionRequest);
+        MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
+
+        RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate.toDate());
+
+        motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+    }
+
     private DateTime determineSubscriptionStartDate(SubscriptionRequest subscriptionRequest) {
-        DateTime creationDate = subscriptionRequest.getCreationDate();
+        DateTime startDate = subscriptionRequest.getCreationDate();
         SubscriptionPack subscriptionRequestPack = subscriptionRequest.getPack();
 
         Integer weekNumber = subscriptionRequest.getSubscriber().getWeek();
         if (weekNumber != null) {
-            return subscriptionRequestPack.adjustStartDate(creationDate, weekNumber);
+            return subscriptionRequestPack.adjustStartDate(startDate, weekNumber);
         }
 
         DateTime dateOfBirth = subscriptionRequest.getSubscriber().getDateOfBirth();
@@ -96,7 +122,11 @@ public class SubscriptionService {
             return subscriptionRequestPack.adjustStartDate(expectedDateOfDelivery);
         }
 
-        return creationDate;
+        return startDate;
+    }
+
+    public void initiateActivationRequest(OMSubscriptionRequest omSubscriptionRequest) {
+        onMobileSubscriptionManagerPublisher.sendActivationRequest(omSubscriptionRequest);
     }
 
     public List<SubscriptionResponse> findByMsisdn(String msisdn) {
@@ -246,7 +276,7 @@ public class SubscriptionService {
 
     private DateTime getNewCampaignStartDate(DateTime existingCampaignStartDate, DateTime rescheduleRequestedDate) {
         DateTime sameDayOfCurrentWeekAsExistingCampaignStartDate = rescheduleRequestedDate.withDayOfWeek(existingCampaignStartDate.getDayOfWeek());
-        if(rescheduleRequestedDate.isAfter(sameDayOfCurrentWeekAsExistingCampaignStartDate))
+        if (rescheduleRequestedDate.isAfter(sameDayOfCurrentWeekAsExistingCampaignStartDate))
             return sameDayOfCurrentWeekAsExistingCampaignStartDate.plusWeeks(1);
         return sameDayOfCurrentWeekAsExistingCampaignStartDate;
     }

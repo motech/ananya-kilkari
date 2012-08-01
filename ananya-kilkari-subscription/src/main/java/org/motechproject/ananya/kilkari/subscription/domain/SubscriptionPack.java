@@ -58,7 +58,7 @@ public enum SubscriptionPack {
 
     public abstract DateTime adjustStartDate(DateTime dob);
 
-    public DateTime adjustStartDate(DateTime creationDate, Integer weekNumber) {
-        return creationDate.minusWeeks(weekNumber - 1);
+    public DateTime adjustStartDate(DateTime startDate, Integer weekNumber) {
+        return startDate.minusWeeks(weekNumber - 1);
     }
 }

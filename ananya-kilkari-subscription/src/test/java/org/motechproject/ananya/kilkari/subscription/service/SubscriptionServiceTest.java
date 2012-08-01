@@ -34,10 +34,13 @@ import org.motechproject.ananya.kilkari.subscription.service.request.Subscriptio
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.model.DayOfWeek;
+import org.motechproject.scheduler.MotechSchedulerService;
+import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -71,11 +74,13 @@ public class SubscriptionServiceTest {
     private CampaignMessageAlertService campaignMessageAlertService;
     @Mock
     private KilkariPropertiesData kilkariPropertiesData;
+    @Mock
+    private MotechSchedulerService motechSchedulerService;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService);
     }
 
     @Test
@@ -800,11 +805,26 @@ public class SubscriptionServiceTest {
         DateTime dob = DateTime.now().minusMonths(6);
         SubscriptionPack subscriptionPack = mock(SubscriptionPack.class);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(subscriptionPack).withDateOfBirth(dob).withWeek(weekNumber).build();
+        when(subscriptionPack.adjustStartDate(subscriptionRequest.getCreationDate(), weekNumber)).thenReturn(dob);
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
         verify(subscriptionPack).adjustStartDate(Matchers.<DateTime>any(), Matchers.<Integer>any());
         verify(subscriptionPack, never()).adjustStartDate(Matchers.<DateTime>any());
+    }
+
+    @Test
+    public void shouldScheduleEarlySubscription() {
+        DateTime dob = DateTime.now().plusMonths(3);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).withDateOfBirth(dob).build();
+
+        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+
+        ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
+        verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
+        RunOnceSchedulableJob runOnceSchedulableJobArgumentCaptorValue = runOnceSchedulableJobArgumentCaptor.getValue();
+        assertEquals(dob.toDate(), runOnceSchedulableJobArgumentCaptorValue.getStartDate());
+        assertEquals(OMSubscriptionRequest.class, runOnceSchedulableJobArgumentCaptorValue.getMotechEvent().getParameters().get("0").getClass());
     }
 
     private DateTime nextFriday(DateTime rescheduleRequestedDate) {

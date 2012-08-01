@@ -147,4 +147,16 @@ public class SubscriptionValidatorTest {
         subscriptionValidator.validateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", "23",
                 "20-10-2038", "20-10-1985", location));
     }
+
+    @Test
+    public void shouldValidateAndThrowIfSubscriptionIsNotActive() {
+        Subscription subscription = mock(Subscription.class);
+        when(subscription.getSubscriptionId()).thenReturn("subscriptionId");
+        when(subscription.isInProgress()).thenReturn(false);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Subscription is not active for subscriptionId subscriptionId");
+
+        subscriptionValidator.validateActiveSubscription(subscription);
+    }
 }

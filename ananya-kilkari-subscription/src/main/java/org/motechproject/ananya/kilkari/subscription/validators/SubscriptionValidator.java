@@ -31,6 +31,13 @@ public class SubscriptionValidator {
         raiseExceptionIfThereAreErrors(errors);
     }
 
+    public void validateActiveSubscription(Subscription subscription) {
+        Errors errors = new Errors();
+        if (!subscription.isInProgress())
+            errors.add(String.format("Subscription is not active for subscriptionId %s", subscription.getSubscriptionId()));
+        raiseExceptionIfThereAreErrors(errors);
+    }
+
     public void validateSubscriberDetails(SubscriberUpdateRequest updateRequest) {
         Errors errors = new Errors();
         if (updateRequest.hasLocation()) {

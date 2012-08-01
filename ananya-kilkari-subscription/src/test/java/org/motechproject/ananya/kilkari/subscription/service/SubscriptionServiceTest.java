@@ -545,6 +545,24 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    public void shouldThrowExceptionWhenUnScheduleCurrentCampaignIsInvokedForANonActivePack() {
+        String subscriptionId = "subscriptionId";
+        String message = "some error";
+        CampaignChangeReason campaignChangeReason = CampaignChangeReason.MISCARRIAGE;
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_COMPLETION).build();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        doThrow(new ValidationException(message)).when(subscriptionValidator).validateActiveSubscription(subscription);
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(message);
+
+        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId, campaignChangeReason, DateTime.now()));
+
+        verify(messageCampaignService, never()).stop(any(MessageCampaignRequest.class));
+        verify(campaignMessageService, never()).deleteCampaignMessagesFor(any(String.class));
+        verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class));
+    }
+
+    @Test
     public void shouldThrowExceptionIfValidationFailsForUpdatingSubscriberDetails() {
         SubscriberUpdateRequest request = mock(SubscriberUpdateRequest.class);
         String message = "some error";

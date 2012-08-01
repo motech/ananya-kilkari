@@ -206,6 +206,8 @@ public class SubscriptionService {
 
     public void rescheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(campaignRescheduleRequest.getSubscriptionId());
+        subscriptionValidator.validateActiveSubscription(subscription);
+
         unScheduleCampaign(subscription);
         scheduleCampaign(campaignRescheduleRequest);
     }

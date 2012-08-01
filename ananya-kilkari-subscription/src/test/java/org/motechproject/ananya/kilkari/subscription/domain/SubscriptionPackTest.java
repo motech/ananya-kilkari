@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.domain;
 
 import org.joda.time.DateTime;
+import org.joda.time.Weeks;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -51,7 +52,8 @@ public class SubscriptionPackTest {
         DateTime edd = now.plusMonths(2);
         DateTime startDate = SubscriptionPack.FIFTEEN_MONTHS.adjustStartDate(edd);
 
-        assertEquals(now.minusMonths(1), startDate);
+        assertEquals(edd.getDayOfWeek(), startDate.getDayOfWeek());
+        assertTrue(Weeks.weeksBetween(startDate, edd).getWeeks() >= 12);
     }
 
     @Test
@@ -60,20 +62,21 @@ public class SubscriptionPackTest {
         DateTime dob = now.minusMonths(2);
         DateTime startDate = SubscriptionPack.SEVEN_MONTHS.adjustStartDate(dob);
 
-        assertEquals(now.plusMonths(3), startDate);
+        assertEquals(dob.getDayOfWeek(), startDate.getDayOfWeek());
+        assertTrue(Weeks.weeksBetween(dob, startDate).getWeeks() >= 20);
     }
 
     @Test
     public void shouldSetStartDateOnSameDateAsDOBForTwelveMonthsPack() {
         DateTime now = DateTime.now();
-        DateTime edd = now;
-        DateTime startDate = SubscriptionPack.TWELVE_MONTHS.adjustStartDate(edd);
+        DateTime dob = now;
+        DateTime startDate = SubscriptionPack.TWELVE_MONTHS.adjustStartDate(dob);
 
         assertEquals(now, startDate);
     }
 
     @Test
-    public void shouldSetStartDateBasedOnTheCurrentWeek() {
+    public void shouldSetStartDateBasedOnTheCurrentWeekForFifteenMonthsPack() {
         DateTime now = DateTime.now();
         Integer weekNumber = 4;
         DateTime startDate = SubscriptionPack.FIFTEEN_MONTHS.adjustStartDate(now, weekNumber);

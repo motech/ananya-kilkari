@@ -20,7 +20,6 @@ public class SubscriptionDataBuilder {
         subscriptionData.setMsisdn(RandomStringUtils.randomNumeric(10));
         subscriptionData.setBeneficiaryAge("25");
         subscriptionData.setBeneficiaryName("Dumbledore");
-        subscriptionData.setDateOfBirth(DateTime.now().minusMonths(6).toString("dd-MM-yyyy"));
         subscriptionData.setExpectedDateOfDelivery(DateTime.now().plusMonths(5).toString("dd-MM-yyyy"));
         LocationRequest location = new LocationRequest();
         location.setBlock("block");

@@ -277,4 +277,13 @@ public class CampaignMessageAlertServiceTest {
 
         verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, messageExpiryDate);
     }
+
+    @Test
+    public void shouldDeleteCampaignMessageAlertForASubscriptionId(){
+        String subscriptionId = "subscriptionId";
+
+        campaignMessageAlertService.deleteFor(subscriptionId);
+
+        verify(allCampaignMessageAlerts).deleteFor(subscriptionId);
+    }
 }

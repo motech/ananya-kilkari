@@ -89,6 +89,10 @@ public class CampaignMessageAlertService {
         return campaignMessageAlert.getMessageId();
     }
 
+    public void deleteFor(String subscriptionId) {
+        allCampaignMessageAlerts.deleteFor(subscriptionId);
+    }
+
     private interface CampaignMessageAlertUpdater {
         public void update(CampaignMessageAlert campaignMessageAlert);
     }

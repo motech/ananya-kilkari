@@ -26,4 +26,10 @@ public class AllCampaignMessageAlerts extends MotechBaseRepository<CampaignMessa
         List<CampaignMessageAlert> campaignMessageAlerts = db.queryView(viewQuery, CampaignMessageAlert.class);
         return singleResult(campaignMessageAlerts);
     }
+
+    public void deleteFor(String subscriptionId) {
+        CampaignMessageAlert campaignMessageAlert = findBySubscriptionId(subscriptionId);
+        if (campaignMessageAlert != null)
+            remove(campaignMessageAlert);
+    }
 }

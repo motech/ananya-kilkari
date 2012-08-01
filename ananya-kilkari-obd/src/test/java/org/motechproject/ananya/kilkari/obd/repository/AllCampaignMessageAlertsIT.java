@@ -8,6 +8,7 @@ import org.motechproject.ananya.kilkari.obd.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
 public class AllCampaignMessageAlertsIT extends SpringIntegrationTest {
@@ -29,5 +30,23 @@ public class AllCampaignMessageAlertsIT extends SpringIntegrationTest {
         assertEquals(messageId, expectedCampaignMessage.getMessageId());
         assertEquals(messageExpiryDate.withZone(DateTimeZone.UTC), expectedCampaignMessage.getMessageExpiryDate());
         assertTrue(expectedCampaignMessage.isRenewed());
+    }
+
+    @Test
+    public void shouldDeleteExistingCampaignMessageAlert(){
+        String subscriptionId = "subscriptionId";
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "messageId", false, DateTime.now().plusWeeks(1));
+        obdDbConnector.create(campaignMessageAlert);
+
+        allCampaignMessageAlerts.deleteFor(subscriptionId);
+
+        assertNull(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId));
+    }
+
+    @Test
+    public void shouldNotDeleteACampaignMessageAlertIfItDoesNotExist(){
+        String subscriptionId = "abcd1234";
+
+        allCampaignMessageAlerts.deleteFor(subscriptionId);
     }
 }

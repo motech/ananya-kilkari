@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.subscription.service;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
@@ -36,6 +37,7 @@ public class SubscriptionService {
     private MessageCampaignService messageCampaignService;
     private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
     private CampaignMessageService campaignMessageService;
+    private CampaignMessageAlertService campaignMessageAlertService;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
@@ -43,7 +45,7 @@ public class SubscriptionService {
     public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher,
                                SubscriptionValidator subscriptionValidator, ReportingService reportingService,
                                KilkariInboxService kilkariInboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
-                               CampaignMessageService campaignMessageService) {
+                               CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
@@ -52,6 +54,7 @@ public class SubscriptionService {
         this.messageCampaignService = messageCampaignService;
         this.onMobileSubscriptionGateway = onMobileSubscriptionGateway;
         this.campaignMessageService = campaignMessageService;
+        this.campaignMessageAlertService = campaignMessageAlertService;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
@@ -150,7 +153,6 @@ public class SubscriptionService {
             @Override
             public void perform(Subscription subscription) {
                 subscription.deactivationRequestSent();
-                kilkariInboxService.scheduleInboxDeletion(subscription);
             }
         });
     }
@@ -179,6 +181,8 @@ public class SubscriptionService {
             public void perform(Subscription subscription) {
                 subscription.deactivate();
                 kilkariInboxService.scheduleInboxDeletion(subscription);
+                unScheduleCampaign(subscription);
+                campaignMessageAlertService.deleteFor(subscription.getSubscriptionId());
             }
         });
     }
@@ -196,6 +200,7 @@ public class SubscriptionService {
             public void perform(Subscription subscription) {
                 subscription.complete();
                 kilkariInboxService.scheduleInboxDeletion(subscription);
+                campaignMessageAlertService.deleteFor(subscription.getSubscriptionId());
             }
         });
     }
@@ -209,6 +214,7 @@ public class SubscriptionService {
         subscriptionValidator.validateActiveSubscription(subscription);
 
         unScheduleCampaign(subscription);
+        removeScheduledMessagesFromOBD(subscription);
         scheduleCampaign(campaignRescheduleRequest);
     }
 
@@ -234,7 +240,6 @@ public class SubscriptionService {
     private void unScheduleCampaign(Subscription subscription) {
         MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStartDate());
         messageCampaignService.stop(unEnrollRequest);
-        removeScheduledMessagesFromOBD(subscription);
     }
 
     private void removeScheduledMessagesFromOBD(Subscription subscription) {

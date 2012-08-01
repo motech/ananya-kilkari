@@ -12,6 +12,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
@@ -64,11 +65,13 @@ public class SubscriptionServiceTest {
     private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
     @Mock
     private CampaignMessageService campaignMessageService;
+    @Mock
+    private CampaignMessageAlertService campaignMessageAlertService;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService);
     }
 
     @Test
@@ -373,12 +376,13 @@ public class SubscriptionServiceTest {
         DateTime date = DateTime.now();
         String reason = "balance is low";
         Integer graceCount = 7;
-        Subscription subscription = new Subscription() {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now()) {
             public String getSubscriptionId() {
                 return subscriptionId;
             }
         };
         subscription.setStatus(SubscriptionStatus.SUSPENDED);
+
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         subscriptionService.deactivateSubscription(subscriptionId, date, reason, graceCount);
@@ -460,6 +464,8 @@ public class SubscriptionServiceTest {
         assertEquals(null, OMSubscriptionRequest.getChannel());
         assertEquals(pack, OMSubscriptionRequest.getPack());
         assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
+
+        verify(campaignMessageAlertService).deleteFor(subscriptionId);
     }
 
     @Test
@@ -475,7 +481,6 @@ public class SubscriptionServiceTest {
         verify(kilkariInboxService).scheduleInboxDeletion(subscription);
     }
 
-
     @Test
     public void shouldNotSendDeactivationRequestAgainIfTheExistingSubscriptionIsAlreadyInDeactivatedState() {
         final String msisdn = "9988776655";
@@ -490,6 +495,7 @@ public class SubscriptionServiceTest {
         verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
         verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
         verify(kilkariInboxService, never()).scheduleInboxDeletion(any(Subscription.class));
+        verify(campaignMessageAlertService, never()).deleteFor(any(String.class));
     }
 
     @Test
@@ -499,18 +505,6 @@ public class SubscriptionServiceTest {
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         subscriptionService.deactivateSubscription(subscriptionId, DateTime.now(), null, null);
-
-        verify(kilkariInboxService).scheduleInboxDeletion(subscription);
-    }
-
-    @Test
-    public void shouldScheduleInboxDeletionWhenDeactivationOfSubscriptionWasRequested() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.SEVEN_MONTHS, DateTime.now());
-        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.SEVEN_MONTHS, Channel.IVR, subscription.getSubscriptionId());
-        String subscriptionId = subscription.getSubscriptionId();
-        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-
-        subscriptionService.deactivationRequested(omSubscriptionRequest);
 
         verify(kilkariInboxService).scheduleInboxDeletion(subscription);
     }
@@ -748,6 +742,24 @@ public class SubscriptionServiceTest {
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         Assert.assertEquals(dob.plusMonths(5), subscriptionArgumentCaptorValue.getStartDate());
 
+    }
+
+    @Test
+    public void shouldUnScheduleMessageCampaignAndDeleteCampaignMessageAlertOnSuccessfulDeactivationRequest(){
+        DateTime createdAt = DateTime.now();
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.TWELVE_MONTHS, createdAt);
+        String subscriptionId = subscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.deactivateSubscription(subscriptionId, createdAt.plusWeeks(1), "Balance Low", null);
+
+        ArgumentCaptor<MessageCampaignRequest> campaignRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
+        verify(messageCampaignService).stop(campaignRequestArgumentCaptor.capture());
+        MessageCampaignRequest messageCampaignRequest = campaignRequestArgumentCaptor.getValue();
+        assertEquals(subscriptionId, messageCampaignRequest.getExternalId());
+        assertEquals(subscription.getPack().name(), messageCampaignRequest.getSubscriptionPack());
+        assertEquals(createdAt, messageCampaignRequest.getSubscriptionStartDate());
+        verify(campaignMessageAlertService).deleteFor(subscriptionId);
     }
 }
 

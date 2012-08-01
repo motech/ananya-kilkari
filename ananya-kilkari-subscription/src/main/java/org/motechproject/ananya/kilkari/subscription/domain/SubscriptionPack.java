@@ -25,7 +25,6 @@ public enum SubscriptionPack {
     };
     private int startWeek;
     private int totalWeeks;
-    private static final int MAX_WEEK = 60;
 
     SubscriptionPack(int startWeek, int totalWeeks) {
         this.startWeek = startWeek;
@@ -44,8 +43,8 @@ public enum SubscriptionPack {
         return SubscriptionPack.valueOf(StringUtils.trimToEmpty(pack).toUpperCase());
     }
 
-    public boolean isWeekWithinPackRange(Integer week) {
-        return week >= startWeek && week <= MAX_WEEK;
+    public boolean isValidWeekNumber(Integer week) {
+        return week >= 1 && week <= totalWeeks;
     }
 
     public static boolean isValid(String subscriptionPack) {
@@ -59,7 +58,7 @@ public enum SubscriptionPack {
 
     public abstract DateTime adjustStartDate(DateTime dob);
 
-    public DateTime adjustStartDate(DateTime creationDate, Integer currentWeek) {
-        return creationDate.minusWeeks(currentWeek - this.startWeek - 1);
+    public DateTime adjustStartDate(DateTime creationDate, Integer weekNumber) {
+        return creationDate.minusWeeks(weekNumber - 1);
     }
 }

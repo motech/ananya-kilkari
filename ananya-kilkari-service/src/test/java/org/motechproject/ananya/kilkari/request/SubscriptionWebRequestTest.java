@@ -93,6 +93,15 @@ public class SubscriptionWebRequestTest {
 
         validateErrors(1, "Invalid subscription pack Invalid-Pack");
     }
+    
+    @Test
+    public void shouldAddErrorWhenBothEDDAndDOBGivenToCreateNewSubscription() {
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withDOB("01-01-2012").withEDD("31-12-2012").build();
+
+        subscriptionWebRequest.validate(errors);
+
+        validateErrors(1, "Invalid request. Both expected date of delivery and date of birth present");
+    }
 
     @Test
     public void shouldAddErrorWhenInvalidChannelIsGivenToCreateNewSubscription() {

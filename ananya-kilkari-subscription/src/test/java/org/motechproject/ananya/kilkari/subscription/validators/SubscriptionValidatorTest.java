@@ -84,24 +84,24 @@ public class SubscriptionValidatorTest {
 
     @Test
     public void shouldFailValidationIfWeekNumberIsOutsidePacksRange() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(2).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(30).build();
 
         Location location = subscriptionRequest.getLocation();
         SubscriberLocation existingLocation = new SubscriberLocation();
         when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(existingLocation);
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Given week[2] is not within the pack[SEVEN_MONTHS] range");
+        expectedException.expectMessage("Given week[30] is not within the pack[SEVEN_MONTHS] range");
 
         subscriptionValidator.validate(subscriptionRequest);
     }
 
     @Test
     public void shouldFailValidationAndAppendErrorMessagesIfThereAreMultipleFailures() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(2).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(29).build();
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Location does not exist for District[district] Block[block] and Panchayat[panchayat],Given week[2] is not within the pack[SEVEN_MONTHS] range");
+        expectedException.expectMessage("Location does not exist for District[district] Block[block] and Panchayat[panchayat],Given week[29] is not within the pack[SEVEN_MONTHS] range");
 
         subscriptionValidator.validate(subscriptionRequest);
     }

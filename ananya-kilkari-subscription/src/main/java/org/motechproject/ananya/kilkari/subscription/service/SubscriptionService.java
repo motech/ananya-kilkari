@@ -78,9 +78,9 @@ public class SubscriptionService {
         DateTime creationDate = subscriptionRequest.getCreationDate();
         SubscriptionPack subscriptionRequestPack = subscriptionRequest.getPack();
 
-        DateTime expectedDateOfDelivery = subscriptionRequest.getSubscriber().getExpectedDateOfDelivery();
-        if (expectedDateOfDelivery != null) {
-            return subscriptionRequestPack.adjustStartDate(expectedDateOfDelivery);
+        Integer weekNumber = subscriptionRequest.getSubscriber().getWeek();
+        if (weekNumber != null) {
+            return subscriptionRequestPack.adjustStartDate(creationDate, weekNumber);
         }
 
         DateTime dateOfBirth = subscriptionRequest.getSubscriber().getDateOfBirth();
@@ -88,9 +88,9 @@ public class SubscriptionService {
             return subscriptionRequestPack.adjustStartDate(dateOfBirth);
         }
 
-        Integer weekNumber = subscriptionRequest.getSubscriber().getWeek();
-        if (weekNumber != null) {
-            return subscriptionRequestPack.adjustStartDate(creationDate, weekNumber);
+        DateTime expectedDateOfDelivery = subscriptionRequest.getSubscriber().getExpectedDateOfDelivery();
+        if (expectedDateOfDelivery != null) {
+            return subscriptionRequestPack.adjustStartDate(expectedDateOfDelivery);
         }
 
         return creationDate;

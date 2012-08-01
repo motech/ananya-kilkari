@@ -37,9 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -664,7 +662,7 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldBackDateStartDateForALateSubscriptionWhenWeekNumberIsGivenForSevenMonthsPack() {
-        Integer weekNumber = 40;
+        Integer weekNumber = 28;
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(weekNumber).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
@@ -672,7 +670,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        assertEquals(subscriptionRequest.getCreationDate().minusWeeks(7), subscriptionArgumentCaptorValue.getStartDate());
+        assertEquals(subscriptionRequest.getCreationDate().minusWeeks(27), subscriptionArgumentCaptorValue.getStartDate());
 
     }
 
@@ -747,7 +745,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldUnScheduleMessageCampaignAndDeleteCampaignMessageAlertOnSuccessfulDeactivationRequest(){
+    public void shouldUnScheduleMessageCampaignAndDeleteCampaignMessageAlertOnSuccessfulDeactivationRequest() {
         DateTime createdAt = DateTime.now();
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.TWELVE_MONTHS, createdAt);
         String subscriptionId = subscription.getSubscriptionId();
@@ -762,6 +760,19 @@ public class SubscriptionServiceTest {
         assertEquals(subscription.getPack().name(), messageCampaignRequest.getSubscriptionPack());
         assertEquals(createdAt, messageCampaignRequest.getSubscriptionStartDate());
         verify(campaignMessageAlertService).deleteFor(subscriptionId);
+    }
+
+    @Test
+    public void shouldGivePriorityToWeekNumberOverDOBForALateSubscription() {
+        Integer weekNumber = 40;
+        DateTime dob = DateTime.now().minusMonths(6);
+        SubscriptionPack subscriptionPack = mock(SubscriptionPack.class);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(subscriptionPack).withDateOfBirth(dob).withWeek(weekNumber).build();
+
+        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+
+        verify(subscriptionPack).adjustStartDate(Matchers.<DateTime>any(), Matchers.<Integer>any());
+        verify(subscriptionPack, never()).adjustStartDate(Matchers.<DateTime>any());
     }
 }
 

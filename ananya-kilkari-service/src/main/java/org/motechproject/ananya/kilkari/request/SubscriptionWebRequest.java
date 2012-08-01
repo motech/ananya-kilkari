@@ -161,10 +161,17 @@ public class SubscriptionWebRequest implements Serializable {
         validateChannel(errors);
         if (!Channel.isIVR(channel)) {
             validateAge(errors);
+            validateOnlyOneOfEDDOrDOBPresent(errors);
             validateDOB(errors);
             validateEDD(errors);
             validateWeekNumber(errors);
         }
+    }
+
+    private void validateOnlyOneOfEDDOrDOBPresent(Errors errors) {
+        if(StringUtils.isNotEmpty(expectedDateOfDelivery)&& StringUtils.isNotEmpty(dateOfBirth))
+            errors.add("Invalid request. Both expected date of delivery and date of birth present");
+
     }
 
     private void validateWeekNumber(Errors errors) {

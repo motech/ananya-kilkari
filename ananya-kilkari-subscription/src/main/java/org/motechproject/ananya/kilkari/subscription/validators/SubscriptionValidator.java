@@ -49,7 +49,7 @@ public class SubscriptionValidator {
 
     private void validateWeek(SubscriptionRequest subscriptionRequest, Errors errors) {
         if (subscriptionRequest.getSubscriber().getWeek() != null) {
-            if (!subscriptionRequest.getPack().isWeekWithinPackRange(subscriptionRequest.getSubscriber().getWeek()))
+            if (!subscriptionRequest.getPack().isValidWeekNumber(subscriptionRequest.getSubscriber().getWeek()))
                 errors.add(String.format("Given week[%s] is not within the pack[%s] range", subscriptionRequest.getSubscriber().getWeek(), subscriptionRequest.getPack().name()));
         }
     }

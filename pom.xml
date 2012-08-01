@@ -15,6 +15,8 @@
         <module>ananya-kilkari-smoke</module>
         <module>ananya-kilkari-reporting</module>
         <module>ananya-kilkari-message</module>
+        <module>ananya-kilkari-functional-tests</module>
+
     </modules>
     <name>Ananya Kilkari</name>
     <url>http://www.motechproject.org</url>
@@ -425,9 +427,6 @@
     <profiles>
         <profile>
             <id>regression</id>
-            <modules>
-                <module>ananya-kilkari-functional-test</module>
-            </modules>
             <build>
                 <plugins>
                     <plugin>

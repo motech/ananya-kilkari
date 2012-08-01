@@ -39,12 +39,18 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionToActiveForSuccessfulActivation() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        DateTime createdAt = DateTime.now();
+        DateTime activatedOn = createdAt.plus(5000);
+        DateTime startDate = DateTime.now().minusDays(23);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, createdAt);
+        subscription.setStartDate(startDate);
         Operator operator = Operator.AIRTEL;
-        subscription.activate(operator.name());
+
+        subscription.activate(operator.name(), activatedOn);
 
         assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
         assertEquals(operator, subscription.getOperator());
+        assertEquals(startDate.plus(5000), subscription.getStartDate());
     }
 
     @Test

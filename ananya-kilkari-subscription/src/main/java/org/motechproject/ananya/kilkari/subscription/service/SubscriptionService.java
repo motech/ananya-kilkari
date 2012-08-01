@@ -104,13 +104,13 @@ public class SubscriptionService {
         return (List<SubscriptionResponse>) (List<? extends SubscriptionResponse>) allSubscriptions.findByMsisdn(msisdn);
     }
 
-    public void activate(String subscriptionId, DateTime activatedOn, final String operator) {
+    public void activate(String subscriptionId, final DateTime activatedOn, final String operator) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         scheduleCampaign(subscription, activatedOn);
         updateStatusAndReport(subscriptionId, activatedOn, null, operator, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
-                subscription.activate(operator);
+                subscription.activate(operator, activatedOn);
             }
         });
     }

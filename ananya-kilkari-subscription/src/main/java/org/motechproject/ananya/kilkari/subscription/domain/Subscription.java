@@ -139,9 +139,10 @@ public class Subscription extends MotechBaseDataObject implements SubscriptionRe
         setStatus(SubscriptionStatus.SUSPENDED);
     }
 
-    public void activate(String operator) {
+    public void activate(String operator, DateTime activatedOn) {
         setStatus(SubscriptionStatus.ACTIVE);
         setOperator(Operator.getFor(operator));
+        startDate = startDate.plus(activatedOn.getMillis() - creationDate.getMillis());
     }
 
     public void activationFailed(String operator) {

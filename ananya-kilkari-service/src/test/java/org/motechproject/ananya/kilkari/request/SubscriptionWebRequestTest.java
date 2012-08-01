@@ -47,7 +47,7 @@ public class SubscriptionWebRequestTest {
         assertEquals("1234567890", subscriptionWebRequest.getMsisdn());
         assertEquals("1234567890", subscriptionWebRequest.getMsisdn());
         assertEquals("myname", subscriptionWebRequest.getBeneficiaryName());
-        assertEquals(12, subscriptionWebRequest.getBeneficiaryAge());
+        assertEquals(12, (int) subscriptionWebRequest.getBeneficiaryAge());
         assertEquals(dateTimeFormatter.parseDateTime(dob), subscriptionWebRequest.getDateOfBirth());
         assertEquals(dateTimeFormatter.parseDateTime(edd), subscriptionWebRequest.getExpectedDateOfDelivery());
         assertEquals("mydistrict", subscriptionWebRequest.getDistrict());
@@ -93,7 +93,7 @@ public class SubscriptionWebRequestTest {
 
         validateErrors(1, "Invalid subscription pack Invalid-Pack");
     }
-    
+
     @Test
     public void shouldAddErrorWhenBothEDDAndDOBGivenToCreateNewSubscription() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withDOB("01-01-2012").withEDD("31-12-2012").build();
@@ -195,9 +195,9 @@ public class SubscriptionWebRequestTest {
 
     @Test
     public void shouldConvertAgeToIntegerAndReturn() {
-        assertEquals(12, new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryAge("12").build().getBeneficiaryAge());
-        assertEquals(0, new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryAge(null).build().getBeneficiaryAge());
-        assertEquals(0, new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryAge("").build().getBeneficiaryAge());
+        assertEquals(12, (int)new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryAge("12").build().getBeneficiaryAge());
+        assertEquals(null, new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryAge(null).build().getBeneficiaryAge());
+        assertEquals(null, new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryAge("").build().getBeneficiaryAge());
     }
 
     @Test

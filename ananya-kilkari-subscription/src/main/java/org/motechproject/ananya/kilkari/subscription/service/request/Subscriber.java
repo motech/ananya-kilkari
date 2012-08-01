@@ -5,7 +5,7 @@ import org.joda.time.DateTime;
 public class Subscriber {
 
     private String beneficiaryName;
-    private int beneficiaryAge;
+    private Integer beneficiaryAge;
     private DateTime dateOfBirth;
     private DateTime expectedDateOfDelivery;
     private Integer week;
@@ -15,7 +15,7 @@ public class Subscriber {
     private Subscriber() {
     }
 
-    public Subscriber(String beneficiaryName, int beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer week) {
+    public Subscriber(String beneficiaryName, Integer beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer week) {
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
         this.dateOfBirth = dateOfBirth;
@@ -27,7 +27,7 @@ public class Subscriber {
         return beneficiaryName;
     }
 
-    public int getBeneficiaryAge() {
+    public Integer getBeneficiaryAge() {
         return beneficiaryAge;
     }
 

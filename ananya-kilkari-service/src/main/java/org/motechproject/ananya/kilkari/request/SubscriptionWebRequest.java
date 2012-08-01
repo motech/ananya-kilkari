@@ -68,8 +68,8 @@ public class SubscriptionWebRequest implements Serializable {
     }
 
     @JsonIgnore
-    public int getBeneficiaryAge() {
-        return StringUtils.isNotEmpty(beneficiaryAge) ? Integer.parseInt(beneficiaryAge) : 0;
+    public Integer getBeneficiaryAge() {
+        return StringUtils.isNotEmpty(beneficiaryAge) ? Integer.parseInt(beneficiaryAge) : null;
     }
 
     @JsonIgnore

@@ -14,7 +14,7 @@ public class SubscriptionCreationReportRequest extends SubscriptionBaseReportReq
 
     private String name;
 
-    private int ageOfBeneficiary;
+    private Integer ageOfBeneficiary;
 
     private DateTime edd;
 
@@ -22,7 +22,7 @@ public class SubscriptionCreationReportRequest extends SubscriptionBaseReportReq
 
     private SubscriberLocation location;
 
-    public SubscriptionCreationReportRequest(SubscriptionDetails subscriptionDetails, String channel, int ageOfBeneficiary, String name, DateTime dob, DateTime edd, SubscriberLocation location) {
+    public SubscriptionCreationReportRequest(SubscriptionDetails subscriptionDetails, String channel, Integer ageOfBeneficiary, String name, DateTime dob, DateTime edd, SubscriberLocation location) {
         super(subscriptionDetails.getSubscriptionId(), subscriptionDetails.getStatus(), subscriptionDetails.getCreationDate());
         this.name = name;
         this.msisdn = subscriptionDetails.getMsisdn();
@@ -50,7 +50,7 @@ public class SubscriptionCreationReportRequest extends SubscriptionBaseReportReq
         return name;
     }
 
-    public int getAgeOfBeneficiary() {
+    public Integer getAgeOfBeneficiary() {
         return ageOfBeneficiary;
     }
 

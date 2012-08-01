@@ -18,17 +18,17 @@ public class SubscriptionCreationReportRequestTest {
         SubscriptionCreationReportRequest subscriptionCreationReportRequest = new SubscriptionCreationReportRequest(subscriptionDetails, "CALL_CENTER", 23, name, dob, edd, new SubscriberLocation("district", "block", "panchayat"));
         SubscriberLocation location = subscriptionCreationReportRequest.getLocation();
 
-        assertEquals("msisdn",subscriptionCreationReportRequest.getMsisdn());
-        assertEquals("FIFTEEN_MONTHS",subscriptionCreationReportRequest.getPack());
-        assertEquals("CALL_CENTER",subscriptionCreationReportRequest.getChannel());
-        assertEquals(23,subscriptionCreationReportRequest.getAgeOfBeneficiary());
-        assertEquals(dob,subscriptionCreationReportRequest.getDob());
-        assertEquals(edd,subscriptionCreationReportRequest.getEdd());
+        assertEquals("msisdn", subscriptionCreationReportRequest.getMsisdn());
+        assertEquals("FIFTEEN_MONTHS", subscriptionCreationReportRequest.getPack());
+        assertEquals("CALL_CENTER", subscriptionCreationReportRequest.getChannel());
+        assertEquals(23, (int) subscriptionCreationReportRequest.getAgeOfBeneficiary());
+        assertEquals(dob, subscriptionCreationReportRequest.getDob());
+        assertEquals(edd, subscriptionCreationReportRequest.getEdd());
         assertEquals("district", location.getDistrict());
         assertEquals("block", location.getBlock());
         assertEquals("panchayat", location.getPanchayat());
-        assertEquals(subscriptionDetails.getCreationDate(),subscriptionCreationReportRequest.getCreatedAt());
-        assertEquals(name,subscriptionCreationReportRequest.getName());
+        assertEquals(subscriptionDetails.getCreationDate(), subscriptionCreationReportRequest.getCreatedAt());
+        assertEquals(name, subscriptionCreationReportRequest.getName());
         assertEquals("PENDING_ACTIVATION", subscriptionCreationReportRequest.getSubscriptionStatus());
-     }
+    }
 }

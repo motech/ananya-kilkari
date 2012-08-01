@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
-import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
+import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.request.CampaignChangeRequest;
 import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;

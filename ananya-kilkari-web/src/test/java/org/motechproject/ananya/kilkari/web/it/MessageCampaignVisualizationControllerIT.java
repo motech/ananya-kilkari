@@ -36,7 +36,7 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 subscription.getSubscriptionId(), subscriptionPack.name(), subscription.getStartDate());
-        messageCampaignService.start(messageCampaignRequest);
+        messageCampaignService.start(messageCampaignRequest, 0, 0);
 
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()
                 .perform(get("/messagecampaign/visualize").param("msisdn", msisdn))

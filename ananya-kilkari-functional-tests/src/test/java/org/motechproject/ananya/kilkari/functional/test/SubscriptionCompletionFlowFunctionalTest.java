@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.functional.test.utils.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.functional.test.utils.SubscriptionDataBuilder;
-import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
+import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class SubscriptionCompletionFlowFunctionalTest extends SpringIntegrationTest {

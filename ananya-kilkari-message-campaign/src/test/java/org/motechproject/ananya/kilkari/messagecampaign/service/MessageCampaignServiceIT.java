@@ -50,7 +50,7 @@ public class MessageCampaignServiceIT {
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 "my_id1", MessageCampaignPack.SEVEN_MONTHS.name(), referenceDate);
 
-        messageCampaignService.start(messageCampaignRequest);
+        messageCampaignService.start(messageCampaignRequest, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
 
         List<DateTime> dateTimeList = messageCampaignService.getMessageTimings(
                 messageCampaignRequest.getExternalId(),
@@ -72,7 +72,7 @@ public class MessageCampaignServiceIT {
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 "my_id2", MessageCampaignPack.TWELVE_MONTHS.name(), referenceDate);
 
-        messageCampaignService.start(messageCampaignRequest);
+        messageCampaignService.start(messageCampaignRequest, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
 
         List<DateTime> dateTimeList = messageCampaignService.getMessageTimings(
                 messageCampaignRequest.getExternalId(),
@@ -95,7 +95,7 @@ public class MessageCampaignServiceIT {
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 "my_id3", MessageCampaignPack.FIFTEEN_MONTHS.name(), referenceDate);
 
-        messageCampaignService.start(messageCampaignRequest);
+        messageCampaignService.start(messageCampaignRequest, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
 
         List<DateTime> dateTimeList = messageCampaignService.getMessageTimings(
                 messageCampaignRequest.getExternalId(),
@@ -120,7 +120,7 @@ public class MessageCampaignServiceIT {
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 externalId, MessageCampaignPack.FIFTEEN_MONTHS.name(), referenceDate);
 
-        messageCampaignService.start(messageCampaignRequest);
+        messageCampaignService.start(messageCampaignRequest, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
         CampaignEnrollment enrollment = allCampaignEnrollments.findByExternalId(externalId).get(0);
         enrollment.setStatus(CampaignEnrollmentStatus.INACTIVE);
         allCampaignEnrollments.update(enrollment);
@@ -129,7 +129,7 @@ public class MessageCampaignServiceIT {
         MessageCampaignRequest messageCampaignRequest2 = new MessageCampaignRequest(
                 externalId, MessageCampaignPack.TWELVE_MONTHS.name(), referenceDate2);
 
-        messageCampaignService.start(messageCampaignRequest2);
+        messageCampaignService.start(messageCampaignRequest2, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
 
         List<MessageCampaignEnrollment> enrollments = messageCampaignService.searchEnrollments(externalId);
 

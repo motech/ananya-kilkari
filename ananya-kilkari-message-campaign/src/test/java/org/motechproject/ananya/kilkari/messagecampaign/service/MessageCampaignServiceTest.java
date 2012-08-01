@@ -5,9 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
-import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
+import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
 import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
@@ -32,14 +31,10 @@ public class MessageCampaignServiceTest {
     @Mock
     private org.motechproject.server.messagecampaign.service.MessageCampaignService platformMessageCampaignService;
 
-    @Mock
-    private KilkariPropertiesData kilkariProperties;
-
-
     @Before
     public void setUp() {
         initMocks(this);
-        this.messageCampaignService = new MessageCampaignService(platformMessageCampaignService, kilkariProperties);
+        this.messageCampaignService = new MessageCampaignService(platformMessageCampaignService);
     }
 
     @Test
@@ -47,10 +42,12 @@ public class MessageCampaignServiceTest {
         String externalId = "externalId";
         String subscriptionPack = MessageCampaignPack.TWELVE_MONTHS.name();
         DateTime subscriptionStartDate = DateTime.now();
+        int campaignScheduleDeltaDays = 2;
+        int campaignScheduleDeltaMinutes = 30;
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 externalId, subscriptionPack, subscriptionStartDate);
 
-        this.messageCampaignService.start(messageCampaignRequest);
+        this.messageCampaignService.start(messageCampaignRequest, campaignScheduleDeltaDays, campaignScheduleDeltaMinutes);
 
         ArgumentCaptor<CampaignRequest> campaignRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignRequest.class);
         verify(platformMessageCampaignService).startFor(campaignRequestArgumentCaptor.capture());
@@ -58,8 +55,8 @@ public class MessageCampaignServiceTest {
 
         assertEquals(externalId, campaignRequest.externalId());
         assertEquals(MessageCampaignPack.TWELVE_MONTHS.getCampaignName(), campaignRequest.campaignName());
-        assertEquals(subscriptionStartDate.toLocalDate(), campaignRequest.referenceDate());
-        assertEquals(new Time(subscriptionStartDate.toLocalTime()), campaignRequest.deliverTime());
+        assertEquals(subscriptionStartDate.toLocalDate().plusDays(campaignScheduleDeltaDays), campaignRequest.referenceDate());
+        assertEquals(new Time(subscriptionStartDate.toLocalTime().plusMinutes(campaignScheduleDeltaMinutes)), campaignRequest.deliverTime());
     }
 
     @Test

@@ -11,9 +11,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
-import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
@@ -25,6 +25,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
@@ -68,11 +69,13 @@ public class SubscriptionServiceTest {
     private CampaignMessageService campaignMessageService;
     @Mock
     private CampaignMessageAlertService campaignMessageAlertService;
+    @Mock
+    private KilkariPropertiesData kilkariPropertiesData;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData);
     }
 
     @Test
@@ -114,7 +117,7 @@ public class SubscriptionServiceTest {
         }
 
         verify(allSubscriptions, never()).add(any(Subscription.class));
-        verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class));
+        verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class), any(Integer.class), any(Integer.class));
         verify(reportingServiceImpl, never()).reportSubscriptionCreation(any(SubscriptionCreationReportRequest.class));
         verify(onMobileSubscriptionManagerPublisher, never()).sendActivationRequest(any(OMSubscriptionRequest.class));
     }
@@ -297,7 +300,11 @@ public class SubscriptionServiceTest {
         String operator = "airtel";
         DateTime activatedOn = DateTime.now();
         String subscriptionId = subscription.getSubscriptionId();
+        int deltaDays = 2;
+        int deltaMinutes = 30;
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(kilkariPropertiesData.getCampaignScheduleDeltaDays()).thenReturn(deltaDays);
+        when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(deltaMinutes);
 
         subscriptionService.activate(subscriptionId, activatedOn, operator);
 
@@ -310,9 +317,20 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
         verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
         SubscriptionStateChangeReportRequest stateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
-        Assert.assertEquals(operator, stateChangeReportRequest.getOperator());
-        Assert.assertEquals(subscriptionId, stateChangeReportRequest.getSubscriptionId());
-        Assert.assertEquals(SubscriptionStatus.ACTIVE.name(), stateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(operator, stateChangeReportRequest.getOperator());
+        assertEquals(subscriptionId, stateChangeReportRequest.getSubscriptionId());
+        assertEquals(SubscriptionStatus.ACTIVE.name(), stateChangeReportRequest.getSubscriptionStatus());
+
+        ArgumentCaptor<MessageCampaignRequest> messageCampaignRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
+        ArgumentCaptor<Integer> actualDeltaDays = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<Integer> actualDeltaMinutes = ArgumentCaptor.forClass(Integer.class);
+        verify(messageCampaignService).start(messageCampaignRequestArgumentCaptor.capture(), actualDeltaDays.capture(), actualDeltaMinutes.capture());
+        MessageCampaignRequest actualMessageCampaignRequest = messageCampaignRequestArgumentCaptor.getValue();
+
+        assertEquals(subscription.getSubscriptionId(), actualMessageCampaignRequest.getExternalId());
+        assertEquals(subscription.getPack().name(), actualMessageCampaignRequest.getSubscriptionPack());
+        assertEquals(deltaDays, actualDeltaDays.getValue().intValue());
+        assertEquals(deltaMinutes, actualDeltaMinutes.getValue().intValue());
     }
 
     @Test
@@ -539,11 +557,15 @@ public class SubscriptionServiceTest {
 
         order.verify(messageCampaignService).getActiveCampaignStartDate(subscriptionId);
         ArgumentCaptor<MessageCampaignRequest> campaignEnrollmentRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
-        order.verify(messageCampaignService).start(campaignEnrollmentRequestArgumentCaptor.capture());
+        ArgumentCaptor<Integer> deltaDaysCaptor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<Integer> deltaMinutesCaptor = ArgumentCaptor.forClass(Integer.class);
+        order.verify(messageCampaignService).start(campaignEnrollmentRequestArgumentCaptor.capture(), deltaDaysCaptor.capture(), deltaMinutesCaptor.capture());
         MessageCampaignRequest campaignEnrollmentRequest = campaignEnrollmentRequestArgumentCaptor.getValue();
         assertEquals(subscriptionId, campaignEnrollmentRequest.getExternalId());
         assertEquals(campaignChangeReason.name(), campaignEnrollmentRequest.getSubscriptionPack());
         assertEquals(nextFriday(rescheduleRequestedDate), campaignEnrollmentRequest.getSubscriptionStartDate());
+        assertEquals(0, deltaDaysCaptor.getValue().intValue());
+        assertEquals(0, deltaMinutesCaptor.getValue().intValue());
     }
 
     @Test
@@ -561,7 +583,7 @@ public class SubscriptionServiceTest {
 
         verify(messageCampaignService, never()).stop(any(MessageCampaignRequest.class));
         verify(campaignMessageService, never()).deleteCampaignMessagesFor(any(String.class));
-        verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class));
+        verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class), 0, 0);
     }
 
     @Test

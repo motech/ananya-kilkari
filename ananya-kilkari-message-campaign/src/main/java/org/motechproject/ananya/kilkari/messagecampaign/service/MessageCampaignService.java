@@ -6,7 +6,6 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequestMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.response.MessageCampaignEnrollment;
-import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
 import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
@@ -31,21 +30,19 @@ public class MessageCampaignService {
     public static final String MISCARRIAGE_CAMPAIGN_KEY = "kilkari-mother-child-campaign-miscarriage";
 
     public static final String CAMPAIGN_MESSAGE_NAME = "Mother Child Health Care";
-    private KilkariPropertiesData kilkariProperties;
     private org.motechproject.server.messagecampaign.service.MessageCampaignService campaignService;
 
     @Autowired
-    public MessageCampaignService(org.motechproject.server.messagecampaign.service.MessageCampaignService campaignService, KilkariPropertiesData kilkariProperties) {
+    public MessageCampaignService(org.motechproject.server.messagecampaign.service.MessageCampaignService campaignService) {
         this.campaignService = campaignService;
-        this.kilkariProperties = kilkariProperties;
     }
 
-    public void start(MessageCampaignRequest campaignRequest) {
-        campaignService.startFor(MessageCampaignRequestMapper.newRequestFrom(campaignRequest, kilkariProperties));
+    public void start(MessageCampaignRequest campaignRequest, Integer campaignScheduleDeltaDays, Integer campaignScheduleDeltaMinutes) {
+        campaignService.startFor(MessageCampaignRequestMapper.newRequestFrom(campaignRequest, campaignScheduleDeltaDays, campaignScheduleDeltaMinutes));
     }
 
     public boolean stop(MessageCampaignRequest enrollRequest) {
-        campaignService.stopAll(MessageCampaignRequestMapper.newRequestFrom(enrollRequest, kilkariProperties));
+        campaignService.stopAll(MessageCampaignRequestMapper.newRequestFrom(enrollRequest, 0, 0));
         return true;
     }
 

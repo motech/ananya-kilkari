@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
-import org.motechproject.ananya.kilkari.messagecampaign.utils.KilkariPropertiesData;
+import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;

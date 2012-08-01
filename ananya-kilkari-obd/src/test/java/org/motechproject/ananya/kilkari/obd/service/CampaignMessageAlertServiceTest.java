@@ -1,7 +1,6 @@
 package org.motechproject.ananya.kilkari.obd.service;
 
 
-import org.apache.activemq.broker.region.Subscription;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,11 +11,10 @@ import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessageAlerts;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class CampaignMessageAlertServiceTest {
@@ -146,7 +144,7 @@ public class CampaignMessageAlertServiceTest {
     }
 
     @Test
-    public void shouldAssignAExpiryDateToWeeklyScheduledMessageWhichIsNWeeksFromCreationDate_whenRenewalHasHappened() {
+    public void shouldAssignAExpiryDateToWeeklyScheduledMessageWhichIsNWeeksFromStartDate_whenRenewalHasHappened() {
         String messageId = "mymessageid";
         String msisdn = "1234567890";
         String operator = "AIRTEL";
@@ -167,7 +165,7 @@ public class CampaignMessageAlertServiceTest {
     }
 
     @Test
-    public void shouldAssignAExpiryDateToWeeklyScheduledMessageWhichIsNWeeksFromCreationDate_whenRenewalHasNotHappened() {
+    public void shouldAssignAExpiryDateToWeeklyScheduledMessageWhichIsNWeeksFromStartDate_whenRenewalHasNotHappened() {
         String messageId = "mymessageid";
         String msisdn = "1234567890";
         String operator = "AIRTEL";
@@ -241,7 +239,7 @@ public class CampaignMessageAlertServiceTest {
     }
 
     @Test
-    public void shouldScheduleCampaignMessageIfExistsAndNotExpired(){
+    public void shouldScheduleCampaignMessageIfExistsAndNotExpired() {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
         String operator = "AIRTEL";
@@ -261,7 +259,7 @@ public class CampaignMessageAlertServiceTest {
     }
 
     @Test
-    public void shouldScheduleCampaignMessageIfExistsAndAlreadyExpired(){
+    public void shouldScheduleCampaignMessageIfExistsAndAlreadyExpired() {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
         String operator = "AIRTEL";

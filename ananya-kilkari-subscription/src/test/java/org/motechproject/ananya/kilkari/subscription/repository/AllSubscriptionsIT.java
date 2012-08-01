@@ -23,8 +23,10 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
     public void shouldAddASubscriptionIntoDb() {
         String msisdn = "1234567890";
         DateTime createdAt = DateTime.now();
+        DateTime startDate = createdAt.plusWeeks(2);
 
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, createdAt);
+        subscription.setStartDate(startDate);
         allSubscriptions.add(subscription);
 
         markForDeletion(subscription);
@@ -38,6 +40,7 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptionFromDb.getPack());
         assertEquals(SubscriptionStatus.NEW, subscriptionFromDb.getStatus());
         assertEquals(createdAt.withZone(DateTimeZone.UTC), subscriptionFromDb.getCreationDate());
+        assertEquals(startDate.withZone(DateTimeZone.UTC), subscriptionFromDb.getStartDate());
     }
 
     @Test

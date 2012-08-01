@@ -27,7 +27,7 @@ public class DocumentVerifier {
         }.executeWithTimeout();
 
         if (subscription == null)
-            throw new RuntimeException("Subscription not in " + status);
+            throw new RuntimeException(String.format("Subscription id %s not in status %s",subscriptionData.getSubscriptionId(), status));
         return subscription;
 
     }
@@ -47,7 +47,7 @@ public class DocumentVerifier {
         }.executeWithTimeout();
 
         if(campaignMessage==null)
-            throw new RuntimeException("Campaign Message not in OBD db" );
+            throw new RuntimeException(String.format("Campaign Message for subscription id - %s not in OBD db for week %s ",subscriptionData.getSubscriptionId(),weekMessageId ));
     }
 
 

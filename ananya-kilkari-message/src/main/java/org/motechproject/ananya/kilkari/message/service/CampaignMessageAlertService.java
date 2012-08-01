@@ -32,7 +32,7 @@ public class CampaignMessageAlertService {
     }
 
     public void scheduleCampaignMessageAlert(String subscriptionId, final String messageId, final DateTime messageExpiryDate, String msisdn, String operator) {
-        CampaignMessageAlertUpdater updater  = new CampaignMessageAlertUpdater() {
+        CampaignMessageAlertUpdater updater = new CampaignMessageAlertUpdater() {
             @Override
             public void update(CampaignMessageAlert existingCampaignMessageAlert) {
                 existingCampaignMessageAlert.updateWith(messageId, existingCampaignMessageAlert.isRenewed(), messageExpiryDate);
@@ -44,8 +44,14 @@ public class CampaignMessageAlertService {
         processCampaignMessageAlert(subscriptionId, updater, AlertTriggerType.WEEKLY_MESSAGE, msisdn, operator);
     }
 
+    public void clearMessageId(String subscriptionId) {
+        CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
+        campaignMessageAlert.clearMessageId();
+        allCampaignMessageAlerts.update(campaignMessageAlert);
+    }
+
     private String scheduleCampaignMessageAlert(String subscriptionId, String msisdn, String operator, AlertTriggerType alertTriggerType) {
-        CampaignMessageAlertUpdater updater  = new CampaignMessageAlertUpdater() {
+        CampaignMessageAlertUpdater updater = new CampaignMessageAlertUpdater() {
             @Override
             public void update(CampaignMessageAlert campaignMessageAlert) {
                 campaignMessageAlert.updateWith(campaignMessageAlert.getMessageId(), true, campaignMessageAlert.getMessageExpiryDate());
@@ -55,7 +61,7 @@ public class CampaignMessageAlertService {
         return processCampaignMessageAlert(subscriptionId, updater, alertTriggerType, msisdn, operator);
     }
 
-    private String processCampaignMessageAlert(String subscriptionId, CampaignMessageAlertUpdater updater,  AlertTriggerType alertTriggerType, String msisdn, String operator) {
+    private String processCampaignMessageAlert(String subscriptionId, CampaignMessageAlertUpdater updater, AlertTriggerType alertTriggerType, String msisdn, String operator) {
         CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
         if (campaignMessageAlert == null) {
             logger.info(String.format("Could not find campaign message alert for subscriptionId: %s", subscriptionId));

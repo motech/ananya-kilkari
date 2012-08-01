@@ -64,6 +64,10 @@ public class CampaignMessageAlert extends MotechBaseDataObject {
         return alertRaisedAndRenewed;
     }
 
+    public void clearMessageId() {
+        messageId = null;
+    }
+
     private boolean hasNotExpired() {
         return messageExpiryDate.isAfterNow();
     }

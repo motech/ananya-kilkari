@@ -88,10 +88,19 @@ public class MessageCampaignService {
         return enrollmentsForCampaign.get(0).getStartDate();
     }
 
-    private String getActiveCampaignName(String subscriptionId) {
-        List<MessageCampaignEnrollment> activeEnrollment = Lambda.select(searchEnrollments(subscriptionId),
+    public DateTime getActiveCampaignStartDate(String subscriptionId) {
+        List<MessageCampaignEnrollment> activeCampaigns = getActiveCampaigns(subscriptionId);
+        return activeCampaigns.get(0).getStartDate();
+    }
+
+    private List<MessageCampaignEnrollment> getActiveCampaigns(String subscriptionId) {
+        return Lambda.select(searchEnrollments(subscriptionId),
                 having(on(MessageCampaignEnrollment.class).getStatus(),
                         Matchers.is(CampaignEnrollmentStatus.ACTIVE.name())));
-        return activeEnrollment.get(0).getCampaignName();
+    }
+
+    private String getActiveCampaignName(String subscriptionId) {
+        List<MessageCampaignEnrollment> activeEnrollments = getActiveCampaigns(subscriptionId);
+        return activeEnrollments.get(0).getCampaignName();
     }
 }

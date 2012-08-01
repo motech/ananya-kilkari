@@ -31,10 +31,13 @@ public class SubscriptionValidator {
         raiseExceptionIfThereAreErrors(errors);
     }
 
-    public void validateActiveSubscription(Subscription subscription) {
+    public void validateActiveSubscriptionExists(String subscriptionId) {
         Errors errors = new Errors();
-        if (!subscription.isInProgress())
-            errors.add(String.format("Subscription is not active for subscriptionId %s", subscription.getSubscriptionId()));
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        if (subscription == null)
+            errors.add(String.format("Subscription does not exist for subscriptionId %s", subscriptionId));
+        else if(!subscription.isInProgress())
+            errors.add(String.format("Subscription is not active for subscriptionId %s", subscriptionId));
         raiseExceptionIfThereAreErrors(errors);
     }
 

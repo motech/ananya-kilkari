@@ -210,11 +210,12 @@ public class SubscriptionService {
     }
 
     public void rescheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
-        Subscription subscription = allSubscriptions.findBySubscriptionId(campaignRescheduleRequest.getSubscriptionId());
-        subscriptionValidator.validateActiveSubscription(subscription);
+        String subscriptionId = campaignRescheduleRequest.getSubscriptionId();
+        subscriptionValidator.validateActiveSubscriptionExists(subscriptionId);
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
 
         unScheduleCampaign(subscription);
-        removeScheduledMessagesFromOBD(subscription);
+        removeScheduledMessagesFromOBD(subscriptionId);
         scheduleCampaign(campaignRescheduleRequest);
     }
 
@@ -226,9 +227,25 @@ public class SubscriptionService {
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(), request.getDateOfBirth(), subscriberLocation));
     }
 
+    private void unScheduleCampaign(Subscription subscription) {
+        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStartDate());
+        messageCampaignService.stop(unEnrollRequest);
+    }
+
     private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
-        MessageCampaignRequest enrollRequest = new MessageCampaignRequest(campaignRescheduleRequest.getSubscriptionId(), campaignRescheduleRequest.getReason().name(), campaignRescheduleRequest.getCreatedAt());
+        DateTime existingCampaignStartDate = messageCampaignService.getActiveCampaignStartDate(campaignRescheduleRequest.getSubscriptionId());
+        DateTime newCampaignStartDate = getNewCampaignStartDate(existingCampaignStartDate, campaignRescheduleRequest.getCreatedAt());
+
+        MessageCampaignRequest enrollRequest = new MessageCampaignRequest(campaignRescheduleRequest.getSubscriptionId(),
+                campaignRescheduleRequest.getReason().name(), newCampaignStartDate);
         messageCampaignService.start(enrollRequest);
+    }
+
+    private DateTime getNewCampaignStartDate(DateTime existingCampaignStartDate, DateTime rescheduleRequestedDate) {
+        DateTime sameDayOfCurrentWeekAsExistingCampaignStartDate = rescheduleRequestedDate.withDayOfWeek(existingCampaignStartDate.getDayOfWeek());
+        if(rescheduleRequestedDate.isAfter(sameDayOfCurrentWeekAsExistingCampaignStartDate))
+            return sameDayOfCurrentWeekAsExistingCampaignStartDate.plusWeeks(1);
+        return sameDayOfCurrentWeekAsExistingCampaignStartDate;
     }
 
     private void scheduleCampaign(Subscription subscription, DateTime activatedOn) {
@@ -237,13 +254,9 @@ public class SubscriptionService {
         messageCampaignService.start(campaignRequest);
     }
 
-    private void unScheduleCampaign(Subscription subscription) {
-        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStartDate());
-        messageCampaignService.stop(unEnrollRequest);
-    }
-
-    private void removeScheduledMessagesFromOBD(Subscription subscription) {
-        campaignMessageService.deleteCampaignMessagesFor(subscription.getSubscriptionId());
+    private void removeScheduledMessagesFromOBD(String subscriptionId) {
+        campaignMessageService.deleteCampaignMessagesFor(subscriptionId);
+        campaignMessageAlertService.clearMessageId(subscriptionId);
     }
 
     private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Integer graceCount, Action<Subscription> action) {

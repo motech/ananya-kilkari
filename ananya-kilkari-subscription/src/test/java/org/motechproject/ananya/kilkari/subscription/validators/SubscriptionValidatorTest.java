@@ -151,12 +151,26 @@ public class SubscriptionValidatorTest {
     @Test
     public void shouldValidateAndThrowIfSubscriptionIsNotActive() {
         Subscription subscription = mock(Subscription.class);
-        when(subscription.getSubscriptionId()).thenReturn("subscriptionId");
+        String subscriptionId = "subscriptionId";
+
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(subscription.isInProgress()).thenReturn(false);
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Subscription is not active for subscriptionId subscriptionId");
 
-        subscriptionValidator.validateActiveSubscription(subscription);
+        subscriptionValidator.validateActiveSubscriptionExists(subscriptionId);
+    }
+
+    @Test
+    public void shouldValidateAndThrowIfSubscriptionIsNotThere() {
+        String subscriptionId = "subscriptionId";
+
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(null);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Subscription does not exist for subscriptionId subscriptionId");
+
+        subscriptionValidator.validateActiveSubscriptionExists(subscriptionId);
     }
 }

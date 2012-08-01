@@ -280,11 +280,26 @@ public class CampaignMessageAlertServiceTest {
     }
 
     @Test
-    public void shouldDeleteCampaignMessageAlertForASubscriptionId(){
+    public void shouldDeleteCampaignMessageAlertForASubscriptionId() {
         String subscriptionId = "subscriptionId";
 
         campaignMessageAlertService.deleteFor(subscriptionId);
 
         verify(allCampaignMessageAlerts).deleteFor(subscriptionId);
+    }
+
+    @Test
+    public void shouldClearMessageId() {
+        String subscriptionId = "subscriptionId";
+        DateTime messageExpiryDate = DateTime.now().plusWeeks(1);
+        String messageId = "messageId";
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(new CampaignMessageAlert(subscriptionId, messageId, false, messageExpiryDate));
+
+        campaignMessageAlertService.clearMessageId(subscriptionId);
+
+        ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
+        verify(allCampaignMessageAlerts).update(campaignMessageAlertArgumentCaptor.capture());
+        CampaignMessageAlert campaignMessageAlert = campaignMessageAlertArgumentCaptor.getValue();
+        assertNull(campaignMessageAlert.getMessageId());
     }
 }

@@ -32,6 +32,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberU
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
+import org.motechproject.model.DayOfWeek;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -514,28 +515,35 @@ public class SubscriptionServiceTest {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
         SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
-        DateTime startDate = DateTime.now().plusWeeks(3);
+        DateTime friday = new DateTime(2011, 11, 25, 12, 30, 30);
+        DateTime existingCampaignStartDate = friday;
         CampaignChangeReason campaignChangeReason = CampaignChangeReason.MISCARRIAGE;
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).withStartDate(startDate).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).withStartDate(existingCampaignStartDate).build();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(messageCampaignService.getActiveCampaignStartDate(subscriptionId)).thenReturn(existingCampaignStartDate);
 
-        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId, campaignChangeReason, startDate));
+        DateTime saturday = existingCampaignStartDate.plusMonths(3);
+        DateTime rescheduleRequestedDate = saturday;
+        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId, campaignChangeReason, rescheduleRequestedDate));
 
-        InOrder order = inOrder(messageCampaignService, campaignMessageService);
+        InOrder order = inOrder(messageCampaignService, campaignMessageService, campaignMessageAlertService);
         ArgumentCaptor<MessageCampaignRequest> campaignUnEnrollmentRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
         order.verify(messageCampaignService).stop(campaignUnEnrollmentRequestArgumentCaptor.capture());
         MessageCampaignRequest campaignRequest = campaignUnEnrollmentRequestArgumentCaptor.getValue();
         assertEquals(subscription.getSubscriptionId(), campaignRequest.getExternalId());
         assertEquals(subscription.getPack().name(), campaignRequest.getSubscriptionPack());
         assertEquals(subscription.getStartDate(), campaignRequest.getSubscriptionStartDate());
-        order.verify(campaignMessageService).deleteCampaignMessagesFor(subscription.getSubscriptionId());
 
+        order.verify(campaignMessageService).deleteCampaignMessagesFor(subscriptionId);
+        order.verify(campaignMessageAlertService).clearMessageId(subscriptionId);
+
+        order.verify(messageCampaignService).getActiveCampaignStartDate(subscriptionId);
         ArgumentCaptor<MessageCampaignRequest> campaignEnrollmentRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
         order.verify(messageCampaignService).start(campaignEnrollmentRequestArgumentCaptor.capture());
         MessageCampaignRequest campaignEnrollmentRequest = campaignEnrollmentRequestArgumentCaptor.getValue();
         assertEquals(subscriptionId, campaignEnrollmentRequest.getExternalId());
         assertEquals(campaignChangeReason.name(), campaignEnrollmentRequest.getSubscriptionPack());
-        assertEquals(startDate, campaignEnrollmentRequest.getSubscriptionStartDate());
+        assertEquals(nextFriday(rescheduleRequestedDate), campaignEnrollmentRequest.getSubscriptionStartDate());
     }
 
     @Test
@@ -545,7 +553,7 @@ public class SubscriptionServiceTest {
         CampaignChangeReason campaignChangeReason = CampaignChangeReason.MISCARRIAGE;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_COMPLETION).build();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        doThrow(new ValidationException(message)).when(subscriptionValidator).validateActiveSubscription(subscription);
+        doThrow(new ValidationException(message)).when(subscriptionValidator).validateActiveSubscriptionExists(subscriptionId);
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(message);
 
@@ -773,6 +781,10 @@ public class SubscriptionServiceTest {
 
         verify(subscriptionPack).adjustStartDate(Matchers.<DateTime>any(), Matchers.<Integer>any());
         verify(subscriptionPack, never()).adjustStartDate(Matchers.<DateTime>any());
+    }
+
+    private DateTime nextFriday(DateTime rescheduleRequestedDate) {
+        return rescheduleRequestedDate.withDayOfWeek(DayOfWeek.Friday.getValue()).plusWeeks(1);
     }
 }
 

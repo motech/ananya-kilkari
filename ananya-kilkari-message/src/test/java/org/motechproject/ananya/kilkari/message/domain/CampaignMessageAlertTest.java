@@ -40,7 +40,7 @@ public class CampaignMessageAlertTest {
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "messageId", true, messageExpiryTime);
         assertTrue(campaignMessageAlert.canBeScheduled(false));
     }
-    
+
     @Test
     public void canBeScheduled_IfAlertRaisedIsExpiredAndActivated() {
         DateTime messageExpiryTime = DateTime.now().minusDays(1);
@@ -67,5 +67,12 @@ public class CampaignMessageAlertTest {
         DateTime messageExpiryTime = DateTime.now().minusDays(1);
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "WEEK1", true, messageExpiryTime);
         assertFalse(campaignMessageAlert.canBeScheduled(true));
+    }
+
+    @Test
+    public void shouldClearMessageId() {
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert("subscriptionId", "WEEK1", true, DateTime.now().plusWeeks(1));
+        campaignMessageAlert.clearMessageId();
+        assertNull(campaignMessageAlert.getMessageId());
     }
 }

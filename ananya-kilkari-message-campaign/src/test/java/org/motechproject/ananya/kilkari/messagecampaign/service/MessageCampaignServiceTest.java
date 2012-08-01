@@ -126,4 +126,20 @@ public class MessageCampaignServiceTest {
 
         assertEquals(startDate.toLocalDate(), campaignStartDate.toLocalDate());
     }
+
+    @Test
+    public void shouldGetActiveCampaignStartDateForGivenSubscriptionId() {
+        String subscriptionId = "abcd1234";
+        String activeCampaignName = "twelve_months";
+        DateTime startDate = DateTime.now();
+
+        ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<>();
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, "fifteen_months", startDate.minusYears(1).toLocalDate(), CampaignEnrollmentStatus.COMPLETED));
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, activeCampaignName, startDate.toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
+        when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(campaignEnrollmentRecords);
+
+        DateTime actualCampaignStartDate = this.messageCampaignService.getActiveCampaignStartDate(subscriptionId);
+
+        assertEquals(startDate.toLocalDate(), actualCampaignStartDate.toLocalDate());
+    }
 }

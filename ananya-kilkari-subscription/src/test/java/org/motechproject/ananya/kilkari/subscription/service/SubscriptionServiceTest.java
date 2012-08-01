@@ -533,12 +533,14 @@ public class SubscriptionServiceTest {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
         SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
+        int deltaMinutes = 30;
         DateTime friday = new DateTime(2011, 11, 25, 12, 30, 30);
         DateTime existingCampaignStartDate = friday;
         CampaignChangeReason campaignChangeReason = CampaignChangeReason.MISCARRIAGE;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).withStartDate(existingCampaignStartDate).build();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getActiveCampaignStartDate(subscriptionId)).thenReturn(existingCampaignStartDate);
+        when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(deltaMinutes);
 
         DateTime saturday = existingCampaignStartDate.plusMonths(3);
         DateTime rescheduleRequestedDate = saturday;
@@ -565,7 +567,7 @@ public class SubscriptionServiceTest {
         assertEquals(campaignChangeReason.name(), campaignEnrollmentRequest.getSubscriptionPack());
         assertEquals(nextFriday(rescheduleRequestedDate), campaignEnrollmentRequest.getSubscriptionStartDate());
         assertEquals(0, deltaDaysCaptor.getValue().intValue());
-        assertEquals(0, deltaMinutesCaptor.getValue().intValue());
+        assertEquals(deltaMinutes, deltaMinutesCaptor.getValue().intValue());
     }
 
     @Test

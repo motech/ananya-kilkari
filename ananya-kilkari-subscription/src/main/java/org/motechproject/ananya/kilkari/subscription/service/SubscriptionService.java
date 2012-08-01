@@ -241,7 +241,7 @@ public class SubscriptionService {
 
         MessageCampaignRequest enrollRequest = new MessageCampaignRequest(campaignRescheduleRequest.getSubscriptionId(),
                 campaignRescheduleRequest.getReason().name(), newCampaignStartDate);
-        messageCampaignService.start(enrollRequest, 0, 0);
+        messageCampaignService.start(enrollRequest, 0, kilkariPropertiesData.getCampaignScheduleDeltaMinutes());
     }
 
     private DateTime getNewCampaignStartDate(DateTime existingCampaignStartDate, DateTime rescheduleRequestedDate) {

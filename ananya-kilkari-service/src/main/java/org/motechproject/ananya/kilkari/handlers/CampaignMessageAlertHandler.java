@@ -4,7 +4,6 @@ import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
 import org.motechproject.server.messagecampaign.EventKeys;
-import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ public class CampaignMessageAlertHandler {
         this.kilkariCampaignService = kilkariCampaignService;
     }
 
-    @MotechListener(subjects = {EventKeys.MESSAGE_CAMPAIGN_FIRED_EVENT_SUBJECT})
+    @MotechListener(subjects = {EventKeys.SEND_MESSAGE})
     public void handleAlertEvent(MotechEvent motechEvent) {
         Map<String,Object> parameters = motechEvent.getParameters();
         String subscriptionId = (String) parameters.get(EventKeys.EXTERNAL_ID_KEY);
@@ -32,12 +31,10 @@ public class CampaignMessageAlertHandler {
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
     }
 
-    @MotechListener(subjects = {EventKeys.MESSAGE_CAMPAIGN_COMPLETED_EVENT_SUBJECT})
+    @MotechListener(subjects = {EventKeys.CAMPAIGN_COMPLETED})
     public void handleCompletionEvent(MotechEvent motechEvent) {
         Map<String,Object> parameters = motechEvent.getParameters();
-        CampaignEnrollment campaignEnrollment = (CampaignEnrollment) parameters.get(EventKeys.ENROLLMENT_KEY);
-        String subscriptionId = campaignEnrollment.getExternalId();
-        String campaignName = campaignEnrollment.getCampaignName();
+        String subscriptionId = (String) parameters.get(EventKeys.EXTERNAL_ID_KEY);
         logger.info("Handling campaign completion event for subscription id: " + subscriptionId);
         kilkariCampaignService.processCampaignCompletion(subscriptionId);
     }

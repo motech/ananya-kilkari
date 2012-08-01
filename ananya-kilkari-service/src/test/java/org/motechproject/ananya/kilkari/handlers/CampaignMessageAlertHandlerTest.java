@@ -6,7 +6,6 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.messagecampaign.EventKeys;
-import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollment;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class CampaignMessageAlertHandlerTest {
         parameters.put(EventKeys.CAMPAIGN_NAME_KEY, "mypack");
         parameters.put(EventKeys.MESSAGE_NAME_KEY, "mymessagenamekey");
 
-        MotechEvent motechEvent = new MotechEvent(EventKeys.MESSAGE_CAMPAIGN_FIRED_EVENT_SUBJECT, parameters);
+        MotechEvent motechEvent = new MotechEvent(EventKeys.SEND_MESSAGE, parameters);
 
         campaignMessageAlertHandler.handleAlertEvent(motechEvent);
         verify(kilkariCampaignService).scheduleWeeklyMessage("myexternalid", "mypack");
@@ -45,9 +44,8 @@ public class CampaignMessageAlertHandlerTest {
     public void shouldCompleteSubscriptionWhileHandlingCampaignCompletedEvent(){
         Map<String, Object> parameters = new HashMap<>();
         String subscriptionId = "subscriptionId";
-        String campaignName = "campaignName";
-        parameters.put(EventKeys.ENROLLMENT_KEY, new CampaignEnrollment(subscriptionId, campaignName));
-        MotechEvent motechEvent = new MotechEvent(EventKeys.MESSAGE_CAMPAIGN_COMPLETED_EVENT_SUBJECT, parameters);
+        parameters.put(EventKeys.EXTERNAL_ID_KEY, subscriptionId);
+        MotechEvent motechEvent = new MotechEvent(EventKeys.CAMPAIGN_COMPLETED, parameters);
 
         campaignMessageAlertHandler.handleCompletionEvent(motechEvent);
 

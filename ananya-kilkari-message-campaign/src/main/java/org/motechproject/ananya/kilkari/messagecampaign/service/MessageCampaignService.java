@@ -59,7 +59,7 @@ public class MessageCampaignService {
         List<MessageCampaignEnrollment> messageCampaignEnrollments = new ArrayList<>();
         for (CampaignEnrollmentRecord campaignEnrollmentRecord : enrollmentRecords) {
             messageCampaignEnrollments.add(new MessageCampaignEnrollment(campaignEnrollmentRecord.getExternalId(),
-                    campaignEnrollmentRecord.getCampaignName(), campaignEnrollmentRecord.getStartDate(),
+                    campaignEnrollmentRecord.getCampaignName(), campaignEnrollmentRecord.getReferenceDate(),
                     campaignEnrollmentRecord.getStatus()));
         }
         return messageCampaignEnrollments;

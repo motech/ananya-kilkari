@@ -243,11 +243,6 @@
                 <version>1.0.0.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-mapper-asl</artifactId>
-                <version>1.8.4</version>
-            </dependency>
-            <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.16</version>
@@ -312,16 +307,6 @@
                 <version>2.5</version>
             </dependency>
             <dependency>
-                <groupId>org.ektorp</groupId>
-                <artifactId>org.ektorp</artifactId>
-                <version>1.2.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.ektorp</groupId>
-                <artifactId>org.ektorp.spring</artifactId>
-                <version>1.2.2</version>
-            </dependency>
-            <dependency>
                 <groupId>postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>9.1-901.jdbc4</version>
@@ -380,6 +365,11 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
                 <version>${httpcomponents.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>1.9.7</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

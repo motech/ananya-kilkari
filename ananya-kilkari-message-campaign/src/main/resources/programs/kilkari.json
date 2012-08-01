@@ -1,7 +1,7 @@
 [
     {
         "name" : "kilkari-mother-child-campaign-fifteen-months",
-        "type" : "REPEATING",
+        "type" : "REPEAT_INTERVAL",
         "maxDuration" : "60 Weeks",
         "messages" : [
             {
@@ -9,14 +9,14 @@
                 "formats" : ["IVR"],
                 "languages" : ["en"],
                 "messageKey": "PREGNANCY",
-                "deliverTime" : "13:00",
-                "repeatInterval" : "1 week"
+                "startTime" : "13:00",
+                "repeatEvery" : "1 week"
             }
         ]
     },
     {
         "name" : "kilkari-mother-child-campaign-twelve-months",
-        "type" : "REPEATING",
+        "type" : "REPEAT_INTERVAL",
         "maxDuration" : "48 Weeks",
         "messages" : [
             {
@@ -24,14 +24,14 @@
                 "formats" : ["IVR"],
                 "languages" : ["en"],
                 "messageKey": "PREGNANCY",
-                "deliverTime" : "13:00",
-                "repeatInterval" : "1 week"
+                "startTime" : "13:00",
+                "repeatEvery" : "1 week"
             }
         ]
     },
     {
         "name" : "kilkari-mother-child-campaign-seven-months",
-        "type" : "REPEATING",
+        "type" : "REPEAT_INTERVAL",
         "maxDuration" : "28 Weeks",
         "messages" : [
             {
@@ -39,14 +39,14 @@
                 "formats" : ["IVR"],
                 "languages" : ["en"],
                 "messageKey": "PREGNANCY",
-                "deliverTime" : "13:00",
-                "repeatInterval" : "1 week"
+                "startTime" : "13:00",
+                "repeatEvery" : "1 week"
             }
         ]
     },
     {
         "name" : "kilkari-mother-child-campaign-infant-death",
-        "type" : "REPEATING",
+        "type" : "REPEAT_INTERVAL",
         "maxDuration" : "2 Weeks",
         "messages" : [
             {
@@ -54,14 +54,14 @@
                 "formats" : ["IVR"],
                 "languages" : ["en"],
                 "messageKey": "PREGNANCY",
-                "deliverTime" : "13:00",
-                "repeatInterval" : "1 week"
+                "startTime" : "13:00",
+                "repeatEvery" : "1 week"
             }
         ]
     },
     {
         "name" : "kilkari-mother-child-campaign-miscarriage",
-        "type" : "REPEATING",
+        "type" : "REPEAT_INTERVAL",
         "maxDuration" : "1 Week",
         "messages" : [
             {
@@ -69,8 +69,8 @@
                 "formats" : ["IVR"],
                 "languages" : ["en"],
                 "messageKey": "PREGNANCY",
-                "deliverTime" : "13:00",
-                "repeatInterval" : "1 week"
+                "startTime" : "13:00",
+                "repeatEvery" : "1 week"
             }
         ]
     }

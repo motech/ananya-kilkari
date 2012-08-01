@@ -59,7 +59,7 @@ public class MessageCampaignServiceTest {
         assertEquals(externalId, campaignRequest.externalId());
         assertEquals(MessageCampaignPack.TWELVE_MONTHS.getCampaignName(), campaignRequest.campaignName());
         assertEquals(subscriptionCreationDate.toLocalDate(), campaignRequest.referenceDate());
-        assertEquals(new Time(subscriptionCreationDate.toLocalTime()), campaignRequest.reminderTime());
+        assertEquals(new Time(subscriptionCreationDate.toLocalTime()), campaignRequest.deliverTime());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class MessageCampaignServiceTest {
         assertEquals(externalId, campaignRequest.externalId());
         assertEquals(MessageCampaignPack.TWELVE_MONTHS.getCampaignName(), campaignRequest.campaignName());
         assertEquals(subscriptionCreationDate.toLocalDate(), campaignRequest.referenceDate());
-        assertEquals(new Time(subscriptionCreationDate.toLocalTime()), campaignRequest.reminderTime());
+        assertEquals(new Time(subscriptionCreationDate.toLocalTime()), campaignRequest.deliverTime());
     }
 
     @Test

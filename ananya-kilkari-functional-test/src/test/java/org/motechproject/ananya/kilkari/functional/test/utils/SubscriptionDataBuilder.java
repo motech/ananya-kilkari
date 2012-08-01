@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.functional.test.utils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
-import org.motechproject.ananya.kilkari.subscription.domain.LocationRequest;
+import org.motechproject.ananya.kilkari.request.LocationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 public class SubscriptionDataBuilder {

@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.functional.test.domain;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.motechproject.ananya.kilkari.subscription.domain.LocationRequest;
+import org.motechproject.ananya.kilkari.request.LocationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 public class SubscriptionData {

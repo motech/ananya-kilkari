@@ -203,14 +203,14 @@ public class KilkariSubscriptionServiceTest {
         request.setCreatedAt(DateTime.now());
         request.setDateOfBirth("20-10-1985");
         request.setBlock("block");
-        request.setSubscriptionId("subscriptionId");
+        String subscriptionId = "subscriptionId";
         Errors errors = new Errors();
         errors.add("some error");
         when(subscriberDetailsValidator.validate(any(SubscriberWebRequest.class))).thenReturn(errors);
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("some error");
 
-        kilkariSubscriptionService.updateSubscriberDetails(request);
+        kilkariSubscriptionService.updateSubscriberDetails(request, subscriptionId);
     }
 
     @Test
@@ -221,10 +221,10 @@ public class KilkariSubscriptionServiceTest {
         request.setCreatedAt(DateTime.now());
         request.setDateOfBirth("20-10-1985");
         request.setBlock("block");
-        request.setSubscriptionId("subscriptionId");
+        String subscriptionId = "subscriptionId";
         when(subscriberDetailsValidator.validate(request)).thenReturn(new Errors());
 
-        kilkariSubscriptionService.updateSubscriberDetails(request);
+        kilkariSubscriptionService.updateSubscriberDetails(request, subscriptionId);
 
         ArgumentCaptor<SubscriberUpdateRequest> captor = ArgumentCaptor.forClass(SubscriberUpdateRequest.class);
         verify(subscriptionService).updateSubscriberDetails(captor.capture());
@@ -235,6 +235,6 @@ public class KilkariSubscriptionServiceTest {
         assertEquals(request.getCreatedAt(), subscriberUpdateRequest.getCreatedAt());
         assertEquals(request.getDateOfBirth(), subscriberUpdateRequest.getDateOfBirth());
         assertEquals(request.getBlock(), subscriberUpdateRequest.getBlock());
-        assertEquals(request.getSubscriptionId(), subscriberUpdateRequest.getSubscriptionId());
+        assertEquals(subscriptionId, subscriberUpdateRequest.getSubscriptionId());
     }
 }

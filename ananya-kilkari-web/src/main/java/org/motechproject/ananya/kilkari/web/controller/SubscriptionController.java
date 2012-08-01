@@ -104,10 +104,10 @@ public class SubscriptionController {
         return BaseResponse.success("Campaign Change request submitted successfully");
     }
 
-    @RequestMapping(value = "/subscriber/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/subscriber/{subscriptionId}", method = RequestMethod.PUT)
     @ResponseBody
-    public BaseResponse updateSubscriberDetails(@RequestBody SubscriberWebRequest subscriberWebRequest) {
-        kilkariSubscriptionService.updateSubscriberDetails(subscriberWebRequest);
+    public BaseResponse updateSubscriberDetails(@RequestBody SubscriberWebRequest subscriberWebRequest, @PathVariable String subscriptionId) {
+        kilkariSubscriptionService.updateSubscriberDetails(subscriberWebRequest, subscriptionId);
         return BaseResponse.success("Subscriber Update request submitted successfully");
     }
 

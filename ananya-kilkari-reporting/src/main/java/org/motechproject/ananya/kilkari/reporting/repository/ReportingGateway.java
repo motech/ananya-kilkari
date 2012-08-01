@@ -4,7 +4,7 @@ import org.motechproject.ananya.kilkari.reporting.domain.*;
 
 public interface ReportingGateway {
     String CREATE_SUBSCRIPTION_PATH = "subscription";
-    String SUBSCRIPTION_STATE_CHANGE_PATH = "updatesubscription";
+    String SUBSCRIPTION_STATE_CHANGE_PATH = "subscription";
     String GET_LOCATION_PATH = "location";
     String OBD_CALL_DETAILS_PATH = "obd/callDetails";
     String SUBSCRIBER_UPDATE_PATH = "subscriber";

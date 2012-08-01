@@ -25,9 +25,10 @@ public class SubscriberDetailsValidatorTest {
         SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
         subscriberWebRequest.setBeneficiaryAge("23a");
         subscriberWebRequest.setChannel("ivr");
-        subscriberWebRequest.setCreatedAt(DateTime.now());
+        DateTime now = DateTime.now();
+        subscriberWebRequest.setCreatedAt(now);
         subscriberWebRequest.setDateOfBirth("20/10/1985");
-        String edd = getDate(DateTime.now().minusWeeks(1).toDate());
+        String edd = getDate(now.minusWeeks(1).toDate());
         subscriberWebRequest.setExpectedDateOfDelivery(edd);
 
         Errors errors = subscriberDetailsValidator.validate(subscriberWebRequest);
@@ -40,7 +41,7 @@ public class SubscriberDetailsValidatorTest {
     }
 
     private String getDate(Date date) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-mm-YYYY");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
         return simpleDateFormat.format(date);
     }
 }

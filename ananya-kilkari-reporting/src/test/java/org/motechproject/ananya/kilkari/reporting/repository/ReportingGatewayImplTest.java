@@ -186,7 +186,7 @@ public class ReportingGatewayImplTest {
         SubscriptionStateChangeReportRequest actualStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
-        assertEquals("url/updatesubscription/abcd1234", urlArgumentCaptor.getValue());
+        assertEquals("url/subscription/abcd1234", urlArgumentCaptor.getValue());
         assertEquals(stateChangeReportRequest, actualStateChangeReportRequest);
     }
 

@@ -109,12 +109,12 @@ public class KilkariSubscriptionService {
                 CampaignChangeReason.from(campaignChangeRequest.getReason()), campaignChangeRequest.getCreatedAt()));
     }
 
-    public void updateSubscriberDetails(SubscriberWebRequest request) {
+    public void updateSubscriberDetails(SubscriberWebRequest request, String subscriptionId) {
         Errors errors = subscriberDetailsValidator.validate(request);
         raiseExceptionIfThereAreErrors(errors);
 
         Location location = new Location(request.getDistrict(), request.getBlock(), request.getPanchayat());
-        subscriptionService.updateSubscriberDetails(new SubscriberUpdateRequest(request.getSubscriptionId(), request.getChannel(), request.getCreatedAt(),
+        subscriptionService.updateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, request.getChannel(), request.getCreatedAt(),
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(), request.getDateOfBirth(),
                 location));
     }

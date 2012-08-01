@@ -10,8 +10,6 @@ import java.io.Serializable;
 
 public class SubscriberWebRequest implements Serializable {
     @JsonProperty
-    private String subscriptionId;
-    @JsonProperty
     private String channel;
     @JsonIgnore
     private DateTime createdAt;
@@ -29,11 +27,6 @@ public class SubscriberWebRequest implements Serializable {
     public SubscriberWebRequest() {
         this.location = new LocationRequest();
         this.createdAt = DateTime.now();
-    }
-
-    @JsonIgnore
-    public String getSubscriptionId() {
-        return subscriptionId;
     }
 
     @JsonIgnore
@@ -122,10 +115,6 @@ public class SubscriberWebRequest implements Serializable {
         this.channel = channel;
     }
 
-    public void setSubscriptionId(String subscriptionId) {
-        this.subscriptionId = subscriptionId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -134,7 +123,6 @@ public class SubscriberWebRequest implements Serializable {
         SubscriberWebRequest that = (SubscriberWebRequest) o;
 
         return new EqualsBuilder()
-                .append(this.subscriptionId, that.subscriptionId)
                 .append(this.channel, that.channel)
                 .append(this.beneficiaryAge, that.beneficiaryAge)
                 .append(this.beneficiaryName, that.beneficiaryName)
@@ -147,7 +135,6 @@ public class SubscriberWebRequest implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(this.subscriptionId)
                 .append(this.channel)
                 .append(this.beneficiaryAge)
                 .append(this.beneficiaryName)

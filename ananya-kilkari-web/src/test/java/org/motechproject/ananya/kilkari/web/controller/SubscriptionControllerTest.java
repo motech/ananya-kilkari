@@ -422,15 +422,16 @@ public class SubscriptionControllerTest {
     public void shouldUpdateSubscriberDetails() throws Exception {
         SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
         byte[] requestBody = TestUtils.toJson(subscriberWebRequest).getBytes();
+        String subscriptionId = "subscription-id";
 
         mockMvc(subscriptionController)
-                .perform(post("/subscriber/update")
+                .perform(put("/subscriber/"+subscriptionId)
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber Update request submitted successfully")));
 
-        verify(kilkariSubscriptionService).updateSubscriberDetails(subscriberWebRequest);
+        verify(kilkariSubscriptionService).updateSubscriberDetails(subscriberWebRequest, subscriptionId);
     }
 
     private void mockSubscription(String msisdn) {

@@ -10,12 +10,13 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Ananya Kilkari Subscription</name>
-    <artifactId>ananya-kilkari-subscription</artifactId>
+    <name>Ananya Kilkari Message</name>
+    <artifactId>ananya-kilkari-message</artifactId>
 
     <properties>
-        <db.name>motech-subscription</db.name>
+        <db.name>motech-message</db.name>
     </properties>
+
 
     <dependencies>
         <dependency>
@@ -26,47 +27,12 @@
         </dependency>
         <dependency>
             <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-message-campaign</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-message</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject.ananya.kilkari</groupId>
             <artifactId>ananya-kilkari-obd</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-reporting</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-platform-common-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject</groupId>
-            <artifactId>motech-platform-server-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
-            <artifactId>motech-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.motechproject</groupId>
-            <artifactId>motech-scheduler</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -115,4 +81,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

@@ -1,15 +1,13 @@
-package org.motechproject.ananya.kilkari.obd.repository;
+package org.motechproject.ananya.kilkari.message.repository;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageAlert;
-import org.motechproject.ananya.kilkari.obd.utils.SpringIntegrationTest;
+import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.message.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 public class AllCampaignMessageAlertsIT extends SpringIntegrationTest {
 
@@ -22,7 +20,7 @@ public class AllCampaignMessageAlertsIT extends SpringIntegrationTest {
         String messageId = "messageId";
         DateTime messageExpiryDate = DateTime.now().plusWeeks(1);
         CampaignMessageAlert actualCampaignMessage = new CampaignMessageAlert(subscriptionId, messageId, true, messageExpiryDate);
-        obdDbConnector.create(actualCampaignMessage);
+        messageDbConnector.create(actualCampaignMessage);
         markForDeletion(actualCampaignMessage);
 
         CampaignMessageAlert expectedCampaignMessage = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
@@ -36,7 +34,7 @@ public class AllCampaignMessageAlertsIT extends SpringIntegrationTest {
     public void shouldDeleteExistingCampaignMessageAlert(){
         String subscriptionId = "subscriptionId";
         CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "messageId", false, DateTime.now().plusWeeks(1));
-        obdDbConnector.create(campaignMessageAlert);
+        messageDbConnector.create(campaignMessageAlert);
 
         allCampaignMessageAlerts.deleteFor(subscriptionId);
 

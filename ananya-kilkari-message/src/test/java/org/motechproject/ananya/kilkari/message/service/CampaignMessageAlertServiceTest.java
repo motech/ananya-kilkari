@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.service;
+package org.motechproject.ananya.kilkari.message.service;
 
 
 import org.joda.time.DateTime;
@@ -6,8 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageAlert;
-import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessageAlerts;
+import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.message.repository.AllCampaignMessageAlerts;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;

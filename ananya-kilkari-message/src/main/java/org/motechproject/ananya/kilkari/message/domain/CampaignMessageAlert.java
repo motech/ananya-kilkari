@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.domain;
+package org.motechproject.ananya.kilkari.message.domain;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;

@@ -1,8 +1,10 @@
-package org.motechproject.ananya.kilkari.obd.service;
+package org.motechproject.ananya.kilkari.message.service;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageAlert;
-import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessageAlerts;
+import org.motechproject.ananya.kilkari.message.domain.AlertTriggerType;
+import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.message.repository.AllCampaignMessageAlerts;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

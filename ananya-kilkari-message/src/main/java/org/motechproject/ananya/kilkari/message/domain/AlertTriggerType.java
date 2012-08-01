@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.service;
+package org.motechproject.ananya.kilkari.message.domain;
 
 public enum AlertTriggerType {
 

@@ -1,9 +1,9 @@
-package org.motechproject.ananya.kilkari.obd.repository;
+package org.motechproject.ananya.kilkari.message.repository;
 
 import org.ektorp.CouchDbConnector;
 import org.ektorp.ViewQuery;
 import org.ektorp.support.GenerateView;
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
 import org.motechproject.dao.MotechBaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,7 +15,7 @@ import java.util.List;
 public class AllCampaignMessageAlerts extends MotechBaseRepository<CampaignMessageAlert> {
 
     @Autowired
-    public AllCampaignMessageAlerts(@Qualifier("obdDbConnector") CouchDbConnector db) {
+    public AllCampaignMessageAlerts(@Qualifier("messageDbConnector") CouchDbConnector db) {
         super(CampaignMessageAlert.class, db);
         initStandardDesignDocument();
     }

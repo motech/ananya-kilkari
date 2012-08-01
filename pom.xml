@@ -14,6 +14,7 @@
         <module>ananya-kilkari-service</module>
         <module>ananya-kilkari-smoke</module>
         <module>ananya-kilkari-reporting</module>
+        <module>ananya-kilkari-message</module>
     </modules>
     <name>Ananya Kilkari</name>
     <url>http://www.motechproject.org</url>

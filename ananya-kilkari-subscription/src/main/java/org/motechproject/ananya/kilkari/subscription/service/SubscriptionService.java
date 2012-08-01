@@ -57,8 +57,9 @@ public class SubscriptionService {
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
         subscriptionValidator.validate(subscriptionRequest);
 
-        DateTime creationDate = determineSubscriptionCreationDate(subscriptionRequest);
-        Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), creationDate);
+        DateTime startDate = determineSubscriptionStartDate(subscriptionRequest);
+        Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), subscriptionRequest.getCreationDate());
+        subscription.setStartDate(startDate);
         allSubscriptions.add(subscription);
 
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper();
@@ -70,7 +71,7 @@ public class SubscriptionService {
         return subscription;
     }
 
-    private DateTime determineSubscriptionCreationDate(SubscriptionRequest subscriptionRequest) {
+    private DateTime determineSubscriptionStartDate(SubscriptionRequest subscriptionRequest) {
         DateTime creationDate = subscriptionRequest.getCreationDate();
         SubscriptionPack subscriptionRequestPack = subscriptionRequest.getPack();
 
@@ -224,12 +225,12 @@ public class SubscriptionService {
 
     private void scheduleCampaign(Subscription subscription) {
         MessageCampaignRequest campaignRequest = new MessageCampaignRequest(
-                subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getCreationDate());
+                subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStartDate());
         messageCampaignService.start(campaignRequest);
     }
 
     private void unScheduleCampaign(Subscription subscription) {
-        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getCreationDate());
+        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStartDate());
         messageCampaignService.stop(unEnrollRequest);
         removeScheduledMessagesFromOBD(subscription);
     }

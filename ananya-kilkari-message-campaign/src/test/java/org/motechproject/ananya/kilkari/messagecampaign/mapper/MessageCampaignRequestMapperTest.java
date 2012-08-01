@@ -35,8 +35,8 @@ public class MessageCampaignRequestMapperTest {
 
         assertEquals(messageCampaignRequest.getExternalId(), campaignRequest.externalId());
         assertEquals(MessageCampaignService.TWELVE_MONTHS_CAMPAIGN_KEY, campaignRequest.campaignName());
-        assertEquals(messageCampaignRequest.getSubscriptionCreationDate().plusDays(deltaDays).toLocalDate(), campaignRequest.referenceDate());
-        assertEquals(new Time(messageCampaignRequest.getSubscriptionCreationDate().plusMinutes(deltaMinutes).toLocalTime()), campaignRequest.deliverTime());
-        assertEquals(new Time(messageCampaignRequest.getSubscriptionCreationDate().plusMinutes(deltaMinutes).toLocalTime()), campaignRequest.deliverTime());
+        assertEquals(messageCampaignRequest.getSubscriptionStartDate().plusDays(deltaDays).toLocalDate(), campaignRequest.referenceDate());
+        assertEquals(new Time(messageCampaignRequest.getSubscriptionStartDate().plusMinutes(deltaMinutes).toLocalTime()), campaignRequest.deliverTime());
+        assertEquals(new Time(messageCampaignRequest.getSubscriptionStartDate().plusMinutes(deltaMinutes).toLocalTime()), campaignRequest.deliverTime());
     }
 }

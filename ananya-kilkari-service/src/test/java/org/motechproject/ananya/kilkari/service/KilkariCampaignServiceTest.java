@@ -83,35 +83,38 @@ public class KilkariCampaignServiceTest {
         String msisdn = "1234567890";
         List<SubscriptionResponse> subscriptionResponses = new ArrayList<>();
 
-        SubscriptionResponse subscriptionResponse1 = new SubscriptionBuilder().withDefaults().withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
-        SubscriptionResponse subscriptionResponse2 = new SubscriptionBuilder().withDefaults().withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
+        DateTime now = DateTime.now();
+        DateTime subscriptionStartDate1 = now.plusWeeks(2);
+        DateTime subscriptionStartDate2 = now.plusWeeks(3);
+        SubscriptionResponse subscriptionResponse1 = new SubscriptionBuilder().withDefaults().withCreationDate(now).withStartDate(subscriptionStartDate1).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
+        SubscriptionResponse subscriptionResponse2 = new SubscriptionBuilder().withDefaults().withCreationDate(now).withStartDate(subscriptionStartDate2).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
         subscriptionResponses.add(subscriptionResponse1);
         subscriptionResponses.add(subscriptionResponse2);
 
         List<DateTime> dateTimes = new ArrayList<>();
-        dateTimes.add(DateTime.now());
+        dateTimes.add(now);
 
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptionResponses);
 
         when(messageCampaignService.getMessageTimings(
                 subscriptionResponse1.getSubscriptionId(),
-                subscriptionResponse1.getCreationDate(),
+                subscriptionResponse1.getStartDate(),
                 subscriptionResponse1.endDate())).thenReturn(dateTimes);
         when(messageCampaignService.getMessageTimings(
                 subscriptionResponse2.getSubscriptionId(),
-                subscriptionResponse2.getCreationDate(),
+                subscriptionResponse2.getStartDate(),
                 subscriptionResponse2.endDate())).thenReturn(dateTimes);
 
         Map<String, List<DateTime>> messageTimings = kilkariCampaignService.getMessageTimings(msisdn);
 
         verify(messageCampaignService).getMessageTimings(
                 eq(subscriptionResponse1.getSubscriptionId()),
-                eq(subscriptionResponse1.getCreationDate()),
+                eq(subscriptionResponse1.getStartDate()),
                 eq(subscriptionResponse1.endDate()));
 
         verify(messageCampaignService).getMessageTimings(
                 eq(subscriptionResponse2.getSubscriptionId()),
-                eq(subscriptionResponse2.getCreationDate()),
+                eq(subscriptionResponse2.getStartDate()),
                 eq(subscriptionResponse2.endDate()));
 
         assertThat(messageTimings.size(), is(2));
@@ -385,7 +388,7 @@ public class KilkariCampaignServiceTest {
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(creationDate);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, subscription.getCreationDate(), subscription.getPack())).thenReturn(messageId);
+        when(campaignMessageIdStrategy.createMessageId(campaignName, subscription.getStartDate(), subscription.getPack())).thenReturn(messageId);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 

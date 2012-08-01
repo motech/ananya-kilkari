@@ -35,7 +35,7 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
         markForDeletion(subscription);
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                subscription.getSubscriptionId(), subscriptionPack.name(), subscription.getCreationDate());
+                subscription.getSubscriptionId(), subscriptionPack.name(), subscription.getStartDate());
         messageCampaignService.start(messageCampaignRequest);
 
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()

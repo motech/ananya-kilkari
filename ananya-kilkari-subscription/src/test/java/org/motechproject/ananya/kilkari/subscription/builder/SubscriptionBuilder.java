@@ -12,13 +12,21 @@ public class SubscriptionBuilder {
     private Operator operator;
     private SubscriptionStatus status;
     private DateTime creationDate;
+    private DateTime startDate;
 
     public SubscriptionBuilder withDefaults() {
+        DateTime now = DateTime.now();
         return withMsisdn("9876543210")
                 .withOperator(Operator.AIRTEL)
                 .withStatus(SubscriptionStatus.ACTIVE)
                 .withPack(SubscriptionPack.FIFTEEN_MONTHS)
-                .withCreationDate(DateTime.now());
+                .withCreationDate(now)
+                .withStartDate(now);
+    }
+
+    public SubscriptionBuilder withStartDate(DateTime now) {
+        this.startDate = now;
+        return this;
     }
 
     public SubscriptionBuilder withStatus(SubscriptionStatus status) {
@@ -51,6 +59,7 @@ public class SubscriptionBuilder {
         Subscription subscription = new Subscription(msisdn, pack, creationDate);
         subscription.setStatus(status);
         subscription.setOperator(operator);
+        subscription.setStartDate(startDate);
         return subscription;
     }
 }

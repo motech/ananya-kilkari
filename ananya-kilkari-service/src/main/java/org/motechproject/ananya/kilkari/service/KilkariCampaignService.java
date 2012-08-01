@@ -84,7 +84,7 @@ public class KilkariCampaignService {
 
             List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
                     subscriptionId,
-                    subscriptionResponse.getCreationDate(), subscriptionResponse.endDate());
+                    subscriptionResponse.getStartDate(), subscriptionResponse.endDate());
             campaignMessageMap.put(subscriptionId, messageTimings);
         }
         return campaignMessageMap;

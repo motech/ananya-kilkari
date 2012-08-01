@@ -520,12 +520,12 @@ public class SubscriptionServiceTest {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
         SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
-        DateTime creationDate = DateTime.now();
+        DateTime startDate = DateTime.now().plusWeeks(3);
         CampaignChangeReason campaignChangeReason = CampaignChangeReason.MISCARRIAGE;
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).withCreationDate(creationDate).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).withStartDate(startDate).build();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId, campaignChangeReason, creationDate));
+        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId, campaignChangeReason, startDate));
 
         InOrder order = inOrder(messageCampaignService, campaignMessageService);
         ArgumentCaptor<MessageCampaignRequest> campaignUnEnrollmentRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
@@ -533,7 +533,7 @@ public class SubscriptionServiceTest {
         MessageCampaignRequest campaignRequest = campaignUnEnrollmentRequestArgumentCaptor.getValue();
         assertEquals(subscription.getSubscriptionId(), campaignRequest.getExternalId());
         assertEquals(subscription.getPack().name(), campaignRequest.getSubscriptionPack());
-        assertEquals(subscription.getCreationDate(), campaignRequest.getSubscriptionCreationDate());
+        assertEquals(subscription.getStartDate(), campaignRequest.getSubscriptionStartDate());
         order.verify(campaignMessageService).deleteCampaignMessagesFor(subscription.getSubscriptionId());
 
         ArgumentCaptor<MessageCampaignRequest> campaignEnrollmentRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
@@ -541,7 +541,7 @@ public class SubscriptionServiceTest {
         MessageCampaignRequest campaignEnrollmentRequest = campaignEnrollmentRequestArgumentCaptor.getValue();
         assertEquals(subscriptionId, campaignEnrollmentRequest.getExternalId());
         assertEquals(campaignChangeReason.name(), campaignEnrollmentRequest.getSubscriptionPack());
-        assertEquals(creationDate, campaignEnrollmentRequest.getSubscriptionCreationDate());
+        assertEquals(startDate, campaignEnrollmentRequest.getSubscriptionStartDate());
     }
 
     @Test
@@ -594,7 +594,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldBackDateCreationDateForALateSubscriptionWhenEDDIsGiven() {
+    public void shouldBackDateStartDateForALateSubscriptionWhenEDDIsGiven() {
         DateTime edd = DateTime.now().plusWeeks(1);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.FIFTEEN_MONTHS).withExpectedDateOfDelivery(edd).build();
 
@@ -603,11 +603,11 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        Assert.assertEquals(edd.minusMonths(3), subscriptionArgumentCaptorValue.getCreationDate());
+        Assert.assertEquals(edd.minusMonths(3), subscriptionArgumentCaptorValue.getStartDate());
     }
 
     @Test
-    public void shouldBackDateCreationDateForALateSubscriptionWhenDOBIsGivenForFifteenMonthsPack() {
+    public void shouldBackDateStartDateForALateSubscriptionWhenDOBIsGivenForFifteenMonthsPack() {
         DateTime dob = DateTime.now().minusMonths(1);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.FIFTEEN_MONTHS).withDateOfBirth(dob).build();
 
@@ -616,12 +616,12 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        Assert.assertEquals(dob.minusMonths(3), subscriptionArgumentCaptorValue.getCreationDate());
+        Assert.assertEquals(dob.minusMonths(3), subscriptionArgumentCaptorValue.getStartDate());
 
     }
 
     @Test
-    public void shouldBackDateCreationDateForALateSubscriptionWhenDOBIsGivenForTwelveMonthsPack() {
+    public void shouldBackDateStartDateForALateSubscriptionWhenDOBIsGivenForTwelveMonthsPack() {
         DateTime dob = DateTime.now().minusMonths(1);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).withDateOfBirth(dob).build();
 
@@ -630,12 +630,12 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        Assert.assertEquals(dob, subscriptionArgumentCaptorValue.getCreationDate());
+        Assert.assertEquals(dob, subscriptionArgumentCaptorValue.getStartDate());
 
     }
 
     @Test
-    public void shouldBackDateCreationDateForALateSubscriptionWhenDOBIsGivenForSevenMonthsPack() {
+    public void shouldBackDateStartDateForALateSubscriptionWhenDOBIsGivenForSevenMonthsPack() {
         DateTime dob = DateTime.now().minusMonths(1);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withDateOfBirth(dob).build();
 
@@ -644,12 +644,12 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        Assert.assertEquals(dob.plusMonths(5), subscriptionArgumentCaptorValue.getCreationDate());
+        Assert.assertEquals(dob.plusMonths(5), subscriptionArgumentCaptorValue.getStartDate());
 
     }
 
     @Test
-    public void shouldBackDateCreationDateForALateSubscriptionWhenWeekNumberIsGivenForSevenMonthsPack() {
+    public void shouldBackDateStartDateForALateSubscriptionWhenWeekNumberIsGivenForSevenMonthsPack() {
         Integer weekNumber = 40;
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(weekNumber).build();
 
@@ -658,12 +658,12 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        Assert.assertEquals(subscriptionRequest.getCreationDate().minusWeeks(7), subscriptionArgumentCaptorValue.getCreationDate());
+        Assert.assertEquals(subscriptionRequest.getCreationDate().minusWeeks(7), subscriptionArgumentCaptorValue.getStartDate());
 
     }
 
     @Test
-    public void shouldFutureDateCreationDateForAnEarlySubscriptionWhenEDDIsGivenForFifteenMonths() {
+    public void shouldSetDateForAnEarlySubscriptionWhenEDDIsGivenForFifteenMonths() {
         DateTime now = DateTime.now();
         DateTime edd = now.plusMonths(4);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.FIFTEEN_MONTHS).withExpectedDateOfDelivery(edd).build();
@@ -673,11 +673,11 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        Assert.assertEquals(edd.minusMonths(3), subscriptionArgumentCaptorValue.getCreationDate());
+        Assert.assertEquals(edd.minusMonths(3), subscriptionArgumentCaptorValue.getStartDate());
     }
 
     @Test
-    public void shouldFutureDateCreationDateForAnEarlySubscriptionWhenEDDIsGivenForTwelveMonths() {
+    public void shouldSetDateForAnEarlySubscriptionWhenEDDIsGivenForTwelveMonths() {
         DateTime now = DateTime.now();
         DateTime edd = now.plusMonths(4);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).withExpectedDateOfDelivery(edd).build();
@@ -687,11 +687,11 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        Assert.assertEquals(edd, subscriptionArgumentCaptorValue.getCreationDate());
+        Assert.assertEquals(edd, subscriptionArgumentCaptorValue.getStartDate());
     }
 
     @Test
-    public void shouldFutureDateCreationDateForAnEarlySubscriptionWhenEDDIsGivenForSevenMonths() {
+    public void shouldSetDateForAnEarlySubscriptionWhenEDDIsGivenForSevenMonths() {
         DateTime now = DateTime.now();
         DateTime edd = now.plusMonths(4);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withExpectedDateOfDelivery(edd).build();
@@ -701,11 +701,11 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        Assert.assertEquals(edd.plusMonths(5), subscriptionArgumentCaptorValue.getCreationDate());
+        Assert.assertEquals(edd.plusMonths(5), subscriptionArgumentCaptorValue.getStartDate());
     }
 
     @Test
-    public void shouldFutureDateCreationDateForAnEarlySubscriptionWhenDOBIsGivenForTwelveMonths() {
+    public void shouldSetDateForAnEarlySubscriptionWhenDOBIsGivenForTwelveMonths() {
         DateTime dob = DateTime.now().plusMonths(3);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).withDateOfBirth(dob).build();
 
@@ -714,12 +714,12 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        Assert.assertEquals(dob, subscriptionArgumentCaptorValue.getCreationDate());
+        Assert.assertEquals(dob, subscriptionArgumentCaptorValue.getStartDate());
 
     }
 
     @Test
-    public void shouldFutureDateCreationDateForAnEarlySubscriptionWhenDOBIsGivenForSevenMonths() {
+    public void shouldSetDateForAnEarlySubscriptionWhenDOBIsGivenForSevenMonths() {
         DateTime dob = DateTime.now().plusMonths(3);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withDateOfBirth(dob).build();
 
@@ -728,7 +728,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        Assert.assertEquals(dob.plusMonths(5), subscriptionArgumentCaptorValue.getCreationDate());
+        Assert.assertEquals(dob.plusMonths(5), subscriptionArgumentCaptorValue.getStartDate());
 
     }
 }

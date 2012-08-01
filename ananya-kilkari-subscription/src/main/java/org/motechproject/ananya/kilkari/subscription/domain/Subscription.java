@@ -35,6 +35,9 @@ public class Subscription extends MotechBaseDataObject implements SubscriptionRe
     @JsonProperty
     private SubscriptionPack pack;
 
+    @JsonProperty
+    private DateTime startDate;
+
     public Subscription() {
     }
 
@@ -42,6 +45,7 @@ public class Subscription extends MotechBaseDataObject implements SubscriptionRe
         this.pack = pack;
         this.msisdn = PhoneNumber.formatPhoneNumberTo10Digits(msisdn).toString();
         this.creationDate = createdAt;
+        this.startDate = creationDate;
         this.status = SubscriptionStatus.NEW;
         this.subscriptionId = UUID.randomUUID().toString();
     }
@@ -78,6 +82,15 @@ public class Subscription extends MotechBaseDataObject implements SubscriptionRe
         this.operator = operator;
     }
 
+    public DateTime getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(DateTime startDate) {
+        this.startDate = startDate;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -91,7 +104,6 @@ public class Subscription extends MotechBaseDataObject implements SubscriptionRe
                 .append(this.operator, that.operator)
                 .isEquals();
     }
-
 
     @Override
     public int hashCode() {
@@ -110,6 +122,7 @@ public class Subscription extends MotechBaseDataObject implements SubscriptionRe
                 .append(this.pack)
                 .append(this.status)
                 .append(this.creationDate)
+                .append(this.startDate)
                 .toString();
     }
 
@@ -160,7 +173,7 @@ public class Subscription extends MotechBaseDataObject implements SubscriptionRe
     }
 
     public DateTime endDate() {
-        return getCreationDate().plusWeeks(getPack().getTotalWeeks());
+        return getStartDate().plusWeeks(getPack().getTotalWeeks());
     }
 
     @JsonIgnore
@@ -169,11 +182,11 @@ public class Subscription extends MotechBaseDataObject implements SubscriptionRe
     }
 
     public DateTime currentWeeksMessageExpiryDate() {
-        return getCreationDate().plusWeeks(getWeeksElapsedAfterCreationDate() + 1);
+        return getStartDate().plusWeeks(getWeeksElapsedAfterStartDate() + 1);
     }
 
-    private int getWeeksElapsedAfterCreationDate() {
-        return Weeks.weeksBetween(getCreationDate(), DateTime.now()).getWeeks();
+    private int getWeeksElapsedAfterStartDate() {
+        return Weeks.weeksBetween(getStartDate(), DateTime.now()).getWeeks();
     }
 
     public boolean hasBeenActivated() {

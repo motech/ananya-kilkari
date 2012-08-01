@@ -25,7 +25,7 @@ public class CampaignMessageIdStrategy {
     }
 
     public int getWeekNumber(DateTime campaignStartDate, String campaignName, SubscriptionPack pack) {
-        int weeksDifference = getWeeksElapsedAfterCampaignCreationDate(campaignStartDate);
+        int weeksDifference = getWeeksElapsedAfterCampaignStartDate(campaignStartDate);
         return weeksDifference + getPackStartingWeek(campaignName, pack) + 1;
     }
 
@@ -35,7 +35,7 @@ public class CampaignMessageIdStrategy {
         return 0;
     }
 
-    private int getWeeksElapsedAfterCampaignCreationDate(DateTime campaignStartDate) {
+    private int getWeeksElapsedAfterCampaignStartDate(DateTime campaignStartDate) {
         return Weeks.weeksBetween(campaignStartDate, DateTime.now()).getWeeks();
     }
 }

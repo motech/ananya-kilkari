@@ -46,9 +46,9 @@ public class MessageCampaignServiceTest {
     public void shouldStartNewCampaignForTheGivenRequest() {
         String externalId = "externalId";
         String subscriptionPack = MessageCampaignPack.TWELVE_MONTHS.name();
-        DateTime subscriptionCreationDate = DateTime.now();
+        DateTime subscriptionStartDate = DateTime.now();
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                externalId, subscriptionPack, subscriptionCreationDate);
+                externalId, subscriptionPack, subscriptionStartDate);
 
         this.messageCampaignService.start(messageCampaignRequest);
 
@@ -58,17 +58,17 @@ public class MessageCampaignServiceTest {
 
         assertEquals(externalId, campaignRequest.externalId());
         assertEquals(MessageCampaignPack.TWELVE_MONTHS.getCampaignName(), campaignRequest.campaignName());
-        assertEquals(subscriptionCreationDate.toLocalDate(), campaignRequest.referenceDate());
-        assertEquals(new Time(subscriptionCreationDate.toLocalTime()), campaignRequest.deliverTime());
+        assertEquals(subscriptionStartDate.toLocalDate(), campaignRequest.referenceDate());
+        assertEquals(new Time(subscriptionStartDate.toLocalTime()), campaignRequest.deliverTime());
     }
 
     @Test
     public void shouldStop() {
         String externalId = "externalId";
         String subscriptionPack = MessageCampaignPack.TWELVE_MONTHS.name();
-        DateTime subscriptionCreationDate = DateTime.now();
+        DateTime subscriptionStartDate = DateTime.now();
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                externalId, subscriptionPack, subscriptionCreationDate);
+                externalId, subscriptionPack, subscriptionStartDate);
 
         this.messageCampaignService.stop(messageCampaignRequest);
 
@@ -78,8 +78,8 @@ public class MessageCampaignServiceTest {
 
         assertEquals(externalId, campaignRequest.externalId());
         assertEquals(MessageCampaignPack.TWELVE_MONTHS.getCampaignName(), campaignRequest.campaignName());
-        assertEquals(subscriptionCreationDate.toLocalDate(), campaignRequest.referenceDate());
-        assertEquals(new Time(subscriptionCreationDate.toLocalTime()), campaignRequest.deliverTime());
+        assertEquals(subscriptionStartDate.toLocalDate(), campaignRequest.referenceDate());
+        assertEquals(new Time(subscriptionStartDate.toLocalTime()), campaignRequest.deliverTime());
     }
 
     @Test

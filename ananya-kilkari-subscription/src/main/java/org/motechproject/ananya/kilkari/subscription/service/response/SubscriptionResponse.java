@@ -19,4 +19,5 @@ public interface SubscriptionResponse {
     boolean hasBeenActivated();
     boolean isInDeactivatedState();
     boolean isInProgress();
+    DateTime getStartDate();
 }

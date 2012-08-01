@@ -11,8 +11,8 @@ public class MessageCampaignRequestMapper {
 
     public static CampaignRequest newRequestFrom(MessageCampaignRequest messageCampaignRequest, KilkariPropertiesData kilkariProperties) {
         String campaignName = MessageCampaignPack.from(messageCampaignRequest.getSubscriptionPack()).getCampaignName();
-        Time reminderTime = new Time(messageCampaignRequest.getSubscriptionCreationDate().plusMinutes(kilkariProperties.getCampaignScheduleDeltaMinutes()).toLocalTime());
-        DateTime referenceDate = messageCampaignRequest.getSubscriptionCreationDate();
+        Time reminderTime = new Time(messageCampaignRequest.getSubscriptionStartDate().plusMinutes(kilkariProperties.getCampaignScheduleDeltaMinutes()).toLocalTime());
+        DateTime referenceDate = messageCampaignRequest.getSubscriptionStartDate();
 
         LocalDate referenceDateWithDelta = referenceDate.plusDays(kilkariProperties.getCampaignScheduleDeltaDays()).toLocalDate();
         CampaignRequest campaignRequest = new CampaignRequest(messageCampaignRequest.getExternalId(), campaignName, referenceDateWithDelta, reminderTime);

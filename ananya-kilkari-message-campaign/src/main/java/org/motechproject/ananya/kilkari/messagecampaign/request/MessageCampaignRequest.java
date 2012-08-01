@@ -8,12 +8,12 @@ public class MessageCampaignRequest {
 
     private String externalId;
     private String subscriptionPack;
-    private DateTime subscriptionCreationDate;
+    private DateTime subscriptionStartDate;
 
-    public MessageCampaignRequest(String externalId, String subscriptionPack, DateTime subscriptionCreationDate) {
+    public MessageCampaignRequest(String externalId, String subscriptionPack, DateTime subscriptionStartDate) {
         this.externalId = externalId;
         this.subscriptionPack = subscriptionPack;
-        this.subscriptionCreationDate = subscriptionCreationDate;
+        this.subscriptionStartDate = subscriptionStartDate;
     }
 
     public String getExternalId() {
@@ -24,8 +24,8 @@ public class MessageCampaignRequest {
         return subscriptionPack;
     }
 
-    public DateTime getSubscriptionCreationDate() {
-        return subscriptionCreationDate;
+    public DateTime getSubscriptionStartDate() {
+        return subscriptionStartDate;
     }
 
     @Override

@@ -95,12 +95,27 @@ public class SubscriptionWebRequestTest {
     }
 
     @Test
-    public void shouldAddErrorWhenBothEDDAndDOBGivenToCreateNewSubscription() {
-        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withDOB("01-01-2012").withEDD("31-12-2012").build();
+    public void shouldAddErrorWhenMoreThanOneOfEddDobOrWeekNumberIsGivenToCreateNewSubscription() {
+        SubscriptionWebRequest subscriptionWebRequestWithDobEdd = new SubscriptionWebRequestBuilder().withDefaults().withDOB("01-01-2012").withEDD("31-12-2012").build();
+        SubscriptionWebRequest subscriptionWebRequestWithEddWeek = new SubscriptionWebRequestBuilder().withDefaults().withWeek("4").withEDD("31-12-2012").build();
+        SubscriptionWebRequest subscriptionWebRequestWithDobWeek = new SubscriptionWebRequestBuilder().withDefaults().withWeek("4").withDOB("31-12-2011").build();
+        SubscriptionWebRequest subscriptionWebRequestWithDobEddWeek = new SubscriptionWebRequestBuilder().withDefaults().withWeek("4").withDOB("31-12-2011").withEDD("31-12-2012").build();
 
-        subscriptionWebRequest.validate(errors);
+        errors = new Errors();
+        subscriptionWebRequestWithDobEdd.validate(errors);
+        validateErrors(1, "Invalid request. Only one of date of delivery, date of birth and week number should be present");
 
-        validateErrors(1, "Invalid request. Both expected date of delivery and date of birth present");
+        errors = new Errors();
+        subscriptionWebRequestWithEddWeek.validate(errors);
+        validateErrors(1, "Invalid request. Only one of date of delivery, date of birth and week number should be present");
+
+        errors = new Errors();
+        subscriptionWebRequestWithDobWeek.validate(errors);
+        validateErrors(1, "Invalid request. Only one of date of delivery, date of birth and week number should be present");
+
+        errors = new Errors();
+        subscriptionWebRequestWithDobEddWeek.validate(errors);
+        validateErrors(1, "Invalid request. Only one of date of delivery, date of birth and week number should be present");
     }
 
     @Test

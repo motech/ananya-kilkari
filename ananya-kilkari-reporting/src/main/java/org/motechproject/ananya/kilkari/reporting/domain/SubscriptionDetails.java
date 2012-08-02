@@ -13,15 +13,18 @@ public class SubscriptionDetails {
 
     private String pack;
 
+    private DateTime startDate;
+
     public SubscriptionDetails() {
     }
 
-    public SubscriptionDetails(String msisdn, String pack, DateTime createdAt, String status, String subscriptionId) {
+    public SubscriptionDetails(String msisdn, String pack, DateTime createdAt, String status, String subscriptionId, DateTime startDate) {
         this.pack = pack;
         this.msisdn = msisdn;
         this.creationDate = createdAt;
         this.status = status;
         this.subscriptionId = subscriptionId;
+        this.startDate = startDate;
     }
 
     public String getMsisdn() {
@@ -42,5 +45,9 @@ public class SubscriptionDetails {
 
     public String getPack() {
         return pack;
+    }
+
+    public DateTime getStartDate() {
+        return startDate;
     }
 }

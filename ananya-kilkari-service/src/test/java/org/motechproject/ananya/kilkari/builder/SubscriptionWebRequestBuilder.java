@@ -24,7 +24,7 @@ public class SubscriptionWebRequestBuilder {
         subscriptionWebRequest.setBlock("block");
         subscriptionWebRequest.setPanchayat("panchayat");
         subscriptionWebRequest.setDateOfBirth(null);
-        subscriptionWebRequest.setExpectedDateOfDelivery(DateTime.now().plusDays(30).toString("dd-MM-yyyy"));
+        subscriptionWebRequest.setExpectedDateOfDelivery(null);
         subscriptionWebRequest.setCreatedAt(DateTime.now());
         return this;
     }

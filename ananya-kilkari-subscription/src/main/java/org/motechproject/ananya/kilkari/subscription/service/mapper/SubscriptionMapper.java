@@ -17,7 +17,7 @@ public class SubscriptionMapper {
 
     public SubscriptionCreationReportRequest createSubscriptionCreationReportRequest(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription, Channel channel, Location location, Subscriber subscriber) {
         SubscriptionDetails subscriptionDetails = new SubscriptionDetails(subscription.getMsisdn(), subscription.getPack().name(),
-                subscription.getCreationDate(), subscription.getStatus().name(), subscription.getSubscriptionId());
+                subscription.getCreationDate(), subscription.getStatus().name(), subscription.getSubscriptionId(), subscription.getStartDate());
 
         SubscriberLocation subscriberLocation = new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
 

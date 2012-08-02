@@ -22,6 +22,8 @@ public class SubscriptionCreationReportRequest extends SubscriptionBaseReportReq
 
     private SubscriberLocation location;
 
+    private DateTime startDate;
+
     public SubscriptionCreationReportRequest(SubscriptionDetails subscriptionDetails, String channel, Integer ageOfBeneficiary, String name, DateTime dob, DateTime edd, SubscriberLocation location) {
         super(subscriptionDetails.getSubscriptionId(), subscriptionDetails.getStatus(), subscriptionDetails.getCreationDate());
         this.name = name;
@@ -32,6 +34,7 @@ public class SubscriptionCreationReportRequest extends SubscriptionBaseReportReq
         this.dob = dob;
         this.edd = edd;
         this.location = location;
+        this.startDate = subscriptionDetails.getStartDate();
     }
 
     public String getChannel() {
@@ -66,10 +69,13 @@ public class SubscriptionCreationReportRequest extends SubscriptionBaseReportReq
         return location;
     }
 
+    public DateTime getStartDate() {
+        return startDate;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                 .append("channel", channel).toString();
     }
-
 }

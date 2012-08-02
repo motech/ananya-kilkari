@@ -78,10 +78,10 @@ public class SubscriptionService {
         OMSubscriptionRequest omSubscriptionRequest = subscriptionMapper.createOMSubscriptionRequest(subscription, channel);
         if (startDate.isAfter(subscriptionRequest.getCreationDate())) {
             scheduleEarlySubscription(startDate, omSubscriptionRequest);
-            return subscription;
         }
+        else
+            initiateActivationRequest(omSubscriptionRequest);
 
-        initiateActivationRequest(omSubscriptionRequest);
         reportingService.reportSubscriptionCreation(
                 subscriptionMapper.createSubscriptionCreationReportRequest(subscription, channel, subscriptionRequest.getLocation(), subscriptionRequest.getSubscriber()));
 

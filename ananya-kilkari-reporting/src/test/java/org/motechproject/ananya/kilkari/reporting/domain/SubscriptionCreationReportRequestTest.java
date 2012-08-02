@@ -9,7 +9,8 @@ public class SubscriptionCreationReportRequestTest {
 
     @Test
     public void shouldCreateASubscriptionReportRequest() {
-        SubscriptionDetails subscriptionDetails = new SubscriptionDetails("msisdn", "FIFTEEN_MONTHS", DateTime.now(), "PENDING_ACTIVATION", "subscriptionID");
+        DateTime startDate = DateTime.now().plusDays(5);
+        SubscriptionDetails subscriptionDetails = new SubscriptionDetails("msisdn", "FIFTEEN_MONTHS", DateTime.now(), "PENDING_ACTIVATION", "subscriptionID", startDate);
 
         DateTime edd = DateTime.now().plusMonths(9);
         DateTime dob = DateTime.now().minusMonths(10);
@@ -30,5 +31,6 @@ public class SubscriptionCreationReportRequestTest {
         assertEquals(subscriptionDetails.getCreationDate(), subscriptionCreationReportRequest.getCreatedAt());
         assertEquals(name, subscriptionCreationReportRequest.getName());
         assertEquals("PENDING_ACTIVATION", subscriptionCreationReportRequest.getSubscriptionStatus());
+        assertEquals(startDate, subscriptionCreationReportRequest.getStartDate());
     }
 }

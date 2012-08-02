@@ -23,7 +23,8 @@ public class SubscriptionMapperTest {
     @Before
     public void setUp() throws Exception {
         subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890")
-                .withPack(SubscriptionPack.SEVEN_MONTHS).withCreationDate(DateTime.now()).build();
+                .withPack(SubscriptionPack.SEVEN_MONTHS).withCreationDate(DateTime.now())
+                .withStartDate(DateTime.now()).build();
         channel = Channel.IVR;
     }
 
@@ -44,6 +45,7 @@ public class SubscriptionMapperTest {
         assertEquals(subscription.getMsisdn(), request.getMsisdn());
         assertEquals(subscription.getPack().name(), request.getPack());
         assertEquals(subscription.getSubscriptionId(), request.getSubscriptionId());
+        assertEquals(subscription.getStartDate(), request.getStartDate());
         assertEquals(channel.name(), request.getChannel());
     }
 

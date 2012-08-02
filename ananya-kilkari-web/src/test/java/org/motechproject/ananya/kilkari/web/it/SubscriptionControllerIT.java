@@ -26,6 +26,7 @@ import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
+import org.motechproject.scheduler.MotechSchedulerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.server.MvcResult;
@@ -59,6 +60,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
     @Autowired
     private SubscriptionDetailsMapper subscriptionDetailsMapper;
+
+    @Autowired
+    private MotechSchedulerService motechSchedulerService;
 
     @Before
     public void setUp() {
@@ -179,6 +183,46 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(pack, subscription.getPack());
         assertFalse(StringUtils.isBlank(subscription.getSubscriptionId()));
     }
+
+    @Test
+    public void shouldCreateAndScheduleAnEarlySubscription() throws Exception {
+        final String msisdn = "9876543210";
+        final String channelString = Channel.CALL_CENTER.toString();
+        final SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
+        DateTime now = DateTime.now();
+        DateTime edd = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0).plusMonths(4);
+        DateTime expectedStartDate = SubscriptionPack.FIFTEEN_MONTHS.adjustStartDate(edd);
+        BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
+
+        ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
+        reportingService.setBehavior(mockedReportingService);
+
+        SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withEDD(edd.toString("dd-MM-yyyy")).withCreatedAt(now).build();
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(post("/subscription").body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andReturn();
+
+        String responseString = result.getResponse().getContentAsString();
+        responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
+
+        BaseResponse actualResponse = TestUtils.fromJson(responseString, BaseResponse.class);
+        assertEquals(expectedResponse, actualResponse);
+
+        Subscription subscription = allSubscriptions.findSubscriptionInProgress(msisdn, pack);
+
+        assertNotNull(subscription);
+        markForDeletion(subscription);
+        assertEquals(msisdn, subscription.getMsisdn());
+        assertEquals(pack, subscription.getPack());
+        assertEquals(expectedStartDate.getMillis(), subscription.getStartDate().getMillis());
+        assertFalse(StringUtils.isBlank(subscription.getSubscriptionId()));
+
+        // TODO: Fetch job timings and assert
+    }
+
 
     @Test
     public void shouldDeactivateSubscriptionForTheGivenMsisdnForTheCallCentreChannel() throws Exception {

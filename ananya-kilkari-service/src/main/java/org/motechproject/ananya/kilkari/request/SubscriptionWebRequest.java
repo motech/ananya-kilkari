@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.request;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -14,6 +16,8 @@ import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 import org.motechproject.common.domain.PhoneNumber;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SubscriptionWebRequest implements Serializable {
     @JsonProperty
@@ -161,17 +165,29 @@ public class SubscriptionWebRequest implements Serializable {
         validateChannel(errors);
         if (!Channel.isIVR(channel)) {
             validateAge(errors);
-            validateOnlyOneOfEDDOrDOBPresent(errors);
+            validateOnlyOneOfEDDOrDOBOrWeekNumberPresent(errors);
             validateDOB(errors);
             validateEDD(errors);
             validateWeekNumber(errors);
         }
     }
 
-    private void validateOnlyOneOfEDDOrDOBPresent(Errors errors) {
-        if(StringUtils.isNotEmpty(expectedDateOfDelivery)&& StringUtils.isNotEmpty(dateOfBirth))
-            errors.add("Invalid request. Both expected date of delivery and date of birth present");
+    private void validateOnlyOneOfEDDOrDOBOrWeekNumberPresent(Errors errors) {
+        List<Boolean> checks = new ArrayList<>();
+        checks.add(StringUtils.isNotEmpty(expectedDateOfDelivery));
+        checks.add(StringUtils.isNotEmpty(dateOfBirth));
+        checks.add(StringUtils.isNotEmpty(week));
 
+        int numberOfOptions = CollectionUtils.countMatches(checks, new Predicate() {
+            @Override
+            public boolean evaluate(Object o) {
+                return (Boolean)o;
+            }
+        });
+
+        if (numberOfOptions > 1) {
+            errors.add("Invalid request. Only one of date of delivery, date of birth and week number should be present");
+        }
     }
 
     private void validateWeekNumber(Errors errors) {

@@ -821,9 +821,18 @@ public class SubscriptionServiceTest {
 
         ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
         verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
+        ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionCreationReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
+        verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionCreationReportRequestArgumentCaptor.capture());
+
         RunOnceSchedulableJob runOnceSchedulableJobArgumentCaptorValue = runOnceSchedulableJobArgumentCaptor.getValue();
         assertEquals(dob.toDate(), runOnceSchedulableJobArgumentCaptorValue.getStartDate());
+        assertEquals(SubscriptionEventKeys.EARLY_SUBSCRIPTION, runOnceSchedulableJobArgumentCaptorValue.getMotechEvent().getSubject());
         assertEquals(OMSubscriptionRequest.class, runOnceSchedulableJobArgumentCaptorValue.getMotechEvent().getParameters().get("0").getClass());
+
+        SubscriptionCreationReportRequest subscriptionCreationReportRequest = subscriptionCreationReportRequestArgumentCaptor.getValue();
+        assertEquals(subscriptionRequest.getMsisdn(),subscriptionCreationReportRequest.getMsisdn());
+        assertEquals(subscriptionRequest.getPack().toString(),subscriptionCreationReportRequest.getPack());
+        assertEquals(subscriptionRequest.getSubscriber().getDateOfBirth(),subscriptionCreationReportRequest.getDob());
     }
 
     private DateTime nextFriday(DateTime rescheduleRequestedDate) {

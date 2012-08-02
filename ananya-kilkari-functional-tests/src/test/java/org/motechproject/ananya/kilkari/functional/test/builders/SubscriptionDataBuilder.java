@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.functional.test.utils;
+package org.motechproject.ananya.kilkari.functional.test.builders;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.joda.time.DateTime;

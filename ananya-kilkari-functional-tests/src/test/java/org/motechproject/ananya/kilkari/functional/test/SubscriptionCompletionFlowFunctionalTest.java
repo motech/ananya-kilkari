@@ -2,16 +2,15 @@ package org.motechproject.ananya.kilkari.functional.test;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.functional.test.builders.SubscriptionDataBuilder;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.functional.test.utils.SpringIntegrationTest;
-import org.motechproject.ananya.kilkari.functional.test.utils.SubscriptionDataBuilder;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class SubscriptionCompletionFlowFunctionalTest extends SpringIntegrationTest {
+import static org.motechproject.ananya.kilkari.functional.test.Actions.*;
 
-    @Autowired
-    private FlowSystem flowSystem;
+public class SubscriptionCompletionFlowFunctionalTest extends SpringIntegrationTest {
 
     @Autowired
     private KilkariPropertiesData kilkariProperties;
@@ -26,14 +25,15 @@ public class SubscriptionCompletionFlowFunctionalTest extends SpringIntegrationT
 
         SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
 
-        flowSystem.subscribe(subscriptionData).
-                activate(subscriptionData).
-                moveToFutureTime(futureDateForFirstCampaignAlertToBeRaised).
-                verifyCampaignMessageInOBD(subscriptionData, "WEEK1").
-                renew(subscriptionData).
-                moveToFutureTime(futureDateOfSecondCampaignAlert).
-                verifyCampaignMessageInOBD(subscriptionData, "WEEK2").
-                moveToFutureTime(futureDateOfPackCompletion.plusWeeks(1)).
-                verifyPackCompletion(subscriptionData);
+        when(ivr).subscribes(subscriptionData);
+        and(subscriptionManager).activates(subscriptionData);
+        and(time).isMovedToFuture(futureDateForFirstCampaignAlertToBeRaised);
+        then(campaignMessageVerifier).verifyCampaignMessageExists(subscriptionData, "WEEK1");
+        when(subscriptionManager).renews(subscriptionData);
+        and(time).isMovedToFuture(futureDateOfSecondCampaignAlert);
+        then(campaignMessageVerifier).verifyCampaignMessageExists(subscriptionData, "WEEK2");
+//        and(time).isMovedToFuture(futureDateOfPackCompletion.plusWeeks(1));
+//        then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
     }
 }
+

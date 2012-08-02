@@ -5,6 +5,11 @@ import org.ektorp.CouchDbConnector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.motechproject.ananya.kilkari.functional.test.domain.Ivr;
+import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionManager;
+import org.motechproject.ananya.kilkari.functional.test.domain.Time;
+import org.motechproject.ananya.kilkari.functional.test.verifiers.CampaignMessageVerifier;
+import org.motechproject.ananya.kilkari.functional.test.verifiers.SubscriptionVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,6 +28,17 @@ public abstract class SpringIntegrationTest {
     protected CouchDbConnector kilkariDbConnector;
 
     protected ArrayList<BulkDeleteDocument> toDelete;
+
+    @Autowired
+    protected Ivr ivr;
+    @Autowired
+    protected SubscriptionManager subscriptionManager;
+    @Autowired
+    protected Time time;
+    @Autowired
+    protected CampaignMessageVerifier campaignMessageVerifier;
+    @Autowired
+    protected SubscriptionVerifier subscriptionVerifier;
 
     @Before
     public void before() {

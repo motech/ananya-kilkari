@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ananya-kilkari-functional-test</artifactId>
+    <artifactId>ananya-kilkari-functional-tests</artifactId>
 
     <build>
         <plugins>

@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.functional.test.utils;
+package org.motechproject.ananya.kilkari.functional.test.verifiers;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;

@@ -33,11 +33,12 @@ public class SubscriberDetailsValidatorTest {
 
         Errors errors = subscriberDetailsValidator.validate(subscriberWebRequest);
 
-        assertEquals(4, errors.getCount());
+        assertEquals(5, errors.getCount());
         assertTrue(errors.hasMessage("Invalid channel ivr"));
         assertTrue(errors.hasMessage("Invalid beneficiary age 23a"));
         assertTrue(errors.hasMessage("Invalid date of birth 20/10/1985"));
         assertTrue(errors.hasMessage("Invalid expected date of delivery " + edd));
+        assertTrue(errors.hasMessage("Invalid request. Only one of date of delivery, date of birth should be present"));
     }
 
     private String getDate(Date date) {

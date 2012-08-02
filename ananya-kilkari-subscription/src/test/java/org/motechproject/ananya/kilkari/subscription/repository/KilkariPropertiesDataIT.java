@@ -18,7 +18,7 @@ public class KilkariPropertiesDataIT {
     private KilkariPropertiesData kilkariProperties;
     @Test
     public void shouldBeAbleToLoadThePropertiesFromTheKilkariPropertiesFile(){
-        assertEquals(3,kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion());
+        assertEquals(0,kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion());
         assertEquals(2,kilkariProperties.getCampaignScheduleDeltaDays());
         assertEquals(30,kilkariProperties.getCampaignScheduleDeltaMinutes());
 

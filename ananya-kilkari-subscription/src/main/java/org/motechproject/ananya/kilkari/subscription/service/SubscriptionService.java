@@ -244,11 +244,12 @@ public class SubscriptionService {
     public void rescheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
         String subscriptionId = campaignRescheduleRequest.getSubscriptionId();
         subscriptionValidator.validateActiveSubscriptionExists(subscriptionId);
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        DateTime existingActiveCampaignStartDate = messageCampaignService.getActiveCampaignStartDate(subscriptionId);
 
         unScheduleCampaign(subscription);
         removeScheduledMessagesFromOBD(subscriptionId);
-        scheduleCampaign(campaignRescheduleRequest);
+        scheduleCampaign(campaignRescheduleRequest, existingActiveCampaignStartDate);
     }
 
     public void updateSubscriberDetails(SubscriberUpdateRequest request) {
@@ -264,8 +265,7 @@ public class SubscriptionService {
         messageCampaignService.stop(unEnrollRequest);
     }
 
-    private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
-        DateTime existingCampaignStartDate = messageCampaignService.getActiveCampaignStartDate(campaignRescheduleRequest.getSubscriptionId());
+    private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest, DateTime existingCampaignStartDate) {
         DateTime newCampaignStartDate = getNewCampaignStartDate(existingCampaignStartDate, campaignRescheduleRequest.getCreatedAt());
 
         MessageCampaignRequest enrollRequest = new MessageCampaignRequest(campaignRescheduleRequest.getSubscriptionId(),

@@ -302,4 +302,14 @@ public class CampaignMessageAlertServiceTest {
         CampaignMessageAlert campaignMessageAlert = campaignMessageAlertArgumentCaptor.getValue();
         assertNull(campaignMessageAlert.getMessageId());
     }
+
+    @Test
+    public void shouldNotClearMessageIdIfThereAreNoAlerts() {
+        String subscriptionId = "subscriptionId";
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(null);
+
+        campaignMessageAlertService.clearMessageId(subscriptionId);
+
+        verify(allCampaignMessageAlerts, never()).update(any(CampaignMessageAlert.class));
+    }
 }

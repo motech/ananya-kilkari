@@ -46,8 +46,10 @@ public class CampaignMessageAlertService {
 
     public void clearMessageId(String subscriptionId) {
         CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
-        campaignMessageAlert.clearMessageId();
-        allCampaignMessageAlerts.update(campaignMessageAlert);
+        if(campaignMessageAlert != null) {
+            campaignMessageAlert.clearMessageId();
+            allCampaignMessageAlerts.update(campaignMessageAlert);
+        }
     }
 
     private String scheduleCampaignMessageAlert(String subscriptionId, String msisdn, String operator, AlertTriggerType alertTriggerType) {

@@ -41,7 +41,8 @@ import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -551,6 +552,7 @@ public class SubscriptionServiceTest {
         subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId, campaignChangeReason, rescheduleRequestedDate));
 
         InOrder order = inOrder(messageCampaignService, campaignMessageService, campaignMessageAlertService);
+        order.verify(messageCampaignService).getActiveCampaignStartDate(subscriptionId);
         ArgumentCaptor<MessageCampaignRequest> campaignUnEnrollmentRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
         order.verify(messageCampaignService).stop(campaignUnEnrollmentRequestArgumentCaptor.capture());
         MessageCampaignRequest campaignRequest = campaignUnEnrollmentRequestArgumentCaptor.getValue();
@@ -561,7 +563,6 @@ public class SubscriptionServiceTest {
         order.verify(campaignMessageService).deleteCampaignMessagesFor(subscriptionId);
         order.verify(campaignMessageAlertService).clearMessageId(subscriptionId);
 
-        order.verify(messageCampaignService).getActiveCampaignStartDate(subscriptionId);
         ArgumentCaptor<MessageCampaignRequest> campaignEnrollmentRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
         ArgumentCaptor<Integer> deltaDaysCaptor = ArgumentCaptor.forClass(Integer.class);
         ArgumentCaptor<Integer> deltaMinutesCaptor = ArgumentCaptor.forClass(Integer.class);

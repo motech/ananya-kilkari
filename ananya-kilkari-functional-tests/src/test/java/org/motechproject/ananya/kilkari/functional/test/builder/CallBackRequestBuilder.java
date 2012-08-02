@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.functional.test.builders;
+package org.motechproject.ananya.kilkari.functional.test.builder;
 
 public class CallBackRequestBuilder {
     public static String template = "{" +

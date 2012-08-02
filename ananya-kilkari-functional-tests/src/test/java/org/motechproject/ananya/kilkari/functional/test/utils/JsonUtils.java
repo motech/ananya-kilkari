@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 @Ignore
-public class TestUtils {
+public class JsonUtils {
     public static String toJson(Object objectToSerialize) {
         ObjectMapper mapper = new ObjectMapper();
         StringWriter stringWriter = new StringWriter();

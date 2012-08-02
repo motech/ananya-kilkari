@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.functional.test.verifiers;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
@@ -14,16 +15,18 @@ import org.springframework.stereotype.Component;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import static org.mockito.Mockito.when;
 @Component
 public class ReportVerifier {
+
 
     private StubReportingService stubReportingService;
 
     @Mock
-    private ReportingService reportingService;
+    protected ReportingService reportingService;
+
 
     @Autowired
     public ReportVerifier(StubReportingService stubReportingService) {
@@ -53,5 +56,9 @@ public class ReportVerifier {
         LocationRequest location = subscriptionData.getLocation();
         if (location == null) return;
         when(reportingService.getLocation(anyString(), anyString(), anyString())).thenReturn(new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat()));
+    }
+
+    public void resetMockBehaviour(){
+        Mockito.reset(reportingService);
     }
 }

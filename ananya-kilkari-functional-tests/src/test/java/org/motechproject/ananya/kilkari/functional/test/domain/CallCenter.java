@@ -1,8 +1,9 @@
 package org.motechproject.ananya.kilkari.functional.test.domain;
 
-import org.motechproject.ananya.kilkari.functional.test.utils.TestUtils;
+import org.motechproject.ananya.kilkari.functional.test.utils.JsonUtils;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.ReportVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.SubscriptionVerifier;
+import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
@@ -17,11 +18,14 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.c
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 
 @Component
-public class Ivr {
+public class CallCenter {
     @Autowired
     private SubscriptionController subscriptionController;
     @Autowired
     private SubscriptionVerifier subscriptionVerifier;
+    @Autowired
+    private StubReportingService stubReportingService;
+
     @Autowired
     private ReportVerifier reportVerifier;
 
@@ -29,7 +33,7 @@ public class Ivr {
         reportVerifier.setUpReporting(subscriptionData);
         mockMvc(subscriptionController)
                 .perform(post("/subscription/")
-                        .body(TestUtils.toJson(subscriptionData).getBytes())
+                        .body(JsonUtils.toJson(subscriptionData).getBytes())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))

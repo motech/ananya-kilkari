@@ -2,15 +2,15 @@ package org.motechproject.ananya.kilkari.functional.test;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.functional.test.builders.SubscriptionDataBuilder;
+import org.motechproject.ananya.kilkari.functional.test.builder.SubscriptionDataBuilder;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
-import org.motechproject.ananya.kilkari.functional.test.utils.SpringIntegrationTest;
+import org.motechproject.ananya.kilkari.functional.test.utils.FunctionalTestUtils;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.motechproject.ananya.kilkari.functional.test.Actions.*;
 
-public class SubscriptionCompletionFlowFunctionalTest extends SpringIntegrationTest {
+public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtils {
 
     @Autowired
     private KilkariPropertiesData kilkariProperties;
@@ -25,10 +25,12 @@ public class SubscriptionCompletionFlowFunctionalTest extends SpringIntegrationT
 
         SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
 
-        when(ivr).subscribes(subscriptionData);
+
+        when(callCenter).subscribes(subscriptionData);
         and(subscriptionManager).activates(subscriptionData);
         and(time).isMovedToFuture(futureDateForFirstCampaignAlertToBeRaised);
         then(campaignMessageVerifier).verifyCampaignMessageExists(subscriptionData, "WEEK1");
+
         when(subscriptionManager).renews(subscriptionData);
         and(time).isMovedToFuture(futureDateOfSecondCampaignAlert);
         then(campaignMessageVerifier).verifyCampaignMessageExists(subscriptionData, "WEEK2");

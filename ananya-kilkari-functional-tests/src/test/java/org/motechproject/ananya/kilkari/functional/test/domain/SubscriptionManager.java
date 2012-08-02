@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.functional.test.domain;
 
-import org.motechproject.ananya.kilkari.functional.test.builders.CallBackRequestBuilder;
+import org.motechproject.ananya.kilkari.functional.test.builder.CallBackRequestBuilder;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.SubscriptionVerifier;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;

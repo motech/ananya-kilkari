@@ -14,10 +14,10 @@ public class SubscriptionDataBuilder {
         subscriptionData = new SubscriptionData();
     }
 
-    public SubscriptionDataBuilder  withDefaults() {
+    public SubscriptionDataBuilder withDefaults() {
         subscriptionData.setPack(SubscriptionPack.FIFTEEN_MONTHS);
         subscriptionData.setChannel("CALL_CENTER");
-        subscriptionData.setMsisdn(RandomStringUtils.randomNumeric(10));
+        subscriptionData.setMsisdn("1" + RandomStringUtils.randomNumeric(9));
         subscriptionData.setBeneficiaryAge("25");
         subscriptionData.setBeneficiaryName("Dumbledore");
         subscriptionData.setExpectedDateOfDelivery(DateTime.now().plusMonths(5).toString("dd-MM-yyyy"));
@@ -68,7 +68,6 @@ public class SubscriptionDataBuilder {
         subscriptionData.setLocation(location);
         return this;
     }
-
 
 
     public SubscriptionData build() {

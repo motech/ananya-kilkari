@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.smoke;
 
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +42,7 @@ public class CallCenterSmokeTest {
     @Test
     public void shouldPostHttpRequestAndVerifyEntriesInReportDbAndCouchDb() throws InterruptedException {
         String expectedStatus = "PENDING_ACTIVATION";
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withEDD(null).withDOB(null).build();
 
         String responseEntity = restTemplate.postForObject(KILKARI_SUBSCRIPTION_POST_URL, subscriptionRequest, String.class);
 
@@ -56,7 +55,7 @@ public class CallCenterSmokeTest {
 
         List<SubscriptionStatusMeasure> subscriptionStatusMeasures = reportService.getSubscriptionStatusMeasureForMsisdn(subscriptionRequest.getMsisdn());
         assertEquals(2, subscriptionStatusMeasures.size());
-        assertReportData(subscriptionStatusMeasures, subscriptionRequest.getChannel(), subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), expectedStatus, subscriptionRequest.getBeneficiaryName(), subscriptionRequest.getBeneficiaryAge(), subscriptionRequest.getDateOfBirth(), subscriptionRequest.getExpectedDateOfDelivery());
+        assertReportData(subscriptionStatusMeasures, subscriptionRequest.getChannel(), subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), expectedStatus, subscriptionRequest.getBeneficiaryName(), subscriptionRequest.getBeneficiaryAge());
     }
 
     private void assertKilkariData(String pack, String expectedStatus, SubscriberResponse response) {
@@ -65,7 +64,7 @@ public class CallCenterSmokeTest {
         assertEquals(expectedStatus, subscriptionDetails.getStatus());
     }
 
-    private void assertReportData(List<SubscriptionStatusMeasure> subscriptionStatusMeasures, String channel, String msisdn, String pack, String expectedStatus, String beneficiaryName, String beneficiaryAge, String dateOfBirth, String estimatedDateOfDelivery) {
+    private void assertReportData(List<SubscriptionStatusMeasure> subscriptionStatusMeasures, String channel, String msisdn, String pack, String expectedStatus, String beneficiaryName, String beneficiaryAge) {
         SubscriptionStatusMeasure subscriptionStatusMeasure0 = subscriptionStatusMeasures.get(0);
         SubscriptionStatusMeasure subscriptionStatusMeasure1 = subscriptionStatusMeasures.get(1);
 
@@ -75,8 +74,6 @@ public class CallCenterSmokeTest {
         assertEquals("NEW", subscriptionStatusMeasure0.getStatus().toUpperCase());
         assertEquals(beneficiaryName, subscriptionStatusMeasure0.getName());
         assertEquals(beneficiaryAge, subscriptionStatusMeasure0.getAge());
-        assertEquals(dateOfBirth, new DateTime(subscriptionStatusMeasure0.getDateOfBirth()).toString("dd-MM-yyyy"));
-        assertEquals(estimatedDateOfDelivery, new DateTime(subscriptionStatusMeasure0.getEstimatedDateOfDelivery()).toString("dd-MM-yyyy"));
 
         assertEquals(msisdn, subscriptionStatusMeasure1.getMsisdn());
         assertEquals(pack, subscriptionStatusMeasure1.getPack().toUpperCase());

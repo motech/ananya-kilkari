@@ -18,7 +18,6 @@ import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionReque
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -70,7 +69,7 @@ public class SubscriptionService {
         subscriptionValidator.validate(subscriptionRequest);
 
         DateTime startDate = determineSubscriptionStartDate(subscriptionRequest);
-        Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), subscriptionRequest.getCreationDate());
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), subscriptionRequest.getCreationDate());
         subscription.setStartDate(startDate);
         allSubscriptions.add(subscription);
 
@@ -129,26 +128,26 @@ public class SubscriptionService {
         onMobileSubscriptionManagerPublisher.sendActivationRequest(omSubscriptionRequest);
     }
 
-    public List<SubscriptionResponse> findByMsisdn(String msisdn) {
+    public List<Subscription> findByMsisdn(String msisdn) {
         validateMsisdn(msisdn);
-        return (List<SubscriptionResponse>) (List<? extends SubscriptionResponse>) allSubscriptions.findByMsisdn(msisdn);
+        return (List<Subscription>) (List<? extends Subscription>) allSubscriptions.findByMsisdn(msisdn);
     }
 
     public void activate(String subscriptionId, final DateTime activatedOn, final String operator) {
-        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         scheduleCampaign(subscription, activatedOn);
-        updateStatusAndReport(subscriptionId, activatedOn, null, operator, null, new Action<Subscription>() {
+        updateStatusAndReport(subscriptionId, activatedOn, null, operator, null, new Action<org.motechproject.ananya.kilkari.subscription.domain.Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
+            public void perform(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
                 subscription.activate(operator, activatedOn);
             }
         });
     }
 
     public void activationFailed(String subscriptionId, DateTime updatedOn, String reason, final String operator) {
-        updateStatusAndReport(subscriptionId, updatedOn, reason, operator, null, new Action<Subscription>() {
+        updateStatusAndReport(subscriptionId, updatedOn, reason, operator, null, new Action<org.motechproject.ananya.kilkari.subscription.domain.Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
+            public void perform(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
                 subscription.activationFailed(operator);
             }
         });
@@ -156,9 +155,9 @@ public class SubscriptionService {
 
     public void activationRequested(OMSubscriptionRequest omSubscriptionRequest) {
         onMobileSubscriptionGateway.activateSubscription(omSubscriptionRequest);
-        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), null, null, null, new Action<Subscription>() {
+        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), null, null, null, new Action<org.motechproject.ananya.kilkari.subscription.domain.Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
+            public void perform(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
                 subscription.activationRequestSent();
             }
         });
@@ -166,14 +165,14 @@ public class SubscriptionService {
 
     public void requestDeactivation(DeactivationRequest deactivationRequest) {
         String subscriptionId = deactivationRequest.getSubscriptionId();
-        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         if (!subscription.isInProgress()) {
             logger.debug(String.format("Cannot unsubscribe. Subscription in %s status", subscription.getStatus()));
             return;
         }
-        updateStatusAndReport(subscriptionId, deactivationRequest.getCreatedAt(), null, null, null, new Action<Subscription>() {
+        updateStatusAndReport(subscriptionId, deactivationRequest.getCreatedAt(), null, null, null, new Action<org.motechproject.ananya.kilkari.subscription.domain.Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
+            public void perform(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
                 subscription.deactivationRequestReceived();
             }
         });
@@ -182,36 +181,36 @@ public class SubscriptionService {
 
     public void deactivationRequested(OMSubscriptionRequest omSubscriptionRequest) {
         onMobileSubscriptionGateway.deactivateSubscription(omSubscriptionRequest);
-        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), null, null, null, new Action<Subscription>() {
+        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), null, null, null, new Action<org.motechproject.ananya.kilkari.subscription.domain.Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
+            public void perform(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
                 subscription.deactivationRequestSent();
             }
         });
     }
 
     public void renewSubscription(String subscriptionId, final DateTime renewedDate, Integer graceCount) {
-        updateStatusAndReport(subscriptionId, renewedDate, null, null, graceCount, new Action<Subscription>() {
+        updateStatusAndReport(subscriptionId, renewedDate, null, null, graceCount, new Action<org.motechproject.ananya.kilkari.subscription.domain.Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
+            public void perform(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
                 subscription.activateOnRenewal();
             }
         });
     }
 
     public void suspendSubscription(String subscriptionId, final DateTime renewalDate, String reason, Integer graceCount) {
-        updateStatusAndReport(subscriptionId, renewalDate, reason, null, graceCount, new Action<Subscription>() {
+        updateStatusAndReport(subscriptionId, renewalDate, reason, null, graceCount, new Action<org.motechproject.ananya.kilkari.subscription.domain.Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
+            public void perform(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
                 subscription.suspendOnRenewal();
             }
         });
     }
 
     public void deactivateSubscription(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
-        updateStatusAndReport(subscriptionId, deactivationDate, reason, null, graceCount, new Action<Subscription>() {
+        updateStatusAndReport(subscriptionId, deactivationDate, reason, null, graceCount, new Action<org.motechproject.ananya.kilkari.subscription.domain.Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
+            public void perform(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
                 subscription.deactivate();
                 kilkariInboxService.scheduleInboxDeletion(subscription);
                 unScheduleCampaign(subscription);
@@ -221,16 +220,16 @@ public class SubscriptionService {
     }
 
     public void subscriptionComplete(OMSubscriptionRequest omSubscriptionRequest) {
-        Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
         if (subscription.isInDeactivatedState()) {
             logger.info(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), subscription.getStatus()));
             return;
         }
         onMobileSubscriptionGateway.deactivateSubscription(omSubscriptionRequest);
 
-        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), "Subscription completed", null, null, new Action<Subscription>() {
+        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), "Subscription completed", null, null, new Action<org.motechproject.ananya.kilkari.subscription.domain.Subscription>() {
             @Override
-            public void perform(Subscription subscription) {
+            public void perform(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
                 subscription.complete();
                 kilkariInboxService.scheduleInboxDeletion(subscription);
                 campaignMessageAlertService.deleteFor(subscription.getSubscriptionId());
@@ -238,14 +237,14 @@ public class SubscriptionService {
         });
     }
 
-    public SubscriptionResponse findBySubscriptionId(String subscriptionId) {
+    public Subscription findBySubscriptionId(String subscriptionId) {
         return allSubscriptions.findBySubscriptionId(subscriptionId);
     }
 
     public void rescheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
         String subscriptionId = campaignRescheduleRequest.getSubscriptionId();
         subscriptionValidator.validateActiveSubscriptionExists(subscriptionId);
-        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
 
         unScheduleCampaign(subscription);
         removeScheduledMessagesFromOBD(subscriptionId);
@@ -260,7 +259,7 @@ public class SubscriptionService {
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(), request.getDateOfBirth(), subscriberLocation));
     }
 
-    private void unScheduleCampaign(Subscription subscription) {
+    private void unScheduleCampaign(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
         MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStartDate());
         messageCampaignService.stop(unEnrollRequest);
     }
@@ -281,7 +280,7 @@ public class SubscriptionService {
         return sameDayOfCurrentWeekAsExistingCampaignStartDate;
     }
 
-    private void scheduleCampaign(Subscription subscription, DateTime activatedOn) {
+    private void scheduleCampaign(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription, DateTime activatedOn) {
         MessageCampaignRequest campaignRequest = new MessageCampaignRequest(
                 subscription.getSubscriptionId(), subscription.getPack().name(), activatedOn);
         messageCampaignService.start(campaignRequest, kilkariPropertiesData.getCampaignScheduleDeltaDays(), kilkariPropertiesData.getCampaignScheduleDeltaMinutes());
@@ -292,8 +291,8 @@ public class SubscriptionService {
         campaignMessageAlertService.clearMessageId(subscriptionId);
     }
 
-    private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Integer graceCount, Action<Subscription> action) {
-        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+    private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Integer graceCount, Action<org.motechproject.ananya.kilkari.subscription.domain.Subscription> action) {
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         action.perform(subscription);
         allSubscriptions.update(subscription);
         reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscription.getSubscriptionId(), subscription.getStatus().name(), updatedOn, reason, operator, graceCount));

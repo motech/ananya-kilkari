@@ -4,18 +4,18 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequestMapper;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
+import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.*;
-import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
@@ -77,37 +77,37 @@ public class KilkariCampaignService {
     }
 
     public Map<String, List<DateTime>> getMessageTimings(String msisdn) {
-        List<SubscriptionResponse> subscriptionResponseList = kilkariSubscriptionService.findByMsisdn(msisdn);
+        List<Subscription> subscriptionList = kilkariSubscriptionService.findByMsisdn(msisdn);
         Map<String, List<DateTime>> campaignMessageMap = new HashMap<>();
-        for (SubscriptionResponse subscriptionResponse : subscriptionResponseList) {
-            String subscriptionId = subscriptionResponse.getSubscriptionId();
+        for (Subscription subscription : subscriptionList) {
+            String subscriptionId = subscription.getSubscriptionId();
 
             List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
                     subscriptionId,
-                    subscriptionResponse.getStartDate(), subscriptionResponse.endDate());
+                    subscription.getStartDate(), subscription.endDate());
             campaignMessageMap.put(subscriptionId, messageTimings);
         }
         return campaignMessageMap;
     }
 
     public void scheduleWeeklyMessage(String subscriptionId, String campaignName) {
-        SubscriptionResponse subscriptionResponse = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
+        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
 
-        final String messageId = campaignMessageIdStrategy.createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId, campaignName), subscriptionResponse.getPack());
-        final DateTime messageExpiryDate = subscriptionResponse.currentWeeksMessageExpiryDate();
+        final String messageId = campaignMessageIdStrategy.createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId, campaignName), subscription.getPack());
+        final DateTime messageExpiryDate = subscription.currentWeeksMessageExpiryDate();
 
-        campaignMessageAlertService.scheduleCampaignMessageAlert(subscriptionId, messageId, messageExpiryDate, subscriptionResponse.getMsisdn(), subscriptionResponse.getOperator().name());
+        campaignMessageAlertService.scheduleCampaignMessageAlert(subscriptionId, messageId, messageExpiryDate, subscription.getMsisdn(), subscription.getOperator().name());
 
-        if (subscriptionResponse.hasBeenActivated())
+        if (subscription.hasBeenActivated())
             kilkariInboxService.newMessage(subscriptionId, messageId);
     }
 
     public void activateSchedule(String subscriptionId) {
         logger.info(String.format("Processing activation for subscriptionId: %s", subscriptionId));
 
-        SubscriptionResponse subscriptionResponse = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
+        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
 
-        String currentMessageId = campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, subscriptionResponse.getMsisdn(), subscriptionResponse.getOperator().name());
+        String currentMessageId = campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
 
         if (currentMessageId != null)
             kilkariInboxService.newMessage(subscriptionId, currentMessageId);
@@ -115,12 +115,12 @@ public class KilkariCampaignService {
 
     public void renewSchedule(String subscriptionId) {
         logger.info(String.format("Processing activation for subscriptionId: %s", subscriptionId));
-        SubscriptionResponse subscriptionResponse = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
-        campaignMessageAlertService.scheduleCampaignMessageAlertForRenewal(subscriptionId, subscriptionResponse.getMsisdn(), subscriptionResponse.getOperator().name());
+        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
+        campaignMessageAlertService.scheduleCampaignMessageAlertForRenewal(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
     }
 
     public void processCampaignCompletion(String subscriptionId) {
-        SubscriptionResponse subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
+        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
         if (!subscription.isInDeactivatedState())
             kilkariSubscriptionService.processSubscriptionCompletion(subscription);
     }

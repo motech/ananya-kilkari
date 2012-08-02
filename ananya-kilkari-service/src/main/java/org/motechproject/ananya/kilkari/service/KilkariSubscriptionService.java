@@ -12,7 +12,6 @@ import org.motechproject.ananya.kilkari.subscription.service.mapper.Subscription
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.validators.SubscriberDetailsValidator;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -79,20 +78,20 @@ public class KilkariSubscriptionService {
         subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
     }
 
-    public List<SubscriptionResponse> findByMsisdn(String msisdn) {
+    public List<Subscription> findByMsisdn(String msisdn) {
         return subscriptionService.findByMsisdn(msisdn);
     }
 
-    public SubscriptionResponse findBySubscriptionId(String subscriptionId) {
+    public Subscription findBySubscriptionId(String subscriptionId) {
         return subscriptionService.findBySubscriptionId(subscriptionId);
     }
 
-    public void processSubscriptionCompletion(SubscriptionResponse subscriptionResponse) {
+    public void processSubscriptionCompletion(Subscription subscription) {
         String subjectKey = SubscriptionEventKeys.SUBSCRIPTION_COMPLETE;
         Date startDate = DateTime.now().plusDays(kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
         HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put(MotechSchedulerService.JOB_ID_KEY, subscriptionResponse.getSubscriptionId());
-        parameters.put("0", new SubscriptionMapper().createOMSubscriptionRequest(subscriptionResponse, Channel.MOTECH));
+        parameters.put(MotechSchedulerService.JOB_ID_KEY, subscription.getSubscriptionId());
+        parameters.put("0", new SubscriptionMapper().createOMSubscriptionRequest(subscription, Channel.MOTECH));
 
         MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
         RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);

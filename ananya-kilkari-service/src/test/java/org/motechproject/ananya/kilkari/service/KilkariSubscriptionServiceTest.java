@@ -21,7 +21,6 @@ import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionReque
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.validators.SubscriberDetailsValidator;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -129,20 +128,20 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldReturnSubscriptionGivenASubscriptionId() {
-        Subscription exptectedSubscription = new Subscription();
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription exptectedSubscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription();
         String susbscriptionid = "susbscriptionid";
         when(subscriptionService.findBySubscriptionId(susbscriptionid)).thenReturn(exptectedSubscription);
 
-        SubscriptionResponse subscriptionResponse = kilkariSubscriptionService.findBySubscriptionId(susbscriptionid);
+        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(susbscriptionid);
 
-        assertEquals(exptectedSubscription, subscriptionResponse);
+        assertEquals(exptectedSubscription, subscription);
     }
 
     @Test
     public void shouldScheduleASubscriptionCompletionEvent() {
         String subscriptionId = "subscriptionId";
         DateTime now = DateTime.now();
-        Subscription mockedSubscription = mock(Subscription.class);
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription mockedSubscription = mock(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).thenReturn(3);
 

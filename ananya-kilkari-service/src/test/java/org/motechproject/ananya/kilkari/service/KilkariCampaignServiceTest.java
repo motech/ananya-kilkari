@@ -24,7 +24,6 @@ import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
-import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
@@ -81,45 +80,45 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldGetMessageTimings() {
         String msisdn = "1234567890";
-        List<SubscriptionResponse> subscriptionResponses = new ArrayList<>();
+        List<Subscription> subscriptions = new ArrayList<>();
 
         DateTime now = DateTime.now();
         DateTime subscriptionStartDate1 = now.plusWeeks(2);
         DateTime subscriptionStartDate2 = now.plusWeeks(3);
-        SubscriptionResponse subscriptionResponse1 = new SubscriptionBuilder().withDefaults().withCreationDate(now).withStartDate(subscriptionStartDate1).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
-        SubscriptionResponse subscriptionResponse2 = new SubscriptionBuilder().withDefaults().withCreationDate(now).withStartDate(subscriptionStartDate2).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
-        subscriptionResponses.add(subscriptionResponse1);
-        subscriptionResponses.add(subscriptionResponse2);
+        Subscription subscription1 = new SubscriptionBuilder().withDefaults().withCreationDate(now).withStartDate(subscriptionStartDate1).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
+        Subscription subscription2 = new SubscriptionBuilder().withDefaults().withCreationDate(now).withStartDate(subscriptionStartDate2).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
+        subscriptions.add(subscription1);
+        subscriptions.add(subscription2);
 
         List<DateTime> dateTimes = new ArrayList<>();
         dateTimes.add(now);
 
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptionResponses);
+        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
         when(messageCampaignService.getMessageTimings(
-                subscriptionResponse1.getSubscriptionId(),
-                subscriptionResponse1.getStartDate(),
-                subscriptionResponse1.endDate())).thenReturn(dateTimes);
+                subscription1.getSubscriptionId(),
+                subscription1.getStartDate(),
+                subscription1.endDate())).thenReturn(dateTimes);
         when(messageCampaignService.getMessageTimings(
-                subscriptionResponse2.getSubscriptionId(),
-                subscriptionResponse2.getStartDate(),
-                subscriptionResponse2.endDate())).thenReturn(dateTimes);
+                subscription2.getSubscriptionId(),
+                subscription2.getStartDate(),
+                subscription2.endDate())).thenReturn(dateTimes);
 
         Map<String, List<DateTime>> messageTimings = kilkariCampaignService.getMessageTimings(msisdn);
 
         verify(messageCampaignService).getMessageTimings(
-                eq(subscriptionResponse1.getSubscriptionId()),
-                eq(subscriptionResponse1.getStartDate()),
-                eq(subscriptionResponse1.endDate()));
+                eq(subscription1.getSubscriptionId()),
+                eq(subscription1.getStartDate()),
+                eq(subscription1.endDate()));
 
         verify(messageCampaignService).getMessageTimings(
-                eq(subscriptionResponse2.getSubscriptionId()),
-                eq(subscriptionResponse2.getStartDate()),
-                eq(subscriptionResponse2.endDate()));
+                eq(subscription2.getSubscriptionId()),
+                eq(subscription2.getStartDate()),
+                eq(subscription2.endDate()));
 
         assertThat(messageTimings.size(), is(2));
-        assertThat(messageTimings, hasEntry(subscriptionResponse1.getSubscriptionId(), dateTimes));
-        assertThat(messageTimings, hasEntry(subscriptionResponse2.getSubscriptionId(), dateTimes));
+        assertThat(messageTimings, hasEntry(subscription1.getSubscriptionId(), dateTimes));
+        assertThat(messageTimings, hasEntry(subscription2.getSubscriptionId(), dateTimes));
     }
 
     @Test
@@ -220,7 +219,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldScheduleUnsubscriptionWhenPackIsCompletedAndWhenStatusIsNotDeactivated() {
         String subscriptionId = "abcd1234";
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1));
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1));
         subscription.setStatus(SubscriptionStatus.ACTIVE);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -233,7 +232,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldNotScheduleUnsubscriptionWhenPackIsCompletedAndStatusIsDeactivated() {
         String subscriptionId = "abcd1234";
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1));
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1));
         subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -357,7 +356,7 @@ public class KilkariCampaignServiceTest {
         String campaignName = "campaignName";
         Operator operator = Operator.AIRTEL;
         String msisdn = "9988776655";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, creationDate);
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, creationDate);
         subscription.setOperator(operator);
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         String subscriptionId = subscription.getSubscriptionId();
@@ -377,7 +376,7 @@ public class KilkariCampaignServiceTest {
     public void shouldCallCampaignMessageAlertServiceAndNotUpdateInboxWhenSubscriptionIsNotActive() {
         DateTime creationDate = DateTime.now();
         String msisdn = "9988776655";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, creationDate);
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, creationDate);
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
         subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
@@ -399,7 +398,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldNotUpdateInboxDuringActivationWhenMessageHasNotAlreadyBeenScheduled() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
@@ -414,7 +413,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldUpdateInboxDuringActivationWhenMessageHasAlreadyBeenScheduled() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
@@ -431,7 +430,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldNotUpdateInboxDuringRenewalWhenMessageHasNotAlreadyBeenScheduled() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
@@ -446,7 +445,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldNotUpdateInboxDuringRenewalnWhenMessageHasAlreadyBeenScheduled() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
@@ -463,7 +462,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldCallCampaignMessageAlertServiceOnActivation(){
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
@@ -477,7 +476,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldCallCampaignMessageAlertServiceOnRenewal(){
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);

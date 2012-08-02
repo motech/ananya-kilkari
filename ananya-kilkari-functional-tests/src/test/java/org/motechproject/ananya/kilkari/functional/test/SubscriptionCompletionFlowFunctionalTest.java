@@ -29,11 +29,10 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
         when(callCenter).subscribes(subscriptionData);
         and(subscriptionManager).activates(subscriptionData);
         and(time).isMovedToFuture(futureDateForFirstCampaignAlertToBeRaised);
-        then(campaignMessageVerifier).verifyCampaignMessageExists(subscriptionData, "WEEK1");
-
+        then(user).messageIsReady(subscriptionData, "WEEK1");
         when(subscriptionManager).renews(subscriptionData);
         and(time).isMovedToFuture(futureDateOfSecondCampaignAlert);
-        then(campaignMessageVerifier).verifyCampaignMessageExists(subscriptionData, "WEEK2");
+        then(user).messageIsReady(subscriptionData, "WEEK2");
 //        and(time).isMovedToFuture(futureDateOfPackCompletion.plusWeeks(1));
 //        then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
     }

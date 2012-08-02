@@ -4,6 +4,7 @@ import org.junit.After;
 import org.motechproject.ananya.kilkari.functional.test.domain.CallCenter;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionManager;
 import org.motechproject.ananya.kilkari.functional.test.domain.Time;
+import org.motechproject.ananya.kilkari.functional.test.domain.User;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.CampaignMessageVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.ReportVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.SubscriptionVerifier;
@@ -21,6 +22,8 @@ public class FunctionalTestUtils extends SpringIntegrationTest {
     protected CampaignMessageVerifier campaignMessageVerifier;
     @Autowired
     protected SubscriptionVerifier subscriptionVerifier;
+    @Autowired
+    protected User user;
 
     @Autowired
     protected ReportVerifier reportVerifier;

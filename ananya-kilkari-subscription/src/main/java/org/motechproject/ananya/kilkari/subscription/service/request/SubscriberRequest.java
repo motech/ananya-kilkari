@@ -66,7 +66,6 @@ public class SubscriberRequest {
         return location.getPanchayat();
     }
 
-
     public Location getLocation() {
         return location == null ? Location.NULL : location;
     }

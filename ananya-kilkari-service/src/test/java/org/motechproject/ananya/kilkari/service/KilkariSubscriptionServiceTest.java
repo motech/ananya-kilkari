@@ -22,6 +22,7 @@ import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
+import org.motechproject.ananya.kilkari.utils.DateUtils;
 import org.motechproject.ananya.kilkari.validators.SubscriberDetailsValidator;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
@@ -232,7 +233,7 @@ public class KilkariSubscriptionServiceTest {
         assertEquals(request.getBeneficiaryAge(), subscriberUpdateRequest.getBeneficiaryAge());
         assertEquals(request.getChannel(), subscriberUpdateRequest.getChannel());
         assertEquals(request.getCreatedAt(), subscriberUpdateRequest.getCreatedAt());
-        assertEquals(request.getDateOfBirth(), subscriberUpdateRequest.getDateOfBirth());
+        assertEquals(DateUtils.parseDate(request.getDateOfBirth()), subscriberUpdateRequest.getDateOfBirth());
         assertEquals(request.getBlock(), subscriberUpdateRequest.getBlock());
         assertEquals(subscriptionId, subscriberUpdateRequest.getSubscriptionId());
     }

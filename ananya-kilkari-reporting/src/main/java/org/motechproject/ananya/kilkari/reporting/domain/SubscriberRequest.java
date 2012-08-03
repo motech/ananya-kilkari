@@ -1,8 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.domain;
 
-import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 
 import java.io.Serializable;
 
@@ -14,12 +12,12 @@ public class SubscriberRequest implements Serializable {
     private DateTime dateOfBirth;
     private SubscriberLocation location;
 
-    public SubscriberRequest(DateTime createdAt, String beneficiaryName, String beneficiaryAge, String expectedDateOfDelivery, String dateOfBirth, SubscriberLocation location) {
+    public SubscriberRequest(DateTime createdAt, String beneficiaryName, String beneficiaryAge, DateTime expectedDateOfDelivery, DateTime dateOfBirth, SubscriberLocation location) {
         this.createdAt = createdAt;
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
-        this.expectedDateOfDelivery = parseDateTime(expectedDateOfDelivery);
-        this.dateOfBirth = parseDateTime(dateOfBirth);
+        this.expectedDateOfDelivery = expectedDateOfDelivery;
+        this.dateOfBirth = dateOfBirth;
         this.location = location;
     }
 
@@ -45,9 +43,5 @@ public class SubscriberRequest implements Serializable {
 
     public SubscriberLocation getLocation() {
         return location;
-    }
-
-    private DateTime parseDateTime(String dateTime) {
-        return StringUtils.isNotEmpty(dateTime) ? DateTimeFormat.forPattern("dd-MM-yyyy").parseDateTime(dateTime) : null;
     }
 }

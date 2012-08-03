@@ -13,6 +13,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
+import org.motechproject.ananya.kilkari.utils.DateUtils;
 import org.motechproject.ananya.kilkari.validators.SubscriberDetailsValidator;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -114,8 +115,8 @@ public class KilkariSubscriptionService {
 
         Location location = new Location(request.getDistrict(), request.getBlock(), request.getPanchayat());
         subscriptionService.updateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, request.getChannel(), request.getCreatedAt(),
-                request.getBeneficiaryName(), request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(), request.getDateOfBirth(),
-                location));
+                request.getBeneficiaryName(), request.getBeneficiaryAge(), DateUtils.parseDate(request.getExpectedDateOfDelivery()),
+                DateUtils.parseDate(request.getDateOfBirth()), location));
     }
 
     private void raiseExceptionIfThereAreErrors(Errors validationErrors) {

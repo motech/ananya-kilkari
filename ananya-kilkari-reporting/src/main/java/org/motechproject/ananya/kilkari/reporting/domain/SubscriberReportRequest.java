@@ -9,13 +9,13 @@ public class SubscriberReportRequest implements Serializable {
     private DateTime createdAt;
     private String beneficiaryName;
     private String beneficiaryAge;
-    private String expectedDateOfDelivery;
-    private String dateOfBirth;
+    private DateTime expectedDateOfDelivery;
+    private DateTime dateOfBirth;
     private SubscriberLocation location;
 
     public SubscriberReportRequest(String subscriptionId, DateTime createdAt,
-                                   String beneficiaryName, String beneficiaryAge, String expectedDateOfDelivery,
-                                   String dateOfBirth, SubscriberLocation location) {
+                                   String beneficiaryName, String beneficiaryAge, DateTime expectedDateOfDelivery,
+                                   DateTime dateOfBirth, SubscriberLocation location) {
         this.subscriptionId = subscriptionId;
         this.createdAt = createdAt;
         this.beneficiaryName = beneficiaryName;
@@ -41,11 +41,11 @@ public class SubscriberReportRequest implements Serializable {
         return beneficiaryAge;
     }
 
-    public String getExpectedDateOfDelivery() {
+    public DateTime getExpectedDateOfDelivery() {
         return expectedDateOfDelivery;
     }
 
-    public String getDateOfBirth() {
+    public DateTime getDateOfBirth() {
         return dateOfBirth;
     }
 

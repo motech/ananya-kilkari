@@ -33,7 +33,6 @@ import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
-import org.motechproject.model.DayOfWeek;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
@@ -614,17 +613,19 @@ public class SubscriptionServiceTest {
     public void shouldPublishASubscriberUpdateEvent() {
         String subscriptionId = "subscriptionId";
         Location location = new Location("district", "block", "panchayat");
+        DateTime expectedDateOfDelivery = DateTime.now().plusYears(5);
+        DateTime dateOfBirth = DateTime.now().minusYears(5);
 
         subscriptionService.updateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", "23",
-                "20-10-2038", "20-10-1985", location));
+                expectedDateOfDelivery, dateOfBirth, location));
 
         ArgumentCaptor<SubscriberReportRequest> captor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
         verify(reportingServiceImpl).reportSubscriberDetailsChange(captor.capture());
         SubscriberReportRequest reportRequest = captor.getValue();
 
         assertEquals(subscriptionId, reportRequest.getSubscriptionId());
-        assertEquals("20-10-2038", reportRequest.getExpectedDateOfDelivery());
-        assertEquals("20-10-1985", reportRequest.getDateOfBirth());
+        assertEquals(expectedDateOfDelivery, reportRequest.getExpectedDateOfDelivery());
+        assertEquals(dateOfBirth, reportRequest.getDateOfBirth());
         assertEquals("23", reportRequest.getBeneficiaryAge());
         assertEquals("name", reportRequest.getBeneficiaryName());
         assertEquals("district", reportRequest.getLocation().getDistrict());

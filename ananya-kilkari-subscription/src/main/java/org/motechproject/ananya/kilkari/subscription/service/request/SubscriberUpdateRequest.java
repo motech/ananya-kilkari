@@ -9,13 +9,13 @@ public class SubscriberUpdateRequest {
     private DateTime createdAt;
     private String beneficiaryName;
     private String beneficiaryAge;
-    private String expectedDateOfDelivery;
-    private String dateOfBirth;
+    private DateTime expectedDateOfDelivery;
+    private DateTime dateOfBirth;
     private Location location;
 
     public SubscriberUpdateRequest(String subscriptionId, String channel, DateTime createdAt,
-                                   String beneficiaryName, String beneficiaryAge, String expectedDateOfDelivery,
-                                   String dateOfBirth, Location location) {
+                                   String beneficiaryName, String beneficiaryAge, DateTime expectedDateOfDelivery,
+                                   DateTime dateOfBirth, Location location) {
         this.subscriptionId = subscriptionId;
         this.channel = channel;
         this.createdAt = createdAt;
@@ -46,11 +46,11 @@ public class SubscriberUpdateRequest {
         return beneficiaryAge;
     }
 
-    public String getExpectedDateOfDelivery() {
+    public DateTime getExpectedDateOfDelivery() {
         return expectedDateOfDelivery;
     }
 
-    public String getDateOfBirth() {
+    public DateTime getDateOfBirth() {
         return dateOfBirth;
     }
 

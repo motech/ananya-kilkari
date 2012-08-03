@@ -131,7 +131,7 @@ public class SubscriptionValidatorTest {
         expectedException.expectMessage("Location does not exist for District[district] Block[block] and Panchayat[panchayat]");
 
         subscriptionValidator.validateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", "23",
-                "20-10-2038", "20-10-1985", location));
+                DateTime.now().plusYears(2), DateTime.now().minus(2), location));
     }
 
     @Test
@@ -145,7 +145,7 @@ public class SubscriptionValidatorTest {
         expectedException.expectMessage("Subscription does not exist for subscriptionId subscriptionId");
 
         subscriptionValidator.validateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", "23",
-                "20-10-2038", "20-10-1985", location));
+                DateTime.now().plusYears(2), DateTime.now().minus(2), location));
     }
 
     @Test

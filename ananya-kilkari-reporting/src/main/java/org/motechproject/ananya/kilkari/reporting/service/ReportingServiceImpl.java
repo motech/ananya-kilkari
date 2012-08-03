@@ -54,6 +54,7 @@ public class ReportingServiceImpl implements ReportingService {
     public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest request) {
         String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIBER_UPDATE_PATH, subscriptionId);
         httpClientService.put(url, request);
+
     }
 
     private String getBaseUrl() {

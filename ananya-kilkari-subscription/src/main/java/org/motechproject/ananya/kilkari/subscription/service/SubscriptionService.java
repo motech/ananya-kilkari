@@ -82,8 +82,7 @@ public class SubscriptionService {
         OMSubscriptionRequest omSubscriptionRequest = subscriptionMapper.createOMSubscriptionRequest(subscription, channel);
         if (isEarlySubscription) {
             scheduleEarlySubscription(startDate, omSubscriptionRequest);
-        }
-        else
+        } else
             initiateActivationRequest(omSubscriptionRequest);
 
         reportingService.reportSubscriptionCreation(subscriptionMapper.createSubscriptionCreationReportRequest(
@@ -261,7 +260,7 @@ public class SubscriptionService {
         subscriptionValidator.validateSubscriberDetails(request);
 
         SubscriberLocation subscriberLocation = new SubscriberLocation(request.getDistrict(), request.getBlock(), request.getPanchayat());
-        reportingService.reportSubscriberDetailsChange(new SubscriberReportRequest(request.getSubscriptionId(), request.getCreatedAt(),
+        reportingService.reportSubscriberDetailsChange(request.getSubscriptionId(), new SubscriberReportRequest(request.getCreatedAt(),
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(), request.getDateOfBirth(), subscriberLocation));
     }
 

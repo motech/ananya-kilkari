@@ -51,12 +51,9 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public void reportSubscriberDetailsChange(SubscriberReportRequest request) {
-        String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIBER_UPDATE_PATH, request.getSubscriptionId());
-        SubscriberRequest subscriberRequest = new SubscriberRequest(request.getCreatedAt(), request.getBeneficiaryName(),
-                request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(),
-                request.getDateOfBirth(), request.getLocation());
-        httpClientService.put(url, subscriberRequest);
+    public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest request) {
+        String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIBER_UPDATE_PATH, subscriptionId);
+        httpClientService.put(url, request);
     }
 
     private String getBaseUrl() {

@@ -81,15 +81,15 @@ public class ReportingServiceImplTest {
     public void shouldReportASubscriberUpdate() {
         String subscriptionId = "subscriptionId";
         String beneficiaryName = "Name";
-        SubscriberReportRequest subscriberReportRequest = new SubscriberReportRequest(subscriptionId, null, beneficiaryName, null, null, null, null);
+        SubscriberReportRequest subscriberReportRequest = new SubscriberReportRequest(null, beneficiaryName, null, null, null, null);
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
-        reportingServiceImpl.reportSubscriberDetailsChange(subscriberReportRequest);
+        reportingServiceImpl.reportSubscriberDetailsChange(subscriptionId, subscriberReportRequest);
 
-        ArgumentCaptor<SubscriberRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberRequest.class);
+        ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
         ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
         verify(httpClientService).put(urlCaptor.capture(), requestCaptor.capture());
-        SubscriberRequest requestCaptorValue = requestCaptor.getValue();
+        SubscriberReportRequest requestCaptorValue = requestCaptor.getValue();
         String urlCaptorValue = urlCaptor.getValue();
         assertEquals(beneficiaryName, requestCaptorValue.getBeneficiaryName());
         assertEquals("url/subscriber/" + subscriptionId, urlCaptorValue);

@@ -5,7 +5,6 @@ import org.joda.time.DateTime;
 import java.io.Serializable;
 
 public class SubscriberReportRequest implements Serializable {
-    private String subscriptionId;
     private DateTime createdAt;
     private String beneficiaryName;
     private Integer beneficiaryAge;
@@ -13,20 +12,15 @@ public class SubscriberReportRequest implements Serializable {
     private DateTime dateOfBirth;
     private SubscriberLocation location;
 
-    public SubscriberReportRequest(String subscriptionId, DateTime createdAt,
+    public SubscriberReportRequest(DateTime createdAt,
                                    String beneficiaryName, Integer beneficiaryAge, DateTime expectedDateOfDelivery,
                                    DateTime dateOfBirth, SubscriberLocation location) {
-        this.subscriptionId = subscriptionId;
         this.createdAt = createdAt;
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
         this.expectedDateOfDelivery = expectedDateOfDelivery;
         this.dateOfBirth = dateOfBirth;
         this.location = location;
-    }
-
-    public String getSubscriptionId() {
-        return subscriptionId;
     }
 
     public DateTime getCreatedAt() {

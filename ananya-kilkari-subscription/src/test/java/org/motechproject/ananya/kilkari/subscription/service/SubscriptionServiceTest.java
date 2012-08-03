@@ -606,7 +606,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.updateSubscriberDetails(request);
 
-        verify(reportingServiceImpl, never()).reportSubscriberDetailsChange(any(SubscriberReportRequest.class));
+        verify(reportingServiceImpl, never()).reportSubscriberDetailsChange(request.getSubscriptionId(), any(SubscriberReportRequest.class));
     }
 
     @Test
@@ -619,11 +619,13 @@ public class SubscriptionServiceTest {
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", 23,
                 expectedDateOfDelivery, dateOfBirth, location));
 
-        ArgumentCaptor<SubscriberReportRequest> captor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
-        verify(reportingServiceImpl).reportSubscriberDetailsChange(captor.capture());
-        SubscriberReportRequest reportRequest = captor.getValue();
+        ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
+        ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
+        verify(reportingServiceImpl).reportSubscriberDetailsChange(subscriptionIdCaptor.capture(), requestCaptor.capture());
+        SubscriberReportRequest reportRequest = requestCaptor.getValue();
+        String actualSubscriptionId = subscriptionIdCaptor.getValue();
 
-        assertEquals(subscriptionId, reportRequest.getSubscriptionId());
+        assertEquals(subscriptionId, actualSubscriptionId);
         assertEquals(expectedDateOfDelivery, reportRequest.getExpectedDateOfDelivery());
         assertEquals(dateOfBirth, reportRequest.getDateOfBirth());
         assertEquals(23, (int)reportRequest.getBeneficiaryAge());

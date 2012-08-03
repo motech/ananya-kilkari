@@ -6,7 +6,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
-import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,12 +41,12 @@ public class SubscriptionValidator {
         raiseExceptionIfThereAreErrors(errors);
     }
 
-    public void validateSubscriberDetails(SubscriberUpdateRequest updateRequest) {
+    public void validateSubscriberDetails(SubscriberRequest request) {
         Errors errors = new Errors();
-        if (updateRequest.hasLocation()) {
-            validateLocationExists(updateRequest.getLocation(), errors);
+        if (request.hasLocation()) {
+            validateLocationExists(request.getLocation(), errors);
         }
-        validateSubscriptionExists(updateRequest.getSubscriptionId(), errors);
+        validateSubscriptionExists(request.getSubscriptionId(), errors);
         raiseExceptionIfThereAreErrors(errors);
     }
 

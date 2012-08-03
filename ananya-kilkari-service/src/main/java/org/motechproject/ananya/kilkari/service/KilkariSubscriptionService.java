@@ -9,11 +9,9 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationExcept
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
-import org.motechproject.ananya.kilkari.subscription.service.request.Location;
-import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.utils.DateUtils;
 import org.motechproject.ananya.kilkari.validators.SubscriberDetailsValidator;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -57,7 +55,7 @@ public class KilkariSubscriptionService {
 
     public void createSubscription(SubscriptionWebRequest subscriptionWebRequest) {
         validateSubscriptionRequest(subscriptionWebRequest);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestMapper().createSubscriptionDomainRequest(subscriptionWebRequest);
+        SubscriptionRequest subscriptionRequest = SubscriptionRequestMapper.mapToSubscriptionRequest(subscriptionWebRequest);
         try {
             subscriptionService.createSubscription(subscriptionRequest, Channel.from(subscriptionWebRequest.getChannel()));
         } catch (DuplicateSubscriptionException e) {
@@ -112,11 +110,8 @@ public class KilkariSubscriptionService {
     public void updateSubscriberDetails(SubscriberWebRequest request, String subscriptionId) {
         Errors errors = subscriberDetailsValidator.validate(request);
         raiseExceptionIfThereAreErrors(errors);
-
-        Location location = new Location(request.getDistrict(), request.getBlock(), request.getPanchayat());
-        subscriptionService.updateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, request.getChannel(), request.getCreatedAt(),
-                request.getBeneficiaryName(), request.getBeneficiaryAge(), DateUtils.parseDate(request.getExpectedDateOfDelivery()),
-                DateUtils.parseDate(request.getDateOfBirth()), location));
+        SubscriberRequest subscriberRequest = SubscriptionRequestMapper.mapToSubscriberRequest(request, subscriptionId);
+        subscriptionService.updateSubscriberDetails(subscriberRequest);
     }
 
     private void raiseExceptionIfThereAreErrors(Errors validationErrors) {

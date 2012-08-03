@@ -3,19 +3,19 @@ package org.motechproject.ananya.kilkari.subscription.service.request;
 
 import org.joda.time.DateTime;
 
-public class SubscriberUpdateRequest {
+public class SubscriberRequest {
     private String subscriptionId;
     private String channel;
     private DateTime createdAt;
     private String beneficiaryName;
-    private String beneficiaryAge;
+    private Integer beneficiaryAge;
     private DateTime expectedDateOfDelivery;
     private DateTime dateOfBirth;
     private Location location;
 
-    public SubscriberUpdateRequest(String subscriptionId, String channel, DateTime createdAt,
-                                   String beneficiaryName, String beneficiaryAge, DateTime expectedDateOfDelivery,
-                                   DateTime dateOfBirth, Location location) {
+    public SubscriberRequest(String subscriptionId, String channel, DateTime createdAt,
+                             String beneficiaryName, Integer beneficiaryAge, DateTime expectedDateOfDelivery,
+                             DateTime dateOfBirth, Location location) {
         this.subscriptionId = subscriptionId;
         this.channel = channel;
         this.createdAt = createdAt;
@@ -42,7 +42,7 @@ public class SubscriberUpdateRequest {
         return beneficiaryName;
     }
 
-    public String getBeneficiaryAge() {
+    public Integer getBeneficiaryAge() {
         return beneficiaryAge;
     }
 

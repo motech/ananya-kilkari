@@ -19,7 +19,7 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationExcept
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.DateUtils;
@@ -226,15 +226,15 @@ public class KilkariSubscriptionServiceTest {
 
         kilkariSubscriptionService.updateSubscriberDetails(request, subscriptionId);
 
-        ArgumentCaptor<SubscriberUpdateRequest> captor = ArgumentCaptor.forClass(SubscriberUpdateRequest.class);
+        ArgumentCaptor<SubscriberRequest> captor = ArgumentCaptor.forClass(SubscriberRequest.class);
         verify(subscriptionService).updateSubscriberDetails(captor.capture());
         verify(subscriberDetailsValidator).validate(request);
-        SubscriberUpdateRequest subscriberUpdateRequest = captor.getValue();
-        assertEquals(request.getBeneficiaryAge(), subscriberUpdateRequest.getBeneficiaryAge());
-        assertEquals(request.getChannel(), subscriberUpdateRequest.getChannel());
-        assertEquals(request.getCreatedAt(), subscriberUpdateRequest.getCreatedAt());
-        assertEquals(DateUtils.parseDate(request.getDateOfBirth()), subscriberUpdateRequest.getDateOfBirth());
-        assertEquals(request.getBlock(), subscriberUpdateRequest.getBlock());
-        assertEquals(subscriptionId, subscriberUpdateRequest.getSubscriptionId());
+        SubscriberRequest subscriberRequest = captor.getValue();
+        assertEquals(request.getBeneficiaryAge(), subscriberRequest.getBeneficiaryAge());
+        assertEquals(request.getChannel(), subscriberRequest.getChannel());
+        assertEquals(request.getCreatedAt(), subscriberRequest.getCreatedAt());
+        assertEquals(DateUtils.parseDate(request.getDateOfBirth()), subscriberRequest.getDateOfBirth());
+        assertEquals(request.getBlock(), subscriberRequest.getBlock());
+        assertEquals(subscriptionId, subscriberRequest.getSubscriptionId());
     }
 }

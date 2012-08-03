@@ -16,7 +16,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
-import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 
 import static org.mockito.Matchers.anyString;
@@ -130,7 +130,7 @@ public class SubscriptionValidatorTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Location does not exist for District[district] Block[block] and Panchayat[panchayat]");
 
-        subscriptionValidator.validateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", "23",
+        subscriptionValidator.validateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", 23,
                 DateTime.now().plusYears(2), DateTime.now().minus(2), location));
     }
 
@@ -144,7 +144,7 @@ public class SubscriptionValidatorTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Subscription does not exist for subscriptionId subscriptionId");
 
-        subscriptionValidator.validateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", "23",
+        subscriptionValidator.validateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", 23,
                 DateTime.now().plusYears(2), DateTime.now().minus(2), location));
     }
 

@@ -30,7 +30,7 @@ import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertie
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
-import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberUpdateRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -598,7 +598,7 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldThrowExceptionIfValidationFailsForUpdatingSubscriberDetails() {
-        SubscriberUpdateRequest request = mock(SubscriberUpdateRequest.class);
+        SubscriberRequest request = mock(SubscriberRequest.class);
         String message = "some error";
         doThrow(new ValidationException(message)).when(subscriptionValidator).validateSubscriberDetails(request);
         expectedException.expect(ValidationException.class);
@@ -616,7 +616,7 @@ public class SubscriptionServiceTest {
         DateTime expectedDateOfDelivery = DateTime.now().plusYears(5);
         DateTime dateOfBirth = DateTime.now().minusYears(5);
 
-        subscriptionService.updateSubscriberDetails(new SubscriberUpdateRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", "23",
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", 23,
                 expectedDateOfDelivery, dateOfBirth, location));
 
         ArgumentCaptor<SubscriberReportRequest> captor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
@@ -626,7 +626,7 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, reportRequest.getSubscriptionId());
         assertEquals(expectedDateOfDelivery, reportRequest.getExpectedDateOfDelivery());
         assertEquals(dateOfBirth, reportRequest.getDateOfBirth());
-        assertEquals("23", reportRequest.getBeneficiaryAge());
+        assertEquals(23, (int)reportRequest.getBeneficiaryAge());
         assertEquals("name", reportRequest.getBeneficiaryName());
         assertEquals("district", reportRequest.getLocation().getDistrict());
         assertEquals("block", reportRequest.getLocation().getBlock());

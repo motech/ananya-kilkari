@@ -7,12 +7,12 @@ import java.io.Serializable;
 public class SubscriberRequest implements Serializable {
     private DateTime createdAt;
     private String beneficiaryName;
-    private String beneficiaryAge;
+    private Integer beneficiaryAge;
     private DateTime expectedDateOfDelivery;
     private DateTime dateOfBirth;
     private SubscriberLocation location;
 
-    public SubscriberRequest(DateTime createdAt, String beneficiaryName, String beneficiaryAge, DateTime expectedDateOfDelivery, DateTime dateOfBirth, SubscriberLocation location) {
+    public SubscriberRequest(DateTime createdAt, String beneficiaryName, Integer beneficiaryAge, DateTime expectedDateOfDelivery, DateTime dateOfBirth, SubscriberLocation location) {
         this.createdAt = createdAt;
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
@@ -29,7 +29,7 @@ public class SubscriberRequest implements Serializable {
         return beneficiaryName;
     }
 
-    public String getBeneficiaryAge() {
+    public Integer getBeneficiaryAge() {
         return beneficiaryAge;
     }
 

@@ -10,18 +10,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Properties;
 
+import static org.motechproject.ananya.kilkari.reporting.domain.URLPath.*;
+
 @Service
 @ProductionProfile
 public class ReportingServiceImpl implements ReportingService {
-
     private ReportingGateway reportGateway;
     private HttpClientService httpClientService;
     private Properties kilkariProperties;
-    private String CREATE_SUBSCRIPTION_PATH = "subscription";
-    private String SUBSCRIPTION_STATE_CHANGE_PATH = "subscription";
-    private String CALL_DETAILS_PATH = "callDetails";
-    private String SUBSCRIBER_UPDATE_PATH = "subscriber";
-
 
     @Autowired
     public ReportingServiceImpl(ReportingGateway reportGateway, HttpClientService httpClientService, @Qualifier("kilkariProperties") Properties kilkariProperties) {

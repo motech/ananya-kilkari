@@ -13,12 +13,13 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Properties;
 
+import static org.motechproject.ananya.kilkari.reporting.domain.URLPath.GET_LOCATION_PATH;
+
 @Service
 public class ReportingGateway {
 
     private RestTemplate restTemplate;
     private Properties kilkariProperties;
-    private static final String GET_LOCATION_PATH = "location";
 
     private final static Logger logger = LoggerFactory.getLogger(ReportingGateway.class);
 
@@ -42,7 +43,7 @@ public class ReportingGateway {
     }
 
     private HashMap<String, String> constructParameterMap(String district, String block, String panchayat) {
-        HashMap<String, String> locationParameters = new HashMap<String, String>();
+        HashMap<String, String> locationParameters = new HashMap();
         locationParameters.put("district", district);
         locationParameters.put("block", block);
         locationParameters.put("panchayat", panchayat);

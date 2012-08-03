@@ -70,21 +70,24 @@ public class SubscriptionService {
         subscriptionValidator.validate(subscriptionRequest);
 
         DateTime startDate = determineSubscriptionStartDate(subscriptionRequest);
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(), subscriptionRequest.getCreationDate());
+        boolean isEarlySubscription = startDate.isAfter(subscriptionRequest.getCreationDate());
+
+        Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
+                subscriptionRequest.getCreationDate(), (isEarlySubscription ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW));
         subscription.setStartDate(startDate);
         allSubscriptions.add(subscription);
 
         SubscriptionMapper subscriptionMapper = new SubscriptionMapper();
 
         OMSubscriptionRequest omSubscriptionRequest = subscriptionMapper.createOMSubscriptionRequest(subscription, channel);
-        if (startDate.isAfter(subscriptionRequest.getCreationDate())) {
+        if (isEarlySubscription) {
             scheduleEarlySubscription(startDate, omSubscriptionRequest);
         }
         else
             initiateActivationRequest(omSubscriptionRequest);
 
-        reportingService.reportSubscriptionCreation(
-                subscriptionMapper.createSubscriptionCreationReportRequest(subscription, channel, subscriptionRequest.getLocation(), subscriptionRequest.getSubscriber()));
+        reportingService.reportSubscriptionCreation(subscriptionMapper.createSubscriptionCreationReportRequest(
+                subscription, channel, subscriptionRequest.getLocation(), subscriptionRequest.getSubscriber()));
 
         return subscription;
     }

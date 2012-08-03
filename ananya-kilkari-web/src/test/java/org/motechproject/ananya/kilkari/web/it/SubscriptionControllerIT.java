@@ -78,8 +78,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     public void shouldRetrieveSubscriptionDetailsFromDatabase() throws Exception {
         String msisdn = "9876543210";
         String channelString = Channel.IVR.toString();
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
         markForDeletion(subscription1);
@@ -217,6 +217,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         markForDeletion(subscription);
         assertEquals(msisdn, subscription.getMsisdn());
         assertEquals(pack, subscription.getPack());
+        assertEquals(SubscriptionStatus.NEW_EARLY, subscription.getStatus());
         assertEquals(expectedStartDate.getMillis(), subscription.getStartDate().getMillis());
         assertFalse(StringUtils.isBlank(subscription.getSubscriptionId()));
 
@@ -239,7 +240,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         expectedUnsubscriptionRequest.setChannel(Channel.CALL_CENTER.name());
         expectedUnsubscriptionRequest.setReason("Reason for deactivation");
 
-        Subscription expectedSubscription = new Subscription(msisdn, pack, DateTime.now().minusMonths(15));
+        Subscription expectedSubscription = new Subscription(msisdn, pack, DateTime.now().minusMonths(15), SubscriptionStatus.NEW);
         expectedSubscription.setStatus(SubscriptionStatus.ACTIVE);
         allSubscriptions.add(expectedSubscription);
         markForDeletion(expectedSubscription);

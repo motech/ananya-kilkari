@@ -40,12 +40,12 @@ public class Subscription extends MotechBaseDataObject {
     public Subscription() {
     }
 
-    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt) {
+    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, SubscriptionStatus status) {
         this.pack = pack;
         this.msisdn = PhoneNumber.formatPhoneNumberTo10Digits(msisdn).toString();
         this.creationDate = createdAt;
         this.startDate = creationDate;
-        this.status = SubscriptionStatus.NEW;
+        this.status = status;
         this.subscriptionId = UUID.randomUUID().toString();
     }
 
@@ -141,7 +141,7 @@ public class Subscription extends MotechBaseDataObject {
     public void activate(String operator, DateTime activatedOn) {
         setStatus(SubscriptionStatus.ACTIVE);
         setOperator(Operator.getFor(operator));
-        startDate = startDate.plus(activatedOn.getMillis() - creationDate.getMillis());
+        startDate = startDate.plus(activatedOn.getMillis() - startDate.getMillis());
     }
 
     public void activationFailed(String operator) {

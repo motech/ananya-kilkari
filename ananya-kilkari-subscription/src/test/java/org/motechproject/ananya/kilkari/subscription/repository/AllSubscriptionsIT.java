@@ -25,7 +25,7 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         DateTime createdAt = DateTime.now();
         DateTime startDate = createdAt.plusWeeks(2);
 
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, createdAt);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, createdAt, SubscriptionStatus.NEW);
         subscription.setStartDate(startDate);
         allSubscriptions.add(subscription);
 
@@ -47,9 +47,9 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
     public void shouldQueryForSubscriptionsInDbBasedOnGivenMsisdn() {
         String msisdn = "1234567890";
 
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
-        Subscription subscription3 = new Subscription("2314567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription3 = new Subscription("2314567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
         allSubscriptions.add(subscription3);
@@ -79,13 +79,13 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
     public void shouldFindSubscriptionByMsisdnAndPack() {
         String msisdn = "1234567890";
 
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         allSubscriptions.add(subscription1);
 
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         allSubscriptions.add(subscription2);
 
-        Subscription subscription3 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
+        Subscription subscription3 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         subscription3.setStatus(SubscriptionStatus.COMPLETED);
         allSubscriptions.add(subscription3);
 
@@ -104,8 +104,8 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
     public void shouldFindSubscriptionBySubscriptionId() {
         String msisdn = "1234567890";
 
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now());
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
 
@@ -123,11 +123,11 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         String msisdn1 = "1234567890";
         String msisdn = "91" + msisdn1;
 
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         subscription1.setStatus(SubscriptionStatus.ACTIVE);
         allSubscriptions.add(subscription1);
 
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now());
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         subscription2.setStatus(SubscriptionStatus.COMPLETED);
         allSubscriptions.add(subscription2);
 

@@ -4,15 +4,10 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 
 public class InboxCallDetailsWebRequest extends CallDetailsWebRequest {
     @JsonProperty
     private String pack;
-
-    public InboxCallDetailsWebRequest(CampaignMessageCallSource callSource) {
-        super(callSource);
-    }
 
     @JsonIgnore
     public String getPack() {
@@ -26,7 +21,7 @@ public class InboxCallDetailsWebRequest extends CallDetailsWebRequest {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof OBDSuccessfulCallDetailsWebRequest)) return false;
+        if (!(o instanceof InboxCallDetailsWebRequest)) return false;
 
         InboxCallDetailsWebRequest that = (InboxCallDetailsWebRequest) o;
 

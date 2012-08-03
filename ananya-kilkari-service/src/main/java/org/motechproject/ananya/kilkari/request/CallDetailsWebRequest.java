@@ -8,7 +8,6 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignCode;
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.common.domain.PhoneNumber;
 
@@ -21,16 +20,13 @@ public class CallDetailsWebRequest {
     private String msisdn;
     @JsonProperty
     private String campaignId;
-    @JsonProperty
+    @JsonProperty("callDetailRecord")
     private CallDurationWebRequest callDurationWebRequest;
     @JsonIgnore
     private DateTime createdAt;
-    @JsonIgnore
-    private CampaignMessageCallSource callSource;
 
-    public CallDetailsWebRequest(CampaignMessageCallSource callSource) {
+    public CallDetailsWebRequest() {
         createdAt = DateTime.now();
-        this.callSource = callSource;
     }
 
     public void setMsisdn(String msisdn) {
@@ -61,10 +57,6 @@ public class CallDetailsWebRequest {
         return createdAt;
     }
 
-    public CampaignMessageCallSource getCallSource() {
-        return callSource;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -76,8 +68,6 @@ public class CallDetailsWebRequest {
                 .append(this.msisdn, that.msisdn)
                 .append(this.campaignId, that.campaignId)
                 .append(this.callDurationWebRequest, that.callDurationWebRequest)
-                .append(this.createdAt, that.createdAt)
-                .append(this.callSource, that.callSource)
                 .isEquals();
     }
 
@@ -87,24 +77,15 @@ public class CallDetailsWebRequest {
                 .append(this.msisdn)
                 .append(this.campaignId)
                 .append(this.callDurationWebRequest)
-                .append(this.createdAt)
-                .append(this.callSource)
                 .hashCode();
     }
 
     public Errors validate() {
         Errors errors = new Errors();
-        validateCallSource(errors);
         validateMsisdn(errors);
         validateCampaignId(errors);
         validateCallDuration(errors);
         return errors;
-    }
-
-    private void validateCallSource(Errors errors) {
-        if(callSource == null) {
-            errors.add("Null call source");
-        }
     }
 
     private void validateCallDuration(Errors errors) {

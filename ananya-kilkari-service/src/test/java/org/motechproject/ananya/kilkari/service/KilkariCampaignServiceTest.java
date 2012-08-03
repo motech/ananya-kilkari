@@ -20,6 +20,7 @@ import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
+import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
@@ -59,7 +60,7 @@ public class KilkariCampaignServiceTest {
     @Mock
     private ReportingService reportingService;
     @Mock
-    private OBDRequestPublisher obdRequestPublisher;
+    private CallDetailsRequestPublisher callDetailsRequestPublisher;
     @Mock
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
     @Mock
@@ -73,11 +74,10 @@ public class KilkariCampaignServiceTest {
     @Mock
     private CampaignMessageAlertService campaignMessageAlertService;
 
-
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, campaignMessageAlertService, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, inboxService, obdServiceOptionFactory, successfulCallRequestValidator);
+        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, campaignMessageAlertService, campaignMessageService, reportingService, callDetailsRequestPublisher, callDeliveryFailureRecordValidator, inboxService, obdServiceOptionFactory, successfulCallRequestValidator);
     }
 
     @Test
@@ -130,7 +130,7 @@ public class KilkariCampaignServiceTest {
 
         kilkariCampaignService.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
 
-        verify(obdRequestPublisher).publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
+        verify(callDetailsRequestPublisher).publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
     }
 
     @Test
@@ -220,7 +220,7 @@ public class KilkariCampaignServiceTest {
 
         kilkariCampaignService.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
 
-        verify(obdRequestPublisher).publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
+        verify(callDetailsRequestPublisher).publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
     }
 
     @Test
@@ -256,7 +256,7 @@ public class KilkariCampaignServiceTest {
     public void shouldPublishCallDeliveryFailureRecords() {
         FailedCallReports failedCallReports = Mockito.mock(FailedCallReports.class);
         kilkariCampaignService.publishCallDeliveryFailureRequest(failedCallReports);
-        verify(obdRequestPublisher).publishCallDeliveryFailureRecord(failedCallReports);
+        verify(callDetailsRequestPublisher).publishCallDeliveryFailureRecord(failedCallReports);
     }
 
     @Test
@@ -301,7 +301,7 @@ public class KilkariCampaignServiceTest {
         verify(callDeliveryFailureRecordValidator, times(2)).validate(any(FailedCallReport.class));
 
         ArgumentCaptor<InvalidFailedCallReports> invalidCallDeliveryFailureRecordArgumentCaptor = ArgumentCaptor.forClass(InvalidFailedCallReports.class);
-        verify(obdRequestPublisher).publishInvalidCallDeliveryFailureRecord(invalidCallDeliveryFailureRecordArgumentCaptor.capture());
+        verify(callDetailsRequestPublisher).publishInvalidCallDeliveryFailureRecord(invalidCallDeliveryFailureRecordArgumentCaptor.capture());
         InvalidFailedCallReports invalidFailedCallReports = invalidCallDeliveryFailureRecordArgumentCaptor.getValue();
         List<InvalidFailedCallReport> recordObjectFaileds = invalidFailedCallReports.getRecordObjectFaileds();
 
@@ -336,7 +336,7 @@ public class KilkariCampaignServiceTest {
         verify(callDeliveryFailureRecordValidator, times(3)).validate(any(FailedCallReport.class));
 
         ArgumentCaptor<ValidFailedCallReport> captor = ArgumentCaptor.forClass(ValidFailedCallReport.class);
-        verify(obdRequestPublisher, times(2)).publishValidCallDeliveryFailureRecord(captor.capture());
+        verify(callDetailsRequestPublisher, times(2)).publishValidCallDeliveryFailureRecord(captor.capture());
         List<ValidFailedCallReport> actualValidFailedCallReports = captor.getAllValues();
         assertEquals("1234567890",actualValidFailedCallReports.get(0).getMsisdn());
         assertEquals("1234567891", actualValidFailedCallReports.get(1).getMsisdn());
@@ -356,7 +356,7 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.processCallDeliveryFailureRecord(failedCallReports);
 
         verify(callDeliveryFailureRecordValidator, times(1)).validate(any(FailedCallReport.class));
-        verify(obdRequestPublisher, never()).publishInvalidCallDeliveryFailureRecord(any(InvalidFailedCallReports.class));
+        verify(callDetailsRequestPublisher, never()).publishInvalidCallDeliveryFailureRecord(any(InvalidFailedCallReports.class));
     }
 
     @Test
@@ -495,5 +495,14 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.renewSchedule(subscriptionId);
 
         verify(campaignMessageAlertService).scheduleCampaignMessageAlertForRenewal(subscriptionId, msisdn, operator.name());
+    }
+
+    @Test
+    public void shouldPublishInboxCallDetails(){
+        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest();
+
+        kilkariCampaignService.publishInboxCallDetailsRequest(inboxCallDetailsWebRequest);
+
+        verify(callDetailsRequestPublisher).publishInboxCallDetailsRequest(inboxCallDetailsWebRequest);
     }
 }

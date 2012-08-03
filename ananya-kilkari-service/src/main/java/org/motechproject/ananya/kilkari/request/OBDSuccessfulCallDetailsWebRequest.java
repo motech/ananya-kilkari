@@ -6,7 +6,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 
 public class OBDSuccessfulCallDetailsWebRequest extends CallDetailsWebRequest {
@@ -15,10 +14,6 @@ public class OBDSuccessfulCallDetailsWebRequest extends CallDetailsWebRequest {
 
     @JsonIgnore
     private String subscriptionId;
-
-    public OBDSuccessfulCallDetailsWebRequest() {
-        super(CampaignMessageCallSource.OBD);
-    }
 
     public String getServiceOption() {
         return serviceOption;

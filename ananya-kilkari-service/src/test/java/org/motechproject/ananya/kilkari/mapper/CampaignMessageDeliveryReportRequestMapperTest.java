@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.domain;
+package org.motechproject.ananya.kilkari.mapper;
 
 import org.joda.time.DateTime;
 import org.junit.Test;

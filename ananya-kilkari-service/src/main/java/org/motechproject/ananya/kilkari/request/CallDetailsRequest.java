@@ -1,8 +1,6 @@
 package org.motechproject.ananya.kilkari.request;
 
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
@@ -10,7 +8,6 @@ import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import java.io.Serializable;
 
 public class CallDetailsRequest implements Serializable {
-
     private String msisdn;
     private String campaignId;
     private CallDurationRequest callDurationRequest;
@@ -24,6 +21,7 @@ public class CallDetailsRequest implements Serializable {
         this.callDurationRequest = callDurationRequest;
         this.createdAt = createdAt;
         this.callSource = callSource;
+
         this.channel = Channel.IVR;
     }
 
@@ -49,32 +47,5 @@ public class CallDetailsRequest implements Serializable {
 
     public Channel getChannel() {
         return channel;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CallDetailsRequest)) return false;
-
-        CallDetailsRequest that = (CallDetailsRequest) o;
-
-        return new EqualsBuilder()
-                .append(this.msisdn, that.msisdn)
-                .append(this.campaignId, that.campaignId)
-                .append(this.callDurationRequest, that.callDurationRequest)
-                .append(this.createdAt, that.createdAt)
-                .append(this.callSource, that.callSource)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(this.msisdn)
-                .append(this.campaignId)
-                .append(this.callDurationRequest)
-                .append(this.createdAt)
-                .append(this.callSource)
-                .hashCode();
     }
 }

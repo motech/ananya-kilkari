@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.domain;
+package org.motechproject.ananya.kilkari.mapper;
 
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.reporting.domain.CallDurationReportRequest;

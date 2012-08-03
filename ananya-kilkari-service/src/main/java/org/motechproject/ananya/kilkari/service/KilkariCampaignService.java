@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequestMapper;
+import org.motechproject.ananya.kilkari.mapper.CampaignMessageDeliveryReportRequestMapper;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.mapper.OBDSuccessfulCallDetailsRequestMapper;
@@ -10,11 +10,11 @@ import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertServ
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
-import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.*;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
+import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -43,7 +43,7 @@ public class KilkariCampaignService {
     private CampaignMessageAlertService campaignMessageAlertService;
     private CampaignMessageService campaignMessageService;
     private ReportingService reportingService;
-    private OBDRequestPublisher obdRequestPublisher;
+    private CallDetailsRequestPublisher callDetailsRequestPublisher;
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
     private InboxService inboxService;
     private OBDServiceOptionFactory obdServiceOptionFactory;
@@ -61,7 +61,7 @@ public class KilkariCampaignService {
                                   CampaignMessageAlertService campaignMessageAlertService,
                                   CampaignMessageService campaignMessageService,
                                   ReportingService reportingService,
-                                  OBDRequestPublisher obdRequestPublisher,
+                                  CallDetailsRequestPublisher callDetailsRequestPublisher,
                                   CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator,
                                   InboxService inboxService,
                                   OBDServiceOptionFactory obdServiceOptionFactory,
@@ -72,7 +72,7 @@ public class KilkariCampaignService {
         this.campaignMessageAlertService = campaignMessageAlertService;
         this.campaignMessageService = campaignMessageService;
         this.reportingService = reportingService;
-        this.obdRequestPublisher = obdRequestPublisher;
+        this.callDetailsRequestPublisher = callDetailsRequestPublisher;
         this.callDeliveryFailureRecordValidator = callDeliveryFailureRecordValidator;
         this.inboxService = inboxService;
         this.obdServiceOptionFactory = obdServiceOptionFactory;
@@ -149,15 +149,19 @@ public class KilkariCampaignService {
     }
 
     public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntries invalidOBDRequestEntries) {
-        obdRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
+        callDetailsRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
+    }
+
+    public void publishInboxCallDetailsRequest(InboxCallDetailsWebRequest inboxCallDetailsWebRequest) {
+        callDetailsRequestPublisher.publishInboxCallDetailsRequest(inboxCallDetailsWebRequest);
     }
 
     public void publishSuccessfulCallRequest(OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest) {
-        obdRequestPublisher.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
+        callDetailsRequestPublisher.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
     }
 
     public void publishCallDeliveryFailureRequest(FailedCallReports failedCallReports) {
-        obdRequestPublisher.publishCallDeliveryFailureRecord(failedCallReports);
+        callDetailsRequestPublisher.publishCallDeliveryFailureRecord(failedCallReports);
     }
 
     @Transactional
@@ -191,12 +195,13 @@ public class KilkariCampaignService {
         InvalidFailedCallReports invalidFailedCallReports = new InvalidFailedCallReports();
         invalidFailedCallReports.setRecordObjectFaileds(invalidFailedCallReport);
 
-        obdRequestPublisher.publishInvalidCallDeliveryFailureRecord(invalidFailedCallReports);
+
+        callDetailsRequestPublisher.publishInvalidCallDeliveryFailureRecord(invalidFailedCallReports);
     }
 
     private void publishValidRecords(List<ValidFailedCallReport> validFailedCallReports) {
         for (ValidFailedCallReport failedCallReport : validFailedCallReports) {
-            obdRequestPublisher.publishValidCallDeliveryFailureRecord(failedCallReport);
+            callDetailsRequestPublisher.publishValidCallDeliveryFailureRecord(failedCallReport);
         }
     }
 

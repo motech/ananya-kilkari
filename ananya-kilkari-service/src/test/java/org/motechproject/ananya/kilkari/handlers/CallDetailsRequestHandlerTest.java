@@ -10,7 +10,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
-import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
+import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
+import org.motechproject.ananya.kilkari.service.CallDetailsEventKeys;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
@@ -29,11 +30,12 @@ import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class OBDRequestHandlerTest {
+public class CallDetailsRequestHandlerTest {
 
     @Mock
     private OBDServiceOptionFactory obdServiceOptionFactory;
@@ -48,11 +50,11 @@ public class OBDRequestHandlerTest {
     @Mock
     private CallRecordsService callRecordsService;
 
-    private OBDRequestHandler obdRequestHandler;
+    private CallDetailsRequestHandler callDetailsRequestHandler;
 
     @Before
     public void setUp() {
-        obdRequestHandler = new OBDRequestHandler(kilkariCampaignService, callRecordsService);
+        callDetailsRequestHandler = new CallDetailsRequestHandler(kilkariCampaignService, callRecordsService);
     }
 
     @Test
@@ -63,7 +65,7 @@ public class OBDRequestHandlerTest {
         obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
         stringObjectHashMap.put("0", obdSuccessfulCallDetailsRequest);
 
-        obdRequestHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, stringObjectHashMap));
+        callDetailsRequestHandler.handleOBDCallbackRequest(new MotechEvent(CallDetailsEventKeys.PROCESS_OBD_SUCCESSFUL_CALL_REQUEST_SUBJECT, stringObjectHashMap));
 
         verify(kilkariCampaignService).processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
     }
@@ -76,7 +78,7 @@ public class OBDRequestHandlerTest {
         obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
         stringObjectHashMap.put("0", obdSuccessfulCallDetailsRequest);
 
-        obdRequestHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, stringObjectHashMap));
+        callDetailsRequestHandler.handleOBDCallbackRequest(new MotechEvent(CallDetailsEventKeys.PROCESS_OBD_SUCCESSFUL_CALL_REQUEST_SUBJECT, stringObjectHashMap));
 
         verify(kilkariCampaignService).processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
     }
@@ -90,7 +92,7 @@ public class OBDRequestHandlerTest {
         map.put("0", obdSuccessfulCallDetailsRequest);
         when(successfulCallRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
 
-        obdRequestHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, map));
+        callDetailsRequestHandler.handleOBDCallbackRequest(new MotechEvent(CallDetailsEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, map));
     }
 
     @Test
@@ -120,7 +122,7 @@ public class OBDRequestHandlerTest {
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("0", invalidOBDRequestEntries);
 
-        obdRequestHandler.handleInvalidCallRecordsRequest(new MotechEvent(OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, parameters));
+        callDetailsRequestHandler.handleInvalidCallRecordsRequest(new MotechEvent(CallDetailsEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, parameters));
 
         ArgumentCaptor<ArrayList> captor = ArgumentCaptor.forClass(ArrayList.class);
         verify(callRecordsService).processInvalidCallRecords(captor.capture());
@@ -133,5 +135,16 @@ public class OBDRequestHandlerTest {
         assertEquals(msisdn1, actualInvalidCallRecord1.getMsisdn());
         assertEquals(operator1, actualInvalidCallRecord1.getOperator());
         assertEquals(desc1, actualInvalidCallRecord1.getDescription());
+    }
+
+    @Test
+    public void shouldInvokeKilkariCampaignServiceToProcessCallDeliveryFailureRecords() {
+        HashMap<String, Object> parameters = new HashMap<>();
+        FailedCallReports failureRecordFailed = mock(FailedCallReports.class);
+        parameters.put("0", failureRecordFailed);
+
+        callDetailsRequestHandler.handleCallDeliveryFailureRecord(new MotechEvent(CallDetailsEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, parameters));
+
+        verify(kilkariCampaignService).processCallDeliveryFailureRecord(failureRecordFailed);
     }
 }

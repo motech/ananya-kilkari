@@ -43,6 +43,7 @@
             <groupId>org.motechproject.ananya.kilkari</groupId>
             <artifactId>ananya-kilkari-config</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

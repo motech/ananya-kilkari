@@ -9,8 +9,7 @@ import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -51,15 +50,15 @@ public class OBDControllerTest {
     @Test
     public void shouldHandleSuccessfulResponseFromObd() throws Exception {
         String subscriptionId = "abcd1234";
-        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
-        successfulCallRequest.setMsisdn("1234567890");
-        successfulCallRequest.setCampaignId("WEEK12");
-        successfulCallRequest.setServiceOption("HELP");
+        OBDSuccessfulCallDetailsRequest successfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        successfulCallDetailsRequest.setMsisdn("1234567890");
+        successfulCallDetailsRequest.setCampaignId("WEEK12");
+        successfulCallDetailsRequest.setServiceOption("HELP");
         CallDetailRecord callDetailRecord = new CallDetailRecord();
         callDetailRecord.setStartTime("21-11-2012 22-10-15");
         callDetailRecord.setEndTime("23-11-2012 22-10-15");
-        successfulCallRequest.setCallDetailRecord(callDetailRecord);
-        byte[] requestBody = TestUtils.toJson(successfulCallRequest).getBytes();
+        successfulCallDetailsRequest.setCallDetailRecord(callDetailRecord);
+        byte[] requestBody = TestUtils.toJson(successfulCallDetailsRequest).getBytes();
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
         mockMvc(obdController)
@@ -103,15 +102,16 @@ public class OBDControllerTest {
     @Test
     public void shouldInvokeKilkariCampaignServiceForProcessingValidObdRequest() throws Exception {
         String subscriptionId = "abcd1234";
-        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
-        successfulCallRequest.setMsisdn("1234567890");
-        successfulCallRequest.setCampaignId("WEEK13");
-        successfulCallRequest.setServiceOption("HELP");
+        OBDSuccessfulCallDetailsRequest successfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        successfulCallDetailsRequest.setMsisdn("1234567890");
+        successfulCallDetailsRequest.setCampaignId("WEEK13");
+        successfulCallDetailsRequest.setServiceOption("HELP");
         CallDetailRecord callDetailRecord = new CallDetailRecord();
         callDetailRecord.setStartTime("21-11-2012 22-10-15");
         callDetailRecord.setEndTime("23-11-2012 22-10-15");
-        successfulCallRequest.setCallDetailRecord(callDetailRecord);
-        byte[] requestBody = TestUtils.toJson(successfulCallRequest).getBytes();
+        successfulCallDetailsRequest.setCallDetailRecord(callDetailRecord);
+        successfulCallDetailsRequest.setSubscriptionId(subscriptionId);
+        byte[] requestBody = TestUtils.toJson(successfulCallDetailsRequest).getBytes();
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
         mockMvc(obdController)
@@ -120,13 +120,12 @@ public class OBDControllerTest {
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD call details received successfully for subscriptionId : " + subscriptionId)));
 
-        ArgumentCaptor<OBDSuccessfulCallRequestWrapper> successfulCallRequestWrapperArgumentCaptor = ArgumentCaptor.forClass(OBDSuccessfulCallRequestWrapper.class);
-        verify(kilkariCampaignService).publishSuccessfulCallRequest(successfulCallRequestWrapperArgumentCaptor.capture());
-        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = successfulCallRequestWrapperArgumentCaptor.getValue();
+        ArgumentCaptor<OBDSuccessfulCallDetailsRequest> successfulCallRequestArgumentCaptor = ArgumentCaptor.forClass(OBDSuccessfulCallDetailsRequest.class);
+        verify(kilkariCampaignService).publishSuccessfulCallRequest(successfulCallRequestArgumentCaptor.capture());
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = successfulCallRequestArgumentCaptor.getValue();
 
-        assertEquals(subscriptionId, successfulCallRequestWrapper.getSubscriptionId());
-        assertEquals(successfulCallRequest, successfulCallRequestWrapper.getSuccessfulCallRequest());
-        assertNotNull(successfulCallRequestWrapper.getCreatedAt());
+        assertEquals(subscriptionId, obdSuccessfulCallDetailsRequest.getSubscriptionId());
+        assertNotNull(obdSuccessfulCallDetailsRequest.getCreatedAt());
     }
 
     @Test

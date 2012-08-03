@@ -26,7 +26,7 @@ public class CallDetailsReportHandlerTest {
 
     @Test
     public void shouldInvokeReportingServiceToReportCampaignMessageDelivery() {
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(null, null, null, null, null, null, null);
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(null, null, null, null, null, null, null, null);
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("0", campaignMessageDeliveryReportRequest);
 

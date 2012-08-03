@@ -12,7 +12,7 @@ import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.*;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
@@ -125,23 +125,23 @@ public class KilkariCampaignService {
             kilkariSubscriptionService.processSubscriptionCompletion(subscription);
     }
 
-    public void processSuccessfulMessageDelivery(OBDSuccessfulCallRequestWrapper obdRequestWrapper) {
-        validateSuccessfulCallRequest(obdRequestWrapper);
+    public void processSuccessfulMessageDelivery(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
+        validateSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
 
-        CampaignMessage campaignMessage = campaignMessageService.find(obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId());
+        CampaignMessage campaignMessage = campaignMessageService.find(obdSuccessfulCallDetailsRequest.getSubscriptionId(), obdSuccessfulCallDetailsRequest.getCampaignId());
         if (campaignMessage == null) {
             logger.error(String.format("Campaign Message not present for subscriptionId: %s, campaignId: %s",
-                    obdRequestWrapper.getSubscriptionId(), obdRequestWrapper.getCampaignId()));
+                    obdSuccessfulCallDetailsRequest.getSubscriptionId(), obdSuccessfulCallDetailsRequest.getCampaignId()));
             return;
         }
         int retryCount = campaignMessage.getDnpRetryCount();
 
-        reportingService.reportCampaignMessageDeliveryStatus(new CampaignMessageDeliveryReportRequestMapper().mapFrom(obdRequestWrapper, retryCount));
+        reportingService.reportCampaignMessageDeliveryStatus(new CampaignMessageDeliveryReportRequestMapper().mapFrom(obdSuccessfulCallDetailsRequest, retryCount));
         campaignMessageService.deleteCampaignMessage(campaignMessage);
 
-        ServiceOption serviceOption = ServiceOption.getFor(obdRequestWrapper.getSuccessfulCallRequest().getServiceOption());
+        ServiceOption serviceOption = ServiceOption.getFor(obdSuccessfulCallDetailsRequest.getServiceOption());
         if (obdServiceOptionFactory.getHandler(serviceOption) != null) {
-            obdServiceOptionFactory.getHandler(serviceOption).process(obdRequestWrapper);
+            obdServiceOptionFactory.getHandler(serviceOption).process(obdSuccessfulCallDetailsRequest);
         }
     }
 
@@ -149,8 +149,8 @@ public class KilkariCampaignService {
         obdRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
     }
 
-    public void publishSuccessfulCallRequest(OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper) {
-        obdRequestPublisher.publishSuccessfulCallRequest(successfulCallRequestWrapper);
+    public void publishSuccessfulCallRequest(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
+        obdRequestPublisher.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
     }
 
     public void publishCallDeliveryFailureRequest(FailedCallReports failedCallReports) {
@@ -197,8 +197,8 @@ public class KilkariCampaignService {
         }
     }
 
-    private void validateSuccessfulCallRequest(OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper) {
-        Errors validationErrors = successfulCallRequestValidator.validate(successfulCallRequestWrapper);
+    private void validateSuccessfulCallRequest(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
+        Errors validationErrors = successfulCallRequestValidator.validate(obdSuccessfulCallDetailsRequest);
         if (validationErrors.hasErrors()) {
             throw new ValidationException(String.format("OBD Request Invalid: %s", validationErrors.allMessages()));
         }

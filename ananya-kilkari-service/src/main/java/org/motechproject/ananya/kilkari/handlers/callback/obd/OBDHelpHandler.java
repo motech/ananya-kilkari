@@ -1,8 +1,7 @@
 package org.motechproject.ananya.kilkari.handlers.callback.obd;
 
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.service.SubscriberCareService;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +18,12 @@ public class OBDHelpHandler implements ServiceOptionHandler {
     }
 
     @Override
-    public void process(OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper) {
-        createSubscriberCareDoc(successfulCallRequestWrapper.getSuccessfulCallRequest());
+    public void process(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
+        createSubscriberCareDoc(obdSuccessfulCallDetailsRequest);
     }
 
-    private void createSubscriberCareDoc(OBDSuccessfulCallRequest obdRequest) {
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(obdRequest.getMsisdn(), obdRequest.getServiceOption(), Channel.IVR.name());
+    private void createSubscriberCareDoc(OBDSuccessfulCallDetailsRequest obdDetailsRequest) {
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(obdDetailsRequest.getMsisdn(), obdDetailsRequest.getServiceOption(), obdDetailsRequest.getChannel().name());
         subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
     }
 }

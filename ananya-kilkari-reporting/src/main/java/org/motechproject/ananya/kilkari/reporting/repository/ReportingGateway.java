@@ -6,7 +6,7 @@ public interface ReportingGateway {
     String CREATE_SUBSCRIPTION_PATH = "subscription";
     String SUBSCRIPTION_STATE_CHANGE_PATH = "subscription";
     String GET_LOCATION_PATH = "location";
-    String OBD_CALL_DETAILS_PATH = "obd/callDetails";
+    String CALL_DETAILS_PATH = "callDetails";
     String SUBSCRIBER_UPDATE_PATH = "subscriber";
 
     void createSubscription(SubscriptionCreationReportRequest subscriptionCreationReportRequest);

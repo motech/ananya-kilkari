@@ -10,6 +10,7 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.reporting.domain.CallDetailsReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.slf4j.Logger;
@@ -129,7 +130,7 @@ public class CampaignMessageService {
     private void reportCampaignMessageStatus(ValidFailedCallReport failedCallReport, CampaignMessage campaignMessage) {
         String retryCount = getRetryCount(campaignMessage);
         CallDetailsReportRequest callDetailRecord = new CallDetailsReportRequest(format(failedCallReport.getCreatedAt()), format(failedCallReport.getCreatedAt()));
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(), null, retryCount, failedCallReport.getStatusCode().name(), callDetailRecord);
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(), null, retryCount, failedCallReport.getStatusCode().name(), callDetailRecord, CampaignMessageCallSource.OBD.name());
 
         reportingService.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
     }

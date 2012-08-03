@@ -17,8 +17,7 @@ import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
@@ -59,37 +58,37 @@ public class OBDRequestHandlerTest {
     @Test
     public void shouldHandleAOBDCallBackRequest() {
         HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
-        successfulCallRequest.setServiceOption(ServiceOption.HELP.name());
-        OBDSuccessfulCallRequestWrapper expectedObdRequest = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, "subscriptionId", DateTime.now(), Channel.IVR);
-        stringObjectHashMap.put("0", expectedObdRequest);
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        obdSuccessfulCallDetailsRequest.setServiceOption(ServiceOption.HELP.name());
+        obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
+        stringObjectHashMap.put("0", obdSuccessfulCallDetailsRequest);
 
         obdRequestHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, stringObjectHashMap));
 
-        verify(kilkariCampaignService).processSuccessfulMessageDelivery(expectedObdRequest);
+        verify(kilkariCampaignService).processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
     }
 
     @Test
     public void shouldHandleAOBDCallBackRequestWithDeactivation() {
         HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
-        successfulCallRequest.setServiceOption(ServiceOption.UNSUBSCRIBE.name());
-        OBDSuccessfulCallRequestWrapper expectedObdRequest = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, "subscriptionId", DateTime.now(), Channel.IVR);
-        stringObjectHashMap.put("0", expectedObdRequest);
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        obdSuccessfulCallDetailsRequest.setServiceOption(ServiceOption.UNSUBSCRIBE.name());
+        obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
+        stringObjectHashMap.put("0", obdSuccessfulCallDetailsRequest);
 
         obdRequestHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, stringObjectHashMap));
 
-        verify(kilkariCampaignService).processSuccessfulMessageDelivery(expectedObdRequest);
+        verify(kilkariCampaignService).processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
     }
 
     @Test
     public void shouldNotThrowExceptionIfHandlerIsNotThereForServiceOption() {
         Map<String, Object> map = new HashMap<>();
-        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
-        successfulCallRequest.setServiceOption("");
-        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, "subscriptionId", DateTime.now(), Channel.IVR);
-        map.put("0", successfulCallRequestWrapper);
-        when(successfulCallRequestValidator.validate(successfulCallRequestWrapper)).thenReturn(new Errors());
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        obdSuccessfulCallDetailsRequest.setServiceOption("");
+        obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
+        map.put("0", obdSuccessfulCallDetailsRequest);
+        when(successfulCallRequestValidator.validate(obdSuccessfulCallDetailsRequest)).thenReturn(new Errors());
 
         obdRequestHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, map));
     }

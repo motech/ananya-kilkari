@@ -4,8 +4,8 @@ import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.scheduler.context.EventContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,8 +20,8 @@ public class OBDRequestPublisher {
         this.eventContext = eventContext;
     }
 
-    public void publishSuccessfulCallRequest(OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper) {
-        eventContext.send(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, successfulCallRequestWrapper);
+    public void publishSuccessfulCallRequest(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
+        eventContext.send(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, obdSuccessfulCallDetailsRequest);
     }
 
     public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntries invalidOBDRequestEntries) {

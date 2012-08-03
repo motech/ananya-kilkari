@@ -11,8 +11,7 @@ import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.scheduler.context.EventContext;
 
@@ -34,10 +33,11 @@ public class OBDRequestPublisherTest {
 
     @Test
     public void shouldPublishCallBackRequests() {
-        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(new OBDSuccessfulCallRequest(), "subscriptionID", DateTime.now(), Channel.IVR);
-        obdRequestPublisher.publishSuccessfulCallRequest(successfulCallRequestWrapper);
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
 
-        verify(eventContext).send(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, successfulCallRequestWrapper);
+        obdRequestPublisher.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
+
+        verify(eventContext).send(OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT, obdSuccessfulCallDetailsRequest);
     }
 
     @Test

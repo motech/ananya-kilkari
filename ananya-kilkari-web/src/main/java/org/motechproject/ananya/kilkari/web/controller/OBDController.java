@@ -3,8 +3,7 @@ package org.motechproject.ananya.kilkari.web.controller;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
@@ -23,8 +22,9 @@ public class OBDController {
 
     @RequestMapping(value = "/obd/calldetails/{subscriptionId}", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResponse handleSuccessfulResponse(@RequestBody OBDSuccessfulCallRequest successfulCallRequest, @PathVariable String subscriptionId) {
-        kilkariCampaignService.publishSuccessfulCallRequest(new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, DateTime.now(), Channel.IVR));
+    public BaseResponse handleSuccessfulResponse(@RequestBody OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest, @PathVariable String subscriptionId) {
+        obdSuccessfulCallDetailsRequest.setSubscriptionId(subscriptionId);
+        kilkariCampaignService.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
         return BaseResponse.success("OBD call details received successfully for subscriptionId : " + subscriptionId);
     }
 

@@ -19,8 +19,7 @@ import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertServ
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
@@ -123,16 +122,16 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldPublishObdCallbackRequest() {
-        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(new OBDSuccessfulCallRequest(), "subscriptionId", DateTime.now(), Channel.IVR);
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
 
-        kilkariCampaignService.publishSuccessfulCallRequest(successfulCallRequestWrapper);
+        kilkariCampaignService.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
 
-        verify(obdRequestPublisher).publishSuccessfulCallRequest(successfulCallRequestWrapper);
+        verify(obdRequestPublisher).publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
     }
 
     @Test
     public void shouldProcessSuccessfulCampaignMessageDelivery() {
-        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK1";
         String msisdn = "1234567890";
@@ -144,19 +143,20 @@ public class KilkariCampaignServiceTest {
         callDetailRecord.setStartTime(startTime);
         callDetailRecord.setEndTime(endTime);
 
-        successfulCallRequest.setMsisdn(msisdn);
-        successfulCallRequest.setCampaignId(campaignId);
-        successfulCallRequest.setServiceOption(serviceOption);
-        successfulCallRequest.setCallDetailRecord(callDetailRecord);
-        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, DateTime.now(), Channel.IVR);
+        obdSuccessfulCallDetailsRequest.setMsisdn(msisdn);
+        obdSuccessfulCallDetailsRequest.setCampaignId(campaignId);
+        obdSuccessfulCallDetailsRequest.setServiceOption(serviceOption);
+        obdSuccessfulCallDetailsRequest.setCallDetailRecord(callDetailRecord);
+        obdSuccessfulCallDetailsRequest.setSubscriptionId(subscriptionId);
+
         CampaignMessage campaignMessage = mock(CampaignMessage.class);
         when(campaignMessage.getDnpRetryCount()).thenReturn(retryCount);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        when(successfulCallRequestValidator.validate(successfulCallRequestWrapper)).thenReturn(new Errors());
+        when(successfulCallRequestValidator.validate(obdSuccessfulCallDetailsRequest)).thenReturn(new Errors());
         when(obdServiceOptionFactory.getHandler(ServiceOption.HELP)).thenReturn(serviceOptionHandler);
 
-        kilkariCampaignService.processSuccessfulMessageDelivery(successfulCallRequestWrapper);
+        kilkariCampaignService.processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
 
         InOrder inOrder = Mockito.inOrder(campaignMessageService, reportingService);
         inOrder.verify(campaignMessageService).find(subscriptionId, campaignId);
@@ -175,12 +175,12 @@ public class KilkariCampaignServiceTest {
         assertEquals(startTime, campaignMessageDeliveryReportRequest.getCallDetailRecord().getStartTime());
         assertEquals(endTime, campaignMessageDeliveryReportRequest.getCallDetailRecord().getEndTime());
 
-        verify(serviceOptionHandler).process(successfulCallRequestWrapper);
+        verify(serviceOptionHandler).process(obdSuccessfulCallDetailsRequest);
     }
 
     @Test
     public void shouldNotProcessSuccessfulCampaignMessageDeliveryIfThereIsNoSubscriptionAvailable() {
-        OBDSuccessfulCallRequest successfulCallRequest = new OBDSuccessfulCallRequest();
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK1";
         String msisdn = "1234567890";
@@ -191,16 +191,16 @@ public class KilkariCampaignServiceTest {
         callDetailRecord.setStartTime(startTime);
         callDetailRecord.setEndTime(endTime);
 
-        successfulCallRequest.setMsisdn(msisdn);
-        successfulCallRequest.setCampaignId(campaignId);
-        successfulCallRequest.setServiceOption(serviceOption);
-        successfulCallRequest.setCallDetailRecord(callDetailRecord);
-        OBDSuccessfulCallRequestWrapper successfulCallRequestWrapper = new OBDSuccessfulCallRequestWrapper(successfulCallRequest, subscriptionId, DateTime.now(), Channel.IVR);
+        obdSuccessfulCallDetailsRequest.setMsisdn(msisdn);
+        obdSuccessfulCallDetailsRequest.setCampaignId(campaignId);
+        obdSuccessfulCallDetailsRequest.setServiceOption(serviceOption);
+        obdSuccessfulCallDetailsRequest.setCallDetailRecord(callDetailRecord);
+        obdSuccessfulCallDetailsRequest.setSubscriptionId(subscriptionId);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(null);
 
-        when(successfulCallRequestValidator.validate(successfulCallRequestWrapper)).thenReturn(new Errors());
+        when(successfulCallRequestValidator.validate(obdSuccessfulCallDetailsRequest)).thenReturn(new Errors());
 
-        kilkariCampaignService.processSuccessfulMessageDelivery(successfulCallRequestWrapper);
+        kilkariCampaignService.processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
 
         verify(campaignMessageService).find(subscriptionId, campaignId);
         verify(campaignMessageService, never()).deleteCampaignMessage(any(CampaignMessage.class));

@@ -70,7 +70,7 @@ public class ReportingGatewayImpl implements ReportingGateway {
 
     @Override
     public void reportCampaignMessageDelivery(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
-        String url = String.format("%s%s", getBaseUrl(), OBD_CALL_DETAILS_PATH);
+        String url = String.format("%s%s", getBaseUrl(), CALL_DETAILS_PATH);
         try {
             restTemplate.postForLocation(url, campaignMessageDeliveryReportRequest, new HashMap<String, String>());
         } catch (HttpClientErrorException ex) {

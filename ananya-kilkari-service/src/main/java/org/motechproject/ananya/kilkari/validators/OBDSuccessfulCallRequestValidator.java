@@ -6,8 +6,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignCode;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallRequestWrapper;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
@@ -28,14 +27,13 @@ public class OBDSuccessfulCallRequestValidator {
         this.subscriptionService = subscriptionService;
     }
 
-    public Errors validate(OBDSuccessfulCallRequestWrapper obdRequestWrapper) {
+    public Errors validate(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
         Errors errors = new Errors();
-        OBDSuccessfulCallRequest successfulCallRequest = obdRequestWrapper.getSuccessfulCallRequest();
-        validateMsisdn(successfulCallRequest.getMsisdn(), errors);
-        validateServiceOption(successfulCallRequest.getServiceOption(), errors);
-        validateCampaignId(successfulCallRequest.getCampaignId(), errors);
-        validateDateFormat(successfulCallRequest.getCallDetailRecord(), errors);
-        validateSubscription(obdRequestWrapper.getSubscriptionId(), errors);
+        validateMsisdn(obdSuccessfulCallDetailsRequest.getMsisdn(), errors);
+        validateServiceOption(obdSuccessfulCallDetailsRequest.getServiceOption(), errors);
+        validateCampaignId(obdSuccessfulCallDetailsRequest.getCampaignId(), errors);
+        validateDateFormat(obdSuccessfulCallDetailsRequest.getCallDetailRecord(), errors);
+        validateSubscription(obdSuccessfulCallDetailsRequest.getSubscriptionId(), errors);
 
         return errors;
     }

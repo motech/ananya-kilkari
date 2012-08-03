@@ -203,7 +203,7 @@ public class ReportingGatewayImplTest {
         CampaignMessageDeliveryReportRequest actualDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
-        assertEquals("url/obd/callDetails", urlArgumentCaptor.getValue());
+        assertEquals("url/callDetails", urlArgumentCaptor.getValue());
         assertEquals(deliveryReportRequest, actualDeliveryReportRequest);
     }
 

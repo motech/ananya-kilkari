@@ -105,7 +105,8 @@ public class ReportingServiceImplIT {
 
     @Test
     public void shouldReportCampaignMessageDelivery() {
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest("subscriptionId", "msisdn", "campaignId", "serviceOption", "3", "SUCCESS", new CallDetailsReportRequest("25-12-2012", "27-12-2012"));
+        String callSource = "OBD";
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest("subscriptionId", "msisdn", "campaignId", "serviceOption", "3", "SUCCESS", new CallDetailsReportRequest("25-12-2012", "27-12-2012"), callSource);
         ReportingGateway reportingGateway = mock(ReportingGateway.class);
         stubReportingGateway.setBehavior(reportingGateway);
 
@@ -127,5 +128,6 @@ public class ReportingServiceImplIT {
         assertEquals(campaignMessageDeliveryReportRequest.getMsisdn(), actualCampaignMessageDeliveryReportRequest.getMsisdn());
         assertEquals(campaignMessageDeliveryReportRequest.getCampaignId(), actualCampaignMessageDeliveryReportRequest.getCampaignId());
         assertEquals(campaignMessageDeliveryReportRequest.getServiceOption(), actualCampaignMessageDeliveryReportRequest.getServiceOption());
+        assertEquals(callSource, actualCampaignMessageDeliveryReportRequest.getCallSource());
     }
 }

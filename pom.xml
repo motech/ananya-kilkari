@@ -326,6 +326,11 @@
             </dependency>
             <dependency>
                 <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
+                <artifactId>motech-http-client</artifactId>
+                <version>${motech-contrib.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
                 <artifactId>motech-retry</artifactId>
                 <version>${motech-contrib.version}</version>
             </dependency>

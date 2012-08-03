@@ -245,12 +245,13 @@ public class SubscriptionService {
     public void rescheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
         String subscriptionId = campaignRescheduleRequest.getSubscriptionId();
         subscriptionValidator.validateActiveSubscriptionExists(subscriptionId);
+
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        DateTime existingActiveCampaignStartDate = messageCampaignService.getActiveCampaignStartDate(subscriptionId);
+        DateTime nextAlertDateTime = messageCampaignService.getMessageTimings(subscriptionId, campaignRescheduleRequest.getCreatedAt(), campaignRescheduleRequest.getCreatedAt().plusMonths(1)).get(0);
 
         unScheduleCampaign(subscription);
         removeScheduledMessagesFromOBD(subscriptionId);
-        scheduleCampaign(campaignRescheduleRequest, existingActiveCampaignStartDate);
+        scheduleCampaign(campaignRescheduleRequest, nextAlertDateTime);
     }
 
     public void updateSubscriberDetails(SubscriberUpdateRequest request) {
@@ -266,19 +267,10 @@ public class SubscriptionService {
         messageCampaignService.stop(unEnrollRequest);
     }
 
-    private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest, DateTime existingCampaignStartDate) {
-        DateTime newCampaignStartDate = getNewCampaignStartDate(existingCampaignStartDate, campaignRescheduleRequest.getCreatedAt());
-
+    private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest, DateTime nextAlertDateTime) {
         MessageCampaignRequest enrollRequest = new MessageCampaignRequest(campaignRescheduleRequest.getSubscriptionId(),
-                campaignRescheduleRequest.getReason().name(), newCampaignStartDate);
+                campaignRescheduleRequest.getReason().name(), nextAlertDateTime);
         messageCampaignService.start(enrollRequest, 0, kilkariPropertiesData.getCampaignScheduleDeltaMinutes());
-    }
-
-    private DateTime getNewCampaignStartDate(DateTime existingCampaignStartDate, DateTime rescheduleRequestedDate) {
-        DateTime sameDayOfCurrentWeekAsExistingCampaignStartDate = rescheduleRequestedDate.withDayOfWeek(existingCampaignStartDate.getDayOfWeek());
-        if (rescheduleRequestedDate.isAfter(sameDayOfCurrentWeekAsExistingCampaignStartDate))
-            return sameDayOfCurrentWeekAsExistingCampaignStartDate.plusWeeks(1);
-        return sameDayOfCurrentWeekAsExistingCampaignStartDate;
     }
 
     private void scheduleCampaign(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription, DateTime activatedOn) {

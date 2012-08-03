@@ -27,6 +27,11 @@
         </dependency>
         <dependency>
             <groupId>org.motechproject.ananya.kilkari</groupId>
+            <artifactId>ananya-kilkari-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
             <artifactId>ananya-kilkari-message-campaign</artifactId>
             <version>${project.version}</version>
         </dependency>

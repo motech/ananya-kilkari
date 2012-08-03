@@ -1,20 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
-                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <util:properties id="couchdbProperties" location="classpath:/couchdb.properties"/>
-    <util:properties id="kilkariProperties" location="classpath:/kilkari.properties"/>
-    <context:component-scan base-package="org.motechproject.ananya.kilkari"/>
-
-    <import resource="applicationKilkariMessageCampaignContext.xml"/>
-    <import resource="applicationKilkariMessageContext.xml" />
-
-    <bean id="kilkariRestTemplate" class="org.springframework.web.client.RestTemplate" autowire="byName"/>
+    <import resource="classpath*:applicationKilkariCommonContext.xml"/>
+    <import resource="classpath*:applicationKilkariMessageCampaignContext.xml"/>
+    <import resource="classpath*:applicationKilkariMessageContext.xml"/>
 
     <bean id="kilkariSubscriptionDbInstance" class="org.ektorp.impl.StdCouchDbInstance">
         <constructor-arg>

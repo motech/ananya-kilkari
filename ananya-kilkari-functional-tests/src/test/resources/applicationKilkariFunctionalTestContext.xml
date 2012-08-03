@@ -10,5 +10,4 @@
     <context:property-placeholder location="classpath*:activemq.properties"/>
 
     <import resource="applicationContext.xml"/>
-
 </beans>

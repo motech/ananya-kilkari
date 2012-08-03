@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
-                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
 
     <util:properties id="obdProperties" location="classpath:/obd.properties"/>
 
-    <context:component-scan base-package="org.motechproject.ananya.kilkari"/>
-
+    <import resource="classpath*:applicationKilkariCommonContext.xml" />
     <import resource="classpath*:applicationScheduler.xml"/>
     <import resource="classpath*:applicationPlatformServerAPI.xml"/>
     <import resource="classpath*:applicationContext-retry.xml"/>
@@ -31,6 +28,4 @@
     <bean id="obdHttpClient" class="org.apache.http.impl.client.DefaultHttpClient">
         <constructor-arg ref="obdHttpClientConnectionManager" />
     </bean>
-
-    <bean id="kilkariRestTemplate" class="org.springframework.web.client.RestTemplate" autowire="byName"/>
 </beans>

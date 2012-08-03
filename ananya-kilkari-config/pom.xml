@@ -13,6 +13,13 @@
     <name>Ananya Kilkari Config</name>
     <artifactId>ananya-kilkari-config</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+    </dependencies>
+
     <build>
         <finalName>ananya-kilkari-config</finalName>
 

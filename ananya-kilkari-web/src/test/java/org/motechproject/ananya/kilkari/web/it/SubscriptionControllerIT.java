@@ -12,10 +12,7 @@ import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
+import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
@@ -31,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.server.MvcResult;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -221,7 +219,11 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(expectedStartDate.getMillis(), subscription.getStartDate().getMillis());
         assertFalse(StringUtils.isBlank(subscription.getSubscriptionId()));
 
-        // TODO: Fetch job timings and assert
+        List<Date> scheduledDates = motechSchedulerService.getScheduledJobTimingsWithPrefix(SubscriptionEventKeys.EARLY_SUBSCRIPTION,
+                subscription.getSubscriptionId(), DateTime.now().toDate(), DateTime.now().plusMonths(4).toDate());
+
+        assertEquals(1, scheduledDates.size());
+        assertEquals(expectedStartDate.toDate(), scheduledDates.get(0));
     }
 
 

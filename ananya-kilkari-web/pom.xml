@@ -64,7 +64,7 @@
                         <configuration>
                             <target>
                                 <copy todir="${project.build.outputDirectory}">
-                                    <fileset dir="${project.basedir}/../ananya-kilkari-config/src/main/resources"/>
+                                    <fileset dir="${project.basedir}/../ananya-kilkari-config/src/test/resources"/>
                                 </copy>
                             </target>
                         </configuration>
@@ -110,6 +110,7 @@
             <artifactId>ananya-kilkari-config</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
+            <classifier>tests</classifier>
         </dependency>
         <dependency>
             <groupId>org.motechproject.ananya.kilkari</groupId>

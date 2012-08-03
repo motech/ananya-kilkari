@@ -22,8 +22,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ReportingGatewayImplTest {
-    private ReportingGatewayImpl reportingGateway;
+public class ReportingGatewayTest {
+    private ReportingGateway reportingGateway;
     @Mock
     private RestTemplate restTemplate;
     @Mock
@@ -39,7 +39,7 @@ public class ReportingGatewayImplTest {
     @Before
     public void setUp() {
         initMocks(this);
-        reportingGateway = new ReportingGatewayImpl(restTemplate, kilkariProperties);
+        reportingGateway = new ReportingGateway(restTemplate, kilkariProperties);
     }
 
 

@@ -1,22 +1,22 @@
 package org.motechproject.ananya.kilkari.web.mapper;
 
+import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SubscriptionDetailsMapper {
-    private KilkariInboxService kilkariInboxService;
+    private InboxService inboxService;
 
     @Autowired
-    public SubscriptionDetailsMapper(KilkariInboxService kilkariInboxService) {
-        this.kilkariInboxService = kilkariInboxService;
+    public SubscriptionDetailsMapper(InboxService inboxService) {
+        this.inboxService = inboxService;
     }
 
     public SubscriptionDetails mapFrom(Subscription subscription) {
-        String messageId = kilkariInboxService.getMessageFor(subscription.getSubscriptionId());
+        String messageId = inboxService.getMessageFor(subscription.getSubscriptionId());
         return new SubscriptionDetails(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStatus().name(), messageId);
     }
 }

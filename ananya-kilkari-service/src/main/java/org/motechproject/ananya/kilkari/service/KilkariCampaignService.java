@@ -5,6 +5,7 @@ import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequ
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
+import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
@@ -15,7 +16,6 @@ import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
@@ -42,7 +42,7 @@ public class KilkariCampaignService {
     private ReportingService reportingService;
     private OBDRequestPublisher obdRequestPublisher;
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
-    private KilkariInboxService kilkariInboxService;
+    private InboxService inboxService;
     private OBDServiceOptionFactory obdServiceOptionFactory;
     private OBDSuccessfulCallRequestValidator successfulCallRequestValidator;
 
@@ -60,7 +60,7 @@ public class KilkariCampaignService {
                                   ReportingService reportingService,
                                   OBDRequestPublisher obdRequestPublisher,
                                   CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator,
-                                  KilkariInboxService kilkariInboxService,
+                                  InboxService inboxService,
                                   OBDServiceOptionFactory obdServiceOptionFactory,
                                   OBDSuccessfulCallRequestValidator successfulCallRequestValidator) {
         this.messageCampaignService = messageCampaignService;
@@ -71,7 +71,7 @@ public class KilkariCampaignService {
         this.reportingService = reportingService;
         this.obdRequestPublisher = obdRequestPublisher;
         this.callDeliveryFailureRecordValidator = callDeliveryFailureRecordValidator;
-        this.kilkariInboxService = kilkariInboxService;
+        this.inboxService = inboxService;
         this.obdServiceOptionFactory = obdServiceOptionFactory;
         this.successfulCallRequestValidator = successfulCallRequestValidator;
     }
@@ -94,12 +94,12 @@ public class KilkariCampaignService {
         Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
 
         final String messageId = campaignMessageIdStrategy.createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId, campaignName), subscription.getPack());
-        final DateTime messageExpiryDate = subscription.currentWeeksMessageExpiryDate();
+        final DateTime messageExpiryDate = subscription.getCurrentWeeksMessageExpiryDate();
 
         campaignMessageAlertService.scheduleCampaignMessageAlert(subscriptionId, messageId, messageExpiryDate, subscription.getMsisdn(), subscription.getOperator().name());
 
         if (subscription.hasBeenActivated())
-            kilkariInboxService.newMessage(subscriptionId, messageId);
+            inboxService.newMessage(subscriptionId, messageId);
     }
 
     public void activateSchedule(String subscriptionId) {
@@ -110,7 +110,7 @@ public class KilkariCampaignService {
         String currentMessageId = campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
 
         if (currentMessageId != null)
-            kilkariInboxService.newMessage(subscriptionId, currentMessageId);
+            inboxService.newMessage(subscriptionId, currentMessageId);
     }
 
     public void renewSchedule(String subscriptionId) {

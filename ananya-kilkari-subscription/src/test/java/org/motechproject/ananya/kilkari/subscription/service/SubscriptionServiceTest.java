@@ -11,7 +11,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.message.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
+import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
@@ -23,7 +25,6 @@ import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
@@ -63,7 +64,7 @@ public class SubscriptionServiceTest {
     @Mock
     private AllInboxMessages allInboxMessages;
     @Mock
-    private KilkariInboxService kilkariInboxService;
+    private InboxService inboxService;
     @Mock
     private MessageCampaignService messageCampaignService;
     @Mock
@@ -80,7 +81,7 @@ public class SubscriptionServiceTest {
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, kilkariInboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService);
     }
 
     @Test
@@ -460,7 +461,7 @@ public class SubscriptionServiceTest {
     public void shouldProcessSubscriptionCompletion() {
         final String msisdn = "9988776655";
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new SubscriptionBuilder().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).build();
+        Subscription subscription = new SubscriptionBuilder().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).withStartDate(DateTime.now().minusWeeks(4)).build();
         final String subscriptionId = subscription.getSubscriptionId();
         final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -502,7 +503,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.subscriptionComplete(new OMSubscriptionRequest(msisdn, pack, Channel.IVR, subscriptionId));
 
-        verify(kilkariInboxService).scheduleInboxDeletion(subscription);
+        verify(inboxService).scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
     }
 
     @Test
@@ -518,7 +519,7 @@ public class SubscriptionServiceTest {
 
         verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
         verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
-        verify(kilkariInboxService, never()).scheduleInboxDeletion(any(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class));
+        verify(inboxService, never()).scheduleInboxDeletion(any(String.class), any(DateTime.class));
         verify(campaignMessageAlertService, never()).deleteFor(any(String.class));
     }
 
@@ -530,7 +531,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.deactivateSubscription(subscriptionId, DateTime.now(), null, null);
 
-        verify(kilkariInboxService).scheduleInboxDeletion(subscription);
+        verify(inboxService).scheduleInboxDeletion(subscriptionId, subscription.getCurrentWeeksMessageExpiryDate());
     }
 
     @Test

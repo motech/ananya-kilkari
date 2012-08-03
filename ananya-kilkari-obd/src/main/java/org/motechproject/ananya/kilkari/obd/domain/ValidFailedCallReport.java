@@ -1,7 +1,6 @@
 package org.motechproject.ananya.kilkari.obd.domain;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 
 import java.io.Serializable;
 

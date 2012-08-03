@@ -9,20 +9,23 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
+import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
+import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.*;
-import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.domain.*;
-import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
+import org.motechproject.ananya.kilkari.subscription.domain.Operator;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
@@ -59,7 +62,7 @@ public class KilkariCampaignServiceTest {
     @Mock
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
     @Mock
-    private KilkariInboxService kilkariInboxService;
+    private InboxService inboxService;
     @Mock
     private OBDServiceOptionFactory obdServiceOptionFactory;
     @Mock
@@ -73,7 +76,7 @@ public class KilkariCampaignServiceTest {
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, campaignMessageAlertService, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, kilkariInboxService, obdServiceOptionFactory, successfulCallRequestValidator);
+        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, campaignMessageAlertService, campaignMessageService, reportingService, obdRequestPublisher, callDeliveryFailureRecordValidator, inboxService, obdServiceOptionFactory, successfulCallRequestValidator);
     }
 
     @Test
@@ -369,7 +372,7 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 
         verify(campaignMessageAlertService).scheduleCampaignMessageAlert(subscriptionId, messageId, expiryDate, msisdn, operator.name());
-        verify(kilkariInboxService).newMessage(subscriptionId, messageId);
+        verify(inboxService).newMessage(subscriptionId, messageId);
     }
 
     @Test
@@ -392,7 +395,7 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 
         verify(campaignMessageAlertService).scheduleCampaignMessageAlert(subscriptionId, messageId, expiryDate, msisdn, operator.name());
-        verify(kilkariInboxService, never()).newMessage(subscriptionId, messageId);
+        verify(inboxService, never()).newMessage(subscriptionId, messageId);
     }
 
     @Test
@@ -407,7 +410,7 @@ public class KilkariCampaignServiceTest {
 
         kilkariCampaignService.activateSchedule(subscriptionId);
 
-        verify(kilkariInboxService, never()).newMessage(anyString(), anyString());
+        verify(inboxService, never()).newMessage(anyString(), anyString());
     }
 
     @Test
@@ -424,7 +427,7 @@ public class KilkariCampaignServiceTest {
 
         kilkariCampaignService.activateSchedule(subscriptionId);
 
-        verify(kilkariInboxService).newMessage(subscriptionId, messageId);
+        verify(inboxService).newMessage(subscriptionId, messageId);
     }
 
     @Test
@@ -439,7 +442,7 @@ public class KilkariCampaignServiceTest {
 
         kilkariCampaignService.renewSchedule(subscriptionId);
 
-        verify(kilkariInboxService, never()).newMessage(anyString(), anyString());
+        verify(inboxService, never()).newMessage(anyString(), anyString());
     }
 
     @Test
@@ -456,7 +459,7 @@ public class KilkariCampaignServiceTest {
 
         kilkariCampaignService.renewSchedule(subscriptionId);
 
-        verify(kilkariInboxService, never()).newMessage(anyString(), anyString());
+        verify(inboxService, never()).newMessage(anyString(), anyString());
     }
 
     @Test

@@ -6,7 +6,6 @@ import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 
 import static junit.framework.Assert.assertEquals;
 

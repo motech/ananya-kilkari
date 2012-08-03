@@ -4,10 +4,10 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 
 import static org.junit.Assert.assertEquals;
@@ -17,12 +17,12 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class SubscriptionDetailsMapperTest {
     private SubscriptionDetailsMapper subscriptionDetailsMapper;
     @Mock
-    private KilkariInboxService kilkariInboxService;
+    private InboxService inboxService;
 
     @Before
     public void setup() {
         initMocks(this);
-        subscriptionDetailsMapper = new SubscriptionDetailsMapper(kilkariInboxService);
+        subscriptionDetailsMapper = new SubscriptionDetailsMapper(inboxService);
     }
 
     @Test
@@ -40,7 +40,7 @@ public class SubscriptionDetailsMapperTest {
     public void shouldIncludeLastCampaignIdInTheSubscriptionDetails() {
         String messageId = "week3";
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("9988776655").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now().minusWeeks(3)).build();
-        when(kilkariInboxService.getMessageFor(subscription.getSubscriptionId())).thenReturn(messageId);
+        when(inboxService.getMessageFor(subscription.getSubscriptionId())).thenReturn(messageId);
 
         SubscriptionDetails subscriptionDetails = subscriptionDetailsMapper.mapFrom(subscription);
 

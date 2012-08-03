@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service.request;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 public class SubscriptionRequest {
     private String msisdn;

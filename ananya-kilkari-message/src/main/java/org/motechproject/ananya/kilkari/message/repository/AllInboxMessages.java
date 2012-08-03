@@ -1,9 +1,9 @@
-package org.motechproject.ananya.kilkari.subscription.repository;
+package org.motechproject.ananya.kilkari.message.repository;
 
 import org.ektorp.CouchDbConnector;
 import org.ektorp.ViewQuery;
 import org.ektorp.support.GenerateView;
-import org.motechproject.ananya.kilkari.subscription.domain.InboxMessage;
+import org.motechproject.ananya.kilkari.message.domain.InboxMessage;
 import org.motechproject.dao.MotechBaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,7 +15,7 @@ import java.util.List;
 public class AllInboxMessages extends MotechBaseRepository<InboxMessage> {
 
     @Autowired
-    public AllInboxMessages(@Qualifier("kilkariSubscriptionDbConnector") CouchDbConnector db) {
+    public AllInboxMessages(@Qualifier("messageDbConnector") CouchDbConnector db) {
         super(InboxMessage.class, db);
         initStandardDesignDocument();
     }

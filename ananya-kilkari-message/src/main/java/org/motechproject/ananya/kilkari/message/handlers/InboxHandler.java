@@ -1,7 +1,7 @@
-package org.motechproject.ananya.kilkari.subscription.handlers;
+package org.motechproject.ananya.kilkari.message.handlers;
 
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
+import org.motechproject.ananya.kilkari.message.service.InboxEventKeys;
+import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
 import org.slf4j.Logger;
@@ -13,17 +13,17 @@ import org.springframework.stereotype.Component;
 public class InboxHandler {
     private final static Logger logger = LoggerFactory.getLogger(InboxHandler.class);
     
-    private KilkariInboxService kilkariInboxService;
+    private InboxService inboxService;
 
     @Autowired
-    public InboxHandler(KilkariInboxService kilkariInboxService) {
-        this.kilkariInboxService = kilkariInboxService;
+    public InboxHandler(InboxService inboxService) {
+        this.inboxService = inboxService;
     }
 
-    @MotechListener(subjects = {SubscriptionEventKeys.DELETE_INBOX})
+    @MotechListener(subjects = {InboxEventKeys.DELETE_INBOX})
     public void handleInboxDeletion(MotechEvent event) {
         String subscriptionId = (String) event.getParameters().get("0");
         logger.info(String.format("Handling inbox deletion event for subscriptionid: %s", subscriptionId));
-        kilkariInboxService.deleteInbox(subscriptionId);
+        inboxService.deleteInbox(subscriptionId);
     }
 }

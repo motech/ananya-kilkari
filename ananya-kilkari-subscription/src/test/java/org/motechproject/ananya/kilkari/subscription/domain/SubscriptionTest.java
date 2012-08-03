@@ -6,7 +6,6 @@ import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 public class SubscriptionTest {
 
@@ -141,7 +140,7 @@ public class SubscriptionTest {
         DateTime startedDate = DateTime.now().minusDays(3);
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStartDate(startedDate).build();
 
-        DateTime expiryDate = subscription.currentWeeksMessageExpiryDate();
+        DateTime expiryDate = subscription.getCurrentWeeksMessageExpiryDate();
         assertThat(expiryDate, is(subscription.getStartDate().plusWeeks(1)));
     }
 

@@ -15,9 +15,8 @@ import org.springframework.stereotype.Component;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 @Component
 public class ReportVerifier {
 

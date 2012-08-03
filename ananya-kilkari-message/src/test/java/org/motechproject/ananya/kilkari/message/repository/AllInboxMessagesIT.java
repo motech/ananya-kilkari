@@ -1,7 +1,8 @@
-package org.motechproject.ananya.kilkari.subscription.repository;
+package org.motechproject.ananya.kilkari.message.repository;
 
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.subscription.domain.InboxMessage;
+import org.motechproject.ananya.kilkari.message.domain.InboxMessage;
+import org.motechproject.ananya.kilkari.message.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
@@ -16,7 +17,7 @@ public class AllInboxMessagesIT extends SpringIntegrationTest {
         String subscriptionId = "subscriptionId";
         String messageId = "WEEK13";
         InboxMessage inboxMessage = new InboxMessage(subscriptionId, messageId);
-        kilkariSubscriptionDbConnector.create(inboxMessage);
+        messageDbConnector.create(inboxMessage);
         markForDeletion(inboxMessage);
 
         InboxMessage actualInboxMessage = allInboxMessages.findBySubscriptionId(subscriptionId);

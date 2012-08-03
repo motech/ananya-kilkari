@@ -181,7 +181,8 @@ public class Subscription extends MotechBaseDataObject {
         return status.isInDeactivatedState();
     }
 
-    public DateTime currentWeeksMessageExpiryDate() {
+    @JsonIgnore
+    public DateTime getCurrentWeeksMessageExpiryDate() {
         return getStartDate().plusWeeks(getWeeksElapsedAfterStartDate() + 1);
     }
 

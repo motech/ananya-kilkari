@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
+import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
@@ -37,7 +38,7 @@ public class SubscriptionService {
     private OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher;
     private SubscriptionValidator subscriptionValidator;
     private ReportingService reportingService;
-    private KilkariInboxService kilkariInboxService;
+    private InboxService inboxService;
     private MessageCampaignService messageCampaignService;
     private OnMobileSubscriptionGateway onMobileSubscriptionGateway;
     private CampaignMessageService campaignMessageService;
@@ -50,13 +51,13 @@ public class SubscriptionService {
     @Autowired
     public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher,
                                SubscriptionValidator subscriptionValidator, ReportingService reportingService,
-                               KilkariInboxService kilkariInboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
+                               InboxService inboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
                                CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData, MotechSchedulerService motechSchedulerService) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
         this.reportingService = reportingService;
-        this.kilkariInboxService = kilkariInboxService;
+        this.inboxService = inboxService;
         this.messageCampaignService = messageCampaignService;
         this.onMobileSubscriptionGateway = onMobileSubscriptionGateway;
         this.campaignMessageService = campaignMessageService;
@@ -212,7 +213,7 @@ public class SubscriptionService {
             @Override
             public void perform(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
                 subscription.deactivate();
-                kilkariInboxService.scheduleInboxDeletion(subscription);
+                inboxService.scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
                 unScheduleCampaign(subscription);
                 campaignMessageAlertService.deleteFor(subscription.getSubscriptionId());
             }
@@ -231,7 +232,7 @@ public class SubscriptionService {
             @Override
             public void perform(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {
                 subscription.complete();
-                kilkariInboxService.scheduleInboxDeletion(subscription);
+                inboxService.scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
                 campaignMessageAlertService.deleteFor(subscription.getSubscriptionId());
             }
         });

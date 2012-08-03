@@ -1,8 +1,8 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
 import org.motechproject.ananya.kilkari.reporting.domain.*;
-import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
+import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

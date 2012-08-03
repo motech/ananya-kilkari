@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.handlers.callback.obd;
 
-import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;

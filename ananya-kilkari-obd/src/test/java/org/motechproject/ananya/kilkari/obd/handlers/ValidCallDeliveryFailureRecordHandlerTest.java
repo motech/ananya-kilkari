@@ -3,8 +3,8 @@ package org.motechproject.ananya.kilkari.obd.handlers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
+import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.scheduler.domain.MotechEvent;
 

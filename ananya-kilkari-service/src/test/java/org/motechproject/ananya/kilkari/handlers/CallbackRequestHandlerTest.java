@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
-import org.motechproject.ananya.kilkari.handlers.CallbackRequestHandler;
 import org.motechproject.ananya.kilkari.handlers.callback.subscription.SubscriptionStateHandler;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;

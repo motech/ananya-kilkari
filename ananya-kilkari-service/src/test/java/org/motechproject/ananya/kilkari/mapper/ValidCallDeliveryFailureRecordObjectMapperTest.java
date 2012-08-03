@@ -1,10 +1,10 @@
 package org.motechproject.ananya.kilkari.mapper;
 
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
+import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 
 import static org.junit.Assert.assertEquals;
 

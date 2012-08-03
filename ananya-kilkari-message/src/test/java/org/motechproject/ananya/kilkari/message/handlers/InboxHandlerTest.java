@@ -1,10 +1,10 @@
-package org.motechproject.ananya.kilkari.subscription.handlers;
+package org.motechproject.ananya.kilkari.message.handlers;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
-import org.motechproject.ananya.kilkari.subscription.service.KilkariInboxService;
+import org.motechproject.ananya.kilkari.message.service.InboxEventKeys;
+import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.HashMap;
@@ -16,12 +16,12 @@ public class InboxHandlerTest {
 
     private InboxHandler inboxHandler;
     @Mock
-    private KilkariInboxService kilkariInboxService;
+    private InboxService inboxService;
 
     @Before
     public void setup(){
         initMocks(this);
-        inboxHandler = new InboxHandler(kilkariInboxService);
+        inboxHandler = new InboxHandler(inboxService);
     }
 
     @Test
@@ -33,8 +33,8 @@ public class InboxHandlerTest {
             }
         };
 
-        inboxHandler.handleInboxDeletion(new MotechEvent(SubscriptionEventKeys.DELETE_INBOX, parameters));
+        inboxHandler.handleInboxDeletion(new MotechEvent(InboxEventKeys.DELETE_INBOX, parameters));
 
-        verify(kilkariInboxService).deleteInbox(subscriptionId);
+        verify(inboxService).deleteInbox(subscriptionId);
     }
 }

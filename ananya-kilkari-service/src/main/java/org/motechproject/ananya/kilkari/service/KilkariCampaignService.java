@@ -3,6 +3,8 @@ package org.motechproject.ananya.kilkari.service;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.CampaignMessageDeliveryReportRequestMapper;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
+import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
+import org.motechproject.ananya.kilkari.mapper.OBDSuccessfulCallDetailsRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
@@ -14,6 +16,7 @@ import org.motechproject.ananya.kilkari.obd.request.*;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
@@ -125,10 +128,10 @@ public class KilkariCampaignService {
             kilkariSubscriptionService.processSubscriptionCompletion(subscription);
     }
 
-    public void processSuccessfulMessageDelivery(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
-        validateSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
+    public void processSuccessfulMessageDelivery(OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsWebRequest) {
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = validateSuccessfulCallRequest(obdSuccessfulCallDetailsWebRequest);
 
-        CampaignMessage campaignMessage = campaignMessageService.find(obdSuccessfulCallDetailsRequest.getSubscriptionId(), obdSuccessfulCallDetailsRequest.getCampaignId());
+        CampaignMessage campaignMessage = campaignMessageService.find(obdSuccessfulCallDetailsRequest.getSubscriptionId(),obdSuccessfulCallDetailsRequest.getCampaignId());
         if (campaignMessage == null) {
             logger.error(String.format("Campaign Message not present for subscriptionId: %s, campaignId: %s",
                     obdSuccessfulCallDetailsRequest.getSubscriptionId(), obdSuccessfulCallDetailsRequest.getCampaignId()));
@@ -139,9 +142,9 @@ public class KilkariCampaignService {
         reportingService.reportCampaignMessageDeliveryStatus(new CampaignMessageDeliveryReportRequestMapper().mapFrom(obdSuccessfulCallDetailsRequest, retryCount));
         campaignMessageService.deleteCampaignMessage(campaignMessage);
 
-        ServiceOption serviceOption = ServiceOption.getFor(obdSuccessfulCallDetailsRequest.getServiceOption());
-        if (obdServiceOptionFactory.getHandler(serviceOption) != null) {
-            obdServiceOptionFactory.getHandler(serviceOption).process(obdSuccessfulCallDetailsRequest);
+        ServiceOptionHandler serviceOptionHandler = obdServiceOptionFactory.getHandler(obdSuccessfulCallDetailsRequest.getServiceOption());
+        if (serviceOptionHandler != null) {
+            serviceOptionHandler.process(obdSuccessfulCallDetailsRequest);
         }
     }
 
@@ -149,7 +152,7 @@ public class KilkariCampaignService {
         obdRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
     }
 
-    public void publishSuccessfulCallRequest(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
+    public void publishSuccessfulCallRequest(OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest) {
         obdRequestPublisher.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
     }
 
@@ -197,10 +200,18 @@ public class KilkariCampaignService {
         }
     }
 
-    private void validateSuccessfulCallRequest(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
-        Errors validationErrors = successfulCallRequestValidator.validate(obdSuccessfulCallDetailsRequest);
-        if (validationErrors.hasErrors()) {
+    private OBDSuccessfulCallDetailsRequest validateSuccessfulCallRequest(OBDSuccessfulCallDetailsWebRequest webRequest) {
+        Errors validationErrors = webRequest.validate();
+        if(validationErrors.hasErrors()) {
             throw new ValidationException(String.format("OBD Request Invalid: %s", validationErrors.allMessages()));
         }
+
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequestMapper().map(webRequest);
+        validationErrors = successfulCallRequestValidator.validate(obdSuccessfulCallDetailsRequest);
+        if(validationErrors.hasErrors()) {
+            throw new ValidationException(String.format("OBD Request Invalid: %s", validationErrors.allMessages()));
+        }
+        return obdSuccessfulCallDetailsRequest;
+
     }
 }

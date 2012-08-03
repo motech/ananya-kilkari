@@ -13,9 +13,6 @@ import org.motechproject.common.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
 public class CallbackRequestValidator {
 
@@ -42,8 +39,8 @@ public class CallbackRequestValidator {
         return errors;
     }
 
-    private List<String> validateSubscriptionRequest(CallbackRequestWrapper callbackRequestWrapper) {
-        List<String> errors = new ArrayList<>();
+    private Errors validateSubscriptionRequest(CallbackRequestWrapper callbackRequestWrapper) {
+        Errors errors = new Errors();
         final String requestStatus = callbackRequestWrapper.getStatus();
         final String requestAction = callbackRequestWrapper.getAction();
 

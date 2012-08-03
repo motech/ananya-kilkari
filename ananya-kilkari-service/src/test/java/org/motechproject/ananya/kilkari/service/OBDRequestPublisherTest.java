@@ -10,7 +10,7 @@ import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.scheduler.context.EventContext;
 
 import static org.mockito.Mockito.mock;
@@ -31,7 +31,7 @@ public class OBDRequestPublisherTest {
 
     @Test
     public void shouldPublishCallBackRequests() {
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
 
         obdRequestPublisher.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
 

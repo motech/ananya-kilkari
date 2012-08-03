@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.subscription.validators;
+package org.motechproject.ananya.kilkari.validators;
 
 
 import org.apache.commons.lang.StringUtils;
@@ -7,6 +7,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.subscription.domain.CampaignChangeReason;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.utils.DateUtils;
 
 import java.util.regex.Pattern;
 
@@ -36,14 +37,6 @@ public class ValidationUtils {
         return SubscriptionPack.isValid(pack);
     }
 
-    public static boolean assertNotNull(Object object) {
-        return object != null;
-    }
-
-    public static boolean assertNull(Object object) {
-        return object == null;
-    }
-
     public static boolean assertDateBefore(DateTime before, DateTime now) {
         return before.isBefore(now);
     }
@@ -53,7 +46,7 @@ public class ValidationUtils {
             return false;
         }
         try {
-            DateTimeFormat.forPattern("dd-MM-yyyy HH-mm-ss").parseDateTime(value);
+            DateUtils.parseDateTime(value);
         } catch (Exception e) {
             return false;
         }
@@ -69,7 +62,7 @@ public class ValidationUtils {
             if (!ValidationUtils.assertDateFormat(expectedDateOfDelivery))
                 return false;
 
-            if (!ValidationUtils.assertDateBefore(createdAt, parseDateTime(expectedDateOfDelivery)))
+            if (!ValidationUtils.assertDateBefore(createdAt, DateUtils.parseDate(expectedDateOfDelivery)))
                 return false;
         }
         return true;
@@ -80,7 +73,7 @@ public class ValidationUtils {
             if (!ValidationUtils.assertDateFormat(dateOfBirth))
                 return false;
 
-            if (!ValidationUtils.assertDateBefore(parseDateTime(dateOfBirth), createdAt))
+            if (!ValidationUtils.assertDateBefore(DateUtils.parseDate(dateOfBirth), createdAt))
                 return false;
         }
         return true;
@@ -92,9 +85,5 @@ public class ValidationUtils {
                 return false;
         }
         return true;
-    }
-
-    private static DateTime parseDateTime(String dateTime) {
-        return StringUtils.isNotEmpty(dateTime) ? DateTimeFormat.forPattern("dd-MM-yyyy").parseDateTime(dateTime) : null;
     }
 }

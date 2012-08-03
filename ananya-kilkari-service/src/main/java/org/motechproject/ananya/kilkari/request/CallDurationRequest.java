@@ -1,43 +1,35 @@
-package org.motechproject.ananya.kilkari.obd.domain;
+package org.motechproject.ananya.kilkari.request;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
+import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public class CallDetailRecord  implements Serializable {
-    @JsonProperty
-    private String startTime;
-    @JsonProperty
-    private String endTime;
+public class CallDurationRequest implements Serializable {
+    private DateTime startTime;
 
-    public void setStartTime(String startTime) {
+    private DateTime endTime;
+
+    public CallDurationRequest(DateTime startTime, DateTime endTime) {
         this.startTime = startTime;
-    }
-
-    public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
 
-
-    @JsonIgnore
-    public String getStartTime() {
+    public DateTime getStartTime() {
         return startTime;
     }
 
-    @JsonIgnore
-    public String getEndTime() {
+    public DateTime getEndTime() {
         return endTime;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CallDetailRecord)) return false;
+        if (!(o instanceof CallDurationRequest)) return false;
 
-        CallDetailRecord that = (CallDetailRecord) o;
+        CallDurationRequest that = (CallDurationRequest) o;
 
         return new EqualsBuilder()
                 .append(this.startTime, that.startTime)

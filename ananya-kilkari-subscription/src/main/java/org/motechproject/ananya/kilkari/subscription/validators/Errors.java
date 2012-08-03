@@ -24,8 +24,8 @@ public class Errors {
         return !hasErrors();
     }
 
-    public void addAll(List<String> strings) {
-        errorMessages.addAll(strings);
+    public void addAll(Errors errors) {
+        errorMessages.addAll(errors.errorMessages);
     }
 
     public int getCount() {

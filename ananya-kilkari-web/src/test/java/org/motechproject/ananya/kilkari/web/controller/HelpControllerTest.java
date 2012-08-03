@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -35,7 +36,7 @@ public class HelpControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber care request processed successfully")));
 
 
-        verify(subscriberCareService).processSubscriberCareRequest(new SubscriberCareRequest("1234567890", "help", "ivr"));
+        verify(subscriberCareService).processSubscriberCareRequest(new SubscriberCareRequest("1234567890", "help", "ivr", DateTime.now()));
     }
 
 }

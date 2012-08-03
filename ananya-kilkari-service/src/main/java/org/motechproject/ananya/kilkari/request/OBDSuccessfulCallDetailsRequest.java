@@ -2,35 +2,26 @@ package org.motechproject.ananya.kilkari.request;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
+import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 
 public class OBDSuccessfulCallDetailsRequest extends CallDetailsRequest {
-    @JsonProperty
-    private String serviceOption;
-
-    @JsonIgnore
+    private ServiceOption serviceOption;
     private String subscriptionId;
 
-    public OBDSuccessfulCallDetailsRequest() {
-        super(CampaignMessageCallSource.OBD);
+    public OBDSuccessfulCallDetailsRequest(String subscriptionId, ServiceOption serviceOption, String msisdn, String campaingId, CallDurationRequest callDurationRequest, DateTime createdAt) {
+        super(CampaignMessageCallSource.OBD, msisdn, campaingId, callDurationRequest, createdAt);
+        this.subscriptionId = subscriptionId;
+        this.serviceOption = serviceOption;
     }
 
-    public String getServiceOption() {
+    public ServiceOption getServiceOption() {
         return serviceOption;
     }
 
     public String getSubscriptionId() {
         return subscriptionId;
-    }
-
-    public void setServiceOption(String serviceOption) {
-        this.serviceOption = serviceOption;
-    }
-
-    public void setSubscriptionId(String subscriptionId) {
-        this.subscriptionId = subscriptionId;
     }
 
     @Override

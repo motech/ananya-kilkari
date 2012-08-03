@@ -17,6 +17,7 @@ import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.validators.OBDSuccessfulCallRequestValidator;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +58,7 @@ public class OBDRequestHandlerTest {
     @Test
     public void shouldHandleAOBDCallBackRequest() {
         HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
         obdSuccessfulCallDetailsRequest.setServiceOption(ServiceOption.HELP.name());
         obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
         stringObjectHashMap.put("0", obdSuccessfulCallDetailsRequest);
@@ -69,7 +71,7 @@ public class OBDRequestHandlerTest {
     @Test
     public void shouldHandleAOBDCallBackRequestWithDeactivation() {
         HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
         obdSuccessfulCallDetailsRequest.setServiceOption(ServiceOption.UNSUBSCRIBE.name());
         obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
         stringObjectHashMap.put("0", obdSuccessfulCallDetailsRequest);
@@ -82,11 +84,11 @@ public class OBDRequestHandlerTest {
     @Test
     public void shouldNotThrowExceptionIfHandlerIsNotThereForServiceOption() {
         Map<String, Object> map = new HashMap<>();
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
         obdSuccessfulCallDetailsRequest.setServiceOption("");
         obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
         map.put("0", obdSuccessfulCallDetailsRequest);
-        when(successfulCallRequestValidator.validate(obdSuccessfulCallDetailsRequest)).thenReturn(new Errors());
+        when(successfulCallRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
 
         obdRequestHandler.handleOBDCallbackRequest(new MotechEvent(OBDEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, map));
     }

@@ -21,8 +21,9 @@ public class OBDHelpHandler implements ServiceOptionHandler {
         createSubscriberCareDoc(obdSuccessfulCallDetailsRequest);
     }
 
-    private void createSubscriberCareDoc(OBDSuccessfulCallDetailsRequest obdDetailsRequest) {
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(obdDetailsRequest.getMsisdn(), obdDetailsRequest.getServiceOption(), obdDetailsRequest.getChannel().name());
+    private void createSubscriberCareDoc(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(obdSuccessfulCallDetailsRequest.getMsisdn(), obdSuccessfulCallDetailsRequest.getServiceOption().name(),
+                obdSuccessfulCallDetailsRequest.getChannel().name(), obdSuccessfulCallDetailsRequest.getCreatedAt());
         subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
     }
 }

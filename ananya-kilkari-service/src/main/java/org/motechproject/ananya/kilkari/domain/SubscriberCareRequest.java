@@ -14,11 +14,11 @@ public class SubscriberCareRequest implements Serializable {
     private String channel;
     private DateTime createdAt;
 
-    public SubscriberCareRequest(String msisdn, String reason, String channel) {
+    public SubscriberCareRequest(String msisdn, String reason, String channel, DateTime createdAt) {
         this.msisdn = msisdn;
         this.reason = reason;
         this.channel = channel;
-        this.createdAt = DateTime.now();
+        this.createdAt = createdAt;
     }
 
     public String getReason() {

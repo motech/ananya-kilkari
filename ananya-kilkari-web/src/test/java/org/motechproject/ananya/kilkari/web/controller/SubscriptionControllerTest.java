@@ -236,7 +236,7 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldGiveAnErrorMessageWhenCallBackRequestIsInvalid() throws Exception {
-        ArrayList<String> errorsMessages = new ArrayList<String>() {
+        Errors errorsMessages = new Errors() {
             {
                 add("Invalid msisdn invalidMsisdn");
                 add("Invalid operator invalidOperator");

@@ -51,13 +51,12 @@ public class ErrorsTest {
 
     @Test
     public void shouldAddACollectionOfErrorMessages() {
-        List<String> errorMessages = new ArrayList<String>() {{
-            add("Error message 1");
-            add("Error message 2");
-        }};
+        Errors newErrors = new Errors();
+        newErrors.add("Error message 1");
+        newErrors.add("Error message 2");
         String expectedErrorMessage = "Error message 1" + "," + "Error message 2";
 
-        errors.addAll(errorMessages);
+        errors.addAll(newErrors);
 
         String actualErrorMessage = errors.allMessages();
         assertEquals(expectedErrorMessage, actualErrorMessage);
@@ -65,14 +64,12 @@ public class ErrorsTest {
 
     @Test
     public void shouldReturnTheNumberOfErrorMessages() {
-        List<String> errorMessages = new ArrayList<String>() {{
-            add("Error message 1");
-            add("Error message 2");
-        }};
-        errors.addAll(errorMessages);
+        Errors newErrors = new Errors();
+        newErrors.add("Error message 1");
+        newErrors.add("Error message 2");
+        errors.addAll(newErrors);
 
         int errorsCount = errors.getCount();
         assertEquals(2, errorsCount);
-
     }
 }

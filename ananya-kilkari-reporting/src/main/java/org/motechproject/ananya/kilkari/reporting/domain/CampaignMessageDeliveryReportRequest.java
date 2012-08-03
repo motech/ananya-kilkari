@@ -8,11 +8,11 @@ public class CampaignMessageDeliveryReportRequest  implements Serializable {
     private String campaignId;
     private String retryCount;
     private String status;
-    private CallDetailsReportRequest callDetailRecord;
+    private CallDurationReportRequest callDetailRecord;
     private String serviceOption;
     private String callSource;
 
-    public CampaignMessageDeliveryReportRequest(String subscriptionId, String msisdn, String campaignId, String serviceOption, String retryCount, String status, CallDetailsReportRequest callDetailRecord, String callSource) {
+    public CampaignMessageDeliveryReportRequest(String subscriptionId, String msisdn, String campaignId, String serviceOption, String retryCount, String status, CallDurationReportRequest callDetailRecord, String callSource) {
         this.subscriptionId = subscriptionId;
         this.msisdn = msisdn;
         this.campaignId = campaignId;
@@ -43,7 +43,7 @@ public class CampaignMessageDeliveryReportRequest  implements Serializable {
         return serviceOption;
     }
 
-    public CallDetailsReportRequest getCallDetailRecord() {
+    public CallDurationReportRequest getCallDetailRecord() {
         return callDetailRecord;
     }
 

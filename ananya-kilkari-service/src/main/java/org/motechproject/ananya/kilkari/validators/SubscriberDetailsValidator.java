@@ -7,7 +7,6 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

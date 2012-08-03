@@ -6,7 +6,7 @@ import org.motechproject.ananya.kilkari.obd.domain.OBDEventKeys;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
@@ -31,7 +31,7 @@ public class OBDRequestHandler {
 
     @MotechListener(subjects = {OBDEventKeys.PROCESS_SUCCESSFUL_CALL_REQUEST_SUBJECT})
     public void handleOBDCallbackRequest(MotechEvent motechEvent) {
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = (OBDSuccessfulCallDetailsRequest) motechEvent.getParameters().get("0");
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = (OBDSuccessfulCallDetailsWebRequest) motechEvent.getParameters().get("0");
         logger.info("Handling OBD callback for : " + obdSuccessfulCallDetailsRequest.getSubscriptionId());
         kilkariCampaignService.processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
         logger.info("Completed handling OBD callback for : " + obdSuccessfulCallDetailsRequest.getSubscriptionId());

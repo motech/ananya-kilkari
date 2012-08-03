@@ -7,5 +7,5 @@ import java.util.ArrayList;
 
 public class InboxCallDetailsRequestsList {
     @JsonProperty
-    private ArrayList<InboxCallDetailsRequest> inboxCallDetailsRequests;
+    private ArrayList<InboxCallDetailsWebRequest> inboxCallDetailsRequests;
 }

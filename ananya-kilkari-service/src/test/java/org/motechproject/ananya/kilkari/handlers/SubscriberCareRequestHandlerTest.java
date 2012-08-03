@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.handlers;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -26,7 +27,7 @@ public class SubscriberCareRequestHandlerTest {
     @Test
     public void shouldInvokeSubscriberCareServiceWithTheRequest() {
         String channel = "ivr";
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("1234567890", SubscriberCareReasons.HELP.name(), channel);
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("1234567890", SubscriberCareReasons.HELP.name(), channel, DateTime.now());
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put("0", subscriberCareRequest);
         MotechEvent motechEvent = new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIBER_CARE_REQUEST, parameters);

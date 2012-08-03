@@ -9,7 +9,7 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.reporting.domain.CallDetailsReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.CallDurationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
@@ -129,8 +129,8 @@ public class CampaignMessageService {
 
     private void reportCampaignMessageStatus(ValidFailedCallReport failedCallReport, CampaignMessage campaignMessage) {
         String retryCount = getRetryCount(campaignMessage);
-        CallDetailsReportRequest callDetailRecord = new CallDetailsReportRequest(format(failedCallReport.getCreatedAt()), format(failedCallReport.getCreatedAt()));
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(), null, retryCount, failedCallReport.getStatusCode().name(), callDetailRecord, CampaignMessageCallSource.OBD.name());
+        CallDurationReportRequest callDurationRecord = new CallDurationReportRequest(failedCallReport.getCreatedAt(), failedCallReport.getCreatedAt());
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(), null, retryCount, failedCallReport.getStatusCode().name(), callDurationRecord, CampaignMessageCallSource.OBD.name());
 
         reportingService.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
     }
@@ -138,11 +138,6 @@ public class CampaignMessageService {
     private String getRetryCount(CampaignMessage campaignMessage) {
         return campaignMessage.getStatus() == CampaignMessageStatus.DNP ? String.valueOf(campaignMessage.getDnpRetryCount())
                 : String.valueOf(campaignMessage.getDncRetryCount());
-    }
-
-    private String format(DateTime dateTime) {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy HH-mm-ss");
-        return formatter.print(dateTime);
     }
 
     private interface GatewayAction {

@@ -418,8 +418,8 @@ public class CampaignMessageServiceTest {
         assertEquals(campaignId, reportRequest.getCampaignId());
         assertEquals("0", reportRequest.getRetryCount());
         assertEquals(status.name(), reportRequest.getStatus());
-        assertEquals("25-12-2012 23-23-23", reportRequest.getCallDetailRecord().getStartTime());
-        assertEquals("25-12-2012 23-23-23", reportRequest.getCallDetailRecord().getEndTime());
+        assertEquals(createdAt, reportRequest.getCallDetailRecord().getStartTime());
+        assertEquals(createdAt, reportRequest.getCallDetailRecord().getEndTime());
         assertNull(reportRequest.getServiceOption());
     }
 
@@ -458,8 +458,8 @@ public class CampaignMessageServiceTest {
         assertEquals(campaignId, reportRequest.getCampaignId());
         assertEquals("1", reportRequest.getRetryCount());
         assertEquals(status.name(), reportRequest.getStatus());
-        assertEquals("25-12-2012 23-23-23", reportRequest.getCallDetailRecord().getStartTime());
-        assertEquals("25-12-2012 23-23-23", reportRequest.getCallDetailRecord().getEndTime());
+        assertEquals(createdAt, reportRequest.getCallDetailRecord().getStartTime());
+        assertEquals(createdAt, reportRequest.getCallDetailRecord().getEndTime());
         assertNull(reportRequest.getServiceOption());
     }
 

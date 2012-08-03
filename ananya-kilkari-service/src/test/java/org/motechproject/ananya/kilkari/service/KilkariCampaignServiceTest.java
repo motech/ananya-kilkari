@@ -12,7 +12,6 @@ import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandl
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
-import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
@@ -20,7 +19,9 @@ import org.motechproject.ananya.kilkari.obd.request.*;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
+import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -36,8 +37,8 @@ import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -125,7 +126,7 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldPublishObdCallbackRequest() {
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
 
         kilkariCampaignService.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
 
@@ -134,34 +135,37 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldProcessSuccessfulCampaignMessageDelivery() {
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = Mockito.mock(OBDSuccessfulCallDetailsWebRequest.class);
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK1";
         String msisdn = "1234567890";
         Integer retryCount = 3;
         String serviceOption = ServiceOption.HELP.name();
-        String startTime = "25-12-2012";
-        String endTime = "27-12-2012";
-        CallDetailRecord callDetailRecord = new CallDetailRecord();
-        callDetailRecord.setStartTime(startTime);
-        callDetailRecord.setEndTime(endTime);
+        String startTime = "25-12-2012 12-13-14";
+        String endTime = "27-12-2012 12-15-19";
+        CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest();
+        callDurationWebRequest.setStartTime(startTime);
+        callDurationWebRequest.setEndTime(endTime);
 
-        obdSuccessfulCallDetailsRequest.setMsisdn(msisdn);
-        obdSuccessfulCallDetailsRequest.setCampaignId(campaignId);
-        obdSuccessfulCallDetailsRequest.setServiceOption(serviceOption);
-        obdSuccessfulCallDetailsRequest.setCallDetailRecord(callDetailRecord);
-        obdSuccessfulCallDetailsRequest.setSubscriptionId(subscriptionId);
+        when(obdSuccessfulCallDetailsRequest.getMsisdn()).thenReturn(msisdn);
+        when(obdSuccessfulCallDetailsRequest.getCampaignId()).thenReturn(campaignId);
+        when(obdSuccessfulCallDetailsRequest.getServiceOption()).thenReturn(serviceOption);
+        when(obdSuccessfulCallDetailsRequest.getCallDurationWebRequest()).thenReturn(callDurationWebRequest);
+        when(obdSuccessfulCallDetailsRequest.getSubscriptionId()).thenReturn(subscriptionId);
 
         CampaignMessage campaignMessage = mock(CampaignMessage.class);
         when(campaignMessage.getDnpRetryCount()).thenReturn(retryCount);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        when(successfulCallRequestValidator.validate(obdSuccessfulCallDetailsRequest)).thenReturn(new Errors());
+        when(successfulCallRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
         when(obdServiceOptionFactory.getHandler(ServiceOption.HELP)).thenReturn(serviceOptionHandler);
+        when(obdSuccessfulCallDetailsRequest.validate()).thenReturn(new Errors());
 
         kilkariCampaignService.processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
 
-        InOrder inOrder = Mockito.inOrder(campaignMessageService, reportingService);
+        InOrder inOrder = Mockito.inOrder(obdSuccessfulCallDetailsRequest, successfulCallRequestValidator, campaignMessageService, reportingService);
+        inOrder.verify(obdSuccessfulCallDetailsRequest).validate();
+        inOrder.verify(successfulCallRequestValidator).validate(any(OBDSuccessfulCallDetailsRequest.class));
         inOrder.verify(campaignMessageService).find(subscriptionId, campaignId);
 
         ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
@@ -175,33 +179,33 @@ public class KilkariCampaignServiceTest {
         assertEquals(campaignId, campaignMessageDeliveryReportRequest.getCampaignId());
         assertEquals(retryCount.toString(), campaignMessageDeliveryReportRequest.getRetryCount());
         assertEquals(serviceOption, campaignMessageDeliveryReportRequest.getServiceOption());
-        assertEquals(startTime, campaignMessageDeliveryReportRequest.getCallDetailRecord().getStartTime());
-        assertEquals(endTime, campaignMessageDeliveryReportRequest.getCallDetailRecord().getEndTime());
+        assertEquals(new DateTime(2012, 12, 25, 12, 13, 14), campaignMessageDeliveryReportRequest.getCallDetailRecord().getStartTime());
+        assertEquals(new DateTime(2012, 12, 27, 12, 15, 19), campaignMessageDeliveryReportRequest.getCallDetailRecord().getEndTime());
 
-        verify(serviceOptionHandler).process(obdSuccessfulCallDetailsRequest);
+        verify(serviceOptionHandler).process(any(OBDSuccessfulCallDetailsRequest.class));
     }
 
     @Test
     public void shouldNotProcessSuccessfulCampaignMessageDeliveryIfThereIsNoSubscriptionAvailable() {
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK1";
         String msisdn = "1234567890";
         String serviceOption = ServiceOption.HELP.name();
-        String startTime = "25-12-2012";
-        String endTime = "27-12-2012";
-        CallDetailRecord callDetailRecord = new CallDetailRecord();
-        callDetailRecord.setStartTime(startTime);
-        callDetailRecord.setEndTime(endTime);
+        String startTime = "25-12-2012 12-13-14";
+        String endTime = "27-12-2012 12-15-19";
+        CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest();
+        callDurationWebRequest.setStartTime(startTime);
+        callDurationWebRequest.setEndTime(endTime);
 
         obdSuccessfulCallDetailsRequest.setMsisdn(msisdn);
         obdSuccessfulCallDetailsRequest.setCampaignId(campaignId);
         obdSuccessfulCallDetailsRequest.setServiceOption(serviceOption);
-        obdSuccessfulCallDetailsRequest.setCallDetailRecord(callDetailRecord);
+        obdSuccessfulCallDetailsRequest.setCallDurationWebRequest(callDurationWebRequest);
         obdSuccessfulCallDetailsRequest.setSubscriptionId(subscriptionId);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(null);
 
-        when(successfulCallRequestValidator.validate(obdSuccessfulCallDetailsRequest)).thenReturn(new Errors());
+        when(successfulCallRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
 
         kilkariCampaignService.processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
 
@@ -222,7 +226,9 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldScheduleUnsubscriptionWhenPackIsCompletedAndWhenStatusIsNotDeactivated() {
         String subscriptionId = "abcd1234";
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1), SubscriptionStatus.NEW);
+
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1), SubscriptionStatus.NEW);
+
         subscription.setStatus(SubscriptionStatus.ACTIVE);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -235,7 +241,8 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldNotScheduleUnsubscriptionWhenPackIsCompletedAndStatusIsDeactivated() {
         String subscriptionId = "abcd1234";
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1), SubscriptionStatus.NEW);
+
         subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);

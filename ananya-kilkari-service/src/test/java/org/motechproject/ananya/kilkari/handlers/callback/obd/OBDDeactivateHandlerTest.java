@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.handlers.callback.obd;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -24,15 +25,16 @@ public class OBDDeactivateHandlerTest {
         OBDDeactivateHandler obdDeactivateHandler = new OBDDeactivateHandler(subscriptionService);
         Channel channel = Channel.IVR;
         String subscriptionId = "subscriptionId";
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest =  new OBDSuccessfulCallDetailsRequest();
-        obdSuccessfulCallDetailsRequest.setSubscriptionId(subscriptionId);
+        DateTime createdAt = DateTime.now().minusMinutes(42);
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest =  new OBDSuccessfulCallDetailsRequest(subscriptionId, null, null, null, null, createdAt);
 
         obdDeactivateHandler.process(obdSuccessfulCallDetailsRequest);
 
         ArgumentCaptor<DeactivationRequest> captor = ArgumentCaptor.forClass(DeactivationRequest.class);
         verify(subscriptionService).requestDeactivation(captor.capture());
         DeactivationRequest actualRequest = captor.getValue();
-        assertEquals(actualRequest.getChannel(), channel);
-        assertEquals(actualRequest.getSubscriptionId(), subscriptionId);
+        assertEquals(channel, actualRequest.getChannel());
+        assertEquals(subscriptionId, actualRequest.getSubscriptionId());
+        assertEquals(createdAt, actualRequest.getCreatedAt());
     }
 }

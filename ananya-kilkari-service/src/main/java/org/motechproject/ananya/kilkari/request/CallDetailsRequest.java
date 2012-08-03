@@ -3,10 +3,7 @@ package org.motechproject.ananya.kilkari.request;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 
@@ -14,36 +11,20 @@ import java.io.Serializable;
 
 public class CallDetailsRequest implements Serializable {
 
-    @JsonProperty
     private String msisdn;
-    @JsonProperty
     private String campaignId;
-    @JsonProperty
-    private CallDetailRecord callDetailRecord;
-
-    @JsonIgnore
+    private CallDurationRequest callDurationRequest;
     private DateTime createdAt;
-    @JsonIgnore
     private CampaignMessageCallSource callSource;
-    @JsonIgnore
     private Channel channel;
 
-    public CallDetailsRequest(CampaignMessageCallSource callSource) {
-        createdAt = DateTime.now();
-        this.callSource = callSource;
-        channel = Channel.IVR;
-    }
-
-    public void setMsisdn(String msisdn) {
+    public CallDetailsRequest(CampaignMessageCallSource callSource, String msisdn, String campaignId, CallDurationRequest callDurationRequest, DateTime createdAt) {
         this.msisdn = msisdn;
-    }
-
-    public void setCampaignId(String campaignId) {
         this.campaignId = campaignId;
-    }
-
-    public void setCallDetailRecord(CallDetailRecord callDetailRecord) {
-        this.callDetailRecord = callDetailRecord;
+        this.callDurationRequest = callDurationRequest;
+        this.createdAt = createdAt;
+        this.callSource = callSource;
+        this.channel = Channel.IVR;
     }
 
     public String getMsisdn() {
@@ -54,8 +35,8 @@ public class CallDetailsRequest implements Serializable {
         return campaignId;
     }
 
-    public CallDetailRecord getCallDetailRecord() {
-        return callDetailRecord;
+    public CallDurationRequest getCallDurationRequest() {
+        return callDurationRequest;
     }
 
     public DateTime getCreatedAt() {
@@ -80,7 +61,7 @@ public class CallDetailsRequest implements Serializable {
         return new EqualsBuilder()
                 .append(this.msisdn, that.msisdn)
                 .append(this.campaignId, that.campaignId)
-                .append(this.callDetailRecord, that.callDetailRecord)
+                .append(this.callDurationRequest, that.callDurationRequest)
                 .append(this.createdAt, that.createdAt)
                 .append(this.callSource, that.callSource)
                 .isEquals();
@@ -91,7 +72,7 @@ public class CallDetailsRequest implements Serializable {
         return new HashCodeBuilder()
                 .append(this.msisdn)
                 .append(this.campaignId)
-                .append(this.callDetailRecord)
+                .append(this.callDurationRequest)
                 .append(this.createdAt)
                 .append(this.callSource)
                 .hashCode();

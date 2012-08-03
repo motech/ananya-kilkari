@@ -12,7 +12,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
+import org.motechproject.ananya.kilkari.validators.ValidationUtils;
 import org.motechproject.common.domain.PhoneNumber;
 
 import java.io.Serializable;

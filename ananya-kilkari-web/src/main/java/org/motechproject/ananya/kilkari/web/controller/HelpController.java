@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
+import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.service.SubscriberCareService;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
@@ -23,7 +24,7 @@ public class HelpController {
     @RequestMapping(value = "/help", method = RequestMethod.GET)
     @ResponseBody
     public BaseResponse createSubscriberCareRequest(@RequestParam String msisdn, @RequestParam String reason, @RequestParam String channel) {
-        subscriberCareService.processSubscriberCareRequest(new SubscriberCareRequest(msisdn, reason, channel));
+        subscriberCareService.processSubscriberCareRequest(new SubscriberCareRequest(msisdn, reason, channel, DateTime.now()));
         return BaseResponse.success("Subscriber care request processed successfully");
     }
 

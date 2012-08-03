@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class SubscriberCareServiceTest {
 
     @Test(expected = ValidationException.class)
     public void shouldThrowExceptionForInvalidMsisdnInSubscriberCareRequest() {
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("12345", SubscriberCareReasons.HELP.name(), "ivr");
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("12345", SubscriberCareReasons.HELP.name(), "ivr", DateTime.now());
 
         subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
     }
@@ -43,7 +44,7 @@ public class SubscriberCareServiceTest {
     public void shouldSaveValidSubscriberCareRequest() {
         String msisdn = "1234567890";
         SubscriberCareReasons reason = SubscriberCareReasons.HELP;
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason.name(), "ivr");
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason.name(), "ivr", DateTime.now());
 
         subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
 
@@ -60,7 +61,7 @@ public class SubscriberCareServiceTest {
         String msisdn = "1234566789";
         String reason = SubscriberCareReasons.HELP.name();
         String channel = "ivr";
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason, channel);
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason, channel, DateTime.now());
 
         subscriberCareService.processSubscriberCareRequest(subscriberCareRequest);
 

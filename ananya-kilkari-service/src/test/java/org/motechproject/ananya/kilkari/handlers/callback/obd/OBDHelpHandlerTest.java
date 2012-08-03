@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.handlers.callback.obd;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -29,10 +30,8 @@ public class OBDHelpHandlerTest {
     public void shouldCreateASubscriberCareRequest() {
         String msisdn = "1234567890";
         String serviceOption = ServiceOption.HELP.name();
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
-        obdSuccessfulCallDetailsRequest.setMsisdn(msisdn);
-        obdSuccessfulCallDetailsRequest.setServiceOption(serviceOption);
-
+        DateTime createdAt = DateTime.now().minusMinutes(42);
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest(null, ServiceOption.HELP, msisdn, null, null, createdAt);
         obdHelpHandler.process(obdSuccessfulCallDetailsRequest);
 
         ArgumentCaptor<SubscriberCareRequest> subscriberCareRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
@@ -42,5 +41,6 @@ public class OBDHelpHandlerTest {
         assertEquals(msisdn, subscriberCareRequest.getMsisdn());
         assertEquals(serviceOption, subscriberCareRequest.getReason());
         assertEquals(Channel.IVR.name(), subscriberCareRequest.getChannel());
+        assertEquals(createdAt, subscriberCareRequest.getCreatedAt());
     }
 }

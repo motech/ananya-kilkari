@@ -6,11 +6,11 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 
-public class InboxCallDetailsRequest extends CallDetailsRequest {
+public class InboxCallDetailsWebRequest extends CallDetailsWebRequest {
     @JsonProperty
     private String pack;
 
-    public InboxCallDetailsRequest(CampaignMessageCallSource callSource) {
+    public InboxCallDetailsWebRequest(CampaignMessageCallSource callSource) {
         super(callSource);
     }
 
@@ -26,9 +26,9 @@ public class InboxCallDetailsRequest extends CallDetailsRequest {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof OBDSuccessfulCallDetailsRequest)) return false;
+        if (!(o instanceof OBDSuccessfulCallDetailsWebRequest)) return false;
 
-        InboxCallDetailsRequest that = (InboxCallDetailsRequest) o;
+        InboxCallDetailsWebRequest that = (InboxCallDetailsWebRequest) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))

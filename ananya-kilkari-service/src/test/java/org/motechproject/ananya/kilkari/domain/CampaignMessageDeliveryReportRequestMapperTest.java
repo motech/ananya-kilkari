@@ -2,9 +2,10 @@ package org.motechproject.ananya.kilkari.domain;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.obd.domain.CallDetailRecord;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
+import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
+import org.motechproject.ananya.kilkari.request.CallDurationRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 
 import static junit.framework.Assert.assertEquals;
@@ -16,16 +17,10 @@ public class CampaignMessageDeliveryReportRequestMapperTest {
         DateTime startTime = DateTime.now();
         DateTime endTime = DateTime.now().plusMinutes(2);
         String subscriptionId = "subscriptionId";
-        CallDetailRecord callDetailRecord = new CallDetailRecord();
-        callDetailRecord.setStartTime(startTime.toString());
-        callDetailRecord.setEndTime(endTime.toString());
+        CallDurationRequest callDurationRequest = new CallDurationRequest(startTime, endTime);
+        DateTime createdAt = DateTime.now().minusSeconds(56);
 
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest();
-        obdSuccessfulCallDetailsRequest.setMsisdn("1234567890");
-        obdSuccessfulCallDetailsRequest.setServiceOption("HELP");
-        obdSuccessfulCallDetailsRequest.setCampaignId("CampaignId");
-        obdSuccessfulCallDetailsRequest.setCallDetailRecord(callDetailRecord);
-        obdSuccessfulCallDetailsRequest.setSubscriptionId(subscriptionId);
+        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest(subscriptionId, ServiceOption.HELP, "1234567890", "CampaignId", callDurationRequest, createdAt);
 
         Integer retryCount = 3;
         CampaignMessageDeliveryReportRequestMapper campaignMessageDeliveryReportRequestMapper = new CampaignMessageDeliveryReportRequestMapper();
@@ -35,11 +30,11 @@ public class CampaignMessageDeliveryReportRequestMapperTest {
         assertEquals(subscriptionId, actualDeliveryReportRequest.getSubscriptionId());
         assertEquals(obdSuccessfulCallDetailsRequest.getMsisdn(), actualDeliveryReportRequest.getMsisdn());
         assertEquals(obdSuccessfulCallDetailsRequest.getCampaignId(), actualDeliveryReportRequest.getCampaignId());
-        assertEquals(obdSuccessfulCallDetailsRequest.getServiceOption(), actualDeliveryReportRequest.getServiceOption());
+        assertEquals(obdSuccessfulCallDetailsRequest.getServiceOption().name(), actualDeliveryReportRequest.getServiceOption());
         assertEquals(CampaignMessageStatus.SUCCESS.name(), actualDeliveryReportRequest.getStatus());
         assertEquals(retryCount.toString(), actualDeliveryReportRequest.getRetryCount());
-        assertEquals(startTime.toString(), obdSuccessfulCallDetailsRequest.getCallDetailRecord().getStartTime());
-        assertEquals(endTime.toString(), obdSuccessfulCallDetailsRequest.getCallDetailRecord().getEndTime());
+        assertEquals(startTime, obdSuccessfulCallDetailsRequest.getCallDurationRequest().getStartTime());
+        assertEquals(endTime, obdSuccessfulCallDetailsRequest.getCallDurationRequest().getEndTime());
         assertEquals("OBD", actualDeliveryReportRequest.getCallSource());
     }
 }

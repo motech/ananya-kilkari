@@ -50,7 +50,7 @@ public class SubscriptionPublisherTest {
 
     @Test
     public void shouldPublishSubscriberCareRequestIntoQueue() {
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("1234567890", SubscriberCareReasons.HELP.name(), channel);
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("1234567890", SubscriberCareReasons.HELP.name(), channel, DateTime.now());
 
         subscriptionPublisher.processSubscriberCareRequest(subscriberCareRequest);
 

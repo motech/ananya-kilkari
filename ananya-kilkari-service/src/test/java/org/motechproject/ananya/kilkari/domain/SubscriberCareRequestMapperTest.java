@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.domain;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 
@@ -11,13 +12,14 @@ public class SubscriberCareRequestMapperTest {
         String msisdn = "1234567890";
         SubscriberCareReasons reason = SubscriberCareReasons.HELP;
         String channel = "ivr";
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason.name().toLowerCase(), channel);
+        DateTime dateTime = DateTime.now().minusSeconds(42);
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason.name().toLowerCase(), channel, dateTime);
 
         SubscriberCareDoc subscriberCareDoc = SubscriberCareRequestMapper.map(subscriberCareRequest);
 
         assertEquals(msisdn, subscriberCareDoc.getMsisdn());
         assertEquals(reason, subscriberCareDoc.getReason());
         assertEquals(Channel.IVR, subscriberCareDoc.getChannel());
-        assertEquals(subscriberCareRequest.getCreatedAt(), subscriberCareDoc.getCreatedAt());
+        assertEquals(dateTime, subscriberCareDoc.getCreatedAt());
     }
 }

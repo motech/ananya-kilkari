@@ -77,7 +77,7 @@ public class SubscriptionValidator {
         String panchayat = location.getPanchayat();
         SubscriberLocation existingLocation = reportingService.getLocation(district, block, panchayat);
 
-        if (!ValidationUtils.assertNotNull(existingLocation)) {
+        if (existingLocation == null) {
             errors.add(String.format("Location does not exist for District[%s] Block[%s] and Panchayat[%s]", district, block, panchayat));
         }
     }

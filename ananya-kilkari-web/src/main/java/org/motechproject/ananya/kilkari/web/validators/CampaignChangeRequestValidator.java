@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.web.validators;
 
 import org.motechproject.ananya.kilkari.request.CampaignChangeRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
+import org.motechproject.ananya.kilkari.validators.ValidationUtils;
 import org.springframework.stereotype.Component;
 
 @Component

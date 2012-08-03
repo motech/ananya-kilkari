@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.subscription.validators;
+package org.motechproject.ananya.kilkari.validators;
 
 import org.joda.time.DateTime;
 import org.junit.Rule;
@@ -104,27 +104,6 @@ public class ValidationUtilsTest {
     @Test
     public void shouldReturnFalseWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscription() {
         assertFalse(PhoneNumber.isValid("123456789a"));
-    }
-
-    @Test
-    public void shouldReturnFalseWhenAssertingNullForNotNull() {
-        assertFalse(ValidationUtils.assertNotNull(null));
-    }
-
-    @Test
-    public void shouldNotReturnFalseWhenAssertingNotNullForNotNull() {
-        assertTrue(ValidationUtils.assertNotNull(new Object()));
-    }
-
-    @Test
-    public void shouldReturnFalseWhenAssertingNotNullForNull() {
-
-        assertFalse(ValidationUtils.assertNull(new Object()));
-    }
-
-    @Test
-    public void shouldNotReturnFalseWhenAssertingNullForNull() {
-        assertTrue(ValidationUtils.assertNull(null));
     }
 
     @Test

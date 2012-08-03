@@ -2,14 +2,13 @@ package org.motechproject.ananya.kilkari.subscription.domain;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Weeks;
 
 public enum SubscriptionPack {
+
     FIFTEEN_MONTHS(0, 60) {
         @Override
         public DateTime adjustStartDate(DateTime dob) {
-            Weeks weeks = Weeks.weeksBetween(dob.minusMonths(3), dob);
-            return dob.minusWeeks(weeks.getWeeks());
+            return dob.minusWeeks(12);
         }
     }, TWELVE_MONTHS(12, 48) {
         @Override
@@ -19,10 +18,10 @@ public enum SubscriptionPack {
     }, SEVEN_MONTHS(32, 28) {
         @Override
         public DateTime adjustStartDate(DateTime dob) {
-            Weeks weeks = Weeks.weeksBetween(dob, dob.plusMonths(5));
-            return dob.plusWeeks(weeks.getWeeks());
+            return dob.plusWeeks(20);
         }
     };
+
     private int startWeek;
     private int totalWeeks;
 

@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
-import org.motechproject.ananya.kilkari.reporting.it.TimedRunner;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.ananya.kilkari.reporting.repository.StubReportingGateway;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.reporting.it;
+package org.motechproject.ananya.kilkari.reporting.service;
 
 public abstract class TimedRunner {
 

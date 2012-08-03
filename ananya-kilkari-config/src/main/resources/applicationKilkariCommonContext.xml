@@ -7,8 +7,17 @@
     <util:properties id="couchdbProperties" location="classpath:/couchdb.properties"/>
     <util:properties id="kilkariProperties" location="classpath:/kilkari.properties"/>
 
+    <context:property-placeholder properties-ref="kilkariProperties" ignore-unresolvable="true"/>
+
     <context:component-scan base-package="org.motechproject.ananya.kilkari"/>
 
-    <bean id="kilkariRestTemplate" class="org.springframework.web.client.RestTemplate" autowire="byName"/>
+    <bean id="kilkariRestTemplate" class="org.springframework.web.client.RestTemplate" autowire="byName">
+        <constructor-arg>
+            <bean class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory">
+                <property name="connectTimeout" value="${kilkari.external.http.connect.timeout}"/>
+                <property name="readTimeout" value="${kilkari.external.http.read.timeout}"/>
+            </bean>
+        </constructor-arg>
+    </bean>
 
 </beans>

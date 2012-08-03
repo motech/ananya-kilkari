@@ -9,7 +9,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.utils.DateUtils;
+import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

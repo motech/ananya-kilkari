@@ -27,7 +27,6 @@ import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
-import org.motechproject.ananya.kilkari.web.validators.CampaignChangeRequestValidator;
 import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
 import org.springframework.http.MediaType;
 
@@ -60,15 +59,13 @@ public class SubscriptionControllerTest {
     private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
     @Mock
     private SubscriptionDetailsMapper mockedSubscriptionDetailsMapper;
-    @Mock
-    private CampaignChangeRequestValidator campaignChangeRequestValidator;
 
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, callbackRequestValidator, unsubscriptionRequestValidator, mockedSubscriptionDetailsMapper, campaignChangeRequestValidator);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService, callbackRequestValidator, unsubscriptionRequestValidator, mockedSubscriptionDetailsMapper);
     }
 
     @Test
@@ -377,8 +374,6 @@ public class SubscriptionControllerTest {
         campaignChangeRequest.setReason(reason);
         byte[] requestBody = TestUtils.toJson(campaignChangeRequest).getBytes();
 
-        when(campaignChangeRequestValidator.validate(any(CampaignChangeRequest.class))).thenReturn(new Errors());
-
         mockMvc(subscriptionController)
                 .perform(post("/subscription/changecampaign")
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
@@ -398,20 +393,15 @@ public class SubscriptionControllerTest {
     public void shouldValidateCampaignChangeRequest() throws Exception {
         CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
         campaignChangeRequest.setSubscriptionId("subscriptionId");
-        campaignChangeRequest.setReason("reason");
+        campaignChangeRequest.setReason("asfddd");
         byte[] requestBody = TestUtils.toJson(campaignChangeRequest).getBytes();
-
-        Errors errors = new Errors();
-        errors.add("some error description1");
-        errors.add("some error description2");
-        when(campaignChangeRequestValidator.validate(any(CampaignChangeRequest.class))).thenReturn(errors);
 
         mockMvc(subscriptionController)
                 .perform(post("/subscription/changecampaign")
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("ERROR", "some error description1,some error description2")));
+                .andExpect(content().string(baseResponseMatcher("ERROR", "Invalid reason asfddd")));
     }
 
     @Test
@@ -428,6 +418,35 @@ public class SubscriptionControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber Update request submitted successfully")));
 
         verify(kilkariSubscriptionService).updateSubscriberDetails(subscriberWebRequest, subscriptionId);
+    }
+
+    @Test
+    public void shouldChangePackForTheGivenSubscriber() throws Exception {
+        String msisdn = "1234567890";
+        String channel = Channel.CALL_CENTER.name();
+        String pack = SubscriptionPack.FIFTEEN_MONTHS.name();
+        ChangePackWebRequest changePackWebRequest = new ChangePackWebRequest();
+        changePackWebRequest.setMsisdn(msisdn);
+        changePackWebRequest.setChannel(channel);
+        changePackWebRequest.setPack(pack);
+
+        byte[] requestBody = TestUtils.toJson(changePackWebRequest).getBytes();
+
+        mockMvc(subscriptionController)
+                .perform(post("/subscription/changepack")
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Change Pack request submitted successfully")));
+
+        ArgumentCaptor<ChangePackWebRequest> changePackWebRequestArgumentCaptor = ArgumentCaptor.forClass(ChangePackWebRequest.class);
+        verify(kilkariSubscriptionService).changePack(changePackWebRequestArgumentCaptor.capture());
+        ChangePackWebRequest request = changePackWebRequestArgumentCaptor.getValue();
+
+        assertEquals(msisdn, request.getMsisdn());
+        assertEquals(channel, request.getChannel());
+        assertEquals(pack, request.getPack());
+        assertNotNull(request.getCreatedAt());
     }
 
     private void mockSubscription(String msisdn) {

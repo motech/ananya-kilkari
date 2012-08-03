@@ -6,13 +6,11 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.builder.ChangePackWebRequestBuilder;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
-import org.motechproject.ananya.kilkari.request.CampaignChangeRequest;
-import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
-import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
-import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
+import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -21,9 +19,7 @@ import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionReque
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.utils.DateUtils;
-import org.motechproject.ananya.kilkari.validators.SubscriberDetailsValidator;
+import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
@@ -52,13 +48,11 @@ public class KilkariSubscriptionServiceTest {
     private MotechSchedulerService motechSchedulerService;
     @Mock
     private KilkariPropertiesData kilkariPropertiesData;
-    @Mock
-    private SubscriberDetailsValidator subscriberDetailsValidator;
 
     @Before
     public void setup() {
         initMocks(this);
-        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, kilkariPropertiesData, subscriberDetailsValidator);
+        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, kilkariPropertiesData);
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
     }
 
@@ -204,31 +198,27 @@ public class KilkariSubscriptionServiceTest {
         request.setDateOfBirth("20-10-1985");
         request.setBlock("block");
         String subscriptionId = "subscriptionId";
-        Errors errors = new Errors();
-        errors.add("some error");
-        when(subscriberDetailsValidator.validate(any(SubscriberWebRequest.class))).thenReturn(errors);
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("some error");
 
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid channel CALL_CENTER");
         kilkariSubscriptionService.updateSubscriberDetails(request, subscriptionId);
+
     }
 
     @Test
     public void shouldUpdateSubscriberDetails() {
         SubscriberWebRequest request = new SubscriberWebRequest();
         request.setBeneficiaryAge("23");
-        request.setChannel(Channel.CALL_CENTER.name());
+        request.setChannel(Channel.IVR.name());
         request.setCreatedAt(DateTime.now());
         request.setDateOfBirth("20-10-1985");
         request.setBlock("block");
         String subscriptionId = "subscriptionId";
-        when(subscriberDetailsValidator.validate(request)).thenReturn(new Errors());
 
         kilkariSubscriptionService.updateSubscriberDetails(request, subscriptionId);
 
         ArgumentCaptor<SubscriberRequest> captor = ArgumentCaptor.forClass(SubscriberRequest.class);
         verify(subscriptionService).updateSubscriberDetails(captor.capture());
-        verify(subscriberDetailsValidator).validate(request);
         SubscriberRequest subscriberRequest = captor.getValue();
         assertEquals(Integer.valueOf(request.getBeneficiaryAge()), subscriberRequest.getBeneficiaryAge());
         assertEquals(request.getChannel(), subscriberRequest.getChannel());
@@ -236,5 +226,11 @@ public class KilkariSubscriptionServiceTest {
         assertEquals(DateUtils.parseDate(request.getDateOfBirth()), subscriberRequest.getDateOfBirth());
         assertEquals(request.getBlock(), subscriberRequest.getBlock());
         assertEquals(subscriptionId, subscriberRequest.getSubscriptionId());
+    }
+
+    @Test
+    public void shouldNotThrowExceptionIfChangePackRequestIsValid() {
+        ChangePackWebRequest changePackWebRequest = new ChangePackWebRequestBuilder().withDefaults().build();
+        kilkariSubscriptionService.changePack(changePackWebRequest);
     }
 }

@@ -1,7 +1,5 @@
 package org.motechproject.ananya.kilkari.request;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -12,12 +10,9 @@ import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.validators.ValidationUtils;
-import org.motechproject.common.domain.PhoneNumber;
+import org.motechproject.ananya.kilkari.subscription.validators.WebRequestValidator;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SubscriptionWebRequest implements Serializable {
     @JsonProperty
@@ -159,82 +154,26 @@ public class SubscriptionWebRequest implements Serializable {
         this.msisdn = msisdn;
     }
 
-    public void validate(Errors errors) {
-        validateMsisdn(errors);
-        validatePack(errors);
-        validateChannel(errors);
+    public Errors validate() {
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateMsisdn(msisdn);
+        webRequestValidator.validatePack(pack);
+        webRequestValidator.validateChannel(channel);
         if (!Channel.isIVR(channel)) {
-            validateAge(errors);
-            validateOnlyOneOfEDDOrDOBOrWeekNumberPresent(errors);
-            validateDOB(errors);
-            validateEDD(errors);
-            validateWeekNumber(errors);
+            webRequestValidator.validateAge(beneficiaryAge);
+            webRequestValidator.validateOnlyOneOfEDDOrDOBOrWeekNumberPresent(expectedDateOfDelivery, dateOfBirth, week);
+            webRequestValidator.validateDOB(dateOfBirth, createdAt);
+            webRequestValidator.validateEDD(expectedDateOfDelivery, createdAt);
+            webRequestValidator.validateWeekNumber(week);
         }
-    }
+        return webRequestValidator.getErrors();
 
-    private void validateOnlyOneOfEDDOrDOBOrWeekNumberPresent(Errors errors) {
-        List<Boolean> checks = new ArrayList<>();
-        checks.add(StringUtils.isNotEmpty(expectedDateOfDelivery));
-        checks.add(StringUtils.isNotEmpty(dateOfBirth));
-        checks.add(StringUtils.isNotEmpty(week));
-
-        int numberOfOptions = CollectionUtils.countMatches(checks, new Predicate() {
-            @Override
-            public boolean evaluate(Object o) {
-                return (Boolean)o;
-            }
-        });
-
-        if (numberOfOptions > 1) {
-            errors.add("Invalid request. Only one of date of delivery, date of birth and week number should be present");
-        }
-    }
-
-    private void validateWeekNumber(Errors errors) {
-        if (StringUtils.isNotEmpty(week)) {
-            if (!ValidationUtils.assertNumeric(week)) {
-                errors.add("Invalid week number %s", week);
-            }
-        }
-    }
-
-    private void validatePack(Errors errors) {
-        if (!ValidationUtils.assertPack(pack)) {
-            errors.add("Invalid subscription pack %s", pack);
-        }
-    }
-
-    private void validateMsisdn(Errors errors) {
-        if (PhoneNumber.isNotValid(msisdn)) {
-            errors.add("Invalid msisdn %s", msisdn);
-        }
-    }
-
-    public void validateChannel(Errors errors) {
-        if (!ValidationUtils.assertChannel(channel)) {
-            errors.add("Invalid channel %s", channel);
-        }
     }
 
     public void validateChannel() {
-        if (!ValidationUtils.assertChannel(channel)) {
+        if (!Channel.isValid(channel)) {
             throw new ValidationException(String.format("Invalid channel %s", channel));
         }
-    }
-
-    private void validateEDD(Errors errors) {
-        if (!ValidationUtils.assertEDD(expectedDateOfDelivery, createdAt))
-            errors.add("Invalid expected date of delivery %s", expectedDateOfDelivery);
-    }
-
-    private void validateDOB(Errors errors) {
-        if (!ValidationUtils.assertDOB(dateOfBirth, createdAt))
-            errors.add("Invalid date of birth %s", dateOfBirth);
-    }
-
-    private void validateAge(Errors errors) {
-        if (!ValidationUtils.assertAge(beneficiaryAge))
-            errors.add("Invalid beneficiary age %s", beneficiaryAge);
     }
 
     private DateTime parseDateTime(String dateTime) {

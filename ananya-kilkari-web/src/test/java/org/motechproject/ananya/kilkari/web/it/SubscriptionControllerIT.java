@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.motechproject.ananya.kilkari.TimedRunner;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
@@ -127,11 +128,11 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         final Subscription subscription = new TimedRunner<Subscription>(20, 1000) {
             @Override
-            Subscription run() {
+            public Subscription run() {
                 List<Subscription> subscriptionList = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
                 return subscriptionList.isEmpty() ? null : subscriptionList.get(0);
             }
-        }.execute();
+        }.executeWithTimeout();
 
         assertNotNull(subscription);
         markForDeletion(subscription);
@@ -168,12 +169,12 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         final Subscription subscription = new TimedRunner<Subscription>(20, 1000) {
             @Override
-            Subscription run() {
+            public Subscription run() {
                 List<Subscription> subscriptions = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
                 return subscriptions.isEmpty() ? null : subscriptions.get(0);
 
             }
-        }.execute();
+        }.executeWithTimeout();
 
         assertNotNull(subscription);
         markForDeletion(subscription);
@@ -264,20 +265,20 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         Boolean statusChanged = new TimedRunner<Boolean>(20, 1000) {
             @Override
-            Boolean run() {
+            public Boolean run() {
                 Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
                 return subscription.getStatus() == SubscriptionStatus.PENDING_DEACTIVATION ? Boolean.TRUE : null;
 
             }
-        }.execute();
+        }.executeWithTimeout();
 
         Boolean deactivationRequested = new TimedRunner<Boolean>(20, 1000) {
             @Override
-            Boolean run() {
+            public Boolean run() {
                 return onMobileSubscriptionService.isDeactivateSubscriptionCalled() ? Boolean.TRUE : null;
 
             }
-        }.execute();
+        }.executeWithTimeout();
 
         assertNotNull(statusChanged);
         assertNotNull(deactivationRequested);

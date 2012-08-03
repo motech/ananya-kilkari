@@ -12,7 +12,6 @@ import org.motechproject.ananya.kilkari.subscription.service.mapper.Subscription
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.validators.SubscriberDetailsValidator;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
@@ -32,7 +31,6 @@ public class KilkariSubscriptionService {
     private SubscriptionService subscriptionService;
     private MotechSchedulerService motechSchedulerService;
     private KilkariPropertiesData kilkariProperties;
-    private SubscriberDetailsValidator subscriberDetailsValidator;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariSubscriptionService.class);
 
@@ -40,13 +38,11 @@ public class KilkariSubscriptionService {
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
                                       SubscriptionService subscriptionService,
                                       MotechSchedulerService motechSchedulerService,
-                                      KilkariPropertiesData kilkariProperties,
-                                      SubscriberDetailsValidator subscriberDetailsValidator) {
+                                      KilkariPropertiesData kilkariProperties) {
         this.subscriptionPublisher = subscriptionPublisher;
         this.subscriptionService = subscriptionService;
         this.motechSchedulerService = motechSchedulerService;
         this.kilkariProperties = kilkariProperties;
-        this.subscriberDetailsValidator = subscriberDetailsValidator;
     }
 
     public void createSubscriptionAsync(SubscriptionWebRequest subscriptionWebRequest) {
@@ -65,8 +61,7 @@ public class KilkariSubscriptionService {
     }
 
     private void validateSubscriptionRequest(SubscriptionWebRequest subscriptionWebRequest) {
-        Errors errors = new Errors();
-        subscriptionWebRequest.validate(errors);
+        Errors errors = subscriptionWebRequest.validate();
         if (errors.hasErrors()) {
             throw new ValidationException(errors.allMessages());
         }
@@ -108,7 +103,7 @@ public class KilkariSubscriptionService {
     }
 
     public void updateSubscriberDetails(SubscriberWebRequest request, String subscriptionId) {
-        Errors errors = subscriberDetailsValidator.validate(request);
+        Errors errors = request.validate();
         raiseExceptionIfThereAreErrors(errors);
         SubscriberRequest subscriberRequest = SubscriptionRequestMapper.mapToSubscriberRequest(request, subscriptionId);
         subscriptionService.updateSubscriberDetails(subscriberRequest);
@@ -118,5 +113,9 @@ public class KilkariSubscriptionService {
         if (validationErrors.hasErrors()) {
             throw new ValidationException(validationErrors.allMessages());
         }
+    }
+
+    public void changePack(ChangePackWebRequest changePackWebRequest) {
+
     }
 }

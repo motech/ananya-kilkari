@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.motechproject.ananya.kilkari.TimedRunner;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
@@ -89,7 +90,7 @@ public class OBDControllerIT extends SpringIntegrationTest {
             public Boolean run() {
                 return stubOnMobileOBDGateway.isInvalidFailureRecordCalled() ? Boolean.TRUE : null;
             }
-        }.execute();
+        }.executeWithTimeout();
         stubOnMobileOBDGateway.setInvalidFailureRecordCalled(false);
 
         new TimedRunner<Boolean>(20, 1000) {
@@ -97,7 +98,7 @@ public class OBDControllerIT extends SpringIntegrationTest {
             public Boolean run() {
                 return stubReportingService.isReportCampaignMessageDeliveryCalled() ? Boolean.TRUE : null;
             }
-        }.execute();
+        }.executeWithTimeout();
         stubReportingService.setReportCampaignMessageDeliveryCalled(false);
 
         ArgumentCaptor<InvalidFailedCallReports> invalidCallDeliveryFailureRecordArgumentCaptor = ArgumentCaptor.forClass(InvalidFailedCallReports.class);

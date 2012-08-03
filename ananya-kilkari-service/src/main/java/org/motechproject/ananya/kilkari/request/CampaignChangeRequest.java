@@ -5,6 +5,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
+import org.motechproject.ananya.kilkari.subscription.validators.WebRequestValidator;
 
 import java.io.Serializable;
 
@@ -46,6 +48,12 @@ public class CampaignChangeRequest implements Serializable {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public Errors validate() {
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateCampaignChangeReason(reason);
+        return webRequestValidator.getErrors();
     }
 
     @Override

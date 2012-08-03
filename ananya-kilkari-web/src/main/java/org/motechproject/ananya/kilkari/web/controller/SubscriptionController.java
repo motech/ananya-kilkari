@@ -10,7 +10,6 @@ import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
-import org.motechproject.ananya.kilkari.web.validators.CampaignChangeRequestValidator;
 import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,19 +24,16 @@ public class SubscriptionController {
     private CallbackRequestValidator callbackRequestValidator;
     private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
     private SubscriptionDetailsMapper subscriptionDetailsMapper;
-    private CampaignChangeRequestValidator campaignChangeRequestValidator;
 
     @Autowired
     public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService,
                                   CallbackRequestValidator callbackRequestValidator,
                                   UnsubscriptionRequestValidator unsubscriptionRequestValidator,
-                                  SubscriptionDetailsMapper subscriptionDetailsMapper,
-                                  CampaignChangeRequestValidator campaignChangeRequestValidator) {
+                                  SubscriptionDetailsMapper subscriptionDetailsMapper) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.callbackRequestValidator = callbackRequestValidator;
         this.unsubscriptionRequestValidator = unsubscriptionRequestValidator;
         this.subscriptionDetailsMapper = subscriptionDetailsMapper;
-        this.campaignChangeRequestValidator = campaignChangeRequestValidator;
     }
 
 
@@ -97,11 +93,18 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription/changecampaign", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse changeCampaign(@RequestBody CampaignChangeRequest campaignChangeRequest) {
-        Errors validationErrors = campaignChangeRequestValidator.validate(campaignChangeRequest);
+        Errors validationErrors = campaignChangeRequest.validate();
         raiseExceptionIfThereAreErrors(validationErrors);
 
         kilkariSubscriptionService.processCampaignChange(campaignChangeRequest);
         return BaseResponse.success("Campaign Change request submitted successfully");
+    }
+
+    @RequestMapping(value = "/subscription/changepack", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseResponse changePack(@RequestBody ChangePackWebRequest changePackWebRequest) {
+        kilkariSubscriptionService.changePack(changePackWebRequest);
+        return BaseResponse.success("Change Pack request submitted successfully");
     }
 
     @RequestMapping(value = "/subscriber/{subscriptionId}", method = RequestMethod.PUT)

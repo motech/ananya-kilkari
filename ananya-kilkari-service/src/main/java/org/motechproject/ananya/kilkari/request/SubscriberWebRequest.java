@@ -5,6 +5,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
+import org.motechproject.ananya.kilkari.subscription.validators.WebRequestValidator;
 
 import java.io.Serializable;
 
@@ -113,6 +116,16 @@ public class SubscriberWebRequest implements Serializable {
 
     public void setChannel(String channel) {
         this.channel = channel;
+    }
+
+    public Errors validate() {
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateChannel(channel, Channel.IVR);
+        webRequestValidator.validateAge(beneficiaryAge);
+        webRequestValidator.validateDOB(dateOfBirth, createdAt);
+        webRequestValidator.validateEDD(expectedDateOfDelivery, createdAt);
+        webRequestValidator.validateOnlyOneOfEDDOrDOBIsPresent(expectedDateOfDelivery, dateOfBirth);
+        return webRequestValidator.getErrors();
     }
 
     @Override

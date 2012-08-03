@@ -1,10 +1,11 @@
-package org.motechproject.ananya.kilkari.utils;
+package org.motechproject.ananya.kilkari.subscription.validators;
 
 
 import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

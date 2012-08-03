@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.utils;
+package org.motechproject.ananya.kilkari.subscription.validators;
 
 
 import org.apache.commons.lang.StringUtils;

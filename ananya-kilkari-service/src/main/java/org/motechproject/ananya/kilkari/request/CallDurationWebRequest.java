@@ -7,7 +7,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.validators.ValidationUtils;
+import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 
 public class CallDurationWebRequest {
     @JsonProperty

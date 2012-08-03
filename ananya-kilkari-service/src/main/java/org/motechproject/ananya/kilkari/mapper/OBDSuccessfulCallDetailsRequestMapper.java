@@ -6,7 +6,7 @@ import org.motechproject.ananya.kilkari.request.CallDurationRequest;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
-import org.motechproject.ananya.kilkari.utils.DateUtils;
+import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 public class OBDSuccessfulCallDetailsRequestMapper {
 

@@ -3,7 +3,6 @@ package org.motechproject.ananya.kilkari.request;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -19,14 +18,9 @@ public class SubscriptionWebRequestTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-    private Errors errors;
 
-    @Before
-    public void tearDown() {
-        errors = new Errors();
-    }
 
-    private void validateErrors(int size, String... msgs) {
+    private void validateErrors(int size, Errors errors, String... msgs) {
         assertEquals(size, errors.getCount());
         for (String msg : msgs) {
             assertTrue(errors.hasMessage(msg));
@@ -61,37 +55,29 @@ public class SubscriptionWebRequestTest {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("9876543210")
                 .withChannel(Channel.IVR.name()).withPack(SubscriptionPack.FIFTEEN_MONTHS.name()).build();
 
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(0);
+        validateErrors(0, subscriptionWebRequest.validate());
     }
 
     @Test
     public void shouldNotAddErrorWhenGivenSubscriptionDetailsAreAllValid() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS.name()).withChannel(Channel.IVR.name()).build();
-        subscriptionWebRequest.validate(errors);
-        validateErrors(0);
+        validateErrors(0, subscriptionWebRequest.validate());
 
         subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(), Channel.IVR.name(), "12", "myname", "01-11-2013", "04-11-2016", "mydistrict", "myblock", "mypanchayat", DateTime.now());
-        subscriptionWebRequest.validate(errors);
-        validateErrors(0);
+        validateErrors(0, subscriptionWebRequest.validate());
 
         subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(), Channel.IVR.name(), null, null, null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
-        subscriptionWebRequest.validate(errors);
-        validateErrors(0);
+        validateErrors(0, subscriptionWebRequest.validate());
 
         subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(), Channel.IVR.name(), "", "", "", "", "mydistrict", "myblock", "mypanchayat", DateTime.now());
-        subscriptionWebRequest.validate(errors);
-        validateErrors(0);
+         
+        validateErrors(0, subscriptionWebRequest.validate());
     }
 
     @Test
     public void shouldAddErrorWhenInvalidPackIsGivenToCreateNewSubscription() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("1234567890").withPack("Invalid-Pack").withChannel(Channel.IVR.name()).build();
-
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(1, "Invalid subscription pack Invalid-Pack");
+        validateErrors(1, subscriptionWebRequest.validate(), "Invalid subscription pack Invalid-Pack");
     }
 
     @Test
@@ -101,48 +87,34 @@ public class SubscriptionWebRequestTest {
         SubscriptionWebRequest subscriptionWebRequestWithDobWeek = new SubscriptionWebRequestBuilder().withDefaults().withWeek("4").withDOB("31-12-2011").build();
         SubscriptionWebRequest subscriptionWebRequestWithDobEddWeek = new SubscriptionWebRequestBuilder().withDefaults().withWeek("4").withDOB("31-12-2011").withEDD("31-12-2012").build();
 
-        errors = new Errors();
-        subscriptionWebRequestWithDobEdd.validate(errors);
-        validateErrors(1, "Invalid request. Only one of date of delivery, date of birth and week number should be present");
+        validateErrors(1, subscriptionWebRequestWithDobEdd.validate(), "Invalid request. Only one of expected date of delivery, date of birth and week number should be present");
 
-        errors = new Errors();
-        subscriptionWebRequestWithEddWeek.validate(errors);
-        validateErrors(1, "Invalid request. Only one of date of delivery, date of birth and week number should be present");
+        validateErrors(1, subscriptionWebRequestWithEddWeek.validate(), "Invalid request. Only one of expected date of delivery, date of birth and week number should be present");
 
-        errors = new Errors();
-        subscriptionWebRequestWithDobWeek.validate(errors);
-        validateErrors(1, "Invalid request. Only one of date of delivery, date of birth and week number should be present");
+        validateErrors(1, subscriptionWebRequestWithDobWeek.validate(), "Invalid request. Only one of expected date of delivery, date of birth and week number should be present");
 
-        errors = new Errors();
-        subscriptionWebRequestWithDobEddWeek.validate(errors);
-        validateErrors(1, "Invalid request. Only one of date of delivery, date of birth and week number should be present");
+        validateErrors(1, subscriptionWebRequestWithDobEddWeek.validate(), "Invalid request. Only one of expected date of delivery, date of birth and week number should be present");
     }
 
     @Test
     public void shouldAddErrorWhenInvalidChannelIsGivenToCreateNewSubscription() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("1234567890").withPack(SubscriptionPack.TWELVE_MONTHS.name()).withChannel("Invalid-Channel").withCreatedAt(DateTime.now()).build();
 
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(1, "Invalid channel Invalid-Channel");
+        validateErrors(1, subscriptionWebRequest.validate(), "Invalid channel Invalid-Channel");
     }
 
     @Test
     public void shouldAddErrorWhenInvalidMsisdnNumberIsGivenToCreateNewSubscription() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("12345").withPack(SubscriptionPack.TWELVE_MONTHS.name()).withChannel(Channel.IVR.name()).build();
 
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(1, "Invalid msisdn 12345");
+        validateErrors(1, subscriptionWebRequest.validate(), "Invalid msisdn 12345");
     }
 
     @Test
     public void shouldAddErrorWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscription() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("123456789a").withPack(SubscriptionPack.TWELVE_MONTHS.name()).withChannel(Channel.IVR.name()).build();
 
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(1, "Invalid msisdn 123456789a");
+        validateErrors(1, subscriptionWebRequest.validate(), "Invalid msisdn 123456789a");
     }
 
 
@@ -150,67 +122,53 @@ public class SubscriptionWebRequestTest {
     public void shouldAddErrorWhenNonNumericAgeIsGivenToCreateNewSubscriptionForCC() {
         SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "1a", "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
 
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(1, "Invalid beneficiary age 1a");
+        validateErrors(1, subscriptionWebRequest.validate(), "Invalid beneficiary age 1a");
     }
 
     @Test
     public void shouldNotAddErrorWhenNoAgeIsGivenToCreateNewSubscriptionForCC() {
         SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "", "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
-        subscriptionWebRequest.validate(errors);
-        validateErrors(0);
+        validateErrors(0, subscriptionWebRequest.validate());
 
         subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), null, "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
-        subscriptionWebRequest.validate(errors);
-        validateErrors(0);
+        validateErrors(0, subscriptionWebRequest.validate());
     }
 
     @Test
     public void shouldAddErrorWhenInvalidDOBIsGivenToCreateNewSubscriptionForCC() {
         SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-21-11", null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
-
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(1, "Invalid date of birth 21-21-11");
+        validateErrors(1, subscriptionWebRequest.validate(), "Invalid date of birth 21-21-11");
     }
 
     @Test
     public void shouldNotAddErrorWhenEmptyDOBIsGivenToCreateNewSubscriptionForCC() {
         String edd = DateTime.now().plusDays(2).toString("dd-MM-yyyy");
         SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", "", edd, "mydistrict", "myblock", "mypanchayat", DateTime.now());
-        subscriptionWebRequest.validate(errors);
-        validateErrors(0);
+        validateErrors(0, subscriptionWebRequest.validate());
 
         subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", null, edd, "mydistrict", "myblock", "mypanchayat", DateTime.now());
-        subscriptionWebRequest.validate(errors);
-        validateErrors(0);
+        validateErrors(0, subscriptionWebRequest.validate());
     }
 
     @Test
     public void shouldAddErrorWhenInvalidEDDIsGivenToCreateNewSubscriptionForCC() {
         SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", null, "21-21-11", "mydistrict", "myblock", "mypanchayat", DateTime.now());
-
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(1, "Invalid expected date of delivery 21-21-11");
+        validateErrors(1, subscriptionWebRequest.validate(), "Invalid expected date of delivery 21-21-11");
     }
 
     @Test
     public void shouldNotAddErrorWhenEmptyEDDIsGivenToCreateNewSubscriptionForCC() {
         String dob = DateTime.now().minusDays(1).toString("dd-MM-yyyy");
         SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", dob, "", "mydistrict", "myblock", "mypanchayat", DateTime.now());
-        subscriptionWebRequest.validate(errors);
-        validateErrors(0);
+        validateErrors(0, subscriptionWebRequest.validate());
 
         subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS.name(), Channel.CALL_CENTER.name(), "122", "NAME", dob, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
-        subscriptionWebRequest.validate(errors);
-        validateErrors(0);
+        validateErrors(0, subscriptionWebRequest.validate());
     }
 
     @Test
     public void shouldConvertAgeToIntegerAndReturn() {
-        assertEquals(12, (int)new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryAge("12").build().getBeneficiaryAge());
+        assertEquals(12, (int) new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryAge("12").build().getBeneficiaryAge());
         assertEquals(null, new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryAge(null).build().getBeneficiaryAge());
         assertEquals(null, new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryAge("").build().getBeneficiaryAge());
     }
@@ -222,10 +180,7 @@ public class SubscriptionWebRequestTest {
         String edd = null;
         SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(),
                 Channel.CALL_CENTER.name(), "12", "myname", dob, edd, "mydistrict", "myblock", "mypanchayat", createdAt);
-
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(1, "Invalid date of birth " + dob);
+        validateErrors(1, subscriptionWebRequest.validate(), "Invalid date of birth " + dob);
     }
 
     @Test
@@ -235,10 +190,7 @@ public class SubscriptionWebRequestTest {
         String edd = createdAt.minusMonths(4).toString("dd-MM-yyyy");
         SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS.name(),
                 Channel.CALL_CENTER.name(), "12", "myname", dob, edd, "mydistrict", "myblock", "mypanchayat", createdAt);
-
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(1, "Invalid expected date of delivery " + edd);
+        validateErrors(1, subscriptionWebRequest.validate(), "Invalid expected date of delivery " + edd);
     }
 
     @Test
@@ -260,28 +212,20 @@ public class SubscriptionWebRequestTest {
     @Test
     public void shouldAddMultipleErrorsIfMsisdnPackAndChannelAreInvalid() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withMsisdn("12345").withPack("invalid pack").withChannel("invalid channel").build();
-
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(3, "Invalid msisdn 12345", "Invalid subscription pack invalid pack", "Invalid channel invalid channel");
+        validateErrors(3, subscriptionWebRequest.validate(), "Invalid msisdn 12345", "Invalid subscription pack invalid pack", "Invalid channel invalid channel");
     }
 
     @Test
     public void shouldNotFailValidationIfWeekNumberIsBlank() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withWeek("").build();
 
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(0);
+        validateErrors(0, subscriptionWebRequest.validate());
     }
 
     @Test
     public void shouldFailValidationIfWeekNumberIsNotANumber() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withWeek("a").build();
-
-        subscriptionWebRequest.validate(errors);
-
-        validateErrors(1, "Invalid week number a");
+        validateErrors(1, subscriptionWebRequest.validate(), "Invalid week number a");
     }
 
     @Test

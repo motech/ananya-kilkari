@@ -230,7 +230,7 @@ public class KilkariSubscriptionServiceTest {
         verify(subscriptionService).updateSubscriberDetails(captor.capture());
         verify(subscriberDetailsValidator).validate(request);
         SubscriberRequest subscriberRequest = captor.getValue();
-        assertEquals(request.getBeneficiaryAge(), subscriberRequest.getBeneficiaryAge());
+        assertEquals(Integer.valueOf(request.getBeneficiaryAge()), subscriberRequest.getBeneficiaryAge());
         assertEquals(request.getChannel(), subscriberRequest.getChannel());
         assertEquals(request.getCreatedAt(), subscriberRequest.getCreatedAt());
         assertEquals(DateUtils.parseDate(request.getDateOfBirth()), subscriberRequest.getDateOfBirth());

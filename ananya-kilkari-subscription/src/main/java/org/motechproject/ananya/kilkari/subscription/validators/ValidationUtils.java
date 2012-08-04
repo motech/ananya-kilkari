@@ -5,25 +5,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class ValidationUtils {
-
-    public static boolean assertDateFormat(String value) {
-        if (StringUtils.isEmpty(value) || !Pattern.matches("^\\d{2}-\\d{2}-\\d{4}$", value)) {
-            return false;
-        }
-        try {
-            DateTimeFormat.forPattern("dd-MM-yyyy").parseDateTime(value);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
 
     public static boolean assertNumeric(String value) {
         return StringUtils.isNotEmpty(value) && StringUtils.isNumeric(value);
@@ -39,6 +26,18 @@ public class ValidationUtils {
 
     public static boolean assertDateBefore(DateTime before, DateTime now) {
         return before.isBefore(now);
+    }
+
+    public static boolean assertDateFormat(String value) {
+        if (StringUtils.isEmpty(value) || !Pattern.matches("^\\d{2}-\\d{2}-\\d{4}$", value)) {
+            return false;
+        }
+        try {
+            DateUtils.parseDate(value);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     public static boolean assertDateTimeFormat(String value) {

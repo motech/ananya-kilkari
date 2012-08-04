@@ -4,7 +4,6 @@ import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -86,6 +85,7 @@ public class ValidationUtilsTest {
         assertTrue(ValidationUtils.assertDateTimeFormat("21-01-2012 23-56-56"));
     }
 
+    @Test
     public void shouldReturnFalseWhenAssertingNullForNotNull() {
         assertFalse(ValidationUtils.assertNotNull(null));
     }

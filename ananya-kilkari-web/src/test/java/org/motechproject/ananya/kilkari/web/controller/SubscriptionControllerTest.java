@@ -396,6 +396,10 @@ public class SubscriptionControllerTest {
         campaignChangeRequest.setReason("asfddd");
         byte[] requestBody = TestUtils.toJson(campaignChangeRequest).getBytes();
 
+        Errors errors = new Errors();
+        errors.add("some error description1");
+        errors.add("some error description2");
+
         mockMvc(subscriptionController)
                 .perform(post("/subscription/changecampaign")
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 @Service
 @TestProfile
 public class StubReportingService implements ReportingService {
-
     private ReportingService behavior;
     private boolean reportCampaignMessageDeliveryCalled;
 

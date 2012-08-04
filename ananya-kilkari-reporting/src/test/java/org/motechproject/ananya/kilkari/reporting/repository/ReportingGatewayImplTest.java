@@ -7,7 +7,8 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
+import org.motechproject.ananya.kilkari.reporting.domain.*;
+import org.motechproject.http.client.service.HttpClientService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -18,16 +19,19 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ReportingGatewayTest {
+public class ReportingGatewayImplTest {
     private ReportingGateway reportingGateway;
     @Mock
     private RestTemplate restTemplate;
     @Mock
     private Properties kilkariProperties;
+    @Mock
+    private HttpClientService httpClientService;
     @Captor
     private ArgumentCaptor<Class<String>> responseTypeArgumentCaptor;
     @Captor
@@ -39,9 +43,8 @@ public class ReportingGatewayTest {
     @Before
     public void setUp() {
         initMocks(this);
-        reportingGateway = new ReportingGateway(restTemplate, kilkariProperties);
+        reportingGateway = new ReportingGatewayImpl(restTemplate, httpClientService, kilkariProperties);
     }
-
 
     @Test
     public void shouldInvokeReportingServiceWithGetLocations() {
@@ -154,6 +157,56 @@ public class ReportingGatewayTest {
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
-        assertEquals("url/location", url);
+        assertEquals("url/location?", url);
+    }
+
+    @Test
+    public void shouldReportASubscriptionCreation() {
+        SubscriptionCreationReportRequest subscriptionCreationReportRequest = mock(SubscriptionCreationReportRequest.class);
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+
+        reportingGateway.reportSubscriptionCreation(subscriptionCreationReportRequest);
+
+        verify(httpClientService).post("url/subscription", subscriptionCreationReportRequest);
+    }
+
+    @Test
+    public void shouldReportASubscriptionStateChange() {
+        String subscriptionId = "subscriptionId";
+        SubscriptionStateChangeReportRequest subscriptionCreationReportRequest = mock(SubscriptionStateChangeReportRequest.class);
+        when(subscriptionCreationReportRequest.getSubscriptionId()).thenReturn(subscriptionId);
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+
+        reportingGateway.reportSubscriptionStateChange(subscriptionCreationReportRequest);
+
+        verify(httpClientService).put("url/subscription/"+subscriptionId, subscriptionCreationReportRequest);
+    }
+
+    @Test
+    public void shouldReportASuccessfulCampaignMessageDelivery() {
+        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = mock(CampaignMessageDeliveryReportRequest.class);
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+
+        reportingGateway.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
+
+        verify(httpClientService).post("url/callDetails", campaignMessageDeliveryReportRequest);
+    }
+
+    @Test
+    public void shouldReportASubscriberUpdate() {
+        String subscriptionId = "subscriptionId";
+        String beneficiaryName = "Name";
+        SubscriberReportRequest subscriberReportRequest = new SubscriberReportRequest(null, beneficiaryName, null, null, null, null);
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+
+        reportingGateway.reportSubscriberDetailsChange(subscriptionId, subscriberReportRequest);
+
+        ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
+        ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
+        verify(httpClientService).put(urlCaptor.capture(), requestCaptor.capture());
+        SubscriberReportRequest requestCaptorValue = requestCaptor.getValue();
+        String urlCaptorValue = urlCaptor.getValue();
+        assertEquals(beneficiaryName, requestCaptorValue.getBeneficiaryName());
+        assertEquals("url/subscriber/" + subscriptionId, urlCaptorValue);
     }
 }

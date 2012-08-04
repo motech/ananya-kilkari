@@ -2,7 +2,6 @@ package org.motechproject.ananya.kilkari.reporting.service;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
@@ -28,9 +27,9 @@ public class ReportingServiceImplTest {
     @Before
     public void setUp() {
         initMocks(this);
-        reportingServiceImpl = new ReportingServiceImpl(reportGateway, httpClientService, kilkariProperties);
+        reportingServiceImpl = new ReportingServiceImpl(reportGateway);
     }
-   
+
     @Test
     public void shouldGetLocation() {
         String district = "district";
@@ -44,54 +43,41 @@ public class ReportingServiceImplTest {
         assertEquals(block, location.getBlock());
         assertEquals(panchayat, location.getPanchayat());
     }
-    
+
     @Test
     public void shouldReportASubscriptionCreation() {
         SubscriptionCreationReportRequest subscriptionCreationReportRequest = mock(SubscriptionCreationReportRequest.class);
-        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
         reportingServiceImpl.reportSubscriptionCreation(subscriptionCreationReportRequest);
 
-        verify(httpClientService).post("url/subscription", subscriptionCreationReportRequest);
+        verify(reportGateway).reportSubscriptionCreation(subscriptionCreationReportRequest);
     }
 
     @Test
     public void shouldReportASubscriptionStateChange() {
-        String subscriptionId = "subscriptionId";
         SubscriptionStateChangeReportRequest subscriptionCreationReportRequest = mock(SubscriptionStateChangeReportRequest.class);
-        when(subscriptionCreationReportRequest.getSubscriptionId()).thenReturn(subscriptionId);
-        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
         reportingServiceImpl.reportSubscriptionStateChange(subscriptionCreationReportRequest);
 
-        verify(httpClientService).put("url/subscription/"+subscriptionId, subscriptionCreationReportRequest);
+        verify(reportGateway).reportSubscriptionStateChange(subscriptionCreationReportRequest);
     }
 
     @Test
     public void shouldReportASuccessfulCampaignMessageDelivery() {
         CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = mock(CampaignMessageDeliveryReportRequest.class);
-        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
         reportingServiceImpl.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
 
-        verify(httpClientService).post("url/callDetails", campaignMessageDeliveryReportRequest);
+        verify(reportGateway).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
     }
 
     @Test
     public void shouldReportASubscriberUpdate() {
         String subscriptionId = "subscriptionId";
-        String beneficiaryName = "Name";
-        SubscriberReportRequest subscriberReportRequest = new SubscriberReportRequest(null, beneficiaryName, null, null, null, null);
-        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        SubscriberReportRequest subscriberReportRequest = new SubscriberReportRequest(null, "Name", null, null, null, null);
 
         reportingServiceImpl.reportSubscriberDetailsChange(subscriptionId, subscriberReportRequest);
 
-        ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
-        ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
-        verify(httpClientService).put(urlCaptor.capture(), requestCaptor.capture());
-        SubscriberReportRequest requestCaptorValue = requestCaptor.getValue();
-        String urlCaptorValue = urlCaptor.getValue();
-        assertEquals(beneficiaryName, requestCaptorValue.getBeneficiaryName());
-        assertEquals("url/subscriber/" + subscriptionId, urlCaptorValue);
+        verify(reportGateway).reportSubscriberDetailsChange(subscriptionId, subscriberReportRequest);
     }
 }

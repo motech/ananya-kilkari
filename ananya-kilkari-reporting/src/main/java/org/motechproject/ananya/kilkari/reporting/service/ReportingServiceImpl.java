@@ -3,27 +3,17 @@ package org.motechproject.ananya.kilkari.reporting.service;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
-import org.motechproject.http.client.service.HttpClientService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import java.util.Properties;
-
-import static org.motechproject.ananya.kilkari.reporting.domain.URLPath.*;
 
 @Service
 @ProductionProfile
 public class ReportingServiceImpl implements ReportingService {
     private ReportingGateway reportGateway;
-    private HttpClientService httpClientService;
-    private Properties kilkariProperties;
 
     @Autowired
-    public ReportingServiceImpl(ReportingGateway reportGateway, HttpClientService httpClientService, @Qualifier("kilkariProperties") Properties kilkariProperties) {
+    public ReportingServiceImpl(ReportingGateway reportGateway) {
         this.reportGateway = reportGateway;
-        this.httpClientService = httpClientService;
-        this.kilkariProperties = kilkariProperties;
     }
 
     @Override
@@ -33,32 +23,21 @@ public class ReportingServiceImpl implements ReportingService {
 
     @Override
     public void reportSubscriptionCreation(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {
-        String url = String.format("%s%s", getBaseUrl(), CREATE_SUBSCRIPTION_PATH);
-        httpClientService.post(url, subscriptionCreationReportRequest);
+        reportGateway.reportSubscriptionCreation(subscriptionCreationReportRequest);
     }
 
     @Override
     public void reportSubscriptionStateChange(SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest) {
-        String subscriptionId = subscriptionStateChangeReportRequest.getSubscriptionId();
-        String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIPTION_STATE_CHANGE_PATH, subscriptionId);
-        httpClientService.put(url, subscriptionStateChangeReportRequest);
+        reportGateway.reportSubscriptionStateChange(subscriptionStateChangeReportRequest);
     }
 
     @Override
     public void reportCampaignMessageDeliveryStatus(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
-        String url = String.format("%s%s", getBaseUrl(), CALL_DETAILS_PATH);
-        httpClientService.post(url, campaignMessageDeliveryReportRequest);
+        reportGateway.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
     }
 
     @Override
     public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest request) {
-        String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIBER_UPDATE_PATH, subscriptionId);
-        httpClientService.put(url, request);
-
-    }
-
-    private String getBaseUrl() {
-        String baseUrl = kilkariProperties.getProperty("reporting.service.base.url");
-        return baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+        reportGateway.reportSubscriberDetailsChange(subscriptionId, request);
     }
 }

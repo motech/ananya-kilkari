@@ -18,6 +18,10 @@ public enum SubscriptionStatus {
         return equals(PENDING_ACTIVATION);
     }
 
+    public boolean isActive() {
+        return equals(ACTIVE);
+    }
+
     boolean isInProgress() {
         return this != COMPLETED &&
                 this != DEACTIVATED &&

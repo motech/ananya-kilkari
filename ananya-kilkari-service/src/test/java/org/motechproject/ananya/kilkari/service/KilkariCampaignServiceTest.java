@@ -88,8 +88,8 @@ public class KilkariCampaignServiceTest {
         DateTime now = DateTime.now();
         DateTime subscriptionStartDate1 = now.plusWeeks(2);
         DateTime subscriptionStartDate2 = now.plusWeeks(3);
-        Subscription subscription1 = new SubscriptionBuilder().withDefaults().withCreationDate(now).withStartDate(subscriptionStartDate1).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
-        Subscription subscription2 = new SubscriptionBuilder().withDefaults().withCreationDate(now).withStartDate(subscriptionStartDate2).withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
+        Subscription subscription1 = new SubscriptionBuilder().withDefaults().withCreationDate(now).withStartDate(subscriptionStartDate1).withStatus(SubscriptionStatus.ACTIVE).build();
+        Subscription subscription2 = new SubscriptionBuilder().withDefaults().withCreationDate(now).withStartDate(subscriptionStartDate2).withStatus(SubscriptionStatus.ACTIVE).build();
         subscriptions.add(subscription1);
         subscriptions.add(subscription2);
 

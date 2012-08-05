@@ -1,9 +1,9 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.mapper.CallDetailsRequestMapper;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
+import org.motechproject.ananya.kilkari.mapper.CallDetailsRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.OBDSuccessfulCallDetailsRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
@@ -83,11 +83,12 @@ public class KilkariCampaignService {
         List<Subscription> subscriptionList = kilkariSubscriptionService.findByMsisdn(msisdn);
         Map<String, List<DateTime>> campaignMessageMap = new HashMap<>();
         for (Subscription subscription : subscriptionList) {
+            if (!subscription.isActive()) continue;
+
             String subscriptionId = subscription.getSubscriptionId();
 
             List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
-                    subscriptionId,
-                    subscription.getStartDate(), subscription.endDate());
+                    subscriptionId, subscription.getStartDate(), subscription.endDate());
             campaignMessageMap.put(subscriptionId, messageTimings);
         }
         return campaignMessageMap;

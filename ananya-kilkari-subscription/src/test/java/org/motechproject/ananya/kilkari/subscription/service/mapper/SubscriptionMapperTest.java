@@ -46,7 +46,6 @@ public class SubscriptionMapperTest {
         assertEquals(subscription.getPack().name(), request.getPack());
         assertEquals(subscription.getSubscriptionId(), request.getSubscriptionId());
         assertEquals(subscription.getStartDate(), request.getStartDate());
-        assertEquals(subscription.getOperator().name(), request.getOperator());
         assertEquals(channel.name(), request.getChannel());
     }
 

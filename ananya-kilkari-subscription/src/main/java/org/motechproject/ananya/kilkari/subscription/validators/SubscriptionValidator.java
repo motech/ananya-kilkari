@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.validators;
 
+import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -75,7 +76,7 @@ public class SubscriptionValidator {
         String district = location.getDistrict();
         String block = location.getBlock();
         String panchayat = location.getPanchayat();
-        SubscriberLocation existingLocation = reportingService.getLocation(district, block, panchayat);
+        LocationResponse existingLocation = reportingService.getLocation(district, block, panchayat);
 
         if (existingLocation == null) {
             errors.add(String.format("Location does not exist for District[%s] Block[%s] and Panchayat[%s]", district, block, panchayat));

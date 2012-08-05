@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.reporting.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.http.client.service.HttpClientService;
@@ -35,9 +36,9 @@ public class ReportingServiceImplTest {
         String district = "district";
         String block = "block";
         String panchayat = "panchayat";
-        when(reportGateway.getLocation(district, block, panchayat)).thenReturn(new SubscriberLocation(district, block, panchayat));
+        when(reportGateway.getLocation(district, block, panchayat)).thenReturn(new LocationResponse(district, block, panchayat));
 
-        SubscriberLocation location = reportingServiceImpl.getLocation(district, block, panchayat);
+        LocationResponse location = reportingServiceImpl.getLocation(district, block, panchayat);
 
         assertEquals(district, location.getDistrict());
         assertEquals(block, location.getBlock());

@@ -7,7 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
+import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
@@ -55,9 +55,8 @@ public class SubscriptionValidatorTest {
     @Test
     public void shouldValidateIfSubscriptionAlreadyExists() {
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().build();
-
-        SubscriberLocation existingLocation = new SubscriberLocation();
         Location location = subscription.getLocation();
+        LocationResponse existingLocation = new LocationResponse(location.getDistrict(), location.getBlock(), location.getPanchayat());
         when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(existingLocation);
 
         Subscription existingActiveSubscription = new Subscription();
@@ -85,9 +84,8 @@ public class SubscriptionValidatorTest {
     @Test
     public void shouldFailValidationIfWeekNumberIsOutsidePacksRange() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(30).build();
-
         Location location = subscriptionRequest.getLocation();
-        SubscriberLocation existingLocation = new SubscriberLocation();
+        LocationResponse existingLocation = new LocationResponse(location.getDistrict(), location.getBlock(), location.getPanchayat());
         when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(existingLocation);
 
         expectedException.expect(ValidationException.class);
@@ -109,10 +107,10 @@ public class SubscriptionValidatorTest {
     @Test
     public void blankWeekNumberIsValid() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(null).build();
-
         Location location = subscriptionRequest.getLocation();
-        SubscriberLocation existingLocation = new SubscriberLocation();
+        LocationResponse existingLocation = new LocationResponse(location.getDistrict(), location.getBlock(), location.getPanchayat());
         when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(existingLocation);
+
         try {
             subscriptionValidator.validate(subscriptionRequest);
         } catch (ValidationException e) {
@@ -137,7 +135,7 @@ public class SubscriptionValidatorTest {
     @Test
     public void shouldValidateInvalidSubscriptionIdInSubscriberDetails() {
         Location location = new Location("district", "block", "panchayat");
-        when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(new SubscriberLocation());
+        when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(new LocationResponse(location.getDistrict(), location.getBlock(), location.getPanchayat()));
         String subscriptionId = "subscriptionId";
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(null);
 

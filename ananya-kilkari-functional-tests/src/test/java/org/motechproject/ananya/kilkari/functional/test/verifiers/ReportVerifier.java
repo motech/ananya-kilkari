@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.functional.test.verifiers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
@@ -54,7 +55,7 @@ public class ReportVerifier {
     public void setUpReporting(SubscriptionData subscriptionData) {
         LocationRequest location = subscriptionData.getLocation();
         if (location == null) return;
-        when(reportingService.getLocation(anyString(), anyString(), anyString())).thenReturn(new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat()));
+        when(reportingService.getLocation(anyString(), anyString(), anyString())).thenReturn(new LocationResponse(location.getDistrict(), location.getBlock(), location.getPanchayat()));
     }
 
     public void resetMockBehaviour(){

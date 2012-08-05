@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
+import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,7 @@ public class StubReportingGateway implements ReportingGateway {
     private ReportingGateway behavior;
 
     @Override
-    public SubscriberLocation getLocation(String district, String block, String panchayat) {
+    public LocationResponse getLocation(String district, String block, String panchayat) {
         if (verify())
             return behavior.getLocation(district, block, panchayat);
         return null;

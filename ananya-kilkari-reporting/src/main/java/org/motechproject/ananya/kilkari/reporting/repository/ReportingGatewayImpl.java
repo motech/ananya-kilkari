@@ -5,6 +5,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.motechproject.http.client.service.HttpClientService;
@@ -36,11 +37,11 @@ public class ReportingGatewayImpl implements ReportingGateway {
     }
 
     @Override
-    public SubscriberLocation getLocation(String district, String block, String panchayat) {
+    public LocationResponse getLocation(String district, String block, String panchayat) {
         List<NameValuePair> locationParameters = constructParameterMap(district, block, panchayat);
         String url = constructGetLocationUrl(locationParameters);
         try {
-            return restTemplate.getForEntity(url, SubscriberLocation.class).getBody();
+            return restTemplate.getForEntity(url, LocationResponse.class).getBody();
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode().equals(HttpStatus.NOT_FOUND))
                 return null;

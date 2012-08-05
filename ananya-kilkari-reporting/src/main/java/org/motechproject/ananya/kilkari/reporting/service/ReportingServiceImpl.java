@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
+import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
@@ -17,7 +18,7 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public SubscriberLocation getLocation(String district, String block, String panchayat) {
+    public LocationResponse getLocation(String district, String block, String panchayat) {
         return reportGateway.getLocation(district, block, panchayat);
     }
 

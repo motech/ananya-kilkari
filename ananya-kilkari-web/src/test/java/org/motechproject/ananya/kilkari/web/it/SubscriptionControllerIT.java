@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.TimedRunner;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
+import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
@@ -149,7 +150,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
-        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("district", "block", "panchayat"));
         reportingService.setBehavior(mockedReportingService);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 
@@ -194,7 +195,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
-        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new SubscriberLocation("district", "block", "panchayat"));
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("district", "block", "panchayat"));
         reportingService.setBehavior(mockedReportingService);
 
         SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withEDD(edd.toString("dd-MM-yyyy")).withCreatedAt(now).build();

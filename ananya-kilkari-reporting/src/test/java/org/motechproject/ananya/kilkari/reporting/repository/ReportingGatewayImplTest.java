@@ -7,6 +7,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.http.client.service.HttpClientService;
 import org.springframework.http.HttpStatus;
@@ -19,9 +20,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ReportingGatewayImplTest {
@@ -49,10 +48,10 @@ public class ReportingGatewayImplTest {
     @Test
     public void shouldInvokeReportingServiceWithGetLocations() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        SubscriberLocation expectedLocation = new SubscriberLocation("mydistrict", "myblock", "mypanchayat");
+        LocationResponse expectedLocation = new LocationResponse("mydistrict", "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        SubscriberLocation actualLocation = reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat");
+        LocationResponse actualLocation = reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat");
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -60,7 +59,7 @@ public class ReportingGatewayImplTest {
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
         verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture());
 
-        assertEquals(SubscriberLocation.class, subscriberLocationCaptor.getValue());
+        assertEquals(LocationResponse.class, subscriberLocationCaptor.getValue());
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
@@ -75,7 +74,7 @@ public class ReportingGatewayImplTest {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        SubscriberLocation actualLocation = reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat");
+        LocationResponse actualLocation = reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat");
 
         assertNull(actualLocation);
 
@@ -83,7 +82,7 @@ public class ReportingGatewayImplTest {
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
         verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture());
 
-        assertEquals(SubscriberLocation.class, subscriberLocationCaptor.getValue());
+        assertEquals(LocationResponse.class, subscriberLocationCaptor.getValue());
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
@@ -119,10 +118,10 @@ public class ReportingGatewayImplTest {
     @Test
     public void shouldInvokeReportingServiceWithGetLocationsIfDistrctNotPresent() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        SubscriberLocation expectedLocation = new SubscriberLocation(null, "myblock", "mypanchayat");
+        LocationResponse expectedLocation = new LocationResponse(null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        SubscriberLocation actualLocation = reportingGateway.getLocation(null, "myblock", "mypanchayat");
+        LocationResponse actualLocation = reportingGateway.getLocation(null, "myblock", "mypanchayat");
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -130,7 +129,7 @@ public class ReportingGatewayImplTest {
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
         verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture());
 
-        assertEquals(SubscriberLocation.class, subscriberLocationCaptor.getValue());
+        assertEquals(LocationResponse.class, subscriberLocationCaptor.getValue());
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
@@ -142,10 +141,10 @@ public class ReportingGatewayImplTest {
     @Test
     public void shouldInvokeReportingServiceToGetLocationIfDistrictBlockAndPanchayatAreNotPresent() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        SubscriberLocation expectedLocation = new SubscriberLocation(null, "myblock", "mypanchayat");
+        LocationResponse expectedLocation = new LocationResponse(null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        SubscriberLocation actualLocation = reportingGateway.getLocation(null, null, null);
+        LocationResponse actualLocation = reportingGateway.getLocation(null, null, null);
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -153,7 +152,7 @@ public class ReportingGatewayImplTest {
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
         verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture());
 
-        assertEquals(SubscriberLocation.class, subscriberLocationCaptor.getValue());
+        assertEquals(LocationResponse.class, subscriberLocationCaptor.getValue());
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
@@ -179,7 +178,7 @@ public class ReportingGatewayImplTest {
 
         reportingGateway.reportSubscriptionStateChange(subscriptionCreationReportRequest);
 
-        verify(httpClientService).put("url/subscription/"+subscriptionId, subscriptionCreationReportRequest);
+        verify(httpClientService).put("url/subscription/" + subscriptionId, subscriptionCreationReportRequest);
     }
 
     @Test

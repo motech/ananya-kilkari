@@ -1,8 +1,8 @@
 package org.motechproject.ananya.kilkari.subscription.service.mapper;
 
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionDetails;
+import org.apache.commons.lang.math.NumberUtils;
+import org.motechproject.ananya.kilkari.contract.request.SubscriberLocation;
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
@@ -15,13 +15,22 @@ public class SubscriptionMapper {
         return new OMSubscriptionRequest(subscription.getMsisdn(), subscription.getPack(), channel, subscription.getSubscriptionId());
     }
 
-    public SubscriptionCreationReportRequest createSubscriptionCreationReportRequest(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription, Channel channel, Location location, Subscriber subscriber) {
-        SubscriptionDetails subscriptionDetails = new SubscriptionDetails(subscription.getMsisdn(), subscription.getPack().name(),
-                subscription.getCreationDate(), subscription.getStatus().name(), subscription.getSubscriptionId(), subscription.getStartDate());
-
+    public SubscriptionReportRequest createSubscriptionCreationReportRequest(Subscription subscription, Channel channel, Location location, Subscriber subscriber) {
         SubscriberLocation subscriberLocation = new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
+        SubscriptionReportRequest subscriptionReportRequest = new SubscriptionReportRequest();
+        subscriptionReportRequest.setAgeOfBeneficiary(subscriber.getBeneficiaryAge());
+        subscriptionReportRequest.setChannel(channel.name());
+        subscriptionReportRequest.setName(subscriber.getBeneficiaryName());
+        subscriptionReportRequest.setSubscriptionId(subscription.getSubscriptionId());
+        subscriptionReportRequest.setSubscriptionStatus(subscription.getStatus().name());
+        subscriptionReportRequest.setCreatedAt(subscription.getCreationDate());
+        subscriptionReportRequest.setStartDate(subscription.getStartDate());
+        subscriptionReportRequest.setDateOfBirth(subscriber.getDateOfBirth());
+        subscriptionReportRequest.setEstimatedDateOfDelivery(subscriber.getExpectedDateOfDelivery());
+        subscriptionReportRequest.setLocation(subscriberLocation);
+        subscriptionReportRequest.setMsisdn(NumberUtils.createLong(subscription.getMsisdn()));
+        subscriptionReportRequest.setPack(subscription.getPack().name());
 
-        return new SubscriptionCreationReportRequest(subscriptionDetails, channel.name(), subscriber.getBeneficiaryAge(),
-                subscriber.getBeneficiaryName(), subscriber.getDateOfBirth(), subscriber.getExpectedDateOfDelivery(), subscriberLocation);
+        return subscriptionReportRequest;
     }
 }

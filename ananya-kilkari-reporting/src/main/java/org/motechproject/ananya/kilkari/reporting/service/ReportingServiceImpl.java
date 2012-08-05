@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
@@ -23,8 +24,8 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public void reportSubscriptionCreation(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {
-        reportGateway.reportSubscriptionCreation(subscriptionCreationReportRequest);
+    public void reportSubscriptionCreation(SubscriptionReportRequest subscriptionReportRequest) {
+        reportGateway.reportSubscriptionCreation(subscriptionReportRequest);
     }
 
     @Override

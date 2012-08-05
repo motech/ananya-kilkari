@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
@@ -20,9 +21,9 @@ public class StubReportingService implements ReportingService {
     }
 
     @Override
-    public void reportSubscriptionCreation(SubscriptionCreationReportRequest subscriptionCreationReportRequest) {
+    public void reportSubscriptionCreation(SubscriptionReportRequest subscriptionReportRequest) {
         if (verify()) {
-            behavior.reportSubscriptionCreation(subscriptionCreationReportRequest);
+            behavior.reportSubscriptionCreation(subscriptionReportRequest);
         }
     }
 

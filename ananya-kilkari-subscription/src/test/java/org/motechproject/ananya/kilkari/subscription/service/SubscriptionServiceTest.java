@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.message.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
@@ -18,7 +19,6 @@ import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignR
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionCreationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
@@ -124,7 +124,7 @@ public class SubscriptionServiceTest {
 
         verify(allSubscriptions, never()).add(any(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class));
         verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class), any(Integer.class), any(Integer.class));
-        verify(reportingServiceImpl, never()).reportSubscriptionCreation(any(SubscriptionCreationReportRequest.class));
+        verify(reportingServiceImpl, never()).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
         verify(onMobileSubscriptionManagerPublisher, never()).sendActivationRequest(any(OMSubscriptionRequest.class));
     }
 
@@ -133,14 +133,14 @@ public class SubscriptionServiceTest {
         String msisdn = "1234567890";
         Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
-        ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
+        ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
         subscriptionService.createSubscription(subscription, channel);
 
         verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
-        SubscriptionCreationReportRequest actualSubscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
-        assertEquals(msisdn, actualSubscriptionCreationReportRequest.getMsisdn());
+        SubscriptionReportRequest actualSubscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
+        assertEquals(msisdn, actualSubscriptionCreationReportRequest.getMsisdn().toString());
         assertEquals(subscriptionPack.name(), actualSubscriptionCreationReportRequest.getPack());
         assertEquals(channel.name(), actualSubscriptionCreationReportRequest.getChannel());
     }
@@ -630,9 +630,9 @@ public class SubscriptionServiceTest {
         assertEquals(dateOfBirth, reportRequest.getDateOfBirth());
         assertEquals(23, (int)reportRequest.getBeneficiaryAge());
         assertEquals("name", reportRequest.getBeneficiaryName());
-        assertEquals("district", reportRequest.getLocation().getDistrict());
-        assertEquals("block", reportRequest.getLocation().getBlock());
-        assertEquals("panchayat", reportRequest.getLocation().getPanchayat());
+        assertEquals("district", reportRequest.getKilkariLocation().getDistrict());
+        assertEquals("block", reportRequest.getKilkariLocation().getBlock());
+        assertEquals("panchayat", reportRequest.getKilkariLocation().getPanchayat());
     }
 
     @Test
@@ -832,18 +832,18 @@ public class SubscriptionServiceTest {
 
         ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
         verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
-        ArgumentCaptor<SubscriptionCreationReportRequest> subscriptionCreationReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionCreationReportRequest.class);
-        verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionCreationReportRequestArgumentCaptor.capture());
+        ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
+        verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
 
         RunOnceSchedulableJob runOnceSchedulableJobArgumentCaptorValue = runOnceSchedulableJobArgumentCaptor.getValue();
         assertEquals(dob.toDate(), runOnceSchedulableJobArgumentCaptorValue.getStartDate());
         assertEquals(SubscriptionEventKeys.EARLY_SUBSCRIPTION, runOnceSchedulableJobArgumentCaptorValue.getMotechEvent().getSubject());
         assertEquals(OMSubscriptionRequest.class, runOnceSchedulableJobArgumentCaptorValue.getMotechEvent().getParameters().get("0").getClass());
 
-        SubscriptionCreationReportRequest subscriptionCreationReportRequest = subscriptionCreationReportRequestArgumentCaptor.getValue();
-        assertEquals(subscriptionRequest.getMsisdn(), subscriptionCreationReportRequest.getMsisdn());
+        SubscriptionReportRequest subscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
+        assertEquals(subscriptionRequest.getMsisdn(), subscriptionCreationReportRequest.getMsisdn().toString());
         assertEquals(subscriptionRequest.getPack().toString(), subscriptionCreationReportRequest.getPack());
-        assertEquals(subscriptionRequest.getSubscriber().getDateOfBirth(), subscriptionCreationReportRequest.getDob());
+        assertEquals(subscriptionRequest.getSubscriber().getDateOfBirth(), subscriptionCreationReportRequest.getDateOfBirth());
         assertEquals(SubscriptionStatus.NEW_EARLY.toString(), subscriptionCreationReportRequest.getSubscriptionStatus());
     }
 }

@@ -1,7 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.validators;
 
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberLocation;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;

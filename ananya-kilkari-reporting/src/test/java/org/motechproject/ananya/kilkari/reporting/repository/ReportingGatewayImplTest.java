@@ -7,6 +7,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.http.client.service.HttpClientService;
@@ -105,7 +106,7 @@ public class ReportingGatewayImplTest {
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
         verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture());
 
-        assertEquals(SubscriberLocation.class, subscriberLocationCaptor.getValue());
+        assertEquals(SubscriberKilkariLocation.class, subscriberLocationCaptor.getValue());
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
@@ -161,7 +162,7 @@ public class ReportingGatewayImplTest {
 
     @Test
     public void shouldReportASubscriptionCreation() {
-        SubscriptionCreationReportRequest subscriptionCreationReportRequest = mock(SubscriptionCreationReportRequest.class);
+        SubscriptionReportRequest subscriptionCreationReportRequest = mock(SubscriptionReportRequest.class);
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
         reportingGateway.reportSubscriptionCreation(subscriptionCreationReportRequest);

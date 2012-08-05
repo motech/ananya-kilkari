@@ -3,8 +3,11 @@ package org.motechproject.ananya.kilkari.reporting.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
-import org.motechproject.ananya.kilkari.reporting.domain.*;
+import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
+import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.http.client.service.HttpClientService;
 
@@ -47,7 +50,7 @@ public class ReportingServiceImplTest {
 
     @Test
     public void shouldReportASubscriptionCreation() {
-        SubscriptionCreationReportRequest subscriptionCreationReportRequest = mock(SubscriptionCreationReportRequest.class);
+        SubscriptionReportRequest subscriptionCreationReportRequest = mock(SubscriptionReportRequest.class);
 
         reportingServiceImpl.reportSubscriptionCreation(subscriptionCreationReportRequest);
 

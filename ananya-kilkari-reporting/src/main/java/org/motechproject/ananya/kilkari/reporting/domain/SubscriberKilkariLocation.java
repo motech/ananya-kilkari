@@ -5,7 +5,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
 
-public class SubscriberLocation implements Serializable {
+public class SubscriberKilkariLocation implements Serializable {
     @JsonProperty
     private String district;
     @JsonProperty
@@ -13,10 +13,10 @@ public class SubscriberLocation implements Serializable {
     @JsonProperty
     private String panchayat;
 
-    public SubscriberLocation() {
+    public SubscriberKilkariLocation() {
     }
 
-    public SubscriberLocation(String district, String block, String panchayat) {
+    public SubscriberKilkariLocation(String district, String block, String panchayat) {
         this.district = district;
         this.block = block;
         this.panchayat = panchayat;

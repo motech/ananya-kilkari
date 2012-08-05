@@ -8,10 +8,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
+import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
-import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.http.client.service.HttpClientService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -108,7 +108,7 @@ public class ReportingGatewayImplTest {
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
         verify(restTemplate).getForEntity(urlArgumentCaptor.capture(), subscriberLocationCaptor.capture());
 
-        assertEquals(SubscriberKilkariLocation.class, subscriberLocationCaptor.getValue());
+        assertEquals(LocationResponse.class, subscriberLocationCaptor.getValue());
 
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();

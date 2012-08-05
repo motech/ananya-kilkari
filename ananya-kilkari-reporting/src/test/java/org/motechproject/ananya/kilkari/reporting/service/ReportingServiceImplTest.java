@@ -4,10 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
+import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.http.client.service.HttpClientService;
 

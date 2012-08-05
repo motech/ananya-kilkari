@@ -1,10 +1,10 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
 import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
+import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
-import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
 import org.springframework.stereotype.Repository;
 
@@ -39,9 +39,9 @@ public class StubReportingGateway implements ReportingGateway {
     }
 
     @Override
-    public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest request) {
+    public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest) {
         if (verify())
-            behavior.reportSubscriberDetailsChange(subscriptionId, request);
+            behavior.reportSubscriberDetailsChange(subscriptionId, subscriberReportRequest);
     }
 
     public void setBehavior(ReportingGateway behavior) {

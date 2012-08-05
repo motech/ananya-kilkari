@@ -1,14 +1,14 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.contract.request.SubscriberLocation;
+import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberKilkariLocation;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -259,9 +259,9 @@ public class SubscriptionService {
     public void updateSubscriberDetails(SubscriberRequest request) {
         subscriptionValidator.validateSubscriberDetails(request);
 
-        SubscriberKilkariLocation subscriberKilkariLocation = new SubscriberKilkariLocation(request.getDistrict(), request.getBlock(), request.getPanchayat());
+        SubscriberLocation subscriberLocation = new SubscriberLocation(request.getDistrict(), request.getBlock(), request.getPanchayat());
         reportingService.reportSubscriberDetailsChange(request.getSubscriptionId(), new SubscriberReportRequest(request.getCreatedAt(),
-                request.getBeneficiaryName(), request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(), request.getDateOfBirth(), subscriberKilkariLocation));
+                request.getBeneficiaryName(), request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(), request.getDateOfBirth(), subscriberLocation));
     }
 
     private void unScheduleCampaign(org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription) {

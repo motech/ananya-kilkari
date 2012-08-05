@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.message.repository.AllInboxMessages;
@@ -19,7 +20,6 @@ import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
@@ -628,11 +628,11 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, actualSubscriptionId);
         assertEquals(expectedDateOfDelivery, reportRequest.getExpectedDateOfDelivery());
         assertEquals(dateOfBirth, reportRequest.getDateOfBirth());
-        assertEquals(23, (int)reportRequest.getBeneficiaryAge());
+        assertEquals(23, (int) reportRequest.getBeneficiaryAge());
         assertEquals("name", reportRequest.getBeneficiaryName());
-        assertEquals("district", reportRequest.getKilkariLocation().getDistrict());
-        assertEquals("block", reportRequest.getKilkariLocation().getBlock());
-        assertEquals("panchayat", reportRequest.getKilkariLocation().getPanchayat());
+        assertEquals("district", reportRequest.getLocation().getDistrict());
+        assertEquals("block", reportRequest.getLocation().getBlock());
+        assertEquals("panchayat", reportRequest.getLocation().getPanchayat());
     }
 
     @Test

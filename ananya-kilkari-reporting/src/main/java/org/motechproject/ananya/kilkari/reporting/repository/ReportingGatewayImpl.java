@@ -6,10 +6,10 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
+import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
-import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.motechproject.http.client.service.HttpClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,9 +72,9 @@ public class ReportingGatewayImpl implements ReportingGateway {
     }
 
     @Override
-    public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest request) {
+    public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest) {
         String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIBER_UPDATE_PATH, subscriptionId);
-        httpClientService.put(url, request);
+        httpClientService.put(url, subscriberReportRequest);
     }
 
     private String constructGetLocationUrl(List<NameValuePair> params) {

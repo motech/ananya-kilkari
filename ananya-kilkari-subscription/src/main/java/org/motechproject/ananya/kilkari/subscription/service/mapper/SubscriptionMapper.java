@@ -18,18 +18,20 @@ public class SubscriptionMapper {
     public SubscriptionReportRequest createSubscriptionCreationReportRequest(Subscription subscription, Channel channel, Location location, Subscriber subscriber) {
         SubscriberLocation subscriberLocation = new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
         SubscriptionReportRequest subscriptionReportRequest = new SubscriptionReportRequest();
-        subscriptionReportRequest.setAgeOfBeneficiary(subscriber.getBeneficiaryAge());
-        subscriptionReportRequest.setChannel(channel.name());
-        subscriptionReportRequest.setName(subscriber.getBeneficiaryName());
+
         subscriptionReportRequest.setSubscriptionId(subscription.getSubscriptionId());
-        subscriptionReportRequest.setSubscriptionStatus(subscription.getStatus().name());
-        subscriptionReportRequest.setCreatedAt(subscription.getCreationDate());
-        subscriptionReportRequest.setStartDate(subscription.getStartDate());
-        subscriptionReportRequest.setDateOfBirth(subscriber.getDateOfBirth());
-        subscriptionReportRequest.setEstimatedDateOfDelivery(subscriber.getExpectedDateOfDelivery());
-        subscriptionReportRequest.setLocation(subscriberLocation);
+        subscriptionReportRequest.setChannel(channel.name());
         subscriptionReportRequest.setMsisdn(NumberUtils.createLong(subscription.getMsisdn()));
         subscriptionReportRequest.setPack(subscription.getPack().name());
+        subscriptionReportRequest.setName(subscriber.getBeneficiaryName());
+        subscriptionReportRequest.setAgeOfBeneficiary(subscriber.getBeneficiaryAge());
+        subscriptionReportRequest.setCreatedAt(subscription.getCreationDate());
+        subscriptionReportRequest.setSubscriptionStatus(subscription.getStatus().name());
+        subscriptionReportRequest.setEstimatedDateOfDelivery(subscriber.getExpectedDateOfDelivery());
+        subscriptionReportRequest.setDateOfBirth(subscriber.getDateOfBirth());
+        subscriptionReportRequest.setLocation(subscriberLocation);
+        subscriptionReportRequest.setOperator(subscription.getOperator().name());
+        subscriptionReportRequest.setStartDate(subscription.getStartDate());
 
         return subscriptionReportRequest;
     }

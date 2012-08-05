@@ -40,7 +40,7 @@ public class ReportVerifier {
         verify(reportingService).reportSubscriptionCreation(requestArgumentCaptor.capture());
 
         SubscriptionReportRequest reportRequest = requestArgumentCaptor.getValue();
-        assertEquals(subscriptionData.getMsisdn(), reportRequest.getMsisdn());
+        assertEquals(subscriptionData.getMsisdn(), reportRequest.getMsisdn().toString());
         assertEquals(subscriptionData.getBeneficiaryName(), reportRequest.getName());
         assertEquals(subscriptionData.getPack().name(), reportRequest.getPack());
         assertEquals(subscriptionData.getChannel(), reportRequest.getChannel());

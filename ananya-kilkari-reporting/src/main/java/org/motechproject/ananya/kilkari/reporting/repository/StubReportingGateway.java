@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
@@ -32,9 +33,9 @@ public class StubReportingGateway implements ReportingGateway {
     }
 
     @Override
-    public void reportCampaignMessageDeliveryStatus(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
+    public void reportCampaignMessageDeliveryStatus(CallDetailsRequest callDetailsRequest) {
         if (verify())
-            behavior.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
+            behavior.reportCampaignMessageDeliveryStatus(callDetailsRequest);
     }
 
     @Override

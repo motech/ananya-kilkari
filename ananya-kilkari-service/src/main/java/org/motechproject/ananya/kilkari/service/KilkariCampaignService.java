@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.mapper.CampaignMessageDeliveryReportRequestMapper;
+import org.motechproject.ananya.kilkari.mapper.CallDetailsRequestMapper;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.mapper.OBDSuccessfulCallDetailsRequestMapper;
@@ -139,7 +139,7 @@ public class KilkariCampaignService {
         }
         int retryCount = campaignMessage.getDnpRetryCount();
 
-        reportingService.reportCampaignMessageDeliveryStatus(new CampaignMessageDeliveryReportRequestMapper().mapFrom(obdSuccessfulCallDetailsRequest, retryCount));
+        reportingService.reportCampaignMessageDeliveryStatus(CallDetailsRequestMapper.mapFrom(obdSuccessfulCallDetailsRequest, retryCount));
         campaignMessageService.deleteCampaignMessage(campaignMessage);
 
         ServiceOptionHandler serviceOptionHandler = obdServiceOptionFactory.getHandler(obdSuccessfulCallDetailsRequest.getServiceOption());

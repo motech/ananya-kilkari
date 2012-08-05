@@ -2,15 +2,15 @@ package org.motechproject.ananya.kilkari.mapper;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.request.CallDurationRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 
 import static junit.framework.Assert.assertEquals;
 
-public class CampaignMessageDeliveryReportRequestMapperTest {
+public class CallDetailsRequestMapperTest {
 
     @Test
     public void shouldMapCampaignMessageDeliveryReportRequest() {
@@ -23,9 +23,8 @@ public class CampaignMessageDeliveryReportRequestMapperTest {
         OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequest(subscriptionId, ServiceOption.HELP, "1234567890", "CampaignId", callDurationRequest, createdAt);
 
         Integer retryCount = 3;
-        CampaignMessageDeliveryReportRequestMapper campaignMessageDeliveryReportRequestMapper = new CampaignMessageDeliveryReportRequestMapper();
 
-        CampaignMessageDeliveryReportRequest actualDeliveryReportRequest = campaignMessageDeliveryReportRequestMapper.mapFrom(obdSuccessfulCallDetailsRequest, retryCount);
+        CallDetailsRequest actualDeliveryReportRequest = CallDetailsRequestMapper.mapFrom(obdSuccessfulCallDetailsRequest, retryCount);
 
         assertEquals(subscriptionId, actualDeliveryReportRequest.getSubscriptionId());
         assertEquals(obdSuccessfulCallDetailsRequest.getMsisdn(), actualDeliveryReportRequest.getMsisdn());

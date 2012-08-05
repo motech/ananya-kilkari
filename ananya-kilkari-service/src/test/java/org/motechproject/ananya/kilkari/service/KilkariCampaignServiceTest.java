@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
@@ -17,7 +18,6 @@ import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.*;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
@@ -168,9 +168,9 @@ public class KilkariCampaignServiceTest {
         inOrder.verify(successfulCallRequestValidator).validate(any(OBDSuccessfulCallDetailsRequest.class));
         inOrder.verify(campaignMessageService).find(subscriptionId, campaignId);
 
-        ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
-        inOrder.verify(reportingService).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
+        ArgumentCaptor<CallDetailsRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CallDetailsRequest.class);
+        verify(reportingService).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
+        CallDetailsRequest campaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
         inOrder.verify(campaignMessageService).deleteCampaignMessage(campaignMessage);
 
@@ -179,8 +179,8 @@ public class KilkariCampaignServiceTest {
         assertEquals(campaignId, campaignMessageDeliveryReportRequest.getCampaignId());
         assertEquals(retryCount.toString(), campaignMessageDeliveryReportRequest.getRetryCount());
         assertEquals(serviceOption, campaignMessageDeliveryReportRequest.getServiceOption());
-        assertEquals(new DateTime(2012, 12, 25, 12, 13, 14), campaignMessageDeliveryReportRequest.getCallDetailRecord().getStartTime());
-        assertEquals(new DateTime(2012, 12, 27, 12, 15, 19), campaignMessageDeliveryReportRequest.getCallDetailRecord().getEndTime());
+        assertEquals(new DateTime(2012, 12, 25, 12, 13, 14), campaignMessageDeliveryReportRequest.getStartTime());
+        assertEquals(new DateTime(2012, 12, 27, 12, 15, 19), campaignMessageDeliveryReportRequest.getEndTime());
 
         verify(serviceOptionHandler).process(any(OBDSuccessfulCallDetailsRequest.class));
     }

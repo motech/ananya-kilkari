@@ -5,6 +5,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
@@ -65,9 +66,9 @@ public class ReportingGatewayImpl implements ReportingGateway {
     }
 
     @Override
-    public void reportCampaignMessageDeliveryStatus(CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest) {
+    public void reportCampaignMessageDeliveryStatus(CallDetailsRequest callDetailsRequest) {
         String url = String.format("%s%s", getBaseUrl(), CALL_DETAILS_PATH);
-        httpClientService.post(url, campaignMessageDeliveryReportRequest);
+        httpClientService.post(url, callDetailsRequest);
     }
 
     @Override

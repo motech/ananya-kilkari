@@ -7,6 +7,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
@@ -185,7 +186,7 @@ public class ReportingGatewayImplTest {
 
     @Test
     public void shouldReportASuccessfulCampaignMessageDelivery() {
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = mock(CampaignMessageDeliveryReportRequest.class);
+        CallDetailsRequest campaignMessageDeliveryReportRequest = mock(CallDetailsRequest.class);
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
         reportingGateway.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);

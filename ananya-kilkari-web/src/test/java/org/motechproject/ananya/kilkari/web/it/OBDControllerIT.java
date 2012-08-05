@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.motechproject.ananya.kilkari.TimedRunner;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
@@ -12,7 +13,6 @@ import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.StubOnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
@@ -105,9 +105,9 @@ public class OBDControllerIT extends SpringIntegrationTest {
         verify(onMobileOBDGateway).sendInvalidFailureRecord(invalidCallDeliveryFailureRecordArgumentCaptor.capture());
         List<InvalidFailedCallReport> recordObjectFaileds = invalidCallDeliveryFailureRecordArgumentCaptor.getValue().getRecordObjectFaileds();
 
-        ArgumentCaptor<CampaignMessageDeliveryReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageDeliveryReportRequest.class);
+        ArgumentCaptor<CallDetailsRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CallDetailsRequest.class);
         verify(reportingService).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
-        CampaignMessageDeliveryReportRequest reportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
+        CallDetailsRequest reportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
         assertEquals(1, recordObjectFaileds.size());
         assertEquals(msisdn, recordObjectFaileds.get(0).getMsisdn());
@@ -119,8 +119,8 @@ public class OBDControllerIT extends SpringIntegrationTest {
         assertEquals("WEEK13", reportRequest.getCampaignId());
         assertEquals(msisdn, reportRequest.getMsisdn());
         assertEquals(subscription1.getSubscriptionId(), reportRequest.getSubscriptionId());
-        assertNotNull(reportRequest.getCallDetailRecord().getStartTime());
-        assertNotNull(reportRequest.getCallDetailRecord().getEndTime());
+        assertNotNull(reportRequest.getStartTime());
+        assertNotNull(reportRequest.getEndTime());
         assertNull(reportRequest.getServiceOption());
 
     }

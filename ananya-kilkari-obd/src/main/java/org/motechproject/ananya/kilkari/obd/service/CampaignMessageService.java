@@ -1,17 +1,15 @@
 package org.motechproject.ananya.kilkari.obd.service;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailRecordRequest;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.reporting.domain.CallDurationReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
-import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,10 +127,10 @@ public class CampaignMessageService {
 
     private void reportCampaignMessageStatus(ValidFailedCallReport failedCallReport, CampaignMessage campaignMessage) {
         String retryCount = getRetryCount(campaignMessage);
-        CallDurationReportRequest callDurationRecord = new CallDurationReportRequest(failedCallReport.getCreatedAt(), failedCallReport.getCreatedAt());
-        CampaignMessageDeliveryReportRequest campaignMessageDeliveryReportRequest = new CampaignMessageDeliveryReportRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(), null, retryCount, failedCallReport.getStatusCode().name(), callDurationRecord, CampaignMessageCallSource.OBD.name());
-
-        reportingService.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
+        CallDetailRecordRequest callDetailRecordRequest = new CallDetailRecordRequest(failedCallReport.getCreatedAt(), failedCallReport.getCreatedAt());
+        CallDetailsRequest callDetailsRequest = new CallDetailsRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(),
+                null, retryCount, failedCallReport.getStatusCode().name(), callDetailRecordRequest, CampaignMessageCallSource.OBD.name());
+        reportingService.reportCampaignMessageDeliveryStatus(callDetailsRequest);
     }
 
     private String getRetryCount(CampaignMessage campaignMessage) {

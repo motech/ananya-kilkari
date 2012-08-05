@@ -8,6 +8,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.http.client.service.HttpClientService;
@@ -173,13 +174,13 @@ public class ReportingGatewayImplTest {
     @Test
     public void shouldReportASubscriptionStateChange() {
         String subscriptionId = "subscriptionId";
-        SubscriptionStateChangeReportRequest subscriptionCreationReportRequest = mock(SubscriptionStateChangeReportRequest.class);
-        when(subscriptionCreationReportRequest.getSubscriptionId()).thenReturn(subscriptionId);
+        SubscriptionStateChangeRequest subscriptionStateChangeRequest = mock(SubscriptionStateChangeRequest.class);
+        when(subscriptionStateChangeRequest.getSubscriptionId()).thenReturn(subscriptionId);
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
-        reportingGateway.reportSubscriptionStateChange(subscriptionCreationReportRequest);
+        reportingGateway.reportSubscriptionStateChange(subscriptionStateChangeRequest);
 
-        verify(httpClientService).put("url/subscription/" + subscriptionId, subscriptionCreationReportRequest);
+        verify(httpClientService).put("url/subscription/" + subscriptionId, subscriptionStateChangeRequest);
     }
 
     @Test

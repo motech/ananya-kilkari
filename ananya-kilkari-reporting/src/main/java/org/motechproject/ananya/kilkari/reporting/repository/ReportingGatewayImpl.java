@@ -6,6 +6,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.*;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
@@ -57,10 +58,10 @@ public class ReportingGatewayImpl implements ReportingGateway {
     }
 
     @Override
-    public void reportSubscriptionStateChange(SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest) {
-        String subscriptionId = subscriptionStateChangeReportRequest.getSubscriptionId();
+    public void reportSubscriptionStateChange(SubscriptionStateChangeRequest subscriptionStateChangeRequest) {
+        String subscriptionId = subscriptionStateChangeRequest.getSubscriptionId();
         String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIPTION_STATE_CHANGE_PATH, subscriptionId);
-        httpClientService.put(url, subscriptionStateChangeReportRequest);
+        httpClientService.put(url, subscriptionStateChangeRequest);
     }
 
     @Override

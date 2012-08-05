@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
@@ -8,7 +9,6 @@ import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignS
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberKilkariLocation;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -290,7 +290,7 @@ public class SubscriptionService {
         org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         action.perform(subscription);
         allSubscriptions.update(subscription);
-        reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeReportRequest(subscription.getSubscriptionId(), subscription.getStatus().name(), updatedOn, reason, operator, graceCount));
+        reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(), subscription.getStatus().name(), reason, updatedOn, operator, graceCount));
     }
 
     private void validateMsisdn(String msisdn) {

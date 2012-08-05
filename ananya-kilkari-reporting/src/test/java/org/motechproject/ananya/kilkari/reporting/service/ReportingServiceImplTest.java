@@ -4,10 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageDeliveryReportRequest;
 import org.motechproject.ananya.kilkari.reporting.domain.SubscriberReportRequest;
-import org.motechproject.ananya.kilkari.reporting.domain.SubscriptionStateChangeReportRequest;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.http.client.service.HttpClientService;
 
@@ -59,11 +59,11 @@ public class ReportingServiceImplTest {
 
     @Test
     public void shouldReportASubscriptionStateChange() {
-        SubscriptionStateChangeReportRequest subscriptionCreationReportRequest = mock(SubscriptionStateChangeReportRequest.class);
+        SubscriptionStateChangeRequest subscriptionStateChangeRequest = mock(SubscriptionStateChangeRequest.class);
 
-        reportingServiceImpl.reportSubscriptionStateChange(subscriptionCreationReportRequest);
+        reportingServiceImpl.reportSubscriptionStateChange(subscriptionStateChangeRequest);
 
-        verify(reportGateway).reportSubscriptionStateChange(subscriptionCreationReportRequest);
+        verify(reportGateway).reportSubscriptionStateChange(subscriptionStateChangeRequest);
     }
 
     @Test

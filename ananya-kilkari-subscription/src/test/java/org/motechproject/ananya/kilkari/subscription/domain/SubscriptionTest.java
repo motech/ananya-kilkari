@@ -196,4 +196,18 @@ public class SubscriptionTest {
         subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
         assertFalse(subscription.isInDeactivatedState());
     }
+    
+    @Test
+    public void shouldReturnCurrentWeekNumber(){
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.FIFTEEN_MONTHS).withStartDate(DateTime.now().minusWeeks(10)).build();
+        assertEquals(11,subscription.getCurrentWeekOfSubscription());
+
+        subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).withStartDate(DateTime.now().minusWeeks(2)).build();
+        assertEquals(15,subscription.getCurrentWeekOfSubscription());
+
+        subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withStartDate(DateTime.now().minusWeeks(2)).build();
+        assertEquals(35,subscription.getCurrentWeekOfSubscription());
+
+  
+    }
 }

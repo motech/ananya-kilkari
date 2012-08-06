@@ -89,14 +89,14 @@ public class SubscriptionServiceTest {
         String msisdn = "1234567890";
         Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
         Subscription createdSubscription = subscriptionService.createSubscription(subscription, channel);
 
         assertNotNull(createdSubscription);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();
+        Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();
         assertEquals(msisdn, subscriptionSaved.getMsisdn());
         assertEquals(subscriptionPack, subscriptionSaved.getPack());
         assertEquals(createdSubscription, subscriptionSaved);
@@ -122,7 +122,7 @@ public class SubscriptionServiceTest {
             //ignore
         }
 
-        verify(allSubscriptions, never()).add(any(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class));
+        verify(allSubscriptions, never()).add(any(Subscription.class));
         verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class), any(Integer.class), any(Integer.class));
         verify(reportingServiceImpl, never()).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
         verify(onMobileSubscriptionManagerPublisher, never()).sendActivationRequest(any(OMSubscriptionRequest.class));
@@ -166,9 +166,9 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldGetSubscriptionsResponseForAGivenMsisdn() {
         String msisdn = "1234567890";
-        ArrayList<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionsToBeReturned = new ArrayList<>();
-        subscriptionsToBeReturned.add(new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW));
-        subscriptionsToBeReturned.add(new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW));
+        ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
+        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW));
+        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW));
         when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionsToBeReturned);
 
         List<Subscription> subscriptions = subscriptionService.findByMsisdn(msisdn);
@@ -210,7 +210,7 @@ public class SubscriptionServiceTest {
     public void shouldUpdateTheSubscriptionStatusToPendingActivation_WhenActivationIsRequested() {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.PENDING_ACTIVATION;
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription mockedSubscription = mock(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        Subscription mockedSubscription = mock(Subscription.class);
         OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS, Channel.IVR, subscriptionId);
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
@@ -235,7 +235,7 @@ public class SubscriptionServiceTest {
     public void shouldUpdateTheSubscriptionStatusToDeactivationRequested_WhenDeactivationIsRequested() {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.ACTIVE;
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription mockedSubscription = mock(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        Subscription mockedSubscription = mock(Subscription.class);
 
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
@@ -261,7 +261,7 @@ public class SubscriptionServiceTest {
     public void shouldUpdateTheSubscriptionStatusToPendingDeactivation_WhenDeactivationRequestedIsComplete() {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED;
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription mockedSubscription = mock(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        Subscription mockedSubscription = mock(Subscription.class);
         OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS, Channel.IVR, subscriptionId);
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
@@ -285,7 +285,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldUpdateTheSubscriptionStatusToActivationFailed_GivenSubscriptionId() {
         SubscriptionStatus status = SubscriptionStatus.ACTIVATION_FAILED;
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription mockedSubscription = mock(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        Subscription mockedSubscription = mock(Subscription.class);
         String subscriptionId = "abcd1234";
         String operator = Operator.AIRTEL.name();
         String reason = "Activation Failed For some error";
@@ -312,7 +312,7 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldActivateSubscriptionAndScheduleCampaign() {
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new SubscriptionBuilder().withDefaults().build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
         String operator = "airtel";
         DateTime activatedOn = DateTime.now();
         String subscriptionId = subscription.getSubscriptionId();
@@ -324,9 +324,9 @@ public class SubscriptionServiceTest {
 
         subscriptionService.activate(subscriptionId, activatedOn, operator);
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> captor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).update(captor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription actualSubscription = captor.getValue();
+        Subscription actualSubscription = captor.getValue();
         assertEquals(SubscriptionStatus.ACTIVE, actualSubscription.getStatus());
         assertEquals(subscriptionId, actualSubscription.getSubscriptionId());
 
@@ -355,7 +355,7 @@ public class SubscriptionServiceTest {
         DateTime renewalDate = DateTime.now();
         int graceCount = 2;
 
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription() {
+        Subscription subscription = new Subscription() {
             public String getSubscriptionId() {
                 return subscriptionId;
             }
@@ -383,7 +383,7 @@ public class SubscriptionServiceTest {
         final DateTime renewalDate = DateTime.now();
         final String reason = "Balance Low";
         final int graceCount = 0;
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription() {
+        Subscription subscription = new Subscription() {
             public String getSubscriptionId() {
                 return subscriptionId;
             }
@@ -411,7 +411,7 @@ public class SubscriptionServiceTest {
         DateTime date = DateTime.now();
         String reason = "balance is low";
         Integer graceCount = 7;
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW) {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW) {
             public String getSubscriptionId() {
                 return subscriptionId;
             }
@@ -447,16 +447,16 @@ public class SubscriptionServiceTest {
     public void shouldProcessDeactivation() {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.SEVEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.SEVEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         Channel channel = Channel.IVR;
 
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, channel, DateTime.now()));
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> captor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
         ArgumentCaptor<OMSubscriptionRequest> captor1 = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         verify(allSubscriptions).update(captor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription actualSubscription = captor.getValue();
+        Subscription actualSubscription = captor.getValue();
         Assert.assertEquals(msisdn, actualSubscription.getMsisdn());
         Assert.assertEquals(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED, actualSubscription.getStatus());
 
@@ -478,9 +478,9 @@ public class SubscriptionServiceTest {
 
         subscriptionService.subscriptionComplete(omSubscriptionRequest);
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).update(subscriptionArgumentCaptor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription actualSubscription = subscriptionArgumentCaptor.getValue();
+        Subscription actualSubscription = subscriptionArgumentCaptor.getValue();
         Assert.assertEquals(msisdn, actualSubscription.getMsisdn());
         Assert.assertEquals(SubscriptionStatus.PENDING_COMPLETION, actualSubscription.getStatus());
 
@@ -507,7 +507,7 @@ public class SubscriptionServiceTest {
     public void shouldScheduleInboxDeletionUponSubscriptionCompletion() {
         String msisdn = "1234567890";
         SubscriptionPack pack = SubscriptionPack.SEVEN_MONTHS;
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -519,7 +519,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldNotSendDeactivationRequestAgainIfTheExistingSubscriptionIsAlreadyInDeactivatedState() {
         final String msisdn = "9988776655";
-        final org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.DEACTIVATED).build();
+        final Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.DEACTIVATED).build();
         final String subscriptionId = subscription.getSubscriptionId();
         final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
         OMSubscriptionRequest value = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
@@ -535,7 +535,7 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldScheduleInboxDeletionUponSubscriptionDeactivation() {
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription("1234567890", SubscriptionPack.SEVEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.SEVEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -593,7 +593,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = "subscriptionId";
         String message = "some error";
         CampaignChangeReason campaignChangeReason = CampaignChangeReason.MISCARRIAGE;
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_COMPLETION).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_COMPLETION).build();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         doThrow(new ValidationException(message)).when(subscriptionValidator).validateActiveSubscriptionExists(subscriptionId);
         expectedException.expect(ValidationException.class);
@@ -648,7 +648,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldNotProcessDeactivationRequestWhenSubscriptionIsNotInProgress() {
         String subscriptionId = "subsId";
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription mockedSubscription = mock(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        Subscription mockedSubscription = mock(Subscription.class);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now()));
@@ -666,9 +666,9 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
+        Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         assertTrue(Weeks.weeksBetween(subscriptionArgumentCaptorValue.getStartDate(), edd).getWeeks() >= 12);
     }
 
@@ -679,9 +679,9 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
+        Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         assertTrue(Weeks.weeksBetween(subscriptionArgumentCaptorValue.getStartDate(), dob).getWeeks() >= 12);
 
     }
@@ -693,9 +693,9 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
+        Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         Assert.assertEquals(dob, subscriptionArgumentCaptorValue.getStartDate());
 
     }
@@ -707,9 +707,9 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
+        Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         assertTrue(Weeks.weeksBetween(dob, subscriptionArgumentCaptorValue.getStartDate()).getWeeks() >= 20);
 
     }
@@ -721,9 +721,9 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
+        Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         assertEquals(subscriptionRequest.getCreationDate().minusWeeks(27), subscriptionArgumentCaptorValue.getStartDate());
 
     }
@@ -752,7 +752,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscription = subscriptionArgumentCaptor.getValue();
         assertEquals(edd, subscription.getStartDate());
@@ -767,9 +767,9 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
+        Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         assertTrue(Weeks.weeksBetween(edd, subscriptionArgumentCaptorValue.getStartDate()).getWeeks() >= 20);
     }
 
@@ -780,9 +780,9 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
+        Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         assertEquals(dob, subscriptionArgumentCaptorValue.getStartDate());
 
     }
@@ -794,9 +794,9 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
-        ArgumentCaptor<org.motechproject.ananya.kilkari.subscription.domain.Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
+        Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         assertTrue(Weeks.weeksBetween(dob, subscriptionArgumentCaptorValue.getStartDate()).getWeeks() >= 20);
 
     }
@@ -804,7 +804,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldUnScheduleMessageCampaignAndDeleteCampaignMessageAlertOnSuccessfulDeactivationRequest() {
         DateTime createdAt = DateTime.now();
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription("1234567890", SubscriptionPack.TWELVE_MONTHS, createdAt, SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.TWELVE_MONTHS, createdAt, SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -855,6 +855,43 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionRequest.getPack().toString(), subscriptionCreationReportRequest.getPack());
         assertEquals(subscriptionRequest.getSubscriber().getDateOfBirth(), subscriptionCreationReportRequest.getDateOfBirth());
         assertEquals(SubscriptionStatus.NEW_EARLY.toString(), subscriptionCreationReportRequest.getSubscriptionStatus());
+    }
+
+    @Test
+    public void shouldChangeThePackOfAnSubscription() {
+//        String subscriptionId = "abcd1234";
+//        String msisdn = "1234567890";
+//        SubscriptionStatus status = SubscriptionStatus.ACTIVE;
+//        SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
+//        Subscription mockedSubscription = new SubscriptionBuilder().withDefaults().build();
+//
+//        when(mockedSubscription.getStatus()).thenReturn(status);
+//        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+//        when(mockedSubscription.isInProgress()).thenReturn(true);
+//        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
+//
+//        subscriptionService.changePack(new ChangePackRequest(msisdn, subscriptionId, subscriptionPack, Channel.CALL_CENTER, DateTime.now(), null, DateTime.now().minusDays(1)));
+//
+//        InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl, onMobileSubscriptionManagerPublisher);
+//        order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
+//        order.verify(mockedSubscription).deactivationRequestReceived();
+//        order.verify(allSubscriptions).update(mockedSubscription);
+//        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
+//        order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+//        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+//
+//        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+//        assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+//        assertNull(subscriptionStateChangeReportRequest.getOperator());
+//
+//        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
+//        order.verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
+//        Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();
+//        assertEquals(msisdn, subscriptionSaved.getMsisdn());
+//        assertEquals(subscriptionPack, subscriptionSaved.getPack());
+//
+//        order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(any(OMSubscriptionRequest.class));
+//        order.verify(reportingServiceImpl).reportSubscriptionCreation(any(SubscriptionCreationReportRequest.class));
     }
 }
 

@@ -12,7 +12,7 @@ public class Subscriber {
 
     public static final Subscriber NULL = new Subscriber();
 
-    private Subscriber() {
+    public Subscriber() {
     }
 
     public Subscriber(String beneficiaryName, Integer beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer week) {

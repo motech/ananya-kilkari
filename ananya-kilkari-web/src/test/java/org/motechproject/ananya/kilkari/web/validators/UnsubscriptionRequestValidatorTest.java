@@ -31,7 +31,7 @@ public class UnsubscriptionRequestValidatorTest {
     @Test
     public void shouldReturnValidIfUnsubscriptionRequestDetailsAreCorrect() {
         String subscriptionId = "abcd1234";
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription();
+        Subscription subscription = new Subscription();
         subscription.setStatus(SubscriptionStatus.ACTIVE);
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);

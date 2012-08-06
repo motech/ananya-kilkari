@@ -1,13 +1,12 @@
 package org.motechproject.ananya.kilkari.mapper;
 
 import org.apache.commons.lang.StringUtils;
+import org.motechproject.ananya.kilkari.request.ChangePackWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.service.request.Location;
-import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
-import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
-import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.*;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 public class SubscriptionRequestMapper {
@@ -32,6 +31,11 @@ public class SubscriptionRequestMapper {
         return new SubscriberRequest(subscriptionId, request.getChannel(), request.getCreatedAt(),
                 request.getBeneficiaryName(), convertToInteger(request.getBeneficiaryAge()), DateUtils.parseDate(request.getExpectedDateOfDelivery()),
                 DateUtils.parseDate(request.getDateOfBirth()), location);
+    }
+
+    public static ChangePackRequest mapToChangePackRequest(ChangePackWebRequest webRequest) {
+        return new ChangePackRequest(webRequest.getMsisdn(), webRequest.getSubscriptionId(), SubscriptionPack.from(webRequest.getPack()), Channel.from(webRequest.getChannel()),
+                webRequest.getCreatedAt(), DateUtils.parseDate(webRequest.getExpectedDateOfDelivery()), DateUtils.parseDate(webRequest.getDateOfBirth()));
     }
 
     private static Integer convertToInteger(String age) {

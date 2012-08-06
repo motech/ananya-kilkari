@@ -108,14 +108,16 @@ public class KilkariSubscriptionService {
         subscriptionService.updateSubscriberDetails(subscriberRequest);
     }
 
+    public void changePack(ChangePackWebRequest changePackWebRequest) {
+        Errors errors = changePackWebRequest.validate();
+        raiseExceptionIfThereAreErrors(errors);
+        subscriptionService.changePack(SubscriptionRequestMapper.mapToChangePackRequest(changePackWebRequest));
+    }
+
     private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
         if (validationErrors.hasErrors()) {
             throw new ValidationException(validationErrors.allMessages());
         }
-    }
-
-    public void changePack(ChangePackWebRequest changePackWebRequest) {
-
     }
 
     public Subscription findSubscriptionInProgress(String msisdn, SubscriptionPack pack) {

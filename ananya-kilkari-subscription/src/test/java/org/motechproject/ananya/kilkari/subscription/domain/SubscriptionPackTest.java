@@ -82,4 +82,15 @@ public class SubscriptionPackTest {
 
         assertEquals(now.minusWeeks(3), startDate);
     }
+
+    @Test
+    public void shouldCheckIfAPackIsPriorToTheCurrentPack() {
+        assertTrue(SubscriptionPack.FIFTEEN_MONTHS.startsBefore(SubscriptionPack.TWELVE_MONTHS));
+        assertTrue(SubscriptionPack.FIFTEEN_MONTHS.startsBefore(SubscriptionPack.SEVEN_MONTHS));
+        assertTrue(SubscriptionPack.TWELVE_MONTHS.startsBefore(SubscriptionPack.SEVEN_MONTHS));
+
+        assertFalse(SubscriptionPack.SEVEN_MONTHS.startsBefore(SubscriptionPack.FIFTEEN_MONTHS));
+        assertFalse(SubscriptionPack.SEVEN_MONTHS.startsBefore(SubscriptionPack.TWELVE_MONTHS));
+        assertFalse(SubscriptionPack.TWELVE_MONTHS.startsBefore(SubscriptionPack.FIFTEEN_MONTHS));
+    }
 }

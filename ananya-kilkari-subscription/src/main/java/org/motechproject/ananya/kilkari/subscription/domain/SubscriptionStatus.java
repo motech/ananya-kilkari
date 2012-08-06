@@ -17,6 +17,10 @@ public enum SubscriptionStatus {
     public boolean canActivate() {
         return equals(PENDING_ACTIVATION);
     }
+    
+    public boolean canChangePack(){
+        return Arrays.asList(ACTIVE,SUSPENDED,NEW_EARLY).contains(this);
+    }
 
     public boolean isActive() {
         return equals(ACTIVE);

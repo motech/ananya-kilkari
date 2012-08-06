@@ -17,6 +17,7 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationExcept
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
@@ -146,7 +147,7 @@ public class KilkariSubscriptionServiceTest {
     public void shouldScheduleASubscriptionCompletionEvent() {
         String subscriptionId = "subscriptionId";
         DateTime now = DateTime.now();
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription mockedSubscription = mock(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
+        Subscription mockedSubscription = mock(Subscription.class);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).thenReturn(3);
 
@@ -239,8 +240,28 @@ public class KilkariSubscriptionServiceTest {
     }
 
     @Test
-    public void shouldNotThrowExceptionIfChangePackRequestIsValid() {
+    public void shouldProcessValidChangePackRequest() {
         ChangePackWebRequest changePackWebRequest = new ChangePackWebRequestBuilder().withDefaults().build();
         kilkariSubscriptionService.changePack(changePackWebRequest);
+
+        ArgumentCaptor<ChangePackRequest> changePackRequestArgumentCaptor = ArgumentCaptor.forClass(ChangePackRequest.class);
+        verify(subscriptionService).changePack(changePackRequestArgumentCaptor.capture());
+        ChangePackRequest changePackRequest = changePackRequestArgumentCaptor.getValue();
+
+        assertEquals(changePackWebRequest.getMsisdn(), changePackRequest.getMsisdn());
+        assertEquals(changePackWebRequest.getSubscriptionId(), changePackRequest.getSubscriptionId());
+        assertEquals(changePackWebRequest.getPack(), changePackRequest.getPack().name());
+        assertEquals(changePackWebRequest.getChannel(), changePackRequest.getChannel().name());
+        assertEquals(changePackWebRequest.getCreatedAt(), changePackRequest.getCreatedAt());
+    }
+
+    @Test
+    public void shouldThrowExceptionIfValidChangePackRequestIsInvalid() {
+        ChangePackWebRequest changePackWebRequest = new ChangePackWebRequest();
+        expectedException.expect(ValidationException.class);
+
+        kilkariSubscriptionService.changePack(changePackWebRequest);
+
+        verify(subscriptionService, never()).changePack(any(ChangePackRequest.class));
     }
 }

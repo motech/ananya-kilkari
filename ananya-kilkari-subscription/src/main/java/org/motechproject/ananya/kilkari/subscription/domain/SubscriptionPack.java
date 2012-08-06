@@ -10,6 +10,7 @@ public enum SubscriptionPack {
         public DateTime getStartDate(DateTime dob) {
             return dob.minusWeeks(12);
         }
+
     }, TWELVE_MONTHS(13, 48) {
         @Override
         public DateTime getStartDate(DateTime dob) {
@@ -44,6 +45,10 @@ public enum SubscriptionPack {
 
     public boolean isValidWeekNumber(Integer week) {
         return week >= 1 && week <= totalWeeks;
+    }
+
+    public boolean startsBefore(SubscriptionPack other) {
+        return this.getStartWeek() < other.getStartWeek();
     }
 
     public static boolean isValid(String subscriptionPack) {

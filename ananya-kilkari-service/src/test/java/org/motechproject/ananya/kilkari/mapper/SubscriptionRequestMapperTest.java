@@ -2,13 +2,12 @@ package org.motechproject.ananya.kilkari.mapper;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.builder.ChangePackWebRequestBuilder;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
+import org.motechproject.ananya.kilkari.request.ChangePackWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
-import org.motechproject.ananya.kilkari.subscription.service.request.Location;
-import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
-import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
-import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.*;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -86,5 +85,20 @@ public class SubscriptionRequestMapperTest {
         assertNull(subscriberRequest.getBlock());
         assertNull(subscriberRequest.getPanchayat());
         assertEquals(subscriptionId, subscriberRequest.getSubscriptionId());
+    }
+
+    @Test
+    public void shouldMapToChangePackRequest() {
+        ChangePackWebRequest webRequest = new ChangePackWebRequestBuilder().withDefaults().withEDD("25-11-2013").build();
+
+        ChangePackRequest changePackRequest = SubscriptionRequestMapper.mapToChangePackRequest(webRequest);
+
+        assertEquals(webRequest.getMsisdn(), changePackRequest.getMsisdn());
+        assertEquals(webRequest.getSubscriptionId(), changePackRequest.getSubscriptionId());
+        assertEquals(webRequest.getPack(), changePackRequest.getPack().name());
+        assertEquals(webRequest.getChannel(), changePackRequest.getChannel().name());
+        assertEquals(new DateTime(2013, 11, 25, 0, 0, 0), changePackRequest.getExpectedDateOfDelivery());
+        assertNull(changePackRequest.getDateOfBirth());
+        assertEquals(webRequest.getCreatedAt(), changePackRequest.getCreatedAt());
     }
 }

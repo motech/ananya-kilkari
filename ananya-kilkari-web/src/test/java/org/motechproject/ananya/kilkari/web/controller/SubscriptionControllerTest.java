@@ -426,10 +426,12 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldChangePackForTheGivenSubscriber() throws Exception {
+        String subscriptionId = "abcd1234";
         String msisdn = "1234567890";
         String channel = Channel.CALL_CENTER.name();
         String pack = SubscriptionPack.FIFTEEN_MONTHS.name();
         ChangePackWebRequest changePackWebRequest = new ChangePackWebRequest();
+        changePackWebRequest.setSubscriptionId(subscriptionId);
         changePackWebRequest.setMsisdn(msisdn);
         changePackWebRequest.setChannel(channel);
         changePackWebRequest.setPack(pack);
@@ -447,6 +449,7 @@ public class SubscriptionControllerTest {
         verify(kilkariSubscriptionService).changePack(changePackWebRequestArgumentCaptor.capture());
         ChangePackWebRequest request = changePackWebRequestArgumentCaptor.getValue();
 
+        assertEquals(subscriptionId, request.getSubscriptionId());
         assertEquals(msisdn, request.getMsisdn());
         assertEquals(channel, request.getChannel());
         assertEquals(pack, request.getPack());

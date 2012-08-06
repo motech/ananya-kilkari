@@ -28,6 +28,7 @@
 <html>
 
 <head>
+    <title>FakeTime</title>
     <link rel="stylesheet" media="all" type="text/css" href="../css/utils/jquery-ui-theme.css"/>
     <style type="text/css">
         .ui-timepicker-div .ui-widget-header {

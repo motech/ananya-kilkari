@@ -19,7 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -109,6 +113,20 @@ public class MessageCampaignServiceTest {
     }
 
     @Test
+    public void shouldNotGetMessageTimingsForANonActiveSubscription() {
+        DateTime startDate = DateTime.now();
+        String subscriptionId = "abcd1234";
+        DateTime endDate = startDate.plusYears(2);
+
+        when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(new ArrayList<CampaignEnrollmentRecord>());
+
+        List<DateTime> messageTimings = this.messageCampaignService.getMessageTimings(subscriptionId, startDate, endDate);
+
+        verify(platformMessageCampaignService, never()).getCampaignTimings(anyString(), anyString(), any(Date.class), any(Date.class));
+        assertTrue(messageTimings.isEmpty());
+    }
+
+    @Test
     public void shouldGetCampaignStartDateForGivenCampaignSubscription() {
         String subscriptionId = "abcd1234";
         String campaignName = "twelve_months";
@@ -138,5 +156,19 @@ public class MessageCampaignServiceTest {
         DateTime actualCampaignStartDate = this.messageCampaignService.getActiveCampaignStartDate(subscriptionId);
 
         assertEquals(startDate.toLocalDate(), actualCampaignStartDate.toLocalDate());
+    }
+
+    @Test
+    public void shouldReturnActiveCampaignStartDateAsNullForAnInActiveSubscription() {
+        String subscriptionId = "abcd1234";
+        DateTime startDate = DateTime.now();
+
+        ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<>();
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, "fifteen_months", startDate.minusYears(1).toLocalDate(), CampaignEnrollmentStatus.COMPLETED));
+        when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(campaignEnrollmentRecords);
+
+        DateTime actualCampaignStartDate = this.messageCampaignService.getActiveCampaignStartDate(subscriptionId);
+
+        assertNull(actualCampaignStartDate);
     }
 }

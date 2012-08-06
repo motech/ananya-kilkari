@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.messagecampaign.service;
 
 import ch.lambdaj.Lambda;
+import org.apache.commons.lang.StringUtils;
 import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
@@ -64,11 +65,14 @@ public class MessageCampaignService {
 
     public List<DateTime> getMessageTimings(String subscriptionId, DateTime startDate, DateTime endDate) {
         String campaignName = getActiveCampaignName(subscriptionId);
+        List < DateTime > alertTimings = new ArrayList<>();
+        if (StringUtils.isEmpty(campaignName))
+            return alertTimings;
+
         Map<String, List<Date>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
                 startDate.toDate(), endDate.toDate());
         List<Date> campaignMessageTimings = campaignTimings.get(CAMPAIGN_MESSAGE_NAME);
 
-        List<DateTime> alertTimings = new ArrayList<>();
         if (campaignMessageTimings == null || campaignMessageTimings.isEmpty())
             return alertTimings;
 
@@ -87,17 +91,21 @@ public class MessageCampaignService {
 
     public DateTime getActiveCampaignStartDate(String subscriptionId) {
         List<MessageCampaignEnrollment> activeCampaigns = getActiveCampaigns(subscriptionId);
+        if(activeCampaigns.isEmpty())
+            return null;
         return activeCampaigns.get(0).getStartDate();
+    }
+
+    private String getActiveCampaignName(String subscriptionId) {
+        List<MessageCampaignEnrollment> activeCampaigns = getActiveCampaigns(subscriptionId);
+        if(activeCampaigns.isEmpty())
+            return null;
+        return activeCampaigns.get(0).getCampaignName();
     }
 
     private List<MessageCampaignEnrollment> getActiveCampaigns(String subscriptionId) {
         return Lambda.select(searchEnrollments(subscriptionId),
                 having(on(MessageCampaignEnrollment.class).getStatus(),
                         Matchers.is(CampaignEnrollmentStatus.ACTIVE.name())));
-    }
-
-    private String getActiveCampaignName(String subscriptionId) {
-        List<MessageCampaignEnrollment> activeEnrollments = getActiveCampaigns(subscriptionId);
-        return activeEnrollments.get(0).getCampaignName();
     }
 }

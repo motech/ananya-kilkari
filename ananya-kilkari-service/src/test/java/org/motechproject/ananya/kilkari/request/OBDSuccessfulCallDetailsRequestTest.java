@@ -29,11 +29,7 @@ public class OBDSuccessfulCallDetailsRequestTest {
 
     @Test
     public void shouldValidateInvalidServiceOption(){
-        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
-        obdSuccessfulCallDetailsRequest.setCampaignId("WEEK12");
-        obdSuccessfulCallDetailsRequest.setMsisdn("1234567890");
-        obdSuccessfulCallDetailsRequest.setCallDurationWebRequest(callDurationWebRequest);
-        obdSuccessfulCallDetailsRequest.setServiceOption("Invalid");
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest("1234567890","WEEK12",callDurationWebRequest,"Invalid");
 
         when(callDurationWebRequest.validate()).thenReturn(new Errors());
 
@@ -42,11 +38,7 @@ public class OBDSuccessfulCallDetailsRequestTest {
 
     @Test
     public void shouldValidateValidRequest(){
-        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
-        obdSuccessfulCallDetailsRequest.setCampaignId("WEEK12");
-        obdSuccessfulCallDetailsRequest.setMsisdn("1234567890");
-        obdSuccessfulCallDetailsRequest.setCallDurationWebRequest(callDurationWebRequest);
-        obdSuccessfulCallDetailsRequest.setServiceOption("Unsubscribe");
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest("1234567890","WEEK12",callDurationWebRequest,"Unsubscribe");
 
         when(callDurationWebRequest.validate()).thenReturn(new Errors());
 

@@ -25,20 +25,15 @@ public class CallDetailsWebRequest {
     @JsonIgnore
     private DateTime createdAt;
 
+    public CallDetailsWebRequest(String msisdn, String campaignId, CallDurationWebRequest callDurationWebRequest) {
+        this();
+        this.msisdn = msisdn;
+        this.campaignId = campaignId;
+        this.callDurationWebRequest = callDurationWebRequest;
+    }
+
     public CallDetailsWebRequest() {
         createdAt = DateTime.now();
-    }
-
-    public void setMsisdn(String msisdn) {
-        this.msisdn = msisdn;
-    }
-
-    public void setCampaignId(String campaignId) {
-        this.campaignId = campaignId;
-    }
-
-    public void setCallDurationWebRequest(CallDurationWebRequest callDurationWebRequest) {
-        this.callDurationWebRequest = callDurationWebRequest;
     }
 
     public String getMsisdn() {
@@ -113,4 +108,5 @@ public class CallDetailsWebRequest {
         if (PhoneNumber.isNotValid(msisdn))
             errors.add(String.format("Invalid msisdn %s", msisdn));
     }
+
 }

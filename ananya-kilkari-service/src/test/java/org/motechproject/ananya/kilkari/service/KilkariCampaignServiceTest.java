@@ -1,13 +1,16 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
@@ -28,10 +31,12 @@ import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
-import org.motechproject.ananya.kilkari.validators.OBDSuccessfulCallRequestValidator;
+import org.motechproject.ananya.kilkari.validators.CallDetailsRequestValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,14 +75,16 @@ public class KilkariCampaignServiceTest {
     @Mock
     private ServiceOptionHandler serviceOptionHandler;
     @Mock
-    private OBDSuccessfulCallRequestValidator successfulCallRequestValidator;
+    private CallDetailsRequestValidator successfulCallDetailsRequestValidator;
     @Mock
     private CampaignMessageAlertService campaignMessageAlertService;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, campaignMessageAlertService, campaignMessageService, reportingService, callDetailsRequestPublisher, callDeliveryFailureRecordValidator, inboxService, obdServiceOptionFactory, successfulCallRequestValidator);
+        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, campaignMessageAlertService, campaignMessageService, reportingService, callDetailsRequestPublisher, callDeliveryFailureRecordValidator, inboxService, obdServiceOptionFactory, successfulCallDetailsRequestValidator);
     }
 
     @Test
@@ -143,9 +150,7 @@ public class KilkariCampaignServiceTest {
         String serviceOption = ServiceOption.HELP.name();
         String startTime = "25-12-2012 12-13-14";
         String endTime = "27-12-2012 12-15-19";
-        CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest();
-        callDurationWebRequest.setStartTime(startTime);
-        callDurationWebRequest.setEndTime(endTime);
+        CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(startTime, endTime);
 
         when(obdSuccessfulCallDetailsRequest.getMsisdn()).thenReturn(msisdn);
         when(obdSuccessfulCallDetailsRequest.getCampaignId()).thenReturn(campaignId);
@@ -157,20 +162,20 @@ public class KilkariCampaignServiceTest {
         when(campaignMessage.getDnpRetryCount()).thenReturn(retryCount);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(campaignMessage);
 
-        when(successfulCallRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
+        when(successfulCallDetailsRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
         when(obdServiceOptionFactory.getHandler(ServiceOption.HELP)).thenReturn(serviceOptionHandler);
         when(obdSuccessfulCallDetailsRequest.validate()).thenReturn(new Errors());
 
         kilkariCampaignService.processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
 
-        InOrder inOrder = Mockito.inOrder(obdSuccessfulCallDetailsRequest, successfulCallRequestValidator, campaignMessageService, reportingService);
+        InOrder inOrder = Mockito.inOrder(obdSuccessfulCallDetailsRequest, successfulCallDetailsRequestValidator, campaignMessageService, reportingService);
         inOrder.verify(obdSuccessfulCallDetailsRequest).validate();
-        inOrder.verify(successfulCallRequestValidator).validate(any(OBDSuccessfulCallDetailsRequest.class));
+        inOrder.verify(successfulCallDetailsRequestValidator).validate(any(OBDSuccessfulCallDetailsRequest.class));
         inOrder.verify(campaignMessageService).find(subscriptionId, campaignId);
 
-        ArgumentCaptor<CallDetailsRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CallDetailsRequest.class);
+        ArgumentCaptor<CallDetailsReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CallDetailsReportRequest.class);
         verify(reportingService).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
-        CallDetailsRequest campaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
+        CallDetailsReportRequest campaignMessageDeliveryReportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
         inOrder.verify(campaignMessageService).deleteCampaignMessage(campaignMessage);
 
@@ -187,25 +192,19 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldNotProcessSuccessfulCampaignMessageDeliveryIfThereIsNoSubscriptionAvailable() {
-        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK1";
         String msisdn = "1234567890";
         String serviceOption = ServiceOption.HELP.name();
         String startTime = "25-12-2012 12-13-14";
         String endTime = "27-12-2012 12-15-19";
-        CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest();
-        callDurationWebRequest.setStartTime(startTime);
-        callDurationWebRequest.setEndTime(endTime);
+        CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(startTime, endTime);
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, serviceOption);
 
-        obdSuccessfulCallDetailsRequest.setMsisdn(msisdn);
-        obdSuccessfulCallDetailsRequest.setCampaignId(campaignId);
-        obdSuccessfulCallDetailsRequest.setServiceOption(serviceOption);
-        obdSuccessfulCallDetailsRequest.setCallDurationWebRequest(callDurationWebRequest);
         obdSuccessfulCallDetailsRequest.setSubscriptionId(subscriptionId);
         when(campaignMessageService.find(subscriptionId, campaignId)).thenReturn(null);
 
-        when(successfulCallRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
+        when(successfulCallDetailsRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
 
         kilkariCampaignService.processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
 
@@ -317,8 +316,8 @@ public class KilkariCampaignServiceTest {
 
         ArrayList<FailedCallReport> callDeliveryFailureRecordObjects = new ArrayList<>();
         FailedCallReport erroredOutFailedCallReport = mock(FailedCallReport.class);
-        FailedCallReport successfulFailedCallReport1 = new FailedCallReport("sub1","1234567890","WEEK13","ACTIVE");
-        FailedCallReport successfulFailedCallReport2 = new FailedCallReport("sub2","1234567891","WEEK13","ACTIVE");
+        FailedCallReport successfulFailedCallReport1 = new FailedCallReport("sub1", "1234567890", "WEEK13", "ACTIVE");
+        FailedCallReport successfulFailedCallReport2 = new FailedCallReport("sub2", "1234567891", "WEEK13", "ACTIVE");
         callDeliveryFailureRecordObjects.add(erroredOutFailedCallReport);
         callDeliveryFailureRecordObjects.add(successfulFailedCallReport1);
         callDeliveryFailureRecordObjects.add(successfulFailedCallReport2);
@@ -338,7 +337,7 @@ public class KilkariCampaignServiceTest {
         ArgumentCaptor<ValidFailedCallReport> captor = ArgumentCaptor.forClass(ValidFailedCallReport.class);
         verify(callDetailsRequestPublisher, times(2)).publishValidCallDeliveryFailureRecord(captor.capture());
         List<ValidFailedCallReport> actualValidFailedCallReports = captor.getAllValues();
-        assertEquals("1234567890",actualValidFailedCallReports.get(0).getMsisdn());
+        assertEquals("1234567890", actualValidFailedCallReports.get(0).getMsisdn());
         assertEquals("1234567891", actualValidFailedCallReports.get(1).getMsisdn());
     }
 
@@ -470,7 +469,7 @@ public class KilkariCampaignServiceTest {
     }
 
     @Test
-    public void shouldCallCampaignMessageAlertServiceOnActivation(){
+    public void shouldCallCampaignMessageAlertServiceOnActivation() {
         String msisdn = "1234567890";
         org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
@@ -484,7 +483,7 @@ public class KilkariCampaignServiceTest {
     }
 
     @Test
-    public void shouldCallCampaignMessageAlertServiceOnRenewal(){
+    public void shouldCallCampaignMessageAlertServiceOnRenewal() {
         String msisdn = "1234567890";
         org.motechproject.ananya.kilkari.subscription.domain.Subscription subscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
@@ -498,11 +497,68 @@ public class KilkariCampaignServiceTest {
     }
 
     @Test
-    public void shouldPublishInboxCallDetails(){
+    public void shouldPublishInboxCallDetails() {
         InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest();
 
         kilkariCampaignService.publishInboxCallDetailsRequest(inboxCallDetailsWebRequest);
 
         verify(callDetailsRequestPublisher).publishInboxCallDetailsRequest(inboxCallDetailsWebRequest);
+    }
+
+    @Test
+    public void shouldValidateSubscriptionIdIfRequestValidationIsSuccessful() {
+        String pack = "twelve_months";
+        String msisdn = "1234567890";
+        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, "WEEK12", new CallDurationWebRequest("22-11-2011 11-55-35", "23-12-2012 12-59-34"), pack);
+        when(kilkariSubscriptionService.findSubscriptionInProgress(msisdn, SubscriptionPack.TWELVE_MONTHS)).thenReturn(null);
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid inbox call details request: Subscription not found");
+
+        kilkariCampaignService.processInboxCallDetailsRequest(inboxCallDetailsWebRequest);
+    }
+
+    @Test
+    public void shouldReportInboxCallDetails() {
+        String pack = "twelve_months";
+        String msisdn = "1234567890";
+        String subscriptionId = "subscriptionId";
+        String campaignId = "WEEK12";
+        String startTime = "22-11-2011 11-55-35";
+        String endTime = "23-12-2012 12-59-34";
+        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, campaignId, new CallDurationWebRequest(startTime, endTime), pack);
+        Subscription subscription = Mockito.mock(Subscription.class);
+        when(kilkariSubscriptionService.findSubscriptionInProgress(msisdn, SubscriptionPack.TWELVE_MONTHS)).thenReturn(subscription);
+        when(subscription.getSubscriptionId()).thenReturn(subscriptionId);
+
+        kilkariCampaignService.processInboxCallDetailsRequest(inboxCallDetailsWebRequest);
+
+        ArgumentCaptor<CallDetailsReportRequest> captor = ArgumentCaptor.forClass(CallDetailsReportRequest.class);
+        verify(reportingService).reportCampaignMessageDeliveryStatus(captor.capture());
+        CallDetailsReportRequest callDetailsReportRequest = captor.getValue();
+
+        Assert.assertEquals(msisdn, callDetailsReportRequest.getMsisdn());
+        Assert.assertEquals("INBOX", callDetailsReportRequest.getCallSource());
+        Assert.assertEquals(campaignId, callDetailsReportRequest.getCampaignId());
+        Assert.assertNull(callDetailsReportRequest.getRetryCount());
+        Assert.assertNull(callDetailsReportRequest.getServiceOption());
+        Assert.assertEquals(DateUtils.parseDateTime(startTime), callDetailsReportRequest.getStartTime());
+        Assert.assertEquals(DateUtils.parseDateTime(endTime), callDetailsReportRequest.getEndTime());
+        Assert.assertEquals("SUCCESS", callDetailsReportRequest.getStatus());
+        Assert.assertEquals(subscriptionId, callDetailsReportRequest.getSubscriptionId());
+
+        Assert.assertNull(callDetailsReportRequest.getServiceOption());
+    }
+
+    @Test
+    public void shouldValidateInboxCallDetailsRequest() {
+        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = Mockito.mock(InboxCallDetailsWebRequest.class);
+        Errors errors = new Errors();
+        String errorString = "some error";
+        errors.add(errorString);
+        when(inboxCallDetailsWebRequest.validate()).thenReturn(errors);
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid inbox call details request: " + errorString);
+
+        kilkariCampaignService.processInboxCallDetailsRequest(inboxCallDetailsWebRequest);
     }
 }

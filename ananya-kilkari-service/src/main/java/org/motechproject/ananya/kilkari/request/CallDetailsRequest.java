@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.request;
 
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 
@@ -14,8 +15,10 @@ public class CallDetailsRequest implements Serializable {
     private DateTime createdAt;
     private CampaignMessageCallSource callSource;
     private Channel channel;
+    protected String subscriptionId;
+    protected ServiceOption serviceOption;
 
-    public CallDetailsRequest(CampaignMessageCallSource callSource, String msisdn, String campaignId, CallDurationRequest callDurationRequest, DateTime createdAt) {
+    public CallDetailsRequest(String subscriptionId, ServiceOption serviceOption, String msisdn, String campaignId, CallDurationRequest callDurationRequest, DateTime createdAt, CampaignMessageCallSource callSource) {
         this.msisdn = msisdn;
         this.campaignId = campaignId;
         this.callDurationRequest = callDurationRequest;
@@ -23,6 +26,8 @@ public class CallDetailsRequest implements Serializable {
         this.callSource = callSource;
 
         this.channel = Channel.IVR;
+        this.subscriptionId = subscriptionId;
+        this.serviceOption = serviceOption;
     }
 
     public String getMsisdn() {
@@ -47,5 +52,13 @@ public class CallDetailsRequest implements Serializable {
 
     public Channel getChannel() {
         return channel;
+    }
+
+    public String getSubscriptionId() {
+        return subscriptionId;
+    }
+
+    public ServiceOption getServiceOption() {
+        return serviceOption;
     }
 }

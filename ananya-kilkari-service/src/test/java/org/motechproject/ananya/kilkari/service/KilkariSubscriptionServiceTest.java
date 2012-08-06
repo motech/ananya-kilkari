@@ -20,7 +20,6 @@ import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
@@ -124,13 +123,23 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldReturnSubscriptionGivenASubscriptionId() {
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription exptectedSubscription = new org.motechproject.ananya.kilkari.subscription.domain.Subscription();
+        Subscription exptectedSubscription = new Subscription();
         String susbscriptionid = "susbscriptionid";
         when(subscriptionService.findBySubscriptionId(susbscriptionid)).thenReturn(exptectedSubscription);
 
         Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(susbscriptionid);
 
         assertEquals(exptectedSubscription, subscription);
+    }
+
+    @Test
+    public void shouldFindInProgressSubscriptionByMsisdnAndPack() {
+        String msisdn = "1234567890";
+        SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
+        Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.ACTIVE);
+        when(subscriptionService.findSubscriptionInProgress(msisdn, pack)).thenReturn(subscription);
+
+        assertEquals(subscription, kilkariSubscriptionService.findSubscriptionInProgress(msisdn, pack));
     }
 
     @Test

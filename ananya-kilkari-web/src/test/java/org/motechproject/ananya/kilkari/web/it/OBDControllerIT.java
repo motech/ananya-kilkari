@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.motechproject.ananya.kilkari.TimedRunner;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
@@ -105,9 +105,9 @@ public class OBDControllerIT extends SpringIntegrationTest {
         verify(onMobileOBDGateway).sendInvalidFailureRecord(invalidCallDeliveryFailureRecordArgumentCaptor.capture());
         List<InvalidFailedCallReport> recordObjectFaileds = invalidCallDeliveryFailureRecordArgumentCaptor.getValue().getRecordObjectFaileds();
 
-        ArgumentCaptor<CallDetailsRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CallDetailsRequest.class);
+        ArgumentCaptor<CallDetailsReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CallDetailsReportRequest.class);
         verify(reportingService).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
-        CallDetailsRequest reportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
+        CallDetailsReportRequest reportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
         assertEquals(1, recordObjectFaileds.size());
         assertEquals(msisdn, recordObjectFaileds.get(0).getMsisdn());

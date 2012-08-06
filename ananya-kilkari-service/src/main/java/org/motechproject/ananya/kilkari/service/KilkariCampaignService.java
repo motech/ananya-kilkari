@@ -1,10 +1,11 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
+import org.motechproject.ananya.kilkari.mapper.CallDetailsReportRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.CallDetailsRequestMapper;
-import org.motechproject.ananya.kilkari.mapper.OBDSuccessfulCallDetailsRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
@@ -14,15 +15,16 @@ import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.*;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
+import org.motechproject.ananya.kilkari.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
-import org.motechproject.ananya.kilkari.validators.OBDSuccessfulCallRequestValidator;
+import org.motechproject.ananya.kilkari.validators.CallDetailsRequestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,7 @@ public class KilkariCampaignService {
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
     private InboxService inboxService;
     private OBDServiceOptionFactory obdServiceOptionFactory;
-    private OBDSuccessfulCallRequestValidator successfulCallRequestValidator;
+    private CallDetailsRequestValidator callDetailsRequestValidator;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariCampaignService.class);
 
@@ -65,7 +67,7 @@ public class KilkariCampaignService {
                                   CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator,
                                   InboxService inboxService,
                                   OBDServiceOptionFactory obdServiceOptionFactory,
-                                  OBDSuccessfulCallRequestValidator successfulCallRequestValidator) {
+                                  CallDetailsRequestValidator callDetailsRequestValidator) {
         this.messageCampaignService = messageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.campaignMessageIdStrategy = campaignMessageIdStrategy;
@@ -76,7 +78,7 @@ public class KilkariCampaignService {
         this.callDeliveryFailureRecordValidator = callDeliveryFailureRecordValidator;
         this.inboxService = inboxService;
         this.obdServiceOptionFactory = obdServiceOptionFactory;
-        this.successfulCallRequestValidator = successfulCallRequestValidator;
+        this.callDetailsRequestValidator = callDetailsRequestValidator;
     }
 
     public Map<String, List<DateTime>> getMessageTimings(String msisdn) {
@@ -130,24 +132,42 @@ public class KilkariCampaignService {
     }
 
     public void processSuccessfulMessageDelivery(OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsWebRequest) {
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = validateSuccessfulCallRequest(obdSuccessfulCallDetailsWebRequest);
+        CallDetailsRequest callDetailsRequest = validateSuccessfulCallRequest(obdSuccessfulCallDetailsWebRequest);
 
-        CampaignMessage campaignMessage = campaignMessageService.find(obdSuccessfulCallDetailsRequest.getSubscriptionId(),obdSuccessfulCallDetailsRequest.getCampaignId());
+        CampaignMessage campaignMessage = campaignMessageService.find(callDetailsRequest.getSubscriptionId(), callDetailsRequest.getCampaignId());
         if (campaignMessage == null) {
             logger.error(String.format("Campaign Message not present for subscriptionId: %s, campaignId: %s",
-                    obdSuccessfulCallDetailsRequest.getSubscriptionId(), obdSuccessfulCallDetailsRequest.getCampaignId()));
+                    callDetailsRequest.getSubscriptionId(), callDetailsRequest.getCampaignId()));
             return;
         }
         int retryCount = campaignMessage.getDnpRetryCount();
 
-        reportingService.reportCampaignMessageDeliveryStatus(CallDetailsRequestMapper.mapFrom(obdSuccessfulCallDetailsRequest, retryCount));
+        reportingService.reportCampaignMessageDeliveryStatus(CallDetailsReportRequestMapper.mapFrom(callDetailsRequest, retryCount));
         campaignMessageService.deleteCampaignMessage(campaignMessage);
 
-        ServiceOptionHandler serviceOptionHandler = obdServiceOptionFactory.getHandler(obdSuccessfulCallDetailsRequest.getServiceOption());
+        ServiceOptionHandler serviceOptionHandler = obdServiceOptionFactory.getHandler(callDetailsRequest.getServiceOption());
         if (serviceOptionHandler != null) {
-            serviceOptionHandler.process(obdSuccessfulCallDetailsRequest);
+            serviceOptionHandler.process(callDetailsRequest);
         }
     }
+
+    public void processInboxCallDetailsRequest(InboxCallDetailsWebRequest inboxCallDetailsWebRequest) {
+        Errors errors = inboxCallDetailsWebRequest.validate();
+        if (errors.hasErrors())
+            throw new ValidationException(String.format("Invalid inbox call details request: %s", errors.allMessages()));
+        Subscription subscription = validateSubscription(inboxCallDetailsWebRequest);
+        CallDetailsReportRequest callDetailsReportRequest = CallDetailsReportRequestMapper.mapFrom(inboxCallDetailsWebRequest, subscription);
+        reportingService.reportCampaignMessageDeliveryStatus(callDetailsReportRequest);
+    }
+
+    private Subscription validateSubscription(InboxCallDetailsWebRequest inboxCallDetailsWebRequest) {
+        Subscription subscription = kilkariSubscriptionService.findSubscriptionInProgress(inboxCallDetailsWebRequest.getMsisdn(), SubscriptionPack.from(inboxCallDetailsWebRequest.getPack()));
+        if(subscription == null)
+            throw new ValidationException("Invalid inbox call details request: Subscription not found");
+        return subscription;
+
+    }
+
 
     public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntries invalidOBDRequestEntries) {
         callDetailsRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
@@ -206,18 +226,22 @@ public class KilkariCampaignService {
         }
     }
 
-    private OBDSuccessfulCallDetailsRequest validateSuccessfulCallRequest(OBDSuccessfulCallDetailsWebRequest webRequest) {
+    private CallDetailsRequest validateSuccessfulCallRequest(OBDSuccessfulCallDetailsWebRequest webRequest) {
         Errors validationErrors = webRequest.validate();
-        if(validationErrors.hasErrors()) {
+        if (validationErrors.hasErrors()) {
             throw new ValidationException(String.format("OBD Request Invalid: %s", validationErrors.allMessages()));
         }
 
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsRequestMapper().map(webRequest);
-        validationErrors = successfulCallRequestValidator.validate(obdSuccessfulCallDetailsRequest);
-        if(validationErrors.hasErrors()) {
+        CallDetailsRequest callDetailsRequest = new CallDetailsRequestMapper().mapOBDRequest(webRequest);
+        validateSubscription(callDetailsRequest);
+        return callDetailsRequest;
+    }
+
+    private void validateSubscription(CallDetailsRequest callDetailsRequest) {
+        Errors validationErrors;
+        validationErrors = callDetailsRequestValidator.validate(callDetailsRequest);
+        if (validationErrors.hasErrors()) {
             throw new ValidationException(String.format("OBD Request Invalid: %s", validationErrors.allMessages()));
         }
-        return obdSuccessfulCallDetailsRequest;
-
     }
 }

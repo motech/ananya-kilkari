@@ -10,6 +10,7 @@ import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.service.CallDeliveryFailureEventKeys;
+import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.scheduler.context.EventContext;
@@ -73,7 +74,7 @@ public class CallDetailsRequestPublisherTest {
 
     @Test
     public void shouldPublishInboxCallDetailsRequest() {
-        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest();
+        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest("1234567890", "WEEK12", new CallDurationWebRequest(), "twelve_months");
 
         callDetailsRequestPublisher.publishInboxCallDetailsRequest(inboxCallDetailsWebRequest);
 

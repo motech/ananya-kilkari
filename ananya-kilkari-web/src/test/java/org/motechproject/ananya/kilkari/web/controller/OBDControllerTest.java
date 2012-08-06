@@ -50,14 +50,8 @@ public class OBDControllerTest {
     @Test
     public void shouldHandleSuccessfulResponseFromObd() throws Exception {
         String subscriptionId = "abcd1234";
-        OBDSuccessfulCallDetailsWebRequest successfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
-        successfulCallDetailsRequest.setMsisdn("1234567890");
-        successfulCallDetailsRequest.setCampaignId("WEEK12");
-        successfulCallDetailsRequest.setServiceOption("HELP");
-        CallDurationWebRequest callDetailRecord = new CallDurationWebRequest();
-        callDetailRecord.setStartTime("21-11-2012 22-10-15");
-        callDetailRecord.setEndTime("23-11-2012 22-10-15");
-        successfulCallDetailsRequest.setCallDurationWebRequest(callDetailRecord);
+        CallDurationWebRequest callDetailRecord = new CallDurationWebRequest("21-11-2012 22-10-15", "23-11-2012 22-10-15");
+        OBDSuccessfulCallDetailsWebRequest successfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest("1234567890", "WEEK12", callDetailRecord, "HELP");
         byte[] requestBody = TestUtils.toJson(successfulCallDetailsRequest).getBytes();
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
 
@@ -102,14 +96,8 @@ public class OBDControllerTest {
     @Test
     public void shouldInvokeKilkariCampaignServiceForProcessingValidObdRequest() throws Exception {
         String subscriptionId = "abcd1234";
-        OBDSuccessfulCallDetailsWebRequest successfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
-        successfulCallDetailsRequest.setMsisdn("1234567890");
-        successfulCallDetailsRequest.setCampaignId("WEEK13");
-        successfulCallDetailsRequest.setServiceOption("HELP");
-        CallDurationWebRequest callDetailRecord = new CallDurationWebRequest();
-        callDetailRecord.setStartTime("21-11-2012 22-10-15");
-        callDetailRecord.setEndTime("23-11-2012 22-10-15");
-        successfulCallDetailsRequest.setCallDurationWebRequest(callDetailRecord);
+        CallDurationWebRequest callDetailRecord = new CallDurationWebRequest("21-11-2012 22-10-15", "23-11-2012 22-10-15");
+        OBDSuccessfulCallDetailsWebRequest successfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest("1234567890", "WEEK13", callDetailRecord, "HELP");
         successfulCallDetailsRequest.setSubscriptionId(subscriptionId);
         byte[] requestBody = TestUtils.toJson(successfulCallDetailsRequest).getBytes();
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());

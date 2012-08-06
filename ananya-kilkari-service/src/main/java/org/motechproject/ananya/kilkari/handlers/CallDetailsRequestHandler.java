@@ -6,6 +6,7 @@ import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
+import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.service.CallDetailsEventKeys;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
@@ -50,6 +51,13 @@ public class CallDetailsRequestHandler {
         FailedCallReports failedCallReports = (FailedCallReports) motechEvent.getParameters().get("0");
         logger.info("Handling OBD call delivery failure record");
         kilkariCampaignService.processCallDeliveryFailureRecord(failedCallReports);
+    }
+
+    @MotechListener(subjects = {CallDetailsEventKeys.PROCESS_INBOX_CALL_REQUEST_SUBJECT})
+    public void handleInboxCallDetailsRequest(MotechEvent motechEvent) {
+        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = (InboxCallDetailsWebRequest) motechEvent.getParameters().get("0");
+        logger.info(String.format("Handling inbox call details for msisdn:%s, pack:%s", inboxCallDetailsWebRequest.getMsisdn(), inboxCallDetailsWebRequest.getPack()));
+        kilkariCampaignService.processInboxCallDetailsRequest(inboxCallDetailsWebRequest);
     }
 
     private List<InvalidCallRecord> mapToInvalidCallRecord(InvalidOBDRequestEntries invalidOBDRequestEntries) {

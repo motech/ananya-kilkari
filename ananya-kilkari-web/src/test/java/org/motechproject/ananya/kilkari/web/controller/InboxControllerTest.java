@@ -51,15 +51,7 @@ public class InboxControllerTest {
 
 
     private InboxCallDetailsWebRequest createRequest(String msisdn, String pack, String campaignId, final String startTime, final String endTime) {
-        InboxCallDetailsWebRequest request = new InboxCallDetailsWebRequest();
-        request.setPack(pack);
-        request.setCampaignId(campaignId);
-        request.setCallDurationWebRequest(new CallDurationWebRequest(){{
-            setEndTime(endTime);
-            setStartTime(startTime);
-        }});
-        request.setMsisdn(msisdn);
-        return request;
+        return new InboxCallDetailsWebRequest(msisdn, campaignId, new CallDurationWebRequest(startTime, endTime), pack);
     }
 
 

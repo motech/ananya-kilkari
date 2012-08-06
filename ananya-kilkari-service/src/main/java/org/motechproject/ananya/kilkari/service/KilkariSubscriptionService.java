@@ -118,4 +118,8 @@ public class KilkariSubscriptionService {
     public void changePack(ChangePackWebRequest changePackWebRequest) {
 
     }
+
+    public Subscription findSubscriptionInProgress(String msisdn, SubscriptionPack pack) {
+        return subscriptionService.findSubscriptionInProgress(msisdn, pack);
+    }
 }

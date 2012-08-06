@@ -11,24 +11,19 @@ import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 public class OBDSuccessfulCallDetailsWebRequest extends CallDetailsWebRequest {
     @JsonProperty
     private String serviceOption;
-
     @JsonIgnore
     private String subscriptionId;
 
-    public String getServiceOption() {
-        return serviceOption;
+    public OBDSuccessfulCallDetailsWebRequest() {
     }
 
-    public String getSubscriptionId() {
-        return subscriptionId;
-    }
-
-    public void setServiceOption(String serviceOption) {
+    public OBDSuccessfulCallDetailsWebRequest(String msisdn, String campaignId, CallDurationWebRequest callDurationWebRequest, String serviceOption) {
+        super(msisdn, campaignId, callDurationWebRequest);
         this.serviceOption = serviceOption;
     }
 
-    public void setSubscriptionId(String subscriptionId) {
-        this.subscriptionId = subscriptionId;
+    public String getServiceOption() {
+        return serviceOption;
     }
 
     @Override
@@ -64,5 +59,13 @@ public class OBDSuccessfulCallDetailsWebRequest extends CallDetailsWebRequest {
     private void validateServiceOption(Errors errors) {
         if (!StringUtils.isEmpty(serviceOption) && !ServiceOption.isValid(serviceOption))
             errors.add(String.format("Invalid service option %s", serviceOption));
+    }
+
+    public void setSubscriptionId(String subscriptionId) {
+        this.subscriptionId = subscriptionId;
+    }
+
+    public String getSubscriptionId() {
+        return subscriptionId;
     }
 }

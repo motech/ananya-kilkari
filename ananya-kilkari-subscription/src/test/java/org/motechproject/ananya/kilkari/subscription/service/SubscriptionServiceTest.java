@@ -181,6 +181,16 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    public void shouldFindInProgressSubscriptionByMsisdnAndPack() {
+        String msisdn = "1234567890";
+        SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
+
+        Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.ACTIVE);
+        when(allSubscriptions.findSubscriptionInProgress(msisdn, pack)).thenReturn(subscription);
+        assertEquals(subscription, subscriptionService.findSubscriptionInProgress(msisdn, pack));
+    }
+
+    @Test
     public void shouldThrowAnExceptionForInvalidMsisdnNumbers() {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid msisdn 12345");

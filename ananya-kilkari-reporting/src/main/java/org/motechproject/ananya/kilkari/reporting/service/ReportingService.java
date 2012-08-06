@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
@@ -13,7 +13,7 @@ public interface ReportingService {
 
     void reportSubscriptionStateChange(SubscriptionStateChangeRequest subscriptionStateChangeRequest);
 
-    void reportCampaignMessageDeliveryStatus(CallDetailsRequest callDetailsRequest);
+    void reportCampaignMessageDeliveryStatus(CallDetailsReportRequest callDetailsReportRequest);
 
     void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest);
 }

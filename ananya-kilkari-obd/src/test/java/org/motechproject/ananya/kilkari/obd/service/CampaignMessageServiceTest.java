@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
@@ -265,7 +265,7 @@ public class CampaignMessageServiceTest {
         campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
-        verify(reportingService).reportCampaignMessageDeliveryStatus(any(CallDetailsRequest.class));
+        verify(reportingService).reportCampaignMessageDeliveryStatus(any(CallDetailsReportRequest.class));
 
         ArgumentCaptor<CampaignMessage> campaignMessageArgumentCaptor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages).update(campaignMessageArgumentCaptor.capture());
@@ -288,7 +288,7 @@ public class CampaignMessageServiceTest {
         campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
-        verify(reportingService).reportCampaignMessageDeliveryStatus(any(CallDetailsRequest.class));
+        verify(reportingService).reportCampaignMessageDeliveryStatus(any(CallDetailsReportRequest.class));
 
         ArgumentCaptor<CampaignMessage> campaignMessageArgumentCaptor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages).update(campaignMessageArgumentCaptor.capture());
@@ -311,7 +311,7 @@ public class CampaignMessageServiceTest {
         campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
-        verify(reportingService).reportCampaignMessageDeliveryStatus(any(CallDetailsRequest.class));
+        verify(reportingService).reportCampaignMessageDeliveryStatus(any(CallDetailsReportRequest.class));
         verify(allCampaignMessages).delete(campaignMessage);
     }
 
@@ -349,7 +349,7 @@ public class CampaignMessageServiceTest {
         campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
-        verify(reportingService).reportCampaignMessageDeliveryStatus(any(CallDetailsRequest.class));
+        verify(reportingService).reportCampaignMessageDeliveryStatus(any(CallDetailsReportRequest.class));
         verify(allCampaignMessages).delete(campaignMessage);
     }
 
@@ -382,7 +382,7 @@ public class CampaignMessageServiceTest {
         campaignMessageService.processValidCallDeliveryFailureRecords(failedCallReport);
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
-        verify(reportingService, never()).reportCampaignMessageDeliveryStatus(any(CallDetailsRequest.class));
+        verify(reportingService, never()).reportCampaignMessageDeliveryStatus(any(CallDetailsReportRequest.class));
         verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
     }
 
@@ -404,9 +404,9 @@ public class CampaignMessageServiceTest {
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
 
-        ArgumentCaptor<CallDetailsRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CallDetailsRequest.class);
+        ArgumentCaptor<CallDetailsReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CallDetailsReportRequest.class);
         verify(reportingService).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
-        CallDetailsRequest reportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
+        CallDetailsReportRequest reportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
         ArgumentCaptor<CampaignMessage> campaignMessageArgumentCaptor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages).update(campaignMessageArgumentCaptor.capture());
@@ -444,9 +444,9 @@ public class CampaignMessageServiceTest {
 
         verify(allCampaignMessages).find(subscriptionId, campaignId);
 
-        ArgumentCaptor<CallDetailsRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CallDetailsRequest.class);
+        ArgumentCaptor<CallDetailsReportRequest> campaignMessageDeliveryReportRequestArgumentCaptor = ArgumentCaptor.forClass(CallDetailsReportRequest.class);
         verify(reportingService).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
-        CallDetailsRequest reportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
+        CallDetailsReportRequest reportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
         ArgumentCaptor<CampaignMessage> campaignMessageArgumentCaptor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages).update(campaignMessageArgumentCaptor.capture());

@@ -10,18 +10,19 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
-import org.motechproject.ananya.kilkari.service.CallDetailsEventKeys;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
+import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.service.CallDetailsEventKeys;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.validators.OBDSuccessfulCallRequestValidator;
+import org.motechproject.ananya.kilkari.validators.CallDetailsRequestValidator;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.ArrayList;
@@ -30,9 +31,7 @@ import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CallDetailsRequestHandlerTest {
@@ -44,7 +43,7 @@ public class CallDetailsRequestHandlerTest {
     @Mock
     private ServiceOptionHandler serviceOptionHandler;
     @Mock
-    private OBDSuccessfulCallRequestValidator successfulCallRequestValidator;
+    private CallDetailsRequestValidator successfulCallDetailsRequestValidator;
     @Mock
     private CampaignMessageService campaignMessageService;
     @Mock
@@ -60,8 +59,7 @@ public class CallDetailsRequestHandlerTest {
     @Test
     public void shouldHandleAOBDCallBackRequest() {
         HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
-        obdSuccessfulCallDetailsRequest.setServiceOption(ServiceOption.HELP.name());
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest(null, null, null, ServiceOption.HELP.name());
         obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
         stringObjectHashMap.put("0", obdSuccessfulCallDetailsRequest);
 
@@ -73,8 +71,7 @@ public class CallDetailsRequestHandlerTest {
     @Test
     public void shouldHandleAOBDCallBackRequestWithDeactivation() {
         HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
-        obdSuccessfulCallDetailsRequest.setServiceOption(ServiceOption.UNSUBSCRIBE.name());
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest(null, null, null, ServiceOption.UNSUBSCRIBE.name());
         obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
         stringObjectHashMap.put("0", obdSuccessfulCallDetailsRequest);
 
@@ -86,11 +83,10 @@ public class CallDetailsRequestHandlerTest {
     @Test
     public void shouldNotThrowExceptionIfHandlerIsNotThereForServiceOption() {
         Map<String, Object> map = new HashMap<>();
-        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
-        obdSuccessfulCallDetailsRequest.setServiceOption("");
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest(null, null, null, "");
         obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
         map.put("0", obdSuccessfulCallDetailsRequest);
-        when(successfulCallRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
+        when(successfulCallDetailsRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
 
         callDetailsRequestHandler.handleOBDCallbackRequest(new MotechEvent(CallDetailsEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, map));
     }
@@ -146,5 +142,16 @@ public class CallDetailsRequestHandlerTest {
         callDetailsRequestHandler.handleCallDeliveryFailureRecord(new MotechEvent(CallDetailsEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, parameters));
 
         verify(kilkariCampaignService).processCallDeliveryFailureRecord(failureRecordFailed);
+    }
+
+    @Test
+    public void shouldInvokeKilkariCampaignServiceToProcessInboxCallDetails() {
+        HashMap<String, Object> parameters = new HashMap<>();
+        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = mock(InboxCallDetailsWebRequest.class);
+        parameters.put("0", inboxCallDetailsWebRequest);
+
+        callDetailsRequestHandler.handleInboxCallDetailsRequest(new MotechEvent(CallDetailsEventKeys.PROCESS_INBOX_CALL_REQUEST_SUBJECT, parameters));
+
+        verify(kilkariCampaignService).processInboxCallDetailsRequest(inboxCallDetailsWebRequest);
     }
 }

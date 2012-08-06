@@ -275,4 +275,8 @@ public class SubscriptionService {
         if (PhoneNumber.isNotValid(msisdn))
             throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
     }
+
+    public Subscription findSubscriptionInProgress(String msisdn, SubscriptionPack pack) {
+        return allSubscriptions.findSubscriptionInProgress(msisdn, pack);
+    }
 }

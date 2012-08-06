@@ -23,27 +23,23 @@ public class CallDetailsWebRequestTest {
     @Test
     public void shouldValidateInValidRequestWithAllFieldsNull() {
         CallDetailsWebRequest callDetailsWebRequest = new CallDetailsWebRequest();
+
         assertEquals("Invalid msisdn null,Invalid campaign id null,Null call duration", callDetailsWebRequest.validate().allMessages());
     }
 
     @Test
     public void shouldValidateInValidRequestWithInvalidCallDuration() {
-        CallDetailsWebRequest callDetailsWebRequest = new CallDetailsWebRequest();
-        callDetailsWebRequest.setCampaignId("WEEK12");
-        callDetailsWebRequest.setMsisdn("1234567890");
-        callDetailsWebRequest.setCallDurationWebRequest(callDurationWebRequest);
-        when(callDurationWebRequest.validate()).thenReturn(new Errors(){{ add("invalid call duration for something");}});
+        CallDetailsWebRequest callDetailsWebRequest = new CallDetailsWebRequest("1234567890", "WEEK12", callDurationWebRequest);
+        when(callDurationWebRequest.validate()).thenReturn(new Errors() {{
+            add("invalid call duration for something");
+        }});
 
         assertEquals("invalid call duration for something", callDetailsWebRequest.validate().allMessages());
     }
 
-
     @Test
     public void shouldValidateInValidRequestWithEmptyFields() {
-        CallDetailsWebRequest callDetailsWebRequest = new CallDetailsWebRequest();
-        callDetailsWebRequest.setCampaignId("");
-        callDetailsWebRequest.setMsisdn("");
-        callDetailsWebRequest.setCallDurationWebRequest(callDurationWebRequest);
+        CallDetailsWebRequest callDetailsWebRequest = new CallDetailsWebRequest("", "", callDurationWebRequest);
         when(callDurationWebRequest.validate()).thenReturn(new Errors());
 
         assertEquals("Invalid msisdn ,Invalid campaign id ", callDetailsWebRequest.validate().allMessages());
@@ -51,10 +47,7 @@ public class CallDetailsWebRequestTest {
 
     @Test
     public void shouldValidateInValidRequestWithInvalidFields() {
-        CallDetailsWebRequest callDetailsWebRequest = new CallDetailsWebRequest();
-        callDetailsWebRequest.setCampaignId("invalid");
-        callDetailsWebRequest.setMsisdn("invalid");
-        callDetailsWebRequest.setCallDurationWebRequest(callDurationWebRequest);
+        CallDetailsWebRequest callDetailsWebRequest = new CallDetailsWebRequest("invalid", "invalid", callDurationWebRequest);
         when(callDurationWebRequest.validate()).thenReturn(new Errors());
 
         assertEquals("Invalid msisdn invalid,Invalid campaign id invalid", callDetailsWebRequest.validate().allMessages());
@@ -62,11 +55,9 @@ public class CallDetailsWebRequestTest {
 
     @Test
     public void shouldValidateValidRequest() {
-        CallDetailsWebRequest callDetailsWebRequest = new CallDetailsWebRequest();
-        callDetailsWebRequest.setCampaignId("WEEK12");
-        callDetailsWebRequest.setMsisdn("1234567890");
-        callDetailsWebRequest.setCallDurationWebRequest(callDurationWebRequest);
+        CallDetailsWebRequest callDetailsWebRequest = new CallDetailsWebRequest("1234567890", "WEEK12", callDurationWebRequest);
         when(callDurationWebRequest.validate()).thenReturn(new Errors());
+
         assertTrue(callDetailsWebRequest.validate().hasNoErrors());
     }
 }

@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
@@ -36,8 +36,8 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public void reportCampaignMessageDeliveryStatus(CallDetailsRequest callDetailsRequest) {
-        reportGateway.reportCampaignMessageDeliveryStatus(callDetailsRequest);
+    public void reportCampaignMessageDeliveryStatus(CallDetailsReportRequest callDetailsReportRequest) {
+        reportGateway.reportCampaignMessageDeliveryStatus(callDetailsReportRequest);
     }
 
     @Override

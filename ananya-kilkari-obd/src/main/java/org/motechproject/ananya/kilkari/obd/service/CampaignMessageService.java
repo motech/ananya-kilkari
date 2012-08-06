@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.obd.service;
 
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.contract.request.CallDetailRecordRequest;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
@@ -128,9 +128,9 @@ public class CampaignMessageService {
     private void reportCampaignMessageStatus(ValidFailedCallReport failedCallReport, CampaignMessage campaignMessage) {
         String retryCount = getRetryCount(campaignMessage);
         CallDetailRecordRequest callDetailRecordRequest = new CallDetailRecordRequest(failedCallReport.getCreatedAt(), failedCallReport.getCreatedAt());
-        CallDetailsRequest callDetailsRequest = new CallDetailsRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(),
+        CallDetailsReportRequest callDetailsReportRequest = new CallDetailsReportRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(),
                 null, retryCount, failedCallReport.getStatusCode().name(), callDetailRecordRequest, CampaignMessageCallSource.OBD.name());
-        reportingService.reportCampaignMessageDeliveryStatus(callDetailsRequest);
+        reportingService.reportCampaignMessageDeliveryStatus(callDetailsReportRequest);
     }
 
     private String getRetryCount(CampaignMessage campaignMessage) {

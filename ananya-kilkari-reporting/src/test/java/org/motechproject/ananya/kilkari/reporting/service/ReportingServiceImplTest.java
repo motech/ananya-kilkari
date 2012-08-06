@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.reporting.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsRequest;
+import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
@@ -68,7 +68,7 @@ public class ReportingServiceImplTest {
 
     @Test
     public void shouldReportASuccessfulCampaignMessageDelivery() {
-        CallDetailsRequest campaignMessageDeliveryReportRequest = mock(CallDetailsRequest.class);
+        CallDetailsReportRequest campaignMessageDeliveryReportRequest = mock(CallDetailsReportRequest.class);
 
         reportingServiceImpl.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
 

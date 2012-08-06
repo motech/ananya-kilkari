@@ -8,7 +8,9 @@ import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 
-public class CallDurationWebRequest {
+import java.io.Serializable;
+
+public class CallDurationWebRequest implements Serializable {
     @JsonProperty
     private String startTime;
     @JsonProperty

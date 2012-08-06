@@ -67,7 +67,6 @@ public class KilkariSubscriptionService {
         }
     }
 
-
     public void processCallbackRequest(CallbackRequestWrapper callbackRequestWrapper) {
         subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
     }

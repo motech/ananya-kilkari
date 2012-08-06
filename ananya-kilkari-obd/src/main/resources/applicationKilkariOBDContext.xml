@@ -8,7 +8,7 @@
 
     <util:properties id="obdProperties" location="classpath:/obd.properties"/>
 
-    <import resource="classpath*:applicationKilkariCommonContext.xml" />
+    <import resource="classpath*:applicationKilkariCommonContext.xml"/>
     <import resource="classpath*:applicationScheduler.xml"/>
     <import resource="classpath*:applicationPlatformServerAPI.xml"/>
     <import resource="classpath*:applicationContext-retry.xml"/>
@@ -25,7 +25,11 @@
     </bean>
 
     <bean id="obdHttpClientConnectionManager" class="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager"/>
-    <bean id="obdHttpClient" class="org.apache.http.impl.client.DefaultHttpClient">
-        <constructor-arg ref="obdHttpClientConnectionManager" />
+
+    <bean id="obdHttpClient" class="org.motechproject.ananya.kilkari.obd.repository.OBDHttpClient">
+        <constructor-arg ref="obdHttpClientConnectionManager"/>
+        <constructor-arg value="${kilkari.external.http.read.timeout}"/>
+        <constructor-arg value="${kilkari.external.http.connect.timeout}"/>
     </bean>
+
 </beans>

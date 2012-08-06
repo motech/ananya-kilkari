@@ -11,10 +11,11 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignCode;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.common.domain.PhoneNumber;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CallDetailsWebRequest {
+public class CallDetailsWebRequest implements Serializable {
 
     @JsonProperty
     private String msisdn;

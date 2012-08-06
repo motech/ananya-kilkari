@@ -4,26 +4,26 @@ import org.motechproject.ananya.kilkari.contract.request.CallDetailRecordRequest
 import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
-import org.motechproject.ananya.kilkari.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.CallDurationRequest;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 public class CallDetailsReportRequestMapper {
-    public static CallDetailsReportRequest mapFrom(CallDetailsRequest callDetailsRequest, Integer retryCount) {
-        CallDurationRequest callDurationRequest = callDetailsRequest.getCallDurationRequest();
+    public static CallDetailsReportRequest mapFrom(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest, Integer retryCount) {
+        CallDurationRequest callDurationRequest = obdSuccessfulCallDetailsRequest.getCallDurationRequest();
         CallDetailRecordRequest callDurationReportRequest = new CallDetailRecordRequest(callDurationRequest.getStartTime(), callDurationRequest.getEndTime());
         return new CallDetailsReportRequest(
-                callDetailsRequest.getSubscriptionId(),
-                callDetailsRequest.getMsisdn(),
-                callDetailsRequest.getCampaignId(),
-                callDetailsRequest.getServiceOption().name(),
+                obdSuccessfulCallDetailsRequest.getSubscriptionId(),
+                obdSuccessfulCallDetailsRequest.getMsisdn(),
+                obdSuccessfulCallDetailsRequest.getCampaignId(),
+                obdSuccessfulCallDetailsRequest.getServiceOption().name(),
                 retryCount.toString(),
                 CampaignMessageStatus.SUCCESS.name(),
                 callDurationReportRequest,
-                callDetailsRequest.getCallSource().name());
+                obdSuccessfulCallDetailsRequest.getCallSource().name());
     }
 
     public static CallDetailsReportRequest mapFrom(InboxCallDetailsWebRequest inboxCallDetailsWebRequest, Subscription subscription) {

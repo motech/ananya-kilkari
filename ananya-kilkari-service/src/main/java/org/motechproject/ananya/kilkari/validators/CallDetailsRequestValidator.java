@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.validators;
 
-import org.motechproject.ananya.kilkari.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
@@ -17,9 +16,9 @@ public class CallDetailsRequestValidator {
         this.subscriptionService = subscriptionService;
     }
 
-    public Errors validate(CallDetailsRequest callDetailsRequest) {
+    public Errors validate(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
         Errors errors = new Errors();
-        validateSubscription(callDetailsRequest.getSubscriptionId(), errors);
+        validateSubscription(obdSuccessfulCallDetailsRequest.getSubscriptionId(), errors);
         return errors;
     }
 

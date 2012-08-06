@@ -3,23 +3,14 @@ package org.motechproject.ananya.kilkari.mapper;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
-import org.motechproject.ananya.kilkari.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
-import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
-import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 public class CallDetailsRequestMapperTest {
 
@@ -39,7 +30,7 @@ public class CallDetailsRequestMapperTest {
         OBDSuccessfulCallDetailsWebRequest webRequest = new OBDSuccessfulCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, ServiceOption.HELP.name());
         webRequest.setSubscriptionId(subscriptionId);
 
-        CallDetailsRequest request = callDetailsRequestMapper.mapOBDRequest(webRequest);
+        OBDSuccessfulCallDetailsRequest request = callDetailsRequestMapper.mapOBDRequest(webRequest);
 
         assertEquals(ServiceOption.HELP, request.getServiceOption());
         assertEquals(webRequest.getCreatedAt(), request.getCreatedAt());

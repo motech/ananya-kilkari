@@ -1,7 +1,6 @@
 package org.motechproject.ananya.kilkari.handlers.callback.obd;
 
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
-import org.motechproject.ananya.kilkari.request.CallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.service.SubscriberCareService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +17,9 @@ public class OBDHelpHandler implements ServiceOptionHandler {
     }
 
     @Override
-    public void process(CallDetailsRequest callDetailsRequest) {
-        createSubscriberCareDoc(callDetailsRequest);
-    }
-
-    private void createSubscriberCareDoc(CallDetailsRequest callDetailsRequest) {
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(callDetailsRequest.getMsisdn(), callDetailsRequest.getServiceOption().name(),
-                callDetailsRequest.getChannel().name(), callDetailsRequest.getCreatedAt());
+    public void process(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
+        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(obdSuccessfulCallDetailsRequest.getMsisdn(), obdSuccessfulCallDetailsRequest.getServiceOption().name(),
+                obdSuccessfulCallDetailsRequest.getChannel().name(), obdSuccessfulCallDetailsRequest.getCreatedAt());
         subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
     }
 }

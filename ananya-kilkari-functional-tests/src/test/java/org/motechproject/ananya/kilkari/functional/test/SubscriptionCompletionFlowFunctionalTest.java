@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.motechproject.ananya.kilkari.functional.test.builder.SubscriptionDataBuilder;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.functional.test.utils.FunctionalTestUtils;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,8 +34,8 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
         when(subscriptionManager).renews(subscriptionData);
         and(time).isMovedToFuture(futureDateOfSecondCampaignAlert);
         then(user).messageIsReady(subscriptionData, "WEEK2");
-//        and(time).isMovedToFuture(futureDateOfPackCompletion.plusWeeks(1));
-//        then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
+        and(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
+        then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
     }
 }
 

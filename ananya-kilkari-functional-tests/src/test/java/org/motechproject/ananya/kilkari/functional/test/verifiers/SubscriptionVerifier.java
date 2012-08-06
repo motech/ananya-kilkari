@@ -25,7 +25,7 @@ public class SubscriptionVerifier {
     }
 
     private Subscription waitForSubscription(final SubscriptionData subscriptionData, final SubscriptionStatus status) {
-        return new TimedRunner<Subscription>(50, 6000) {
+        return new TimedRunner<Subscription>(20, 6000) {
                 public Subscription run() {
                     Subscription subscription = getSubscription(subscriptionData);
                     return subscription != null && subscription.getStatus().equals(status)? subscription : null;

@@ -16,7 +16,7 @@ public class CampaignMessageVerifier {
 
 
     public void verifyCampaignMessageExists(final SubscriptionData subscriptionData,final String weekMessageId) {
-        CampaignMessage campaignMessage = new TimedRunner<CampaignMessage>(50, 6000) {
+        CampaignMessage campaignMessage = new TimedRunner<CampaignMessage>(20, 6000) {
             public CampaignMessage run() {
                 CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionData.getSubscriptionId(),weekMessageId) ;
                 return campaignMessage!=null && campaignMessage.getMessageId().equals(weekMessageId)? campaignMessage : null;

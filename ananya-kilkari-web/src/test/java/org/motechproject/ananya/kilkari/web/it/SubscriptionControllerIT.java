@@ -190,7 +190,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
         DateTime now = DateTime.now();
         DateTime edd = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0).plusMonths(4);
-        DateTime expectedStartDate = SubscriptionPack.FIFTEEN_MONTHS.adjustStartDate(edd);
+        DateTime expectedStartDate = SubscriptionPack.FIFTEEN_MONTHS.getStartDate(edd);
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);

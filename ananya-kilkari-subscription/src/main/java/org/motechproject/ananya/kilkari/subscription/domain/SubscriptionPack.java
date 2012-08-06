@@ -5,19 +5,19 @@ import org.joda.time.DateTime;
 
 public enum SubscriptionPack {
 
-    FIFTEEN_MONTHS(0, 60) {
+    FIFTEEN_MONTHS(1, 60) {
         @Override
-        public DateTime adjustStartDate(DateTime dob) {
+        public DateTime getStartDate(DateTime dob) {
             return dob.minusWeeks(12);
         }
-    }, TWELVE_MONTHS(12, 48) {
+    }, TWELVE_MONTHS(13, 48) {
         @Override
-        public DateTime adjustStartDate(DateTime dob) {
+        public DateTime getStartDate(DateTime dob) {
             return dob;
         }
-    }, SEVEN_MONTHS(32, 28) {
+    }, SEVEN_MONTHS(33, 28) {
         @Override
-        public DateTime adjustStartDate(DateTime dob) {
+        public DateTime getStartDate(DateTime dob) {
             return dob.plusWeeks(20);
         }
     };
@@ -55,9 +55,9 @@ public enum SubscriptionPack {
         return true;
     }
 
-    public abstract DateTime adjustStartDate(DateTime dob);
+    public abstract DateTime getStartDate(DateTime dob);
 
-    public DateTime adjustStartDate(DateTime startDate, Integer weekNumber) {
+    public DateTime getStartDateForWeek(DateTime startDate, Integer weekNumber) {
         return startDate.minusWeeks(weekNumber - 1);
     }
 }

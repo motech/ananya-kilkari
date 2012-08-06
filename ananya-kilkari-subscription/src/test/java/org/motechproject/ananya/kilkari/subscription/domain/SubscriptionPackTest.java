@@ -49,7 +49,7 @@ public class SubscriptionPackTest {
     public void shouldSetStartDateThreeMonthsBeforeEDDForFifteenMonthsPack() {
         DateTime now = DateTime.now();
         DateTime edd = now.plusMonths(2);
-        DateTime startDate = SubscriptionPack.FIFTEEN_MONTHS.adjustStartDate(edd);
+        DateTime startDate = SubscriptionPack.FIFTEEN_MONTHS.getStartDate(edd);
 
         assertEquals(edd.getDayOfWeek(), startDate.getDayOfWeek());
         assertTrue(Weeks.weeksBetween(startDate, edd).getWeeks() >= 12);
@@ -59,7 +59,7 @@ public class SubscriptionPackTest {
     public void shouldSetStartDateFiveMonthsAfterDOBForSevenMonthsPack() {
         DateTime now = DateTime.now();
         DateTime dob = now.minusMonths(2);
-        DateTime startDate = SubscriptionPack.SEVEN_MONTHS.adjustStartDate(dob);
+        DateTime startDate = SubscriptionPack.SEVEN_MONTHS.getStartDate(dob);
 
         assertEquals(dob.getDayOfWeek(), startDate.getDayOfWeek());
         assertTrue(Weeks.weeksBetween(dob, startDate).getWeeks() >= 20);
@@ -69,7 +69,7 @@ public class SubscriptionPackTest {
     public void shouldSetStartDateOnSameDateAsDOBForTwelveMonthsPack() {
         DateTime now = DateTime.now();
         DateTime dob = now;
-        DateTime startDate = SubscriptionPack.TWELVE_MONTHS.adjustStartDate(dob);
+        DateTime startDate = SubscriptionPack.TWELVE_MONTHS.getStartDate(dob);
 
         assertEquals(now, startDate);
     }
@@ -78,7 +78,7 @@ public class SubscriptionPackTest {
     public void shouldSetStartDateBasedOnTheCurrentWeekForFifteenMonthsPack() {
         DateTime now = DateTime.now();
         Integer weekNumber = 4;
-        DateTime startDate = SubscriptionPack.FIFTEEN_MONTHS.adjustStartDate(now, weekNumber);
+        DateTime startDate = SubscriptionPack.FIFTEEN_MONTHS.getStartDateForWeek(now, weekNumber);
 
         assertEquals(now.minusWeeks(3), startDate);
     }

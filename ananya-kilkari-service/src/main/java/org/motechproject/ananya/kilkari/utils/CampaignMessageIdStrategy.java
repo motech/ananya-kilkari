@@ -26,13 +26,14 @@ public class CampaignMessageIdStrategy {
 
     public int getWeekNumber(DateTime campaignStartDate, String campaignName, SubscriptionPack pack) {
         int weeksDifference = getWeeksElapsedAfterCampaignStartDate(campaignStartDate);
-        return weeksDifference + getPackStartingWeek(campaignName, pack) + 1;
+        return weeksDifference + getPackStartingWeek(campaignName, pack);
     }
 
     private int getPackStartingWeek(String campaignName, SubscriptionPack pack) {
-        if(!campaignName.equals(MessageCampaignService.INFANT_DEATH_CAMPAIGN_KEY) && !campaignName.equals(MessageCampaignService.MISCARRIAGE_CAMPAIGN_KEY))
+        if(!campaignName.equals(MessageCampaignService.INFANT_DEATH_CAMPAIGN_KEY) &&
+           !campaignName.equals(MessageCampaignService.MISCARRIAGE_CAMPAIGN_KEY))
             return pack.getStartWeek();
-        return 0;
+        return 1;
     }
 
     private int getWeeksElapsedAfterCampaignStartDate(DateTime campaignStartDate) {

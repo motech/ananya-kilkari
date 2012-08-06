@@ -69,8 +69,8 @@ public class SubscriptionService {
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
         subscriptionValidator.validate(subscriptionRequest);
 
-        DateTime startDate = determineSubscriptionStartDate(subscriptionRequest);
-        boolean isEarlySubscription = startDate.isAfter(subscriptionRequest.getCreationDate());
+        DateTime startDate = subscriptionRequest.getSubscriptionStartDate();
+        boolean isEarlySubscription = subscriptionRequest.isEarlySubscription(startDate);
 
         Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
                 subscriptionRequest.getCreationDate(), (isEarlySubscription ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW));
@@ -103,28 +103,6 @@ public class SubscriptionService {
         RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate.toDate());
 
         motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
-    }
-
-    private DateTime determineSubscriptionStartDate(SubscriptionRequest subscriptionRequest) {
-        DateTime startDate = subscriptionRequest.getCreationDate();
-        SubscriptionPack subscriptionRequestPack = subscriptionRequest.getPack();
-
-        Integer weekNumber = subscriptionRequest.getSubscriber().getWeek();
-        if (weekNumber != null) {
-            return subscriptionRequestPack.adjustStartDate(startDate, weekNumber);
-        }
-
-        DateTime dateOfBirth = subscriptionRequest.getSubscriber().getDateOfBirth();
-        if (dateOfBirth != null) {
-            return subscriptionRequestPack.adjustStartDate(dateOfBirth);
-        }
-
-        DateTime expectedDateOfDelivery = subscriptionRequest.getSubscriber().getExpectedDateOfDelivery();
-        if (expectedDateOfDelivery != null) {
-            return subscriptionRequestPack.adjustStartDate(expectedDateOfDelivery);
-        }
-
-        return startDate;
     }
 
     public void initiateActivationRequest(OMSubscriptionRequest omSubscriptionRequest) {

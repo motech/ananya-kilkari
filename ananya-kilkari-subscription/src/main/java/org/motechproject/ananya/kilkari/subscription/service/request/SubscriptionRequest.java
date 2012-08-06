@@ -42,4 +42,27 @@ public class SubscriptionRequest {
     public boolean hasLocation() {
         return !Location.NULL.equals(getLocation());
     }
+
+    public DateTime getSubscriptionStartDate() {
+        Integer weekNumber = subscriber.getWeek();
+        if (weekNumber != null) {
+            return pack.getStartDateForWeek(creationDate, weekNumber);
+        }
+
+        DateTime dateOfBirth = subscriber.getDateOfBirth();
+        if (dateOfBirth != null) {
+            return pack.getStartDate(dateOfBirth);
+        }
+
+        DateTime expectedDateOfDelivery = subscriber.getExpectedDateOfDelivery();
+        if (expectedDateOfDelivery != null) {
+            return pack.getStartDate(expectedDateOfDelivery);
+        }
+
+        return creationDate;
+    }
+
+    public boolean isEarlySubscription(DateTime startDate) {
+        return startDate.isAfter(creationDate);
+    }
 }

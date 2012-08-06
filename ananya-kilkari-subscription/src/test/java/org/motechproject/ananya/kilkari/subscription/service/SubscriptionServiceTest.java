@@ -815,12 +815,12 @@ public class SubscriptionServiceTest {
         DateTime dob = DateTime.now().minusMonths(6);
         SubscriptionPack subscriptionPack = mock(SubscriptionPack.class);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(subscriptionPack).withDateOfBirth(dob).withWeek(weekNumber).build();
-        when(subscriptionPack.adjustStartDate(subscriptionRequest.getCreationDate(), weekNumber)).thenReturn(dob);
+        when(subscriptionPack.getStartDateForWeek(subscriptionRequest.getCreationDate(), weekNumber)).thenReturn(dob);
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
-        verify(subscriptionPack).adjustStartDate(Matchers.<DateTime>any(), Matchers.<Integer>any());
-        verify(subscriptionPack, never()).adjustStartDate(Matchers.<DateTime>any());
+        verify(subscriptionPack).getStartDateForWeek(Matchers.<DateTime>any(), Matchers.<Integer>any());
+        verify(subscriptionPack, never()).getStartDate(Matchers.<DateTime>any());
     }
 
     @Test

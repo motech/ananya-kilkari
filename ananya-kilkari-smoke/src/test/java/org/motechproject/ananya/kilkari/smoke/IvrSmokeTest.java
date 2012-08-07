@@ -55,7 +55,7 @@ public class IvrSmokeTest {
 
     private void assertKilkariData(String pack, String expectedStatus, SubscriberResponse response) {
         SubscriptionDetails subscriptionDetails = response.getSubscriptionDetails().get(0);
-        assertEquals(pack, subscriptionDetails.getPack());
+        assertEquals(pack.toUpperCase(), subscriptionDetails.getPack().toUpperCase());
         assertEquals(expectedStatus, subscriptionDetails.getStatus());
     }
 }

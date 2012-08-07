@@ -7,7 +7,9 @@ import org.motechproject.ananya.kilkari.smoke.domain.BaseResponse;
 import org.motechproject.ananya.kilkari.smoke.domain.SubscriberResponse;
 import org.motechproject.ananya.kilkari.smoke.domain.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.smoke.service.SubscriptionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
@@ -17,17 +19,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
-import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.*;
+import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.constructUrl;
+import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.fromJsonWithResponse;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationKilkariSmokeContext.xml")
-public class IvrSmokeTest {
-    RestTemplate restTemplate;
-    SubscriptionService subscriptionService;
+public class IvrSmokeTest extends BaseSmokeTest {
+    @Autowired
+    private SubscriptionService subscriptionService;
+    private RestTemplate restTemplate;
 
     @Before
     public void setUp() throws SQLException {
-        subscriptionService = new SubscriptionService();
         restTemplate = new RestTemplate();
     }
 
@@ -43,7 +46,7 @@ public class IvrSmokeTest {
         parametersMap.put("channel", channel);
         parametersMap.put("pack", pack);
 
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(constructUrl(KILKARI_URL, "subscription", parametersMap), String.class);
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(constructUrl(baseUrl(), "subscription", parametersMap), String.class);
 
         BaseResponse baseResponse = fromJsonWithResponse(responseEntity.getBody(), BaseResponse.class);
         assertEquals("SUCCESS", baseResponse.getStatus());

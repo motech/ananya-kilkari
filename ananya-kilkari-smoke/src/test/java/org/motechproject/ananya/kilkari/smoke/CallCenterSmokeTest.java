@@ -7,8 +7,9 @@ import org.motechproject.ananya.kilkari.smoke.domain.BaseResponse;
 import org.motechproject.ananya.kilkari.smoke.domain.SubscriberResponse;
 import org.motechproject.ananya.kilkari.smoke.domain.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.smoke.domain.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.smoke.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.smoke.domain.builder.SubscriptionRequestBuilder;
+import org.motechproject.ananya.kilkari.smoke.service.SubscriptionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
@@ -16,18 +17,18 @@ import org.springframework.web.client.RestTemplate;
 import java.sql.SQLException;
 
 import static junit.framework.Assert.assertEquals;
-import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.KILKARI_SUBSCRIPTION_POST_URL;
+import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.constructUrl;
 import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.fromJsonWithResponse;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationKilkariSmokeContext.xml")
-public class CallCenterSmokeTest {
-    RestTemplate restTemplate;
-    SubscriptionService subscriptionService;
+public class CallCenterSmokeTest extends BaseSmokeTest {
+    @Autowired
+    private SubscriptionService subscriptionService;
+    private RestTemplate restTemplate;
 
     @Before
     public void setUp() throws SQLException {
-        subscriptionService = new SubscriptionService();
         restTemplate = new RestTemplate();
     }
 
@@ -36,7 +37,7 @@ public class CallCenterSmokeTest {
         String expectedStatus = "PENDING_ACTIVATION";
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withEDD(null).withDOB(null).withLocation(null).build();
 
-        String responseEntity = restTemplate.postForObject(KILKARI_SUBSCRIPTION_POST_URL, subscriptionRequest, String.class);
+        String responseEntity = restTemplate.postForObject(constructUrl(baseUrl(), "subscription"), subscriptionRequest, String.class);
 
         BaseResponse baseResponse = fromJsonWithResponse(responseEntity, BaseResponse.class);
         assertEquals("SUCCESS", baseResponse.getStatus());

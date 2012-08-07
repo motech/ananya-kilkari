@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.smoke.domain.kilkari;
+package org.motechproject.ananya.kilkari.smoke.domain;
 
 import java.util.ArrayList;
 import java.util.List;

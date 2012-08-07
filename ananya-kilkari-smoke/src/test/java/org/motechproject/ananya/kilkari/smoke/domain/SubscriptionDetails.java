@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.smoke.domain.kilkari;
+package org.motechproject.ananya.kilkari.smoke.domain;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;

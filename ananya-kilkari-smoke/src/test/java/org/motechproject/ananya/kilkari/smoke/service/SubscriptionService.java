@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.smoke.service;
 
-import org.motechproject.ananya.kilkari.smoke.domain.kilkari.SubscriberResponse;
+import org.motechproject.ananya.kilkari.smoke.domain.SubscriberResponse;
 import org.motechproject.ananya.kilkari.smoke.utils.TimedRunner;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;

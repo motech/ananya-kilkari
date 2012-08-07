@@ -1,8 +1,8 @@
-package org.motechproject.ananya.kilkari.smoke.utils;
+package org.motechproject.ananya.kilkari.smoke.domain.builder;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.smoke.domain.kilkari.Location;
-import org.motechproject.ananya.kilkari.smoke.domain.kilkari.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.smoke.domain.Location;
+import org.motechproject.ananya.kilkari.smoke.domain.SubscriptionRequest;
 
 public class SubscriptionRequestBuilder {
 

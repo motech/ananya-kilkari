@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.smoke.domain.kilkari;
+package org.motechproject.ananya.kilkari.smoke.domain;
 
 public class Location{
     private String district;

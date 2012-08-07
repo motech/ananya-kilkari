@@ -8,9 +8,11 @@ import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.TimedRunner;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
+import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
+import org.motechproject.ananya.kilkari.request.ChangeMsisdnWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
@@ -29,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.server.MvcResult;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -282,6 +285,35 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         assertNotNull(statusChanged);
         assertNotNull(deactivationRequested);
+    }
+
+    @Test
+    public void shouldChangeMsisdnForAnExistingSubscription() throws Exception {
+        String oldMsisdn = "9876543210";
+        String newMsisdn = "9876543211";
+        DateTime createdAt = DateTime.now().minusWeeks(4).minusHours(1);
+        Subscription oldSubscription = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, createdAt, SubscriptionStatus.ACTIVE);
+
+        allSubscriptions.add(oldSubscription);
+
+        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()));
+
+        ReportingService mockReportingService = mock(ReportingService.class);
+        reportingService.setBehavior(mockReportingService);
+        when(mockReportingService.getSubscriber(oldSubscription.getSubscriptionId())).thenReturn(new SubscriberResponse("name", 25, null, null, null));
+
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(post("/subscription/changemsisdn").body(TestUtils.toJson(changeMsisdnWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andReturn();
+
+        Subscription newSubscription = allSubscriptions.findSubscriptionInProgress(newMsisdn, SubscriptionPack.NANHI_KILKARI);
+        assertNotNull(newSubscription);
+        assertEquals(37, newSubscription.getCurrentWeekOfSubscription());
+
+        oldSubscription = allSubscriptions.findBySubscriptionId(oldSubscription.getSubscriptionId());
+        assertTrue(oldSubscription.getStatus() == SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED || oldSubscription.getStatus() == SubscriptionStatus.PENDING_DEACTIVATION);
     }
 
 

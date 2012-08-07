@@ -347,12 +347,11 @@ public class SubscriptionService {
             location = new Location(subscriberResponse.getLocationResponse().getDistrict(),
                 subscriberResponse.getLocationResponse().getBlock(), subscriberResponse.getLocationResponse().getPanchayat());
         Subscriber subscriber = new Subscriber(subscriberResponse.getBeneficiaryName(), subscriberResponse.getBeneficiaryAge(),
-                subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), null);
+                subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getWeeksElapsedAfterStartDate() + 1);
 
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeMsisdnRequest.getNewMsisdn(),
                 DateTime.now(), subscription.getPack(), location, subscriber);
 
-        // TODO: fetch current week and use in create subscription
         createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
     }
 

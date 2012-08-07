@@ -922,7 +922,7 @@ public class SubscriptionServiceTest {
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.NANHI_KILKARI));
 
-        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), SubscriptionStatus.ACTIVE);
+        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now().minusWeeks(2).minusHours(1), SubscriptionStatus.ACTIVE);
         Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), SubscriptionStatus.ACTIVE);
         String beneficiaryName = "name";
         Integer beneficiaryAge = 25;

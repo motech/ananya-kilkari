@@ -35,7 +35,8 @@ public enum SubscriptionStatus {
                 this != DEACTIVATED &&
                 this != PENDING_DEACTIVATION &&
                 this != PENDING_COMPLETION &&
-                this != ACTIVATION_FAILED;
+                this != ACTIVATION_FAILED &&
+                this != DEACTIVATION_REQUEST_RECEIVED;
     }
 
     boolean hasCompletionRequestSent() {

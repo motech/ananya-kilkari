@@ -196,7 +196,8 @@ public class Subscription extends MotechBaseDataObject {
         return getStartDate().plusWeeks(getWeeksElapsedAfterStartDate() + 1);
     }
 
-    private int getWeeksElapsedAfterStartDate() {
+    @JsonIgnore
+    public int getWeeksElapsedAfterStartDate() {
         return Weeks.weeksBetween(getStartDate(), DateTime.now()).getWeeks();
     }
 

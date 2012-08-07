@@ -17,6 +17,9 @@ public class ChangeMsisdnWebRequest {
     @JsonProperty
     private List<String> packs;
 
+
+    public ChangeMsisdnWebRequest() { }
+
     public ChangeMsisdnWebRequest(String oldMsisdn, String newMsisdn, List<String> packs) {
         this.oldMsisdn = oldMsisdn;
         this.newMsisdn = newMsisdn;

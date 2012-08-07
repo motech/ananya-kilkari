@@ -21,7 +21,7 @@ public class MessageCampaignRequestMapperTest {
         int deltaDays = 2;
         int deltaMinutes = 30;
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                "externalId", "twelve_months", new DateTime(2012, 5, 5, 0, 0));
+                "externalId", "choti_kilkari", new DateTime(2012, 5, 5, 0, 0));
 
         CampaignRequest campaignRequest = MessageCampaignRequestMapper.newRequestFrom(messageCampaignRequest, deltaDays, deltaMinutes);
 

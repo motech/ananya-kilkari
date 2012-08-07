@@ -226,7 +226,7 @@ public class KilkariCampaignServiceTest {
     public void shouldScheduleUnsubscriptionWhenPackIsCompletedAndWhenStatusIsNotDeactivated() {
         String subscriptionId = "abcd1234";
 
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.BARI_KILKARI, DateTime.now().minusWeeks(1), SubscriptionStatus.NEW);
 
         subscription.setStatus(SubscriptionStatus.ACTIVE);
 
@@ -240,7 +240,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldNotScheduleUnsubscriptionWhenPackIsCompletedAndStatusIsDeactivated() {
         String subscriptionId = "abcd1234";
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now().minusWeeks(1), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.BARI_KILKARI, DateTime.now().minusWeeks(1), SubscriptionStatus.NEW);
 
         subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
 
@@ -365,7 +365,7 @@ public class KilkariCampaignServiceTest {
         String campaignName = "campaignName";
         Operator operator = Operator.AIRTEL;
         String msisdn = "9988776655";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, creationDate, SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, creationDate, SubscriptionStatus.NEW);
         subscription.setOperator(operator);
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         String subscriptionId = subscription.getSubscriptionId();
@@ -385,7 +385,7 @@ public class KilkariCampaignServiceTest {
     public void shouldCallCampaignMessageAlertServiceAndNotUpdateInboxWhenSubscriptionIsNotActive() {
         DateTime creationDate = DateTime.now();
         String msisdn = "9988776655";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, creationDate, SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, creationDate, SubscriptionStatus.NEW);
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
         subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
@@ -407,7 +407,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldNotUpdateInboxDuringActivationWhenMessageHasNotAlreadyBeenScheduled() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
@@ -422,7 +422,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldUpdateInboxDuringActivationWhenMessageHasAlreadyBeenScheduled() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
@@ -439,7 +439,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldNotUpdateInboxDuringRenewalWhenMessageHasNotAlreadyBeenScheduled() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
@@ -454,7 +454,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldNotUpdateInboxDuringRenewalnWhenMessageHasAlreadyBeenScheduled() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
@@ -471,7 +471,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldCallCampaignMessageAlertServiceOnActivation() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
@@ -485,7 +485,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldCallCampaignMessageAlertServiceOnRenewal() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
@@ -507,10 +507,10 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldValidateSubscriptionIdIfRequestValidationIsSuccessful() {
-        String pack = "twelve_months";
+        String pack = "choti_kilkari";
         String msisdn = "1234567890";
         InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, "WEEK12", new CallDurationWebRequest("22-11-2011 11-55-35", "23-12-2012 12-59-34"), pack);
-        when(kilkariSubscriptionService.findSubscriptionInProgress(msisdn, SubscriptionPack.TWELVE_MONTHS)).thenReturn(null);
+        when(kilkariSubscriptionService.findSubscriptionInProgress(msisdn, SubscriptionPack.CHOTI_KILKARI)).thenReturn(null);
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid inbox call details request: Subscription not found");
 
@@ -519,7 +519,7 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldReportInboxCallDetails() {
-        String pack = "twelve_months";
+        String pack = "choti_kilkari";
         String msisdn = "1234567890";
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK12";
@@ -527,7 +527,7 @@ public class KilkariCampaignServiceTest {
         String endTime = "23-12-2012 12-59-34";
         InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, campaignId, new CallDurationWebRequest(startTime, endTime), pack);
         Subscription subscription = Mockito.mock(Subscription.class);
-        when(kilkariSubscriptionService.findSubscriptionInProgress(msisdn, SubscriptionPack.TWELVE_MONTHS)).thenReturn(subscription);
+        when(kilkariSubscriptionService.findSubscriptionInProgress(msisdn, SubscriptionPack.CHOTI_KILKARI)).thenReturn(subscription);
         when(subscription.getSubscriptionId()).thenReturn(subscriptionId);
 
         kilkariCampaignService.processInboxCallDetailsRequest(inboxCallDetailsWebRequest);

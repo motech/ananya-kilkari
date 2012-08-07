@@ -29,7 +29,7 @@ public class OnMobileSubscriptionManagerPublisherTest {
     @Test
     public void shouldPublishProcessSubscriptionActivationEventIntoQueue() {
         String subscriptionId = "ABCD1234";
-        onMobileSubscriptionManagerPublisher.sendActivationRequest(new OMSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS, Channel.IVR, subscriptionId));
+        onMobileSubscriptionManagerPublisher.sendActivationRequest(new OMSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI, Channel.IVR, subscriptionId));
 
         ArgumentCaptor<OMSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -39,7 +39,7 @@ public class OnMobileSubscriptionManagerPublisherTest {
 
         assertEquals(SubscriptionEventKeys.ACTIVATE_SUBSCRIPTION, eventName);
         assertEquals("1234567890", OMSubscriptionRequest.getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS, OMSubscriptionRequest.getPack());
+        assertEquals(SubscriptionPack.CHOTI_KILKARI, OMSubscriptionRequest.getPack());
         assertEquals(Channel.IVR, OMSubscriptionRequest.getChannel());
         assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
     }
@@ -47,7 +47,7 @@ public class OnMobileSubscriptionManagerPublisherTest {
     @Test
     public void shouldPublishProcessSubscriptionDeactivationEventIntoQueue() {
         String subscriptionId = "ABCD1234";
-        onMobileSubscriptionManagerPublisher.processDeactivation(new OMSubscriptionRequest("1234567890", SubscriptionPack.TWELVE_MONTHS, Channel.IVR, subscriptionId));
+        onMobileSubscriptionManagerPublisher.processDeactivation(new OMSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI, Channel.IVR, subscriptionId));
 
         ArgumentCaptor<OMSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -57,7 +57,7 @@ public class OnMobileSubscriptionManagerPublisherTest {
 
         assertEquals(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, eventName);
         assertEquals("1234567890", OMSubscriptionRequest.getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS, OMSubscriptionRequest.getPack());
+        assertEquals(SubscriptionPack.CHOTI_KILKARI, OMSubscriptionRequest.getPack());
         assertEquals(Channel.IVR, OMSubscriptionRequest.getChannel());
         assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
     }

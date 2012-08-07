@@ -429,7 +429,7 @@ public class SubscriptionControllerTest {
         String subscriptionId = "abcd1234";
         String msisdn = "1234567890";
         String channel = Channel.CALL_CENTER.name();
-        String pack = SubscriptionPack.FIFTEEN_MONTHS.name();
+        String pack = SubscriptionPack.BARI_KILKARI.name();
         ChangePackWebRequest changePackWebRequest = new ChangePackWebRequest();
         changePackWebRequest.setSubscriptionId(subscriptionId);
         changePackWebRequest.setMsisdn(msisdn);
@@ -458,7 +458,7 @@ public class SubscriptionControllerTest {
 
     private void mockSubscription(String msisdn) {
         String subscriptionId = "subscription-id";
-        SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
+        SubscriptionPack subscriptionPack = SubscriptionPack.BARI_KILKARI;
         SubscriptionStatus subscriptionStatus = SubscriptionStatus.NEW;
 
         when(mockedSubscription.getMsisdn()).thenReturn(msisdn);

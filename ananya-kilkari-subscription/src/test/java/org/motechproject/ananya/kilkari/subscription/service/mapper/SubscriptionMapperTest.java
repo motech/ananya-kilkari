@@ -23,7 +23,7 @@ public class SubscriptionMapperTest {
     @Before
     public void setUp() throws Exception {
         subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890")
-                .withPack(SubscriptionPack.SEVEN_MONTHS).withCreationDate(DateTime.now())
+                .withPack(SubscriptionPack.NANHI_KILKARI).withCreationDate(DateTime.now())
                 .withStartDate(DateTime.now()).build();
         channel = Channel.IVR;
     }

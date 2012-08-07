@@ -63,7 +63,7 @@ public class SubscriptionValidatorTest {
         when(allSubscriptions.findSubscriptionInProgress(subscription.getMsisdn(), subscription.getPack())).thenReturn(existingActiveSubscription);
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Active subscription already exists for msisdn[9876543210] and pack[FIFTEEN_MONTHS]");
+        expectedException.expectMessage("Active subscription already exists for msisdn[9876543210] and pack[BARI_KILKARI]");
 
         subscriptionValidator.validate(subscription);
     }
@@ -83,30 +83,30 @@ public class SubscriptionValidatorTest {
 
     @Test
     public void shouldFailValidationIfWeekNumberIsOutsidePacksRange() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(30).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withWeek(30).build();
         Location location = subscriptionRequest.getLocation();
         LocationResponse existingLocation = new LocationResponse(location.getDistrict(), location.getBlock(), location.getPanchayat());
         when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(existingLocation);
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Given week[30] is not within the pack[SEVEN_MONTHS] range");
+        expectedException.expectMessage("Given week[30] is not within the pack[NANHI_KILKARI] range");
 
         subscriptionValidator.validate(subscriptionRequest);
     }
 
     @Test
     public void shouldFailValidationAndAppendErrorMessagesIfThereAreMultipleFailures() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(29).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withWeek(29).build();
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Location does not exist for District[district] Block[block] and Panchayat[panchayat],Given week[29] is not within the pack[SEVEN_MONTHS] range");
+        expectedException.expectMessage("Location does not exist for District[district] Block[block] and Panchayat[panchayat],Given week[29] is not within the pack[NANHI_KILKARI] range");
 
         subscriptionValidator.validate(subscriptionRequest);
     }
 
     @Test
     public void blankWeekNumberIsValid() {
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(null).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withWeek(null).build();
         Location location = subscriptionRequest.getLocation();
         LocationResponse existingLocation = new LocationResponse(location.getDistrict(), location.getBlock(), location.getPanchayat());
         when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(existingLocation);

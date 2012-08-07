@@ -13,12 +13,12 @@ public class SubscriptionTest {
     public void shouldInitializeSubscription() {
         DateTime beforeCreation = DateTime.now();
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         DateTime afterCreation = DateTime.now();
 
         assertEquals(SubscriptionStatus.NEW, subscription.getStatus());
         assertEquals(msisdn, subscription.getMsisdn());
-        assertEquals(SubscriptionPack.FIFTEEN_MONTHS, subscription.getPack());
+        assertEquals(SubscriptionPack.BARI_KILKARI, subscription.getPack());
         assertNotNull(subscription.getSubscriptionId());
 
         DateTime creationDate = subscription.getCreationDate();
@@ -29,7 +29,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionToPendingDuringActivationRequest() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         subscription.activationRequestSent();
 
         assertEquals(SubscriptionStatus.PENDING_ACTIVATION, subscription.getStatus());
@@ -40,7 +40,7 @@ public class SubscriptionTest {
     public void shouldChangeStatusOfSubscriptionToActiveForSuccessfulActivation() {
         DateTime createdAt = DateTime.now();
         DateTime activatedOn = createdAt.plus(5000);
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, createdAt, SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, createdAt, SubscriptionStatus.NEW);
         subscription.setStartDate(activatedOn);
         Operator operator = Operator.AIRTEL;
 
@@ -53,7 +53,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionToActivationFailedForUnsuccessfulActivation() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         Operator operator = Operator.AIRTEL;
         subscription.activationFailed(operator.name());
 
@@ -63,7 +63,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionToActivatedAndUpdateRenewalDate() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         subscription.activateOnRenewal();
 
         assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
@@ -71,7 +71,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionSuspendedAndUpdateRenewalDate() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         subscription.suspendOnRenewal();
 
         assertEquals(SubscriptionStatus.SUSPENDED, subscription.getStatus());
@@ -79,7 +79,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusToDeactivatedOnDeactivationOnlyIfPriorStatusIsNotPendingCompleted() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         subscription.deactivate();
 
@@ -88,7 +88,7 @@ public class SubscriptionTest {
     
     @Test
     public void shouldChangeStatusToCompletedOnDeactivationOnlyIfPriorStatusIsPendingCompleted() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
         subscription.deactivate();
 
@@ -97,7 +97,7 @@ public class SubscriptionTest {
 
     @Test
     public void shouldChangeStatusOfSubscriptionToPendingCompletion() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         subscription.complete();
 
         assertEquals(SubscriptionStatus.PENDING_COMPLETION, subscription.getStatus());
@@ -106,7 +106,7 @@ public class SubscriptionTest {
     @Test
     public void shouldReturnIsActiveBasedOnStatus() {
         String msisdn = "9876534211";
-        SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
         Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.NEW);
 
         subscription.setStatus(SubscriptionStatus.ACTIVE);
@@ -199,13 +199,13 @@ public class SubscriptionTest {
     
     @Test
     public void shouldReturnCurrentWeekNumber(){
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.FIFTEEN_MONTHS).withStartDate(DateTime.now().minusWeeks(10)).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withStartDate(DateTime.now().minusWeeks(10)).build();
         assertEquals(11,subscription.getCurrentWeekOfSubscription());
 
-        subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).withStartDate(DateTime.now().minusWeeks(2)).build();
+        subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withStartDate(DateTime.now().minusWeeks(2)).build();
         assertEquals(15,subscription.getCurrentWeekOfSubscription());
 
-        subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withStartDate(DateTime.now().minusWeeks(2)).build();
+        subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withStartDate(DateTime.now().minusWeeks(2)).build();
         assertEquals(35,subscription.getCurrentWeekOfSubscription());
 
   

@@ -28,7 +28,7 @@ public class OnMobileSubscriptionGatewayImplTest {
     @Test
     public void shouldInvokeSubscriptionManagerWithActivationSubscriptionDetails() {
         String msisdn = "msisdn";
-        SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
         Channel channel = Channel.IVR;
         String username = "thoughtworks";
         String password = "password123";
@@ -54,7 +54,7 @@ public class OnMobileSubscriptionGatewayImplTest {
     @Test
     public void shouldInvokeSubscriptionManagerWithDeactivationSubscriptionDetails() {
         String msisdn = "msisdn";
-        SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
         Channel channel = Channel.IVR;
         String username = "thoughtworks";
         String password = "password123";

@@ -38,7 +38,7 @@ public class ChangePackProcessorTest {
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVATION_FAILED).build();
         String subscriptionId = subscription.getSubscriptionId();
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.FIFTEEN_MONTHS, Channel.CALL_CENTER, DateTime.now(), null, null);
+        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null);
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Subscription is not active for subscription "+subscriptionId);
@@ -48,11 +48,11 @@ public class ChangePackProcessorTest {
 
     @Test
     public void changePackRequestPackShouldBeDifferentFromCurrentPack() {
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.FIFTEEN_MONTHS).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).build();
         String subscriptionId = subscription.getSubscriptionId();
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.FIFTEEN_MONTHS, Channel.CALL_CENTER, DateTime.now(), null, null);
+        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null);
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Subscription %s is already subscribed to requested pack ",subscriptionId));
@@ -62,11 +62,11 @@ public class ChangePackProcessorTest {
 
     @Test
     public void shouldInvalidateIfCurrentlyIn12MonthPackAndChangePackRequestedFor15MonthWithoutEddOrDobChange(){
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).build();
         String subscriptionId = subscription.getSubscriptionId();
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.FIFTEEN_MONTHS, Channel.CALL_CENTER, DateTime.now(), null, null);
+        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null);
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Subscription %s is already in %s pack and cannot be moved to an earlier pack ",subscriptionId,subscription.getPack().name()));
@@ -75,11 +75,11 @@ public class ChangePackProcessorTest {
 
     @Test
     public void shouldInvalidateIfCurrentlyIn7MonthPackAndChangePackRequestedFor12MonthWithoutEddOrDobChange(){
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).build();
         String subscriptionId = subscription.getSubscriptionId();
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.TWELVE_MONTHS, Channel.CALL_CENTER, DateTime.now(), null, null);
+        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null);
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Subscription %s is already in %s pack and cannot be moved to an earlier pack ",subscriptionId,subscription.getPack().name()));
@@ -89,12 +89,12 @@ public class ChangePackProcessorTest {
 
     @Test
     public void shouldNotAllowChangePackIfNumberOfWeeksLeftInCurrentPackIsLessThanChangePackRequest() {
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).build();
         subscription.setStartDate(DateTime.now().minusWeeks(24));
         String subscriptionId = subscription.getSubscriptionId();
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.SEVEN_MONTHS, Channel.CALL_CENTER, DateTime.now(), null, null);
+        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null);
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Subscription %s has fewer weeks left than the new pack request",subscriptionId));

@@ -12,7 +12,7 @@ public class CampaignMessageIdStrategyTest {
     public void shouldCreateMessageIdIfPackWasSubscribed2DaysBack() {
         String campaignName = "kilkari-mother-child-campaign-fifteen-months";
 
-        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now().minusDays(2), SubscriptionPack.FIFTEEN_MONTHS);
+        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now().minusDays(2), SubscriptionPack.BARI_KILKARI);
 
         assertEquals("WEEK1", messageId);
     }
@@ -21,7 +21,7 @@ public class CampaignMessageIdStrategyTest {
     public void shouldCreateMessageIdIfPackWasSubscribedToday() {
         String campaignName = "kilkari-mother-child-campaign-twelve-months";
 
-        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now(), SubscriptionPack.TWELVE_MONTHS);
+        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now(), SubscriptionPack.CHOTI_KILKARI);
 
         assertEquals("WEEK13", messageId);
     }
@@ -30,7 +30,7 @@ public class CampaignMessageIdStrategyTest {
     public void shouldCreateMessageIdForInfantDeathCampaign(){
         String campaignName = "kilkari-mother-child-campaign-infant-death";
 
-        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now(), SubscriptionPack.FIFTEEN_MONTHS);
+        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now(), SubscriptionPack.BARI_KILKARI);
 
         assertEquals("ID1", messageId);
     }
@@ -39,7 +39,7 @@ public class CampaignMessageIdStrategyTest {
     public void shouldCreateMessageIdForMiscarriageCampaign(){
         String campaignName = "kilkari-mother-child-campaign-miscarriage";
 
-        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now(), SubscriptionPack.FIFTEEN_MONTHS);
+        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now(), SubscriptionPack.BARI_KILKARI);
 
         assertEquals("MC1", messageId);
     }

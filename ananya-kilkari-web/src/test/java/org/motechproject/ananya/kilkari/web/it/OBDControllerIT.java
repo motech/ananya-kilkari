@@ -60,8 +60,8 @@ public class OBDControllerIT extends SpringIntegrationTest {
     @Test
     public void shouldHandleCallDeliveryFailureRecords() throws Exception {
         String msisdn = "1234567890";
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
         markForDeletion(subscription1);

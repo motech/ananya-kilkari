@@ -88,7 +88,7 @@ public class SubscriptionServiceTest {
     public void shouldCreateNewSubscription() {
         String msisdn = "1234567890";
         Channel channel = Channel.IVR;
-        SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
+        SubscriptionPack subscriptionPack = SubscriptionPack.CHOTI_KILKARI;
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
@@ -132,7 +132,7 @@ public class SubscriptionServiceTest {
     public void shouldPublishReportingEventOnCreatingSubscription() {
         String msisdn = "1234567890";
         Channel channel = Channel.IVR;
-        SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
+        SubscriptionPack subscriptionPack = SubscriptionPack.CHOTI_KILKARI;
         ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
@@ -149,7 +149,7 @@ public class SubscriptionServiceTest {
     public void shouldSendActivationRequestToOMSubscriptionManager_OnCreatingSubscription() {
         String msisdn = "1234567890";
         Channel channel = Channel.IVR;
-        SubscriptionPack subscriptionPack = SubscriptionPack.TWELVE_MONTHS;
+        SubscriptionPack subscriptionPack = SubscriptionPack.CHOTI_KILKARI;
         ArgumentCaptor<OMSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
@@ -167,23 +167,23 @@ public class SubscriptionServiceTest {
     public void shouldGetSubscriptionsResponseForAGivenMsisdn() {
         String msisdn = "1234567890";
         ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
-        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW));
-        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW));
+        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), SubscriptionStatus.NEW));
+        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW));
         when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionsToBeReturned);
 
         List<Subscription> subscriptions = subscriptionService.findByMsisdn(msisdn);
 
         assertEquals(2, subscriptions.size());
         assertEquals(msisdn, subscriptions.get(0).getMsisdn());
-        assertEquals(SubscriptionPack.TWELVE_MONTHS, subscriptions.get(0).getPack());
+        assertEquals(SubscriptionPack.CHOTI_KILKARI, subscriptions.get(0).getPack());
         assertEquals(msisdn, subscriptions.get(1).getMsisdn());
-        assertEquals(SubscriptionPack.FIFTEEN_MONTHS, subscriptions.get(1).getPack());
+        assertEquals(SubscriptionPack.BARI_KILKARI, subscriptions.get(1).getPack());
     }
 
     @Test
     public void shouldFindInProgressSubscriptionByMsisdnAndPack() {
         String msisdn = "1234567890";
-        SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
+        SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
 
         Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.ACTIVE);
         when(allSubscriptions.findSubscriptionInProgress(msisdn, pack)).thenReturn(subscription);
@@ -211,7 +211,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.PENDING_ACTIVATION;
         Subscription mockedSubscription = mock(Subscription.class);
-        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS, Channel.IVR, subscriptionId);
+        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI, Channel.IVR, subscriptionId);
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
@@ -262,7 +262,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED;
         Subscription mockedSubscription = mock(Subscription.class);
-        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.FIFTEEN_MONTHS, Channel.IVR, subscriptionId);
+        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI, Channel.IVR, subscriptionId);
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
@@ -411,7 +411,7 @@ public class SubscriptionServiceTest {
         DateTime date = DateTime.now();
         String reason = "balance is low";
         Integer graceCount = 7;
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW) {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW) {
             public String getSubscriptionId() {
                 return subscriptionId;
             }
@@ -447,7 +447,7 @@ public class SubscriptionServiceTest {
     public void shouldProcessDeactivation() {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.SEVEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         Channel channel = Channel.IVR;
 
@@ -470,7 +470,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldProcessSubscriptionCompletion() {
         final String msisdn = "9988776655";
-        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        final SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
         Subscription subscription = new SubscriptionBuilder().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).withStartDate(DateTime.now().minusWeeks(4)).build();
         final String subscriptionId = subscription.getSubscriptionId();
         final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
@@ -506,7 +506,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldScheduleInboxDeletionUponSubscriptionCompletion() {
         String msisdn = "1234567890";
-        SubscriptionPack pack = SubscriptionPack.SEVEN_MONTHS;
+        SubscriptionPack pack = SubscriptionPack.NANHI_KILKARI;
         Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -521,7 +521,7 @@ public class SubscriptionServiceTest {
         final String msisdn = "9988776655";
         final Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.DEACTIVATED).build();
         final String subscriptionId = subscription.getSubscriptionId();
-        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        final SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
         OMSubscriptionRequest value = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -535,7 +535,7 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldScheduleInboxDeletionUponSubscriptionDeactivation() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.SEVEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.NANHI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -548,7 +548,7 @@ public class SubscriptionServiceTest {
     public void shouldUnScheduleCurrentCampaignAndScheduleNewCampaignForMCOrID() {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
-        SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
+        SubscriptionPack subscriptionPack = SubscriptionPack.BARI_KILKARI;
         int deltaMinutes = 30;
         DateTime friday = new DateTime(2011, 11, 25, 12, 30, 30);
         DateTime existingCampaignStartDate = friday;
@@ -593,7 +593,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = "subscriptionId";
         String message = "some error";
         CampaignChangeReason campaignChangeReason = CampaignChangeReason.MISCARRIAGE;
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_COMPLETION).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.BARI_KILKARI).withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_COMPLETION).build();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         doThrow(new ValidationException(message)).when(subscriptionValidator).validateActiveSubscriptionExists(subscriptionId);
         expectedException.expect(ValidationException.class);
@@ -662,7 +662,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldBackDateStartDateForALateSubscriptionWhenEDDIsGiven() {
         DateTime edd = DateTime.now().plusWeeks(1);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.FIFTEEN_MONTHS).withExpectedDateOfDelivery(edd).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withExpectedDateOfDelivery(edd).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
@@ -675,7 +675,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldBackDateStartDateForALateSubscriptionWhenDOBIsGivenForFifteenMonthsPack() {
         DateTime dob = DateTime.now().minusMonths(1);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.FIFTEEN_MONTHS).withDateOfBirth(dob).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withDateOfBirth(dob).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
@@ -689,7 +689,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldBackDateStartDateForALateSubscriptionWhenDOBIsGivenForTwelveMonthsPack() {
         DateTime dob = DateTime.now().minusMonths(1);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).withDateOfBirth(dob).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withDateOfBirth(dob).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
@@ -703,7 +703,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldBackDateStartDateForALateSubscriptionWhenDOBIsGivenForSevenMonthsPack() {
         DateTime dob = DateTime.now().minusMonths(1);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withDateOfBirth(dob).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withDateOfBirth(dob).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
@@ -717,7 +717,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldBackDateStartDateForALateSubscriptionWhenWeekNumberIsGivenForSevenMonthsPack() {
         Integer weekNumber = 28;
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withWeek(weekNumber).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withWeek(weekNumber).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
@@ -732,7 +732,7 @@ public class SubscriptionServiceTest {
     public void shouldSetDateForAnEarlySubscriptionWhenEDDIsGivenForFifteenMonths() {
         DateTime now = DateTime.now();
         DateTime edd = now.plusMonths(4);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.FIFTEEN_MONTHS).withExpectedDateOfDelivery(edd).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withExpectedDateOfDelivery(edd).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
@@ -748,7 +748,7 @@ public class SubscriptionServiceTest {
     public void shouldSetDateForAnEarlySubscriptionWhenEDDIsGivenForTwelveMonths() {
         DateTime now = DateTime.now();
         DateTime edd = now.plusMonths(4);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).withExpectedDateOfDelivery(edd).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withExpectedDateOfDelivery(edd).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
@@ -763,7 +763,7 @@ public class SubscriptionServiceTest {
     public void shouldSetDateForAnEarlySubscriptionWhenEDDIsGivenForSevenMonths() {
         DateTime now = DateTime.now();
         DateTime edd = now.plusMonths(4);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withExpectedDateOfDelivery(edd).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withExpectedDateOfDelivery(edd).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
@@ -776,7 +776,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldSetDateForAnEarlySubscriptionWhenDOBIsGivenForTwelveMonths() {
         DateTime dob = DateTime.now().plusMonths(3);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).withDateOfBirth(dob).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withDateOfBirth(dob).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
@@ -790,7 +790,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldSetDateForAnEarlySubscriptionWhenDOBIsGivenForSevenMonths() {
         DateTime dob = DateTime.now().plusMonths(3);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.SEVEN_MONTHS).withDateOfBirth(dob).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withDateOfBirth(dob).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
@@ -804,7 +804,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldUnScheduleMessageCampaignAndDeleteCampaignMessageAlertOnSuccessfulDeactivationRequest() {
         DateTime createdAt = DateTime.now();
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.TWELVE_MONTHS, createdAt, SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.CHOTI_KILKARI, createdAt, SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -836,7 +836,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldScheduleEarlySubscription() {
         DateTime dob = DateTime.now().plusMonths(3);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.TWELVE_MONTHS).withDateOfBirth(dob).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withDateOfBirth(dob).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
 
@@ -862,7 +862,7 @@ public class SubscriptionServiceTest {
 //        String subscriptionId = "abcd1234";
 //        String msisdn = "1234567890";
 //        SubscriptionStatus status = SubscriptionStatus.ACTIVE;
-//        SubscriptionPack subscriptionPack = SubscriptionPack.FIFTEEN_MONTHS;
+//        SubscriptionPack subscriptionPack = SubscriptionPack.BARI_KILKARI;
 //        Subscription mockedSubscription = new SubscriptionBuilder().withDefaults().build();
 //
 //        when(mockedSubscription.getStatus()).thenReturn(status);

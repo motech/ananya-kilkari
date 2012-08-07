@@ -44,7 +44,7 @@ public class MessageCampaignServiceTest {
     @Test
     public void shouldStartNewCampaignForTheGivenRequest() {
         String externalId = "externalId";
-        String subscriptionPack = MessageCampaignPack.TWELVE_MONTHS.name();
+        String subscriptionPack = MessageCampaignPack.CHOTI_KILKARI.name();
         DateTime subscriptionStartDate = DateTime.now();
         int campaignScheduleDeltaDays = 2;
         int campaignScheduleDeltaMinutes = 30;
@@ -58,7 +58,7 @@ public class MessageCampaignServiceTest {
         CampaignRequest campaignRequest = campaignRequestArgumentCaptor.getValue();
 
         assertEquals(externalId, campaignRequest.externalId());
-        assertEquals(MessageCampaignPack.TWELVE_MONTHS.getCampaignName(), campaignRequest.campaignName());
+        assertEquals(MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), campaignRequest.campaignName());
         assertEquals(subscriptionStartDate.toLocalDate().plusDays(campaignScheduleDeltaDays), campaignRequest.referenceDate());
         assertEquals(new Time(subscriptionStartDate.toLocalTime().plusMinutes(campaignScheduleDeltaMinutes)), campaignRequest.deliverTime());
     }
@@ -66,7 +66,7 @@ public class MessageCampaignServiceTest {
     @Test
     public void shouldStop() {
         String externalId = "externalId";
-        String subscriptionPack = MessageCampaignPack.TWELVE_MONTHS.name();
+        String subscriptionPack = MessageCampaignPack.CHOTI_KILKARI.name();
         DateTime subscriptionStartDate = DateTime.now();
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 externalId, subscriptionPack, subscriptionStartDate);
@@ -78,7 +78,7 @@ public class MessageCampaignServiceTest {
         CampaignRequest campaignRequest = campaignRequestArgumentCaptor.getValue();
 
         assertEquals(externalId, campaignRequest.externalId());
-        assertEquals(MessageCampaignPack.TWELVE_MONTHS.getCampaignName(), campaignRequest.campaignName());
+        assertEquals(MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), campaignRequest.campaignName());
         assertEquals(subscriptionStartDate.toLocalDate(), campaignRequest.referenceDate());
         assertEquals(new Time(subscriptionStartDate.toLocalTime()), campaignRequest.deliverTime());
     }
@@ -87,7 +87,7 @@ public class MessageCampaignServiceTest {
     public void shouldGetMessageTimingsForASubscription() {
         DateTime startDate = DateTime.now();
         String subscriptionId = "abcd1234";
-        MessageCampaignPack messageCampaignPack = MessageCampaignPack.SEVEN_MONTHS;
+        MessageCampaignPack messageCampaignPack = MessageCampaignPack.NANHI_KILKARI;
         DateTime endDate = startDate.plusYears(2);
         Date messageTime = DateTime.now().toDate();
 
@@ -99,7 +99,7 @@ public class MessageCampaignServiceTest {
                 startDate.toDate(), endDate.toDate())).thenReturn(campaignTimings);
 
         ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<CampaignEnrollmentRecord>();
-        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(subscriptionId, MessageCampaignPack.FIFTEEN_MONTHS.getCampaignName(), startDate.toLocalDate(), CampaignEnrollmentStatus.COMPLETED));
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(subscriptionId, MessageCampaignPack.BARI_KILKARI.getCampaignName(), startDate.toLocalDate(), CampaignEnrollmentStatus.COMPLETED));
         campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(subscriptionId, messageCampaignPack.getCampaignName(), startDate.toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
         when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(campaignEnrollmentRecords);
 

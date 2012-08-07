@@ -1,8 +1,6 @@
 package org.motechproject.ananya.kilkari.builder;
 
-import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.request.ChangePackWebRequest;
-import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
@@ -16,7 +14,7 @@ public class ChangePackWebRequestBuilder {
 
     public ChangePackWebRequestBuilder withDefaults() {
         changePackWebRequest = new ChangePackWebRequest();
-        changePackWebRequest.setPack(SubscriptionPack.FIFTEEN_MONTHS.name());
+        changePackWebRequest.setPack(SubscriptionPack.BARI_KILKARI.name());
         changePackWebRequest.setSubscriptionId("abcd1234");
         changePackWebRequest.setChannel(Channel.CALL_CENTER.name());
         changePackWebRequest.setMsisdn("9876543210");

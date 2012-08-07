@@ -13,7 +13,7 @@ public class SubscriptionRequestBuilder {
     }
 
     public SubscriptionRequestBuilder withDefaults() {
-        request.setPack("FIFTEEN_MONTHS");
+        request.setPack("bari_kilkari");
         request.setChannel("CALL_CENTER");
         request.setMsisdn("9876543210");
         request.setBeneficiaryAge("25");

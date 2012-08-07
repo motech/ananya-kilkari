@@ -15,7 +15,7 @@ public class SubscriptionWebRequestBuilder {
 
     public SubscriptionWebRequestBuilder withDefaults() {
         subscriptionWebRequest = new SubscriptionWebRequest();
-        subscriptionWebRequest.setPack(SubscriptionPack.FIFTEEN_MONTHS.name());
+        subscriptionWebRequest.setPack(SubscriptionPack.BARI_KILKARI.name());
         subscriptionWebRequest.setChannel(Channel.CALL_CENTER.name());
         subscriptionWebRequest.setMsisdn("9876543210");
         subscriptionWebRequest.setBeneficiaryAge("25");

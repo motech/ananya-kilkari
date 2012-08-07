@@ -27,7 +27,7 @@ public class SubscriptionRequestBuilder {
         return withMsisdn("9876543210")
                 .withOperator(Operator.AIRTEL)
                 .withStatus(SubscriptionStatus.ACTIVE)
-                .withPack(SubscriptionPack.FIFTEEN_MONTHS)
+                .withPack(SubscriptionPack.BARI_KILKARI)
                 .withBlock("block")
                 .withDistrict("district")
                 .withPanchayat("panchayat")

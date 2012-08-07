@@ -35,7 +35,7 @@ public class IvrSmokeTest {
     public void shouldPostHttpRequestAndVerifyEntriesInReportDbAndCouchDb() throws InterruptedException, SQLException {
         String channel = "IVR";
         String msisdn = "9000000001";
-        String pack = "FIFTEEN_MONTHS";
+        String pack = "bari_kilkari";
         String expectedStatus = "PENDING_ACTIVATION";
 
         Map<String, String> parametersMap = new HashMap<>();

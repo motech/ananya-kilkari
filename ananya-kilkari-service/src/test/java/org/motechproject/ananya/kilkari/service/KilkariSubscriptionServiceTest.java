@@ -136,7 +136,7 @@ public class KilkariSubscriptionServiceTest {
     @Test
     public void shouldFindInProgressSubscriptionByMsisdnAndPack() {
         String msisdn = "1234567890";
-        SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
+        SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.ACTIVE);
         when(subscriptionService.findSubscriptionInProgress(msisdn, pack)).thenReturn(subscription);
 

@@ -10,18 +10,18 @@ public class SubscriptionPackTest {
 
     @Test
     public void shouldCreateEnumFromString() {
-        assertEquals(SubscriptionPack.from("twelve_months"), SubscriptionPack.TWELVE_MONTHS);
-        assertEquals(SubscriptionPack.from("TWELVE_MONTHS"), SubscriptionPack.TWELVE_MONTHS);
-        assertEquals(SubscriptionPack.from("TWELVE_MONTHs"), SubscriptionPack.TWELVE_MONTHS);
-        assertEquals(SubscriptionPack.from(" TWELVE_MONTHs "), SubscriptionPack.TWELVE_MONTHS);
+        assertEquals(SubscriptionPack.from("choti_kilkari"), SubscriptionPack.CHOTI_KILKARI);
+        assertEquals(SubscriptionPack.from("CHOTI_KILKARI"), SubscriptionPack.CHOTI_KILKARI);
+        assertEquals(SubscriptionPack.from("CHOTI_KILKARi"), SubscriptionPack.CHOTI_KILKARI);
+        assertEquals(SubscriptionPack.from(" CHOTI_KILKARi "), SubscriptionPack.CHOTI_KILKARI);
     }
 
     @Test
     public void shouldReturnTrueIfSubscriptionPackIsValid() {
-        assertTrue(SubscriptionPack.isValid("twelve_months"));
-        assertTrue(SubscriptionPack.isValid("TWELVE_MONTHS"));
-        assertTrue(SubscriptionPack.isValid("TWELVE_MONTHs"));
-        assertTrue(SubscriptionPack.isValid(" TWELVE_MONTHs "));
+        assertTrue(SubscriptionPack.isValid("choti_kilkari"));
+        assertTrue(SubscriptionPack.isValid("CHOTI_KILKARI"));
+        assertTrue(SubscriptionPack.isValid("CHOTI_KILKARi"));
+        assertTrue(SubscriptionPack.isValid(" CHOTI_KiLKARi "));
     }
 
     @Test
@@ -34,22 +34,22 @@ public class SubscriptionPackTest {
 
     @Test
     public void shouldFailValidationIfWeekIsOutOfPacksRange() {
-        assertFalse(SubscriptionPack.FIFTEEN_MONTHS.isValidWeekNumber(-1));
-        assertFalse(SubscriptionPack.FIFTEEN_MONTHS.isValidWeekNumber(61));
-        assertTrue(SubscriptionPack.FIFTEEN_MONTHS.isValidWeekNumber(1));
+        assertFalse(SubscriptionPack.BARI_KILKARI.isValidWeekNumber(-1));
+        assertFalse(SubscriptionPack.BARI_KILKARI.isValidWeekNumber(61));
+        assertTrue(SubscriptionPack.BARI_KILKARI.isValidWeekNumber(1));
 
-        assertFalse(SubscriptionPack.TWELVE_MONTHS.isValidWeekNumber(50));
-        assertTrue(SubscriptionPack.TWELVE_MONTHS.isValidWeekNumber(13));
+        assertFalse(SubscriptionPack.CHOTI_KILKARI.isValidWeekNumber(50));
+        assertTrue(SubscriptionPack.CHOTI_KILKARI.isValidWeekNumber(13));
 
-        assertFalse(SubscriptionPack.SEVEN_MONTHS.isValidWeekNumber(30));
-        assertTrue(SubscriptionPack.SEVEN_MONTHS.isValidWeekNumber(28));
+        assertFalse(SubscriptionPack.NANHI_KILKARI.isValidWeekNumber(30));
+        assertTrue(SubscriptionPack.NANHI_KILKARI.isValidWeekNumber(28));
     }
 
     @Test
     public void shouldSetStartDateThreeMonthsBeforeEDDForFifteenMonthsPack() {
         DateTime now = DateTime.now();
         DateTime edd = now.plusMonths(2);
-        DateTime startDate = SubscriptionPack.FIFTEEN_MONTHS.getStartDate(edd);
+        DateTime startDate = SubscriptionPack.BARI_KILKARI.getStartDate(edd);
 
         assertEquals(edd.getDayOfWeek(), startDate.getDayOfWeek());
         assertTrue(Weeks.weeksBetween(startDate, edd).getWeeks() >= 12);
@@ -59,7 +59,7 @@ public class SubscriptionPackTest {
     public void shouldSetStartDateFiveMonthsAfterDOBForSevenMonthsPack() {
         DateTime now = DateTime.now();
         DateTime dob = now.minusMonths(2);
-        DateTime startDate = SubscriptionPack.SEVEN_MONTHS.getStartDate(dob);
+        DateTime startDate = SubscriptionPack.NANHI_KILKARI.getStartDate(dob);
 
         assertEquals(dob.getDayOfWeek(), startDate.getDayOfWeek());
         assertTrue(Weeks.weeksBetween(dob, startDate).getWeeks() >= 20);
@@ -69,7 +69,7 @@ public class SubscriptionPackTest {
     public void shouldSetStartDateOnSameDateAsDOBForTwelveMonthsPack() {
         DateTime now = DateTime.now();
         DateTime dob = now;
-        DateTime startDate = SubscriptionPack.TWELVE_MONTHS.getStartDate(dob);
+        DateTime startDate = SubscriptionPack.CHOTI_KILKARI.getStartDate(dob);
 
         assertEquals(now, startDate);
     }
@@ -78,19 +78,19 @@ public class SubscriptionPackTest {
     public void shouldSetStartDateBasedOnTheCurrentWeekForFifteenMonthsPack() {
         DateTime now = DateTime.now();
         Integer weekNumber = 4;
-        DateTime startDate = SubscriptionPack.FIFTEEN_MONTHS.getStartDateForWeek(now, weekNumber);
+        DateTime startDate = SubscriptionPack.BARI_KILKARI.getStartDateForWeek(now, weekNumber);
 
         assertEquals(now.minusWeeks(3), startDate);
     }
 
     @Test
     public void shouldCheckIfAPackIsPriorToTheCurrentPack() {
-        assertTrue(SubscriptionPack.FIFTEEN_MONTHS.startsBefore(SubscriptionPack.TWELVE_MONTHS));
-        assertTrue(SubscriptionPack.FIFTEEN_MONTHS.startsBefore(SubscriptionPack.SEVEN_MONTHS));
-        assertTrue(SubscriptionPack.TWELVE_MONTHS.startsBefore(SubscriptionPack.SEVEN_MONTHS));
+        assertTrue(SubscriptionPack.BARI_KILKARI.startsBefore(SubscriptionPack.CHOTI_KILKARI));
+        assertTrue(SubscriptionPack.BARI_KILKARI.startsBefore(SubscriptionPack.NANHI_KILKARI));
+        assertTrue(SubscriptionPack.CHOTI_KILKARI.startsBefore(SubscriptionPack.NANHI_KILKARI));
 
-        assertFalse(SubscriptionPack.SEVEN_MONTHS.startsBefore(SubscriptionPack.FIFTEEN_MONTHS));
-        assertFalse(SubscriptionPack.SEVEN_MONTHS.startsBefore(SubscriptionPack.TWELVE_MONTHS));
-        assertFalse(SubscriptionPack.TWELVE_MONTHS.startsBefore(SubscriptionPack.FIFTEEN_MONTHS));
+        assertFalse(SubscriptionPack.NANHI_KILKARI.startsBefore(SubscriptionPack.BARI_KILKARI));
+        assertFalse(SubscriptionPack.NANHI_KILKARI.startsBefore(SubscriptionPack.CHOTI_KILKARI));
+        assertFalse(SubscriptionPack.CHOTI_KILKARI.startsBefore(SubscriptionPack.BARI_KILKARI));
     }
 }

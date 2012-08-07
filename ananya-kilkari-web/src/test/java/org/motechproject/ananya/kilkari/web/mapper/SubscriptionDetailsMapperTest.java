@@ -27,7 +27,7 @@ public class SubscriptionDetailsMapperTest {
 
     @Test
     public void shouldMapFromSubscriptionToSubscriptionDetails() {
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now()).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.BARI_KILKARI).withCreationDate(DateTime.now()).build();
 
         SubscriptionDetails subscriptionDetails = subscriptionDetailsMapper.mapFrom(subscription);
 
@@ -39,7 +39,7 @@ public class SubscriptionDetailsMapperTest {
     @Test
     public void shouldIncludeLastCampaignIdInTheSubscriptionDetails() {
         String messageId = "week3";
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("9988776655").withPack(SubscriptionPack.FIFTEEN_MONTHS).withCreationDate(DateTime.now().minusWeeks(3)).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("9988776655").withPack(SubscriptionPack.BARI_KILKARI).withCreationDate(DateTime.now().minusWeeks(3)).build();
         when(inboxService.getMessageFor(subscription.getSubscriptionId())).thenReturn(messageId);
 
         SubscriptionDetails subscriptionDetails = subscriptionDetailsMapper.mapFrom(subscription);

@@ -77,8 +77,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     public void shouldRetrieveSubscriptionDetailsFromDatabase() throws Exception {
         String msisdn = "9876543210";
         String channelString = Channel.IVR.toString();
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.TWELVE_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.FIFTEEN_MONTHS, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
         markForDeletion(subscription1);
@@ -107,7 +107,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     public void shouldCreateSubscriptionForTheGivenMsisdnForTheIVRChannel() throws Exception {
         final String msisdn = "9876543210";
         String channelString = Channel.IVR.toString();
-        final SubscriptionPack pack = SubscriptionPack.TWELVE_MONTHS;
+        final SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         reportingService.setBehavior(mock(ReportingService.class));
@@ -145,7 +145,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     public void shouldCreateSubscriptionForTheGivenMsisdnForTheCallCentreChannel() throws Exception {
         final String msisdn = "9876543210";
         String channelString = Channel.CALL_CENTER.toString();
-        final SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
+        final SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
@@ -187,10 +187,10 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     public void shouldCreateAndScheduleAnEarlySubscription() throws Exception {
         final String msisdn = "9876543210";
         final String channelString = Channel.CALL_CENTER.toString();
-        final SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
+        final SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         DateTime now = DateTime.now();
         DateTime edd = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0).plusMonths(4);
-        DateTime expectedStartDate = SubscriptionPack.FIFTEEN_MONTHS.getStartDate(edd);
+        DateTime expectedStartDate = SubscriptionPack.BARI_KILKARI.getStartDate(edd);
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
@@ -232,7 +232,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     public void shouldDeactivateSubscriptionForTheGivenMsisdnForTheCallCentreChannel() throws Exception {
         final String msisdn = "1111111111";
         String channelString = Channel.CALL_CENTER.toString();
-        final SubscriptionPack pack = SubscriptionPack.FIFTEEN_MONTHS;
+        final SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         BaseResponse expectedResponse = BaseResponse.success("Subscription unsubscribed successfully");
 
         reportingService.setBehavior(Mockito.mock(ReportingService.class));

@@ -54,7 +54,7 @@ public class CallDetailsReportRequestMapperTest {
         CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(startTime, endTime);
         String msisdn = "1234567890";
         String campaignId = "WEEK12";
-        String pack = SubscriptionPack.TWELVE_MONTHS.name();
+        String pack = SubscriptionPack.CHOTI_KILKARI.name();
         Subscription subscription = Mockito.mock(Subscription.class);
         when(subscription.getSubscriptionId()).thenReturn(subscriptionId);
         InboxCallDetailsWebRequest webRequest = new InboxCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, pack);

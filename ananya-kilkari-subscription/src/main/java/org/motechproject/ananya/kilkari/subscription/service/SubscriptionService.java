@@ -272,7 +272,7 @@ public class SubscriptionService {
         Subscription newSubscription = createSubscriptionWithNewPack(changePackRequest);
 
         reportingService.reportChangePack(new SubscriptionChangePackRequest(newSubscription.getMsisdn(), newSubscription.getSubscriptionId(), newSubscription.getPack().name(),
-                changePackRequest.getChannel().name(), changePackRequest.getCreatedAt(), changePackRequest.getExpectedDateOfDelivery(), changePackRequest.getDateOfBirth()));
+                changePackRequest.getChannel().name(), newSubscription.getStatus().name(), changePackRequest.getCreatedAt(), changePackRequest.getExpectedDateOfDelivery(), changePackRequest.getDateOfBirth(), newSubscription.getStartDate()));
     }
 
     private void unScheduleCampaign(Subscription subscription) {

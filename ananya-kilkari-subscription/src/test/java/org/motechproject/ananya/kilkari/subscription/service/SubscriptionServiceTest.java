@@ -916,7 +916,9 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionSaved.getSubscriptionId(), reportRequest.getSubscriptionId());
         assertEquals(requestedPack.name(), reportRequest.getPack());
         assertEquals(Channel.CALL_CENTER.name(), reportRequest.getChannel());
+        assertEquals(subscriptionSaved.getStatus().name(), reportRequest.getSubscriptionStatus());
         assertEquals(dateOfBirth, reportRequest.getDateOfBirth());
+        assertEquals(subscriptionSaved.getStartDate(), reportRequest.getStartDate());
         assertNull(reportRequest.getExpectedDateOfDelivery());
     }
 

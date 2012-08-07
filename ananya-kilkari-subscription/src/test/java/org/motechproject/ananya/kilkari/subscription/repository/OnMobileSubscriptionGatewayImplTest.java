@@ -34,8 +34,6 @@ public class OnMobileSubscriptionGatewayImplTest {
         String password = "password123";
         String subscriptionId = "abcd1234";
         when(onMobileEndpoints.activateSubscriptionURL()).thenReturn("url");
-        when(onMobileEndpoints.username()).thenReturn("thoughtworks");
-        when(onMobileEndpoints.password()).thenReturn("password123");
         OnMobileSubscriptionGatewayImpl onMobileSubscriptionService = new OnMobileSubscriptionGatewayImpl(restTemplate, onMobileEndpoints);
 
         onMobileSubscriptionService.activateSubscription(new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId));
@@ -45,8 +43,6 @@ public class OnMobileSubscriptionGatewayImplTest {
         urlVariables.put("srvkey", pack.name());
         urlVariables.put("mode", channel.name());
         urlVariables.put("refid", subscriptionId);
-        urlVariables.put("user", username);
-        urlVariables.put("pass", password);
 
         verify(restTemplate).getForEntity("url", String.class, urlVariables);
     }
@@ -56,12 +52,8 @@ public class OnMobileSubscriptionGatewayImplTest {
         String msisdn = "msisdn";
         SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
         Channel channel = Channel.IVR;
-        String username = "thoughtworks";
-        String password = "password123";
         String subscriptionId = "abcd1234";
         when(onMobileEndpoints.deactivateSubscriptionURL()).thenReturn("url");
-        when(onMobileEndpoints.username()).thenReturn("thoughtworks");
-        when(onMobileEndpoints.password()).thenReturn("password123");
         OnMobileSubscriptionGatewayImpl onMobileSubscriptionService = new OnMobileSubscriptionGatewayImpl(restTemplate, onMobileEndpoints);
 
         onMobileSubscriptionService.deactivateSubscription(new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId));
@@ -71,8 +63,6 @@ public class OnMobileSubscriptionGatewayImplTest {
         urlVariables.put("srvkey", pack.name());
         urlVariables.put("mode", channel.name());
         urlVariables.put("refid", subscriptionId);
-        urlVariables.put("user", username);
-        urlVariables.put("pass", password);
 
         verify(restTemplate).getForEntity("url", String.class, urlVariables);
     }

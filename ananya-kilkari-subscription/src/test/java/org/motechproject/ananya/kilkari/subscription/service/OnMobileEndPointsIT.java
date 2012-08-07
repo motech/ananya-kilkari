@@ -19,12 +19,6 @@ public class OnMobileEndPointsIT extends SpringIntegrationTest {
     public void shouldCreateSubscriptionActivationRequest() throws IOException {
         String url = onMobileEndpoints.activateSubscriptionURL();
 
-        assertThat(url, is("http://localhost:1111/OMSM/ActivateSubscription?msisdn={msisdn}&srvkey={srvkey}&mode={mode}&refid={refid}&user={user}&pass={pass}"));
-    }
-
-    @Test
-    public void shouldReadOMSMUsernameAndPassword() {
-        assertThat(onMobileEndpoints.username(), is("username"));
-        assertThat(onMobileEndpoints.password(), is("password"));
+        assertThat(url, is("http://localhost:1111/OMSM/ActivateSubscription?msisdn={msisdn}&srvkey={srvkey}&mode={mode}&refid={refid}"));
     }
 }

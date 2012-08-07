@@ -54,8 +54,6 @@ public class OnMobileSubscriptionGatewayImpl implements OnMobileSubscriptionGate
         urlVariables.put("srvkey", omSubscriptionRequest.getPack().name());
         urlVariables.put("mode", omSubscriptionRequest.getChannel().name());
         urlVariables.put("refid", omSubscriptionRequest.getSubscriptionId());
-        urlVariables.put("user", onMobileEndpoints.username());
-        urlVariables.put("pass", onMobileEndpoints.password());
         return urlVariables;
     }
 }

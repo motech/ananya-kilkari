@@ -17,24 +17,14 @@ public class OnMobileEndpoints {
     }
 
     public String activateSubscriptionURL() {
-        return String.format("%s/%s?msisdn={msisdn}&srvkey={srvkey}&mode={mode}&refid={refid}&user={user}&pass={pass}",
-                baseUrl(), kilkariProperties.get("omsm.activate.subscription.url"));
+        return String.format("%s/%s", baseUrl(), kilkariProperties.get("omsm.activate.subscription.url"));
     }
 
     public String deactivateSubscriptionURL() {
-        return String.format("%s/%s?msisdn={msisdn}&srvkey={srvkey}&mode={mode}&refid={refid}&user={user}&pass={pass}",
-                baseUrl(), kilkariProperties.get("omsm.deactivate.subscription.url"));
+        return String.format("%s/%s", baseUrl(), kilkariProperties.get("omsm.deactivate.subscription.url"));
     }
 
     private String baseUrl() {
         return kilkariProperties.getProperty("omsm.base.url");
-    }
-
-    public String username() {
-        return kilkariProperties.getProperty("omsm.username");
-    }
-
-    public String password() {
-        return kilkariProperties.getProperty("omsm.password");
     }
 }

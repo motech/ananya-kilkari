@@ -12,6 +12,9 @@ public class User {
 
     public void messageIsReady(SubscriptionData subscriptionData, String weekMessageId) {
         campaignMessageVerifier.verifyCampaignMessageExists(subscriptionData, weekMessageId);
+    }
 
+    public void messageIsNotReady(SubscriptionData subscriptionData, String weekMessageId) {
+        campaignMessageVerifier.verifyCampaignMessageDoesNotExists(subscriptionData, weekMessageId);
     }
 }

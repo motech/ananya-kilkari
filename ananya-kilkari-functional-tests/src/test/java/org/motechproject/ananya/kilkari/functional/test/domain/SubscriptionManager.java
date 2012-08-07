@@ -45,4 +45,18 @@ public class SubscriptionManager {
                         ));
         subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.ACTIVE);
     }
+
+    public void failsRenew(SubscriptionData subscriptionData) throws Exception {
+        mockMvc(subscriptionController)
+                .perform(put(String.format("/subscription/%s", subscriptionData.getSubscriptionId()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                new CallBackRequestBuilder().forMsisdn(subscriptionData.getMsisdn())
+                                        .forAction("REN")
+                                        .forStatus("BAL_LOW")
+                                        .build()
+                                        .getBytes()
+                        ));
+        subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.SUSPENDED);
+    }
 }

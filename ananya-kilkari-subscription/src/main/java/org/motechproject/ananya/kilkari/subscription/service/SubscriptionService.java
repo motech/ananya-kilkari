@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.contract.request.SubscriberLocation;
 import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
@@ -272,7 +273,7 @@ public class SubscriptionService {
         requestDeactivation(new DeactivationRequest(subscriptionId, changePackRequest.getChannel(), changePackRequest.getCreatedAt()));
         Subscription newSubscription = createSubscriptionWithNewPack(changePackRequest);
 
-        reportingService.reportChangePack(new SubscriptionChangePackRequest(newSubscription.getMsisdn(), newSubscription.getSubscriptionId(), newSubscription.getPack().name(),
+        reportingService.reportChangePack(new SubscriptionChangePackRequest(NumberUtils.createLong(newSubscription.getMsisdn()), newSubscription.getSubscriptionId(), subscriptionId, newSubscription.getPack().name(),
                 changePackRequest.getChannel().name(), newSubscription.getStatus().name(), changePackRequest.getCreatedAt(), changePackRequest.getExpectedDateOfDelivery(), changePackRequest.getDateOfBirth(), newSubscription.getStartDate()));
     }
 

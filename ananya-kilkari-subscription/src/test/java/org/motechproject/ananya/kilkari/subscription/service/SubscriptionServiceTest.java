@@ -912,7 +912,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<SubscriptionChangePackRequest> reportRequestCaptor = ArgumentCaptor.forClass(SubscriptionChangePackRequest.class);
         order.verify(reportingServiceImpl).reportChangePack(reportRequestCaptor.capture());
         SubscriptionChangePackRequest reportRequest = reportRequestCaptor.getValue();
-        assertEquals(msisdn, reportRequest.getMsisdn());
+        assertEquals(msisdn, reportRequest.getMsisdn().toString());
         assertEquals(subscriptionSaved.getSubscriptionId(), reportRequest.getSubscriptionId());
         assertEquals(requestedPack.name(), reportRequest.getPack());
         assertEquals(Channel.CALL_CENTER.name(), reportRequest.getChannel());

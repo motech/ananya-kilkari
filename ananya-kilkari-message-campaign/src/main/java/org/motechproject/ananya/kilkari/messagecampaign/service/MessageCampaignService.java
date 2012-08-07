@@ -96,7 +96,7 @@ public class MessageCampaignService {
         return activeCampaigns.get(0).getStartDate();
     }
 
-    private String getActiveCampaignName(String subscriptionId) {
+    public String getActiveCampaignName(String subscriptionId) {
         List<MessageCampaignEnrollment> activeCampaigns = getActiveCampaigns(subscriptionId);
         if(activeCampaigns.isEmpty())
             return null;

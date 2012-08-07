@@ -8,6 +8,7 @@ import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChange
 import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
+import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
@@ -275,19 +276,22 @@ public class SubscriptionService {
     }
 
     private void unScheduleCampaign(Subscription subscription) {
-        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStartDate());
+        String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
+        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getStartDate());
         messageCampaignService.stop(unEnrollRequest);
     }
 
     private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest, DateTime nextAlertDateTime) {
+        String campaignName = MessageCampaignPack.from(campaignRescheduleRequest.getReason().name()).getCampaignName();
         MessageCampaignRequest enrollRequest = new MessageCampaignRequest(campaignRescheduleRequest.getSubscriptionId(),
-                campaignRescheduleRequest.getReason().name(), nextAlertDateTime);
+                campaignName, nextAlertDateTime);
         messageCampaignService.start(enrollRequest, 0, kilkariPropertiesData.getCampaignScheduleDeltaMinutes());
     }
 
     private void scheduleCampaign(Subscription subscription, DateTime activatedOn) {
+        String campaignName = MessageCampaignPack.from(subscription.getPack().name()).getCampaignName();
         MessageCampaignRequest campaignRequest = new MessageCampaignRequest(
-                subscription.getSubscriptionId(), subscription.getPack().name(), activatedOn);
+                subscription.getSubscriptionId(), campaignName, activatedOn);
         messageCampaignService.start(campaignRequest, kilkariPropertiesData.getCampaignScheduleDeltaDays(), kilkariPropertiesData.getCampaignScheduleDeltaMinutes());
     }
 

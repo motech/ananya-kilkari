@@ -7,12 +7,12 @@ import org.joda.time.DateTime;
 public class MessageCampaignRequest {
 
     private String externalId;
-    private String subscriptionPack;
+    private String campaignName;
     private DateTime subscriptionStartDate;
 
-    public MessageCampaignRequest(String externalId, String subscriptionPack, DateTime subscriptionStartDate) {
+    public MessageCampaignRequest(String externalId, String campaignName, DateTime subscriptionStartDate) {
         this.externalId = externalId;
-        this.subscriptionPack = subscriptionPack;
+        this.campaignName = campaignName;
         this.subscriptionStartDate = subscriptionStartDate;
     }
 
@@ -20,8 +20,8 @@ public class MessageCampaignRequest {
         return externalId;
     }
 
-    public String getSubscriptionPack() {
-        return subscriptionPack;
+    public String getCampaignName() {
+        return campaignName;
     }
 
     public DateTime getSubscriptionStartDate() {

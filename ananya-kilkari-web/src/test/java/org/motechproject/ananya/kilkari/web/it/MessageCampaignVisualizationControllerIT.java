@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.web.it;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -36,7 +37,7 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
         markForDeletion(subscription);
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                subscription.getSubscriptionId(), subscriptionPack.name(), subscription.getStartDate());
+                subscription.getSubscriptionId(), MessageCampaignPack.BARI_KILKARI.getCampaignName(), subscription.getStartDate());
         messageCampaignService.start(messageCampaignRequest, 0, 0);
 
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()

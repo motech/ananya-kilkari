@@ -48,7 +48,7 @@ public class MessageCampaignServiceIT {
         DateTime referenceDate = DateTime.now().plusDays(1);
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                "my_id1", MessageCampaignPack.NANHI_KILKARI.name(), referenceDate);
+                "my_id1", MessageCampaignPack.NANHI_KILKARI.getCampaignName(), referenceDate);
 
         messageCampaignService.start(messageCampaignRequest, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
 
@@ -70,7 +70,7 @@ public class MessageCampaignServiceIT {
         DateTime referenceDate = DateTime.now().plusDays(1);
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                "my_id2", MessageCampaignPack.CHOTI_KILKARI.name(), referenceDate);
+                "my_id2", MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), referenceDate);
 
         messageCampaignService.start(messageCampaignRequest, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
 
@@ -93,7 +93,7 @@ public class MessageCampaignServiceIT {
         DateTime referenceDate = DateTime.now().plusDays(1);
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                "my_id3", MessageCampaignPack.BARI_KILKARI.name(), referenceDate);
+                "my_id3", MessageCampaignPack.BARI_KILKARI.getCampaignName(), referenceDate);
 
         messageCampaignService.start(messageCampaignRequest, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
 
@@ -118,7 +118,7 @@ public class MessageCampaignServiceIT {
 
         String externalId = "my_id4";
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                externalId, MessageCampaignPack.BARI_KILKARI.name(), referenceDate);
+                externalId, MessageCampaignPack.BARI_KILKARI.getCampaignName(), referenceDate);
 
         messageCampaignService.start(messageCampaignRequest, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
         CampaignEnrollment enrollment = allCampaignEnrollments.findByExternalId(externalId).get(0);
@@ -127,7 +127,7 @@ public class MessageCampaignServiceIT {
 
         DateTime referenceDate2 = referenceDate.plusMonths(1);
         MessageCampaignRequest messageCampaignRequest2 = new MessageCampaignRequest(
-                externalId, MessageCampaignPack.CHOTI_KILKARI.name(), referenceDate2);
+                externalId, MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), referenceDate2);
 
         messageCampaignService.start(messageCampaignRequest2, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
 

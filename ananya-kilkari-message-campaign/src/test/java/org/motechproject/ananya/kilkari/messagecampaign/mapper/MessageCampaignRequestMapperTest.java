@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequestMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
@@ -21,7 +22,7 @@ public class MessageCampaignRequestMapperTest {
         int deltaDays = 2;
         int deltaMinutes = 30;
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                "externalId", "choti_kilkari", new DateTime(2012, 5, 5, 0, 0));
+                "externalId", MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), new DateTime(2012, 5, 5, 0, 0));
 
         CampaignRequest campaignRequest = MessageCampaignRequestMapper.newRequestFrom(messageCampaignRequest, deltaDays, deltaMinutes);
 

@@ -9,12 +9,11 @@ import org.motechproject.server.messagecampaign.contract.CampaignRequest;
 public class MessageCampaignRequestMapper {
 
     public static CampaignRequest newRequestFrom(MessageCampaignRequest messageCampaignRequest, Integer campaignScheduleDeltaDays, Integer campaignScheduleDeltaMinutes) {
-        String campaignName = MessageCampaignPack.from(messageCampaignRequest.getSubscriptionPack()).getCampaignName();
         Time reminderTime = new Time(messageCampaignRequest.getSubscriptionStartDate().plusMinutes(campaignScheduleDeltaMinutes).toLocalTime());
         DateTime referenceDate = messageCampaignRequest.getSubscriptionStartDate();
 
         LocalDate referenceDateWithDelta = referenceDate.plusDays(campaignScheduleDeltaDays).toLocalDate();
-        CampaignRequest campaignRequest = new CampaignRequest(messageCampaignRequest.getExternalId(), campaignName, referenceDateWithDelta, reminderTime);
+        CampaignRequest campaignRequest = new CampaignRequest(messageCampaignRequest.getExternalId(), messageCampaignRequest.getCampaignName(), referenceDateWithDelta, reminderTime);
         campaignRequest.setStartTime(reminderTime);
         return campaignRequest;
     }

@@ -44,7 +44,7 @@ public class MessageCampaignServiceTest {
     @Test
     public void shouldStartNewCampaignForTheGivenRequest() {
         String externalId = "externalId";
-        String subscriptionPack = MessageCampaignPack.CHOTI_KILKARI.name();
+        String subscriptionPack = MessageCampaignPack.CHOTI_KILKARI.getCampaignName();
         DateTime subscriptionStartDate = DateTime.now();
         int campaignScheduleDeltaDays = 2;
         int campaignScheduleDeltaMinutes = 30;
@@ -58,7 +58,7 @@ public class MessageCampaignServiceTest {
         CampaignRequest campaignRequest = campaignRequestArgumentCaptor.getValue();
 
         assertEquals(externalId, campaignRequest.externalId());
-        assertEquals(MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), campaignRequest.campaignName());
+        assertEquals(subscriptionPack, campaignRequest.campaignName());
         assertEquals(subscriptionStartDate.toLocalDate().plusDays(campaignScheduleDeltaDays), campaignRequest.referenceDate());
         assertEquals(new Time(subscriptionStartDate.toLocalTime().plusMinutes(campaignScheduleDeltaMinutes)), campaignRequest.deliverTime());
     }
@@ -66,7 +66,7 @@ public class MessageCampaignServiceTest {
     @Test
     public void shouldStop() {
         String externalId = "externalId";
-        String subscriptionPack = MessageCampaignPack.CHOTI_KILKARI.name();
+        String subscriptionPack = MessageCampaignPack.CHOTI_KILKARI.getCampaignName();
         DateTime subscriptionStartDate = DateTime.now();
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 externalId, subscriptionPack, subscriptionStartDate);
@@ -78,7 +78,7 @@ public class MessageCampaignServiceTest {
         CampaignRequest campaignRequest = campaignRequestArgumentCaptor.getValue();
 
         assertEquals(externalId, campaignRequest.externalId());
-        assertEquals(MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), campaignRequest.campaignName());
+        assertEquals(subscriptionPack, campaignRequest.campaignName());
         assertEquals(subscriptionStartDate.toLocalDate(), campaignRequest.referenceDate());
         assertEquals(new Time(subscriptionStartDate.toLocalTime()), campaignRequest.deliverTime());
     }

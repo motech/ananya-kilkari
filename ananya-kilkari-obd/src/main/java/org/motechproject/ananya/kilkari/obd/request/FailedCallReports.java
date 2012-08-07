@@ -10,7 +10,7 @@ import java.util.List;
 
 public class FailedCallReports implements Serializable {
 
-    @JsonProperty ("callDeliveryFailureRecordObjects")
+    @JsonProperty ("callrecords")
     private List<FailedCallReport> failedCallReports = new ArrayList<>();
 
     @JsonIgnore

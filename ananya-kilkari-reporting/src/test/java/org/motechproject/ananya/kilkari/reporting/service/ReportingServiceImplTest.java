@@ -3,10 +3,7 @@ package org.motechproject.ananya.kilkari.reporting.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.kilkari.contract.request.*;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.http.client.service.HttpClientService;
@@ -93,5 +90,13 @@ public class ReportingServiceImplTest {
         reportingServiceImpl.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
 
         verify(reportGateway).reportChangeMsisdnForSubscriber(subscriptionId,msisdn);
+    }
+
+    public void shouldReportASubscriptionChangePack() {
+        SubscriptionChangePackRequest changePackRequest = mock(SubscriptionChangePackRequest.class);
+
+        reportingServiceImpl.reportChangePack(changePackRequest);
+
+        verify(reportGateway).reportSubscriptionChangePack(changePackRequest);
     }
 }

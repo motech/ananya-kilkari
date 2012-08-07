@@ -1,9 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.kilkari.contract.request.*;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
@@ -64,6 +61,12 @@ public class StubReportingService implements ReportingService {
     public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
         if (verify()) {
             behavior.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        }
+    }
+
+    public void reportChangePack(SubscriptionChangePackRequest changePackRequest) {
+        if (verify()) {
+            behavior.reportChangePack(changePackRequest);
         }
     }
 

@@ -1,9 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.kilkari.contract.request.*;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
@@ -56,6 +53,12 @@ public class StubReportingGateway implements ReportingGateway {
     public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
         if (verify())
             behavior.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+
+    }
+
+    public void reportSubscriptionChangePack(SubscriptionChangePackRequest changePackRequest) {
+        if (verify())
+            behavior.reportSubscriptionChangePack(changePackRequest);
     }
 
     public void setBehavior(ReportingGateway behavior) {

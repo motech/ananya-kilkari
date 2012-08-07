@@ -93,7 +93,7 @@ public class KilkariSubscriptionServiceTest {
         kilkariSubscriptionService.createSubscription(subscriptionWebRequest);
 
         ArgumentCaptor<SubscriptionRequest> subscriptionArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
-        verify(subscriptionService).createSubscription(subscriptionArgumentCaptor.capture(), eq(Channel.CALL_CENTER));
+        verify(subscriptionService).createSubscriptionWithReporting(subscriptionArgumentCaptor.capture(), eq(Channel.CALL_CENTER));
         SubscriptionRequest actualSubscription = subscriptionArgumentCaptor.getValue();
         assertEquals(subscriptionWebRequest.getMsisdn(), actualSubscription.getMsisdn());
     }
@@ -106,14 +106,14 @@ public class KilkariSubscriptionServiceTest {
 
         kilkariSubscriptionService.createSubscription(subscriptionWebRequest);
 
-        verify(subscriptionService, never()).createSubscription(any(SubscriptionRequest.class), any(Channel.class));
+        verify(subscriptionService, never()).createSubscriptionWithReporting(any(SubscriptionRequest.class), any(Channel.class));
     }
 
     @Test
     public void shouldJustLogIfSubscriptionAlreadyExists() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().build();
 
-        when(subscriptionService.createSubscription(any(SubscriptionRequest.class), any(Channel.class))).thenThrow(new DuplicateSubscriptionException(""));
+        when(subscriptionService.createSubscriptionWithReporting(any(SubscriptionRequest.class), any(Channel.class))).thenThrow(new DuplicateSubscriptionException(""));
 
         try {
             kilkariSubscriptionService.createSubscription(subscriptionWebRequest);

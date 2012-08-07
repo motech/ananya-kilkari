@@ -1,9 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.kilkari.contract.request.*;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 
@@ -21,4 +18,6 @@ public interface ReportingGateway {
     void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest);
 
     void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn);
+
+    void reportSubscriptionChangePack(SubscriptionChangePackRequest changePackRequest);
 }

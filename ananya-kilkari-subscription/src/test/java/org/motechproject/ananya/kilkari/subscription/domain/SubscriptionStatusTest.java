@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.subscription.domain;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class SubscriptionStatusTest {
@@ -21,5 +22,10 @@ public class SubscriptionStatusTest {
         assertFalse(SubscriptionStatus.PENDING_ACTIVATION.canChangePack());
         assertFalse(SubscriptionStatus.PENDING_COMPLETION.canChangePack());
         assertFalse(SubscriptionStatus.PENDING_DEACTIVATION.canChangePack());
+    }
+
+    @Test
+    public void shouldCheckForEarlySubscriptionStatus() {
+        assertTrue(SubscriptionStatus.NEW_EARLY.isNewEarly());
     }
 }

@@ -135,6 +135,11 @@ public class Subscription extends MotechBaseDataObject {
         return status.isActive();
     }
 
+    @JsonIgnore
+    public boolean isNewEarly() {
+        return status.isNewEarly();
+    }
+
     public void activateOnRenewal() {
         setStatus(SubscriptionStatus.ACTIVE);
     }

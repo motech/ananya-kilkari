@@ -6,4 +6,5 @@ public class URLPath {
     public static final String CALL_DETAILS_PATH = "callDetails";
     public static final String SUBSCRIBER_UPDATE_PATH = "subscriber";
     public static final String GET_LOCATION_PATH = "location";
+    public static final String SUBSCRIPTION_CHANGE_PACK_PATH = "subscription/changepack";
 }

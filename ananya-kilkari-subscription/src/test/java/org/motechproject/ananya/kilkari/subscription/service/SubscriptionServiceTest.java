@@ -12,6 +12,7 @@ import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionChangePackRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
@@ -31,6 +32,7 @@ import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertie
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
@@ -82,11 +84,14 @@ public class SubscriptionServiceTest {
     private MotechSchedulerService motechSchedulerService;
     @Mock
     private ChangeMsisdnValidator changeMsisdnValidator;
+    @Mock
+    private ChangePackProcessor changePackProcessor;
 
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl, inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator);
+        subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl,
+                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changePackProcessor, changeMsisdnValidator);
     }
 
     @Test
@@ -97,7 +102,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
-        Subscription createdSubscription = subscriptionService.createSubscription(subscription, channel);
+        Subscription createdSubscription = subscriptionService.createSubscriptionWithReporting(subscription, channel);
 
         assertNotNull(createdSubscription);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -112,7 +117,7 @@ public class SubscriptionServiceTest {
     public void shouldValidateSubscriptionRequestOnCreation() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         verify(subscriptionValidator).validate(any(SubscriptionRequest.class));
     }
@@ -123,7 +128,7 @@ public class SubscriptionServiceTest {
         doThrow(new ValidationException("")).when(subscriptionValidator).validate(any(SubscriptionRequest.class));
 
         try {
-            subscriptionService.createSubscription(subscription, Channel.CALL_CENTER);
+            subscriptionService.createSubscriptionWithReporting(subscription, Channel.CALL_CENTER);
         } catch (ValidationException e) {
             //ignore
         }
@@ -142,7 +147,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
-        subscriptionService.createSubscription(subscription, channel);
+        subscriptionService.createSubscriptionWithReporting(subscription, channel);
 
         verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
         SubscriptionReportRequest actualSubscriptionCreationReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
@@ -159,7 +164,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<OMSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
-        subscriptionService.createSubscription(subscription, channel);
+        subscriptionService.createSubscriptionWithReporting(subscription, channel);
 
         verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(subscriptionActivationRequestArgumentCaptor.capture());
         OMSubscriptionRequest actualOMSubscriptionRequest = subscriptionActivationRequestArgumentCaptor.getValue();
@@ -670,7 +675,7 @@ public class SubscriptionServiceTest {
         DateTime edd = DateTime.now().plusWeeks(1);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withExpectedDateOfDelivery(edd).build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -683,7 +688,7 @@ public class SubscriptionServiceTest {
         DateTime dob = DateTime.now().minusMonths(1);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withDateOfBirth(dob).build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -697,7 +702,7 @@ public class SubscriptionServiceTest {
         DateTime dob = DateTime.now().minusMonths(1);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withDateOfBirth(dob).build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -711,7 +716,7 @@ public class SubscriptionServiceTest {
         DateTime dob = DateTime.now().minusMonths(1);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withDateOfBirth(dob).build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -725,7 +730,7 @@ public class SubscriptionServiceTest {
         Integer weekNumber = 28;
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withWeek(weekNumber).build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -740,7 +745,7 @@ public class SubscriptionServiceTest {
         DateTime edd = now.plusMonths(4);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withExpectedDateOfDelivery(edd).build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -756,7 +761,7 @@ public class SubscriptionServiceTest {
         DateTime edd = now.plusMonths(4);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withExpectedDateOfDelivery(edd).build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -771,7 +776,7 @@ public class SubscriptionServiceTest {
         DateTime edd = now.plusMonths(4);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withExpectedDateOfDelivery(edd).build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -784,7 +789,7 @@ public class SubscriptionServiceTest {
         DateTime dob = DateTime.now().plusMonths(3);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withDateOfBirth(dob).build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -798,7 +803,7 @@ public class SubscriptionServiceTest {
         DateTime dob = DateTime.now().plusMonths(3);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withDateOfBirth(dob).build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
@@ -833,7 +838,7 @@ public class SubscriptionServiceTest {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(subscriptionPack).withDateOfBirth(dob).withWeek(weekNumber).build();
         when(subscriptionPack.getStartDateForWeek(subscriptionRequest.getCreationDate(), weekNumber)).thenReturn(dob);
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         verify(subscriptionPack).getStartDateForWeek(Matchers.<DateTime>any(), Matchers.<Integer>any());
         verify(subscriptionPack, never()).getStartDate(Matchers.<DateTime>any());
@@ -844,7 +849,7 @@ public class SubscriptionServiceTest {
         DateTime dob = DateTime.now().plusMonths(3);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withDateOfBirth(dob).build();
 
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+        subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.CALL_CENTER);
 
         ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
         verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
@@ -865,39 +870,50 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldChangeThePackOfAnSubscription() {
-//        String subscriptionId = "abcd1234";
-//        String msisdn = "1234567890";
-//        SubscriptionStatus status = SubscriptionStatus.ACTIVE;
-//        SubscriptionPack subscriptionPack = SubscriptionPack.BARI_KILKARI;
-//        Subscription mockedSubscription = new SubscriptionBuilder().withDefaults().build();
-//
-//        when(mockedSubscription.getStatus()).thenReturn(status);
-//        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
-//        when(mockedSubscription.isInProgress()).thenReturn(true);
-//        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
-//
-//        subscriptionService.changePack(new ChangePackRequest(msisdn, subscriptionId, subscriptionPack, Channel.CALL_CENTER, DateTime.now(), null, DateTime.now().minusDays(1)));
-//
-//        InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl, onMobileSubscriptionManagerPublisher);
-//        order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
-//        order.verify(mockedSubscription).deactivationRequestReceived();
-//        order.verify(allSubscriptions).update(mockedSubscription);
-//        ArgumentCaptor<SubscriptionStateChangeReportRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeReportRequest.class);
-//        order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
-//        SubscriptionStateChangeReportRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
-//
-//        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-//        assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
-//        assertNull(subscriptionStateChangeReportRequest.getOperator());
-//
-//        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
-//        order.verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-//        Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();
-//        assertEquals(msisdn, subscriptionSaved.getMsisdn());
-//        assertEquals(subscriptionPack, subscriptionSaved.getPack());
-//
-//        order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(any(OMSubscriptionRequest.class));
-//        order.verify(reportingServiceImpl).reportSubscriptionCreation(any(SubscriptionCreationReportRequest.class));
+        String msisdn = "1234567890";
+        SubscriptionPack requestedPack = SubscriptionPack.NANHI_KILKARI;
+        SubscriptionPack currentPack = SubscriptionPack.BARI_KILKARI;
+        DateTime dateOfBirth = DateTime.now();
+
+        Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).withPack(currentPack).withMsisdn(msisdn).build();
+        String subscriptionId = existingSubscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(existingSubscription);
+
+        ChangePackRequest changePackRequest = new ChangePackRequest(msisdn, subscriptionId, requestedPack, Channel.CALL_CENTER, dateOfBirth.plusWeeks(20), null, dateOfBirth);
+
+        subscriptionService.changePack(changePackRequest);
+
+        InOrder order = inOrder(allSubscriptions, reportingServiceImpl, onMobileSubscriptionManagerPublisher, subscriptionValidator, changePackProcessor);
+        order.verify(subscriptionValidator).validateSubscriptionExists(subscriptionId);
+        order.verify(changePackProcessor).process(changePackRequest, existingSubscription);
+        order.verify(allSubscriptions, times(2)).findBySubscriptionId(subscriptionId);
+        order.verify(allSubscriptions).update(existingSubscription);
+
+        ArgumentCaptor<OMSubscriptionRequest> omDeactivationRequestCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
+        order.verify(onMobileSubscriptionManagerPublisher).processDeactivation(omDeactivationRequestCaptor.capture());
+        OMSubscriptionRequest omDeactivationRequest = omDeactivationRequestCaptor.getValue();
+
+        assertEquals(msisdn, omDeactivationRequest.getMsisdn());
+        assertEquals(subscriptionId, omDeactivationRequest.getSubscriptionId());
+        assertEquals(currentPack, omDeactivationRequest.getPack());
+
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
+        order.verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
+        Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();
+        assertEquals(msisdn, subscriptionSaved.getMsisdn());
+        assertEquals(requestedPack, subscriptionSaved.getPack());
+
+        order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(any(OMSubscriptionRequest.class));
+
+        ArgumentCaptor<SubscriptionChangePackRequest> reportRequestCaptor = ArgumentCaptor.forClass(SubscriptionChangePackRequest.class);
+        order.verify(reportingServiceImpl).reportChangePack(reportRequestCaptor.capture());
+        SubscriptionChangePackRequest reportRequest = reportRequestCaptor.getValue();
+        assertEquals(msisdn, reportRequest.getMsisdn());
+        assertEquals(subscriptionSaved.getSubscriptionId(), reportRequest.getSubscriptionId());
+        assertEquals(requestedPack.name(), reportRequest.getPack());
+        assertEquals(Channel.CALL_CENTER.name(), reportRequest.getChannel());
+        assertEquals(dateOfBirth, reportRequest.getDateOfBirth());
+        assertNull(reportRequest.getExpectedDateOfDelivery());
     }
 
     @Test

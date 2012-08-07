@@ -46,21 +46,27 @@ public class SubscriptionValidator {
         if (request.hasLocation()) {
             validateLocationExists(request.getLocation(), errors);
         }
-        validateSubscriptionExists(request.getSubscriptionId(), errors);
+        checkIfSubscriptionExists(request.getSubscriptionId(), errors);
         raiseExceptionIfThereAreErrors(errors);
+    }
+
+    public void validateSubscriptionExists(String subscriptionId) {
+        Errors errors = new Errors();
+        checkIfSubscriptionExists(subscriptionId, errors);
+        raiseExceptionIfThereAreErrors(errors);
+    }
+
+    private void checkIfSubscriptionExists(String subscriptionId, Errors errors) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        if (subscription == null) {
+            errors.add(String.format("Subscription does not exist for subscriptionId %s", subscriptionId));
+        }
     }
 
     private void validateWeek(SubscriptionRequest subscriptionRequest, Errors errors) {
         if (subscriptionRequest.getSubscriber().getWeek() != null) {
             if (!subscriptionRequest.getPack().isValidWeekNumber(subscriptionRequest.getSubscriber().getWeek()))
                 errors.add(String.format("Given week[%s] is not within the pack[%s] range", subscriptionRequest.getSubscriber().getWeek(), subscriptionRequest.getPack().name()));
-        }
-    }
-
-    private void validateSubscriptionExists(String subscriptionId, Errors errors) {
-        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        if (subscription == null) {
-            errors.add(String.format("Subscription does not exist for subscriptionId %s", subscriptionId));
         }
     }
 

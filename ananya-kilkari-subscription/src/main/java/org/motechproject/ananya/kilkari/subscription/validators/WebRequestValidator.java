@@ -8,6 +8,8 @@ import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.common.domain.PhoneNumber;
 
+import java.util.List;
+
 public class WebRequestValidator {
 
     private Errors errors;
@@ -103,5 +105,19 @@ public class WebRequestValidator {
 
     private DateTime parseDateTime(String dateTime) {
         return StringUtils.isNotEmpty(dateTime) ? DateTimeFormat.forPattern("dd-MM-yyyy").parseDateTime(dateTime) : null;
+    }
+
+    public void validateSubscriptionPacksForChangeMsisdn(List<String> packs) {
+        if (packs.size() <= 0) errors.add("At least one pack should be specified");
+
+        boolean allPackPresent = false;
+        for (String pack : packs) {
+            if(StringUtils.trim(pack).toUpperCase().equals("ALL")) allPackPresent = true;
+        }
+        if (allPackPresent && packs.size() != 1) errors.add("No other pack allowed when ALL specified");
+
+        if (allPackPresent) return;
+
+        for (String pack : packs) validatePack(pack);
     }
 }

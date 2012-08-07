@@ -3,6 +3,9 @@ package org.motechproject.ananya.kilkari.subscription.validators;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
@@ -113,5 +116,31 @@ public class WebRequestValidatorTest {
 
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. Only one of expected date of delivery or date of birth should be present"));
+    }
+
+    @Test
+    public void shouldValidateSubscriptionPackListForChangeMsisdn() {
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateSubscriptionPacksForChangeMsisdn(Arrays.asList("All"));
+        assertEquals(0, webRequestValidator.getErrors().getCount());
+
+        webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateSubscriptionPacksForChangeMsisdn(Arrays.asList("nanhi_kilkari", "choti_kilkari"));
+        assertEquals(0, webRequestValidator.getErrors().getCount());
+
+        webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateSubscriptionPacksForChangeMsisdn(Arrays.asList("All", "nanhi_kilkari"));
+        assertEquals(1, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("No other pack allowed when ALL specified"));
+
+        webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateSubscriptionPacksForChangeMsisdn(Arrays.asList("bad_pack", "nanhi_kilkari"));
+        assertEquals(1, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("Invalid subscription pack bad_pack"));
+
+        webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateSubscriptionPacksForChangeMsisdn(new ArrayList<String>());
+        assertEquals(1, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("At least one pack should be specified"));
     }
 }

@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.contract.request.SubscriberLocation;
 import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
@@ -17,9 +18,11 @@ import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertie
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
-import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.*;
+import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -34,8 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class
-        SubscriptionService {
+public class SubscriptionService {
     private AllSubscriptions allSubscriptions;
     private OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher;
     private SubscriptionValidator subscriptionValidator;
@@ -47,6 +49,7 @@ public class
     private CampaignMessageAlertService campaignMessageAlertService;
     private KilkariPropertiesData kilkariPropertiesData;
     private MotechSchedulerService motechSchedulerService;
+    private ChangeMsisdnValidator changeMsisdnValidator;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
@@ -54,7 +57,7 @@ public class
     public SubscriptionService(AllSubscriptions allSubscriptions, OnMobileSubscriptionManagerPublisher onMobileSubscriptionManagerPublisher,
                                SubscriptionValidator subscriptionValidator, ReportingService reportingService,
                                InboxService inboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
-                               CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData, MotechSchedulerService motechSchedulerService) {
+                               CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData, MotechSchedulerService motechSchedulerService, ChangeMsisdnValidator changeMsisdnValidator) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
@@ -66,6 +69,7 @@ public class
         this.campaignMessageAlertService = campaignMessageAlertService;
         this.kilkariPropertiesData = kilkariPropertiesData;
         this.motechSchedulerService = motechSchedulerService;
+        this.changeMsisdnValidator = changeMsisdnValidator;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
@@ -282,7 +286,60 @@ public class
             throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
     }
 
+    private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
+        if (validationErrors.hasErrors()) {
+            throw new ValidationException(validationErrors.allMessages());
+        }
+    }
+
+    private boolean shouldChangeMsisdn(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
+        if (changeMsisdnRequest.getShouldChangeAllPacks()) return true;
+
+        if (changeMsisdnRequest.getPacks().contains(subscription.getPack())) return true;
+
+        return false;
+    }
+
+    public void changeMsisdn(ChangeMsisdnRequest changeMsisdnRequest) {
+        changeMsisdnValidator.validate(changeMsisdnRequest);
+
+        String oldMsisdn = changeMsisdnRequest.getOldMsisdn();
+        List<Subscription> subscriptionsInProgress = allSubscriptions.findSubscriptionsInProgress(oldMsisdn);
+        for (Subscription subscription : subscriptionsInProgress) {
+            if (!shouldChangeMsisdn(subscription, changeMsisdnRequest)) continue;
+
+            if (subscription.getStatus().equals(SubscriptionStatus.NEW_EARLY))
+                changeMsisdnForEarlySubscription(subscription, changeMsisdnRequest);
+            else
+                migrateMsisdnToNewSubscription(subscription, changeMsisdnRequest);
+        }
+    }
+
+    private void migrateMsisdnToNewSubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
+        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), Channel.CALL_CENTER, DateTime.now()));
+
+        SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
+
+        Location location = null;
+        if (subscriberResponse.getLocationResponse() != null)
+            location = new Location(subscriberResponse.getLocationResponse().getDistrict(),
+                subscriberResponse.getLocationResponse().getBlock(), subscriberResponse.getLocationResponse().getPanchayat());
+        Subscriber subscriber = new Subscriber(subscriberResponse.getBeneficiaryName(), subscriberResponse.getBeneficiaryAge(),
+                subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), null);
+
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeMsisdnRequest.getNewMsisdn(),
+                DateTime.now(), subscription.getPack(), location, subscriber);
+
+        // TODO: fetch current week and use in create subscription
+        createSubscription(subscriptionRequest, Channel.CALL_CENTER);
+    }
+
+    private void changeMsisdnForEarlySubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
+        subscription.setMsisdn(changeMsisdnRequest.getNewMsisdn());
+        allSubscriptions.update(subscription);
+        reportingService.reportChangeMsisdnForSubscriber(subscription.getSubscriptionId(), changeMsisdnRequest.getNewMsisdn());
+    }
+
     public void changePack(ChangePackRequest changePackRequest) {
-        
     }
 }

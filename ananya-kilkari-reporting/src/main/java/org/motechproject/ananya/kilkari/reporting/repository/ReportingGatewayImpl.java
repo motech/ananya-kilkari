@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -10,6 +11,7 @@ import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
+import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.motechproject.http.client.service.HttpClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +55,11 @@ public class ReportingGatewayImpl implements ReportingGateway {
     }
 
     @Override
+    public SubscriberResponse getSubscriber(String subscriptionId) {
+        throw new NotImplementedException();
+    }
+
+    @Override
     public void reportSubscriptionCreation(SubscriptionReportRequest subscriptionReportRequest) {
         String url = String.format("%s%s", getBaseUrl(), CREATE_SUBSCRIPTION_PATH);
         httpClientService.post(url, subscriptionReportRequest);
@@ -75,6 +82,11 @@ public class ReportingGatewayImpl implements ReportingGateway {
     public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest) {
         String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIBER_UPDATE_PATH, subscriptionId);
         httpClientService.put(url, subscriberReportRequest);
+    }
+
+    @Override
+    public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
+        throw new NotImplementedException();
     }
 
     private String constructGetLocationUrl(List<NameValuePair> params) {

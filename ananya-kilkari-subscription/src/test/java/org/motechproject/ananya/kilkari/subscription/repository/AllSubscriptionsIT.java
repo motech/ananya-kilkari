@@ -138,4 +138,32 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
 
         assertEquals(subscription1, actualSubscription);
     }
+
+    @Test
+    public void shouldFindSubscriptionsInProgress() {
+        String msisdn = "1234567890";
+
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
+        subscription1.setStatus(SubscriptionStatus.ACTIVE);
+        allSubscriptions.add(subscription1);
+
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
+        subscription2.setStatus(SubscriptionStatus.COMPLETED);
+        allSubscriptions.add(subscription2);
+
+        Subscription subscription3 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
+        subscription3.setStatus(SubscriptionStatus.ACTIVE);
+        allSubscriptions.add(subscription3);
+
+        markForDeletion(subscription1);
+        markForDeletion(subscription2);
+        markForDeletion(subscription3);
+
+        List<Subscription> subscriptionInProgress = allSubscriptions.findSubscriptionsInProgress(msisdn);
+
+        assertEquals(2, subscriptionInProgress.size());
+        assertTrue(subscriptionInProgress.contains(subscription1));
+        assertTrue(subscriptionInProgress.contains(subscription3));
+        assertFalse(subscriptionInProgress.contains(subscription2));
+    }
 }

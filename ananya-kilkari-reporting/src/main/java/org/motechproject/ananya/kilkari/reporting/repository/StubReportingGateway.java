@@ -5,6 +5,7 @@ import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
+import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +18,13 @@ public class StubReportingGateway implements ReportingGateway {
     public LocationResponse getLocation(String district, String block, String panchayat) {
         if (verify())
             return behavior.getLocation(district, block, panchayat);
+        return null;
+    }
+
+    @Override
+    public SubscriberResponse getSubscriber(String subscriptionId) {
+        if (verify())
+            return behavior.getSubscriber(subscriptionId);
         return null;
     }
 
@@ -42,6 +50,12 @@ public class StubReportingGateway implements ReportingGateway {
     public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest) {
         if (verify())
             behavior.reportSubscriberDetailsChange(subscriptionId, subscriberReportRequest);
+    }
+
+    @Override
+    public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
+        if (verify())
+            behavior.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
     }
 
     public void setBehavior(ReportingGateway behavior) {

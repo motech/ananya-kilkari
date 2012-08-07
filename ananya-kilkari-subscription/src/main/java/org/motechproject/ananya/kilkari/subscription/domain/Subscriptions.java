@@ -19,4 +19,12 @@ public class Subscriptions extends ArrayList<Subscription> {
         }
         return null;
     }
+
+    public List<Subscription> subscriptionsInProgress(){
+        List<Subscription> subscriptionsInProgress = new ArrayList<>();
+        for(Subscription subscription : this)
+            if(subscription.isInProgress())
+                subscriptionsInProgress.add(subscription);
+        return subscriptionsInProgress;
+    }
 }

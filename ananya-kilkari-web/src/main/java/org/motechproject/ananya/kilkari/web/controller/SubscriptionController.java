@@ -107,6 +107,16 @@ public class SubscriptionController {
         return BaseResponse.success("Change Pack request submitted successfully");
     }
 
+    @RequestMapping(value = "/subscription/changemsisdn", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseResponse changeMsisdn(@RequestBody ChangeMsisdnWebRequest changeMsisdnWebRequest) {
+        Errors validationErrors = changeMsisdnWebRequest.validate();
+        raiseExceptionIfThereAreErrors(validationErrors);
+
+        kilkariSubscriptionService.changeMsisdn(changeMsisdnWebRequest);
+        return BaseResponse.success("Change Msisdn request submitted successfully");
+    }
+
     @RequestMapping(value = "/subscriber/{subscriptionId}", method = RequestMethod.PUT)
     @ResponseBody
     public BaseResponse updateSubscriberDetails(@RequestBody SubscriberWebRequest subscriberWebRequest, @PathVariable String subscriptionId) {

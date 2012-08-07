@@ -45,7 +45,7 @@ public class SubscriptionRequest {
 
     public DateTime getSubscriptionStartDate() {
         Integer weekNumber = subscriber.getWeek();
-        if (weekNumber != null) {
+        if (weekNumber != null && weekNumber >= 1) {
             return pack.getStartDateForWeek(creationDate, weekNumber);
         }
 

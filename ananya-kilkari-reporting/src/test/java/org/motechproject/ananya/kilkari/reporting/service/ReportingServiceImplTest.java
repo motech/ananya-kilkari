@@ -84,4 +84,14 @@ public class ReportingServiceImplTest {
 
         verify(reportGateway).reportSubscriberDetailsChange(subscriptionId, subscriberReportRequest);
     }
+
+    @Test
+    public void shouldReportChangeMsisdn(){
+        String msisdn = "9876543210";
+        String subscriptionId = "subscriptionId";
+
+        reportingServiceImpl.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+
+        verify(reportGateway).reportChangeMsisdnForSubscriber(subscriptionId,msisdn);
+    }
 }

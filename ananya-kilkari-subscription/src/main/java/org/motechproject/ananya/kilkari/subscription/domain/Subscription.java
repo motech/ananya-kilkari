@@ -203,4 +203,8 @@ public class Subscription extends MotechBaseDataObject {
     public boolean hasBeenActivated() {
         return status.hasBeenActivated();
     }
+
+    public void setMsisdn(String msisdn) {
+        this.msisdn = msisdn;
+    }
 }

@@ -5,9 +5,12 @@ import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
+import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 
 public interface ReportingService {
     LocationResponse getLocation(String district, String block, String panchayat);
+
+    SubscriberResponse getSubscriber(String subscriptionId);
 
     void reportSubscriptionCreation(SubscriptionReportRequest subscriptionReportRequest);
 
@@ -16,4 +19,6 @@ public interface ReportingService {
     void reportCampaignMessageDeliveryStatus(CallDetailsReportRequest callDetailsReportRequest);
 
     void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest);
+
+    void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn);
 }

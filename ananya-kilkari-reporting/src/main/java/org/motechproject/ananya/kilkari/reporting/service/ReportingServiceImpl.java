@@ -5,6 +5,7 @@ import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
+import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,11 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
+    public SubscriberResponse getSubscriber(String subscriptionId) {
+        return reportGateway.getSubscriber(subscriptionId);
+    }
+
+    @Override
     public void reportSubscriptionCreation(SubscriptionReportRequest subscriptionReportRequest) {
         reportGateway.reportSubscriptionCreation(subscriptionReportRequest);
     }
@@ -43,5 +49,10 @@ public class ReportingServiceImpl implements ReportingService {
     @Override
     public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest request) {
         reportGateway.reportSubscriberDetailsChange(subscriptionId, request);
+    }
+
+    @Override
+    public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
+        reportGateway.reportChangeMsisdnForSubscriber(subscriptionId,msisdn);
     }
 }

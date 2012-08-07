@@ -59,10 +59,10 @@ public class SubscriptionRequest {
             return pack.getStartDate(expectedDateOfDelivery);
         }
 
-        return creationDate;
+        return null;
     }
 
     public boolean isEarlySubscription(DateTime startDate) {
-        return startDate.isAfter(creationDate);
+        return startDate != null ? startDate.isAfter(creationDate) : false;
     }
 }

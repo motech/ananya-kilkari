@@ -265,9 +265,7 @@ public class SubscriptionService {
     public void changePack(ChangePackRequest changePackRequest) {
         String subscriptionId = changePackRequest.getSubscriptionId();
         subscriptionValidator.validateSubscriptionExists(subscriptionId);
-
-        Subscription existingSubscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        changePackProcessor.process(changePackRequest, existingSubscription);
+        changePackProcessor.process(changePackRequest);
 
         requestDeactivation(new DeactivationRequest(subscriptionId, changePackRequest.getChannel(), changePackRequest.getCreatedAt()));
         Subscription newSubscription = createSubscriptionWithNewPack(changePackRequest);

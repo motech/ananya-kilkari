@@ -885,7 +885,7 @@ public class SubscriptionServiceTest {
 
         InOrder order = inOrder(allSubscriptions, reportingServiceImpl, onMobileSubscriptionManagerPublisher, subscriptionValidator, changePackProcessor);
         order.verify(subscriptionValidator).validateSubscriptionExists(subscriptionId);
-        order.verify(changePackProcessor).process(changePackRequest, existingSubscription);
+        order.verify(changePackProcessor).process(changePackRequest);
         order.verify(allSubscriptions, times(2)).findBySubscriptionId(subscriptionId);
         order.verify(allSubscriptions).update(existingSubscription);
 

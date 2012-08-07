@@ -110,7 +110,6 @@ public class SubscriptionServiceTest {
         assertEquals(msisdn, subscriptionSaved.getMsisdn());
         assertEquals(subscriptionPack, subscriptionSaved.getPack());
         assertEquals(createdSubscription, subscriptionSaved);
-        assertNull(subscriptionSaved.getStartDate());
     }
 
     @Test

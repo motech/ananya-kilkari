@@ -28,4 +28,9 @@ public class SubscriptionStatusTest {
     public void shouldCheckForEarlySubscriptionStatus() {
         assertTrue(SubscriptionStatus.NEW_EARLY.isNewEarly());
     }
+
+    @Test
+    public void shouldCheckForSuspendedSubscriptionStatus() {
+        assertTrue(SubscriptionStatus.SUSPENDED.isSuspended());
+    }
 }

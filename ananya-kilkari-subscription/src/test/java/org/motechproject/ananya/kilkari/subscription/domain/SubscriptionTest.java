@@ -135,6 +135,24 @@ public class SubscriptionTest {
     }
 
     @Test
+    public void shouldReturnIsActiveOrSuspendedBasedOnStatus() {
+        String msisdn = "9876534211";
+        SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.ACTIVE);
+
+        assertTrue(subscription.isActiveOrSuspended());
+
+        subscription.setStatus(SubscriptionStatus.SUSPENDED);
+        assertTrue(subscription.isActiveOrSuspended());
+
+        subscription.setStatus(SubscriptionStatus.NEW);
+        assertFalse(subscription.isActiveOrSuspended());
+
+        subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+        assertFalse(subscription.isActiveOrSuspended());
+    }
+
+    @Test
     public void expiryDateShouldBeEndDateOfTheCurrentWeek() {
         DateTime startedDate = DateTime.now().minusDays(3);
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStartDate(startedDate).build();

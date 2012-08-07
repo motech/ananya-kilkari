@@ -152,7 +152,7 @@ public class SubscriptionValidatorTest {
         String subscriptionId = "subscriptionId";
 
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(subscription.isInProgress()).thenReturn(false);
+        when(subscription.isActiveOrSuspended()).thenReturn(false);
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Subscription is not active for subscriptionId subscriptionId");

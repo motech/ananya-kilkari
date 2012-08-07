@@ -30,6 +30,10 @@ public enum SubscriptionStatus {
         return equals(NEW_EARLY);
     }
 
+    public boolean isSuspended() {
+        return equals(SUSPENDED);
+    }
+
     boolean isInProgress() {
         return this != COMPLETED &&
                 this != DEACTIVATED &&

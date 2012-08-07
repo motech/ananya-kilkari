@@ -36,7 +36,7 @@ public class SubscriptionValidator {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         if (subscription == null)
             errors.add(String.format("Subscription does not exist for subscriptionId %s", subscriptionId));
-        else if(!subscription.isInProgress())
+        else if(!subscription.isActiveOrSuspended())
             errors.add(String.format("Subscription is not active for subscriptionId %s", subscriptionId));
         raiseExceptionIfThereAreErrors(errors);
     }

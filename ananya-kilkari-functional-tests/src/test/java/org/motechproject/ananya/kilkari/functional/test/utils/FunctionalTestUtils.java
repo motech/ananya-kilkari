@@ -1,11 +1,9 @@
 package org.motechproject.ananya.kilkari.functional.test.utils;
 
 import org.junit.After;
-import org.motechproject.ananya.kilkari.functional.test.domain.CallCenter;
-import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionManager;
-import org.motechproject.ananya.kilkari.functional.test.domain.Time;
-import org.motechproject.ananya.kilkari.functional.test.domain.User;
+import org.motechproject.ananya.kilkari.functional.test.domain.*;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.CampaignMessageVerifier;
+import org.motechproject.ananya.kilkari.functional.test.verifiers.OnMobileOBDVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.ReportVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.SubscriptionVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,11 @@ public class FunctionalTestUtils extends SpringIntegrationTest {
     @Autowired
     protected SubscriptionVerifier subscriptionVerifier;
     @Autowired
+    protected OnMobileOBDVerifier onMobileOBDVerifier;
+    @Autowired
     protected User user;
+    @Autowired
+    protected OBD obd;
 
     @Autowired
     protected ReportVerifier reportVerifier;
@@ -31,6 +33,7 @@ public class FunctionalTestUtils extends SpringIntegrationTest {
     @After
     public void after() {
         reportVerifier.resetMockBehaviour();
+        onMobileOBDVerifier.reset();
         super.after();
     }
 

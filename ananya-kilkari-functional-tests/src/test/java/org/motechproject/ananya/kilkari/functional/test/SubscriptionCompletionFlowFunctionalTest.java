@@ -30,10 +30,12 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
         and(subscriptionManager).activates(subscriptionData);
         and(time).isMovedToFuture(futureDateForFirstCampaignAlertToBeRaised);
         then(user).messageIsReady(subscriptionData, "WEEK1");
+
         when(subscriptionManager).renews(subscriptionData);
         and(time).isMovedToFuture(futureDateOfSecondCampaignAlert);
         then(user).messageIsReady(subscriptionData, "WEEK2");
-        and(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
+
+        when(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
         then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
     }
 
@@ -59,13 +61,13 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
         then(user).messageIsNotReady(subscriptionData, "WEEK2");
 
         when(time).isMovedToFuture(week2MessageExpiryDate);
-        then(subscriptionManager).renews(subscriptionData);
+        and(subscriptionManager).renews(subscriptionData);
         then(user).messageIsNotReady(subscriptionData, "WEEK2");
 
         when(time).isMovedToFuture(futureDateForThirdCampaignAlert);
         and(user).messageIsReady(subscriptionData, "WEEK3");
 
-        and(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
+        when(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
         then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
     }
 }

@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -53,7 +52,8 @@ public class ReportingGatewayImpl implements ReportingGateway {
 
     @Override
     public SubscriberResponse getSubscriber(String subscriptionId) {
-        throw new NotImplementedException();
+        String url = String.format("%s%s/%s", getBaseUrl(), GET_SUBSCRIBER_PATH, subscriptionId);
+        return restTemplate.getForEntity(url, SubscriberResponse.class).getBody();
     }
 
     @Override
@@ -83,7 +83,8 @@ public class ReportingGatewayImpl implements ReportingGateway {
 
     @Override
     public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
-        throw new NotImplementedException();
+        String url = String.format("%s%s?subscriptionId=%s&msisdn=%s", getBaseUrl(), CHANGE_MSISDN_PATH, subscriptionId, msisdn);
+        httpClientService.post(url, null);
     }
 
     public void reportSubscriptionChangePack(SubscriptionChangePackRequest changePackRequest) {

@@ -9,6 +9,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.contract.request.*;
 import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
+import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.http.client.service.HttpClientService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -217,5 +218,29 @@ public class ReportingGatewayImplTest {
         reportingGateway.reportSubscriptionChangePack(changePackRequest);
 
         verify(httpClientService).post("url/subscription/changepack", changePackRequest);
+    }
+
+    @Test
+    public void shouldReportMsisdnChange() {
+        String msisdn = "msisdn";
+        String subscriptionId = "subscriptionId";
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+
+        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+
+        verify(httpClientService).post("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null);
+    }
+
+    @Test
+    public void shouldInvokeReportingServiceWithGetSubscriberForAGivenSubscriptionId() {
+        String subscriptionId = "subscriptionId";
+        String url = "url/subscription/subscriber/subscriptionId";
+
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+
+        when(restTemplate.getForEntity(url, SubscriberResponse.class))
+                .thenReturn(new ResponseEntity(new SubscriberResponse(), HttpStatus.OK));
+
+        reportingGateway.getSubscriber(subscriptionId);
     }
 }

@@ -89,7 +89,6 @@ public class SubscriptionService {
         Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
                 subscriptionRequest.getCreationDate(), (isEarlySubscription ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW));
         subscription.setStartDate(startDate);
-        //TODO change this to be idempotent
         allSubscriptions.add(subscription);
 
         OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, channel);

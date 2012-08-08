@@ -2,12 +2,17 @@ package org.motechproject.ananya.kilkari.functional.test.verifiers;
 
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunner;
+import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunnerResponse;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
+import org.motechproject.scheduler.domain.MotechEvent;
+import org.motechproject.server.event.annotations.MotechListener;
+import org.motechproject.server.messagecampaign.EventKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.security.auth.Subject;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
@@ -20,17 +25,23 @@ public class CampaignMessageVerifier {
     @Autowired
     private AllCampaignMessages allCampaignMessages;
 
+    private boolean campaignAlertRaised = false;
 
     public void verifyCampaignMessageExists(final SubscriptionData subscriptionData, final String weekMessageId) {
-        CampaignMessage campaignMessage = findCampaignMessage(subscriptionData, weekMessageId);
+        CampaignMessage campaignMessage = findCampaignMessageWithRetry(subscriptionData, weekMessageId);
 
         if (campaignMessage == null)
             throw new RuntimeException(String.format("Campaign Message for subscription id - %s not in OBD db for week %s ", subscriptionData.getSubscriptionId(), weekMessageId));
     }
 
-    public void verifyCampaignMessageDoesNotExists(SubscriptionData subscriptionData, String weekMessageId) {
-        CampaignMessage campaignMessage = findCampaignMessage(subscriptionData, weekMessageId);
+    public void verifyCampaignMessageIsNotCreatedAfterCampaignAlert(SubscriptionData subscriptionData, String weekMessageId) {
+        CampaignMessage campaignMessage = findCampaignMessageWithRetry(subscriptionData, weekMessageId);
         assertNull(campaignMessage);
+    }
+
+    @MotechListener(subjects = {EventKeys.SEND_MESSAGE})
+    public void handleCampaignAlert(MotechEvent motechEvent) {
+        campaignAlertRaised = true;
     }
 
 
@@ -44,10 +55,13 @@ public class CampaignMessageVerifier {
                                                           final String weekMessageId,
                                                           final CampaignMessageStatus status) {
         return new TimedRunner<CampaignMessage>(120, 1000) {
-            public CampaignMessage run() {
+            public TimedRunnerResponse<CampaignMessage> run() {
                 CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionData.getSubscriptionId(), weekMessageId);
-                return campaignMessage != null && campaignMessage.getMessageId().equals(weekMessageId)
-                        && campaignMessage.getStatus().equals(status) ? campaignMessage : null;
+                if(campaignMessage == null) {
+                    return null;
+                }
+                return campaignMessage.getMessageId().equals(weekMessageId)
+                        && campaignMessage.getStatus().equals(status) ? new TimedRunnerResponse<>(campaignMessage) : null;
             }
         }.executeWithTimeout();
     }
@@ -58,27 +72,21 @@ public class CampaignMessageVerifier {
         assertFalse(campaignMessage.isSent());
     }
 
-    public void verifyCampaignMessageNotReadyToBeDeliveredInFirstSlot(final SubscriptionData subscriptionData, final String weekMessageId) {
-        CampaignMessage campaignMessage = findCampaignMessageInFirstSlot(subscriptionData, weekMessageId);
-        assertNull("Campaign message found for first slot", campaignMessage);
-    }
-
-    private CampaignMessage findCampaignMessageInFirstSlot(final SubscriptionData subscriptionData, final String weekMessageId) {
-        List<CampaignMessage> allUnsentNewMessages = allCampaignMessages.getAllUnsentNewMessages();
-        for (CampaignMessage unsentNewMessage : allUnsentNewMessages)
-        {
-            if (subscriptionData.getMsisdn().equals(unsentNewMessage.getMsisdn()) && weekMessageId.equals(unsentNewMessage.getMessageId()))
-                return unsentNewMessage;
-        }
-        return null;
-    }
-
-    private CampaignMessage findCampaignMessage(final SubscriptionData subscriptionData, final String weekMessageId) {
-        return new TimedRunner<CampaignMessage>(20, 6000) {
-            public CampaignMessage run() {
-                CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionData.getSubscriptionId(), weekMessageId);
-                return campaignMessage != null && campaignMessage.getMessageId().equals(weekMessageId) ? campaignMessage : null;
+    private CampaignMessage findCampaignMessageWithRetry(final SubscriptionData subscriptionData, final String weekMessageId) {
+        return new TimedRunner<CampaignMessage>(120, 1000) {
+            public TimedRunnerResponse<CampaignMessage> run() {
+                CampaignMessage campaignMessage = findCampaignMessage(subscriptionData, weekMessageId);
+                return campaignMessage == null ? null : new TimedRunnerResponse<>(campaignMessage);
             }
         }.executeWithTimeout();
+    }
+
+    private CampaignMessage findCampaignMessage(SubscriptionData subscriptionData, String weekMessageId) {
+        CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionData.getSubscriptionId(), weekMessageId);
+        return campaignMessage != null && campaignMessage.getMessageId().equals(weekMessageId) ? campaignMessage : null;
+    }
+
+    public void reset() {
+        campaignAlertRaised = false;
     }
 }

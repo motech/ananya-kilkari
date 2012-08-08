@@ -57,7 +57,7 @@ public class ReportVerifier {
         when(reportingService.getLocation(anyString(), anyString(), anyString())).thenReturn(new LocationResponse(location.getDistrict(), location.getBlock(), location.getPanchayat()));
     }
 
-    public void resetMockBehaviour() {
+    public void reset() {
         Mockito.reset(reportingService);
     }
 }

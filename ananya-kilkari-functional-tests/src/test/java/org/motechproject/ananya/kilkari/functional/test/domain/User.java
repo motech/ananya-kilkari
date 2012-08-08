@@ -14,26 +14,28 @@ public class User {
     @Autowired
     private OnMobileOBDVerifier onMobileOBDVerifier;
 
-    private AllCampaignMessages allCampaignMessages;
-
     public void messageIsReady(SubscriptionData subscriptionData, String weekMessageId) {
         campaignMessageVerifier.verifyCampaignMessageExists(subscriptionData, weekMessageId);
     }
 
-    public void messageIsNotReady(SubscriptionData subscriptionData, String weekMessageId) {
-        campaignMessageVerifier.verifyCampaignMessageDoesNotExists(subscriptionData, weekMessageId);
+    public void messageIsNotCreated(SubscriptionData subscriptionData, String weekMessageId) {
+        campaignMessageVerifier.verifyCampaignMessageIsNotCreatedAfterCampaignAlert(subscriptionData, weekMessageId);
     }
 
-    public void verifyThatNewMessageWasDelivered(SubscriptionData subscriptionData, String weekMessageId) {
+    public void messageWasDeliveredDuringFirstSlot(SubscriptionData subscriptionData, String weekMessageId) {
         onMobileOBDVerifier.verifyThatNewMessageWasDelivered(subscriptionData, weekMessageId);
     }
 
 
-    public void verifyThatRetryMessageWasDelivered(SubscriptionData subscriptionData, String weekMessageId) {
+    public void MessageWasDeliveredDuringSecondSlot(SubscriptionData subscriptionData, String weekMessageId) {
         onMobileOBDVerifier.verifyThatRetryMessageWasDelivered(subscriptionData, weekMessageId);
     }
 
     public void resetOnMobileOBDVerifier() {
         onMobileOBDVerifier.reset();
+    }
+
+    public void resetCampaignMessageVerifier() {
+        campaignMessageVerifier.reset();
     }
 }

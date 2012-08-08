@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.functional.test.verifiers;
 
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunner;
+import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunnerResponse;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
@@ -26,9 +27,9 @@ public class SubscriptionVerifier {
 
     private Subscription waitForSubscription(final SubscriptionData subscriptionData, final SubscriptionStatus status) {
         return new TimedRunner<Subscription>(20, 6000) {
-                public Subscription run() {
+                public TimedRunnerResponse<Subscription> run() {
                     Subscription subscription = getSubscription(subscriptionData);
-                    return subscription != null && subscription.getStatus().equals(status)? subscription : null;
+                    return subscription != null && subscription.getStatus().equals(status)? new TimedRunnerResponse<>(subscription) : null;
                 }
             }.executeWithTimeout();
     }

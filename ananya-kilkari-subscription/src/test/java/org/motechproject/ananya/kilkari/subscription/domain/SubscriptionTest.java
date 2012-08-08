@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.domain;
 
 import org.joda.time.DateTime;
+import org.joda.time.Weeks;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 
@@ -8,6 +9,20 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 public class SubscriptionTest {
+
+    @Test
+    public void foo() {
+        DateTime now = DateTime.now();
+        DateTime twoDaysLater = now.plusDays(2);
+        DateTime twoDaysEarlier = now.minusDays(2);
+        DateTime nineDaysLater = now.plusDays(9);
+        DateTime nineDaysEarlier = now.minusDays(9);
+
+        int count1 = Weeks.weeksBetween(now, twoDaysEarlier).getWeeks();
+        int count2 = Weeks.weeksBetween(now, twoDaysLater).getWeeks();
+        int count3 = Weeks.weeksBetween(now, nineDaysEarlier).getWeeks();
+        int count4 = Weeks.weeksBetween(now, nineDaysLater).getWeeks();
+    }
 
     @Test
     public void shouldInitializeSubscription() {

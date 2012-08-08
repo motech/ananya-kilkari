@@ -310,10 +310,12 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         Subscription newSubscription = allSubscriptions.findSubscriptionInProgress(newMsisdn, SubscriptionPack.NANHI_KILKARI);
         assertNotNull(newSubscription);
-        assertEquals(37, newSubscription.getCurrentWeekOfSubscription());
+        assertEquals(38, newSubscription.getCurrentWeekOfSubscription());
 
         oldSubscription = allSubscriptions.findBySubscriptionId(oldSubscription.getSubscriptionId());
         assertTrue(oldSubscription.getStatus() == SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED || oldSubscription.getStatus() == SubscriptionStatus.PENDING_DEACTIVATION);
+
+        markForDeletion(oldSubscription, newSubscription);
     }
 
 

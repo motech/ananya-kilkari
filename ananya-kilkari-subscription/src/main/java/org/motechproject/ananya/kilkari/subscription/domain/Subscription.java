@@ -25,13 +25,16 @@ public class Subscription extends MotechBaseDataObject {
     private String subscriptionId;
 
     @JsonProperty
-    private DateTime creationDate;
-
-    @JsonProperty
     private SubscriptionStatus status;
 
     @JsonProperty
     private SubscriptionPack pack;
+
+    @JsonProperty
+    private DateTime creationDate;
+
+    @JsonProperty
+    private DateTime activationDate;
 
     @JsonProperty
     private DateTime startDate;
@@ -152,10 +155,10 @@ public class Subscription extends MotechBaseDataObject {
         setStatus(SubscriptionStatus.SUSPENDED);
     }
 
-    public void activate(String operator, DateTime activatedOn) {
+    public void activate(String operator, DateTime scheduledStartDate) {
         setStatus(SubscriptionStatus.ACTIVE);
         setOperator(Operator.getFor(operator));
-        startDate = activatedOn;
+        this.startDate = scheduledStartDate;
     }
 
     public void activationFailed(String operator) {
@@ -197,17 +200,33 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public DateTime getCurrentWeeksMessageExpiryDate() {
-        return getStartDate().plusWeeks(getWeeksElapsedAfterStartDate() + 1);
+        return startDate.plusWeeks(getWeeksElapsedAfterStartDate() + 1);
     }
 
     @JsonIgnore
     public int getWeeksElapsedAfterStartDate() {
-        return Weeks.weeksBetween(getStartDate(), DateTime.now()).getWeeks();
+        return Weeks.weeksBetween(startDate, DateTime.now()).getWeeks();
     }
 
     @JsonIgnore
     public int getCurrentWeekOfSubscription() {
+//        if (!status.isActive()) return -1;
         return pack.getStartWeek() + getWeeksElapsedAfterStartDate();
+    }
+
+    /*
+     * Returns the next week number for this subscription devoid in absolute terms, ie. it is
+     * devoid of pack start week initial count.
+     */
+    @JsonIgnore
+    public int getNextWeekNumber() {
+        DateTime now = DateTime.now();
+        if (startDate.isAfter(now)) return 1;
+
+        return
+                1 +                                             // First week
+                Weeks.weeksBetween(startDate, now).getWeeks() + // Weeks elapsed
+                1;                                              // Next week increment
     }
 
     public boolean hasBeenActivated() {
@@ -219,19 +238,12 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     @JsonIgnore
-    public boolean isEarlySubscription() {
-        return startDate.isAfter(creationDate);
-    }
-
-    @JsonIgnore
     public boolean isLateSubscription() {
         return startDate.isBefore(creationDate);
     }
 
     @JsonIgnore
     public DateTime getStartDateForSubscription(DateTime activatedOn) {
-        if (!isLateSubscription()) return activatedOn;
-
         return startDate.plus(activatedOn.getMillis() - creationDate.getMillis());
     }
 }

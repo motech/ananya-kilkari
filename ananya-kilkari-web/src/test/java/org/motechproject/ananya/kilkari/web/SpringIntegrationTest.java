@@ -34,7 +34,9 @@ public abstract class SpringIntegrationTest {
         kilkariSubscriptionDbConnector.executeBulk(toDelete);
     }
 
-    protected void markForDeletion(Object document) {
-        toDelete.add(BulkDeleteDocument.of(document));
+    protected void markForDeletion(Object... documents) {
+        for (Object document : documents) {
+            toDelete.add(BulkDeleteDocument.of(document));
+        }
     }
 }

@@ -119,6 +119,11 @@ public class SubscriptionService {
         return (List<Subscription>) (List<? extends Subscription>) allSubscriptions.findByMsisdn(msisdn);
     }
 
+    private DateTime getBufferedDateTime(DateTime dateTime) {
+        return dateTime.plusDays(kilkariPropertiesData.getCampaignScheduleDeltaDays())
+                .plusMinutes(kilkariPropertiesData.getCampaignScheduleDeltaMinutes());
+    }
+
     public void activate(String subscriptionId, final DateTime activatedOn, final String operator) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(activatedOn);
@@ -126,7 +131,7 @@ public class SubscriptionService {
         updateStatusAndReport(subscriptionId, activatedOn, null, operator, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
-                subscription.activate(operator, scheduleStartDateTime);
+                subscription.activate(operator, getBufferedDateTime(scheduleStartDateTime));
             }
         });
     }
@@ -312,11 +317,12 @@ public class SubscriptionService {
         SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
 
         Location location = null;
-        if (subscriberResponse.getLocationResponse() != null)
+        if (subscriberResponse.getLocationResponse() != null) {
             location = new Location(subscriberResponse.getLocationResponse().getDistrict(),
                     subscriberResponse.getLocationResponse().getBlock(), subscriberResponse.getLocationResponse().getPanchayat());
+        }
         Subscriber subscriber = new Subscriber(subscriberResponse.getBeneficiaryName(), subscriberResponse.getBeneficiaryAge(),
-                subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getWeeksElapsedAfterStartDate() + 1);
+                subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getNextWeekNumber());
 
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeMsisdnRequest.getNewMsisdn(),
                 DateTime.now(), subscription.getPack(), location, subscriber);

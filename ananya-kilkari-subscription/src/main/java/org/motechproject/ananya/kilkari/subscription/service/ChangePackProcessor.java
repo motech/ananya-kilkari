@@ -1,43 +1,48 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
+import org.apache.commons.lang.math.NumberUtils;
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionChangePackRequest;
+import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
+import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ChangePackProcessor {
-    private AllSubscriptions allSubscriptions;
+    private SubscriptionService subscriptionService;
+    private SubscriptionValidator subscriptionValidator;
+    private ReportingService reportingService;
 
     @Autowired
-    public ChangePackProcessor(AllSubscriptions allSubscriptions) {
-        this.allSubscriptions = allSubscriptions;
+    public ChangePackProcessor(SubscriptionService subscriptionService, SubscriptionValidator subscriptionValidator, ReportingService reportingService) {
+        this.subscriptionService = subscriptionService;
+        this.subscriptionValidator = subscriptionValidator;
+        this.reportingService = reportingService;
     }
 
     public void process(ChangePackRequest changePackRequest) {
-        Subscription subscription = allSubscriptions.findBySubscriptionId(changePackRequest.getSubscriptionId());
-        validateStatus(subscription);
-        validateSamePack(subscription, changePackRequest.getPack());
-        validatePossiblePack(subscription, changePackRequest);
+        String subscriptionId = changePackRequest.getSubscriptionId();
+        subscriptionValidator.validateSubscriptionExists(subscriptionId);
+        Subscription existingSubscription = subscriptionService.findBySubscriptionId(subscriptionId);
+        ChangePackValidator.validate(existingSubscription, changePackRequest);
+
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, changePackRequest.getChannel(), changePackRequest.getCreatedAt()));
+        Subscription newSubscription = createSubscriptionWithNewPack(changePackRequest);
+
+        reportingService.reportChangePack(new SubscriptionChangePackRequest(NumberUtils.createLong(newSubscription.getMsisdn()), newSubscription.getSubscriptionId(), subscriptionId, newSubscription.getPack().name(),
+                changePackRequest.getChannel().name(), newSubscription.getStatus().name(), changePackRequest.getCreatedAt(), changePackRequest.getExpectedDateOfDelivery(), changePackRequest.getDateOfBirth(), newSubscription.getStartDate()));
     }
 
-    private void validatePossiblePack(Subscription subscription, ChangePackRequest changePackRequest) {
-        if(!subscription.isNewEarly()) {
-            if(subscription.getCurrentWeekOfSubscription() > changePackRequest.getPack().getStartWeek() )
-                throw new ValidationException(String.format("Subscripiton pack requested is not applicable for subscription ", subscription.getSubscriptionId()));
-        }
+    private Subscription createSubscriptionWithNewPack(ChangePackRequest changePackRequest) {
+        Subscriber subscriber = new Subscriber(null, null, changePackRequest.getDateOfBirth(), changePackRequest.getExpectedDateOfDelivery(), null);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changePackRequest.getMsisdn(), changePackRequest.getCreatedAt(), changePackRequest.getPack(), null, subscriber);
+        return subscriptionService.createSubscription(subscriptionRequest, changePackRequest.getChannel());
     }
 
-    private void validateSamePack(Subscription existingSubscription, SubscriptionPack requestedPack) {
-        if(existingSubscription.getPack().equals(requestedPack))
-            throw new ValidationException(String.format("Subscription %s is already subscribed to requested pack ",existingSubscription.getSubscriptionId()));
-    }
 
-    private void validateStatus(Subscription subscription) {
-        if(!subscription.getStatus().canChangePack())
-            throw new ValidationException("Subscription is not active for subscription " + subscription.getSubscriptionId());
-    }
 }

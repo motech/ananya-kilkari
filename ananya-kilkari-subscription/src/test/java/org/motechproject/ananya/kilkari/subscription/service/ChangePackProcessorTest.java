@@ -1,106 +1,94 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.motechproject.ananya.kilkari.contract.request.SubscriptionChangePackRequest;
+import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 
+import static junit.framework.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ChangePackProcessorTest {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    private ChangePackProcessor changePackProcessor;
     @Mock
-    private AllSubscriptions allSubscripitons;
+    private SubscriptionService subscriptionService;
+    @Mock
+    private ReportingService reportingService;
+    @Mock
+    private SubscriptionValidator subscriptionValidator;
 
-    @Before
-    public void setUp(){
-        changePackProcessor = new ChangePackProcessor(allSubscripitons);
-    }
-
-    @Test
-    public void shouldThrowExceptionIfSubscriptionOfPackChangeIsNotInActiveOrSuspendedState(){
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVATION_FAILED).build();
-        String subscriptionId = subscription.getSubscriptionId();
-        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null);
-        when(allSubscripitons.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
-
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Subscription is not active for subscription "+subscriptionId);
-
-        changePackProcessor.process(changePackRequest);
-    }
 
     @Test
-    public void changePackRequestPackShouldBeDifferentFromCurrentPack() {
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).build();
-        String subscriptionId = subscription.getSubscriptionId();
-        when(allSubscripitons.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
+    public void shouldChangeThePackOfAnSubscription() {
+        ChangePackProcessor changePackProcessor = new ChangePackProcessor(subscriptionService, subscriptionValidator, reportingService);
+        DateTime dateOfBirth = DateTime.now();
 
-        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null);
+        Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.BARI_KILKARI).build();
+        String subscriptionId = existingSubscription.getSubscriptionId();
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("Subscription %s is already subscribed to requested pack ",subscriptionId));
+        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(existingSubscription);
 
-        changePackProcessor.process(changePackRequest);
-    }
 
-    @Test
-    public void shouldInvalidateIfCurrentlyIn12MonthPackAndChangePackRequestedFor15Month(){
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).build();
-        String subscriptionId = subscription.getSubscriptionId();
-        when(allSubscripitons.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
+        ChangePackRequest changePackRequest = new ChangePackRequest(existingSubscription.getMsisdn(), subscriptionId, SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth);
 
-        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null);
-
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("Subscripiton pack requested is not applicable for subscription ", subscriptionId));
+        Subscription newSubscription = new SubscriptionBuilder().withDefaults().withPack(changePackRequest.getPack()).build();
+        when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CALL_CENTER))).thenReturn(newSubscription);
 
         changePackProcessor.process(changePackRequest);
+
+        InOrder order = inOrder(subscriptionService, reportingService, subscriptionValidator);
+        order.verify(subscriptionValidator).validateSubscriptionExists(subscriptionId);
+
+        ArgumentCaptor<DeactivationRequest> deactivationRequestArgumentCaptor = ArgumentCaptor.forClass(DeactivationRequest.class);
+        order.verify(subscriptionService).requestDeactivation(deactivationRequestArgumentCaptor.capture());
+        validateDeactivationRequest(deactivationRequestArgumentCaptor.getValue(), existingSubscription);
+
+        ArgumentCaptor<SubscriptionRequest> createSubscriptionCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
+        order.verify(subscriptionService).createSubscription(createSubscriptionCaptor.capture(), eq(Channel.CALL_CENTER));
+        validateSubscriptionCreationRequest(createSubscriptionCaptor.getValue(), changePackRequest);
+
+
+        ArgumentCaptor<SubscriptionChangePackRequest> reportRequestCaptor = ArgumentCaptor.forClass(SubscriptionChangePackRequest.class);
+        order.verify(reportingService).reportChangePack(reportRequestCaptor.capture());
+        SubscriptionChangePackRequest reportRequest = reportRequestCaptor.getValue();
+        validateReportsRequest(dateOfBirth, existingSubscription, newSubscription, reportRequest);
     }
 
-    @Test
-    public void shouldInvalidateIfCurrentlyIn7MonthPackAndChangePackRequestedFor12Month(){
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).build();
-        String subscriptionId = subscription.getSubscriptionId();
-        when(allSubscripitons.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
-
-        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null);
-
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("Subscripiton pack requested is not applicable for subscription ", subscriptionId));
-
-        changePackProcessor.process(changePackRequest);
+    private void validateReportsRequest(DateTime dateOfBirth, Subscription existingSubscription, Subscription newSubscription, SubscriptionChangePackRequest reportRequest) {
+        assertEquals(existingSubscription.getMsisdn(), reportRequest.getMsisdn().toString());
+        assertEquals(newSubscription.getSubscriptionId(), reportRequest.getSubscriptionId());
+        assertEquals(newSubscription.getPack().name(), reportRequest.getPack());
+        assertEquals(Channel.CALL_CENTER.name(), reportRequest.getChannel());
+        assertEquals(newSubscription.getStatus().name(), reportRequest.getSubscriptionStatus());
+        assertEquals(dateOfBirth, reportRequest.getDateOfBirth());
+        assertEquals(newSubscription.getStartDate(), reportRequest.getStartDate());
+        assertNull(reportRequest.getExpectedDateOfDelivery());
     }
 
-    @Test
-    public void shouldNotAllowChangePackIfNumberOfWeeksLeftInCurrentPackIsLessThanChangePackRequest() {
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).build();
-        subscription.setStartDate(DateTime.now().minusWeeks(24));
-        String subscriptionId = subscription.getSubscriptionId();
-        when(allSubscripitons.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
-
-        ChangePackRequest changePackRequest = new ChangePackRequest("1111111111", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null);
-
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("Subscripiton pack requested is not applicable for subscription ", subscriptionId));
-
-        changePackProcessor.process(changePackRequest);
+    private void validateSubscriptionCreationRequest(SubscriptionRequest subscriptionRequest, ChangePackRequest changePackRequest) {
+        assertEquals(changePackRequest.getDateOfBirth(), subscriptionRequest.getSubscriber().getDateOfBirth());
+        assertEquals(changePackRequest.getExpectedDateOfDelivery(), subscriptionRequest.getSubscriber().getExpectedDateOfDelivery());
     }
+
+    private void validateDeactivationRequest(DeactivationRequest deactivationRequest, Subscription existingSubscription) {
+
+        assertEquals(existingSubscription.getSubscriptionId(), deactivationRequest.getSubscriptionId());
+        assertEquals(Channel.CALL_CENTER, deactivationRequest.getChannel());
+        assertNotNull(deactivationRequest.getCreatedAt());
+    }
+
 }

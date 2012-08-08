@@ -16,6 +16,7 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscri
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.ChangePackProcessor;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
@@ -49,11 +50,13 @@ public class KilkariSubscriptionServiceTest {
     private MotechSchedulerService motechSchedulerService;
     @Mock
     private KilkariPropertiesData kilkariPropertiesData;
+    @Mock
+    private ChangePackProcessor changePackProcessor;
 
     @Before
     public void setup() {
         initMocks(this);
-        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, kilkariPropertiesData);
+        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, kilkariPropertiesData, changePackProcessor);
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
     }
 
@@ -245,7 +248,7 @@ public class KilkariSubscriptionServiceTest {
         kilkariSubscriptionService.changePack(changePackWebRequest);
 
         ArgumentCaptor<ChangePackRequest> changePackRequestArgumentCaptor = ArgumentCaptor.forClass(ChangePackRequest.class);
-        verify(subscriptionService).changePack(changePackRequestArgumentCaptor.capture());
+        verify(changePackProcessor).process(changePackRequestArgumentCaptor.capture());
         ChangePackRequest changePackRequest = changePackRequestArgumentCaptor.getValue();
 
         assertEquals(changePackWebRequest.getMsisdn(), changePackRequest.getMsisdn());
@@ -262,6 +265,6 @@ public class KilkariSubscriptionServiceTest {
 
         kilkariSubscriptionService.changePack(changePackWebRequest);
 
-        verify(subscriptionService, never()).changePack(any(ChangePackRequest.class));
+        verify(changePackProcessor, never()).process(any(ChangePackRequest.class));
     }
 }

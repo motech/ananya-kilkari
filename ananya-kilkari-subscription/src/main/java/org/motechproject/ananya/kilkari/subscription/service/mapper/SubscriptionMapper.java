@@ -11,11 +11,11 @@ import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
 
 public class SubscriptionMapper {
 
-    public OMSubscriptionRequest createOMSubscriptionRequest(Subscription subscription, Channel channel) {
+    public static OMSubscriptionRequest createOMSubscriptionRequest(Subscription subscription, Channel channel) {
         return new OMSubscriptionRequest(subscription.getMsisdn(), subscription.getPack(), channel, subscription.getSubscriptionId());
     }
 
-    public SubscriptionReportRequest createSubscriptionCreationReportRequest(Subscription subscription, Channel channel, Location location, Subscriber subscriber) {
+    public static SubscriptionReportRequest createSubscriptionCreationReportRequest(Subscription subscription, Channel channel, Location location, Subscriber subscriber) {
         SubscriberLocation subscriberLocation = new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
         SubscriptionReportRequest subscriptionReportRequest = new SubscriptionReportRequest();
         subscriptionReportRequest.setAgeOfBeneficiary(subscriber.getBeneficiaryAge());

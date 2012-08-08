@@ -8,6 +8,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
+import org.motechproject.ananya.kilkari.subscription.service.ChangePackProcessor;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
@@ -33,6 +34,7 @@ public class KilkariSubscriptionService {
     private SubscriptionService subscriptionService;
     private MotechSchedulerService motechSchedulerService;
     private KilkariPropertiesData kilkariProperties;
+    private ChangePackProcessor changePackProcessor;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariSubscriptionService.class);
 
@@ -40,11 +42,12 @@ public class KilkariSubscriptionService {
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
                                       SubscriptionService subscriptionService,
                                       MotechSchedulerService motechSchedulerService,
-                                      KilkariPropertiesData kilkariProperties) {
+                                      KilkariPropertiesData kilkariProperties, ChangePackProcessor changePackProcessor) {
         this.subscriptionPublisher = subscriptionPublisher;
         this.subscriptionService = subscriptionService;
         this.motechSchedulerService = motechSchedulerService;
         this.kilkariProperties = kilkariProperties;
+        this.changePackProcessor = changePackProcessor;
     }
 
     public void createSubscriptionAsync(SubscriptionWebRequest subscriptionWebRequest) {
@@ -113,7 +116,7 @@ public class KilkariSubscriptionService {
     public void changePack(ChangePackWebRequest changePackWebRequest) {
         Errors errors = changePackWebRequest.validate();
         raiseExceptionIfThereAreErrors(errors);
-        subscriptionService.changePack(SubscriptionRequestMapper.mapToChangePackRequest(changePackWebRequest));
+        changePackProcessor.process(SubscriptionRequestMapper.mapToChangePackRequest(changePackWebRequest));
     }
 
     private void raiseExceptionIfThereAreErrors(Errors validationErrors) {

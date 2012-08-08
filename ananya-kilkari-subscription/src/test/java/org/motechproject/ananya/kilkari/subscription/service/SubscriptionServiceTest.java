@@ -12,7 +12,6 @@ import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionChangePackRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
@@ -33,7 +32,6 @@ import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertie
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
-import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
@@ -85,14 +83,12 @@ public class SubscriptionServiceTest {
     private MotechSchedulerService motechSchedulerService;
     @Mock
     private ChangeMsisdnValidator changeMsisdnValidator;
-    @Mock
-    private ChangePackProcessor changePackProcessor;
 
     @Before
     public void setUp() {
         initMocks(this);
         subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl,
-                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changePackProcessor, changeMsisdnValidator);
+                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator);
     }
 
     @Test
@@ -872,55 +868,6 @@ public class SubscriptionServiceTest {
         assertEquals(SubscriptionStatus.NEW_EARLY.toString(), subscriptionCreationReportRequest.getSubscriptionStatus());
     }
 
-    @Test
-    public void shouldChangeThePackOfAnSubscription() {
-        String msisdn = "1234567890";
-        SubscriptionPack requestedPack = SubscriptionPack.NANHI_KILKARI;
-        SubscriptionPack currentPack = SubscriptionPack.BARI_KILKARI;
-        DateTime dateOfBirth = DateTime.now();
-
-        Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).withPack(currentPack).withMsisdn(msisdn).build();
-        String subscriptionId = existingSubscription.getSubscriptionId();
-        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(existingSubscription);
-
-        ChangePackRequest changePackRequest = new ChangePackRequest(msisdn, subscriptionId, requestedPack, Channel.CALL_CENTER, dateOfBirth.plusWeeks(20), null, dateOfBirth);
-
-        subscriptionService.changePack(changePackRequest);
-
-        InOrder order = inOrder(allSubscriptions, reportingServiceImpl, onMobileSubscriptionManagerPublisher, subscriptionValidator, changePackProcessor);
-        order.verify(subscriptionValidator).validateSubscriptionExists(subscriptionId);
-        order.verify(changePackProcessor).process(changePackRequest);
-        order.verify(allSubscriptions, times(2)).findBySubscriptionId(subscriptionId);
-        order.verify(allSubscriptions).update(existingSubscription);
-
-        ArgumentCaptor<OMSubscriptionRequest> omDeactivationRequestCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
-        order.verify(onMobileSubscriptionManagerPublisher).processDeactivation(omDeactivationRequestCaptor.capture());
-        OMSubscriptionRequest omDeactivationRequest = omDeactivationRequestCaptor.getValue();
-
-        assertEquals(msisdn, omDeactivationRequest.getMsisdn());
-        assertEquals(subscriptionId, omDeactivationRequest.getSubscriptionId());
-        assertEquals(currentPack, omDeactivationRequest.getPack());
-
-        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
-        order.verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
-        Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();
-        assertEquals(msisdn, subscriptionSaved.getMsisdn());
-        assertEquals(requestedPack, subscriptionSaved.getPack());
-
-        order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(any(OMSubscriptionRequest.class));
-
-        ArgumentCaptor<SubscriptionChangePackRequest> reportRequestCaptor = ArgumentCaptor.forClass(SubscriptionChangePackRequest.class);
-        order.verify(reportingServiceImpl).reportChangePack(reportRequestCaptor.capture());
-        SubscriptionChangePackRequest reportRequest = reportRequestCaptor.getValue();
-        assertEquals(msisdn, reportRequest.getMsisdn().toString());
-        assertEquals(subscriptionSaved.getSubscriptionId(), reportRequest.getSubscriptionId());
-        assertEquals(requestedPack.name(), reportRequest.getPack());
-        assertEquals(Channel.CALL_CENTER.name(), reportRequest.getChannel());
-        assertEquals(subscriptionSaved.getStatus().name(), reportRequest.getSubscriptionStatus());
-        assertEquals(dateOfBirth, reportRequest.getDateOfBirth());
-        assertEquals(subscriptionSaved.getStartDate(), reportRequest.getStartDate());
-        assertNull(reportRequest.getExpectedDateOfDelivery());
-    }
 
     @Test
     public void shouldChangeMsisdn() {

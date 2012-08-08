@@ -1,10 +1,8 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
-import org.apache.commons.lang.math.NumberUtils;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.contract.request.SubscriberLocation;
 import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionChangePackRequest;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
@@ -21,13 +19,8 @@ import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertie
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
-import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
-import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
-import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
-import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.*;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -55,7 +48,6 @@ public class SubscriptionService {
     private KilkariPropertiesData kilkariPropertiesData;
     private MotechSchedulerService motechSchedulerService;
     private ChangeMsisdnValidator changeMsisdnValidator;
-    private ChangePackProcessor changePackProcessor;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
@@ -64,7 +56,7 @@ public class SubscriptionService {
                                SubscriptionValidator subscriptionValidator, ReportingService reportingService,
                                InboxService inboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
                                CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData,
-                               MotechSchedulerService motechSchedulerService, ChangePackProcessor changePackProcessor, ChangeMsisdnValidator changeMsisdnValidator) {
+                               MotechSchedulerService motechSchedulerService, ChangeMsisdnValidator changeMsisdnValidator) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
@@ -77,20 +69,18 @@ public class SubscriptionService {
         this.kilkariPropertiesData = kilkariPropertiesData;
         this.motechSchedulerService = motechSchedulerService;
         this.changeMsisdnValidator = changeMsisdnValidator;
-        this.changePackProcessor = changePackProcessor;
     }
 
     public Subscription createSubscriptionWithReporting(SubscriptionRequest subscriptionRequest, Channel channel) {
-        SubscriptionMapper subscriptionMapper = new SubscriptionMapper();
-        Subscription subscription = createSubscription(subscriptionRequest, channel, subscriptionMapper);
+        Subscription subscription = createSubscription(subscriptionRequest, channel);
 
-        reportingService.reportSubscriptionCreation(subscriptionMapper.createSubscriptionCreationReportRequest(
+        reportingService.reportSubscriptionCreation(SubscriptionMapper.createSubscriptionCreationReportRequest(
                 subscription, channel, subscriptionRequest.getLocation(), subscriptionRequest.getSubscriber()));
 
         return subscription;
     }
 
-    private Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel, SubscriptionMapper subscriptionMapper) {
+    public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
         subscriptionValidator.validate(subscriptionRequest);
 
         DateTime startDate = subscriptionRequest.getSubscriptionStartDate();
@@ -102,7 +92,7 @@ public class SubscriptionService {
         //TODO change this to be idempotent
         allSubscriptions.add(subscription);
 
-        OMSubscriptionRequest omSubscriptionRequest = subscriptionMapper.createOMSubscriptionRequest(subscription, channel);
+        OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, channel);
         if (isEarlySubscription) {
             scheduleEarlySubscription(startDate, omSubscriptionRequest);
         } else
@@ -265,18 +255,6 @@ public class SubscriptionService {
         return allSubscriptions.findSubscriptionInProgress(msisdn, pack);
     }
 
-    public void changePack(ChangePackRequest changePackRequest) {
-        String subscriptionId = changePackRequest.getSubscriptionId();
-        subscriptionValidator.validateSubscriptionExists(subscriptionId);
-        changePackProcessor.process(changePackRequest);
-
-        requestDeactivation(new DeactivationRequest(subscriptionId, changePackRequest.getChannel(), changePackRequest.getCreatedAt()));
-        Subscription newSubscription = createSubscriptionWithNewPack(changePackRequest);
-
-        reportingService.reportChangePack(new SubscriptionChangePackRequest(NumberUtils.createLong(newSubscription.getMsisdn()), newSubscription.getSubscriptionId(), subscriptionId, newSubscription.getPack().name(),
-                changePackRequest.getChannel().name(), newSubscription.getStatus().name(), changePackRequest.getCreatedAt(), changePackRequest.getExpectedDateOfDelivery(), changePackRequest.getDateOfBirth(), newSubscription.getStartDate()));
-    }
-
     private void unScheduleCampaign(Subscription subscription) {
         String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
         MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getStartDate());
@@ -314,18 +292,11 @@ public class SubscriptionService {
             throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
     }
 
-    private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
-        if (validationErrors.hasErrors()) {
-            throw new ValidationException(validationErrors.allMessages());
-        }
-    }
-
     private boolean shouldChangeMsisdn(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
         if (changeMsisdnRequest.getShouldChangeAllPacks()) return true;
 
-        if (changeMsisdnRequest.getPacks().contains(subscription.getPack())) return true;
+        return changeMsisdnRequest.getPacks().contains(subscription.getPack());
 
-        return false;
     }
 
     public void changeMsisdn(ChangeMsisdnRequest changeMsisdnRequest) {
@@ -351,7 +322,7 @@ public class SubscriptionService {
         Location location = null;
         if (subscriberResponse.getLocationResponse() != null)
             location = new Location(subscriberResponse.getLocationResponse().getDistrict(),
-                subscriberResponse.getLocationResponse().getBlock(), subscriberResponse.getLocationResponse().getPanchayat());
+                    subscriberResponse.getLocationResponse().getBlock(), subscriberResponse.getLocationResponse().getPanchayat());
         Subscriber subscriber = new Subscriber(subscriberResponse.getBeneficiaryName(), subscriberResponse.getBeneficiaryAge(),
                 subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getWeeksElapsedAfterStartDate() + 1);
 
@@ -367,10 +338,4 @@ public class SubscriptionService {
         reportingService.reportChangeMsisdnForSubscriber(subscription.getSubscriptionId(), changeMsisdnRequest.getNewMsisdn());
     }
 
-    private Subscription createSubscriptionWithNewPack(ChangePackRequest changePackRequest) {
-        Subscriber subscriber = new Subscriber(null, null, changePackRequest.getDateOfBirth(), changePackRequest.getExpectedDateOfDelivery(), null);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changePackRequest.getMsisdn(), changePackRequest.getCreatedAt(), changePackRequest.getPack(), null, subscriber);
-        Subscription subscription = createSubscription(subscriptionRequest, changePackRequest.getChannel(), new SubscriptionMapper());
-        return subscription;
-    }
 }

@@ -80,6 +80,22 @@ public class KilkariSubscriptionServiceTest {
     }
 
     @Test
+    public void shouldThrowAnExceptionForInvalidMsisdnNumbers() {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid msisdn 12345");
+
+        kilkariSubscriptionService.findByMsisdn("12345");
+    }
+
+    @Test
+    public void shouldThrowAnExceptionForNonNumericMsisdn() {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid msisdn 123456789a");
+
+        kilkariSubscriptionService.findByMsisdn("123456789a");
+    }
+
+    @Test
     public void shouldCreateSubscriptionRequestAsynchronously() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequest();
         subscriptionWebRequest.setCreatedAt(DateTime.now());

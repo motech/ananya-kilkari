@@ -1,7 +1,8 @@
-package org.motechproject.ananya.kilkari.subscription.validators;
+package org.motechproject.ananya.kilkari.request.validator;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
 import java.util.ArrayList;
 import java.util.Arrays;

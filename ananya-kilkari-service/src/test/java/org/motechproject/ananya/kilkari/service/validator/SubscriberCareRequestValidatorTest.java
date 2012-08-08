@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.validators;
+package org.motechproject.ananya.kilkari.service.validator;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
+import org.motechproject.ananya.kilkari.service.validator.SubscriberCareRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 
 public class SubscriberCareRequestValidatorTest {

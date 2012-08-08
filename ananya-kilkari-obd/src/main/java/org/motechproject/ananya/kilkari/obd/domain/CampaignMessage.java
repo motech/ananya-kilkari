@@ -3,7 +3,6 @@ package org.motechproject.ananya.kilkari.obd.domain;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
-import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
 
 @TypeDiscriminator("doc.type === 'CampaignMessage'")
@@ -43,7 +42,7 @@ public class CampaignMessage extends MotechBaseDataObject {
         this.subscriptionId = subscriptionId;
         this.messageId = messageId;
         this.weekEndingDate = weekEndingDate;
-        this.msisdn = PhoneNumber.formatPhoneNumberTo10Digits(msisdn).toString();
+        this.msisdn = msisdn;
         this.operator = operator;
     }
 

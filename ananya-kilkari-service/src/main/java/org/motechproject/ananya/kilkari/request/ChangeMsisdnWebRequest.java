@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.request;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.subscription.validators.WebRequestValidator;
+import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
 import java.util.List;
 

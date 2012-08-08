@@ -4,7 +4,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.common.domain.PhoneNumber;
+import org.motechproject.ananya.kilkari.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
 
 @TypeDiscriminator("doc.type === 'SubscriberCareDoc'")
@@ -25,7 +25,7 @@ public class SubscriberCareDoc extends MotechBaseDataObject {
     }
 
     public SubscriberCareDoc(String msisdn, SubscriberCareReasons reason, DateTime createdAt, Channel channel) {
-        this.msisdn = PhoneNumber.formatPhoneNumberTo10Digits(msisdn).toString();
+        this.msisdn = msisdn;
         this.reason = reason;
         this.channel = channel;
         this.createdAt = createdAt;

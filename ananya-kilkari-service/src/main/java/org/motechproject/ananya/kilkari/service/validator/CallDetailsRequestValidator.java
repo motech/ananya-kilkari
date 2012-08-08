@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.validators;
+package org.motechproject.ananya.kilkari.service.validator;
 
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;

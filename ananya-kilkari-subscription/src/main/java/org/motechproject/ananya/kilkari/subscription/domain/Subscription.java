@@ -9,7 +9,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
 import org.joda.time.Weeks;
-import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
 
 import java.util.UUID;
@@ -42,7 +41,7 @@ public class Subscription extends MotechBaseDataObject {
 
     public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, SubscriptionStatus status) {
         this.pack = pack;
-        this.msisdn = PhoneNumber.formatPhoneNumberTo10Digits(msisdn).toString();
+        this.msisdn = msisdn;
         this.creationDate = createdAt;
         this.startDate = creationDate;
         this.status = status;

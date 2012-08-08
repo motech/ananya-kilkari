@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.service;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequestMapper;
 import org.motechproject.ananya.kilkari.repository.AllSubscriberCareDocs;
-import org.motechproject.ananya.kilkari.validators.SubscriberCareRequestValidator;
+import org.motechproject.ananya.kilkari.service.validator.SubscriberCareRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

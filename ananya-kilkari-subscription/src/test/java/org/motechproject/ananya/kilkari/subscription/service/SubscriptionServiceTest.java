@@ -198,22 +198,6 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldThrowAnExceptionForInvalidMsisdnNumbers() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Invalid msisdn 12345");
-
-        subscriptionService.findByMsisdn("12345");
-    }
-
-    @Test
-    public void shouldThrowAnExceptionForNonNumericMsisdn() {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Invalid msisdn 123456789a");
-
-        subscriptionService.findByMsisdn("123456789a");
-    }
-
-    @Test
     public void shouldUpdateTheSubscriptionStatusToPendingActivation_WhenActivationIsRequested() {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.PENDING_ACTIVATION;

@@ -35,8 +35,8 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationExcept
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
-import org.motechproject.ananya.kilkari.validators.CallDeliveryFailureRecordValidator;
-import org.motechproject.ananya.kilkari.validators.CallDetailsRequestValidator;
+import org.motechproject.ananya.kilkari.service.validator.CallDeliveryFailureRecordValidator;
+import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 
 import java.util.ArrayList;
 import java.util.List;

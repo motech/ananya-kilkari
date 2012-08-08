@@ -120,8 +120,7 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
     @Test
     public void shouldFindSubscriptionInProgress() {
         String pack = "choti_kilkari";
-        String msisdn1 = "1234567890";
-        String msisdn = "91" + msisdn1;
+        String msisdn = "1234567890";
 
         Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
         subscription1.setStatus(SubscriptionStatus.ACTIVE);
@@ -134,7 +133,7 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         markForDeletion(subscription1);
         markForDeletion(subscription2);
 
-        Subscription actualSubscription = allSubscriptions.findSubscriptionInProgress(msisdn1, SubscriptionPack.from(pack));
+        Subscription actualSubscription = allSubscriptions.findSubscriptionInProgress(msisdn, SubscriptionPack.from(pack));
 
         assertEquals(subscription1, actualSubscription);
     }

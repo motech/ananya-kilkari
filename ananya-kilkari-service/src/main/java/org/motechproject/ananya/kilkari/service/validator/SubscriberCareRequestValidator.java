@@ -1,10 +1,10 @@
-package org.motechproject.ananya.kilkari.validators;
+package org.motechproject.ananya.kilkari.service.validator;
 
 import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.common.domain.PhoneNumber;
+import org.motechproject.ananya.kilkari.domain.PhoneNumber;
 import org.springframework.stereotype.Component;
 
 @Component

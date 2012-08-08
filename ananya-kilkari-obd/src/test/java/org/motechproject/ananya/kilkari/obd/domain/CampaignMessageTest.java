@@ -17,14 +17,6 @@ public class CampaignMessageTest {
     }
 
     @Test
-    public void shouldReturn10DigitPhoneNumberWhenGivenANumber() {
-        String expectedNumber = "1234567890";
-        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2)).getMsisdn());
-        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "911234567890", "operator1", DateTime.now().plusDays(2)).getMsisdn());
-        assertEquals(expectedNumber, new CampaignMessage("subscriptionId1", "messageId1", "001234567890", "operator1", DateTime.now().plusDays(2)).getMsisdn());
-    }
-
-    @Test
     public void shouldMarkSent() {
         CampaignMessage campaignMessage = new CampaignMessage();
         campaignMessage.markSent();

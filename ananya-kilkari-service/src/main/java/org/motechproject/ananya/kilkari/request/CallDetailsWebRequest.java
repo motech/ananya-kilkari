@@ -9,7 +9,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignCode;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.common.domain.PhoneNumber;
+import org.motechproject.ananya.kilkari.domain.PhoneNumber;
 
 import java.io.Serializable;
 import java.util.regex.Matcher;

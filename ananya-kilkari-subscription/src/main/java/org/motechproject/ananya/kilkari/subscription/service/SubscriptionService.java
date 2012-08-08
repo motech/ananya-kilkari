@@ -21,8 +21,8 @@ import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionReque
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.*;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
-import org.motechproject.common.domain.PhoneNumber;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
@@ -119,7 +119,6 @@ public class SubscriptionService {
     }
 
     public List<Subscription> findByMsisdn(String msisdn) {
-        validateMsisdn(msisdn);
         return (List<Subscription>) (List<? extends Subscription>) allSubscriptions.findByMsisdn(msisdn);
     }
 
@@ -285,11 +284,6 @@ public class SubscriptionService {
         action.perform(subscription);
         allSubscriptions.update(subscription);
         reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(), subscription.getStatus().name(), reason, updatedOn, operator, graceCount));
-    }
-
-    private void validateMsisdn(String msisdn) {
-        if (PhoneNumber.isNotValid(msisdn))
-            throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
     }
 
     private boolean shouldChangeMsisdn(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {

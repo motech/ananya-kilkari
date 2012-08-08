@@ -22,7 +22,7 @@ import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebReque
 import org.motechproject.ananya.kilkari.service.CallDetailsEventKeys;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.validators.CallDetailsRequestValidator;
+import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.ArrayList;

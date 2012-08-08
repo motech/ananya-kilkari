@@ -11,7 +11,7 @@ import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.repository.AllSubscriberCareDocs;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.validators.SubscriberCareRequestValidator;
+import org.motechproject.ananya.kilkari.service.validator.SubscriberCareRequestValidator;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;

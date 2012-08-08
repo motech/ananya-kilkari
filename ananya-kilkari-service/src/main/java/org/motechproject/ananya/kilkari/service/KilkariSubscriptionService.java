@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.domain.PhoneNumber;
 import org.motechproject.ananya.kilkari.mapper.ChangeMsisdnRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
 import org.motechproject.ananya.kilkari.request.*;
@@ -77,6 +78,7 @@ public class KilkariSubscriptionService {
     }
 
     public List<Subscription> findByMsisdn(String msisdn) {
+        validateMsisdn(msisdn);
         return subscriptionService.findByMsisdn(msisdn);
     }
 
@@ -132,5 +134,10 @@ public class KilkariSubscriptionService {
     public void changeMsisdn(ChangeMsisdnWebRequest changeMsisdnWebRequest) {
         ChangeMsisdnRequest changeMsisdnRequest = ChangeMsisdnRequestMapper.mapFrom(changeMsisdnWebRequest);
         subscriptionService.changeMsisdn(changeMsisdnRequest);
+    }
+
+    private void validateMsisdn(String msisdn) {
+        if (PhoneNumber.isNotValid(msisdn))
+            throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
     }
 }

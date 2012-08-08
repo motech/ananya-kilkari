@@ -13,6 +13,7 @@
     <import resource="classpath*:applicationPlatformServerAPI.xml"/>
     <import resource="classpath*:applicationContext-retry.xml"/>
     <util:properties id="couchdbProperties" location="classpath:couchdb.properties"/>
+
     <bean id="httpClient" class="org.ektorp.spring.HttpClientFactoryBean">
         <property name="properties" ref="couchdbProperties"/>
     </bean>
@@ -30,8 +31,7 @@
 
     <bean id="obdHttpClient" class="org.motechproject.ananya.kilkari.obd.repository.OBDHttpClient">
         <constructor-arg ref="obdHttpClientConnectionManager"/>
-        <constructor-arg value="${kilkari.external.http.read.timeout}"/>
-        <constructor-arg value="${kilkari.external.http.connect.timeout}"/>
+        <constructor-arg value="${http.read.timeout}"/>
+        <constructor-arg value="${http.connect.timeout}"/>
     </bean>
-
 </beans>

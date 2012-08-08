@@ -15,8 +15,8 @@
     <bean id="kilkariRestTemplate" class="org.springframework.web.client.RestTemplate" autowire="byName">
         <constructor-arg>
             <bean class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory">
-                <property name="connectTimeout" value="${kilkari.external.http.connect.timeout}"/>
-                <property name="readTimeout" value="${kilkari.external.http.read.timeout}"/>
+                <property name="connectTimeout" value="${http.connect.timeout}"/>
+                <property name="readTimeout" value="${http.read.timeout}"/>
             </bean>
         </constructor-arg>
     </bean>

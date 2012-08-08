@@ -171,4 +171,11 @@ public class MessageCampaignServiceTest {
 
         assertNull(actualCampaignStartDate);
     }
+
+    @Test
+    public void shouldNotStopACampaignIfCampaignNameDoesNotExist() {
+        messageCampaignService.stop(new MessageCampaignRequest("externalId", null, DateTime.now()));
+        
+        verify(platformMessageCampaignService, never()).stopAll(any(CampaignRequest.class));
+    }
 }

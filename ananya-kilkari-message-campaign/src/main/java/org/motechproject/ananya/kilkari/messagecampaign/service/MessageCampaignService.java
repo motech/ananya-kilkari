@@ -10,6 +10,8 @@ import org.motechproject.ananya.kilkari.messagecampaign.response.MessageCampaign
 import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord;
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,7 @@ public class MessageCampaignService {
     public static final String SEVEN_MONTHS_CAMPAIGN_KEY = "kilkari-mother-child-campaign-seven-months";
     public static final String INFANT_DEATH_CAMPAIGN_KEY = "kilkari-mother-child-campaign-infant-death";
     public static final String MISCARRIAGE_CAMPAIGN_KEY = "kilkari-mother-child-campaign-miscarriage";
+    private final static Logger logger = LoggerFactory.getLogger(MessageCampaignService.class);
 
     public static final String CAMPAIGN_MESSAGE_NAME = "Mother Child Health Care";
     private org.motechproject.server.messagecampaign.service.MessageCampaignService campaignService;
@@ -42,9 +45,12 @@ public class MessageCampaignService {
         campaignService.startFor(MessageCampaignRequestMapper.newRequestFrom(campaignRequest, campaignScheduleDeltaDays, campaignScheduleDeltaMinutes));
     }
 
-    public boolean stop(MessageCampaignRequest enrollRequest) {
+    public void stop(MessageCampaignRequest enrollRequest) {
+        if(StringUtils.isEmpty(enrollRequest.getCampaignName())) {
+            logger.warn("No active campaign found to unenroll for subscriptionId : " + enrollRequest.getExternalId());
+            return;
+        }
         campaignService.stopAll(MessageCampaignRequestMapper.newRequestFrom(enrollRequest, 0, 0));
-        return true;
     }
 
     public List<MessageCampaignEnrollment> searchEnrollments(String externalId) {

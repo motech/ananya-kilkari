@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.functional.test;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.functional.test.builder.SubscriptionDataBuilder;
+import org.motechproject.ananya.kilkari.functional.test.domain.OBD;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.functional.test.utils.FunctionalTestUtils;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
@@ -15,6 +16,8 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
 
     @Autowired
     private KilkariPropertiesData kilkariProperties;
+
+
 
     @Test
     public void shouldSubscribeAndProgressAndCompleteSubscriptionSuccessfully() throws Exception {
@@ -69,6 +72,38 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
 
         when(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
         then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
+    }
+
+    @Test
+    public void shouldRetryDeliveryOfMessagesWhenTheSubscriberDoesNotReceiveMessagesOrCallIsNotMade() throws Exception {
+        int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
+        int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
+        DateTime futureDateForFirstCampaignAlert = DateTime.now().plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1);
+        DateTime futureDateForFirstDayFirstSlot = futureDateForFirstCampaignAlert.withHourOfDay(13).withMinuteOfHour(30);
+        DateTime futureDateForFirstDaySecondSlot = futureDateForFirstCampaignAlert.withHourOfDay(18).withMinuteOfHour(30);
+        DateTime futureDateForSecondDayFirstSlot = futureDateForFirstDaySecondSlot.plusDays(1).withHourOfDay(13).withMinuteOfHour(30);
+        DateTime futureDateForSecondDaySecondSlot = futureDateForSecondDayFirstSlot.withHourOfDay(18).withMinuteOfHour(30);
+        String week1 = "WEEK1";
+
+        SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
+
+        when(callCenter).subscribes(subscriptionData);
+        and(subscriptionManager).activates(subscriptionData);
+        and(time).isMovedToFuture(futureDateForFirstCampaignAlert);
+        then(user).messageIsReady(subscriptionData, week1);
+
+        when(time).isMovedToFuture(futureDateForFirstDayFirstSlot);
+        then(user).verifyThatNewMessageWasDelivered(subscriptionData, week1);
+        and(user).resetOnMobileOBDVerifier();
+
+        when(obd).userDoesNotPickUpTheCall(subscriptionData, week1);
+        and(time).isMovedToFuture(futureDateForFirstDaySecondSlot);
+        then(user).verifyThatRetryMessageWasDelivered(subscriptionData, week1);
+        and(user).resetOnMobileOBDVerifier();
+
+        when(obd).callIsNotDelivered(subscriptionData, week1);
+        and(time).isMovedToFuture(futureDateForSecondDaySecondSlot);
+        then(user).verifyThatNewMessageWasDelivered(subscriptionData, week1);
     }
 }
 

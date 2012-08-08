@@ -48,7 +48,7 @@ public class NewMessagesSenderJob extends MessagesSenderJob {
     @MotechListener(subjects = {NewMessagesSenderJob.RETRY_EVENT_SUBJECT})
     public void sendMessagesWithRetry(MotechEvent motechEvent) {
         logger.info("Handling send new messages with retry event");
-        try{
+        try {
             campaignMessageService.sendNewMessages();
             Map<String,Object> parameters = motechEvent.getParameters();
             retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), NewMessagesSenderJob.RETRY_GROUP_NAME);

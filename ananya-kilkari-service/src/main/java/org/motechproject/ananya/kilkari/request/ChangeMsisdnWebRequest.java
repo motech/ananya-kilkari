@@ -9,6 +9,9 @@ import java.util.List;
 public class ChangeMsisdnWebRequest {
 
     @JsonProperty
+    private String channel;
+
+    @JsonProperty
     private String oldMsisdn;
 
     @JsonProperty
@@ -20,14 +23,16 @@ public class ChangeMsisdnWebRequest {
 
     public ChangeMsisdnWebRequest() { }
 
-    public ChangeMsisdnWebRequest(String oldMsisdn, String newMsisdn, List<String> packs) {
+    public ChangeMsisdnWebRequest(String oldMsisdn, String newMsisdn, List<String> packs, String channel) {
         this.oldMsisdn = oldMsisdn;
         this.newMsisdn = newMsisdn;
         this.packs = packs;
+        this.channel = channel;
     }
 
     public Errors validate() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateChannel(channel);
         webRequestValidator.validateMsisdn(oldMsisdn);
         webRequestValidator.validateMsisdn(newMsisdn);
         webRequestValidator.validateSubscriptionPacksForChangeMsisdn(packs);
@@ -44,5 +49,9 @@ public class ChangeMsisdnWebRequest {
 
     public List<String> getPacks() {
         return packs;
+    }
+
+    public String getChannel() {
+        return channel;
     }
 }

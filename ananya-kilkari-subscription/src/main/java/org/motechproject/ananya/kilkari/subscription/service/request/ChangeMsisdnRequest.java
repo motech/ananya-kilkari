@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.subscription.service.request;
 
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+
 import java.util.List;
 
 public class ChangeMsisdnRequest {
@@ -11,11 +13,14 @@ public class ChangeMsisdnRequest {
 
     private List<SubscriptionPack> packs;
 
+    private Channel channel;
+
     private boolean shouldChangeAllPacks = false;
 
-    public ChangeMsisdnRequest(String oldMsisdn, String newMsisdn) {
+    public ChangeMsisdnRequest(String oldMsisdn, String newMsisdn, Channel channel) {
         this.oldMsisdn = oldMsisdn;
         this.newMsisdn = newMsisdn;
+        this.channel = channel;
     }
 
     public void setPacks(List<SubscriptionPack> packs) {
@@ -40,5 +45,9 @@ public class ChangeMsisdnRequest {
 
     public List<SubscriptionPack> getPacks() {
         return packs;
+    }
+
+    public Channel getChannel() {
+        return channel;
     }
 }

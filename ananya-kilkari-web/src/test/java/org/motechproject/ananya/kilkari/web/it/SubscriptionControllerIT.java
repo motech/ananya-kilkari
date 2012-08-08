@@ -296,7 +296,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         allSubscriptions.add(oldSubscription);
 
-        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()));
+        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()), Channel.CALL_CENTER.toString());
 
         ReportingService mockReportingService = mock(ReportingService.class);
         reportingService.setBehavior(mockReportingService);

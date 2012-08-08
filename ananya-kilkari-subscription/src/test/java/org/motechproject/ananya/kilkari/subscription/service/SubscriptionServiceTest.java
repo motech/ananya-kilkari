@@ -857,7 +857,7 @@ public class SubscriptionServiceTest {
     public void shouldChangeMsisdn() {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn);
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CALL_CENTER);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.NANHI_KILKARI));
 
         Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now().minusWeeks(2).minusHours(1), SubscriptionStatus.ACTIVE);
@@ -915,7 +915,7 @@ public class SubscriptionServiceTest {
     public void shouldChangeMsisdnForEarlySubscription() {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn);
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CALL_CENTER);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.NANHI_KILKARI));
 
         Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), SubscriptionStatus.NEW_EARLY);

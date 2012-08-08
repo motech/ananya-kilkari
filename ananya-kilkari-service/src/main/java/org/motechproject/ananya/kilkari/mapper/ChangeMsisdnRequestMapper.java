@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.mapper;
 
 import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.request.ChangeMsisdnWebRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
 
@@ -12,7 +13,7 @@ public class ChangeMsisdnRequestMapper {
 
     public static ChangeMsisdnRequest mapFrom(ChangeMsisdnWebRequest changeMsisdnWebRequest) {
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(
-                changeMsisdnWebRequest.getOldMsisdn(), changeMsisdnWebRequest.getNewMsisdn());
+                changeMsisdnWebRequest.getOldMsisdn(), changeMsisdnWebRequest.getNewMsisdn(), Channel.from(changeMsisdnWebRequest.getChannel()));
 
         if (changeMsisdnWebRequest.getPacks().size() == 1 &&
             StringUtils.trim(changeMsisdnWebRequest.getPacks().get(0)).equalsIgnoreCase("ALL")) {

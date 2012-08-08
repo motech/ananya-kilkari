@@ -5,6 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
@@ -37,7 +38,7 @@ public class ChangeMsisdnValidatorTest {
     @Test
     public void shouldValidateChangeMsisdnRequest() {
         String oldMsisdn = "9876543210";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211");
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CALL_CENTER);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.BARI_KILKARI, SubscriptionPack.CHOTI_KILKARI));
 
         Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, null, SubscriptionStatus.ACTIVE);
@@ -51,7 +52,7 @@ public class ChangeMsisdnValidatorTest {
     @Test
     public void shouldValidateChangeMsisdnRequestWhenOnePackIsMissing() {
         String oldMsisdn = "9876543210";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211");
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CALL_CENTER);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.BARI_KILKARI, SubscriptionPack.CHOTI_KILKARI, SubscriptionPack.NANHI_KILKARI));
 
         Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, null, SubscriptionStatus.ACTIVE);
@@ -68,7 +69,7 @@ public class ChangeMsisdnValidatorTest {
     @Test
     public void shouldValidateChangeMsisdnRequestWhenAllPacksSpecified() {
         String oldMsisdn = "9876543210";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211");
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CALL_CENTER);
         changeMsisdnRequest.setShouldChangeAllPacks(true);
 
         Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, null, SubscriptionStatus.ACTIVE);
@@ -82,7 +83,7 @@ public class ChangeMsisdnValidatorTest {
     @Test
     public void shouldValidateChangeMsisdnRequestWhenNoSubscriptionIsPresent() {
         String oldMsisdn = "9876543210";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211");
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CALL_CENTER);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.BARI_KILKARI, SubscriptionPack.CHOTI_KILKARI, SubscriptionPack.NANHI_KILKARI));
 
         when(allSubscriptions.findSubscriptionsInProgress(changeMsisdnRequest.getOldMsisdn())).thenReturn(new ArrayList<Subscription>());

@@ -4,7 +4,19 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum SubscriptionStatus {
-    NEW, NEW_EARLY, PENDING_ACTIVATION, ACTIVATION_FAILED, COMPLETED, ACTIVE, DEACTIVATION_REQUEST_RECEIVED, PENDING_DEACTIVATION, DEACTIVATED, SUSPENDED, PENDING_COMPLETION;
+    NEW("New"), NEW_EARLY("Early Subscripiton"), PENDING_ACTIVATION("Pending Subscription"), ACTIVATION_FAILED("Activation Failed"),
+    COMPLETED("Completed"), ACTIVE("Activated"), DEACTIVATION_REQUEST_RECEIVED("Deactivation Requested"), PENDING_DEACTIVATION("Pending Deactivation"),
+    DEACTIVATED("Deactivated"), SUSPENDED("Suspended"), PENDING_COMPLETION("Pending Completion");
+
+    private String displayString;
+
+    SubscriptionStatus(String displayString) {
+        this.displayString = displayString;
+    }
+
+    public String getDisplayString() {
+        return displayString;
+    }
 
     public boolean canRenew() {
         return this == ACTIVE || this == SUSPENDED;

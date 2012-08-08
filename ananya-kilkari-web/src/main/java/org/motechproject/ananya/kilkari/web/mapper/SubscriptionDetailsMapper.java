@@ -17,6 +17,6 @@ public class SubscriptionDetailsMapper {
 
     public SubscriptionDetails mapFrom(Subscription subscription) {
         String messageId = inboxService.getMessageFor(subscription.getSubscriptionId());
-        return new SubscriptionDetails(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStatus().name(), messageId);
+        return new SubscriptionDetails(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStatus().getDisplayString(), messageId);
     }
 }

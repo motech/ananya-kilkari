@@ -33,7 +33,7 @@ public class SubscriptionDetailsMapperTest {
 
         assertEquals(subscription.getSubscriptionId(), subscriptionDetails.getSubscriptionId());
         assertEquals(subscription.getPack().name(), subscriptionDetails.getPack());
-        assertEquals(subscription.getStatus().name(), subscriptionDetails.getStatus());
+        assertEquals(subscription.getStatus().getDisplayString(), subscriptionDetails.getStatus());
     }
 
     @Test

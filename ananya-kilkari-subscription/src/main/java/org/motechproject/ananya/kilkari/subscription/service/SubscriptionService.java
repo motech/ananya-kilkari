@@ -73,7 +73,7 @@ public class SubscriptionService {
         Subscription subscription = createSubscription(subscriptionRequest, channel);
 
         reportingService.reportSubscriptionCreation(SubscriptionMapper.createSubscriptionCreationReportRequest(
-                subscription, channel, subscriptionRequest.getLocation(), subscriptionRequest.getSubscriber()));
+                subscription, channel, subscriptionRequest));
 
         return subscription;
     }
@@ -326,6 +326,7 @@ public class SubscriptionService {
 
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeMsisdnRequest.getNewMsisdn(),
                 DateTime.now(), subscription.getPack(), location, subscriber);
+        subscriptionRequest.setOldSubscriptionId(subscription.getSubscriptionId());
 
         createSubscriptionWithReporting(subscriptionRequest, changeMsisdnRequest.getChannel());
     }

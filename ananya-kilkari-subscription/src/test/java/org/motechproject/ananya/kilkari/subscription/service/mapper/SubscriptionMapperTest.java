@@ -12,6 +12,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -40,7 +41,8 @@ public class SubscriptionMapperTest {
 
     @Test
     public void shouldCreateReportingRequest() {
-        SubscriptionReportRequest request = new SubscriptionMapper().createSubscriptionCreationReportRequest(subscription, channel, Location.NULL, Subscriber.NULL);
+        SubscriptionReportRequest request = new SubscriptionMapper().createSubscriptionCreationReportRequest(
+                subscription, channel, new SubscriptionRequest("msisdn", null, null, Location.NULL, Subscriber.NULL));
 
         assertEquals(subscription.getMsisdn(), request.getMsisdn().toString());
         assertEquals(subscription.getPack().name(), request.getPack());
@@ -57,7 +59,8 @@ public class SubscriptionMapperTest {
         String district = "district";
         Location location = new Location(district, block, panchayat);
 
-        SubscriptionReportRequest request = new SubscriptionMapper().createSubscriptionCreationReportRequest(subscription, channel, location, Subscriber.NULL);
+        SubscriptionReportRequest request = new SubscriptionMapper().createSubscriptionCreationReportRequest(
+                subscription, channel, new SubscriptionRequest("msisdn", null, null, location, Subscriber.NULL));
 
         SubscriberLocation actualLocation = request.getLocation();
         assertEquals(panchayat, actualLocation.getPanchayat());

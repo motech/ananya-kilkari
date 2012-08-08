@@ -8,6 +8,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 
 public class SubscriptionMapper {
 
@@ -15,8 +16,12 @@ public class SubscriptionMapper {
         return new OMSubscriptionRequest(subscription.getMsisdn(), subscription.getPack(), channel, subscription.getSubscriptionId());
     }
 
-    public static SubscriptionReportRequest createSubscriptionCreationReportRequest(Subscription subscription, Channel channel, Location location, Subscriber subscriber) {
+    public static SubscriptionReportRequest createSubscriptionCreationReportRequest(
+            Subscription subscription, Channel channel, SubscriptionRequest subscriptionRequest) {
+        Location location = subscriptionRequest.getLocation();
         SubscriberLocation subscriberLocation = new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
+        Subscriber subscriber = subscriptionRequest.getSubscriber();
+
         SubscriptionReportRequest subscriptionReportRequest = new SubscriptionReportRequest();
         subscriptionReportRequest.setAgeOfBeneficiary(subscriber.getBeneficiaryAge());
         subscriptionReportRequest.setChannel(channel.name());
@@ -30,6 +35,7 @@ public class SubscriptionMapper {
         subscriptionReportRequest.setLocation(subscriberLocation);
         subscriptionReportRequest.setMsisdn(NumberUtils.createLong(subscription.getMsisdn()));
         subscriptionReportRequest.setPack(subscription.getPack().name());
+        subscriptionReportRequest.setOldSubscriptionId(subscriptionRequest.getOldSubscriptionId());
 
         return subscriptionReportRequest;
     }

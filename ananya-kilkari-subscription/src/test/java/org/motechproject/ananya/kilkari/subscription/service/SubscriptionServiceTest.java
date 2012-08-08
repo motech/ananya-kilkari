@@ -909,6 +909,7 @@ public class SubscriptionServiceTest {
 
         assertEquals(beneficiaryName, subscriptionReportRequest.getName());
         assertEquals(beneficiaryAge, subscriptionReportRequest.getAgeOfBeneficiary());
+        assertEquals(subscription1.getSubscriptionId(), subscriptionReportRequest.getOldSubscriptionId());
     }
 
     @Test

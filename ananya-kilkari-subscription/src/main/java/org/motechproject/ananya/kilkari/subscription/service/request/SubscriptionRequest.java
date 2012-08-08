@@ -9,6 +9,7 @@ public class SubscriptionRequest {
     private SubscriptionPack pack;
     private Location location;
     private Subscriber subscriber;
+    private String oldSubscriptionId;
 
     public SubscriptionRequest(String msisdn, DateTime creationDate,
                                SubscriptionPack pack, Location location, Subscriber subscriber) {
@@ -41,6 +42,14 @@ public class SubscriptionRequest {
 
     public boolean hasLocation() {
         return !Location.NULL.equals(getLocation());
+    }
+
+    public String getOldSubscriptionId() {
+        return oldSubscriptionId;
+    }
+
+    public void setOldSubscriptionId(String oldSubscriptionId) {
+        this.oldSubscriptionId = oldSubscriptionId;
     }
 
     public DateTime getSubscriptionStartDate() {

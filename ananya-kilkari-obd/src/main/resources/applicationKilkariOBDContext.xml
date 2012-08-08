@@ -12,11 +12,13 @@
     <import resource="classpath*:applicationScheduler.xml"/>
     <import resource="classpath*:applicationPlatformServerAPI.xml"/>
     <import resource="classpath*:applicationContext-retry.xml"/>
+    <util:properties id="couchdbProperties" location="classpath:couchdb.properties"/>
+    <bean id="httpClient" class="org.ektorp.spring.HttpClientFactoryBean">
+        <property name="properties" ref="couchdbProperties"/>
+    </bean>
 
     <bean id="obdDbInstance" class="org.ektorp.impl.StdCouchDbInstance">
-        <constructor-arg>
-            <bean id="httpClient" class="org.ektorp.spring.HttpClientFactoryBean"/>
-        </constructor-arg>
+        <constructor-arg ref="httpClient"/>
     </bean>
 
     <bean id="obdDbConnector" class="org.ektorp.impl.StdCouchDbConnector">

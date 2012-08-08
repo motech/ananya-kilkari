@@ -2,8 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-                               http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+                               http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+                               http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
 
     <import resource="classpath*:applicationKilkariCommonContext.xml"/>
@@ -19,10 +21,13 @@
         <constructor-arg name="connectionFactory" ref="connectionFactory"/>
     </bean>
 
+    <util:properties id="couchdbProperties" location="classpath:couchdb.properties"/>
+    <bean id="httpClient" class="org.ektorp.spring.HttpClientFactoryBean">
+        <property name="properties" ref="couchdbProperties"/>
+    </bean>
+
     <bean id="kilkariDbInstance" class="org.ektorp.impl.StdCouchDbInstance">
-        <constructor-arg>
-            <bean id="httpClient" class="org.ektorp.spring.HttpClientFactoryBean"/>
-        </constructor-arg>
+        <constructor-arg ref="httpClient"/>
     </bean>
 
     <bean id="kilkariDbConnector" class="org.ektorp.impl.StdCouchDbConnector">

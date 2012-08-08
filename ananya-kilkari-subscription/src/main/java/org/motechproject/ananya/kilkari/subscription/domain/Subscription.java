@@ -155,7 +155,7 @@ public class Subscription extends MotechBaseDataObject {
     public void activate(String operator, DateTime activatedOn) {
         setStatus(SubscriptionStatus.ACTIVE);
         setOperator(Operator.getFor(operator));
-        startDate = startDate.plus(activatedOn.getMillis() - startDate.getMillis());
+        startDate = activatedOn;
     }
 
     public void activationFailed(String operator) {
@@ -216,5 +216,22 @@ public class Subscription extends MotechBaseDataObject {
 
     public void setMsisdn(String msisdn) {
         this.msisdn = msisdn;
+    }
+
+    @JsonIgnore
+    public boolean isEarlySubscription() {
+        return startDate.isAfter(creationDate);
+    }
+
+    @JsonIgnore
+    public boolean isLateSubscription() {
+        return startDate.isBefore(creationDate);
+    }
+
+    @JsonIgnore
+    public DateTime getStartDateForSubscription(DateTime activatedOn) {
+        if (!isLateSubscription()) return activatedOn;
+
+        return startDate.plus(activatedOn.getMillis() - creationDate.getMillis());
     }
 }

@@ -123,11 +123,12 @@ public class SubscriptionService {
 
     public void activate(String subscriptionId, final DateTime activatedOn, final String operator) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        scheduleCampaign(subscription, activatedOn);
+        final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(activatedOn);
+        scheduleCampaign(subscription, scheduleStartDateTime);
         updateStatusAndReport(subscriptionId, activatedOn, null, operator, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
-                subscription.activate(operator, activatedOn);
+                subscription.activate(operator, scheduleStartDateTime);
             }
         });
     }

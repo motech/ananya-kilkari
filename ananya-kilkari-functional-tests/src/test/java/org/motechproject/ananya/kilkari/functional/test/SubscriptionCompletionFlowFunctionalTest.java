@@ -26,7 +26,6 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
 
         SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
 
-
         when(callCenter).subscribes(subscriptionData);
         and(subscriptionManager).activates(subscriptionData);
         and(time).isMovedToFuture(futureDateForFirstCampaignAlertToBeRaised);

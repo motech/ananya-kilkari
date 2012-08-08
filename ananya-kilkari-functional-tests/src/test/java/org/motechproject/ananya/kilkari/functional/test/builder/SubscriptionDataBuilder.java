@@ -1,7 +1,6 @@
 package org.motechproject.ananya.kilkari.functional.test.builder;
 
 import org.apache.commons.lang.RandomStringUtils;
-import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.request.LocationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -20,7 +19,6 @@ public class SubscriptionDataBuilder {
         subscriptionData.setMsisdn("1" + RandomStringUtils.randomNumeric(9));
         subscriptionData.setBeneficiaryAge("25");
         subscriptionData.setBeneficiaryName("Dumbledore");
-        subscriptionData.setExpectedDateOfDelivery(DateTime.now().plusMonths(2).toString("dd-MM-yyyy"));
         LocationRequest location = new LocationRequest();
         location.setBlock("block");
         location.setDistrict("district");

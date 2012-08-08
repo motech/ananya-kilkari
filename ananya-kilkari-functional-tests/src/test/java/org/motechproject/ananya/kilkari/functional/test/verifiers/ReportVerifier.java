@@ -44,7 +44,6 @@ public class ReportVerifier {
         assertEquals(subscriptionData.getBeneficiaryName(), reportRequest.getName());
         assertEquals(subscriptionData.getPack().name(), reportRequest.getPack());
         assertEquals(subscriptionData.getChannel(), reportRequest.getChannel());
-        assertEquals(subscriptionData.getExpectedDateOfDelivery(), reportRequest.getEstimatedDateOfDelivery().toString("dd-MM-yyyy"));
         assertEquals(subscriptionData.getBeneficiaryAge(), String.valueOf(reportRequest.getAgeOfBeneficiary()));
         LocationRequest location = subscriptionData.getLocation();
         assertEquals(location.getBlock(), reportRequest.getLocation().getBlock());

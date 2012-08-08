@@ -32,8 +32,9 @@ public class FunctionalTestUtils extends SpringIntegrationTest {
 
     @After
     public void after() {
-        reportVerifier.resetMockBehaviour();
+        reportVerifier.reset();
         onMobileOBDVerifier.reset();
+        campaignMessageVerifier.reset();
         super.after();
     }
 

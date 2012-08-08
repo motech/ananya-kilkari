@@ -3,7 +3,6 @@ package org.motechproject.ananya.kilkari.functional.test;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.functional.test.builder.SubscriptionDataBuilder;
-import org.motechproject.ananya.kilkari.functional.test.domain.OBD;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.functional.test.utils.FunctionalTestUtils;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
@@ -16,8 +15,6 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
 
     @Autowired
     private KilkariPropertiesData kilkariProperties;
-
-
 
     @Test
     public void shouldSubscribeAndProgressAndCompleteSubscriptionSuccessfully() throws Exception {
@@ -58,17 +55,21 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
         and(subscriptionManager).activates(subscriptionData);
         and(time).isMovedToFuture(futureDateForFirstCampaignAlertToBeRaised);
         then(user).messageIsReady(subscriptionData, "WEEK1");
+        and(user).resetCampaignMessageVerifier();
 
         when(subscriptionManager).failsRenew(subscriptionData);
         and(time).isMovedToFuture(futureDateOfSecondCampaignAlert);
-        then(user).messageIsNotReady(subscriptionData, "WEEK2");
+        then(user).messageIsNotCreated(subscriptionData, "WEEK2");
+        and(user).resetCampaignMessageVerifier();
 
         when(time).isMovedToFuture(week2MessageExpiryDate);
-        and(subscriptionManager).renews(subscriptionData);
-        then(user).messageIsNotReady(subscriptionData, "WEEK2");
+        then(subscriptionManager).renews(subscriptionData);
+        then(user).messageIsNotCreated(subscriptionData, "WEEK2");
+        and(user).resetCampaignMessageVerifier();
 
         when(time).isMovedToFuture(futureDateForThirdCampaignAlert);
         and(user).messageIsReady(subscriptionData, "WEEK3");
+        and(user).resetCampaignMessageVerifier();
 
         when(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
         then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);

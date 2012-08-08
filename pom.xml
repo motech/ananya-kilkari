@@ -31,6 +31,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <db.server>localhost</db.server>
         <db.port>5984</db.port>
+        <activemq.host>localhost</activemq.host>
+        <activemq.port>8161</activemq.port>
+        <main.basedir>${project.basedir}</main.basedir>
+        <activemq.queue.name>kilkari.events.q</activemq.queue.name>
     </properties>
 
     <distributionManagement>
@@ -162,6 +166,29 @@
                             </includes>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>Clear ActiveMQ Before Integration Tests</id>
+                        <phase>pre-integration-test</phase>
+                        <configuration>
+                            <target>
+                                <echo message="Clearing ActiveMQ Queues: START"/>
+                                <exec executable="sh">
+                                    <arg value="${main.basedir}/build/deleteQueue.sh"/>
+                                    <arg value="${activemq.host}:${activemq.port}"/>
+                                    <arg value="${activemq.queue.name}"/>
+                                </exec>
+                                <echo message="Clearing ActiveMQ Queues: END"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

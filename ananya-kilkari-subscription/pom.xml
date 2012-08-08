@@ -15,6 +15,7 @@
 
     <properties>
         <db.name>motech-subscription</db.name>
+        <main.basedir>${project.basedir}/../</main.basedir>
     </properties>
 
     <dependencies>

@@ -15,6 +15,7 @@
 
     <properties>
         <db.name>motech-message</db.name>
+        <main.basedir>${project.basedir}/../</main.basedir>
     </properties>
 
 

@@ -12,6 +12,10 @@
     <artifactId>ananya-kilkari-functional-tests</artifactId>
     <name>Ananya Kilkari Functional Tests</name>
 
+    <properties>
+        <main.basedir>${project.basedir}/../</main.basedir>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

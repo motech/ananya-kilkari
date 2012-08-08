@@ -13,6 +13,7 @@
 
     <properties>
         <jetty.port>9979</jetty.port>
+        <main.basedir>${project.basedir}/../</main.basedir>
     </properties>
 
     <build>

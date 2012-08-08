@@ -15,6 +15,7 @@
 
     <properties>
         <db.name>motech-obd</db.name>
+        <main.basedir>${project.basedir}/../</main.basedir>
     </properties>
 
     <dependencies>

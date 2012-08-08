@@ -12,6 +12,10 @@
     <artifactId>ananya-kilkari-service</artifactId>
     <name>Ananya Kilkari Service</name>
 
+    <properties>
+        <main.basedir>${project.basedir}/../</main.basedir>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.motechproject</groupId>

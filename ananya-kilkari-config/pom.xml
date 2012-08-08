@@ -12,6 +12,9 @@
 
     <name>Ananya Kilkari Config</name>
     <artifactId>ananya-kilkari-config</artifactId>
+    <properties>
+        <main.basedir>${project.basedir}/../</main.basedir>
+    </properties>
 
     <dependencies>
         <dependency>

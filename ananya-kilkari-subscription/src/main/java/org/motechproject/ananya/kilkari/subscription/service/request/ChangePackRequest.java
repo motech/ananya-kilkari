@@ -52,4 +52,12 @@ public class ChangePackRequest {
     public DateTime getDateOfBirth() {
         return dateOfBirth;
     }
+
+    public void setExpectedDateOfDelivery(DateTime expectedDateOfDelivery) {
+        this.expectedDateOfDelivery = expectedDateOfDelivery;
+    }
+
+    public void setDateOfBirth(DateTime dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
 }

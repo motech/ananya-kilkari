@@ -32,12 +32,6 @@ public class WebRequestValidator {
 
     }
 
-    public void validateOneOfEDDOrDOBIsPresent(String... args) {
-        if (!ValidationUtils.assertOnePresent(args))
-            errors.add("Invalid request. One of expected date of delivery or date of birth should be present");
-
-    }
-
     public void validateCampaignChangeReason(String reason) {
         if (!CampaignChangeReason.isValid(reason))
             errors.add("Invalid reason %s", reason);

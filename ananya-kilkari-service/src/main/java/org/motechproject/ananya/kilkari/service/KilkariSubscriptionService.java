@@ -10,7 +10,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
-import org.motechproject.ananya.kilkari.subscription.service.ChangePackProcessor;
+import org.motechproject.ananya.kilkari.subscription.service.ChangePackService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
@@ -35,8 +35,8 @@ public class KilkariSubscriptionService {
     private SubscriptionService subscriptionService;
     private MotechSchedulerService motechSchedulerService;
     private KilkariPropertiesData kilkariProperties;
-    private ChangePackProcessor changePackProcessor;
     private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
+    private ChangePackService changePackService;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariSubscriptionService.class);
 
@@ -44,13 +44,13 @@ public class KilkariSubscriptionService {
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
                                       SubscriptionService subscriptionService,
                                       MotechSchedulerService motechSchedulerService,
-                                      KilkariPropertiesData kilkariProperties,
-                                      ChangePackProcessor changePackProcessor, UnsubscriptionRequestValidator unsubscriptionRequestValidator) {
+                                      ChangePackService changePackService, KilkariPropertiesData kilkariProperties,
+                                      UnsubscriptionRequestValidator unsubscriptionRequestValidator) {
         this.subscriptionPublisher = subscriptionPublisher;
         this.subscriptionService = subscriptionService;
         this.motechSchedulerService = motechSchedulerService;
+        this.changePackService = changePackService;
         this.kilkariProperties = kilkariProperties;
-        this.changePackProcessor = changePackProcessor;
         this.unsubscriptionRequestValidator = unsubscriptionRequestValidator;
     }
 
@@ -117,7 +117,7 @@ public class KilkariSubscriptionService {
     public void changePack(ChangePackWebRequest changePackWebRequest, String subscriptionId) {
         Errors errors = changePackWebRequest.validate();
         raiseExceptionIfThereAreErrors(errors);
-        changePackProcessor.process(SubscriptionRequestMapper.mapToChangePackRequest(changePackWebRequest, subscriptionId));
+        changePackService.process(SubscriptionRequestMapper.mapToChangePackRequest(changePackWebRequest, subscriptionId));
     }
 
     public Subscription findSubscriptionInProgress(String msisdn, SubscriptionPack pack) {

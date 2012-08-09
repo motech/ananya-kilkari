@@ -21,7 +21,7 @@ import static junit.framework.Assert.assertEquals;
 public class ChangePackProcessorIT extends SpringIntegrationTest {
 
     @Autowired
-    private ChangePackProcessor changePackProcessor;
+    private ChangePackService changePackService;
 
     @Autowired
     private AllSubscriptions allSubscriptions;
@@ -42,7 +42,7 @@ public class ChangePackProcessorIT extends SpringIntegrationTest {
         allSubscriptions.add(existingSubscription);
         ChangePackRequest changePackRequest = new ChangePackRequest(msisdn, existingSubscription.getSubscriptionId(), SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now(), DateTime.now().plusMonths(1), null);
 
-        changePackProcessor.process(changePackRequest);
+        changePackService.process(changePackRequest);
 
         List<Subscription> subscriptions = allSubscriptions.findByMsisdn(msisdn);
         Subscription deactivatedSubscription = subscriptions.get(0);

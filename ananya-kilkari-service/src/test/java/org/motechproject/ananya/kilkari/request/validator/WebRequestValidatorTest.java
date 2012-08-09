@@ -2,7 +2,6 @@ package org.motechproject.ananya.kilkari.request.validator;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -143,15 +142,5 @@ public class WebRequestValidatorTest {
         webRequestValidator.validateSubscriptionPacksForChangeMsisdn(new ArrayList<String>());
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("At least one pack should be specified"));
-    }
-
-    @Test
-    public void shouldReturnErrorIfOneOfDobOrEddIsNotPresent() {
-        WebRequestValidator webRequestValidator = new WebRequestValidator();
-
-        webRequestValidator.validateOneOfEDDOrDOBIsPresent("edd","dob","week");
-
-        assertEquals(1, webRequestValidator.getErrors().getCount());
-        assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. One of expected date of delivery or date of birth should be present"));
     }
 }

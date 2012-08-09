@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -8,6 +9,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.contract.request.SubscriptionChangePackRequest;
+import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
@@ -19,10 +21,11 @@ import static junit.framework.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ChangePackProcessorTest {
+public class ChangePackServiceTest {
 
     @Mock
     private SubscriptionService subscriptionService;
@@ -30,11 +33,15 @@ public class ChangePackProcessorTest {
     private ReportingService reportingService;
     @Mock
     private SubscriptionValidator subscriptionValidator;
+    ChangePackService changePackService;
 
+    @Before
+    public void setup() {
+        changePackService = new ChangePackService(subscriptionService, subscriptionValidator, reportingService);
+    }
 
     @Test
     public void shouldChangeThePackOfAnSubscription() {
-        ChangePackProcessor changePackProcessor = new ChangePackProcessor(subscriptionService, subscriptionValidator, reportingService);
         DateTime dateOfBirth = DateTime.now();
 
         Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.BARI_KILKARI).build();
@@ -48,7 +55,7 @@ public class ChangePackProcessorTest {
         Subscription newSubscription = new SubscriptionBuilder().withDefaults().withPack(changePackRequest.getPack()).build();
         when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CALL_CENTER))).thenReturn(newSubscription);
 
-        changePackProcessor.process(changePackRequest);
+        changePackService.process(changePackRequest);
 
         InOrder order = inOrder(subscriptionService, reportingService, subscriptionValidator);
         order.verify(subscriptionValidator).validateSubscriptionExists(subscriptionId);
@@ -66,6 +73,28 @@ public class ChangePackProcessorTest {
         order.verify(reportingService).reportChangePack(reportRequestCaptor.capture());
         SubscriptionChangePackRequest reportRequest = reportRequestCaptor.getValue();
         validateReportsRequest(dateOfBirth, existingSubscription, newSubscription, reportRequest);
+    }
+
+    @Test
+    public void shouldGetEddOrDobFromReportingDBIfThePassedValuesAreNull() {
+        DateTime dateOfBirth = DateTime.now();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.BARI_KILKARI).build();
+        String subscriptionId = subscription.getSubscriptionId();
+        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CALL_CENTER))).thenReturn(subscription);
+        SubscriberResponse subscriberResponse = new SubscriberResponse(null, null, dateOfBirth, null, null);
+        when(reportingService.getSubscriber(subscriptionId)).thenReturn(subscriberResponse);
+
+        changePackService.process(new ChangePackRequest("1234567890", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CALL_CENTER, null, null, null));
+
+        verify(reportingService).getSubscriber(subscriptionId);
+        ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);
+        ArgumentCaptor<SubscriptionRequest> requestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
+        verify(subscriptionService).createSubscription(requestArgumentCaptor.capture(), channelArgumentCaptor.capture());
+        SubscriptionRequest subscriptionRequest = requestArgumentCaptor.getValue();
+
+        assertEquals(subscriberResponse.getExpectedDateOfDelivery(), subscriptionRequest.getSubscriber().getExpectedDateOfDelivery());
+        assertEquals(subscriberResponse.getDateOfBirth(), subscriptionRequest.getSubscriber().getDateOfBirth());
     }
 
     private void validateReportsRequest(DateTime dateOfBirth, Subscription existingSubscription, Subscription newSubscription, SubscriptionChangePackRequest reportRequest) {

@@ -73,7 +73,6 @@ public class ChangePackWebRequest {
         webRequestValidator.validateMsisdn(msisdn);
         webRequestValidator.validatePack(pack);
         webRequestValidator.validateChannel(channel);
-        webRequestValidator.validateOneOfEDDOrDOBIsPresent(expectedDateOfDelivery, dateOfBirth);
         webRequestValidator.validateDOB(dateOfBirth, createdAt);
         webRequestValidator.validateEDD(expectedDateOfDelivery, createdAt);
         return webRequestValidator.getErrors();

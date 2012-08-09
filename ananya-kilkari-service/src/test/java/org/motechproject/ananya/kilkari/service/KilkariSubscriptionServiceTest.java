@@ -17,7 +17,7 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscri
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.service.ChangePackProcessor;
+import org.motechproject.ananya.kilkari.subscription.service.ChangePackService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
@@ -53,14 +53,14 @@ public class KilkariSubscriptionServiceTest {
     @Mock
     private KilkariPropertiesData kilkariPropertiesData;
     @Mock
-    private ChangePackProcessor changePackProcessor;
-    @Mock
     private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
+    @Mock
+    private ChangePackService changePackService;
 
     @Before
     public void setup() {
         initMocks(this);
-        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, kilkariPropertiesData, changePackProcessor, unsubscriptionRequestValidator);
+        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, changePackService, kilkariPropertiesData, unsubscriptionRequestValidator);
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
     }
 
@@ -193,7 +193,7 @@ public class KilkariSubscriptionServiceTest {
         UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
         unsubscriptionRequest.setChannel(Channel.CALL_CENTER.name());
         when(unsubscriptionRequestValidator.validate(subscriptionId)).thenReturn(new Errors());
-        
+
         kilkariSubscriptionService.requestDeactivation(subscriptionId, unsubscriptionRequest);
 
         ArgumentCaptor<DeactivationRequest> deactivationRequestArgumentCaptor = ArgumentCaptor.forClass(DeactivationRequest.class);
@@ -284,7 +284,7 @@ public class KilkariSubscriptionServiceTest {
         kilkariSubscriptionService.changePack(changePackWebRequest, subscriptionId);
 
         ArgumentCaptor<ChangePackRequest> changePackRequestArgumentCaptor = ArgumentCaptor.forClass(ChangePackRequest.class);
-        verify(changePackProcessor).process(changePackRequestArgumentCaptor.capture());
+        verify(changePackService).process(changePackRequestArgumentCaptor.capture());
         ChangePackRequest changePackRequest = changePackRequestArgumentCaptor.getValue();
 
         assertEquals(changePackWebRequest.getMsisdn(), changePackRequest.getMsisdn());
@@ -301,6 +301,6 @@ public class KilkariSubscriptionServiceTest {
 
         kilkariSubscriptionService.changePack(changePackWebRequest, "subscriptionId");
 
-        verify(changePackProcessor, never()).process(any(ChangePackRequest.class));
+        verify(changePackService, never()).process(any(ChangePackRequest.class));
     }
 }

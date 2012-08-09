@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.validators;
+package org.motechproject.ananya.kilkari.service.validator;
 
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;

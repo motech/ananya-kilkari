@@ -11,6 +11,7 @@ import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.request.*;
+import org.motechproject.ananya.kilkari.service.validator.UnsubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -22,6 +23,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackR
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
@@ -52,11 +54,13 @@ public class KilkariSubscriptionServiceTest {
     private KilkariPropertiesData kilkariPropertiesData;
     @Mock
     private ChangePackProcessor changePackProcessor;
+    @Mock
+    private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
 
     @Before
     public void setup() {
         initMocks(this);
-        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, kilkariPropertiesData, changePackProcessor);
+        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, kilkariPropertiesData, changePackProcessor, unsubscriptionRequestValidator);
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
     }
 
@@ -188,7 +192,8 @@ public class KilkariSubscriptionServiceTest {
         String subscriptionId = "abcd1234";
         UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
         unsubscriptionRequest.setChannel(Channel.CALL_CENTER.name());
-
+        when(unsubscriptionRequestValidator.validate(subscriptionId)).thenReturn(new Errors());
+        
         kilkariSubscriptionService.requestDeactivation(subscriptionId, unsubscriptionRequest);
 
         ArgumentCaptor<DeactivationRequest> deactivationRequestArgumentCaptor = ArgumentCaptor.forClass(DeactivationRequest.class);
@@ -197,6 +202,21 @@ public class KilkariSubscriptionServiceTest {
 
         assertEquals(subscriptionId, deactivationRequest.getSubscriptionId());
         assertEquals(Channel.CALL_CENTER, deactivationRequest.getChannel());
+    }
+
+    @Test
+    public void shouldValidateSubscriptionWhileDeactivatingSubscription() {
+        String subscriptionId = "abcd1234";
+        Errors errors = new Errors();
+        errors.add("some error");
+        when(unsubscriptionRequestValidator.validate(subscriptionId)).thenReturn(errors);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("some error");
+
+        kilkariSubscriptionService.requestDeactivation(subscriptionId, mock(UnsubscriptionRequest.class));
+
+        verify(subscriptionService, never()).requestDeactivation(any(DeactivationRequest.class));
     }
 
     @Test

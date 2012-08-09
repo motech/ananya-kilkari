@@ -5,6 +5,7 @@ import org.motechproject.ananya.kilkari.domain.PhoneNumber;
 import org.motechproject.ananya.kilkari.mapper.ChangeMsisdnRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
 import org.motechproject.ananya.kilkari.request.*;
+import org.motechproject.ananya.kilkari.service.validator.UnsubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -35,6 +36,7 @@ public class KilkariSubscriptionService {
     private MotechSchedulerService motechSchedulerService;
     private KilkariPropertiesData kilkariProperties;
     private ChangePackProcessor changePackProcessor;
+    private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariSubscriptionService.class);
 
@@ -42,12 +44,14 @@ public class KilkariSubscriptionService {
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
                                       SubscriptionService subscriptionService,
                                       MotechSchedulerService motechSchedulerService,
-                                      KilkariPropertiesData kilkariProperties, ChangePackProcessor changePackProcessor) {
+                                      KilkariPropertiesData kilkariProperties,
+                                      ChangePackProcessor changePackProcessor, UnsubscriptionRequestValidator unsubscriptionRequestValidator) {
         this.subscriptionPublisher = subscriptionPublisher;
         this.subscriptionService = subscriptionService;
         this.motechSchedulerService = motechSchedulerService;
         this.kilkariProperties = kilkariProperties;
         this.changePackProcessor = changePackProcessor;
+        this.unsubscriptionRequestValidator = unsubscriptionRequestValidator;
     }
 
     public void createSubscriptionAsync(SubscriptionWebRequest subscriptionWebRequest) {
@@ -92,6 +96,9 @@ public class KilkariSubscriptionService {
     }
 
     public void requestDeactivation(String subscriptionId, UnsubscriptionRequest unsubscriptionRequest) {
+        Errors validationErrors = unsubscriptionRequestValidator.validate(subscriptionId);
+        raiseExceptionIfThereAreErrors(validationErrors);
+
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.from(unsubscriptionRequest.getChannel()), unsubscriptionRequest.getCreatedAt()));
     }
 

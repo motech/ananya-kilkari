@@ -10,7 +10,6 @@ import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
-import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -22,17 +21,14 @@ public class SubscriptionController {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
     private CallbackRequestValidator callbackRequestValidator;
-    private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
     private SubscriptionDetailsMapper subscriptionDetailsMapper;
 
     @Autowired
     public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService,
                                   CallbackRequestValidator callbackRequestValidator,
-                                  UnsubscriptionRequestValidator unsubscriptionRequestValidator,
                                   SubscriptionDetailsMapper subscriptionDetailsMapper) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.callbackRequestValidator = callbackRequestValidator;
-        this.unsubscriptionRequestValidator = unsubscriptionRequestValidator;
         this.subscriptionDetailsMapper = subscriptionDetailsMapper;
     }
 
@@ -83,9 +79,6 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.DELETE)
     @ResponseBody
     public BaseResponse removeSubscription(@RequestBody UnsubscriptionRequest unsubscriptionRequest, @PathVariable String subscriptionId) {
-        Errors validationErrors = unsubscriptionRequestValidator.validate(subscriptionId);
-        raiseExceptionIfThereAreErrors(validationErrors);
-
         kilkariSubscriptionService.requestDeactivation(subscriptionId, unsubscriptionRequest);
         return BaseResponse.success("Subscription unsubscribed successfully");
     }

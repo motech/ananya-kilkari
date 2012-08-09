@@ -27,7 +27,7 @@ import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
-import org.motechproject.ananya.kilkari.web.validators.UnsubscriptionRequestValidator;
+import org.motechproject.ananya.kilkari.service.validator.UnsubscriptionRequestValidator;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class SubscriptionControllerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, callbackRequestValidator, unsubscriptionRequestValidator, mockedSubscriptionDetailsMapper);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService, callbackRequestValidator, mockedSubscriptionDetailsMapper);
     }
 
     @Test
@@ -352,17 +352,14 @@ public class SubscriptionControllerTest {
         unsubscriptionRequest.setReason("reason");
         byte[] requestBody = TestUtils.toJson(unsubscriptionRequest).getBytes();
 
-        Errors errors = new Errors();
-        errors.add("some error description1");
-        errors.add("some error description2");
-        when(unsubscriptionRequestValidator.validate(anyString())).thenReturn(errors);
+        doThrow(new ValidationException("some error description")).when(kilkariSubscriptionService).requestDeactivation(anyString(), any(UnsubscriptionRequest.class));
 
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("ERROR", "some error description1,some error description2")));
+                .andExpect(content().string(baseResponseMatcher("ERROR", "some error description")));
     }
 
     @Test

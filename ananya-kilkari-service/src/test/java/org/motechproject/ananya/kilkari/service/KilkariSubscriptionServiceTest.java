@@ -205,11 +205,10 @@ public class KilkariSubscriptionServiceTest {
         String subscriptionId = "subscriptionId";
         String reason = "MISCARRIAGE";
         DateTime createdAt = DateTime.now();
-        campaignChangeRequest.setSubscriptionId(subscriptionId);
         campaignChangeRequest.setReason(reason);
         campaignChangeRequest.setCreatedAt(createdAt);
 
-        kilkariSubscriptionService.processCampaignChange(campaignChangeRequest);
+        kilkariSubscriptionService.processCampaignChange(campaignChangeRequest, subscriptionId);
 
         ArgumentCaptor<CampaignRescheduleRequest> campaignRescheduleRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignRescheduleRequest.class);
         verify(subscriptionService).rescheduleCampaign(campaignRescheduleRequestArgumentCaptor.capture());

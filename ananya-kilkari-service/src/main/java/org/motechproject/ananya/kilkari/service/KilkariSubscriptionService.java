@@ -95,8 +95,8 @@ public class KilkariSubscriptionService {
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.from(unsubscriptionRequest.getChannel()), unsubscriptionRequest.getCreatedAt()));
     }
 
-    public void processCampaignChange(CampaignChangeRequest campaignChangeRequest) {
-        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(campaignChangeRequest.getSubscriptionId(),
+    public void processCampaignChange(CampaignChangeRequest campaignChangeRequest, String subscriptionId) {
+        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId,
                 CampaignChangeReason.from(campaignChangeRequest.getReason()), campaignChangeRequest.getCreatedAt()));
     }
 

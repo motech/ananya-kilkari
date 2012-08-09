@@ -90,13 +90,13 @@ public class SubscriptionController {
         return BaseResponse.success("Subscription unsubscribed successfully");
     }
 
-    @RequestMapping(value = "/subscription/changecampaign", method = RequestMethod.POST)
+    @RequestMapping(value = "/subscription/{subscriptionId}/changecampaign", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResponse changeCampaign(@RequestBody CampaignChangeRequest campaignChangeRequest) {
+    public BaseResponse changeCampaign(@RequestBody CampaignChangeRequest campaignChangeRequest, @PathVariable String subscriptionId) {
         Errors validationErrors = campaignChangeRequest.validate();
         raiseExceptionIfThereAreErrors(validationErrors);
 
-        kilkariSubscriptionService.processCampaignChange(campaignChangeRequest);
+        kilkariSubscriptionService.processCampaignChange(campaignChangeRequest, subscriptionId);
         return BaseResponse.success("Campaign Change successfully completed");
     }
 

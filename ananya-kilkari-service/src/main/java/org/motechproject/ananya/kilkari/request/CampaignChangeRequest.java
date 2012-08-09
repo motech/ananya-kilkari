@@ -13,19 +13,12 @@ import java.io.Serializable;
 public class CampaignChangeRequest implements Serializable {
 
     @JsonProperty
-    private String subscriptionId;
-    @JsonProperty
     private String reason;
     @JsonIgnore
     private DateTime createdAt;
 
     public CampaignChangeRequest() {
         this.createdAt = DateTime.now();
-    }
-
-    @JsonIgnore
-    public String getSubscriptionId() {
-        return subscriptionId;
     }
 
     @JsonIgnore
@@ -40,10 +33,6 @@ public class CampaignChangeRequest implements Serializable {
 
     public void setCreatedAt(DateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public void setSubscriptionId(String subscriptionId) {
-        this.subscriptionId = subscriptionId;
     }
 
     public void setReason(String reason) {
@@ -65,7 +54,6 @@ public class CampaignChangeRequest implements Serializable {
 
         return new EqualsBuilder()
                 .append(this.reason, that.reason)
-                .append(this.subscriptionId, that.subscriptionId)
                 .isEquals();
     }
 
@@ -73,7 +61,6 @@ public class CampaignChangeRequest implements Serializable {
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(this.reason)
-                .append(this.subscriptionId)
                 .hashCode();
     }
 }

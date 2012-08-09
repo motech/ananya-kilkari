@@ -370,29 +370,28 @@ public class SubscriptionControllerTest {
         CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
         String subscriptionId = "subscriptionId";
         String reason = "INFANT_DEATH";
-        campaignChangeRequest.setSubscriptionId(subscriptionId);
         campaignChangeRequest.setReason(reason);
         byte[] requestBody = TestUtils.toJson(campaignChangeRequest).getBytes();
 
         mockMvc(subscriptionController)
-                .perform(post("/subscription/changecampaign")
+                .perform(post("/subscription/" + subscriptionId + "/changecampaign")
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Campaign Change successfully completed")));
 
         ArgumentCaptor<CampaignChangeRequest> campaignChangeRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignChangeRequest.class);
-        verify(kilkariSubscriptionService).processCampaignChange(campaignChangeRequestArgumentCaptor.capture());
+        ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
+        verify(kilkariSubscriptionService).processCampaignChange(campaignChangeRequestArgumentCaptor.capture(), subscriptionIdCaptor.capture());
         CampaignChangeRequest changeRequest = campaignChangeRequestArgumentCaptor.getValue();
 
-        assertEquals(subscriptionId, changeRequest.getSubscriptionId());
+        assertEquals(subscriptionId, subscriptionIdCaptor.getValue());
         assertEquals(reason, changeRequest.getReason());
     }
 
     @Test
     public void shouldValidateCampaignChangeRequest() throws Exception {
         CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
-        campaignChangeRequest.setSubscriptionId("subscriptionId");
         campaignChangeRequest.setReason("asfddd");
         byte[] requestBody = TestUtils.toJson(campaignChangeRequest).getBytes();
 
@@ -401,7 +400,7 @@ public class SubscriptionControllerTest {
         errors.add("some error description2");
 
         mockMvc(subscriptionController)
-                .perform(post("/subscription/changecampaign")
+                .perform(post("/subscription/subscriptionId/changecampaign")
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))

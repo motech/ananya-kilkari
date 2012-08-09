@@ -88,13 +88,15 @@ public class KilkariCampaignService {
         List<Subscription> subscriptionList = kilkariSubscriptionService.findByMsisdn(msisdn);
         Map<String, List<DateTime>> campaignMessageMap = new HashMap<>();
         for (Subscription subscription : subscriptionList) {
-            if (!subscription.isActive()) continue;
-
             String subscriptionId = subscription.getSubscriptionId();
 
-            List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
-                    subscriptionId, subscription.getStartDate(), subscription.endDate());
-            campaignMessageMap.put(subscriptionId, messageTimings);
+            try {
+                List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
+                        subscriptionId, subscription.getCreationDate(), subscription.endDate());
+                campaignMessageMap.put(subscriptionId, messageTimings);
+            } catch (NullPointerException ne) {
+                //ignore
+            }
         }
         return campaignMessageMap;
     }

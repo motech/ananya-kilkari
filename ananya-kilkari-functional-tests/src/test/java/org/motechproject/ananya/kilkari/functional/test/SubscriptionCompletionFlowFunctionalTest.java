@@ -70,5 +70,43 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
         when(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
         then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
     }
+    
+    @Test
+    public void shouldSubscribeAndProgressAndNotifyAndReceiveInfantDeathMessages() throws Exception {
+
+        int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
+        int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
+
+        DateTime now = DateTime.now();
+        DateTime futureDateForFirstCampaignAlertToBeRaised = now.plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 5);
+        DateTime futureDateForSecondCampaignAlert = futureDateForFirstCampaignAlertToBeRaised.plusWeeks(1);
+        
+        DateTime futureDateForFirstInfantDeathCampaignAlert = futureDateForSecondCampaignAlert.plusWeeks(1).plusMinutes(30);
+        DateTime futureDateForSecondInfantDeathCampaignAlert = futureDateForFirstInfantDeathCampaignAlert.plusWeeks(1);
+        DateTime futureDateOfCompletion = futureDateForSecondInfantDeathCampaignAlert.plusWeeks(1);
+        SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
+
+        when(callCenter).subscribes(subscriptionData);
+        and(subscriptionManager).activates(subscriptionData);
+        and(time).isMovedToFuture(futureDateForFirstCampaignAlertToBeRaised);
+        then(user).messageIsReady(subscriptionData, "WEEK1");
+
+        when(time).isMovedToFuture(futureDateForSecondCampaignAlert);
+        and(subscriptionManager).renews(subscriptionData);
+        and(user).messageIsReady(subscriptionData, "WEEK2");
+
+        when(callCenter).changesCampaign(subscriptionData);
+        and(time).isMovedToFuture(futureDateForFirstInfantDeathCampaignAlert);
+        and(subscriptionManager).renews(subscriptionData);
+//        then(user).messageIsNotReady(subscriptionData, "WEEK3");
+        then(user).messageIsReady(subscriptionData, "ID1");
+        
+        when(time).isMovedToFuture(futureDateForSecondInfantDeathCampaignAlert);
+        and(subscriptionManager).renews(subscriptionData);
+        then(user).messageIsReady(subscriptionData, "ID2");
+        
+        when(time).isMovedToFuture(futureDateOfCompletion);
+        then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
+    }
 }
 

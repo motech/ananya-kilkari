@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.functional.test.domain;
 
+import org.motechproject.ananya.kilkari.functional.test.builder.CampaignChangeRequestBuilder;
 import org.motechproject.ananya.kilkari.functional.test.utils.JsonUtils;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.ReportVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.SubscriptionVerifier;
@@ -42,5 +43,18 @@ public class CallCenter {
         Subscription subscription = subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_ACTIVATION);
         reportVerifier.verifySubscriptionCreationRequest(subscriptionData);
         subscriptionData.setSubscriptionId(subscription.getSubscriptionId());
+    }
+
+    public void changesCampaign(SubscriptionData subscriptionData) throws Exception {
+        mockMvc(subscriptionController)
+                .perform(post("/subscription/" + subscriptionData.getSubscriptionId() + "/changecampaign")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                            new CampaignChangeRequestBuilder()
+                            .forReason("INFANT_DEATH")
+                            .build()
+                            .getBytes()
+                        ));
+        
     }
 }

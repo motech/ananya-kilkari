@@ -1,5 +1,6 @@
+<%@page import="org.apache.commons.lang.exception.ExceptionUtils" %>
 <%@page import="java.text.SimpleDateFormat" %>
-<%@page import="java.util.Date" %>
+<%@ page import="java.util.Date" %>
 <%
     try {
         if (request.getMethod().equals("POST")) {
@@ -20,7 +21,7 @@
 
         }
     } catch (java.lang.Exception e) {
-        out.println("Error: " + e.getMessage());
+        out.println("Error: " + ExceptionUtils.getFullStackTrace(e));
         return;
     }
 

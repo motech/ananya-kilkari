@@ -111,23 +111,23 @@ public class KilkariCampaignServiceTest {
 
         when(messageCampaignService.getMessageTimings(
                 subscription1.getSubscriptionId(),
-                subscription1.getStartDate(),
+                subscription1.getCreationDate(),
                 subscription1.endDate())).thenReturn(dateTimes);
         when(messageCampaignService.getMessageTimings(
                 subscription2.getSubscriptionId(),
-                subscription2.getStartDate(),
+                subscription2.getCreationDate(),
                 subscription2.endDate())).thenReturn(dateTimes);
 
         Map<String, List<DateTime>> messageTimings = kilkariCampaignService.getMessageTimings(msisdn);
 
         verify(messageCampaignService).getMessageTimings(
                 eq(subscription1.getSubscriptionId()),
-                eq(subscription1.getStartDate()),
+                eq(subscription1.getCreationDate()),
                 eq(subscription1.endDate()));
 
         verify(messageCampaignService).getMessageTimings(
                 eq(subscription2.getSubscriptionId()),
-                eq(subscription2.getStartDate()),
+                eq(subscription2.getCreationDate()),
                 eq(subscription2.endDate()));
 
         assertThat(messageTimings.size(), is(2));

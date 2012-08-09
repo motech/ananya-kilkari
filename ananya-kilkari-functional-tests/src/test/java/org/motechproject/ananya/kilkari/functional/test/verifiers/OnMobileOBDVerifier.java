@@ -69,6 +69,7 @@ public class OnMobileOBDVerifier {
 
         @Override
         public void sendNewMessages(String content) {
+            System.out.println("########## new message sent ################");
             newMessagesSent = true;
             String[] lines = content.split("\n");
             for (String line : lines) {
@@ -78,6 +79,7 @@ public class OnMobileOBDVerifier {
 
         @Override
         public void sendRetryMessages(String content) {
+            System.out.println("########## retry message sent ################");
             retryMessagesSent = true;
             String[] lines = content.split("\n");
             for (String line : lines) {
@@ -87,6 +89,7 @@ public class OnMobileOBDVerifier {
 
 
         public void reset() {
+            System.out.println("##########  reset called  ################");
             newMessagesSent = false;
             retryMessagesSent = false;
             newCampaignMessages = new ArrayList<>();
@@ -99,15 +102,16 @@ public class OnMobileOBDVerifier {
         }
 
         public OnMobileCampaignMessage findNewMessage(final SubscriptionData subscriptionData, final String campaignId) {
-            return new TimedRunner<OnMobileCampaignMessage>(120, 1000) {
+            return new TimedRunner<OnMobileCampaignMessage>(300, 1000) {
                 @Override
                 protected TimedRunnerResponse<OnMobileCampaignMessage> run() {
                     if (!newMessagesSent) {
+                        System.out.println("new messages sent is not true");
                         return null;
                     }
                     for (OnMobileCampaignMessage campaignMessage : newCampaignMessages) {
                         if (campaignMessage.campaignId.equals(campaignId) && campaignMessage.subscriptionId.equals(subscriptionData.getSubscriptionId())) {
-                            return new TimedRunnerResponse<OnMobileCampaignMessage>(campaignMessage);
+                            return new TimedRunnerResponse<>(campaignMessage);
                         }
                     }
                     return TimedRunnerResponse.EMPTY;
@@ -116,10 +120,11 @@ public class OnMobileOBDVerifier {
         }
 
         public OnMobileCampaignMessage findRetryMessage(final SubscriptionData subscriptionData, final String campaignId) {
-            return new TimedRunner<OnMobileCampaignMessage>(120, 1000) {
+            return new TimedRunner<OnMobileCampaignMessage>(300, 1000) {
                 @Override
                 protected TimedRunnerResponse<OnMobileCampaignMessage> run() {
                     if (!retryMessagesSent) {
+                        System.out.println("retry messages sent is not true");
                         return null;
                     }
                     for (OnMobileCampaignMessage campaignMessage : retryCampaignMessages) {

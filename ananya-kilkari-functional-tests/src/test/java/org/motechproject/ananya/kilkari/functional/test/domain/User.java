@@ -38,4 +38,20 @@ public class User {
     public void resetCampaignMessageVerifier() {
         campaignMessageVerifier.reset();
     }
+
+    public void messageIsSent(SubscriptionData subscriptionData, String week1) {
+        campaignMessageVerifier.verifyCampaignMessageIsSent(subscriptionData, week1);
+    }
+
+    public void messageIsMarkedWithDNPStatus(SubscriptionData subscriptionData, String weekMessageId) {
+        campaignMessageVerifier.verifyDNPCampaignMessageExists(subscriptionData, weekMessageId);
+    }
+
+    public void messageIsReadyToBeDeliveredInRetrySlot(SubscriptionData subscriptionData, String week1) {
+        campaignMessageVerifier.verifyCampaignMessageExistsForRetry(subscriptionData,  week1);
+    }
+
+    public void messageIsMarkedWithDNCStatus(SubscriptionData subscriptionData, String weekMessageId) {
+        campaignMessageVerifier.verifyDNCCampaignMessageExists(subscriptionData, weekMessageId);
+    }
 }

@@ -51,21 +51,6 @@ public class CampaignMessageVerifier {
         assertFalse(campaignMessage.isSent());
     }
 
-    private CampaignMessage findCampaignMessageWithStatus(final SubscriptionData subscriptionData,
-                                                          final String weekMessageId,
-                                                          final CampaignMessageStatus status) {
-        return new TimedRunner<CampaignMessage>(120, 1000) {
-            public TimedRunnerResponse<CampaignMessage> run() {
-                CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionData.getSubscriptionId(), weekMessageId);
-                if(campaignMessage == null) {
-                    return null;
-                }
-                return campaignMessage.getMessageId().equals(weekMessageId)
-                        && campaignMessage.getStatus().equals(status) ? new TimedRunnerResponse<>(campaignMessage) : null;
-            }
-        }.executeWithTimeout();
-    }
-
     public void verifyCampaignMessageFailedDueToDNC(SubscriptionData subscriptionData, String campaignId) {
         CampaignMessage campaignMessage = findCampaignMessageWithStatus(subscriptionData, campaignId, CampaignMessageStatus.DNC);
         assertTrue(campaignMessage.hasFailed());
@@ -81,12 +66,69 @@ public class CampaignMessageVerifier {
         }.executeWithTimeout();
     }
 
+    public void reset() {
+        campaignAlertRaised = false;
+    }
+
+    public void verifyCampaignMessageIsSent(SubscriptionData subscriptionData, String weekMessageId) {
+        CampaignMessage campaignMessage = findSentCampaignMessageFor(subscriptionData, weekMessageId);
+        assertNotNull(campaignMessage);
+    }
+
+    public void verifyDNPCampaignMessageExists(SubscriptionData subscriptionData, String weekMessageId) {
+        CampaignMessage campaignMessage = findCampaignMessageWithStatus(subscriptionData, weekMessageId, CampaignMessageStatus.DNP);
+        assertNotNull(campaignMessage);
+    }
+
+    public void verifyDNCCampaignMessageExists(SubscriptionData subscriptionData, String weekMessageId) {
+        CampaignMessage campaignMessage = findCampaignMessageWithStatus(subscriptionData, weekMessageId, CampaignMessageStatus.DNC);
+        assertNotNull(campaignMessage);
+    }
+
+    private CampaignMessage findCampaignMessageWithStatus(final SubscriptionData subscriptionData,
+                                                          final String weekMessageId,
+                                                          final CampaignMessageStatus status) {
+        return new TimedRunner<CampaignMessage>(120, 1000) {
+            public TimedRunnerResponse<CampaignMessage> run() {
+                CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionData.getSubscriptionId(), weekMessageId);
+                if(campaignMessage == null) {
+                    return null;
+                }
+                return campaignMessage.getMessageId().equals(weekMessageId)
+                        && campaignMessage.getStatus().equals(status) ? new TimedRunnerResponse<>(campaignMessage) : null;
+            }
+        }.executeWithTimeout();
+    }
+
+    private CampaignMessage findSentCampaignMessageFor(final SubscriptionData subscriptionData, final String weekMessageId) {
+        return new TimedRunner<CampaignMessage>(120, 1000) {
+            public TimedRunnerResponse<CampaignMessage> run() {
+                CampaignMessage campaignMessage = findCampaignMessage(subscriptionData, weekMessageId);
+                return campaignMessage.isSent() ? new TimedRunnerResponse<>(campaignMessage) : null ;
+            }
+        }.executeWithTimeout();
+    }
+
+    public void verifyCampaignMessageExistsForRetry(SubscriptionData subscriptionData, String weekMessageId) {
+        CampaignMessage campaignMessage = findRetryCampaignMessage(subscriptionData, weekMessageId);
+        assertNotNull(campaignMessage);
+    }
+
+    private CampaignMessage findRetryCampaignMessage(final SubscriptionData subscriptionData, final String weekMessageId) {
+        return new TimedRunner<CampaignMessage>(120, 1000) {
+            public TimedRunnerResponse<CampaignMessage> run() {
+                List<CampaignMessage> allUnsentRetryMessages = allCampaignMessages.getAllUnsentRetryMessages();
+                for (CampaignMessage unsentRetryMessage : allUnsentRetryMessages) {
+                    if(weekMessageId.equals(unsentRetryMessage.getMessageId()) &&  subscriptionData.getSubscriptionId().equals(unsentRetryMessage.getSubscriptionId()))
+                        return new TimedRunnerResponse<>(unsentRetryMessage);
+                }
+                return null;
+            }
+        }.executeWithTimeout();
+    }
+
     private CampaignMessage findCampaignMessage(SubscriptionData subscriptionData, String weekMessageId) {
         CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionData.getSubscriptionId(), weekMessageId);
         return campaignMessage != null && campaignMessage.getMessageId().equals(weekMessageId) ? campaignMessage : null;
-    }
-
-    public void reset() {
-        campaignAlertRaised = false;
     }
 }

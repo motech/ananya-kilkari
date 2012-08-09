@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.functional.test;
 
 import org.joda.time.DateTime;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.functional.test.builder.SubscriptionDataBuilder;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
@@ -94,16 +95,22 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
         then(user).messageIsReady(subscriptionData, week1);
 
         when(time).isMovedToFuture(futureDateForFirstDayFirstSlot);
-        then(user).messageWasDeliveredDuringFirstSlot(subscriptionData, week1);
-        and(user).resetOnMobileOBDVerifier();
+        then(user).messageIsSent(subscriptionData, week1);
+//        then(user).messageWasDeliveredDuringFirstSlot(subscriptionData, week1);
+//        and(user).resetOnMobileOBDVerifier();
 
         when(obd).userDoesNotPickUpTheCall(subscriptionData, week1);
-        and(time).isMovedToFuture(futureDateForFirstDaySecondSlot);
-        then(user).MessageWasDeliveredDuringSecondSlot(subscriptionData, week1);
-        and(user).resetOnMobileOBDVerifier();
+        then(user).messageIsMarkedWithDNPStatus(subscriptionData, week1);
+
+        when(time).isMovedToFuture(futureDateForFirstDaySecondSlot);
+        then(user).messageIsReadyToBeDeliveredInRetrySlot(subscriptionData, week1);
+//        then(user).MessageWasDeliveredDuringSecondSlot(subscriptionData, week1);
+//        and(user).resetOnMobileOBDVerifier();
 
         when(obd).callIsNotDelivered(subscriptionData, week1);
-        and(time).isMovedToFuture(futureDateForSecondDaySecondSlot);
+        and(user).messageIsMarkedWithDNCStatus(subscriptionData, week1);
+
+        when(time).isMovedToFuture(futureDateForSecondDayFirstSlot);
         then(user).messageWasDeliveredDuringFirstSlot(subscriptionData, week1);
     }
 }

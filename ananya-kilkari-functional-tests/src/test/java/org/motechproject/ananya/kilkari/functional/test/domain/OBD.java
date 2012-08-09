@@ -24,7 +24,7 @@ public class OBD {
     private CampaignMessageVerifier campaignMessageVerifier;
 
     public void userDoesNotPickUpTheCall(SubscriptionData subscriptionData, String campaignId) throws Exception {
-        FailedCallReport failedCallReport = new FailedCallReport(subscriptionData.getSubscriptionId(), subscriptionData.getMsisdn(), campaignId, "DNP");
+        FailedCallReport failedCallReport = new FailedCallReport(subscriptionData.getSubscriptionId(), subscriptionData.getMsisdn(), campaignId, "Q.850_18");
         FailedCallReports failedCallReports = new FailedCallReports();
         failedCallReports.setFailedCallReports(Arrays.asList(failedCallReport));
 
@@ -41,7 +41,7 @@ public class OBD {
     }
 
     public void callIsNotDelivered(SubscriptionData subscriptionData, String campaignId) throws Exception {
-        FailedCallReport failedCallReport = new FailedCallReport(subscriptionData.getSubscriptionId(), subscriptionData.getMsisdn(), campaignId, "DNC");
+        FailedCallReport failedCallReport = new FailedCallReport(subscriptionData.getSubscriptionId(), subscriptionData.getMsisdn(), campaignId, "Q.850_1");
         FailedCallReports failedCallReports = new FailedCallReports();
         failedCallReports.setFailedCallReports(Arrays.asList(failedCallReport));
 

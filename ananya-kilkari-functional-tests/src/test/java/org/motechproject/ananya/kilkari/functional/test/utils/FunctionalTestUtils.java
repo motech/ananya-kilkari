@@ -37,5 +37,4 @@ public class FunctionalTestUtils extends SpringIntegrationTest {
         campaignMessageVerifier.reset();
         super.after();
     }
-
 }

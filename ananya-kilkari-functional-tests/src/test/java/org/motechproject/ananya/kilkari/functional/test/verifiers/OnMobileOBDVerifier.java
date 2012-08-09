@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.functional.test.verifiers;
 
-import org.junit.Test;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunner;
 import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunnerResponse;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 @Component
 public class OnMobileOBDVerifier {
@@ -49,10 +47,6 @@ public class OnMobileOBDVerifier {
         private String campaignId;
         private String subscriptionId;
 
-        private OnMobileCampaignMessage() {
-
-        }
-
         private OnMobileCampaignMessage(String line) {
             String[] cells = line.split(",");
             campaignId = cells[1];
@@ -69,20 +63,20 @@ public class OnMobileOBDVerifier {
 
         @Override
         public void sendNewMessages(String content) {
-            newMessagesSent = true;
             String[] lines = content.split("\n");
             for (String line : lines) {
                 newCampaignMessages.add(new OnMobileCampaignMessage(line));
             }
+            newMessagesSent = true;
         }
 
         @Override
         public void sendRetryMessages(String content) {
-            retryMessagesSent = true;
             String[] lines = content.split("\n");
             for (String line : lines) {
                 retryCampaignMessages.add(new OnMobileCampaignMessage(line));
             }
+            retryMessagesSent = true;
         }
 
 
@@ -99,7 +93,7 @@ public class OnMobileOBDVerifier {
         }
 
         public OnMobileCampaignMessage findNewMessage(final SubscriptionData subscriptionData, final String campaignId) {
-            return new TimedRunner<OnMobileCampaignMessage>(120, 1000) {
+            return new TimedRunner<OnMobileCampaignMessage>(300, 1000) {
                 @Override
                 protected TimedRunnerResponse<OnMobileCampaignMessage> run() {
                     if (!newMessagesSent) {
@@ -107,7 +101,7 @@ public class OnMobileOBDVerifier {
                     }
                     for (OnMobileCampaignMessage campaignMessage : newCampaignMessages) {
                         if (campaignMessage.campaignId.equals(campaignId) && campaignMessage.subscriptionId.equals(subscriptionData.getSubscriptionId())) {
-                            return new TimedRunnerResponse<OnMobileCampaignMessage>(campaignMessage);
+                            return new TimedRunnerResponse<>(campaignMessage);
                         }
                     }
                     return TimedRunnerResponse.EMPTY;
@@ -116,7 +110,7 @@ public class OnMobileOBDVerifier {
         }
 
         public OnMobileCampaignMessage findRetryMessage(final SubscriptionData subscriptionData, final String campaignId) {
-            return new TimedRunner<OnMobileCampaignMessage>(120, 1000) {
+            return new TimedRunner<OnMobileCampaignMessage>(300, 1000) {
                 @Override
                 protected TimedRunnerResponse<OnMobileCampaignMessage> run() {
                     if (!retryMessagesSent) {

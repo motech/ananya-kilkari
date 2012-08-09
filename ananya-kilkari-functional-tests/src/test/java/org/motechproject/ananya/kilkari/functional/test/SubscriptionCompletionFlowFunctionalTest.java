@@ -53,23 +53,24 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
 
         when(callCenter).subscribes(subscriptionData);
         and(subscriptionManager).activates(subscriptionData);
+        and(user).resetCampaignMessageVerifier();
         and(time).isMovedToFuture(futureDateForFirstCampaignAlertToBeRaised);
         then(user).messageIsReady(subscriptionData, "WEEK1");
         and(user).resetCampaignMessageVerifier();
 
         when(subscriptionManager).failsRenew(subscriptionData);
+        and(user).resetCampaignMessageVerifier();
         and(time).isMovedToFuture(futureDateOfSecondCampaignAlert);
         then(user).messageIsNotCreated(subscriptionData, "WEEK2");
-        and(user).resetCampaignMessageVerifier();
 
-        when(time).isMovedToFuture(week2MessageExpiryDate);
+        when(user).resetCampaignMessageVerifier();
+        and(time).isMovedToFuture(week2MessageExpiryDate);
         then(subscriptionManager).renews(subscriptionData);
         then(user).messageIsNotCreated(subscriptionData, "WEEK2");
-        and(user).resetCampaignMessageVerifier();
 
-        when(time).isMovedToFuture(futureDateForThirdCampaignAlert);
+        when(user).resetCampaignMessageVerifier();
+        and(time).isMovedToFuture(futureDateForThirdCampaignAlert);
         and(user).messageIsReady(subscriptionData, "WEEK3");
-        and(user).resetCampaignMessageVerifier();
 
         when(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
         then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);

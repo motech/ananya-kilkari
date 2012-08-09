@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.web;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -27,4 +28,15 @@ public class GatewayLogger {
             logger.info("Accessing external url: {}", Arrays.toString(args));
         }
     }
+
+    @AfterReturning(pointcut = "allExternalHttpCalls()", returning = "result")
+    public void afterRESTCall(JoinPoint joinPoint, Object result) {
+        Object[] args = joinPoint.getArgs();
+        String arguments = "";
+        if (args.length > 0) {
+            arguments = Arrays.toString(args);
+        }
+        logger.info("After accessing external url: {} got response: {}", arguments, result);
+    }
+
 }

@@ -64,8 +64,8 @@ public class OBDControllerTest {
 
     @Test
     public void shouldHandleCallDeliveryFailureRecordFromObd() throws Exception {
-        String callDeliveryFailureRecord1 = createCallDeliveryFailureRecordJSON("subscriptionId1", "msisdn1", "campaignId1", "DNP");
-        String callDeliveryFailureRecord2 = createCallDeliveryFailureRecordJSON("subscriptionId2", "msisdn2", "campaignId2", "DNP");
+        String callDeliveryFailureRecord1 = createCallDeliveryFailureRecordJSON("subscriptionId1", "msisdn1", "campaignId1", "iu_dnp");
+        String callDeliveryFailureRecord2 = createCallDeliveryFailureRecordJSON("subscriptionId2", "msisdn2", "campaignId2", "iu_dnc");
         String requestBody = "{\"callrecords\": [" + callDeliveryFailureRecord1 + "," + callDeliveryFailureRecord2 + "]}";
         mockMvc(obdController)
                 .perform(post("/obd/calldetails").body(requestBody.getBytes()).contentType(MediaType.APPLICATION_JSON))
@@ -79,18 +79,19 @@ public class OBDControllerTest {
         List<FailedCallReport> callDeliveryFailureRecordObjects = failedCallReports.getCallrecords();
         assertEquals(2, callDeliveryFailureRecordObjects.size());
 
-        assertNotNull(failedCallReports.getCreatedAt());
         FailedCallReport failedCallReport1 = callDeliveryFailureRecordObjects.get(0);
+        assertNotNull(failedCallReport1.getCreatedAt());
         assertEquals("msisdn1", failedCallReport1.getMsisdn());
         assertEquals("subscriptionId1", failedCallReport1.getSubscriptionId());
         assertEquals("campaignId1", failedCallReport1.getCampaignId());
-        assertEquals("DNP", failedCallReport1.getStatusCode());
+        assertEquals("iu_dnp", failedCallReport1.getStatusCode());
 
         FailedCallReport failedCallReport2 = callDeliveryFailureRecordObjects.get(1);
+        assertNotNull(failedCallReport2.getCreatedAt());
         assertEquals("msisdn2", failedCallReport2.getMsisdn());
         assertEquals("subscriptionId2", failedCallReport2.getSubscriptionId());
         assertEquals("campaignId2", failedCallReport2.getCampaignId());
-        assertEquals("DNP", failedCallReport2.getStatusCode());
+        assertEquals("iu_dnc", failedCallReport2.getStatusCode());
     }
 
     @Test

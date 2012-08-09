@@ -13,10 +13,12 @@ import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
+import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
+import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.*;
@@ -78,13 +80,15 @@ public class KilkariCampaignServiceTest {
     private CallDetailsRequestValidator successfulCallDetailsRequestValidator;
     @Mock
     private CampaignMessageAlertService campaignMessageAlertService;
+    @Mock
+    private ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordMapper;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, campaignMessageAlertService, campaignMessageService, reportingService, callDetailsRequestPublisher, callDeliveryFailureRecordValidator, inboxService, obdServiceOptionFactory, successfulCallDetailsRequestValidator);
+        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, campaignMessageAlertService, campaignMessageService, reportingService, callDetailsRequestPublisher, callDeliveryFailureRecordValidator, inboxService, obdServiceOptionFactory, successfulCallDetailsRequestValidator, validCallDeliveryFailureRecordMapper);
     }
 
     @Test
@@ -316,8 +320,8 @@ public class KilkariCampaignServiceTest {
 
         ArrayList<FailedCallReport> callDeliveryFailureRecordObjects = new ArrayList<>();
         FailedCallReport erroredOutFailedCallReport = mock(FailedCallReport.class);
-        FailedCallReport successfulFailedCallReport1 = new FailedCallReport("sub1", "1234567890", "WEEK13", "ACTIVE");
-        FailedCallReport successfulFailedCallReport2 = new FailedCallReport("sub2", "1234567891", "WEEK13", "ACTIVE");
+        FailedCallReport successfulFailedCallReport1 = new FailedCallReport("sub1", "1234567890", "WEEK13", "iu_dnp");
+        FailedCallReport successfulFailedCallReport2 = new FailedCallReport("sub2", "1234567891", "WEEK13", "iu_dnc");
         callDeliveryFailureRecordObjects.add(erroredOutFailedCallReport);
         callDeliveryFailureRecordObjects.add(successfulFailedCallReport1);
         callDeliveryFailureRecordObjects.add(successfulFailedCallReport2);
@@ -329,6 +333,10 @@ public class KilkariCampaignServiceTest {
         Errors noError = new Errors();
         when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport1)).thenReturn(noError);
         when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport2)).thenReturn(noError);
+        ValidFailedCallReport validFailedCallReport1 = new ValidFailedCallReport("sub1", "1234567890", "WEEK13", CampaignMessageStatus.DNP, DateTime.now());
+        ValidFailedCallReport validFailedCallReport2 = new ValidFailedCallReport("sub2", "1234567891", "WEEK13", CampaignMessageStatus.DNC, DateTime.now());
+        when(validCallDeliveryFailureRecordMapper.mapFrom(successfulFailedCallReport1)).thenReturn(validFailedCallReport1);
+        when(validCallDeliveryFailureRecordMapper.mapFrom(successfulFailedCallReport2)).thenReturn(validFailedCallReport2);
 
         kilkariCampaignService.processCallDeliveryFailureRecord(failedCallReports);
 
@@ -337,8 +345,8 @@ public class KilkariCampaignServiceTest {
         ArgumentCaptor<ValidFailedCallReport> captor = ArgumentCaptor.forClass(ValidFailedCallReport.class);
         verify(callDetailsRequestPublisher, times(2)).publishValidCallDeliveryFailureRecord(captor.capture());
         List<ValidFailedCallReport> actualValidFailedCallReports = captor.getAllValues();
-        assertEquals("1234567890", actualValidFailedCallReports.get(0).getMsisdn());
-        assertEquals("1234567891", actualValidFailedCallReports.get(1).getMsisdn());
+        assertEquals(validFailedCallReport1, actualValidFailedCallReports.get(0));
+        assertEquals(validFailedCallReport2, actualValidFailedCallReports.get(1));
     }
 
     @Test

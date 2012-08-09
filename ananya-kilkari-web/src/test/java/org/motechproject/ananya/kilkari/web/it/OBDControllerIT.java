@@ -76,8 +76,8 @@ public class OBDControllerIT extends SpringIntegrationTest {
         ReportingService reportingService = mock(ReportingService.class);
         stubReportingService.setBehavior(reportingService);
 
-        String callDeliveryFailureRecord1 = createCallDeliveryFailureRecordJSON(subscription1.getSubscriptionId(), subscription1.getMsisdn(), "WEEK13", "DNP");
-        String callDeliveryFailureRecord2 = createCallDeliveryFailureRecordJSON(subscription2.getSubscriptionId(), subscription2.getMsisdn(), "WEEK", "DNP");
+        String callDeliveryFailureRecord1 = createCallDeliveryFailureRecordJSON(subscription1.getSubscriptionId(), subscription1.getMsisdn(), "WEEK13", "Q.850_96");
+        String callDeliveryFailureRecord2 = createCallDeliveryFailureRecordJSON(subscription2.getSubscriptionId(), subscription2.getMsisdn(), "WEEK", "Q.850_18");
         String requestBody = "{\"callrecords\": [" + callDeliveryFailureRecord1 + "," + callDeliveryFailureRecord2 + "]}";
         mockMvc(obdController)
                 .perform(post("/obd/calldetails").body(requestBody.getBytes()).contentType(MediaType.APPLICATION_JSON))
@@ -114,7 +114,7 @@ public class OBDControllerIT extends SpringIntegrationTest {
         assertEquals(subscription2.getSubscriptionId(), recordObjectFaileds.get(0).getSubscriptionId());
         assertEquals("Invalid campaign id WEEK", recordObjectFaileds.get(0).getDescription());
 
-        assertEquals(CampaignMessageStatus.DNP.name(), reportRequest.getStatus());
+        assertEquals(CampaignMessageStatus.DNC.name(), reportRequest.getStatus());
         assertEquals("0", reportRequest.getRetryCount());
         assertEquals("WEEK13", reportRequest.getCampaignId());
         assertEquals(msisdn, reportRequest.getMsisdn());

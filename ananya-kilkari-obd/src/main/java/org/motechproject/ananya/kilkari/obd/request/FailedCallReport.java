@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.obd.request;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
@@ -14,11 +16,15 @@ public class FailedCallReport implements Serializable {
     private String campaignId;
     @JsonProperty
     private String statusCode;
+    @JsonIgnore
+    private DateTime createdAt;
 
     public FailedCallReport() {
+        this.createdAt = DateTime.now();
     }
 
     public FailedCallReport(String subscriptionId, String msisdn, String campaignId, String statusCode) {
+        this();
         this.subscriptionId = subscriptionId;
         this.msisdn = msisdn;
         this.campaignId = campaignId;
@@ -39,5 +45,9 @@ public class FailedCallReport implements Serializable {
 
     public String getStatusCode() {
         return statusCode;
+    }
+
+    public DateTime getCreatedAt() {
+        return createdAt;
     }
 }

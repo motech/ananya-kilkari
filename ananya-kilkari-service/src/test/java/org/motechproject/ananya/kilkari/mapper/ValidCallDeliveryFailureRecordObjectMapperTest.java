@@ -1,25 +1,37 @@
 package org.motechproject.ananya.kilkari.mapper;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ValidCallDeliveryFailureRecordObjectMapperTest {
+    @Mock
+    private CampaignMessageService campaignMessageService;
+
+    @Before
+    public void setup(){
+        initMocks(this);
+    }
+
     @Test
     public void shouldMapFromCallDeliveryFailureRecordObjectToValidCallDeliveryFailureRecordObject() {
-        FailedCallReport failedCallReport = new FailedCallReport("subscriptionId", "msisdn", "WEEK13", "DNP");
-        FailedCallReports failedCallReports = new FailedCallReports();
+        FailedCallReport failedCallReport = new FailedCallReport("subscriptionId", "msisdn", "WEEK13", "iu_dnp");
 
-        ValidFailedCallReport validFailedCallReport = ValidCallDeliveryFailureRecordObjectMapper.mapFrom(failedCallReport, failedCallReports);
+        when(campaignMessageService.getCampaignMessageStatusFor("iu_dnp")).thenReturn(CampaignMessageStatus.DNP);
+        ValidFailedCallReport validFailedCallReport = new ValidCallDeliveryFailureRecordObjectMapper(campaignMessageService).mapFrom(failedCallReport);
 
         assertEquals("subscriptionId", validFailedCallReport.getSubscriptionId());
         assertEquals("msisdn", validFailedCallReport.getMsisdn());
         assertEquals(CampaignMessageStatus.DNP, validFailedCallReport.getStatusCode());
         assertEquals("WEEK13", validFailedCallReport.getCampaignId());
-        assertEquals(failedCallReports.getCreatedAt(), validFailedCallReport.getCreatedAt());
+        assertEquals(failedCallReport.getCreatedAt(), validFailedCallReport.getCreatedAt());
     }
 }

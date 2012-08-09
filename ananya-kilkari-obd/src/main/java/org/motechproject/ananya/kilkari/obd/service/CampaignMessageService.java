@@ -99,6 +99,10 @@ public class CampaignMessageService {
         allCampaignMessages.removeAll(subscriptionId);
     }
 
+    public CampaignMessageStatus getCampaignMessageStatusFor(String statusCode){
+        return obdProperties.getCampaignMessageStatusFor(statusCode);
+    }
+
     private void updateCampaignMessageStatus(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
         if (hasReachedMaximumRetries(campaignMessage, statusCode))
             allCampaignMessages.delete(campaignMessage);

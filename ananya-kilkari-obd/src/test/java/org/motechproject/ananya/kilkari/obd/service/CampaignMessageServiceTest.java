@@ -471,4 +471,15 @@ public class CampaignMessageServiceTest {
 
         verify(allCampaignMessages).removeAll(subscriptionId);
     }
+
+    @Test
+    public void shouldGetStatusCode() {
+        when(obdProperties.getCampaignMessageStatusFor("iu_dnc")).thenReturn(CampaignMessageStatus.DNC);
+        assertEquals(CampaignMessageStatus.DNC, campaignMessageService.getCampaignMessageStatusFor("iu_dnc"));
+
+        when(obdProperties.getCampaignMessageStatusFor("iu_dnp")).thenReturn(CampaignMessageStatus.DNP);
+        assertEquals(CampaignMessageStatus.DNP, campaignMessageService.getCampaignMessageStatusFor("iu_dnp"));
+
+        assertNull(campaignMessageService.getCampaignMessageStatusFor("iu_dnc123"));
+    }
 }

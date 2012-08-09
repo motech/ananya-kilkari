@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignCode;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.domain.PhoneNumber;
@@ -17,10 +18,12 @@ import java.util.regex.Pattern;
 public class CallDeliveryFailureRecordValidator {
 
     private KilkariSubscriptionService subscriptionService;
+    private CampaignMessageService campaignMessageService;
 
     @Autowired
-    public CallDeliveryFailureRecordValidator(KilkariSubscriptionService subscriptionService) {
+    public CallDeliveryFailureRecordValidator(KilkariSubscriptionService subscriptionService, CampaignMessageService campaignMessageService) {
         this.subscriptionService = subscriptionService;
+        this.campaignMessageService = campaignMessageService;
     }
 
     public Errors validate(FailedCallReport failedCallReport) {
@@ -33,7 +36,7 @@ public class CallDeliveryFailureRecordValidator {
     }
 
     private void validateStatusCode(String statusCode, Errors errors) {
-        if (!CampaignMessageStatus.isValid(statusCode))
+        if (campaignMessageService.getCampaignMessageStatusFor(statusCode) == null)
             errors.add(String.format("Invalid status code %s", statusCode));
     }
 

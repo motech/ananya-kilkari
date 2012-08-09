@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-
 @Service
 public class KilkariSubscriptionService {
     private SubscriptionPublisher subscriptionPublisher;
@@ -66,13 +65,6 @@ public class KilkariSubscriptionService {
         }
     }
 
-    private void validateSubscriptionRequest(SubscriptionWebRequest subscriptionWebRequest) {
-        Errors errors = subscriptionWebRequest.validate();
-        if (errors.hasErrors()) {
-            throw new ValidationException(errors.allMessages());
-        }
-    }
-
     public void processCallbackRequest(CallbackRequestWrapper callbackRequestWrapper) {
         subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
     }
@@ -91,7 +83,7 @@ public class KilkariSubscriptionService {
         Date startDate = DateTime.now().plusDays(kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put(MotechSchedulerService.JOB_ID_KEY, subscription.getSubscriptionId());
-        parameters.put("0", new SubscriptionMapper().createOMSubscriptionRequest(subscription, Channel.MOTECH));
+        parameters.put("0", SubscriptionMapper.createOMSubscriptionRequest(subscription, Channel.MOTECH));
 
         MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
         RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);
@@ -115,16 +107,10 @@ public class KilkariSubscriptionService {
         subscriptionService.updateSubscriberDetails(subscriberRequest);
     }
 
-    public void changePack(ChangePackWebRequest changePackWebRequest) {
+    public void changePack(ChangePackWebRequest changePackWebRequest, String subscriptionId) {
         Errors errors = changePackWebRequest.validate();
         raiseExceptionIfThereAreErrors(errors);
-        changePackProcessor.process(SubscriptionRequestMapper.mapToChangePackRequest(changePackWebRequest));
-    }
-
-    private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
-        if (validationErrors.hasErrors()) {
-            throw new ValidationException(validationErrors.allMessages());
-        }
+        changePackProcessor.process(SubscriptionRequestMapper.mapToChangePackRequest(changePackWebRequest, subscriptionId));
     }
 
     public Subscription findSubscriptionInProgress(String msisdn, SubscriptionPack pack) {
@@ -139,5 +125,18 @@ public class KilkariSubscriptionService {
     private void validateMsisdn(String msisdn) {
         if (PhoneNumber.isNotValid(msisdn))
             throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
+    }
+
+    private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
+        if (validationErrors.hasErrors()) {
+            throw new ValidationException(validationErrors.allMessages());
+        }
+    }
+
+    private void validateSubscriptionRequest(SubscriptionWebRequest subscriptionWebRequest) {
+        Errors errors = subscriptionWebRequest.validate();
+        if (errors.hasErrors()) {
+            throw new ValidationException(errors.allMessages());
+        }
     }
 }

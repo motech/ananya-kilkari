@@ -66,4 +66,19 @@ public class ValidationUtils {
 
         return !(numberOfOptions > 1);
     }
+
+    public static boolean assertOnePresent(String... args) {
+        List<Boolean> checks = new ArrayList<>();
+        for (String arg : args)
+            checks.add(StringUtils.isNotEmpty(arg));
+
+        int numberOfOptions = CollectionUtils.countMatches(checks, new Predicate() {
+            @Override
+            public boolean evaluate(Object o) {
+                return (Boolean) o;
+            }
+        });
+
+        return numberOfOptions ==1;
+    }
 }

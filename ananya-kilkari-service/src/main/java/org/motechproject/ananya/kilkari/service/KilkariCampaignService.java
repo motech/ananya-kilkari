@@ -168,7 +168,6 @@ public class KilkariCampaignService {
 
     }
 
-
     public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntries invalidOBDRequestEntries) {
         callDetailsRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
     }
@@ -215,7 +214,6 @@ public class KilkariCampaignService {
             return;
         InvalidFailedCallReports invalidFailedCallReports = new InvalidFailedCallReports();
         invalidFailedCallReports.setRecordObjectFaileds(invalidFailedCallReport);
-
 
         callDetailsRequestPublisher.publishInvalidCallDeliveryFailureRecord(invalidFailedCallReports);
     }

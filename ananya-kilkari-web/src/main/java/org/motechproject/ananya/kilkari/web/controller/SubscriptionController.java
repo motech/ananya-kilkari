@@ -97,14 +97,14 @@ public class SubscriptionController {
         raiseExceptionIfThereAreErrors(validationErrors);
 
         kilkariSubscriptionService.processCampaignChange(campaignChangeRequest);
-        return BaseResponse.success("Campaign Change request submitted successfully");
+        return BaseResponse.success("Campaign Change successfully completed");
     }
 
-    @RequestMapping(value = "/subscription/changepack", method = RequestMethod.POST)
+    @RequestMapping(value = "/subscription/{subscriptionId}/changepack", method = RequestMethod.PUT)
     @ResponseBody
-    public BaseResponse changePack(@RequestBody ChangePackWebRequest changePackWebRequest) {
-        kilkariSubscriptionService.changePack(changePackWebRequest);
-        return BaseResponse.success("Change Pack request submitted successfully");
+    public BaseResponse changePack(@RequestBody ChangePackWebRequest changePackWebRequest, @PathVariable String subscriptionId) {
+        kilkariSubscriptionService.changePack(changePackWebRequest, subscriptionId);
+        return BaseResponse.success("Change Pack successfully completed");
     }
 
     @RequestMapping(value = "/subscription/changemsisdn", method = RequestMethod.POST)

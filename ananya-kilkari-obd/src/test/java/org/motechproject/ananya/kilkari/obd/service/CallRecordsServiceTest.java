@@ -36,4 +36,5 @@ public class CallRecordsServiceTest {
         verify(allInvalidCallRecords).add(invalidCallRecord1);
         verify(allInvalidCallRecords).add(invalidCallRecord2);
     }
+
 }

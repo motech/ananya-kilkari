@@ -21,6 +21,6 @@ public class ChangePackWebRequestTest {
         assertTrue(errors.hasMessage("Invalid msisdn some-msisdn"));
         assertTrue(errors.hasMessage("Invalid subscription pack some-pack"));
         assertTrue(errors.hasMessage("Invalid channel some-channel"));
-        assertTrue(errors.hasMessage("Invalid request. Only one of expected date of delivery or date of birth should be present"));
+        assertTrue(errors.hasMessage("Invalid request. One of expected date of delivery or date of birth should be present"));
     }
 }

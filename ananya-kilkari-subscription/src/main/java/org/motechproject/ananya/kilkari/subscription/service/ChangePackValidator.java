@@ -16,7 +16,7 @@ public class ChangePackValidator {
     private static void validatePossiblePack(Subscription subscription, ChangePackRequest changePackRequest) {
         if(!subscription.isNewEarly()) {
             if(subscription.getCurrentWeekOfSubscription() > changePackRequest.getPack().getStartWeek() )
-                throw new ValidationException(String.format("Subscripiton pack requested is not applicable for subscription ", subscription.getSubscriptionId()));
+                throw new ValidationException("Subscripiton pack requested is not applicable for subscription " + subscription.getSubscriptionId());
         }
     }
 

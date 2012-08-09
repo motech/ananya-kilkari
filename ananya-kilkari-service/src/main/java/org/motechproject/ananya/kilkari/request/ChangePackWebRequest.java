@@ -8,8 +8,6 @@ import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
 public class ChangePackWebRequest {
     @JsonProperty
-    private String subscriptionId;
-    @JsonProperty
     private String msisdn;
     @JsonProperty
     private String pack;
@@ -24,10 +22,6 @@ public class ChangePackWebRequest {
 
     public ChangePackWebRequest() {
         this.createdAt = DateTime.now();
-    }
-
-    public String getSubscriptionId() {
-        return subscriptionId;
     }
 
     public String getMsisdn() {
@@ -74,16 +68,12 @@ public class ChangePackWebRequest {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public void setSubscriptionId(String subscriptionId) {
-        this.subscriptionId = subscriptionId;
-    }
-
     public Errors validate() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
         webRequestValidator.validateMsisdn(msisdn);
         webRequestValidator.validatePack(pack);
         webRequestValidator.validateChannel(channel);
-        webRequestValidator.validateOnlyOneOfEDDOrDOBIsPresent(expectedDateOfDelivery, dateOfBirth);
+        webRequestValidator.validateOneOfEDDOrDOBIsPresent(expectedDateOfDelivery, dateOfBirth);
         webRequestValidator.validateDOB(dateOfBirth, createdAt);
         webRequestValidator.validateEDD(expectedDateOfDelivery, createdAt);
         return webRequestValidator.getErrors();

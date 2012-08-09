@@ -144,4 +144,14 @@ public class WebRequestValidatorTest {
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("At least one pack should be specified"));
     }
+
+    @Test
+    public void shouldReturnErrorIfOneOfDobOrEddIsNotPresent() {
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+
+        webRequestValidator.validateOneOfEDDOrDOBIsPresent("edd","dob","week");
+
+        assertEquals(1, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. One of expected date of delivery or date of birth should be present"));
+    }
 }

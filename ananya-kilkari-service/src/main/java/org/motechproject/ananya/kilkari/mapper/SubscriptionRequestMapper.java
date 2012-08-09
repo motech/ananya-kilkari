@@ -33,8 +33,8 @@ public class SubscriptionRequestMapper {
                 DateUtils.parseDate(request.getDateOfBirth()), location);
     }
 
-    public static ChangePackRequest mapToChangePackRequest(ChangePackWebRequest webRequest) {
-        return new ChangePackRequest(webRequest.getMsisdn(), webRequest.getSubscriptionId(), SubscriptionPack.from(webRequest.getPack()), Channel.from(webRequest.getChannel()),
+    public static ChangePackRequest mapToChangePackRequest(ChangePackWebRequest webRequest, String subscriptionId) {
+        return new ChangePackRequest(webRequest.getMsisdn(), subscriptionId, SubscriptionPack.from(webRequest.getPack()), Channel.from(webRequest.getChannel()),
                 webRequest.getCreatedAt(), DateUtils.parseDate(webRequest.getExpectedDateOfDelivery()), DateUtils.parseDate(webRequest.getDateOfBirth()));
     }
 

@@ -15,7 +15,6 @@ public class ChangePackWebRequestBuilder {
     public ChangePackWebRequestBuilder withDefaults() {
         changePackWebRequest = new ChangePackWebRequest();
         changePackWebRequest.setPack(SubscriptionPack.BARI_KILKARI.name());
-        changePackWebRequest.setSubscriptionId("abcd1234");
         changePackWebRequest.setChannel(Channel.CALL_CENTER.name());
         changePackWebRequest.setMsisdn("9876543210");
         changePackWebRequest.setDateOfBirth(null);
@@ -38,11 +37,6 @@ public class ChangePackWebRequestBuilder {
         return this;
     }
 
-    public ChangePackWebRequestBuilder withSubscriptionId(String subscriptionId) {
-        changePackWebRequest.setSubscriptionId(subscriptionId);
-        return this;
-    }
-
     public ChangePackWebRequestBuilder withDOB(String dob) {
         changePackWebRequest.setDateOfBirth(dob);
         return this;
@@ -56,6 +50,4 @@ public class ChangePackWebRequestBuilder {
     public ChangePackWebRequest build() {
         return changePackWebRequest;
     }
-
-
 }

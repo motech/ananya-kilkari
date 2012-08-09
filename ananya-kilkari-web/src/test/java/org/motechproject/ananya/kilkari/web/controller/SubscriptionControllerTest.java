@@ -379,7 +379,7 @@ public class SubscriptionControllerTest {
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Campaign Change request submitted successfully")));
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Campaign Change successfully completed")));
 
         ArgumentCaptor<CampaignChangeRequest> campaignChangeRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignChangeRequest.class);
         verify(kilkariSubscriptionService).processCampaignChange(campaignChangeRequestArgumentCaptor.capture());
@@ -415,7 +415,7 @@ public class SubscriptionControllerTest {
         String subscriptionId = "subscription-id";
 
         mockMvc(subscriptionController)
-                .perform(put("/subscriber/"+subscriptionId)
+                .perform(put("/subscriber/" + subscriptionId)
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -431,7 +431,6 @@ public class SubscriptionControllerTest {
         String channel = Channel.CALL_CENTER.name();
         String pack = SubscriptionPack.BARI_KILKARI.name();
         ChangePackWebRequest changePackWebRequest = new ChangePackWebRequest();
-        changePackWebRequest.setSubscriptionId(subscriptionId);
         changePackWebRequest.setMsisdn(msisdn);
         changePackWebRequest.setChannel(channel);
         changePackWebRequest.setPack(pack);
@@ -439,17 +438,18 @@ public class SubscriptionControllerTest {
         byte[] requestBody = TestUtils.toJson(changePackWebRequest).getBytes();
 
         mockMvc(subscriptionController)
-                .perform(post("/subscription/changepack")
+                .perform(put("/subscription/" + subscriptionId + "/changepack")
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Change Pack request submitted successfully")));
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Change Pack successfully completed")));
 
         ArgumentCaptor<ChangePackWebRequest> changePackWebRequestArgumentCaptor = ArgumentCaptor.forClass(ChangePackWebRequest.class);
-        verify(kilkariSubscriptionService).changePack(changePackWebRequestArgumentCaptor.capture());
+        ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
+        verify(kilkariSubscriptionService).changePack(changePackWebRequestArgumentCaptor.capture(), subscriptionIdCaptor.capture());
         ChangePackWebRequest request = changePackWebRequestArgumentCaptor.getValue();
 
-        assertEquals(subscriptionId, request.getSubscriptionId());
+        assertEquals(subscriptionId, subscriptionIdCaptor.getValue());
         assertEquals(msisdn, request.getMsisdn());
         assertEquals(channel, request.getChannel());
         assertEquals(pack, request.getPack());

@@ -260,15 +260,16 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldProcessValidChangePackRequest() {
-        ChangePackWebRequest changePackWebRequest = new ChangePackWebRequestBuilder().withDefaults().build();
-        kilkariSubscriptionService.changePack(changePackWebRequest);
+        ChangePackWebRequest changePackWebRequest = new ChangePackWebRequestBuilder().withDefaults().withEDD(DateTime.now().plusMonths(5).toString("dd-MM-yyyy")).build();
+        String subscriptionId = "subscriptionId";
+        kilkariSubscriptionService.changePack(changePackWebRequest, subscriptionId);
 
         ArgumentCaptor<ChangePackRequest> changePackRequestArgumentCaptor = ArgumentCaptor.forClass(ChangePackRequest.class);
         verify(changePackProcessor).process(changePackRequestArgumentCaptor.capture());
         ChangePackRequest changePackRequest = changePackRequestArgumentCaptor.getValue();
 
         assertEquals(changePackWebRequest.getMsisdn(), changePackRequest.getMsisdn());
-        assertEquals(changePackWebRequest.getSubscriptionId(), changePackRequest.getSubscriptionId());
+        assertEquals(subscriptionId, changePackRequest.getSubscriptionId());
         assertEquals(changePackWebRequest.getPack(), changePackRequest.getPack().name());
         assertEquals(changePackWebRequest.getChannel(), changePackRequest.getChannel().name());
         assertEquals(changePackWebRequest.getCreatedAt(), changePackRequest.getCreatedAt());
@@ -279,7 +280,7 @@ public class KilkariSubscriptionServiceTest {
         ChangePackWebRequest changePackWebRequest = new ChangePackWebRequest();
         expectedException.expect(ValidationException.class);
 
-        kilkariSubscriptionService.changePack(changePackWebRequest);
+        kilkariSubscriptionService.changePack(changePackWebRequest, "subscriptionId");
 
         verify(changePackProcessor, never()).process(any(ChangePackRequest.class));
     }

@@ -168,7 +168,7 @@ public class SubscriptionService {
                 subscription.deactivationRequestReceived();
             }
         });
-        onMobileSubscriptionManagerPublisher.processDeactivation(new SubscriptionMapper().createOMSubscriptionRequest(subscription, deactivationRequest.getChannel()));
+        onMobileSubscriptionManagerPublisher.processDeactivation(SubscriptionMapper.createOMSubscriptionRequest(subscription, deactivationRequest.getChannel()));
     }
 
     public void deactivationRequested(OMSubscriptionRequest omSubscriptionRequest) {
@@ -257,7 +257,7 @@ public class SubscriptionService {
         return allSubscriptions.findSubscriptionInProgress(msisdn, pack);
     }
 
-    private void unScheduleCampaign(Subscription subscription) {
+    public void unScheduleCampaign(Subscription subscription) {
         String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
         MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getStartDate());
         messageCampaignService.stop(unEnrollRequest);

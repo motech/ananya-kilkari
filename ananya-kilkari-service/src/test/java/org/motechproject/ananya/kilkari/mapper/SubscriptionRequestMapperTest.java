@@ -91,10 +91,11 @@ public class SubscriptionRequestMapperTest {
     public void shouldMapToChangePackRequest() {
         ChangePackWebRequest webRequest = new ChangePackWebRequestBuilder().withDefaults().withEDD("25-11-2013").build();
 
-        ChangePackRequest changePackRequest = SubscriptionRequestMapper.mapToChangePackRequest(webRequest);
+        String subscriptionId = "subscriptionId";
+        ChangePackRequest changePackRequest = SubscriptionRequestMapper.mapToChangePackRequest(webRequest, subscriptionId);
 
         assertEquals(webRequest.getMsisdn(), changePackRequest.getMsisdn());
-        assertEquals(webRequest.getSubscriptionId(), changePackRequest.getSubscriptionId());
+        assertEquals(subscriptionId, changePackRequest.getSubscriptionId());
         assertEquals(webRequest.getPack(), changePackRequest.getPack().name());
         assertEquals(webRequest.getChannel(), changePackRequest.getChannel().name());
         assertEquals(new DateTime(2013, 11, 25, 0, 0, 0), changePackRequest.getExpectedDateOfDelivery());

@@ -942,11 +942,17 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldScheduleDeactivation() {
         Integer graceCount = 2;
-        String subscriptionId = "subscriptionId";
+        final String subscriptionId = "subscriptionId";
         String reason = "Some reason";
         DateTime deactivationDate = DateTime.now();
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.PENDING_DEACTIVATION) {
+            public String getSubscriptionId() {
+                return subscriptionId;
+            }
+        };
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.scheduleDeactivation(subscriptionId, deactivationDate, reason, graceCount);
+        subscriptionService.processDeactivation(subscriptionId, deactivationDate, reason, graceCount);
 
         ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
         verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
@@ -955,4 +961,31 @@ public class SubscriptionServiceTest {
         ScheduleDeactivationRequest scheduleDeactivationRequest = (ScheduleDeactivationRequest) actualSchedulableJob.getMotechEvent().getParameters().get("0");
         assertEquals(new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount), scheduleDeactivationRequest);
     }
+
+    @Test
+    public void processDeactivationForSubscriptionCompletionShouldNotScheduleDeactivation() {
+        final String subscriptionId = "sub123";
+        DateTime date = DateTime.now();
+        String reason = "balance is low";
+        Integer graceCount = 7;
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.PENDING_COMPLETION) {
+            public String getSubscriptionId() {
+                return subscriptionId;
+            }
+        };
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.processDeactivation(subscriptionId, date, reason, graceCount);
+
+        verify(allSubscriptions).update(subscription);
+        ArgumentCaptor<SubscriptionStateChangeRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
+        verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
+        SubscriptionStateChangeRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
+        assertEquals(SubscriptionStatus.COMPLETED, subscription.getStatus());
+        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
+        assertEquals(SubscriptionStatus.COMPLETED.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(date, subscriptionStateChangeReportRequest.getCreatedAt());
+        assertEquals(graceCount, subscriptionStateChangeReportRequest.getGraceCount());
+    }
+
 }

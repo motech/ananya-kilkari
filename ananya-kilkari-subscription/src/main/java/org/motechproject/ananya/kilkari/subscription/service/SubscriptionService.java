@@ -201,8 +201,15 @@ public class SubscriptionService {
         });
     }
 
+    public void processDeactivation(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
+        Subscription subscription = findBySubscriptionId(subscriptionId);
+        if (subscription.isSubscriptionCompletionRequestSent())
+            deactivateSubscription(subscriptionId, deactivationDate, reason, graceCount);
+        else
+            scheduleDeactivation(subscriptionId, deactivationDate, reason, graceCount);
+    }
 
-    public void scheduleDeactivation(String subscriptionId,final DateTime deactivationDate, String reason, Integer graceCount) {
+    private void scheduleDeactivation(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
         String subjectKey = SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION;
         Date startDate = DateTime.now().plusDays(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
         HashMap<String, Object> parameters = new HashMap<>();

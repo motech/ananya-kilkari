@@ -15,7 +15,7 @@ public class DeactivateHandler implements SubscriptionStateHandler{
     }
 
     public void perform(CallbackRequestWrapper callbackRequestWrapper) {
-        subscriptionService.scheduleDeactivation(callbackRequestWrapper.getSubscriptionId(), callbackRequestWrapper.getCreatedAt(),
+        subscriptionService.processDeactivation(callbackRequestWrapper.getSubscriptionId(), callbackRequestWrapper.getCreatedAt(),
                 callbackRequestWrapper.getReason(), callbackRequestWrapper.getGraceCount());
     }
 }

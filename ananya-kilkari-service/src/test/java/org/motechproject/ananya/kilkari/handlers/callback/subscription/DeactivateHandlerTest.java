@@ -35,6 +35,6 @@ public class DeactivateHandlerTest {
 
         deactivateHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, deactivationDate));
 
-        verify(subscriptionService).scheduleDeactivation(subscriptionId, deactivationDate, reason, Integer.valueOf(graceCount));
+        verify(subscriptionService).processDeactivation(subscriptionId, deactivationDate, reason, Integer.valueOf(graceCount));
     }
 }

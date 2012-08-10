@@ -55,10 +55,6 @@ public enum SubscriptionStatus {
                 this != DEACTIVATION_REQUEST_RECEIVED;
     }
 
-    boolean hasCompletionRequestSent() {
-        return PENDING_COMPLETION.equals(this);
-    }
-
     public boolean isInDeactivatedState() {
         return getDeactivatedStates().contains(this);
     }

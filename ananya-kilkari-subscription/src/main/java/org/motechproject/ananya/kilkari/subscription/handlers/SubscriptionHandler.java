@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.handlers;
 
+import org.motechproject.ananya.kilkari.subscription.domain.ScheduleDeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -27,8 +28,9 @@ public class SubscriptionHandler {
         subscriptionService.activationRequested(omSubscriptionRequest);
     }
 
-    @MotechListener(subjects = {SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION})
-    public void handleSubscriptionDeactivation(MotechEvent event) {
+    @MotechListener(subjects = {SubscriptionEventKeys.DEACTIVATION_REQUESTED_SUBSCRIPTION})
+    public void handleSubscriptionDeactivationRequest
+            (MotechEvent event) {
         OMSubscriptionRequest omSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
         logger.info(String.format("Handling subscription deactivation event for subscriptionid: %s, msisdn: %s, pack: %s, channel: %s", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack(), omSubscriptionRequest.getChannel()));
         subscriptionService.deactivationRequested(omSubscriptionRequest);
@@ -38,7 +40,7 @@ public class SubscriptionHandler {
     public void handleSubscriptionComplete(MotechEvent event) {
         OMSubscriptionRequest omSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
         logger.info(String.format("Handling subscription completion event for subscriptionid: %s, msisdn: %s, pack: %s", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
-        subscriptionService.subscriptionComplete(omSubscriptionRequest);
+        subscriptionService.requestDeactivationOnSubscriptionCompletion(omSubscriptionRequest);
     }
 
     @MotechListener(subjects = {SubscriptionEventKeys.EARLY_SUBSCRIPTION})
@@ -46,5 +48,12 @@ public class SubscriptionHandler {
         OMSubscriptionRequest omSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
         logger.info(String.format("Handling early subscription for subscriptionid: %s, msisdn: %s, pack: %s", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
         subscriptionService.initiateActivationRequest(omSubscriptionRequest);
+    }
+
+    @MotechListener(subjects = {SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION})
+    public void handleDeactivateSubscription(MotechEvent event) {
+        ScheduleDeactivationRequest scheduleDeactivationRequest = (ScheduleDeactivationRequest) event.getParameters().get("0");
+        logger.info(String.format("Handling deactivation for subscriptionid: %s", scheduleDeactivationRequest.getSubscriptionId()));
+        subscriptionService.deactivateSubscription(scheduleDeactivationRequest.getSubscriptionId(), scheduleDeactivationRequest.getDeactivationDate(), scheduleDeactivationRequest.getReason(), scheduleDeactivationRequest.getGraceCount());
     }
 }

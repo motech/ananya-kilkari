@@ -55,7 +55,7 @@ public class OnMobileSubscriptionManagerPublisherTest {
         OMSubscriptionRequest OMSubscriptionRequest = processSubscriptionRequestArgumentCaptor.getValue();
         String eventName = eventArgumentCaptor.getValue();
 
-        assertEquals(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, eventName);
+        assertEquals(SubscriptionEventKeys.DEACTIVATION_REQUESTED_SUBSCRIPTION, eventName);
         assertEquals("1234567890", OMSubscriptionRequest.getMsisdn());
         assertEquals(SubscriptionPack.CHOTI_KILKARI, OMSubscriptionRequest.getPack());
         assertEquals(Channel.IVR, OMSubscriptionRequest.getChannel());

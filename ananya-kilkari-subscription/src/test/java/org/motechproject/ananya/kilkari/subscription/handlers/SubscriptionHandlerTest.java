@@ -1,9 +1,11 @@
 package org.motechproject.ananya.kilkari.subscription.handlers;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.domain.ScheduleDeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
@@ -48,7 +50,7 @@ public class SubscriptionHandlerTest {
     }
 
     @Test
-    public void shouldDeactivateSubscription() {
+    public void shouldRequestDeactivateSubscription() {
         final String msisdn = "msisdn";
         final SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
         final Channel channel = Channel.IVR;
@@ -58,9 +60,25 @@ public class SubscriptionHandlerTest {
             put("0", omSubscriptionRequest);
         }};
 
-        subscriptionHandler.handleSubscriptionDeactivation(new MotechEvent(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, parameters));
+        subscriptionHandler.handleSubscriptionDeactivationRequest(new MotechEvent(SubscriptionEventKeys.DEACTIVATION_REQUESTED_SUBSCRIPTION, parameters));
 
         verify(subscriptionService).deactivationRequested(omSubscriptionRequest);
+    }
+
+    @Test
+    public void shouldDeactivateSubscription() {
+        final String subscriptionId = "abcd1234";
+        DateTime deactivationDate = DateTime.now();
+        String reason = "some reason";
+        Integer graceCount = 2;
+        final ScheduleDeactivationRequest scheduleDeactivationRequest = new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount);
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
+            put("0", scheduleDeactivationRequest);
+        }};
+
+        subscriptionHandler.handleDeactivateSubscription(new MotechEvent(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, parameters));
+
+        verify(subscriptionService).deactivateSubscription(scheduleDeactivationRequest.getSubscriptionId(),scheduleDeactivationRequest.getDeactivationDate(), scheduleDeactivationRequest.getReason(), scheduleDeactivationRequest.getGraceCount());
     }
 
     @Test
@@ -75,7 +93,7 @@ public class SubscriptionHandlerTest {
 
         subscriptionHandler.handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
 
-        verify(subscriptionService).subscriptionComplete(omSubscriptionRequest);
+        verify(subscriptionService).requestDeactivationOnSubscriptionCompletion(omSubscriptionRequest);
     }
 
     @Test
@@ -112,6 +130,6 @@ public class SubscriptionHandlerTest {
 
         doThrow(new RuntimeException()).when(onMobileSubscriptionGateway).deactivateSubscription(any(OMSubscriptionRequest.class));
 
-        subscriptionHandler.handleSubscriptionDeactivation(new MotechEvent(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, parameters));
+        subscriptionHandler.handleSubscriptionDeactivationRequest(new MotechEvent(SubscriptionEventKeys.DEACTIVATION_REQUESTED_SUBSCRIPTION, parameters));
     }
 }

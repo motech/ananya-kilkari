@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.domain.PhoneNumber;
 import org.motechproject.ananya.kilkari.mapper.ChangeMsisdnRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
@@ -10,6 +9,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
+import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.ChangePackService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
@@ -18,15 +18,11 @@ import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberR
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.scheduler.MotechSchedulerService;
-import org.motechproject.scheduler.domain.MotechEvent;
-import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -83,16 +79,8 @@ public class KilkariSubscriptionService {
     }
 
     public void processSubscriptionCompletion(Subscription subscription) {
-        String subjectKey = SubscriptionEventKeys.SUBSCRIPTION_COMPLETE;
-        Date startDate = DateTime.now().plusDays(kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
-        HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put(MotechSchedulerService.JOB_ID_KEY, subscription.getSubscriptionId());
-        parameters.put("0", SubscriptionMapper.createOMSubscriptionRequest(subscription, Channel.MOTECH));
-
-        MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
-        RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);
-
-        motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+        OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, Channel.MOTECH);
+        subscriptionService.requestDeactivationOnSubscriptionCompletion(omSubscriptionRequest);
     }
 
     public void requestDeactivation(String subscriptionId, UnsubscriptionRequest unsubscriptionRequest) {

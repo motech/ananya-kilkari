@@ -22,6 +22,6 @@ public class OnMobileSubscriptionManagerPublisher {
     }
 
     public void processDeactivation(OMSubscriptionRequest OMSubscriptionRequest) {
-        eventContext.send(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, OMSubscriptionRequest);
+        eventContext.send(SubscriptionEventKeys.DEACTIVATION_REQUESTED_SUBSCRIPTION, OMSubscriptionRequest);
     }
 }

@@ -467,7 +467,7 @@ public class SubscriptionServiceTest {
         final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.subscriptionComplete(omSubscriptionRequest);
+        subscriptionService.requestDeactivationOnSubscriptionCompletion(omSubscriptionRequest);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).update(subscriptionArgumentCaptor.capture());
@@ -490,21 +490,6 @@ public class SubscriptionServiceTest {
         assertEquals(null, OMSubscriptionRequest.getChannel());
         assertEquals(pack, OMSubscriptionRequest.getPack());
         assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
-
-        verify(campaignMessageAlertService).deleteFor(subscriptionId);
-    }
-
-    @Test
-    public void shouldScheduleInboxDeletionUponSubscriptionCompletion() {
-        String msisdn = "1234567890";
-        SubscriptionPack pack = SubscriptionPack.NANHI_KILKARI;
-        Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.NEW);
-        String subscriptionId = subscription.getSubscriptionId();
-        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-
-        subscriptionService.subscriptionComplete(new OMSubscriptionRequest(msisdn, pack, Channel.IVR, subscriptionId));
-
-        verify(inboxService).scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
     }
 
     @Test
@@ -516,7 +501,7 @@ public class SubscriptionServiceTest {
         OMSubscriptionRequest value = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.subscriptionComplete(value);
+        subscriptionService.requestDeactivationOnSubscriptionCompletion(value);
 
         verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
         verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
@@ -937,5 +922,22 @@ public class SubscriptionServiceTest {
 
         verifyZeroInteractions(onMobileSubscriptionManagerPublisher);
         verify(reportingServiceImpl).reportChangeMsisdnForSubscriber(subscription1.getSubscriptionId(), newMsisdn);
+    }
+
+    @Test
+    public void shouldScheduleDeactivation() {
+        Integer graceCount = 2;
+        String subscriptionId = "subscriptionId";
+        String reason = "Some reason";
+        DateTime deactivationDate = DateTime.now();
+
+        subscriptionService.scheduleDeactivation(subscriptionId, deactivationDate, reason, graceCount);
+
+        ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
+        verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
+        RunOnceSchedulableJob actualSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
+        assertEquals(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, actualSchedulableJob.getMotechEvent().getSubject());
+        ScheduleDeactivationRequest scheduleDeactivationRequest = (ScheduleDeactivationRequest) actualSchedulableJob.getMotechEvent().getParameters().get("0");
+        assertEquals(new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount), scheduleDeactivationRequest);
     }
 }

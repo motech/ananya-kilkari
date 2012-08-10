@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -96,6 +97,7 @@ public class SubscriptionService {
             initiateActivationRequest(omSubscriptionRequest);
         return subscription;
     }
+
 
     private void scheduleEarlySubscription(DateTime startDate, OMSubscriptionRequest omSubscriptionRequest) {
 
@@ -199,6 +201,20 @@ public class SubscriptionService {
         });
     }
 
+
+    public void scheduleDeactivation(String subscriptionId,final DateTime deactivationDate, String reason, Integer graceCount) {
+        String subjectKey = SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION;
+        Date startDate = DateTime.now().plusDays(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put(MotechSchedulerService.JOB_ID_KEY, subscriptionId);
+        parameters.put("0", new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount));
+
+        MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
+        RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);
+
+        motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+    }
+
     public void deactivateSubscription(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
         updateStatusAndReport(subscriptionId, deactivationDate, reason, null, graceCount, new Action<Subscription>() {
             @Override
@@ -211,7 +227,7 @@ public class SubscriptionService {
         });
     }
 
-    public void subscriptionComplete(OMSubscriptionRequest omSubscriptionRequest) {
+    public void requestDeactivationOnSubscriptionCompletion(OMSubscriptionRequest omSubscriptionRequest) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
         if (subscription.isInDeactivatedState()) {
             logger.info(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), subscription.getStatus()));
@@ -223,8 +239,6 @@ public class SubscriptionService {
             @Override
             public void perform(Subscription subscription) {
                 subscription.complete();
-                inboxService.scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
-                campaignMessageAlertService.deleteFor(subscription.getSubscriptionId());
             }
         });
     }
@@ -239,7 +253,6 @@ public class SubscriptionService {
 
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         DateTime nextAlertDateTime = messageCampaignService.getMessageTimings(subscriptionId, campaignRescheduleRequest.getCreatedAt(), campaignRescheduleRequest.getCreatedAt().plusMonths(1)).get(0);
-
         unScheduleCampaign(subscription);
         removeScheduledMessagesFromOBD(subscriptionId);
         scheduleCampaign(campaignRescheduleRequest, nextAlertDateTime);
@@ -262,6 +275,7 @@ public class SubscriptionService {
         MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getStartDate());
         messageCampaignService.stop(unEnrollRequest);
     }
+
 
     private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest, DateTime nextAlertDateTime) {
         String campaignName = MessageCampaignPack.from(campaignRescheduleRequest.getReason().name()).getCampaignName();
@@ -336,5 +350,4 @@ public class SubscriptionService {
         allSubscriptions.update(subscription);
         reportingService.reportChangeMsisdnForSubscriber(subscription.getSubscriptionId(), changeMsisdnRequest.getNewMsisdn());
     }
-
 }

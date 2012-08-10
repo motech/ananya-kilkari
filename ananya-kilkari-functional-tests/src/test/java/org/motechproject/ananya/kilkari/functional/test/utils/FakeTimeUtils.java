@@ -12,6 +12,7 @@ public class FakeTimeUtils {
         String offsetValue = System.getProperty("faketime.offset.seconds");
         long currentOffset = Long.parseLong(offsetValue == null ? "0" : offsetValue);
 
+        System.out.println("Changing fake time from "+DateTime.now().toString("dd/MM/yyyy HH")+"to "+dateTime.toString("dd/MM/yyyy HH"));
         Date newDateTime = dateTime.toDate();
         long newOffset = ((newDateTime.getTime() - System.currentTimeMillis()) / 1000) + currentOffset;
         System.setProperty("faketime.offset.seconds", String.valueOf(newOffset));

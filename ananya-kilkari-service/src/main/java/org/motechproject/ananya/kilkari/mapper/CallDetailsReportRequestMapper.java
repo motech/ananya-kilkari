@@ -19,7 +19,7 @@ public class CallDetailsReportRequestMapper {
                 obdSuccessfulCallDetailsRequest.getSubscriptionId(),
                 obdSuccessfulCallDetailsRequest.getMsisdn(),
                 obdSuccessfulCallDetailsRequest.getCampaignId(),
-                obdSuccessfulCallDetailsRequest.getServiceOption().name(),
+                getServiceOption(obdSuccessfulCallDetailsRequest),
                 retryCount.toString(),
                 CampaignMessageStatus.SUCCESS.name(),
                 callDurationReportRequest,
@@ -37,5 +37,9 @@ public class CallDetailsReportRequestMapper {
                 CampaignMessageStatus.SUCCESS.name(),
                 new CallDetailRecordRequest(DateUtils.parseDateTime(callDurationWebRequest.getStartTime()), DateUtils.parseDateTime(callDurationWebRequest.getEndTime())),
                 CampaignMessageCallSource.INBOX.name());
+    }
+
+    private static String getServiceOption(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
+        return obdSuccessfulCallDetailsRequest.getServiceOption() == null ? null : obdSuccessfulCallDetailsRequest.getServiceOption().name();
     }
 }

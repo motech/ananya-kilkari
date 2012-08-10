@@ -17,7 +17,7 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
     private KilkariPropertiesData kilkariProperties;
 
     @Test
-    public void shouldSubscribeAndProgressAndCompleteSubscriptionSuccessfully() throws Exception {
+    public void shouldSubscribeAndProgressAndListenToInboxAndCompleteSubscriptionSuccessfully() throws Exception {
         int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
         int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
         DateTime futureDateForFirstCampaignAlertToBeRaised = DateTime.now().plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1);
@@ -30,10 +30,12 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
         and(subscriptionManager).activates(subscriptionData);
         and(time).isMovedToFuture(futureDateForFirstCampaignAlertToBeRaised);
         then(user).messageIsReady(subscriptionData, "WEEK1");
+        then(user).canListenToThisWeeksInboxMessage(subscriptionData, "WEEK1");
 
         when(subscriptionManager).renews(subscriptionData);
         and(time).isMovedToFuture(futureDateOfSecondCampaignAlert);
         then(user).messageIsReady(subscriptionData, "WEEK2");
+        then(user).cannotListenToPreviousWeeksInboxMessage(subscriptionData, "WEEK1");
 
         when(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
         then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);

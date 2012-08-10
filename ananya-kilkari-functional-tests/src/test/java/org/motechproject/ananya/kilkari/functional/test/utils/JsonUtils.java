@@ -30,4 +30,8 @@ public class JsonUtils {
         }
         return serializedObject;
     }
+
+    public static <T> T fromJsonWithResponse(String jsonString, Class<T> subscriberResponseClass) {
+        return fromJson(jsonString.replace("var response = ", ""), subscriberResponseClass);
+    }
 }

@@ -24,7 +24,6 @@ public class CallCenter {
     private SubscriptionController subscriptionController;
     @Autowired
     private SubscriptionVerifier subscriptionVerifier;
-
     @Autowired
     private ReportVerifier reportVerifier;
 

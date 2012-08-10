@@ -34,8 +34,21 @@ public class CampaignMessageVerifier {
             throw new RuntimeException(String.format("Campaign Message for subscription id - %s not in OBD db for week %s ", subscriptionData.getSubscriptionId(), weekMessageId));
     }
 
-    public void verifyCampaignMessageIsNotCreatedAfterCampaignAlert(SubscriptionData subscriptionData, String weekMessageId) {
-        CampaignMessage campaignMessage = findCampaignMessageWithRetry(subscriptionData, weekMessageId);
+    public void verifyCampaignMessageIsNotCreatedAfterCampaignAlert(final SubscriptionData subscriptionData, final String weekMessageId) {
+        CampaignMessage campaignMessage = new TimedRunner<CampaignMessage>(120, 1000) {
+            @Override
+            protected TimedRunnerResponse<CampaignMessage> run() {
+                if (!campaignAlertRaised) {
+                    return null;
+                }
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                return new TimedRunnerResponse(findCampaignMessage(subscriptionData, weekMessageId));
+            }
+        }.executeWithTimeout();
         assertNull(campaignMessage);
     }
 
@@ -82,8 +95,7 @@ public class CampaignMessageVerifier {
     }
 
     private CampaignMessage findCampaignMessage(SubscriptionData subscriptionData, String weekMessageId) {
-        CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionData.getSubscriptionId(), weekMessageId);
-        return campaignMessage != null && campaignMessage.getMessageId().equals(weekMessageId) ? campaignMessage : null;
+        return allCampaignMessages.find(subscriptionData.getSubscriptionId(), weekMessageId);
     }
 
     public void reset() {

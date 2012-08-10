@@ -117,7 +117,6 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
 
     @Test
     public void shouldDeactivateUserWhenRequested() throws Exception {
-
         int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
         int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
 

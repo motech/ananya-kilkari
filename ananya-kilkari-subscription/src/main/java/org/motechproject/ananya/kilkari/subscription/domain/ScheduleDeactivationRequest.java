@@ -4,7 +4,9 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.DateTime;
 
-public class ScheduleDeactivationRequest {
+import java.io.Serializable;
+
+public class ScheduleDeactivationRequest implements Serializable {
     private String subscriptionId;
     private DateTime deactivationDate;
     private String reason;

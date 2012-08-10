@@ -467,7 +467,7 @@ public class SubscriptionServiceTest {
         final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.requestDeactivationOnSubscriptionCompletion(omSubscriptionRequest);
+        subscriptionService.subscriptionComplete(omSubscriptionRequest);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).update(subscriptionArgumentCaptor.capture());
@@ -490,6 +490,21 @@ public class SubscriptionServiceTest {
         assertEquals(null, OMSubscriptionRequest.getChannel());
         assertEquals(pack, OMSubscriptionRequest.getPack());
         assertEquals(subscriptionId, OMSubscriptionRequest.getSubscriptionId());
+
+        verify(campaignMessageAlertService).deleteFor(subscriptionId);
+    }
+
+    @Test
+    public void shouldScheduleInboxDeletionUponSubscriptionCompletion() {
+        String msisdn = "1234567890";
+        SubscriptionPack pack = SubscriptionPack.NANHI_KILKARI;
+        Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.NEW);
+        String subscriptionId = subscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.subscriptionComplete(new OMSubscriptionRequest(msisdn, pack, Channel.IVR, subscriptionId));
+
+        verify(inboxService).scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
     }
 
     @Test
@@ -501,7 +516,7 @@ public class SubscriptionServiceTest {
         OMSubscriptionRequest value = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.requestDeactivationOnSubscriptionCompletion(value);
+        subscriptionService.subscriptionComplete(value);
 
         verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
         verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));

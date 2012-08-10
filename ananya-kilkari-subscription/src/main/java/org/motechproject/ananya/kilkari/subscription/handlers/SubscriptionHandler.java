@@ -40,7 +40,7 @@ public class SubscriptionHandler {
     public void handleSubscriptionComplete(MotechEvent event) {
         OMSubscriptionRequest omSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
         logger.info(String.format("Handling subscription completion event for subscriptionid: %s, msisdn: %s, pack: %s", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
-        subscriptionService.requestDeactivationOnSubscriptionCompletion(omSubscriptionRequest);
+        subscriptionService.subscriptionComplete(omSubscriptionRequest);
     }
 
     @MotechListener(subjects = {SubscriptionEventKeys.EARLY_SUBSCRIPTION})

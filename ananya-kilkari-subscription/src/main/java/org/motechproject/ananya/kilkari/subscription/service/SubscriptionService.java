@@ -227,7 +227,7 @@ public class SubscriptionService {
         });
     }
 
-    public void requestDeactivationOnSubscriptionCompletion(OMSubscriptionRequest omSubscriptionRequest) {
+    public void subscriptionComplete(OMSubscriptionRequest omSubscriptionRequest) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
         if (subscription.isInDeactivatedState()) {
             logger.info(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), subscription.getStatus()));
@@ -239,6 +239,8 @@ public class SubscriptionService {
             @Override
             public void perform(Subscription subscription) {
                 subscription.complete();
+                inboxService.scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
+                campaignMessageAlertService.deleteFor(subscription.getSubscriptionId());
             }
         });
     }

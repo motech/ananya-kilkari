@@ -25,6 +25,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.Subscriptio
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.scheduler.MotechSchedulerService;
+import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -168,16 +169,22 @@ public class KilkariSubscriptionServiceTest {
     @Test
     public void shouldScheduleASubscriptionCompletionEvent() {
         String subscriptionId = "subscriptionId";
-        Subscription mockedSubscription = mock(Subscription.class);
+        DateTime now = DateTime.now();
+        org.motechproject.ananya.kilkari.subscription.domain.Subscription mockedSubscription = mock(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).thenReturn(3);
 
         kilkariSubscriptionService.processSubscriptionCompletion(mockedSubscription);
 
-        ArgumentCaptor<OMSubscriptionRequest> captor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
-        verify(subscriptionService).requestDeactivationOnSubscriptionCompletion(captor.capture());
-        OMSubscriptionRequest actualRequest = captor.getValue();
-        assertEquals(subscriptionId, actualRequest.getSubscriptionId());
+        ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
+        verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
+        RunOnceSchedulableJob runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
+        assertEquals(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, runOnceSchedulableJob.getMotechEvent().getSubject());
+        assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
+        OMSubscriptionRequest OMSubscriptionRequest = (OMSubscriptionRequest) runOnceSchedulableJob.getMotechEvent().getParameters().get("0");
+        assertEquals(OMSubscriptionRequest.class, OMSubscriptionRequest.getClass());
+        assertEquals(now.plusDays(3).toDate(), runOnceSchedulableJob.getStartDate());
+        assertEquals(Channel.MOTECH, OMSubscriptionRequest.getChannel());
     }
 
     @Test

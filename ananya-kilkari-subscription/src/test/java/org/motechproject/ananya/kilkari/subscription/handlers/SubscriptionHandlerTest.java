@@ -78,7 +78,7 @@ public class SubscriptionHandlerTest {
 
         subscriptionHandler.handleDeactivateSubscription(new MotechEvent(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, parameters));
 
-        verify(subscriptionService).deactivateSubscription(scheduleDeactivationRequest.getSubscriptionId(),scheduleDeactivationRequest.getDeactivationDate(), scheduleDeactivationRequest.getReason(), scheduleDeactivationRequest.getGraceCount());
+        verify(subscriptionService).deactivateSubscription(scheduleDeactivationRequest.getSubscriptionId(), scheduleDeactivationRequest.getDeactivationDate(), scheduleDeactivationRequest.getReason(), scheduleDeactivationRequest.getGraceCount());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class SubscriptionHandlerTest {
 
         subscriptionHandler.handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
 
-        verify(subscriptionService).requestDeactivationOnSubscriptionCompletion(omSubscriptionRequest);
+        verify(subscriptionService).subscriptionComplete(omSubscriptionRequest);
     }
 
     @Test

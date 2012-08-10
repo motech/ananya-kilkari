@@ -29,7 +29,7 @@ public class CallCenter {
     private ReportVerifier reportVerifier;
 
     public void subscribes(SubscriptionData subscriptionData) throws Exception {
-        reportVerifier.setUpReporting(subscriptionData);
+        reportVerifier.setUpReportingExpectations(subscriptionData);
         mockMvc(subscriptionController)
                 .perform(post("/subscription/")
                         .body(JsonUtils.toJson(subscriptionData).getBytes())
@@ -57,7 +57,7 @@ public class CallCenter {
     }
 
     public void unSubscribes(SubscriptionData subscriptionData) throws Exception {
-        reportVerifier.setUpReporting(subscriptionData);
+        reportVerifier.setUpReportingExpectations(subscriptionData);
         UnSubscriptionData unSubscriptionData = new UnSubscriptionData("IVR", "BLAH");
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/"+ subscriptionData.getSubscriptionId())

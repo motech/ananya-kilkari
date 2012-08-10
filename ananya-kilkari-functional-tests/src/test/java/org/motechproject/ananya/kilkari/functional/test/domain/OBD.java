@@ -23,7 +23,7 @@ public class OBD {
     @Autowired
     private CampaignMessageVerifier campaignMessageVerifier;
 
-    public void userDoesNotPickUpTheCall(SubscriptionData subscriptionData, String campaignId) throws Exception {
+    public void reportsUserDidNotPickUpTheCall(SubscriptionData subscriptionData, String campaignId) throws Exception {
         FailedCallReport failedCallReport = new FailedCallReport(subscriptionData.getSubscriptionId(), subscriptionData.getMsisdn(), campaignId, "Q.850_18");
         FailedCallReports failedCallReports = new FailedCallReports();
         failedCallReports.setFailedCallReports(Arrays.asList(failedCallReport));
@@ -40,7 +40,7 @@ public class OBD {
         campaignMessageVerifier.verifyCampaignMessageFailedDueToDNP(subscriptionData, campaignId);
     }
 
-    public void callIsNotDelivered(SubscriptionData subscriptionData, String campaignId) throws Exception {
+    public void doesNotCallTheUser(SubscriptionData subscriptionData, String campaignId) throws Exception {
         FailedCallReport failedCallReport = new FailedCallReport(subscriptionData.getSubscriptionId(), subscriptionData.getMsisdn(), campaignId, "Q.850_1");
         FailedCallReports failedCallReports = new FailedCallReports();
         failedCallReports.setFailedCallReports(Arrays.asList(failedCallReport));

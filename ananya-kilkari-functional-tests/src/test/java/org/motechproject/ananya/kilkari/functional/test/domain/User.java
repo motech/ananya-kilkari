@@ -27,7 +27,7 @@ public class User {
     }
 
 
-    public void MessageWasDeliveredDuringSecondSlot(SubscriptionData subscriptionData, String weekMessageId) {
+    public void messageWasDeliveredDuringSecondSlot(SubscriptionData subscriptionData, String weekMessageId) {
         onMobileOBDVerifier.verifyThatRetryMessageWasDelivered(subscriptionData, weekMessageId);
     }
 

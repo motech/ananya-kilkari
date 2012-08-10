@@ -89,7 +89,6 @@ public class OnMobileOBDVerifier {
 
         @Override
         public void sendInvalidFailureRecord(InvalidFailedCallReports invalidFailedCallReports) {
-            //To change body of implemented methods use File | Settings | File Templates.
         }
 
         public OnMobileCampaignMessage findNewMessage(final SubscriptionData subscriptionData, final String campaignId) {

@@ -51,7 +51,7 @@ public class ReportVerifier {
         assertEquals(location.getPanchayat(), reportRequest.getLocation().getPanchayat());
     }
 
-    public void setUpReporting(SubscriptionData subscriptionData) {
+    public void setUpReportingExpectations(SubscriptionData subscriptionData) {
         LocationRequest location = subscriptionData.getLocation();
         if (location == null) return;
         when(reportingService.getLocation(anyString(), anyString(), anyString())).thenReturn(new LocationResponse(location.getDistrict(), location.getBlock(), location.getPanchayat()));

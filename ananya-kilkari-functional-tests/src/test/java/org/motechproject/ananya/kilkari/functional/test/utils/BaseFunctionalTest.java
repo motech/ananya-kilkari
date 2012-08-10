@@ -8,7 +8,7 @@ import org.motechproject.ananya.kilkari.functional.test.verifiers.ReportVerifier
 import org.motechproject.ananya.kilkari.functional.test.verifiers.SubscriptionVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class FunctionalTestUtils extends SpringIntegrationTest {
+public class BaseFunctionalTest extends SpringIntegrationTest {
 
     @Autowired
     protected CallCenter callCenter;

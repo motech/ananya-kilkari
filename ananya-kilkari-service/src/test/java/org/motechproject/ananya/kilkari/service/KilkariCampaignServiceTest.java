@@ -10,7 +10,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.mapper.ValidCallDeliveryFailureRecordObjectMapper;
@@ -39,6 +38,7 @@ import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.service.validator.CallDeliveryFailureRecordValidator;
 import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
+import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 
 import java.util.ArrayList;
 import java.util.List;

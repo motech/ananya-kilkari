@@ -7,7 +7,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
@@ -18,6 +17,7 @@ import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
+import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;

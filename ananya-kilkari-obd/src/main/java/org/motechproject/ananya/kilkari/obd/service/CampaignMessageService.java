@@ -1,8 +1,6 @@
 package org.motechproject.ananya.kilkari.obd.service;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailRecordRequest;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.obd.builder.CampaignMessageCSVBuilder;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
@@ -11,6 +9,8 @@ import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
+import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailRecordRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

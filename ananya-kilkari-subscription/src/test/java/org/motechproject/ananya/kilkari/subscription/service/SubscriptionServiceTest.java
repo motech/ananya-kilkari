@@ -11,10 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
-import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.message.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
@@ -37,6 +33,10 @@ import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberR
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 

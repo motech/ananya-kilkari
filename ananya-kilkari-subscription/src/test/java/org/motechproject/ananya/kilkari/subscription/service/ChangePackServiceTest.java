@@ -8,14 +8,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionChangePackRequest;
-import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionChangePackRequest;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 
 import static junit.framework.Assert.*;
 import static org.mockito.Matchers.any;

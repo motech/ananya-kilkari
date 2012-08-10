@@ -1,7 +1,5 @@
 package org.motechproject.ananya.kilkari.mapper;
 
-import org.motechproject.ananya.kilkari.contract.request.CallDetailRecordRequest;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 import org.motechproject.ananya.kilkari.request.CallDurationRequest;
@@ -10,6 +8,8 @@ import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
+import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailRecordRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 
 public class CallDetailsReportRequestMapper {
     public static CallDetailsReportRequest mapFrom(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest, Integer retryCount) {

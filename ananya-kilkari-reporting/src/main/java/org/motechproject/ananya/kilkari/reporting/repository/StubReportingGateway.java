@@ -1,9 +1,9 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
-import org.motechproject.ananya.kilkari.contract.request.*;
-import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
-import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
+import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.springframework.stereotype.Repository;
 
 @Repository

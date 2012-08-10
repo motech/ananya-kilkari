@@ -1,7 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.mapper.CallDetailsReportRequestMapper;
@@ -25,6 +24,7 @@ import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.ananya.kilkari.service.validator.CallDeliveryFailureRecordValidator;
 import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
+import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

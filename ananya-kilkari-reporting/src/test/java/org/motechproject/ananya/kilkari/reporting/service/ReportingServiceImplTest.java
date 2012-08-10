@@ -3,9 +3,9 @@ package org.motechproject.ananya.kilkari.reporting.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.contract.request.*;
-import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
+import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.http.client.service.HttpClientService;
 
 import java.util.Properties;

@@ -3,7 +3,6 @@ package org.motechproject.ananya.kilkari.mapper;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.contract.request.CallDetailsReportRequest;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.request.CallDurationRequest;
@@ -13,6 +12,7 @@ import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
+import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

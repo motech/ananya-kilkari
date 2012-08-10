@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.subscription.validators;
 
-import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -8,6 +7,7 @@ import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
+import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -3,8 +3,6 @@ package org.motechproject.ananya.kilkari.subscription.service.mapper;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.contract.request.SubscriberLocation;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -13,6 +11,8 @@ import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionReque
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocation;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
 
 import static junit.framework.Assert.assertEquals;
 

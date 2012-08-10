@@ -1,10 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.contract.request.SubscriberLocation;
-import org.motechproject.ananya.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionStateChangeRequest;
-import org.motechproject.ananya.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
@@ -21,6 +17,10 @@ import org.motechproject.ananya.kilkari.subscription.service.mapper.Subscription
 import org.motechproject.ananya.kilkari.subscription.service.request.*;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocation;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;

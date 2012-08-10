@@ -3,12 +3,12 @@ package org.motechproject.ananya.kilkari.functional.test.verifiers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
 import org.motechproject.ananya.kilkari.request.LocationRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

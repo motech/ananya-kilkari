@@ -4,7 +4,6 @@ import org.motechproject.ananya.kilkari.functional.test.builder.CampaignChangeRe
 import org.motechproject.ananya.kilkari.functional.test.utils.JsonUtils;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.ReportVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.SubscriptionVerifier;
-import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
@@ -14,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import static org.motechproject.ananya.kilkari.functional.test.utils.MVCTestUtils.mockMvc;
+import static org.springframework.test.web.server.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
@@ -48,11 +48,27 @@ public class CallCenter {
                 .perform(post("/subscription/" + subscriptionData.getSubscriptionId() + "/changecampaign")
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(
-                            new CampaignChangeRequestBuilder()
-                            .forReason("INFANT_DEATH")
-                            .build()
-                            .getBytes()
+                                new CampaignChangeRequestBuilder()
+                                        .forReason("INFANT_DEATH")
+                                        .build()
+                                        .getBytes()
                         ));
         
+    }
+
+    public void unSubscribes(SubscriptionData subscriptionData) throws Exception {
+        reportVerifier.setUpReporting(subscriptionData);
+        UnSubscriptionData unSubscriptionData = new UnSubscriptionData("IVR", "BLAH");
+        mockMvc(subscriptionController)
+                .perform(delete("/subscription/"+ subscriptionData.getSubscriptionId())
+                        .body(JsonUtils.toJson(unSubscriptionData).getBytes())
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON));
+
+        Subscription subscription = subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_DEACTIVATION);
+        reportVerifier.verifySubscriptionCreationRequest(subscriptionData);
+        subscriptionData.setSubscriptionId(subscription.getSubscriptionId());
     }
 }

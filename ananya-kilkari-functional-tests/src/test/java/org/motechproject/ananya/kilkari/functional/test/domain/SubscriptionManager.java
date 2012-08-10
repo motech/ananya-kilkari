@@ -59,4 +59,18 @@ public class SubscriptionManager {
                         ));
         subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.SUSPENDED);
     }
+
+    public void confirmsDeactivation(SubscriptionData subscriptionData) throws Exception {
+        mockMvc(subscriptionController)
+                .perform(put(String.format("/subscription/%s", subscriptionData.getSubscriptionId()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                new CallBackRequestBuilder().forMsisdn(subscriptionData.getMsisdn())
+                                        .forAction("DCT")
+                                        .forStatus("SUCCESS")
+                                        .build()
+                                        .getBytes()
+                        ));
+        subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.DEACTIVATED);
+    }
 }

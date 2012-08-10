@@ -104,7 +104,7 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
         when(callCenter).changesCampaign(subscriptionData);
         and(time).isMovedToFuture(futureDateForFirstInfantDeathCampaignAlert);
         and(subscriptionManager).renews(subscriptionData);
-//        then(user).messageIsNotReady(subscriptionData, "WEEK3");
+        then(user).messageIsNotCreated(subscriptionData, "WEEK3");
         then(user).messageIsReady(subscriptionData, "ID1");
 
         when(time).isMovedToFuture(futureDateForSecondInfantDeathCampaignAlert);
@@ -146,5 +146,34 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
         and(time).isMovedToFuture(futureDateForSecondDaySecondSlot);
         then(user).messageWasDeliveredDuringFirstSlot(subscriptionData, week1);
     }
+
+    @Test
+    public void shouldDeactivateUserWhenRequested() throws Exception {
+
+        int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
+        int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
+
+        DateTime now = DateTime.now();
+        DateTime futureDateForFirstCampaignAlertToBeRaised = now.plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 5);
+        DateTime futureDateForSecondCampaignAlert = futureDateForFirstCampaignAlertToBeRaised.plusWeeks(1);
+
+        DateTime futureDateForCampaignAlertToBeRaisedAfterDeactivation = futureDateForSecondCampaignAlert.plusWeeks(1);
+        SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
+
+        when(callCenter).subscribes(subscriptionData);
+        and(subscriptionManager).activates(subscriptionData);
+        and(time).isMovedToFuture(futureDateForFirstCampaignAlertToBeRaised);
+        then(user).messageIsReady(subscriptionData, "WEEK1");
+
+        when(time).isMovedToFuture(futureDateForSecondCampaignAlert);
+        and(subscriptionManager).renews(subscriptionData);
+        and(user).messageIsReady(subscriptionData, "WEEK2");
+
+        when(callCenter).unSubscribes(subscriptionData);
+        and(subscriptionManager).confirmsDeactivation(subscriptionData);
+        and(time).isMovedToFuture(futureDateForCampaignAlertToBeRaisedAfterDeactivation);
+        then(user).messageIsNotCreated(subscriptionData, "WEEK3");
+    }
+
 }
 

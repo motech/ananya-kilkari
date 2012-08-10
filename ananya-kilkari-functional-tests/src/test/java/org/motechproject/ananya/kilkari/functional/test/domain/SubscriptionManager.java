@@ -60,7 +60,7 @@ public class SubscriptionManager {
         subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.SUSPENDED);
     }
 
-    public void confirmsDeactivation(SubscriptionData subscriptionData) throws Exception {
+    public void confirmsDeactivation(SubscriptionData subscriptionData, SubscriptionStatus status) throws Exception {
         mockMvc(subscriptionController)
                 .perform(put(String.format("/subscription/%s", subscriptionData.getSubscriptionId()))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -71,6 +71,6 @@ public class SubscriptionManager {
                                         .build()
                                         .getBytes()
                         ));
-        subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.DEACTIVATED);
+        subscriptionVerifier.verifySubscriptionState(subscriptionData, status);
     }
 }

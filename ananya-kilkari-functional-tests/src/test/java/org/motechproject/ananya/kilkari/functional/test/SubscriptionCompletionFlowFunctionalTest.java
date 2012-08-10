@@ -167,12 +167,44 @@ public class SubscriptionCompletionFlowFunctionalTest extends FunctionalTestUtil
 
         when(time).isMovedToFuture(futureDateForSecondCampaignAlert);
         and(subscriptionManager).renews(subscriptionData);
-        and(user).messageIsReady(subscriptionData, "WEEK2");
+        then(user).messageIsReady(subscriptionData, "WEEK2");
 
         when(callCenter).unSubscribes(subscriptionData);
-        and(subscriptionManager).confirmsDeactivation(subscriptionData);
+        and(subscriptionManager).confirmsDeactivation(subscriptionData, SubscriptionStatus.DEACTIVATED);
         and(time).isMovedToFuture(futureDateForCampaignAlertToBeRaisedAfterDeactivation);
         then(user).messageIsNotCreated(subscriptionData, "WEEK3");
+    }
+
+    @Test
+    public void shouldNotSendMessageWhenCustomerIsPerpetuallySuspended() throws Exception {
+
+        int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
+        int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
+
+        DateTime now = DateTime.now();
+        DateTime firstCampaignAlertDate = now.plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 5);
+        DateTime secondCampaignAlertDate = firstCampaignAlertDate.plusWeeks(1);
+        DateTime thirdCampaignAlertDate = secondCampaignAlertDate.plusWeeks(1);
+        DateTime lastCampaignAlertDate = firstCampaignAlertDate.plusWeeks(59);
+
+        SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
+
+        when(callCenter).subscribes(subscriptionData);
+        and(subscriptionManager).activates(subscriptionData);
+        and(time).isMovedToFuture(firstCampaignAlertDate);
+        then(user).messageIsReady(subscriptionData, "WEEK1");
+
+        when(time).isMovedToFuture(secondCampaignAlertDate);
+        and(subscriptionManager).failsRenew(subscriptionData);
+        then(user).messageIsNotCreated(subscriptionData, "WEEK2");
+
+        when(time).isMovedToFuture(thirdCampaignAlertDate);
+        and(subscriptionManager).failsRenew(subscriptionData);
+        then(user).messageIsNotCreated(subscriptionData, "WEEK3");
+
+        when(time).isMovedToFuture(lastCampaignAlertDate);
+        and(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
+        and(subscriptionManager).confirmsDeactivation(subscriptionData, SubscriptionStatus.COMPLETED);
     }
 
 }

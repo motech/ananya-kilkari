@@ -23,20 +23,24 @@ public class GatewayLogger {
 
     @Before("allExternalHttpCalls()")
     public void beforeRESTCall(JoinPoint joinPoint) {
-        Object[] args = joinPoint.getArgs();
-        if (args.length > 0) {
-            logger.info("Accessing external url: {}", Arrays.toString(args));
+        if (logger.isDebugEnabled()) {
+            Object[] args = joinPoint.getArgs();
+            if (args.length > 0) {
+                logger.debug("Accessing external url: {}", Arrays.toString(args));
+            }
         }
     }
 
     @AfterReturning(pointcut = "allExternalHttpCalls()", returning = "result")
     public void afterRESTCall(JoinPoint joinPoint, Object result) {
-        Object[] args = joinPoint.getArgs();
-        String arguments = "";
-        if (args.length > 0) {
-            arguments = Arrays.toString(args);
+        if (logger.isDebugEnabled()) {
+            Object[] args = joinPoint.getArgs();
+            String arguments = "";
+            if (args.length > 0) {
+                arguments = Arrays.toString(args);
+            }
+            logger.debug("After accessing external url: {} got response: {}", arguments, result);
         }
-        logger.info("After accessing external url: {} got response: {}", arguments, result);
     }
 
 }

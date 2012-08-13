@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.functional.test.verifiers;
 
+import org.junit.Assert;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
 import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunner;
 import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunnerResponse;
@@ -12,10 +13,6 @@ import org.motechproject.server.messagecampaign.EventKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.security.auth.Subject;
-import java.util.List;
-
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 @Component
@@ -34,22 +31,36 @@ public class CampaignMessageVerifier {
             throw new RuntimeException(String.format("Campaign Message for subscription id - %s not in OBD db for week %s ", subscriptionData.getSubscriptionId(), weekMessageId));
     }
 
+
     public void verifyCampaignMessageIsNotCreatedAfterCampaignAlert(final SubscriptionData subscriptionData, final String weekMessageId) {
-        CampaignMessage campaignMessage = new TimedRunner<CampaignMessage>(120, 1000) {
+        Boolean campaignAlertRaised = waitForCampaignAlertToBeRaised();
+        assertTrue("Campaign alert should have been raised", campaignAlertRaised);
+
+        //waiting for 5 seconds before we assert for obd entry
+        waitFor(5000);
+        CampaignMessage campaignMessage = findOBDCampaignMessage(subscriptionData, weekMessageId);
+        assertNull(campaignMessage);
+    }
+
+    private Boolean waitForCampaignAlertToBeRaised() {
+        return new TimedRunner<Boolean>(50, 2000) {
             @Override
-            protected TimedRunnerResponse<CampaignMessage> run() {
-                if (!campaignAlertRaised) {
+            protected TimedRunnerResponse<Boolean> run() {
+                if (!CampaignMessageVerifier.this.campaignAlertRaised) {
                     return null;
                 }
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                return new TimedRunnerResponse(findCampaignMessage(subscriptionData, weekMessageId));
+                return new TimedRunnerResponse<>(CampaignMessageVerifier.this.campaignAlertRaised);
             }
         }.executeWithTimeout();
-        assertNull(campaignMessage);
+    }
+
+    private void waitFor(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Assert.fail("Failed while waiting for 10 seconds");
+            e.printStackTrace();
+        }
     }
 
     @MotechListener(subjects = {EventKeys.SEND_MESSAGE})
@@ -70,7 +81,7 @@ public class CampaignMessageVerifier {
         return new TimedRunner<CampaignMessage>(120, 1000) {
             public TimedRunnerResponse<CampaignMessage> run() {
                 CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionData.getSubscriptionId(), weekMessageId);
-                if(campaignMessage == null) {
+                if (campaignMessage == null) {
                     return null;
                 }
                 return campaignMessage.getMessageId().equals(weekMessageId)
@@ -88,13 +99,13 @@ public class CampaignMessageVerifier {
     private CampaignMessage findCampaignMessageWithRetry(final SubscriptionData subscriptionData, final String weekMessageId) {
         return new TimedRunner<CampaignMessage>(120, 1000) {
             public TimedRunnerResponse<CampaignMessage> run() {
-                CampaignMessage campaignMessage = findCampaignMessage(subscriptionData, weekMessageId);
+                CampaignMessage campaignMessage = findOBDCampaignMessage(subscriptionData, weekMessageId);
                 return campaignMessage == null ? null : new TimedRunnerResponse<>(campaignMessage);
             }
         }.executeWithTimeout();
     }
 
-    private CampaignMessage findCampaignMessage(SubscriptionData subscriptionData, String weekMessageId) {
+    private CampaignMessage findOBDCampaignMessage(SubscriptionData subscriptionData, String weekMessageId) {
         return allCampaignMessages.find(subscriptionData.getSubscriptionId(), weekMessageId);
     }
 

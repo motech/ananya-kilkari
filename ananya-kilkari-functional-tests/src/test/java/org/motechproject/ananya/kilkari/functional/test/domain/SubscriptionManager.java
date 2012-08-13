@@ -19,58 +19,35 @@ public class SubscriptionManager {
     private SubscriptionVerifier subscriptionVerifier;
 
     public void activates(SubscriptionData subscriptionData) throws Exception {
-        mockMvc(subscriptionController)
-                .perform(put(String.format("/subscription/%s", subscriptionData.getSubscriptionId()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(
-                                new CallBackRequestBuilder().forMsisdn(subscriptionData.getMsisdn())
-                                        .forAction("ACT")
-                                        .forStatus("SUCCESS")
-                                        .build()
-                                        .getBytes()
-                        ));
+        callBackRequest(subscriptionData, "ACT", "SUCCESS");
         subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.ACTIVE);
     }
 
     public void renews(SubscriptionData subscriptionData) throws Exception {
-        mockMvc(subscriptionController)
-                .perform(put(String.format("/subscription/%s", subscriptionData.getSubscriptionId()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(
-                                new CallBackRequestBuilder().forMsisdn(subscriptionData.getMsisdn())
-                                        .forAction("REN")
-                                        .forStatus("SUCCESS")
-                                        .build()
-                                        .getBytes()
-                        ));
+        callBackRequest(subscriptionData, "REN", "SUCCESS");
         subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.ACTIVE);
     }
 
     public void failsRenew(SubscriptionData subscriptionData) throws Exception {
-        mockMvc(subscriptionController)
-                .perform(put(String.format("/subscription/%s", subscriptionData.getSubscriptionId()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(
-                                new CallBackRequestBuilder().forMsisdn(subscriptionData.getMsisdn())
-                                        .forAction("REN")
-                                        .forStatus("BAL_LOW")
-                                        .build()
-                                        .getBytes()
-                        ));
+        callBackRequest(subscriptionData, "REN", "BAL_LOW");
         subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.SUSPENDED);
     }
 
     public void confirmsDeactivation(SubscriptionData subscriptionData, SubscriptionStatus status) throws Exception {
+        callBackRequest(subscriptionData, "DCT", "SUCCESS");
+        subscriptionVerifier.verifySubscriptionState(subscriptionData, status);
+    }
+
+    private void callBackRequest(SubscriptionData subscriptionData, String action, String status) throws Exception {
         mockMvc(subscriptionController)
                 .perform(put(String.format("/subscription/%s", subscriptionData.getSubscriptionId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(
                                 new CallBackRequestBuilder().forMsisdn(subscriptionData.getMsisdn())
-                                        .forAction("DCT")
-                                        .forStatus("SUCCESS")
+                                        .forAction(action)
+                                        .forStatus(status)
                                         .build()
                                         .getBytes()
                         ));
-        subscriptionVerifier.verifySubscriptionState(subscriptionData, status);
     }
 }

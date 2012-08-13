@@ -4,6 +4,7 @@ import org.motechproject.ananya.kilkari.functional.test.builder.CampaignChangeRe
 import org.motechproject.ananya.kilkari.functional.test.utils.JsonUtils;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.ReportVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.SubscriptionVerifier;
+import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
@@ -32,6 +33,7 @@ public class CallCenter {
         mockMvc(subscriptionController)
                 .perform(post("/subscription/")
                         .body(JsonUtils.toJson(subscriptionData).getBytes())
+                        .param("channel", Channel.CALL_CENTER.name())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -51,16 +53,17 @@ public class CallCenter {
                                         .forReason("INFANT_DEATH")
                                         .build()
                                         .getBytes()
-                        ));
+                        ).param("channel",Channel.CALL_CENTER.name()));
         
     }
 
     public void unSubscribes(SubscriptionData subscriptionData) throws Exception {
         reportVerifier.setUpReportingExpectations(subscriptionData);
-        UnSubscriptionData unSubscriptionData = new UnSubscriptionData("IVR", "BLAH");
+        UnSubscriptionData unSubscriptionData = new UnSubscriptionData("CALL_CENTER", "reason");
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/"+ subscriptionData.getSubscriptionId())
                         .body(JsonUtils.toJson(unSubscriptionData).getBytes())
+                        .param("channel",Channel.CALL_CENTER.name())
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())

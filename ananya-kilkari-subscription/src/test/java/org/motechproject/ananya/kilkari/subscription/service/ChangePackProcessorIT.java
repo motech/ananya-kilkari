@@ -46,7 +46,7 @@ public class ChangePackProcessorIT extends SpringIntegrationTest {
 
         List<Subscription> subscriptions = allSubscriptions.findByMsisdn(msisdn);
         Subscription deactivatedSubscription = subscriptions.get(0);
-        assertEquals(SubscriptionStatus.PENDING_DEACTIVATION, deactivatedSubscription.getStatus());
+        assertEquals(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED, deactivatedSubscription.getStatus());
         assertEquals(deactivatedSubscription.getPack(), deactivatedSubscription.getPack());
         Subscription newSubscription = subscriptions.get(1);
         assertEquals(SubscriptionStatus.NEW_EARLY, newSubscription.getStatus());

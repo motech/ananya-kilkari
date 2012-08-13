@@ -249,6 +249,9 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public DateTime getStartDateForSubscription(DateTime activatedOn) {
-        return startDate.plus(activatedOn.getMillis() - creationDate.getMillis());
+        if (isLateSubscription())
+            return startDate.plus(activatedOn.getMillis() - creationDate.getMillis());
+
+        return activatedOn;
     }
 }

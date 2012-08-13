@@ -309,6 +309,7 @@ public class SubscriptionService {
     private void updateStatusAndReport(Subscription subscription, DateTime updatedOn, String reason, String operator,
                                        Integer graceCount, Action<Subscription> action) {
         action.perform(subscription);
+        logger.info("Updating Subscription and reporting change " + subscription);
         allSubscriptions.update(subscription);
         reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(),
                 subscription.getStatus().name(), reason, updatedOn, operator, graceCount));

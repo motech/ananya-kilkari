@@ -517,8 +517,9 @@ public class KilkariCampaignServiceTest {
     public void shouldValidateSubscriptionIdIfRequestValidationIsSuccessful() {
         String pack = "choti_kilkari";
         String msisdn = "1234567890";
-        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, "WEEK12", new CallDurationWebRequest("22-11-2011 11-55-35", "23-12-2012 12-59-34"), pack);
-        when(kilkariSubscriptionService.findSubscriptionInProgress(msisdn, SubscriptionPack.CHOTI_KILKARI)).thenReturn(null);
+        String subscriptionId = "subscriptionId";
+        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, "WEEK12", new CallDurationWebRequest("22-11-2011 11-55-35", "23-12-2012 12-59-34"), pack, subscriptionId);
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(null);
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid inbox call details request: Subscription not found");
 
@@ -533,9 +534,9 @@ public class KilkariCampaignServiceTest {
         String campaignId = "WEEK12";
         String startTime = "22-11-2011 11-55-35";
         String endTime = "23-12-2012 12-59-34";
-        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, campaignId, new CallDurationWebRequest(startTime, endTime), pack);
+        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, campaignId, new CallDurationWebRequest(startTime, endTime), pack, subscriptionId);
         Subscription subscription = Mockito.mock(Subscription.class);
-        when(kilkariSubscriptionService.findSubscriptionInProgress(msisdn, SubscriptionPack.CHOTI_KILKARI)).thenReturn(subscription);
+        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(subscription.getSubscriptionId()).thenReturn(subscriptionId);
 
         kilkariCampaignService.processInboxCallDetailsRequest(inboxCallDetailsWebRequest);

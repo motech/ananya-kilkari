@@ -6,7 +6,6 @@ import org.motechproject.ananya.kilkari.request.CallDurationRequest;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailRecordRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
@@ -26,10 +25,10 @@ public class CallDetailsReportRequestMapper {
                 obdSuccessfulCallDetailsRequest.getCallSource().name());
     }
 
-    public static CallDetailsReportRequest mapFrom(InboxCallDetailsWebRequest inboxCallDetailsWebRequest, Subscription subscription) {
+    public static CallDetailsReportRequest mapFrom(InboxCallDetailsWebRequest inboxCallDetailsWebRequest) {
         CallDurationWebRequest callDurationWebRequest = inboxCallDetailsWebRequest.getCallDurationWebRequest();
         return new CallDetailsReportRequest(
-                subscription.getSubscriptionId(),
+                inboxCallDetailsWebRequest.getSubscriptionId(),
                 inboxCallDetailsWebRequest.getMsisdn(),
                 inboxCallDetailsWebRequest.getCampaignId(),
                 null,

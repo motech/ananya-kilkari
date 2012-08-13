@@ -275,16 +275,11 @@ public class SubscriptionService {
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(), request.getDateOfBirth(), subscriberLocation));
     }
 
-    public Subscription findSubscriptionInProgress(String msisdn, SubscriptionPack pack) {
-        return allSubscriptions.findSubscriptionInProgress(msisdn, pack);
-    }
-
     public void unScheduleCampaign(Subscription subscription) {
         String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
         MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getStartDate());
         messageCampaignService.stop(unEnrollRequest);
     }
-
 
     private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest, DateTime nextAlertDateTime) {
         String campaignName = MessageCampaignPack.from(campaignRescheduleRequest.getReason().name()).getCampaignName();

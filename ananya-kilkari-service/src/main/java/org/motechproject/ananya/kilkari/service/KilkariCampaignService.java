@@ -160,17 +160,15 @@ public class KilkariCampaignService {
         Errors errors = inboxCallDetailsWebRequest.validate();
         if (errors.hasErrors())
             throw new ValidationException(String.format("Invalid inbox call details request: %s", errors.allMessages()));
-        Subscription subscription = validateSubscription(inboxCallDetailsWebRequest);
-        CallDetailsReportRequest callDetailsReportRequest = CallDetailsReportRequestMapper.mapFrom(inboxCallDetailsWebRequest, subscription);
+        validateSubscription(inboxCallDetailsWebRequest);
+        CallDetailsReportRequest callDetailsReportRequest = CallDetailsReportRequestMapper.mapFrom(inboxCallDetailsWebRequest);
         reportingService.reportCampaignMessageDeliveryStatus(callDetailsReportRequest);
     }
 
-    private Subscription validateSubscription(InboxCallDetailsWebRequest inboxCallDetailsWebRequest) {
-        Subscription subscription = kilkariSubscriptionService.findSubscriptionInProgress(inboxCallDetailsWebRequest.getMsisdn(), SubscriptionPack.from(inboxCallDetailsWebRequest.getPack()));
+    private void validateSubscription(InboxCallDetailsWebRequest inboxCallDetailsWebRequest) {
+        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(inboxCallDetailsWebRequest.getSubscriptionId());
         if (subscription == null)
             throw new ValidationException("Invalid inbox call details request: Subscription not found");
-        return subscription;
-
     }
 
     public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntries invalidOBDRequestEntries) {

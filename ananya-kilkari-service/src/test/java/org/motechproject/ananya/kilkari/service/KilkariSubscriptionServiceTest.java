@@ -157,16 +157,6 @@ public class KilkariSubscriptionServiceTest {
     }
 
     @Test
-    public void shouldFindInProgressSubscriptionByMsisdnAndPack() {
-        String msisdn = "1234567890";
-        SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
-        Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.ACTIVE);
-        when(subscriptionService.findSubscriptionInProgress(msisdn, pack)).thenReturn(subscription);
-
-        assertEquals(subscription, kilkariSubscriptionService.findSubscriptionInProgress(msisdn, pack));
-    }
-
-    @Test
     public void shouldScheduleASubscriptionCompletionEvent() {
         String subscriptionId = "subscriptionId";
         DateTime now = DateTime.now();

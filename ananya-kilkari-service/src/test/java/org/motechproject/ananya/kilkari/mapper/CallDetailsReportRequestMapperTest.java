@@ -16,7 +16,6 @@ import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsRepo
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.when;
 
 public class CallDetailsReportRequestMapperTest {
 
@@ -78,11 +77,9 @@ public class CallDetailsReportRequestMapperTest {
         String msisdn = "1234567890";
         String campaignId = "WEEK12";
         String pack = SubscriptionPack.CHOTI_KILKARI.name();
-        Subscription subscription = Mockito.mock(Subscription.class);
-        when(subscription.getSubscriptionId()).thenReturn(subscriptionId);
-        InboxCallDetailsWebRequest webRequest = new InboxCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, pack);
+        InboxCallDetailsWebRequest webRequest = new InboxCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, pack, subscriptionId);
 
-        CallDetailsReportRequest actualDeliveryReportRequest = CallDetailsReportRequestMapper.mapFrom(webRequest, subscription);
+        CallDetailsReportRequest actualDeliveryReportRequest = CallDetailsReportRequestMapper.mapFrom(webRequest);
 
         assertEquals(subscriptionId, actualDeliveryReportRequest.getSubscriptionId());
         assertEquals(msisdn, actualDeliveryReportRequest.getMsisdn());

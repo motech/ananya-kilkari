@@ -10,13 +10,21 @@ public class InboxCallDetailsWebRequest extends CallDetailsWebRequest {
     @JsonProperty
     private String pack;
 
-    public InboxCallDetailsWebRequest(String msisdn, String campaignId, CallDurationWebRequest callDurationWebRequest, String pack) {
+    @JsonProperty
+    private String subscriptionId;
+
+    public InboxCallDetailsWebRequest(String msisdn, String campaignId, CallDurationWebRequest callDurationWebRequest, String pack, String subscriptionId) {
         super(msisdn, campaignId, callDurationWebRequest);
         this.pack = pack;
+        this.subscriptionId = subscriptionId;
     }
 
     public InboxCallDetailsWebRequest() {
 
+    }
+
+    public String getSubscriptionId() {
+        return subscriptionId;
     }
 
     public String getPack() {

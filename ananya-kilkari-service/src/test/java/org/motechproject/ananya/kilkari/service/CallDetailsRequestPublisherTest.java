@@ -74,7 +74,7 @@ public class CallDetailsRequestPublisherTest {
 
     @Test
     public void shouldPublishInboxCallDetailsRequest() {
-        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest("1234567890", "WEEK12", new CallDurationWebRequest(), "choti_kilkari");
+        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest("1234567890", "WEEK12", new CallDurationWebRequest(), "choti_kilkari", "subscriptionId");
 
         callDetailsRequestPublisher.publishInboxCallDetailsRequest(inboxCallDetailsWebRequest);
 

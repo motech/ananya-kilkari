@@ -45,15 +45,14 @@ public class InboxControllerTest {
         ArgumentCaptor<InboxCallDetailsWebRequest> captor = ArgumentCaptor.forClass(InboxCallDetailsWebRequest.class);
         verify(kilkariCampaignService, times(2)).publishInboxCallDetailsRequest(captor.capture());
         List<InboxCallDetailsWebRequest> requests = captor.getAllValues();
-        assertEquals(createRequest("9740123425", "PCK1", "WEEK12", "21-12-2011 02-59-59", "22-12-2011 02-59-58"), requests.get(0));
-        assertEquals(createRequest("9740123426", "PCK2", "WEEK11", "22-12-2011 02-59-49", "23-12-2011 02-59-48"), requests.get(1));
+        assertEquals(createRequest("9740123425", "PCK1", "WEEK12", "21-12-2011 02-59-59", "22-12-2011 02-59-58", "subscriptionId1"), requests.get(0));
+        assertEquals(createRequest("9740123426", "PCK2", "WEEK11", "22-12-2011 02-59-49", "23-12-2011 02-59-48", "subscriptionId2"), requests.get(1));
     }
 
 
-    private InboxCallDetailsWebRequest createRequest(String msisdn, String pack, String campaignId, final String startTime, final String endTime) {
-        return new InboxCallDetailsWebRequest(msisdn, campaignId, new CallDurationWebRequest(startTime, endTime), pack);
+    private InboxCallDetailsWebRequest createRequest(String msisdn, String pack, String campaignId, final String startTime, final String endTime, String subscriptionId) {
+        return new InboxCallDetailsWebRequest(msisdn, campaignId, new CallDurationWebRequest(startTime, endTime), pack, subscriptionId);
     }
-
 
     private String getRequestJSON() {
         String json = "{\n" +
@@ -62,6 +61,7 @@ public class InboxControllerTest {
                 "        \"msisdn\":\"9740123425\",\n" +
                 "        \"pack\": \"PCK1\",\n" +
                 "        \"campaignId\":\"WEEK12\",\n" +
+                "        \"subscriptionId\":\"subscriptionId1\",\n" +
                 "        \"callDetailRecord\":{\n" +
                 "              \"startTime\":\"21-12-2011 02-59-59\",\n" +
                 "              \"endTime\":\"22-12-2011 02-59-58\"\n" +
@@ -71,6 +71,7 @@ public class InboxControllerTest {
                 "        \"msisdn\":\"9740123426\",\n" +
                 "        \"pack\": \"PCK2\",\n" +
                 "        \"campaignId\":\"WEEK11\",\n" +
+                "        \"subscriptionId\":\"subscriptionId2\",\n" +
                 "        \"callDetailRecord\":{\n" +
                 "              \"startTime\":\"22-12-2011 02-59-49\",\n" +
                 "              \"endTime\":\"23-12-2011 02-59-48\"\n" +

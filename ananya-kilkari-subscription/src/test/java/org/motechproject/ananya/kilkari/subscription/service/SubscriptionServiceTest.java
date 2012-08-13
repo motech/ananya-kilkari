@@ -188,16 +188,6 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldFindInProgressSubscriptionByMsisdnAndPack() {
-        String msisdn = "1234567890";
-        SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
-
-        Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.ACTIVE);
-        when(allSubscriptions.findSubscriptionInProgress(msisdn, pack)).thenReturn(subscription);
-        assertEquals(subscription, subscriptionService.findSubscriptionInProgress(msisdn, pack));
-    }
-
-    @Test
     public void shouldUpdateTheSubscriptionStatusToPendingActivation_WhenActivationIsRequested() {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.PENDING_ACTIVATION;

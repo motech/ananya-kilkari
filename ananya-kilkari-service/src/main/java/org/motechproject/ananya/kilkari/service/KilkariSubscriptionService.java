@@ -120,10 +120,6 @@ public class KilkariSubscriptionService {
         changePackService.process(SubscriptionRequestMapper.mapToChangePackRequest(changePackWebRequest, subscriptionId));
     }
 
-    public Subscription findSubscriptionInProgress(String msisdn, SubscriptionPack pack) {
-        return subscriptionService.findSubscriptionInProgress(msisdn, pack);
-    }
-
     public void changeMsisdn(ChangeMsisdnWebRequest changeMsisdnWebRequest) {
         ChangeMsisdnRequest changeMsisdnRequest = ChangeMsisdnRequestMapper.mapFrom(changeMsisdnWebRequest);
         subscriptionService.changeMsisdn(changeMsisdnRequest);

@@ -3,7 +3,6 @@ package org.motechproject.ananya.kilkari.functional.test.domain;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.functional.test.utils.FakeTimeUtils;
 import org.quartz.SchedulerException;
-import org.quartz.core.QuartzScheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,7 @@ public class Time {
 
     public void isMovedToFuture(DateTime dateTime) {
         FakeTimeUtils.moveToFutureTime(dateTime);
-        forceRunQuartzScheduler();
+//        forceRunQuartzScheduler();
     }
 
     private void forceRunQuartzScheduler() {

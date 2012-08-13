@@ -9,7 +9,9 @@ import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
+import org.motechproject.http.client.domain.Method;
 import org.motechproject.http.client.service.HttpClientService;
+import org.motechproject.web.context.HttpThreadContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -59,37 +61,50 @@ public class ReportingGatewayImpl implements ReportingGateway {
     @Override
     public void reportSubscriptionCreation(SubscriptionReportRequest subscriptionReportRequest) {
         String url = String.format("%s%s", getBaseUrl(), CREATE_SUBSCRIPTION_PATH);
-        httpClientService.post(url, subscriptionReportRequest);
+        performHttpRequestBasedOnChannel(url, subscriptionReportRequest, Method.POST);
     }
 
     @Override
     public void reportSubscriptionStateChange(SubscriptionStateChangeRequest subscriptionStateChangeRequest) {
         String subscriptionId = subscriptionStateChangeRequest.getSubscriptionId();
         String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIPTION_STATE_CHANGE_PATH, subscriptionId);
-        httpClientService.put(url, subscriptionStateChangeRequest);
+        performHttpRequestBasedOnChannel(url, subscriptionStateChangeRequest, Method.PUT);
     }
 
     @Override
     public void reportCampaignMessageDeliveryStatus(CallDetailsReportRequest callDetailsReportRequest) {
         String url = String.format("%s%s", getBaseUrl(), CALL_DETAILS_PATH);
-        httpClientService.post(url, callDetailsReportRequest);
+        performHttpRequestBasedOnChannel(url, callDetailsReportRequest, Method.POST);
     }
 
     @Override
     public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest) {
         String url = String.format("%s%s/%s", getBaseUrl(), SUBSCRIBER_UPDATE_PATH, subscriptionId);
-        httpClientService.put(url, subscriberReportRequest);
+        performHttpRequestBasedOnChannel(url, subscriberReportRequest, Method.PUT);
     }
 
     @Override
     public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
         String url = String.format("%s%s?subscriptionId=%s&msisdn=%s", getBaseUrl(), CHANGE_MSISDN_PATH, subscriptionId, msisdn);
-        httpClientService.post(url, null);
+        performHttpRequestBasedOnChannel(url, null, Method.POST);
     }
 
+    @Override
     public void reportSubscriptionChangePack(SubscriptionChangePackRequest changePackRequest) {
         String url = String.format("%s%s", getBaseUrl(), SUBSCRIPTION_CHANGE_PACK_PATH);
-        httpClientService.post(url, changePackRequest);
+        performHttpRequestBasedOnChannel(url, changePackRequest, Method.POST);
+    }
+
+    private boolean isCallCenterCall() {
+        String channel = HttpThreadContext.get();
+        return "CALL_CENTER".equalsIgnoreCase(channel);
+    }
+
+    private <T> void performHttpRequestBasedOnChannel(String url, T postObject, Method method) {
+        if (isCallCenterCall())
+            method.execute(restTemplate, url, postObject);
+        else
+            httpClientService.execute(url, postObject, method);
     }
 
     private String constructGetLocationUrl(List<NameValuePair> params) {

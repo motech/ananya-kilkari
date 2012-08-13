@@ -73,9 +73,6 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
 
-    private static final String TWELVE_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-twelve-months";
-    private static final String FIFTEEN_MONTH_CAMPAIGN_NAME = "kilkari-mother-child-campaign-fifteen-months";
-
     @Test
     public void shouldRetrieveSubscriptionDetailsFromDatabase() throws Exception {
         String msisdn = "9876543210";
@@ -158,7 +155,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withEDD(null).build();
         MvcResult result = mockMvc(subscriptionController)
-                .perform(post("/subscription").body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .perform(post("/subscription")
+                        .param("channel", channelString)
+                        .body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andReturn();
@@ -202,7 +201,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withEDD(edd.toString("dd-MM-yyyy")).withCreatedAt(now).build();
         MvcResult result = mockMvc(subscriptionController)
-                .perform(post("/subscription").body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .perform(post("/subscription")
+                        .param("channel", channelString)
+                        .body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andReturn();
@@ -254,7 +255,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         final String subscriptionId = expectedSubscription.getSubscriptionId();
 
         MvcResult result = mockMvc(subscriptionController)
-                .perform(delete("/subscription/" + subscriptionId).body(TestUtils.toJson(expectedUnsubscriptionRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .perform(delete("/subscription/" + subscriptionId)
+                        .param("channel", channelString)
+                        .body(TestUtils.toJson(expectedUnsubscriptionRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andReturn();
@@ -303,7 +306,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         when(mockReportingService.getSubscriber(oldSubscription.getSubscriptionId())).thenReturn(new SubscriberResponse("name", 25, null, null, null));
 
         MvcResult result = mockMvc(subscriptionController)
-                .perform(post("/subscription/changemsisdn").body(TestUtils.toJson(changeMsisdnWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .perform(post("/subscription/changemsisdn")
+                        .param("channel", Channel.CALL_CENTER.toString())
+                        .body(TestUtils.toJson(changeMsisdnWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andReturn();

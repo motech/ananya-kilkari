@@ -10,7 +10,9 @@ import org.mockito.Mock;
 import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
+import org.motechproject.http.client.domain.Method;
 import org.motechproject.http.client.service.HttpClientService;
+import org.motechproject.web.context.HttpThreadContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -167,7 +169,7 @@ public class ReportingGatewayImplTest {
 
         reportingGateway.reportSubscriptionCreation(subscriptionCreationReportRequest);
 
-        verify(httpClientService).post("url/subscription", subscriptionCreationReportRequest);
+        verify(httpClientService).execute("url/subscription", subscriptionCreationReportRequest, Method.POST);
     }
 
     @Test
@@ -179,7 +181,7 @@ public class ReportingGatewayImplTest {
 
         reportingGateway.reportSubscriptionStateChange(subscriptionStateChangeRequest);
 
-        verify(httpClientService).put("url/subscription/" + subscriptionId, subscriptionStateChangeRequest);
+        verify(httpClientService).execute("url/subscription/" + subscriptionId, subscriptionStateChangeRequest, Method.PUT);
     }
 
     @Test
@@ -189,7 +191,7 @@ public class ReportingGatewayImplTest {
 
         reportingGateway.reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequest);
 
-        verify(httpClientService).post("url/callDetails", campaignMessageDeliveryReportRequest);
+        verify(httpClientService).execute("url/callDetails", campaignMessageDeliveryReportRequest, Method.POST);
     }
 
     @Test
@@ -203,11 +205,13 @@ public class ReportingGatewayImplTest {
 
         ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
         ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
-        verify(httpClientService).put(urlCaptor.capture(), requestCaptor.capture());
+        ArgumentCaptor<Method> methodArgumentCaptor = ArgumentCaptor.forClass(Method.class);
+        verify(httpClientService).execute(urlCaptor.capture(), requestCaptor.capture(), methodArgumentCaptor.capture());
         SubscriberReportRequest requestCaptorValue = requestCaptor.getValue();
         String urlCaptorValue = urlCaptor.getValue();
         assertEquals(beneficiaryName, requestCaptorValue.getBeneficiaryName());
         assertEquals("url/subscriber/" + subscriptionId, urlCaptorValue);
+        assertEquals(Method.PUT, methodArgumentCaptor.getValue());
     }
 
     @Test
@@ -217,7 +221,7 @@ public class ReportingGatewayImplTest {
 
         reportingGateway.reportSubscriptionChangePack(changePackRequest);
 
-        verify(httpClientService).post("url/subscription/changepack", changePackRequest);
+        verify(httpClientService).execute("url/subscription/changepack", changePackRequest, Method.POST);
     }
 
     @Test
@@ -228,7 +232,7 @@ public class ReportingGatewayImplTest {
 
         reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
 
-        verify(httpClientService).post("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null);
+        verify(httpClientService).execute("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
     }
 
     @Test
@@ -243,4 +247,17 @@ public class ReportingGatewayImplTest {
 
         reportingGateway.getSubscriber(subscriptionId);
     }
+
+    @Test
+    public void shouldMakeSynchronousCallToReportsForCallCenter() {
+        String msisdn = "msisdn";
+        String subscriptionId = "subscriptionId";
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        HttpThreadContext.set("CALL_CENTER");
+
+        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+
+        verify(httpClientService, never()).execute("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
+    }
+
 }

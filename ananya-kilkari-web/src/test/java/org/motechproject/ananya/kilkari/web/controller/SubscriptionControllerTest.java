@@ -15,6 +15,7 @@ import org.motechproject.ananya.kilkari.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
+import org.motechproject.ananya.kilkari.service.validator.UnsubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -27,10 +28,11 @@ import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
-import org.motechproject.ananya.kilkari.service.validator.UnsubscriptionRequestValidator;
+import org.motechproject.web.context.HttpThreadContext;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -218,7 +220,9 @@ public class SubscriptionControllerTest {
         SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withCreatedAt(createdAt).build();
 
         mockMvc(subscriptionController)
-                .perform(post("/subscription").body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .perform(post("/subscription")
+                        .param("channel", Channel.CALL_CENTER.toString())
+                        .body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
@@ -292,7 +296,7 @@ public class SubscriptionControllerTest {
         SubscriptionWebRequest subscriptionWebRequest = mock(SubscriptionWebRequest.class);
         when(subscriptionWebRequest.getChannel()).thenReturn("call_center");
 
-        subscriptionController.createSubscription(subscriptionWebRequest);
+        subscriptionController.createSubscription(subscriptionWebRequest, "call_center");
 
         verify(subscriptionWebRequest).validateChannel();
     }
@@ -314,7 +318,7 @@ public class SubscriptionControllerTest {
 
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withChannel("xyz").build();
 
-        subscriptionController.createSubscription(subscriptionWebRequest);
+        subscriptionController.createSubscription(subscriptionWebRequest, "xyz");
     }
 
     @Test
@@ -329,6 +333,7 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)
+                        .param("channel", Channel.CALL_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -356,6 +361,7 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)
+                        .param("channel", Channel.CALL_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -372,6 +378,7 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(post("/subscription/" + subscriptionId + "/changecampaign")
+                        .param("channel", Channel.CALL_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -398,6 +405,7 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(post("/subscription/subscriptionId/changecampaign")
+                        .param("channel", Channel.CALL_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -412,6 +420,7 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(put("/subscriber/" + subscriptionId)
+                        .param("channel", Channel.CALL_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -435,6 +444,7 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId + "/changepack")
+                        .param("channel", Channel.CALL_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -570,4 +580,28 @@ public class SubscriptionControllerTest {
 
         return subscriptionWebResponse.getSubscriptionDetails().size() == 0;
     }
+
+    @Test
+    public void shouldSetIVRAsChannelInHttpThreadContext() throws Exception {
+        mockMvc(subscriptionController)
+                .perform(get("/subscription").param("channel", Channel.IVR.toString())).andExpect(status().isOk()).andReturn();
+
+        assertEquals(Channel.IVR.toString(), HttpThreadContext.get());
+    }
+
+    @Test
+    public void shouldSetCallCenterAsChannelInHttpThreadContext() throws Exception {
+        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest(
+                "1234567890", "1234567891", Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()), Channel.CALL_CENTER.toString());
+
+        mockMvc(subscriptionController).perform(
+                post("/subscription/changemsisdn")
+                        .param("channel", Channel.CALL_CENTER.toString())
+                        .body(TestUtils.toJson(changeMsisdnWebRequest).getBytes())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        assertEquals(Channel.CALL_CENTER.toString(), HttpThreadContext.get());
+    }
+
 }

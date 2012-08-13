@@ -130,7 +130,7 @@ public class SubscriptionService {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(activatedOn);
         scheduleCampaign(subscription, scheduleStartDateTime);
-        updateStatusAndReport(subscriptionId, activatedOn, null, operator, null, new Action<Subscription>() {
+        updateStatusAndReport(subscription, activatedOn, null, operator, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.activate(operator, getBufferedDateTime(scheduleStartDateTime));
@@ -164,7 +164,7 @@ public class SubscriptionService {
             logger.debug(String.format("Cannot unsubscribe. Subscription in %s status", subscription.getStatus()));
             return;
         }
-        updateStatusAndReport(subscriptionId, deactivationRequest.getCreatedAt(), null, null, null, new Action<Subscription>() {
+        updateStatusAndReport(subscription, deactivationRequest.getCreatedAt(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.deactivationRequestReceived();
@@ -242,7 +242,7 @@ public class SubscriptionService {
         }
         onMobileSubscriptionGateway.deactivateSubscription(omSubscriptionRequest);
 
-        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), "Subscription completed", null, null, new Action<Subscription>() {
+        updateStatusAndReport(subscription, DateTime.now(), "Subscription completed", null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.complete();
@@ -300,11 +300,18 @@ public class SubscriptionService {
         campaignMessageAlertService.clearMessageId(subscriptionId);
     }
 
-    private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator, Integer graceCount, Action<Subscription> action) {
+    private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator,
+                                       Integer graceCount, Action<Subscription> action) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        updateStatusAndReport(subscription, updatedOn, reason, operator, graceCount, action);
+    }
+
+    private void updateStatusAndReport(Subscription subscription, DateTime updatedOn, String reason, String operator,
+                                       Integer graceCount, Action<Subscription> action) {
         action.perform(subscription);
         allSubscriptions.update(subscription);
-        reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(), subscription.getStatus().name(), reason, updatedOn, operator, graceCount));
+        reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(),
+                subscription.getStatus().name(), reason, updatedOn, operator, graceCount));
     }
 
     private boolean shouldChangeMsisdn(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
@@ -330,7 +337,7 @@ public class SubscriptionService {
     }
 
     private void migrateMsisdnToNewSubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
-        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), Channel.CALL_CENTER, DateTime.now()));
+        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now()));
 
         SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
 

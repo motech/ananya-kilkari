@@ -1,8 +1,8 @@
 package org.motechproject.ananya.kilkari.web.interceptors;
 
+import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.motechproject.web.context.HttpThreadContext;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -17,6 +17,9 @@ public class KilkariChannelInterceptor extends HandlerInterceptorAdapter {
 
         String responsePrefix = HttpConstants.forRequest(request).getResponsePrefix();
         response.getOutputStream().print(responsePrefix);
+
+        HttpThreadContext.set(getChannel(request));
+
         return true;
     }
 
@@ -24,5 +27,11 @@ public class KilkariChannelInterceptor extends HandlerInterceptorAdapter {
             throws Exception {
         String contentType = HttpConstants.forRequest(request).getResponseContentType();
         response.setContentType(contentType);
+    }
+
+    private String getChannel(HttpServletRequest request) {
+        String channel = StringUtils.trim(request.getParameter("channel"));
+        if (channel != null) channel = channel.toUpperCase();
+        return channel;
     }
 }

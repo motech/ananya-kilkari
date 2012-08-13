@@ -1,14 +1,21 @@
 package org.motechproject.ananya.kilkari.functional.test.utils;
 
 import org.junit.After;
+import org.junit.runner.RunWith;
 import org.motechproject.ananya.kilkari.functional.test.domain.*;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.CampaignMessageVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.OnMobileOBDVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.ReportVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.SubscriptionVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-public class BaseFunctionalTest extends SpringIntegrationTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:applicationKilkariFunctionalTestContext.xml")
+@ActiveProfiles("test")
+public class BaseFunctionalTest {
 
     @Autowired
     protected CallCenter callCenter;
@@ -35,6 +42,5 @@ public class BaseFunctionalTest extends SpringIntegrationTest {
         reportVerifier.reset();
         onMobileOBDVerifier.reset();
         campaignMessageVerifier.reset();
-        super.after();
     }
 }

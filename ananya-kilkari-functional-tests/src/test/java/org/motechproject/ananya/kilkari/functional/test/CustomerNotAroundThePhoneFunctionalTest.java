@@ -17,6 +17,8 @@ public class CustomerNotAroundThePhoneFunctionalTest extends BaseFunctionalTest 
 
     @Test
     public void shouldRetryDeliveryOfMessagesWhenTheSubscriberDoesNotReceiveMessagesOrCallIsNotMade() throws Exception {
+        System.out.println("Now running shouldRetryDeliveryOfMessagesWhenTheSubscriberDoesNotReceiveMessagesOrCallIsNotMade");
+
         int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
         int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
         DateTime futureDateForFirstCampaignAlert = DateTime.now().plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1);

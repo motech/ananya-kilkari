@@ -18,6 +18,7 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
 
     @Test
     public void shouldSubscribeAndProgressAndListenToInboxAndCompleteSubscriptionSuccessfully() throws Exception {
+        System.out.println("Now running shouldSubscribeAndProgressAndListenToInboxAndCompleteSubscriptionSuccessfully");
         int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
         int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
         DateTime futureDateForFirstCampaignAlertToBeRaised = DateTime.now().plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1);
@@ -43,6 +44,8 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
 
     @Test
     public void shouldSubscribeAndProgressAndCompleteSubscriptionWithIntermediateSuspensionsSuccessfully() throws Exception {
+        System.out.println("Now running shouldSubscribeAndProgressAndCompleteSubscriptionWithIntermediateSuspensionsSuccessfully");
+
         int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
         int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
         DateTime futureDateForFirstCampaignAlertToBeRaised = DateTime.now().plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1);
@@ -82,6 +85,8 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
     @Test
     public void shouldSubscribeAndProgressAndNotifyAndReceiveInfantDeathMessages() throws Exception {
 
+        System.out.println("Now running shouldSubscribeAndProgressAndNotifyAndReceiveInfantDeathMessages");
+
         int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
         int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
 
@@ -119,6 +124,8 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
 
     @Test
     public void shouldDeactivateUserWhenRequested() throws Exception {
+        System.out.println("Now running shouldDeactivateUserWhenRequested");
+
         int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
         int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
 
@@ -146,6 +153,8 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
 
     @Test
     public void shouldNotSendMessageWhenCustomerIsPerpetuallySuspended() throws Exception {
+
+        System.out.println("Now running shouldNotSendMessageWhenCustomerIsPerpetuallySuspended");
 
         int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
         int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum SubscriptionStatus {
-    NEW("New"), NEW_EARLY("Early Subscripiton"), PENDING_ACTIVATION("Pending Subscription"), ACTIVATION_FAILED("Activation Failed"),
+    NEW("New"), NEW_EARLY("Early Subscription"), PENDING_ACTIVATION("Pending Subscription"), ACTIVATION_FAILED("Activation Failed"),
     COMPLETED("Completed"), ACTIVE("Activated"), DEACTIVATION_REQUEST_RECEIVED("Deactivation Requested"), PENDING_DEACTIVATION("Pending Deactivation"),
     DEACTIVATED("Deactivated"), SUSPENDED("Suspended"), PENDING_COMPLETION("Pending Completion");
 

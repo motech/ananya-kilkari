@@ -35,7 +35,7 @@ public class SubscriptionStatusTest {
     @Test
     public void shouldGetTheDisplayString() {
         assertEquals("New", SubscriptionStatus.NEW.getDisplayString());
-        assertEquals("Early Subscripiton", SubscriptionStatus.NEW_EARLY.getDisplayString());
+        assertEquals("Early Subscription", SubscriptionStatus.NEW_EARLY.getDisplayString());
         assertEquals("Pending Subscription",SubscriptionStatus.PENDING_ACTIVATION.getDisplayString());
         assertEquals("Activation Failed",SubscriptionStatus.ACTIVATION_FAILED.getDisplayString());
         assertEquals("Completed",SubscriptionStatus.COMPLETED.getDisplayString());

@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;

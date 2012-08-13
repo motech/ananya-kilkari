@@ -1,9 +1,9 @@
-package org.motechproject.ananya.kilkari.repository;
+package org.motechproject.ananya.kilkari.subscription.repository;
 
 import org.ektorp.ComplexKey;
 import org.ektorp.CouchDbConnector;
 import org.ektorp.support.View;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareDoc;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
 import org.motechproject.dao.MotechBaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,7 +15,7 @@ import java.util.List;
 public class AllSubscriberCareDocs extends MotechBaseRepository<SubscriberCareDoc> {
 
     @Autowired
-    protected AllSubscriberCareDocs(@Qualifier("kilkariDbConnector") CouchDbConnector db) {
+    protected AllSubscriberCareDocs(@Qualifier("kilkariSubscriptionDbConnector") CouchDbConnector db) {
         super(SubscriberCareDoc.class, db);
         initStandardDesignDocument();
     }

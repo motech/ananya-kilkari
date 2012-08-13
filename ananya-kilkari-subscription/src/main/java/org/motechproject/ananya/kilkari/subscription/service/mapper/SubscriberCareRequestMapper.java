@@ -1,6 +1,9 @@
-package org.motechproject.ananya.kilkari.domain;
+package org.motechproject.ananya.kilkari.subscription.service.mapper;
 
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareReasons;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
 
 public class SubscriberCareRequestMapper {
     public static SubscriberCareDoc map(SubscriberCareRequest subscriberCareRequest) {

@@ -1,10 +1,8 @@
-package org.motechproject.ananya.kilkari.domain;
+package org.motechproject.ananya.kilkari.subscription.domain;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
-import org.motechproject.ananya.kilkari.domain.PhoneNumber;
 import org.motechproject.model.MotechBaseDataObject;
 
 @TypeDiscriminator("doc.type === 'SubscriberCareDoc'")

@@ -1,8 +1,11 @@
-package org.motechproject.ananya.kilkari.domain;
+package org.motechproject.ananya.kilkari.subscription.service.mapper;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareReasons;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
 
 import static org.junit.Assert.assertEquals;
 

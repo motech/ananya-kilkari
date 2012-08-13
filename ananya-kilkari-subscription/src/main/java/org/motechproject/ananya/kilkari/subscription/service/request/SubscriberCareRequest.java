@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.domain;
+package org.motechproject.ananya.kilkari.subscription.service.request;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;

@@ -4,9 +4,9 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
-import org.motechproject.ananya.kilkari.service.SubscriberCareService;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareReasons;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
+import org.motechproject.ananya.kilkari.service.KilkariSubscriberCareService;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.scheduler.domain.MotechEvent;
 
@@ -17,7 +17,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SubscriberCareRequestHandlerTest {
     @Mock
-    private SubscriberCareService subscriberCareService;
+    private KilkariSubscriberCareService kilkariSubscriberCareService;
 
     @Before
     public void setUp() {
@@ -32,8 +32,8 @@ public class SubscriberCareRequestHandlerTest {
         parameters.put("0", subscriberCareRequest);
         MotechEvent motechEvent = new MotechEvent(SubscriptionEventKeys.PROCESS_SUBSCRIBER_CARE_REQUEST, parameters);
 
-        new SubscriberCareRequestHandler(subscriberCareService).handleSubscriberCareRequest(motechEvent);
+        new SubscriberCareRequestHandler(kilkariSubscriberCareService).handleSubscriberCareRequest(motechEvent);
 
-        verify(subscriberCareService).createSubscriberCareRequest(subscriberCareRequest);
+        verify(kilkariSubscriberCareService).createSubscriberCareRequest(subscriberCareRequest);
     }
 }

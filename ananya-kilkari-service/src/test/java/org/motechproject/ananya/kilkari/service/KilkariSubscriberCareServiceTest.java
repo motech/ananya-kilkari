@@ -1,43 +1,41 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareDoc;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
-import org.motechproject.ananya.kilkari.repository.AllSubscriberCareDocs;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.service.validator.SubscriberCareRequestValidator;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareReasons;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.service.SubscriberCareService;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class SubscriberCareServiceTest {
-    private SubscriberCareService subscriberCareService;
-
-    @Mock
-    private AllSubscriberCareDocs allSubscriberCareDocs;
+public class KilkariSubscriberCareServiceTest {
     @Mock
     private SubscriptionPublisher subscriptionPublisher;
+    @Mock
+    private SubscriberCareService subscriberCareService;
+
     private SubscriberCareRequestValidator careRequestValidator;
+    private KilkariSubscriberCareService kilkariSubscriberCareService;
 
     @Before
     public void setUp() {
         initMocks(this);
         careRequestValidator = new SubscriberCareRequestValidator();
-        subscriberCareService = new SubscriberCareService(allSubscriberCareDocs, careRequestValidator, subscriptionPublisher);
+        kilkariSubscriberCareService = new KilkariSubscriberCareService(subscriberCareService, careRequestValidator, subscriptionPublisher);
     }
 
     @Test(expected = ValidationException.class)
     public void shouldThrowExceptionForInvalidMsisdnInSubscriberCareRequest() {
         SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest("12345", SubscriberCareReasons.HELP.name(), "ivr", DateTime.now());
 
-        subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
+        kilkariSubscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
     }
 
     @Test
@@ -46,14 +44,14 @@ public class SubscriberCareServiceTest {
         SubscriberCareReasons reason = SubscriberCareReasons.HELP;
         SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason.name(), "ivr", DateTime.now());
 
-        subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
+        kilkariSubscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
 
-        ArgumentCaptor<SubscriberCareDoc> subscriberCareDocArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareDoc.class);
-        verify(allSubscriberCareDocs).addOrUpdate(subscriberCareDocArgumentCaptor.capture());
-        SubscriberCareDoc subscriberCareDoc = subscriberCareDocArgumentCaptor.getValue();
+        ArgumentCaptor<SubscriberCareRequest> subscriberCareDocArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
+        verify(subscriberCareService).create(subscriberCareDocArgumentCaptor.capture());
+        SubscriberCareRequest actualSubscriberCareRequest = subscriberCareDocArgumentCaptor.getValue();
 
-        assertEquals(msisdn, subscriberCareDoc.getMsisdn());
-        assertEquals(reason, subscriberCareDoc.getReason());
+        assertEquals(msisdn, actualSubscriberCareRequest.getMsisdn());
+        assertEquals(reason.toString(), actualSubscriberCareRequest.getReason());
     }
 
     @Test
@@ -61,16 +59,14 @@ public class SubscriberCareServiceTest {
         String msisdn = "1234566789";
         String reason = SubscriberCareReasons.HELP.name();
         String channel = "ivr";
-        SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(msisdn, reason, channel, DateTime.now());
 
-        subscriberCareService.processSubscriberCareRequest(subscriberCareRequest);
+        kilkariSubscriberCareService.processSubscriberCareRequest(msisdn, reason, channel, DateTime.now());
 
         ArgumentCaptor<SubscriberCareRequest> subscriberCareRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
         verify(subscriptionPublisher).processSubscriberCareRequest(subscriberCareRequestArgumentCaptor.capture());
         SubscriberCareRequest careRequest = subscriberCareRequestArgumentCaptor.getValue();
 
-        Assert.assertEquals(msisdn, careRequest.getMsisdn());
-        Assert.assertEquals(reason, careRequest.getReason());
+        assertEquals(msisdn, careRequest.getMsisdn());
+        assertEquals(reason, careRequest.getReason());
     }
-
 }

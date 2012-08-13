@@ -1,13 +1,12 @@
-package org.motechproject.ananya.kilkari.repository;
+package org.motechproject.ananya.kilkari.subscription.repository;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.SpringIntegrationTest;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareDoc;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareReasons;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

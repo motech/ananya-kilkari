@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 public class ChangePackProcessorIT extends SpringIntegrationTest {
 
@@ -46,7 +47,8 @@ public class ChangePackProcessorIT extends SpringIntegrationTest {
 
         List<Subscription> subscriptions = allSubscriptions.findByMsisdn(msisdn);
         Subscription deactivatedSubscription = subscriptions.get(0);
-        assertEquals(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED, deactivatedSubscription.getStatus());
+        assertTrue(deactivatedSubscription.getStatus() == SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED ||
+                deactivatedSubscription.getStatus() == SubscriptionStatus.PENDING_DEACTIVATION);
         assertEquals(deactivatedSubscription.getPack(), deactivatedSubscription.getPack());
         Subscription newSubscription = subscriptions.get(1);
         assertEquals(SubscriptionStatus.NEW_EARLY, newSubscription.getStatus());

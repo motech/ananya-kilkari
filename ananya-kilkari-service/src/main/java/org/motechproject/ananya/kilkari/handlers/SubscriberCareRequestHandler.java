@@ -1,8 +1,8 @@
 package org.motechproject.ananya.kilkari.handlers;
 
 import org.apache.log4j.Logger;
-import org.motechproject.ananya.kilkari.domain.SubscriberCareRequest;
-import org.motechproject.ananya.kilkari.service.SubscriberCareService;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
+import org.motechproject.ananya.kilkari.service.KilkariSubscriberCareService;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component;
 public class SubscriberCareRequestHandler {
 
     Logger logger = Logger.getLogger(SubscriberCareRequestHandler.class);
-    private SubscriberCareService subscriberCareService;
+    private KilkariSubscriberCareService kilkariSubscriberCareService;
 
     @Autowired
-    public SubscriberCareRequestHandler(SubscriberCareService subscriberCareService) {
-        this.subscriberCareService = subscriberCareService;
+    public SubscriberCareRequestHandler(KilkariSubscriberCareService kilkariSubscriberCareService) {
+        this.kilkariSubscriberCareService = kilkariSubscriberCareService;
     }
 
     @MotechListener(subjects = {SubscriptionEventKeys.PROCESS_SUBSCRIBER_CARE_REQUEST})
@@ -26,6 +26,6 @@ public class SubscriberCareRequestHandler {
         logger.info(String.format("Create subscriber care request event for msisdn: %s, reason: %s, channel:%s, createdAt: %s",
                 subscriberCareRequest.getMsisdn(), subscriberCareRequest.getReason(),
                 subscriberCareRequest.getChannel(), subscriberCareRequest.getCreatedAt()));
-        subscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
+        kilkariSubscriberCareService.createSubscriberCareRequest(subscriberCareRequest);
     }
 }

@@ -17,13 +17,13 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
     private KilkariPropertiesData kilkariProperties;
 
     @Test
-    public void shouldSubscribeAndProgressAndListenToInboxAndCompleteSubscriptionSuccessfully() throws Exception {
+    public void shouldSubscribeAndProgressAndListenToInboxAndDeactivateSubscriptionSuccessfully() throws Exception {
         System.out.println("Now running shouldSubscribeAndProgressAndListenToInboxAndCompleteSubscriptionSuccessfully");
         int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
         int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
         DateTime futureDateForFirstCampaignAlertToBeRaised = DateTime.now().plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1);
         DateTime futureDateOfSecondCampaignAlert = futureDateForFirstCampaignAlertToBeRaised.plusWeeks(1);
-        DateTime futureDateOfPackCompletion = futureDateForFirstCampaignAlertToBeRaised.plusWeeks(59);
+        DateTime futureDateForCampaignAlertToBeRaisedAfterDeactivation = futureDateOfSecondCampaignAlert.plusWeeks(1);
 
         SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
 
@@ -38,8 +38,10 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
         then(user).messageIsReady(subscriptionData, "WEEK2");
         then(user).cannotListenToPreviousWeeksInboxMessage(subscriptionData, "WEEK1");
 
-        when(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
-        then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
+        when(callCenter).unSubscribes(subscriptionData);
+        and(subscriptionManager).confirmsDeactivation(subscriptionData, SubscriptionStatus.DEACTIVATED);
+        and(time).isMovedToFuture(futureDateForCampaignAlertToBeRaisedAfterDeactivation);
+        then(user).messageIsNotCreated(subscriptionData, "WEEK3");
     }
 
     @Test
@@ -120,35 +122,6 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
 
         when(time).isMovedToFuture(futureDateOfCompletion);
         then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
-    }
-
-    @Test
-    public void shouldDeactivateUserWhenRequested() throws Exception {
-        System.out.println("Now running shouldDeactivateUserWhenRequested");
-
-        int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
-        int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
-
-        DateTime now = DateTime.now();
-        DateTime futureDateForFirstCampaignAlertToBeRaised = now.plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 5);
-        DateTime futureDateForSecondCampaignAlert = futureDateForFirstCampaignAlertToBeRaised.plusWeeks(1);
-
-        DateTime futureDateForCampaignAlertToBeRaisedAfterDeactivation = futureDateForSecondCampaignAlert.plusWeeks(1);
-        SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
-
-        when(callCenter).subscribes(subscriptionData);
-        and(subscriptionManager).activates(subscriptionData);
-        and(time).isMovedToFuture(futureDateForFirstCampaignAlertToBeRaised);
-        then(user).messageIsReady(subscriptionData, "WEEK1");
-
-        when(time).isMovedToFuture(futureDateForSecondCampaignAlert);
-        and(subscriptionManager).renews(subscriptionData);
-        then(user).messageIsReady(subscriptionData, "WEEK2");
-
-        when(callCenter).unSubscribes(subscriptionData);
-        and(subscriptionManager).confirmsDeactivation(subscriptionData, SubscriptionStatus.DEACTIVATED);
-        and(time).isMovedToFuture(futureDateForCampaignAlertToBeRaisedAfterDeactivation);
-        then(user).messageIsNotCreated(subscriptionData, "WEEK3");
     }
 
     @Test

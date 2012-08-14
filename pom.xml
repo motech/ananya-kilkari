@@ -374,6 +374,11 @@
                 <version>${motech-platform.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.motechproject.contrib-ananya</groupId>
+                <artifactId>motech-diagnostics</artifactId>
+                <version>${motech-contrib.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
                 <version>1.4</version>

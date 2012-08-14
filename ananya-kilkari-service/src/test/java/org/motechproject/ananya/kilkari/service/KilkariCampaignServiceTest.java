@@ -20,14 +20,13 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.request.*;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
-import org.motechproject.ananya.kilkari.request.*;
-import org.motechproject.ananya.kilkari.service.validator.CallDeliveryFailureRecordValidator;
-import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
+import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
+import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
+import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -37,6 +36,8 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationExcept
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
+import org.motechproject.ananya.kilkari.service.validator.CallDeliveryFailureRecordValidator;
+import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 
 import java.util.ArrayList;
@@ -218,7 +219,7 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldProcessInvalidCallRecords() {
-        InvalidOBDRequestEntriesWebRequest invalidOBDRequestEntries = new InvalidOBDRequestEntriesWebRequest();
+        InvalidOBDRequestEntries invalidOBDRequestEntries = new InvalidOBDRequestEntries();
 
         kilkariCampaignService.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
 
@@ -256,14 +257,14 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldPublishCallDeliveryFailureRecords() {
-        FailedCallReportsWebRequest failedCallReports = Mockito.mock(FailedCallReportsWebRequest.class);
+        FailedCallReports failedCallReports = Mockito.mock(FailedCallReports.class);
         kilkariCampaignService.publishCallDeliveryFailureRequest(failedCallReports);
         verify(callDetailsRequestPublisher).publishCallDeliveryFailureRecord(failedCallReports);
     }
 
     @Test
     public void shouldHandleCallDeliveryFailureRecord() {
-        FailedCallReportsWebRequest failedCallReports = new FailedCallReportsWebRequest();
+        FailedCallReports failedCallReports = new FailedCallReports();
 
         ArrayList<FailedCallReport> reportArrayList = new ArrayList<>();
         FailedCallReport failedCallReport = mock(FailedCallReport.class);
@@ -281,7 +282,7 @@ public class KilkariCampaignServiceTest {
     public void shouldPublishErroredOutCallDeliveryFailureRecords() {
         String msisdn = "12345";
         String subscriptionId = "abcd";
-        FailedCallReportsWebRequest failedCallReports = new FailedCallReportsWebRequest();
+        FailedCallReports failedCallReports = new FailedCallReports();
 
         ArrayList<FailedCallReport> callDeliveryFailureRecordObjects = new ArrayList<>();
         FailedCallReport erroredOutFailedCallReport = mock(FailedCallReport.class);
@@ -315,7 +316,7 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldPublishSuccessfulCallDeliveryFailureRecords() {
-        FailedCallReportsWebRequest failedCallReports = new FailedCallReportsWebRequest();
+        FailedCallReports failedCallReports = new FailedCallReports();
 
         ArrayList<FailedCallReport> callDeliveryFailureRecordObjects = new ArrayList<>();
         FailedCallReport erroredOutFailedCallReport = mock(FailedCallReport.class);
@@ -350,7 +351,7 @@ public class KilkariCampaignServiceTest {
 
     @Test
     public void shouldNotPublishToErrorQueueIfErroredOutCallDeliveryFailureRecordsAreEmpty() {
-        FailedCallReportsWebRequest failedCallReports = new FailedCallReportsWebRequest();
+        FailedCallReports failedCallReports = new FailedCallReports();
 
         ArrayList<FailedCallReport> callDeliveryFailureRecordObjects = new ArrayList<>();
         FailedCallReport successfulFailedCallReport = mock(FailedCallReport.class);

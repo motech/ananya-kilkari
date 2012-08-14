@@ -15,7 +15,7 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CallDetailsWebRequest extends BaseWebRequest implements Serializable {
+public class CallDetailsWebRequest implements Serializable {
 
     @JsonProperty
     private String msisdn;

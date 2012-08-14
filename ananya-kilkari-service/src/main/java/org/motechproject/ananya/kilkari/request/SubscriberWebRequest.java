@@ -11,7 +11,9 @@ import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
 import java.io.Serializable;
 
-public class SubscriberWebRequest extends BaseWebRequest implements Serializable {
+public class SubscriberWebRequest implements Serializable {
+    @JsonProperty
+    private String channel;
     @JsonIgnore
     private DateTime createdAt;
     @JsonProperty
@@ -28,6 +30,11 @@ public class SubscriberWebRequest extends BaseWebRequest implements Serializable
     public SubscriberWebRequest() {
         this.location = new LocationRequest();
         this.createdAt = DateTime.now();
+    }
+
+    @JsonIgnore
+    public String getChannel() {
+        return channel;
     }
 
     @JsonIgnore
@@ -105,6 +112,10 @@ public class SubscriberWebRequest extends BaseWebRequest implements Serializable
 
     public void setCreatedAt(DateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     public Errors validate() {

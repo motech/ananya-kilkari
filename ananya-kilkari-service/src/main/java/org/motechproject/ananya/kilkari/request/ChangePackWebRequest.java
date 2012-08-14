@@ -3,14 +3,16 @@ package org.motechproject.ananya.kilkari.request;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
+import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
-public class ChangePackWebRequest extends BaseWebRequest {
+public class ChangePackWebRequest {
     @JsonProperty
     private String msisdn;
     @JsonProperty
     private String pack;
+    @JsonProperty
+    private String channel;
     @JsonIgnore
     private DateTime createdAt;
     @JsonProperty
@@ -28,6 +30,10 @@ public class ChangePackWebRequest extends BaseWebRequest {
 
     public String getPack() {
         return pack;
+    }
+
+    public String getChannel() {
+        return channel;
     }
 
     public DateTime getCreatedAt() {
@@ -48,6 +54,10 @@ public class ChangePackWebRequest extends BaseWebRequest {
 
     public void setPack(String pack) {
         this.pack = pack;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     public void setExpectedDateOfDelivery(String expectedDateOfDelivery) {

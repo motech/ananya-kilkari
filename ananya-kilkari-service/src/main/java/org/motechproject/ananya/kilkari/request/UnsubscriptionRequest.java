@@ -6,7 +6,9 @@ import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public class UnsubscriptionRequest extends BaseWebRequest implements Serializable {
+public class UnsubscriptionRequest implements Serializable {
+    @JsonProperty
+    private String channel;
     @JsonProperty
     private String reason;
     @JsonIgnore
@@ -17,6 +19,11 @@ public class UnsubscriptionRequest extends BaseWebRequest implements Serializabl
     }
 
     @JsonIgnore
+    public String getChannel() {
+        return channel;
+    }
+
+    @JsonIgnore
     public String getReason() {
         return reason;
     }
@@ -24,6 +31,10 @@ public class UnsubscriptionRequest extends BaseWebRequest implements Serializabl
     @JsonIgnore
     public DateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     public void setReason(String reason) {

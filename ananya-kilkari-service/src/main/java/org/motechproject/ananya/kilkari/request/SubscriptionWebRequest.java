@@ -7,20 +7,18 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
 import java.io.Serializable;
 
-public class SubscriptionWebRequest implements Serializable {
+public class SubscriptionWebRequest extends BaseWebRequest implements Serializable {
     @JsonProperty
     private String msisdn;
     @JsonProperty
     private String pack;
-    @JsonProperty
-    private String channel;
     @JsonIgnore
     private DateTime createdAt;
     @JsonProperty
@@ -49,11 +47,6 @@ public class SubscriptionWebRequest implements Serializable {
     @JsonIgnore
     public String getPack() {
         return pack;
-    }
-
-    @JsonIgnore
-    public String getChannel() {
-        return channel;
     }
 
     @JsonIgnore
@@ -144,10 +137,6 @@ public class SubscriptionWebRequest implements Serializable {
 
     public void setPack(String pack) {
         this.pack = pack;
-    }
-
-    public void setChannel(String channel) {
-        this.channel = channel;
     }
 
     public void setMsisdn(String msisdn) {

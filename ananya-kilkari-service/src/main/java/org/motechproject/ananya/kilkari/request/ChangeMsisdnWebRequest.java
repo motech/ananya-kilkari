@@ -1,15 +1,12 @@
 package org.motechproject.ananya.kilkari.request;
 
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 
 import java.util.List;
 
-public class ChangeMsisdnWebRequest {
-
-    @JsonProperty
-    private String channel;
+public class ChangeMsisdnWebRequest extends BaseWebRequest {
 
     @JsonProperty
     private String oldMsisdn;
@@ -21,7 +18,8 @@ public class ChangeMsisdnWebRequest {
     private List<String> packs;
 
 
-    public ChangeMsisdnWebRequest() { }
+    public ChangeMsisdnWebRequest() {
+    }
 
     public ChangeMsisdnWebRequest(String oldMsisdn, String newMsisdn, List<String> packs, String channel) {
         this.oldMsisdn = oldMsisdn;
@@ -49,9 +47,5 @@ public class ChangeMsisdnWebRequest {
 
     public List<String> getPacks() {
         return packs;
-    }
-
-    public String getChannel() {
-        return channel;
     }
 }

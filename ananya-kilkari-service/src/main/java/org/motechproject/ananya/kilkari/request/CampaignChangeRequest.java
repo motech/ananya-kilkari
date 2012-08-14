@@ -10,7 +10,7 @@ import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
 import java.io.Serializable;
 
-public class CampaignChangeRequest implements Serializable {
+public class CampaignChangeRequest extends BaseWebRequest implements Serializable {
 
     @JsonProperty
     private String reason;

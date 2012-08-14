@@ -43,7 +43,7 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscription", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResponse createSubscription(@RequestBody SubscriptionWebRequest subscriptionWebRequest, @RequestParam String channel) {
+    public BaseResponse createSubscription(@RequestBody SubscriptionWebRequest subscriptionWebRequest) {
         subscriptionWebRequest.validateChannel();
         kilkariSubscriptionService.createSubscription(subscriptionWebRequest);
         return BaseResponse.success("Subscription request submitted successfully");
@@ -78,14 +78,14 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public BaseResponse removeSubscription(@RequestBody UnsubscriptionRequest unsubscriptionRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
+    public BaseResponse removeSubscription(@RequestBody UnsubscriptionRequest unsubscriptionRequest, @PathVariable String subscriptionId) {
         kilkariSubscriptionService.requestDeactivation(subscriptionId, unsubscriptionRequest);
         return BaseResponse.success("Subscription unsubscribed successfully");
     }
 
     @RequestMapping(value = "/subscription/{subscriptionId}/changecampaign", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResponse changeCampaign(@RequestBody CampaignChangeRequest campaignChangeRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
+    public BaseResponse changeCampaign(@RequestBody CampaignChangeRequest campaignChangeRequest, @PathVariable String subscriptionId) {
         Errors validationErrors = campaignChangeRequest.validate();
         raiseExceptionIfThereAreErrors(validationErrors);
 
@@ -95,14 +95,14 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscription/{subscriptionId}/changepack", method = RequestMethod.PUT)
     @ResponseBody
-    public BaseResponse changePack(@RequestBody ChangePackWebRequest changePackWebRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
+    public BaseResponse changePack(@RequestBody ChangePackWebRequest changePackWebRequest, @PathVariable String subscriptionId) {
         kilkariSubscriptionService.changePack(changePackWebRequest, subscriptionId);
         return BaseResponse.success("Change Pack successfully completed");
     }
 
     @RequestMapping(value = "/subscription/changemsisdn", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResponse changeMsisdn(@RequestBody ChangeMsisdnWebRequest changeMsisdnWebRequest, @RequestParam String channel) {
+    public BaseResponse changeMsisdn(@RequestBody ChangeMsisdnWebRequest changeMsisdnWebRequest) {
         Errors validationErrors = changeMsisdnWebRequest.validate();
         raiseExceptionIfThereAreErrors(validationErrors);
 
@@ -112,7 +112,7 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscriber/{subscriptionId}", method = RequestMethod.PUT)
     @ResponseBody
-    public BaseResponse updateSubscriberDetails(@RequestBody SubscriberWebRequest subscriberWebRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
+    public BaseResponse updateSubscriberDetails(@RequestBody SubscriberWebRequest subscriberWebRequest, @PathVariable String subscriptionId) {
         kilkariSubscriptionService.updateSubscriberDetails(subscriberWebRequest, subscriptionId);
         return BaseResponse.success("Subscriber Update request submitted successfully");
     }

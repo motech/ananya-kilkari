@@ -296,7 +296,7 @@ public class SubscriptionControllerTest {
         SubscriptionWebRequest subscriptionWebRequest = mock(SubscriptionWebRequest.class);
         when(subscriptionWebRequest.getChannel()).thenReturn("call_center");
 
-        subscriptionController.createSubscription(subscriptionWebRequest, "call_center");
+        subscriptionController.createSubscription(subscriptionWebRequest);
 
         verify(subscriptionWebRequest).validateChannel();
     }
@@ -318,7 +318,7 @@ public class SubscriptionControllerTest {
 
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withChannel("xyz").build();
 
-        subscriptionController.createSubscription(subscriptionWebRequest, "xyz");
+        subscriptionController.createSubscription(subscriptionWebRequest);
     }
 
     @Test

@@ -6,7 +6,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.ArrayList;
 
-public class InboxCallDetailsWebRequestsList {
+public class InboxCallDetailsWebRequestsList extends BaseWebRequest{
     @JsonProperty
     private ArrayList<InboxCallDetailsWebRequest> callrecords;
 

@@ -5,10 +5,10 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
+import org.motechproject.ananya.kilkari.request.FailedCallReportsWebRequest;
+import org.motechproject.ananya.kilkari.request.InvalidOBDRequestEntriesWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -73,9 +73,9 @@ public class OBDControllerTest {
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD call delivery failure records received successfully")));
 
-        ArgumentCaptor<FailedCallReports> captor = ArgumentCaptor.forClass(FailedCallReports.class);
+        ArgumentCaptor<FailedCallReportsWebRequest> captor = ArgumentCaptor.forClass(FailedCallReportsWebRequest.class);
         verify(kilkariCampaignService).publishCallDeliveryFailureRequest(captor.capture());
-        FailedCallReports failedCallReports = captor.getValue();
+        FailedCallReportsWebRequest failedCallReports = captor.getValue();
         List<FailedCallReport> callDeliveryFailureRecordObjects = failedCallReports.getCallrecords();
         assertEquals(2, callDeliveryFailureRecordObjects.size());
 
@@ -128,9 +128,9 @@ public class OBDControllerTest {
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD invalid call records received successfully")));
 
-        ArgumentCaptor<InvalidOBDRequestEntries> captor = ArgumentCaptor.forClass(InvalidOBDRequestEntries.class);
+        ArgumentCaptor<InvalidOBDRequestEntriesWebRequest> captor = ArgumentCaptor.forClass(InvalidOBDRequestEntriesWebRequest.class);
         verify(kilkariCampaignService).publishInvalidCallRecordsRequest(captor.capture());
-        InvalidOBDRequestEntries actualRequestEntries = captor.getValue();
+        InvalidOBDRequestEntriesWebRequest actualRequestEntries = captor.getValue();
         List<InvalidOBDRequestEntry> callrecords = actualRequestEntries.getInvalidOBDRequestEntryList();
         assertEquals(2, callrecords.size());
 
@@ -158,9 +158,9 @@ public class OBDControllerTest {
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD invalid call records received successfully")));
 
-        ArgumentCaptor<InvalidOBDRequestEntries> captor = ArgumentCaptor.forClass(InvalidOBDRequestEntries.class);
+        ArgumentCaptor<InvalidOBDRequestEntriesWebRequest> captor = ArgumentCaptor.forClass(InvalidOBDRequestEntriesWebRequest.class);
         verify(kilkariCampaignService).publishInvalidCallRecordsRequest(captor.capture());
-        InvalidOBDRequestEntries actualRequestEntries = captor.getValue();
+        InvalidOBDRequestEntriesWebRequest actualRequestEntries = captor.getValue();
         List<InvalidOBDRequestEntry> callrecords = actualRequestEntries.getInvalidOBDRequestEntryList();
         assertTrue(callrecords.isEmpty());
     }

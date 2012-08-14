@@ -11,18 +11,14 @@ import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
-import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.CallDetailsEventKeys;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
+import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.ArrayList;
@@ -99,7 +95,7 @@ public class CallDetailsRequestHandlerTest {
         String operator1 = "operator1";
         String sub1 = "sub1";
 
-        InvalidOBDRequestEntries invalidOBDRequestEntries = Mockito.mock(InvalidOBDRequestEntries.class);
+        InvalidOBDRequestEntriesWebRequest invalidOBDRequestEntries = Mockito.mock(InvalidOBDRequestEntriesWebRequest.class);
         ArrayList<InvalidOBDRequestEntry> invalidCallRecordRequestObjects = new ArrayList<InvalidOBDRequestEntry>();
         InvalidOBDRequestEntry invalidOBDRequestEntry1 = Mockito.mock(InvalidOBDRequestEntry.class);
         when(invalidOBDRequestEntry1.getMsisdn()).thenReturn(msisdn1);
@@ -136,7 +132,7 @@ public class CallDetailsRequestHandlerTest {
     @Test
     public void shouldInvokeKilkariCampaignServiceToProcessCallDeliveryFailureRecords() {
         HashMap<String, Object> parameters = new HashMap<>();
-        FailedCallReports failureRecordFailed = mock(FailedCallReports.class);
+        FailedCallReportsWebRequest failureRecordFailed = mock(FailedCallReportsWebRequest.class);
         parameters.put("0", failureRecordFailed);
 
         callDetailsRequestHandler.handleCallDeliveryFailureRecord(new MotechEvent(CallDetailsEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, parameters));

@@ -1,11 +1,11 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.service.CallDeliveryFailureEventKeys;
+import org.motechproject.ananya.kilkari.request.FailedCallReportsWebRequest;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.request.InvalidOBDRequestEntriesWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.scheduler.context.EventContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +25,11 @@ public class CallDetailsRequestPublisher {
         eventContext.send(CallDetailsEventKeys.PROCESS_OBD_SUCCESSFUL_CALL_REQUEST_SUBJECT, obdSuccessfulCallDetailsRequest);
     }
 
-    public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntries invalidOBDRequestEntries) {
+    public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntriesWebRequest invalidOBDRequestEntries) {
         eventContext.send(CallDetailsEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, invalidOBDRequestEntries);
     }
 
-    public void publishCallDeliveryFailureRecord(FailedCallReports failedCallReports) {
+    public void publishCallDeliveryFailureRecord(FailedCallReportsWebRequest failedCallReports) {
         eventContext.send(CallDetailsEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, failedCallReports);
     }
 

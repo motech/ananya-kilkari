@@ -11,19 +11,18 @@ import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.*;
+import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReport;
+import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
-import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.request.*;
+import org.motechproject.ananya.kilkari.service.validator.CallDeliveryFailureRecordValidator;
+import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
-import org.motechproject.ananya.kilkari.service.validator.CallDeliveryFailureRecordValidator;
-import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,7 +170,7 @@ public class KilkariCampaignService {
             throw new ValidationException("Invalid inbox call details request: Subscription not found");
     }
 
-    public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntries invalidOBDRequestEntries) {
+    public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntriesWebRequest invalidOBDRequestEntries) {
         callDetailsRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
     }
 
@@ -183,12 +182,12 @@ public class KilkariCampaignService {
         callDetailsRequestPublisher.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
     }
 
-    public void publishCallDeliveryFailureRequest(FailedCallReports failedCallReports) {
+    public void publishCallDeliveryFailureRequest(FailedCallReportsWebRequest failedCallReports) {
         callDetailsRequestPublisher.publishCallDeliveryFailureRecord(failedCallReports);
     }
 
     @Transactional
-    public void processCallDeliveryFailureRecord(FailedCallReports failedCallReports) {
+    public void processCallDeliveryFailureRecord(FailedCallReportsWebRequest failedCallReports) {
         List<InvalidFailedCallReport> invalidFailedCallReports = new ArrayList<>();
         List<ValidFailedCallReport> validFailedCallReports = new ArrayList<>();
         validate(failedCallReports, validFailedCallReports, invalidFailedCallReports);
@@ -197,7 +196,7 @@ public class KilkariCampaignService {
         publishValidRecords(validFailedCallReports);
     }
 
-    private void validate(FailedCallReports failedCallReports, List<ValidFailedCallReport> validFailedCallReports, List<InvalidFailedCallReport> invalidFailedCallReports) {
+    private void validate(FailedCallReportsWebRequest failedCallReports, List<ValidFailedCallReport> validFailedCallReports, List<InvalidFailedCallReport> invalidFailedCallReports) {
         for (FailedCallReport failedCallReport : failedCallReports.getCallrecords()) {
             Errors errors = callDeliveryFailureRecordValidator.validate(failedCallReport);
             if (errors.hasErrors()) {

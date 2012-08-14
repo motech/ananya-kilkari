@@ -6,13 +6,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.service.CallDeliveryFailureEventKeys;
-import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
-import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.scheduler.context.EventContext;
 
 import static org.mockito.Mockito.mock;
@@ -42,7 +38,7 @@ public class CallDetailsRequestPublisherTest {
 
     @Test
     public void shouldPublishInvalidCallRecordsRequest() {
-        InvalidOBDRequestEntries invalidOBDRequestEntries = new InvalidOBDRequestEntries();
+        InvalidOBDRequestEntriesWebRequest invalidOBDRequestEntries = new InvalidOBDRequestEntriesWebRequest();
         callDetailsRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
 
         verify(eventContext).send(CallDetailsEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, invalidOBDRequestEntries);
@@ -50,7 +46,7 @@ public class CallDetailsRequestPublisherTest {
 
     @Test
     public void shouldPublishCallDeliveryFailureRecord() {
-        FailedCallReports failedCallReports = mock(FailedCallReports.class);
+        FailedCallReportsWebRequest failedCallReports = mock(FailedCallReportsWebRequest.class);
         callDetailsRequestPublisher.publishCallDeliveryFailureRecord(failedCallReports);
 
         verify(eventContext).send(CallDetailsEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, failedCallReports);

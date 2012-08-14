@@ -45,8 +45,8 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
     }
 
     @Test
-    public void shouldSubscribeAndProgressAndCompleteSubscriptionWithIntermediateSuspensionsSuccessfully() throws Exception {
-        System.out.println("Now running shouldSubscribeAndProgressAndCompleteSubscriptionWithIntermediateSuspensionsSuccessfully");
+    public void shouldSubscribeAndProgressAndListenToLastMessageAndCompleteSubscriptionWithIntermediateSuspensionsSuccessfully() throws Exception {
+        System.out.println("Now running shouldSubscribeAndProgressAndListenToLastMessageAndCompleteSubscriptionWithIntermediateSuspensionsSuccessfully");
 
         int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
         int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
@@ -79,6 +79,10 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
         and(user).messageIsReady(subscriptionData, "WEEK3");
 
         when(user).resetCampaignMessageVerifier();
+        and(time).isMovedToFuture(futureDateOfPackCompletion);
+        then(subscriptionManager).renews(subscriptionData);
+        and(user).messageIsReady(subscriptionData, "WEEK60");
+
         and(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
         then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
     }

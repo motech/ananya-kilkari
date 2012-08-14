@@ -26,16 +26,32 @@
                     <skipTests>true</skipTests>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>Copy Property files before functional tests</id>
+                        <phase>process-test-classes</phase>
+                        <configuration>
+                            <target>
+                                <echo message="Copying Properties: START"/>
+                                <copy todir="${project.build.outputDirectory}">
+                                    <fileset dir="${project.basedir}/../ananya-kilkari-config/src/test/resources">
+                                        <include name="**/*.properties"/>
+                                    </fileset>
+                                </copy>
+                                <echo message="Copying Properties: END"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
-        <dependency>
-            <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-config</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <classifier>tests</classifier>
-        </dependency>
         <dependency>
             <groupId>org.motechproject.ananya.kilkari</groupId>
             <artifactId>ananya-kilkari-web</artifactId>

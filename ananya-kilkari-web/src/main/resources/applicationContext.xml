@@ -31,5 +31,19 @@
         </constructor-arg>
     </bean>
 
+    <bean id="couchDBDiagnostic" class="org.motechproject.diagnostics.diagnostics.CouchDBDiagnostic">
+        <constructor-arg>
+            <map>
+                <entry key="kilkari" value="http://%s:%s/_utils/database.html?kilkari"/>
+                <entry key="motech-subscription" value="http://%s:%s/_utils/database.html?motech-subscription"/>
+                <entry key="motech-message" value="http://localhost:5984/_utils/database.html?motech-message"/>
+                <entry key="motech-message" value="http://localhost:5984/_utils/database.html?motech-message"/>
+                <entry key="motech-message-campaign" value="http://localhost:5984/_utils/database.html?motech-message-campaign"/>
+                <entry key="motech-obd" value="http://localhost:5984/_utils/database.html?motech-obd"/>
+                <entry key="motech-retries" value="http://localhost:5984/_utils/database.html?motech-retries"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
 </beans>
 

@@ -103,6 +103,9 @@ public class KilkariSubscriptionService {
     }
 
     public void processCampaignChange(CampaignChangeRequest campaignChangeRequest, String subscriptionId) {
+        Errors validationErrors = campaignChangeRequest.validate();
+        raiseExceptionIfThereAreErrors(validationErrors);
+
         subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId,
                 CampaignChangeReason.from(campaignChangeRequest.getReason()), campaignChangeRequest.getCreatedAt()));
     }
@@ -121,6 +124,9 @@ public class KilkariSubscriptionService {
     }
 
     public void changeMsisdn(ChangeMsisdnWebRequest changeMsisdnWebRequest) {
+        Errors validationErrors = changeMsisdnWebRequest.validate();
+        raiseExceptionIfThereAreErrors(validationErrors);
+
         ChangeMsisdnRequest changeMsisdnRequest = ChangeMsisdnRequestMapper.mapFrom(changeMsisdnWebRequest);
         subscriptionService.changeMsisdn(changeMsisdnRequest);
     }

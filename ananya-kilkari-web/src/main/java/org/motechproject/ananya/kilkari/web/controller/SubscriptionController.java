@@ -89,8 +89,6 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse changeCampaign(@RequestBody CampaignChangeRequest campaignChangeRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
         campaignChangeRequest.setChannel(channel);
-        Errors validationErrors = campaignChangeRequest.validate();
-        raiseExceptionIfThereAreErrors(validationErrors);
 
         kilkariSubscriptionService.processCampaignChange(campaignChangeRequest, subscriptionId);
         return BaseResponse.success("Campaign Change successfully completed");
@@ -108,11 +106,9 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse changeMsisdn(@RequestBody ChangeMsisdnWebRequest changeMsisdnWebRequest, @RequestParam String channel) {
         changeMsisdnWebRequest.setChannel(channel);
-        Errors validationErrors = changeMsisdnWebRequest.validate();
-        raiseExceptionIfThereAreErrors(validationErrors);
 
         kilkariSubscriptionService.changeMsisdn(changeMsisdnWebRequest);
-            return BaseResponse.success("Change Msisdn request submitted successfully");
+        return BaseResponse.success("Change Msisdn request submitted successfully");
     }
 
     @RequestMapping(value = "/subscriber/{subscriptionId}", method = RequestMethod.PUT)

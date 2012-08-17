@@ -19,6 +19,7 @@ import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertie
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.ChangePackService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
@@ -26,6 +27,8 @@ import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
+
+import java.util.ArrayList;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -210,13 +213,32 @@ public class KilkariSubscriptionServiceTest {
     }
 
     @Test
+    public void shouldValidateCampaignChangeRequest() {
+        CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
+        String subscriptionId = "subscriptionId";
+        String reason = "some reason";
+        String channel = "some channel";
+        campaignChangeRequest.setReason(reason);
+        campaignChangeRequest.setChannel(channel);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid channel some channel,Invalid reason some reason");
+
+        kilkariSubscriptionService.processCampaignChange(campaignChangeRequest, subscriptionId);
+
+        verify(subscriptionService, never()).rescheduleCampaign(any(CampaignRescheduleRequest.class));
+    }
+
+    @Test
     public void shouldProcessCampaignChange() {
         CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
         String subscriptionId = "subscriptionId";
         String reason = "MISCARRIAGE";
+        String channel = Channel.CALL_CENTER.name();
         DateTime createdAt = DateTime.now();
         campaignChangeRequest.setReason(reason);
         campaignChangeRequest.setCreatedAt(createdAt);
+        campaignChangeRequest.setChannel(channel);
 
         kilkariSubscriptionService.processCampaignChange(campaignChangeRequest, subscriptionId);
 
@@ -282,6 +304,50 @@ public class KilkariSubscriptionServiceTest {
         assertEquals(changePackWebRequest.getPack(), changePackRequest.getPack().name());
         assertEquals(changePackWebRequest.getChannel(), changePackRequest.getChannel().name());
         assertEquals(changePackWebRequest.getCreatedAt(), changePackRequest.getCreatedAt());
+    }
+
+    @Test
+    public void shouldValidateChangeMsisdnRequest() {
+        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
+        changeMsisdnWebRequest.setOldMsisdn("123456789");
+        changeMsisdnWebRequest.setNewMsisdn("987654321");
+        changeMsisdnWebRequest.setChannel("some channel");
+        ArrayList<String> packs = new ArrayList<>();
+        packs.add("some pack");
+        changeMsisdnWebRequest.setPacks(packs);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid channel some channel,Invalid msisdn 123456789,Invalid msisdn 987654321,Invalid subscription pack some pack");
+
+        kilkariSubscriptionService.changeMsisdn(changeMsisdnWebRequest);
+
+        verify(subscriptionService, never()).changeMsisdn(any(ChangeMsisdnRequest.class));
+    }
+
+    @Test
+    public void shouldProcessChangeMsisdnRequest() {
+        String oldMsisdn = "1234567890";
+        String newMsisdn = "9876543210";
+        String channel = Channel.CALL_CENTER.name();
+        String pack = SubscriptionPack.BARI_KILKARI.name();
+        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
+        changeMsisdnWebRequest.setOldMsisdn(oldMsisdn);
+        changeMsisdnWebRequest.setNewMsisdn(newMsisdn);
+        changeMsisdnWebRequest.setChannel(channel);
+        ArrayList<String> packs = new ArrayList<>();
+        packs.add(pack);
+        changeMsisdnWebRequest.setPacks(packs);
+
+        kilkariSubscriptionService.changeMsisdn(changeMsisdnWebRequest);
+
+        ArgumentCaptor<ChangeMsisdnRequest> captor = ArgumentCaptor.forClass(ChangeMsisdnRequest.class);
+        verify(subscriptionService).changeMsisdn(captor.capture());
+        ChangeMsisdnRequest msisdnRequest = captor.getValue();
+
+        assertEquals(oldMsisdn, msisdnRequest.getOldMsisdn());
+        assertEquals(newMsisdn, msisdnRequest.getNewMsisdn());
+        assertEquals(channel, msisdnRequest.getChannel().name());
+        assertEquals(pack, msisdnRequest.getPacks().get(0).name());
     }
 
     @Test

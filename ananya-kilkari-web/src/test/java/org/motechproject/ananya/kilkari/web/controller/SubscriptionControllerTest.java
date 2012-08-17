@@ -393,25 +393,6 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void shouldValidateCampaignChangeRequest() throws Exception {
-        CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
-        campaignChangeRequest.setReason("asfddd");
-        byte[] requestBody = TestUtils.toJson(campaignChangeRequest).getBytes();
-
-        Errors errors = new Errors();
-        errors.add("some error description1");
-        errors.add("some error description2");
-
-        mockMvc(subscriptionController)
-                .perform(post("/subscription/subscriptionId/changecampaign")
-                        .param("channel", "some channel")
-                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("ERROR", "Invalid channel some channel,Invalid reason asfddd")));
-    }
-
-    @Test
     public void shouldUpdateSubscriberDetails() throws Exception {
         SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
         byte[] requestBody = TestUtils.toJson(subscriberWebRequest).getBytes();
@@ -601,25 +582,6 @@ public class SubscriptionControllerTest {
                 .andExpect(status().isOk()).andReturn();
 
         assertEquals(Channel.CALL_CENTER.toString(), HttpThreadContext.get());
-    }
-
-    @Test
-    public void shouldValidateChangeMsisdnRequest() throws Exception {
-        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
-        changeMsisdnWebRequest.setOldMsisdn("1234567890");
-        changeMsisdnWebRequest.setNewMsisdn("987654321");
-        ArrayList<String> packs = new ArrayList<>();
-        packs.add(SubscriptionPack.BARI_KILKARI.name());
-        changeMsisdnWebRequest.setPacks(packs);
-        byte[] requestBody = TestUtils.toJson(changeMsisdnWebRequest).getBytes();
-
-        mockMvc(subscriptionController)
-                .perform(post("/subscription/changemsisdn")
-                        .param("channel", "some channel")
-                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("ERROR", "Invalid channel some channel,Invalid msisdn 987654321")));
     }
 
     @Test

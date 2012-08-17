@@ -32,7 +32,7 @@ public abstract class SpringIntegrationTest extends TestCase{
 
     public SpringIntegrationTest(String name) {
         super(name);
-        this.performanceProperties = AutowiredProperties.performanceProperties;
+        this.performanceProperties = BaseConfiguration.performanceProperties;
     }
 
     @Before

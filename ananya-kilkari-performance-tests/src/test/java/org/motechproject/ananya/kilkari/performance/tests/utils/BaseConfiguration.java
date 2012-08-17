@@ -7,18 +7,18 @@ import org.springframework.stereotype.Component;
 import java.util.Properties;
 
 @Component
-public class AutowiredProperties {
+public class BaseConfiguration {
 
     public static Properties performanceProperties;
     public static SubscriptionService subscriptionService;
 
     @Autowired
     public void setPerformanceProperties(Properties performanceProperties) {
-        AutowiredProperties.performanceProperties = performanceProperties;
+        BaseConfiguration.performanceProperties = performanceProperties;
     }
 
     @Autowired
     public void setSubscriptionService(SubscriptionService subscriptionService) {
-        AutowiredProperties.subscriptionService = subscriptionService;
+        BaseConfiguration.subscriptionService = subscriptionService;
     }
 }

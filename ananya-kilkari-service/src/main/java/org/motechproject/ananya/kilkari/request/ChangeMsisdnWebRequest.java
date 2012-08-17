@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.request;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
@@ -8,7 +9,7 @@ import java.util.List;
 
 public class ChangeMsisdnWebRequest {
 
-    @JsonProperty
+    @JsonIgnore
     private String channel;
 
     @JsonProperty
@@ -53,5 +54,21 @@ public class ChangeMsisdnWebRequest {
 
     public String getChannel() {
         return channel;
+    }
+
+    public void setOldMsisdn(String oldMsisdn) {
+        this.oldMsisdn = oldMsisdn;
+    }
+
+    public void setNewMsisdn(String newMsisdn) {
+        this.newMsisdn = newMsisdn;
+    }
+
+    public void setPacks(List<String> packs) {
+        this.packs = packs;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 }

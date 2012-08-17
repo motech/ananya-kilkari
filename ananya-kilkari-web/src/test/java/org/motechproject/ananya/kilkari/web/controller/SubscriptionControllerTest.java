@@ -326,7 +326,6 @@ public class SubscriptionControllerTest {
         String subscriptionId = "abcd1234";
         UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
         unsubscriptionRequest.setReason("reason");
-        unsubscriptionRequest.setChannel(Channel.CALL_CENTER.name());
         byte[] requestBody = TestUtils.toJson(unsubscriptionRequest).getBytes();
 
         when(unsubscriptionRequestValidator.validate(subscriptionId)).thenReturn(new Errors());
@@ -405,11 +404,11 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(post("/subscription/subscriptionId/changecampaign")
-                        .param("channel", Channel.CALL_CENTER.toString())
+                        .param("channel", "some channel")
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("ERROR", "Invalid reason asfddd")));
+                .andExpect(content().string(baseResponseMatcher("ERROR", "Invalid channel some channel,Invalid reason asfddd")));
     }
 
     @Test
@@ -426,6 +425,7 @@ public class SubscriptionControllerTest {
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber Update request submitted successfully")));
 
+        subscriberWebRequest.setChannel(Channel.CALL_CENTER.name());
         verify(kilkariSubscriptionService).updateSubscriberDetails(subscriberWebRequest, subscriptionId);
     }
 
@@ -437,7 +437,6 @@ public class SubscriptionControllerTest {
         String pack = SubscriptionPack.BARI_KILKARI.name();
         ChangePackWebRequest changePackWebRequest = new ChangePackWebRequest();
         changePackWebRequest.setMsisdn(msisdn);
-        changePackWebRequest.setChannel(channel);
         changePackWebRequest.setPack(pack);
 
         byte[] requestBody = TestUtils.toJson(changePackWebRequest).getBytes();
@@ -604,4 +603,53 @@ public class SubscriptionControllerTest {
         assertEquals(Channel.CALL_CENTER.toString(), HttpThreadContext.get());
     }
 
+    @Test
+    public void shouldValidateChangeMsisdnRequest() throws Exception {
+        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
+        changeMsisdnWebRequest.setOldMsisdn("1234567890");
+        changeMsisdnWebRequest.setNewMsisdn("987654321");
+        ArrayList<String> packs = new ArrayList<>();
+        packs.add(SubscriptionPack.BARI_KILKARI.name());
+        changeMsisdnWebRequest.setPacks(packs);
+        byte[] requestBody = TestUtils.toJson(changeMsisdnWebRequest).getBytes();
+
+        mockMvc(subscriptionController)
+                .perform(post("/subscription/changemsisdn")
+                        .param("channel", "some channel")
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andExpect(content().string(baseResponseMatcher("ERROR", "Invalid channel some channel,Invalid msisdn 987654321")));
+    }
+
+    @Test
+    public void shouldProcessChangeMsisdnRequestSuccessfully() throws Exception {
+        String oldMsisdn = "1234567890";
+        String newMsisdn = "9876543210";
+        String channel = Channel.CALL_CENTER.name();
+
+        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
+        changeMsisdnWebRequest.setOldMsisdn(oldMsisdn);
+        changeMsisdnWebRequest.setNewMsisdn(newMsisdn);
+        ArrayList<String> packs = new ArrayList<>();
+        packs.add(SubscriptionPack.BARI_KILKARI.name());
+        changeMsisdnWebRequest.setPacks(packs);
+        byte[] requestBody = TestUtils.toJson(changeMsisdnWebRequest).getBytes();
+
+        mockMvc(subscriptionController)
+                .perform(post("/subscription/changemsisdn")
+                        .param("channel", channel)
+                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Change Msisdn request submitted successfully")));
+
+        ArgumentCaptor<ChangeMsisdnWebRequest> changeMsisdnWebRequestArgumentCaptor = ArgumentCaptor.forClass(ChangeMsisdnWebRequest.class);
+        verify(kilkariSubscriptionService).changeMsisdn(changeMsisdnWebRequestArgumentCaptor.capture());
+        ChangeMsisdnWebRequest request = changeMsisdnWebRequestArgumentCaptor.getValue();
+
+        assertEquals(oldMsisdn, request.getOldMsisdn());
+        assertEquals(newMsisdn, request.getNewMsisdn());
+        assertEquals(channel, request.getChannel());
+    }
 }

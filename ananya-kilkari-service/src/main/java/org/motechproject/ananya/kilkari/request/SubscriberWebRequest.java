@@ -12,7 +12,7 @@ import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 import java.io.Serializable;
 
 public class SubscriberWebRequest implements Serializable {
-    @JsonProperty
+    @JsonIgnore
     private String channel;
     @JsonIgnore
     private DateTime createdAt;

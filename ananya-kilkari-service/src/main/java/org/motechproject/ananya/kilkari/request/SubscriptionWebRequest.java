@@ -19,7 +19,7 @@ public class SubscriptionWebRequest implements Serializable {
     private String msisdn;
     @JsonProperty
     private String pack;
-    @JsonProperty
+    @JsonIgnore
     private String channel;
     @JsonIgnore
     private DateTime createdAt;

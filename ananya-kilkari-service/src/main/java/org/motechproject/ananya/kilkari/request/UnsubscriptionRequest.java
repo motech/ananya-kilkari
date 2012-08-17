@@ -7,7 +7,7 @@ import org.joda.time.DateTime;
 import java.io.Serializable;
 
 public class UnsubscriptionRequest implements Serializable {
-    @JsonProperty
+    @JsonIgnore
     private String channel;
     @JsonProperty
     private String reason;

@@ -153,7 +153,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         reportingService.setBehavior(mockedReportingService);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 
-        SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withEDD(null).build();
+        SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withEDD(null).withChannel(null).build();
         MvcResult result = mockMvc(subscriptionController)
                 .perform(post("/subscription")
                         .param("channel", channelString)
@@ -231,7 +231,6 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(expectedStartDate.toDate(), scheduledDates.get(0));
     }
 
-
     @Test
     public void shouldDeactivateSubscriptionForTheGivenMsisdnForTheCallCentreChannel() throws Exception {
         final String msisdn = "1111111111";
@@ -244,7 +243,6 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         onMobileSubscriptionService.setBehavior(onMobileSubscriptionGateway);
 
         UnsubscriptionRequest expectedUnsubscriptionRequest = new UnsubscriptionRequest();
-        expectedUnsubscriptionRequest.setChannel(Channel.CALL_CENTER.name());
         expectedUnsubscriptionRequest.setReason("Reason for deactivation");
 
         Subscription expectedSubscription = new Subscription(msisdn, pack, DateTime.now().minusMonths(15), SubscriptionStatus.NEW);

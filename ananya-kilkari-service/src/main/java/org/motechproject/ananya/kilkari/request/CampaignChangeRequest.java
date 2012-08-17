@@ -15,6 +15,8 @@ public class CampaignChangeRequest implements Serializable {
     @JsonProperty
     private String reason;
     @JsonIgnore
+    private String channel;
+    @JsonIgnore
     private DateTime createdAt;
 
     public CampaignChangeRequest() {
@@ -31,6 +33,15 @@ public class CampaignChangeRequest implements Serializable {
         return createdAt;
     }
 
+    @JsonIgnore
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
     public void setCreatedAt(DateTime createdAt) {
         this.createdAt = createdAt;
     }
@@ -41,6 +52,7 @@ public class CampaignChangeRequest implements Serializable {
 
     public Errors validate() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateChannel(channel);
         webRequestValidator.validateCampaignChangeReason(reason);
         return webRequestValidator.getErrors();
     }

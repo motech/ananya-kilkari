@@ -11,7 +11,8 @@
     <import resource="classpath*:applicationKilkariCommonContext.xml"/>
     <import resource="classpath*:applicationPlatformServerAPI.xml"/>
     <import resource="classpath:applicationKilkariServiceContext.xml"/>
-    <import resource="classpath:applicationContext-Diagnostics.xml"/>
+    <import resource="classpath:applicationContext-Diagnostics-Queues.xml"/>
+    <import resource="classpath:applicationContext-Diagnostics-Couch.xml"/>
 
     <bean id="handlerMapping"
           class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>

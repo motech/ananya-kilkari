@@ -11,6 +11,7 @@
     <util:properties id="performanceProperties" location="classpath:performance.properties"/>
 
     <util:properties id="couchdbProperties" location="classpath:couchdb.properties"/>
+    <util:properties id="activemqProperties" location="classpath:activemq.properties"/>
 
     <bean id="httpClient" class="org.ektorp.spring.HttpClientFactoryBean">
         <property name="properties" ref="couchdbProperties"/>

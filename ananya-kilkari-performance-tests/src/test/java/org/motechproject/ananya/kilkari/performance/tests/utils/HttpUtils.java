@@ -1,6 +1,9 @@
 package org.motechproject.ananya.kilkari.performance.tests.utils;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.motechproject.ananya.kilkari.performance.tests.domain.BaseResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.Map;
@@ -29,4 +32,11 @@ public class HttpUtils {
     public static <T> T fromJsonWithResponse(String jsonString, Class<T> subscriberResponseClass) {
         return fromJson(jsonString.replace("var response = ", ""), subscriberResponseClass);
     }
+
+    public static BaseResponse httpGetWithJsonResponse(Map<String, String> parametersMap, String minusBaseUrl) {
+        ResponseEntity<String> responseEntity = new RestTemplate().getForEntity(constructUrl(BaseConfiguration.baseUrl(), minusBaseUrl, parametersMap), String.class);
+        return  fromJsonWithResponse(responseEntity.getBody(), BaseResponse.class);
+
+    }
+
 }

@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.performance.tests.utils;
+package org.motechproject.ananya.kilkari.performance.tests.utils.runner;
 
 import com.clarkware.junitperf.LoadTest;
 import com.clarkware.junitperf.TestMethodFactory;
@@ -7,9 +7,7 @@ import junit.framework.TestSuite;
 
 public class TestSuiteUtils {
 
-
     public static TestSuite createTestSuite(int maxUsers, Class testClass, String methodName) {
-
         TestSuite testSuite = new TestSuite();
         Test testCase = new TestMethodFactory(testClass, methodName);
         Test loadTest = new LoadTest(testCase, maxUsers);

@@ -3,14 +3,13 @@ package org.motechproject.ananya.kilkari.performance.tests.utils.runner;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
-import org.junit.Ignore;
-import org.junit.internal.AssumptionViolatedException;
 import org.junit.internal.runners.model.EachTestNotifier;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
 
 import java.util.List;
 
@@ -33,27 +32,17 @@ public class LoadRunner extends BlockJUnit4ClassRunner {
     }
 
     @Override
-    protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-      EachTestNotifier eachNotifier = makeNotifier(method, notifier);
-        if (method.getAnnotation(Ignore.class) != null) {
-            eachNotifier.fireTestIgnored();
-            return;
-        }
+    protected Statement methodBlock(final FrameworkMethod method) {
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                LoadTest loadTest = method.getAnnotation(LoadTest.class);
+                TestSuite testSuite = TestSuiteUtils.createTestSuite(loadTest.concurrentUsers(), method.getMethod().getDeclaringClass(), method.getMethod().getName());
+                TestResult testResult = TestRunner.run(testSuite);
+                assertTrue(testResult.failureCount()==0);
 
-        LoadTest loadTest = method.getAnnotation(LoadTest.class);
-        eachNotifier.fireTestStarted();
-        try {
-            TestSuite testSuite = TestSuiteUtils.createTestSuite(loadTest.concurrentUsers(), method.getMethod().getDeclaringClass(), method.getMethod().getName());
-            TestResult testResult = TestRunner.run(testSuite);
-            assertTrue(testResult.failureCount()==0);
-
-        } catch (AssumptionViolatedException e) {
-            eachNotifier.addFailedAssumption(e);
-        } catch (Throwable e) {
-            eachNotifier.addFailure(e);
-        } finally {
-            eachNotifier.fireTestFinished();
-        }
+            }
+        };
     }
 
     private EachTestNotifier makeNotifier(FrameworkMethod method,

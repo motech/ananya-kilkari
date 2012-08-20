@@ -70,21 +70,15 @@ public class SubscriptionService {
         this.changeMsisdnValidator = changeMsisdnValidator;
     }
 
-    public Subscription createSubscriptionWithReporting(SubscriptionRequest subscriptionRequest, Channel channel) {
-        Subscription subscription = createSubscription(subscriptionRequest, channel);
-
-        reportingService.reportSubscriptionCreation(SubscriptionMapper.createSubscriptionCreationReportRequest(
-                subscription, channel, subscriptionRequest));
-
-        return subscription;
-    }
-
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
         subscriptionValidator.validate(subscriptionRequest);
 
         Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
                 subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate());
         allSubscriptions.add(subscription);
+
+        reportingService.reportSubscriptionCreation(SubscriptionMapper.createSubscriptionCreationReportRequest(
+                subscription, channel, subscriptionRequest));
 
         OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, channel);
         if (subscription.isEarlySubscription()) {
@@ -350,7 +344,7 @@ public class SubscriptionService {
                 DateTime.now(), subscription.getPack(), location, subscriber);
         subscriptionRequest.setOldSubscriptionId(subscription.getSubscriptionId());
 
-        createSubscriptionWithReporting(subscriptionRequest, changeMsisdnRequest.getChannel());
+        createSubscription(subscriptionRequest, changeMsisdnRequest.getChannel());
     }
 
     private void changeMsisdnForEarlySubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {

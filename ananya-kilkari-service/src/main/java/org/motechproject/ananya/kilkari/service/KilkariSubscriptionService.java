@@ -62,7 +62,7 @@ public class KilkariSubscriptionService {
         validateSubscriptionRequest(subscriptionWebRequest);
         SubscriptionRequest subscriptionRequest = SubscriptionRequestMapper.mapToSubscriptionRequest(subscriptionWebRequest);
         try {
-            subscriptionService.createSubscriptionWithReporting(subscriptionRequest, Channel.from(subscriptionWebRequest.getChannel()));
+            subscriptionService.createSubscription(subscriptionRequest, Channel.from(subscriptionWebRequest.getChannel()));
         } catch (DuplicateSubscriptionException e) {
             logger.warn(String.format("Subscription for msisdn[%s] and pack[%s] already exists.",
                     subscriptionWebRequest.getMsisdn(), subscriptionWebRequest.getPack()));

@@ -17,13 +17,12 @@ import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.service.validator.CallDeliveryFailureRecordValidator;
+import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
-import org.motechproject.ananya.kilkari.service.validator.CallDeliveryFailureRecordValidator;
-import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,6 @@ public class KilkariCampaignService {
 
     private MessageCampaignService messageCampaignService;
     private KilkariSubscriptionService kilkariSubscriptionService;
-    private CampaignMessageIdStrategy campaignMessageIdStrategy;
     private CampaignMessageAlertService campaignMessageAlertService;
     private CampaignMessageService campaignMessageService;
     private ReportingService reportingService;
@@ -60,7 +58,6 @@ public class KilkariCampaignService {
     @Autowired
     public KilkariCampaignService(MessageCampaignService messageCampaignService,
                                   KilkariSubscriptionService kilkariSubscriptionService,
-                                  CampaignMessageIdStrategy campaignMessageIdStrategy,
                                   CampaignMessageAlertService campaignMessageAlertService,
                                   CampaignMessageService campaignMessageService,
                                   ReportingService reportingService,
@@ -72,7 +69,6 @@ public class KilkariCampaignService {
                                   ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper) {
         this.messageCampaignService = messageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
-        this.campaignMessageIdStrategy = campaignMessageIdStrategy;
         this.campaignMessageAlertService = campaignMessageAlertService;
         this.campaignMessageService = campaignMessageService;
         this.reportingService = reportingService;
@@ -104,7 +100,7 @@ public class KilkariCampaignService {
     public void scheduleWeeklyMessage(String subscriptionId, String campaignName) {
         Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
 
-        final String messageId = campaignMessageIdStrategy.createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId, campaignName), subscription.getPack());
+        final String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId, campaignName), subscription.getPack());
         final DateTime messageExpiryDate = subscription.getCurrentWeeksMessageExpiryDate();
 
         campaignMessageAlertService.scheduleCampaignMessageAlert(subscriptionId, messageId, messageExpiryDate, subscription.getMsisdn(), subscription.getOperator().name());

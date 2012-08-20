@@ -4,11 +4,9 @@ import org.joda.time.DateTime;
 import org.joda.time.Weeks;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 
-@Component
 public class CampaignMessageIdStrategy {
 
     private static final HashMap<String, String> CAMPAIGN_NAME_CODE_MAPPING = new HashMap<String, String>() {{
@@ -30,8 +28,8 @@ public class CampaignMessageIdStrategy {
     }
 
     private int getPackStartingWeek(String campaignName, SubscriptionPack pack) {
-        if(!campaignName.equals(MessageCampaignService.INFANT_DEATH_CAMPAIGN_KEY) &&
-           !campaignName.equals(MessageCampaignService.MISCARRIAGE_CAMPAIGN_KEY))
+        if (!campaignName.equals(MessageCampaignService.INFANT_DEATH_CAMPAIGN_KEY) &&
+                !campaignName.equals(MessageCampaignService.MISCARRIAGE_CAMPAIGN_KEY))
             return pack.getStartWeek();
         return 1;
     }

@@ -1,5 +1,8 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,6 +30,8 @@ import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.service.validator.CallDeliveryFailureRecordValidator;
+import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -35,9 +40,6 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
-import org.motechproject.ananya.kilkari.service.validator.CallDeliveryFailureRecordValidator;
-import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 
 import java.util.ArrayList;
@@ -45,9 +47,9 @@ import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -60,8 +62,6 @@ public class KilkariCampaignServiceTest {
     private MessageCampaignService messageCampaignService;
     @Mock
     private KilkariSubscriptionService kilkariSubscriptionService;
-    @Mock
-    private CampaignMessageIdStrategy campaignMessageIdStrategy;
     @Mock
     private CampaignMessageService campaignMessageService;
     @Mock
@@ -88,7 +88,7 @@ public class KilkariCampaignServiceTest {
     @Before
     public void setUp() {
         initMocks(this);
-        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageIdStrategy, campaignMessageAlertService, campaignMessageService, reportingService, callDetailsRequestPublisher, callDeliveryFailureRecordValidator, inboxService, obdServiceOptionFactory, successfulCallDetailsRequestValidator, validCallDeliveryFailureRecordMapper);
+        kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService, campaignMessageAlertService, campaignMessageService, reportingService, callDetailsRequestPublisher, callDeliveryFailureRecordValidator, inboxService, obdServiceOptionFactory, successfulCallDetailsRequestValidator, validCallDeliveryFailureRecordMapper);
     }
 
     @Test
@@ -367,8 +367,8 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldCallCampaignMessageAlertServiceAndUpdateInboxToHoldLastScheduledMessage() {
         DateTime creationDate = DateTime.now();
-        String messageId = "week10";
-        String campaignName = "campaignName";
+        String messageId = "WEEK1";
+        String campaignName = MessageCampaignService.FIFTEEN_MONTHS_CAMPAIGN_KEY;
         Operator operator = Operator.AIRTEL;
         String msisdn = "9988776655";
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, creationDate, DateTime.now());
@@ -379,11 +379,10 @@ public class KilkariCampaignServiceTest {
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(creationDate);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, creationDate, subscription.getPack())).thenReturn(messageId);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 
-        verify(campaignMessageAlertService).scheduleCampaignMessageAlert(subscriptionId, messageId, expiryDate, msisdn, operator.name());
+        verify(campaignMessageAlertService).scheduleCampaignMessageAlert(eq(subscriptionId), eq(messageId), Mockito.argThat(dateMatches(expiryDate)), eq(msisdn), eq(operator.name()));
         verify(inboxService).newMessage(subscriptionId, messageId);
     }
 
@@ -396,18 +395,33 @@ public class KilkariCampaignServiceTest {
         subscription.setOperator(operator);
         subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
         String subscriptionId = subscription.getSubscriptionId();
-        String messageId = "week10";
-        String campaignName = "campaignName";
+        String messageId = "WEEK1";
+        String campaignName = MessageCampaignService.FIFTEEN_MONTHS_CAMPAIGN_KEY;
         DateTime expiryDate = creationDate.plusWeeks(1);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(creationDate);
-        when(campaignMessageIdStrategy.createMessageId(campaignName, subscription.getStartDate(), subscription.getPack())).thenReturn(messageId);
 
         kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
 
-        verify(campaignMessageAlertService).scheduleCampaignMessageAlert(subscriptionId, messageId, expiryDate, msisdn, operator.name());
+        verify(campaignMessageAlertService).scheduleCampaignMessageAlert(eq(subscriptionId), eq(messageId), Mockito.argThat(dateMatches(expiryDate)), eq(msisdn), eq(operator.name()));
         verify(inboxService, never()).newMessage(subscriptionId, messageId);
+    }
+
+
+    private Matcher<DateTime> dateMatches(final DateTime expiryDate) {
+        return new TypeSafeMatcher<DateTime>() {
+            @Override
+            public boolean matchesSafely(DateTime dateTime) {
+                return expiryDate.toLocalDate().equals(dateTime.toLocalDate());
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("ExpiryDate expected :" + expiryDate);
+
+            }
+        };
     }
 
     @Test

@@ -5,7 +5,7 @@ import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunner;
 import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunnerResponse;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.StubOnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.request;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
+import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;

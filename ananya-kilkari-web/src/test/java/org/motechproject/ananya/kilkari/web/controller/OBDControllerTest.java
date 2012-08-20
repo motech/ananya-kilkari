@@ -4,15 +4,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidOBDRequestEntries;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.TestUtils;
@@ -75,7 +74,7 @@ public class OBDControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD call delivery failure records received successfully")));
 
         ArgumentCaptor<FailedCallReports> captor = ArgumentCaptor.forClass(FailedCallReports.class);
-        verify(kilkariCampaignService).publishCallDeliveryFailureRequest(captor.capture());
+        verify(kilkariCampaignService).processCallDeliveryFailureRequest(captor.capture());
         FailedCallReports failedCallReports = captor.getValue();
         List<FailedCallReport> callDeliveryFailureRecordObjects = failedCallReports.getCallrecords();
         assertEquals(2, callDeliveryFailureRecordObjects.size());

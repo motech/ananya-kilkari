@@ -1,6 +1,7 @@
-package org.motechproject.ananya.kilkari.domain;
+package org.motechproject.ananya.kilkari.obd.domain;
 
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.obd.domain.PhoneNumber;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

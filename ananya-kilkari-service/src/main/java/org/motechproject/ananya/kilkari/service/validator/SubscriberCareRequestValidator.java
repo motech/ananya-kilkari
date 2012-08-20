@@ -4,7 +4,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareReason
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.domain.PhoneNumber;
+import org.motechproject.ananya.kilkari.obd.domain.PhoneNumber;
 import org.springframework.stereotype.Component;
 
 @Component

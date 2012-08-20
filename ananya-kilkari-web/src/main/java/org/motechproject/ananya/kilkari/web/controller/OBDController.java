@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
@@ -29,7 +29,7 @@ public class OBDController {
     @RequestMapping(value = "/obd/calldetails", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse handleCallDeliveryFailureRecords(@RequestBody FailedCallReports failedCallReports) {
-        kilkariCampaignService.publishCallDeliveryFailureRequest(failedCallReports);
+        kilkariCampaignService.processCallDeliveryFailureRequest(failedCallReports);
         return BaseResponse.success("OBD call delivery failure records received successfully");
     }
 

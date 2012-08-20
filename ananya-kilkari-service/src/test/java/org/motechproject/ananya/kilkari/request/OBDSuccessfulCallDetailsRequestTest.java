@@ -4,7 +4,7 @@ package org.motechproject.ananya.kilkari.request;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
+import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

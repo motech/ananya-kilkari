@@ -1,11 +1,8 @@
-package org.motechproject.ananya.kilkari.mapper;
+package org.motechproject.ananya.kilkari.obd.service;
 
-import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

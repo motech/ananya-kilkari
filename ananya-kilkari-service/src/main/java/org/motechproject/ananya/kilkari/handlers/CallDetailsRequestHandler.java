@@ -2,9 +2,8 @@ package org.motechproject.ananya.kilkari.handlers;
 
 import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidOBDRequestEntries;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
@@ -44,13 +43,6 @@ public class CallDetailsRequestHandler {
         InvalidOBDRequestEntries invalidOBDRequestEntries = (InvalidOBDRequestEntries) event.getParameters().get("0");
         List<InvalidCallRecord> invalidCallRecords = mapToInvalidCallRecord(invalidOBDRequestEntries);
         callRecordsService.processInvalidCallRecords(invalidCallRecords);
-    }
-
-    @MotechListener(subjects = {CallDetailsEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST})
-    public void handleCallDeliveryFailureRecord(MotechEvent motechEvent) {
-        FailedCallReports failedCallReports = (FailedCallReports) motechEvent.getParameters().get("0");
-        logger.info("Handling OBD call delivery failure record");
-        kilkariCampaignService.processCallDeliveryFailureRecord(failedCallReports);
     }
 
     @MotechListener(subjects = {CallDetailsEventKeys.PROCESS_INBOX_CALL_REQUEST_SUBJECT})

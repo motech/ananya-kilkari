@@ -3,11 +3,11 @@ package org.motechproject.ananya.kilkari.service.validator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

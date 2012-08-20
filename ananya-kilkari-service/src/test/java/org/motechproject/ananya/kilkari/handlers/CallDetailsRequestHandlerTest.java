@@ -11,17 +11,16 @@ import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
 import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntries;
-import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidOBDRequestEntries;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.obd.service.CallRecordsService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.service.CallDetailsEventKeys;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 import org.motechproject.scheduler.domain.MotechEvent;
 
@@ -131,17 +130,6 @@ public class CallDetailsRequestHandlerTest {
         assertEquals(msisdn1, actualInvalidCallRecord1.getMsisdn());
         assertEquals(operator1, actualInvalidCallRecord1.getOperator());
         assertEquals(desc1, actualInvalidCallRecord1.getDescription());
-    }
-
-    @Test
-    public void shouldInvokeKilkariCampaignServiceToProcessCallDeliveryFailureRecords() {
-        HashMap<String, Object> parameters = new HashMap<>();
-        FailedCallReports failureRecordFailed = mock(FailedCallReports.class);
-        parameters.put("0", failureRecordFailed);
-
-        callDetailsRequestHandler.handleCallDeliveryFailureRecord(new MotechEvent(CallDetailsEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, parameters));
-
-        verify(kilkariCampaignService).processCallDeliveryFailureRecord(failureRecordFailed);
     }
 
     @Test

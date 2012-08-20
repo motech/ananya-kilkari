@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.repository;
 
 import org.motechproject.ananya.kilkari.obd.profile.TestProfile;
-import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.springframework.stereotype.Component;
 
 @Component

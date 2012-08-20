@@ -2,8 +2,8 @@ package org.motechproject.ananya.kilkari.functional.test.domain;
 
 import org.motechproject.ananya.kilkari.functional.test.utils.JsonUtils;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.CampaignMessageVerifier;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.controller.OBDController;
 import org.springframework.beans.factory.annotation.Autowired;

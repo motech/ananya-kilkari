@@ -16,8 +16,8 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReport;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.springframework.web.client.RestTemplate;
 

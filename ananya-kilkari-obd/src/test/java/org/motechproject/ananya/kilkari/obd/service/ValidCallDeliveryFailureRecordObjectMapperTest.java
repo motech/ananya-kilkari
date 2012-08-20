@@ -1,12 +1,11 @@
-package org.motechproject.ananya.kilkari.mapper;
+package org.motechproject.ananya.kilkari.obd.service;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
-import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;

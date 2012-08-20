@@ -1,28 +1,28 @@
-package org.motechproject.ananya.kilkari.service.validator;
+package org.motechproject.ananya.kilkari.obd.service.validator;
 
 import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignCode;
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
-import org.motechproject.ananya.kilkari.obd.request.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
+import org.motechproject.ananya.kilkari.obd.domain.PhoneNumber;
+import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
-import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
-import org.motechproject.ananya.kilkari.domain.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
 public class CallDeliveryFailureRecordValidator {
 
-    private KilkariSubscriptionService subscriptionService;
+    private AllCampaignMessages allCampaignMessages;
     private CampaignMessageService campaignMessageService;
 
     @Autowired
-    public CallDeliveryFailureRecordValidator(KilkariSubscriptionService subscriptionService, CampaignMessageService campaignMessageService) {
-        this.subscriptionService = subscriptionService;
+    public CallDeliveryFailureRecordValidator(AllCampaignMessages allCampaignMessages, CampaignMessageService campaignMessageService) {
+        this.allCampaignMessages = allCampaignMessages;
         this.campaignMessageService = campaignMessageService;
     }
 
@@ -54,7 +54,8 @@ public class CallDeliveryFailureRecordValidator {
     }
 
     private void validateSubscription(String subscriptionId, Errors errors) {
-        if (subscriptionService.findBySubscriptionId(subscriptionId) == null)
+        List<CampaignMessage> campaignMessages = allCampaignMessages.findBySubscriptionId(subscriptionId);
+        if (campaignMessages == null || campaignMessages.isEmpty())
             errors.add(String.format("Invalid subscription id %s", subscriptionId));
     }
 

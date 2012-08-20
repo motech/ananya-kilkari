@@ -10,6 +10,7 @@ import org.motechproject.ananya.kilkari.builder.ChangeSubscriptionWebRequestBuil
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
+import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.validator.UnsubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
@@ -25,7 +26,6 @@ import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubsc
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 

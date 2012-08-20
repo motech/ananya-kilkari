@@ -3,8 +3,8 @@ package org.motechproject.ananya.kilkari.request;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
-import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 
 import java.io.Serializable;
 

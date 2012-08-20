@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.subscription.validators;
+package org.motechproject.ananya.kilkari.obd.service.validator;
 
 import org.apache.commons.lang.StringUtils;
 

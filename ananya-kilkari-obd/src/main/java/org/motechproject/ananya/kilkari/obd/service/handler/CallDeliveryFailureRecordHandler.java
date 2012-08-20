@@ -1,12 +1,14 @@
-package org.motechproject.ananya.kilkari.obd.handlers;
+package org.motechproject.ananya.kilkari.obd.service.handler;
 
 
 import org.apache.log4j.Logger;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.service.CallDeliveryFailureEventKeys;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.obd.service.OBDCallDetailsService;
 import org.motechproject.scheduler.domain.MotechEvent;
 import org.motechproject.server.event.annotations.MotechListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +19,14 @@ public class CallDeliveryFailureRecordHandler {
     Logger logger = Logger.getLogger(CallDeliveryFailureRecordHandler.class);
     private OnMobileOBDGateway onMobileOBDGateway;
     private CampaignMessageService campaignMessageService;
+    private OBDCallDetailsService obdCallDetailsService;
 
     @Autowired
-    public CallDeliveryFailureRecordHandler(OnMobileOBDGateway onMobileOBDGateway, CampaignMessageService campaignMessageService) {
+    public CallDeliveryFailureRecordHandler(OnMobileOBDGateway onMobileOBDGateway, CampaignMessageService campaignMessageService,
+                                            OBDCallDetailsService obdCallDetailsService) {
         this.onMobileOBDGateway = onMobileOBDGateway;
         this.campaignMessageService = campaignMessageService;
+        this.obdCallDetailsService = obdCallDetailsService;
     }
 
     @MotechListener(subjects = {CallDeliveryFailureEventKeys.PROCESS_INVALID_CALL_DELIVERY_FAILURE_RECORD})
@@ -37,4 +42,12 @@ public class CallDeliveryFailureRecordHandler {
         logger.info("Handling OBD invalid call delivery failure records");
         campaignMessageService.processValidCallDeliveryFailureRecords(validFailedCallReport);
     }
+
+    @MotechListener(subjects = {CallDeliveryFailureEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST})
+    public void handleCallDeliveryFailureRecord(MotechEvent motechEvent) {
+        FailedCallReports failedCallReports = (FailedCallReports) motechEvent.getParameters().get("0");
+        logger.info("Handling OBD call delivery failure record");
+        obdCallDetailsService.processCallDeliveryFailureRecord(failedCallReports);
+    }
+
 }

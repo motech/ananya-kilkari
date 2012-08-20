@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.request;
+package org.motechproject.ananya.kilkari.obd.service.request;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;

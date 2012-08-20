@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.handlers;
+package org.motechproject.ananya.kilkari.obd.service.handler;
 
 
 import org.junit.Before;
@@ -7,10 +7,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReport;
-import org.motechproject.ananya.kilkari.obd.request.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReport;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.service.CallDeliveryFailureEventKeys;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.obd.service.OBDCallDetailsService;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.ArrayList;
@@ -26,13 +28,15 @@ public class CallDeliveryFailureRecordHandlerTest {
     private OnMobileOBDGateway onMobileOBDGateway;
     @Mock
     private CampaignMessageService campaignMessageService;
+    @Mock
+    private OBDCallDetailsService obdCallDetailsService;
 
     private CallDeliveryFailureRecordHandler callDeliveryFailureRecordHandler;
 
     @Before
     public void setUp() {
         initMocks(this);
-        callDeliveryFailureRecordHandler = new CallDeliveryFailureRecordHandler(onMobileOBDGateway, campaignMessageService);
+        callDeliveryFailureRecordHandler = new CallDeliveryFailureRecordHandler(onMobileOBDGateway, campaignMessageService, obdCallDetailsService);
     }
 
     @Test
@@ -70,4 +74,16 @@ public class CallDeliveryFailureRecordHandlerTest {
 
         verify(campaignMessageService).processValidCallDeliveryFailureRecords(failedCallReport);
     }
+
+    @Test
+    public void shouldProcessCallDeliveryFailureRecords() {
+        HashMap<String, Object> parameters = new HashMap<>();
+        FailedCallReports failureRecordFailed = mock(FailedCallReports.class);
+        parameters.put("0", failureRecordFailed);
+
+        callDeliveryFailureRecordHandler.handleCallDeliveryFailureRecord(new MotechEvent(CallDeliveryFailureEventKeys.PROCESS_CALL_DELIVERY_FAILURE_REQUEST, parameters));
+
+        verify(obdCallDetailsService).processCallDeliveryFailureRecord(failureRecordFailed);
+    }
+
 }

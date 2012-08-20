@@ -34,9 +34,6 @@ public class Subscription extends MotechBaseDataObject {
     private DateTime creationDate;
 
     @JsonProperty
-    private DateTime activationDate;
-
-    @JsonProperty
     private DateTime startDate;
 
     public Subscription() {

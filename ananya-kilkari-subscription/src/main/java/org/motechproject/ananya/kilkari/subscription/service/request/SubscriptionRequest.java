@@ -71,7 +71,4 @@ public class SubscriptionRequest {
         return creationDate;
     }
 
-    public boolean isEarlySubscription(DateTime startDate) {
-        return startDate.isAfter(creationDate);
-    }
 }

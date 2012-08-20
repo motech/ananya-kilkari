@@ -104,7 +104,6 @@ public class SubscriptionRequestBuilder {
     public SubscriptionRequest build() {
         Location location = new Location(district, block, panchayat);
         Subscriber subscriber = new Subscriber(beneficiaryName, beneficiaryAge, dob, edd, week);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber);
-        return subscriptionRequest;
+        return new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber);
     }
 }

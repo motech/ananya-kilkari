@@ -82,17 +82,13 @@ public class SubscriptionService {
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
         subscriptionValidator.validate(subscriptionRequest);
 
-        DateTime startDate = subscriptionRequest.getSubscriptionStartDate();
-        boolean isEarlySubscription = subscriptionRequest.isEarlySubscription(startDate);
-
         Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
-                subscriptionRequest.getCreationDate(), (isEarlySubscription ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW));
-        subscription.setStartDate(startDate);
+                subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate());
         allSubscriptions.add(subscription);
 
         OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, channel);
-        if (isEarlySubscription) {
-            scheduleEarlySubscription(startDate, omSubscriptionRequest);
+        if (subscription.isEarlySubscription()) {
+            scheduleEarlySubscription(subscriptionRequest.getSubscriptionStartDate(), omSubscriptionRequest);
         } else
             initiateActivationRequest(omSubscriptionRequest);
         return subscription;

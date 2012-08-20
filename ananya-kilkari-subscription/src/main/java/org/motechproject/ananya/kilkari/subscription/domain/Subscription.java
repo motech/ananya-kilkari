@@ -36,16 +36,18 @@ public class Subscription extends MotechBaseDataObject {
     @JsonProperty
     private DateTime startDate;
 
+    private SubscriptionState state;
+
     public Subscription() {
     }
 
-    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, SubscriptionStatus status) {
+    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, DateTime startDate) {
         this.pack = pack;
         this.msisdn = msisdn;
         this.creationDate = createdAt;
-        this.startDate = creationDate;
-        this.status = status;
+        this.startDate = startDate;
         this.subscriptionId = UUID.randomUUID().toString();
+        this.status = isEarlySubscription() ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW;
     }
 
     public String getMsisdn() {
@@ -227,8 +229,8 @@ public class Subscription extends MotechBaseDataObject {
 
         return
                 1 +                                             // First week
-                Weeks.weeksBetween(startDate, now).getWeeks() + // Weeks elapsed
-                1;                                              // Next week increment
+                        Weeks.weeksBetween(startDate, now).getWeeks() + // Weeks elapsed
+                        1;                                              // Next week increment
     }
 
     public boolean hasBeenActivated() {
@@ -251,4 +253,10 @@ public class Subscription extends MotechBaseDataObject {
 
         return activatedOn;
     }
+
+    @JsonIgnore
+    public boolean isEarlySubscription() {
+        return startDate.isAfter(creationDate);
+    }
+
 }

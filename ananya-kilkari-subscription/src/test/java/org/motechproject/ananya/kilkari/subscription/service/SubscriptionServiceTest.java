@@ -174,8 +174,14 @@ public class SubscriptionServiceTest {
     public void shouldGetSubscriptionsResponseForAGivenMsisdn() {
         String msisdn = "1234567890";
         ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
-        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), SubscriptionStatus.NEW));
-        subscriptionsToBeReturned.add(new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW));
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), DateTime.now());
+        subscription1.setStatus(SubscriptionStatus.NEW);
+        subscriptionsToBeReturned.add(subscription1);
+
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        subscription2.setStatus(SubscriptionStatus.NEW);
+        subscriptionsToBeReturned.add(subscription2);
+
         when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionsToBeReturned);
 
         List<Subscription> subscriptions = subscriptionService.findByMsisdn(msisdn);
@@ -392,7 +398,7 @@ public class SubscriptionServiceTest {
         DateTime date = DateTime.now();
         String reason = "balance is low";
         Integer graceCount = 7;
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.NEW) {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now()) {
             public String getSubscriptionId() {
                 return subscriptionId;
             }
@@ -428,7 +434,9 @@ public class SubscriptionServiceTest {
     public void shouldProcessDeactivation() {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
+        subscription.setStatus(SubscriptionStatus.NEW);
+
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         Channel channel = Channel.IVR;
 
@@ -488,7 +496,10 @@ public class SubscriptionServiceTest {
     public void shouldScheduleInboxDeletionUponSubscriptionCompletion() {
         String msisdn = "1234567890";
         SubscriptionPack pack = SubscriptionPack.NANHI_KILKARI;
-        Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), DateTime.now());
+        subscription.setStatus(SubscriptionStatus.NEW);
+
+
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -516,7 +527,9 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldScheduleInboxDeletionUponSubscriptionDeactivation() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.NANHI_KILKARI, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
+        subscription.setStatus(SubscriptionStatus.NEW);
+
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -788,7 +801,9 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldUnScheduleMessageCampaignAndDeleteCampaignMessageAlertOnSuccessfulDeactivationRequest() {
         DateTime createdAt = DateTime.now();
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.CHOTI_KILKARI, createdAt, SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.CHOTI_KILKARI, createdAt, DateTime.now());
+        subscription.setStatus(SubscriptionStatus.NEW);
+
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getActiveCampaignName(subscriptionId)).thenReturn(MessageCampaignPack.CHOTI_KILKARI.getCampaignName());
@@ -850,8 +865,12 @@ public class SubscriptionServiceTest {
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CALL_CENTER);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.NANHI_KILKARI));
 
-        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now().minusWeeks(2).minusHours(1), SubscriptionStatus.ACTIVE);
-        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), SubscriptionStatus.ACTIVE);
+        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now().minusWeeks(2).minusHours(1), DateTime.now());
+        subscription1.setStatus(SubscriptionStatus.ACTIVE);
+
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), DateTime.now());
+        subscription2.setStatus(SubscriptionStatus.ACTIVE);
+
         String beneficiaryName = "name";
         Integer beneficiaryAge = 25;
         SubscriberResponse subscriberResponse = new SubscriberResponse(beneficiaryName, beneficiaryAge, null, null, null);
@@ -909,8 +928,12 @@ public class SubscriptionServiceTest {
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CALL_CENTER);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.NANHI_KILKARI));
 
-        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), SubscriptionStatus.NEW_EARLY);
-        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), SubscriptionStatus.ACTIVE);
+        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
+        subscription1.setStatus(SubscriptionStatus.NEW_EARLY);
+
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), DateTime.now());
+        subscription2.setStatus(SubscriptionStatus.ACTIVE);
+
 
         when(allSubscriptions.findSubscriptionsInProgress(oldMsisdn)).thenReturn(Arrays.asList(subscription1, subscription2));
         when(allSubscriptions.findBySubscriptionId(subscription1.getSubscriptionId())).thenReturn(subscription1);
@@ -935,11 +958,12 @@ public class SubscriptionServiceTest {
         final String subscriptionId = "subscriptionId";
         String reason = "Some reason";
         DateTime deactivationDate = DateTime.now();
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.PENDING_DEACTIVATION) {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now()) {
             public String getSubscriptionId() {
                 return subscriptionId;
             }
         };
+        subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         subscriptionService.processDeactivation(subscriptionId, deactivationDate, reason, graceCount);
@@ -958,11 +982,12 @@ public class SubscriptionServiceTest {
         DateTime date = DateTime.now();
         String reason = "balance is low";
         Integer graceCount = 7;
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), SubscriptionStatus.PENDING_COMPLETION) {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now()) {
             public String getSubscriptionId() {
                 return subscriptionId;
             }
         };
+        subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         subscriptionService.processDeactivation(subscriptionId, date, reason, graceCount);

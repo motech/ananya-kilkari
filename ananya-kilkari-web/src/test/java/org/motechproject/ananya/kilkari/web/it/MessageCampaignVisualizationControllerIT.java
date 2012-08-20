@@ -32,7 +32,10 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
     public void shouldGetVisualizationForGivenExternalId() throws Exception {
         String msisdn = "9876543210";
         SubscriptionPack subscriptionPack = SubscriptionPack.BARI_KILKARI;
-        Subscription subscription = new Subscription(msisdn, subscriptionPack, DateTime.now(), SubscriptionStatus.NEW);
+        Subscription subscription = new Subscription(msisdn, subscriptionPack, DateTime.now(), DateTime.now());
+        subscription.setStatus(SubscriptionStatus.NEW);
+
+
         allSubscriptions.add(subscription);
         markForDeletion(subscription);
 

@@ -1,10 +1,10 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang.NumberUtils;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangeScheduleRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
@@ -26,31 +26,31 @@ public class ChangePackService {
         this.reportingService = reportingService;
     }
 
-    public void process(ChangePackRequest changePackRequest) {
-        String subscriptionId = changePackRequest.getSubscriptionId();
+    public void process(ChangeScheduleRequest changeScheduleRequest) {
+        String subscriptionId = changeScheduleRequest.getSubscriptionId();
         subscriptionValidator.validateSubscriptionExists(subscriptionId);
         Subscription existingSubscription = subscriptionService.findBySubscriptionId(subscriptionId);
-        ChangePackValidator.validate(existingSubscription, changePackRequest);
+        ChangePackValidator.validate(existingSubscription, changeScheduleRequest);
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, changePackRequest.getChannel(), changePackRequest.getCreatedAt()));
-        updateEddOrDob(changePackRequest);
-        Subscription newSubscription = createSubscriptionWithNewPack(changePackRequest);
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, changeScheduleRequest.getChannel(), changeScheduleRequest.getCreatedAt()));
+        updateEddOrDob(changeScheduleRequest);
+        Subscription newSubscription = createSubscriptionWithNewPack(changeScheduleRequest);
 
         reportingService.reportChangePack(new SubscriptionChangePackRequest(NumberUtils.createLong(newSubscription.getMsisdn()), newSubscription.getSubscriptionId(), subscriptionId, newSubscription.getPack().name(),
-                changePackRequest.getChannel().name(), newSubscription.getStatus().name(), changePackRequest.getCreatedAt(), changePackRequest.getExpectedDateOfDelivery(), changePackRequest.getDateOfBirth(), newSubscription.getStartDate()));
+                changeScheduleRequest.getChannel().name(), newSubscription.getStatus().name(), changeScheduleRequest.getCreatedAt(), changeScheduleRequest.getExpectedDateOfDelivery(), changeScheduleRequest.getDateOfBirth(), newSubscription.getStartDate(), changeScheduleRequest.getReason()));
     }
 
-    private void updateEddOrDob(ChangePackRequest changePackRequest) {
-        if(changePackRequest.getDateOfBirth() == null && changePackRequest.getExpectedDateOfDelivery() == null) {
-            SubscriberResponse subscriberResponse = reportingService.getSubscriber(changePackRequest.getSubscriptionId());
-            changePackRequest.setDateOfBirth(subscriberResponse.getDateOfBirth());
-            changePackRequest.setExpectedDateOfDelivery(subscriberResponse.getExpectedDateOfDelivery());
+    private void updateEddOrDob(ChangeScheduleRequest changeScheduleRequest) {
+        if(changeScheduleRequest.getDateOfBirth() == null && changeScheduleRequest.getExpectedDateOfDelivery() == null) {
+            SubscriberResponse subscriberResponse = reportingService.getSubscriber(changeScheduleRequest.getSubscriptionId());
+            changeScheduleRequest.setDateOfBirth(subscriberResponse.getDateOfBirth());
+            changeScheduleRequest.setExpectedDateOfDelivery(subscriberResponse.getExpectedDateOfDelivery());
         }
     }
 
-    private Subscription createSubscriptionWithNewPack(ChangePackRequest changePackRequest) {
-        Subscriber subscriber = new Subscriber(null, null, changePackRequest.getDateOfBirth(), changePackRequest.getExpectedDateOfDelivery(), null);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changePackRequest.getMsisdn(), changePackRequest.getCreatedAt(), changePackRequest.getPack(), null, subscriber);
-        return subscriptionService.createSubscription(subscriptionRequest, changePackRequest.getChannel());
+    private Subscription createSubscriptionWithNewPack(ChangeScheduleRequest changeScheduleRequest) {
+        Subscriber subscriber = new Subscriber(null, null, changeScheduleRequest.getDateOfBirth(), changeScheduleRequest.getExpectedDateOfDelivery(), null);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeScheduleRequest.getMsisdn(), changeScheduleRequest.getCreatedAt(), changeScheduleRequest.getPack(), null, subscriber);
+        return subscriptionService.createSubscription(subscriptionRequest, changeScheduleRequest.getChannel());
     }
 }

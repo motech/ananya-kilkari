@@ -94,12 +94,12 @@ public class SubscriptionController {
         return BaseResponse.success("Campaign Change successfully completed");
     }
 
-    @RequestMapping(value = "/subscription/{subscriptionId}/changepack", method = RequestMethod.PUT)
+    @RequestMapping(value = "/subscription/{subscriptionId}/changeschedule", method = RequestMethod.PUT)
     @ResponseBody
-    public BaseResponse changePack(@RequestBody ChangePackWebRequest changePackWebRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
-        changePackWebRequest.setChannel(channel);
-        kilkariSubscriptionService.changePack(changePackWebRequest, subscriptionId);
-        return BaseResponse.success("Change Pack successfully completed");
+    public BaseResponse changeSchedule(@RequestBody ChangeScheduleWebRequest changeScheduleWebRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
+        changeScheduleWebRequest.setChannel(channel);
+        kilkariSubscriptionService.changeSchedule(changeScheduleWebRequest, subscriptionId);
+        return BaseResponse.success("Change Schedule successfully completed");
     }
 
     @RequestMapping(value = "/subscription/changemsisdn", method = RequestMethod.POST)

@@ -3,21 +3,13 @@ package org.motechproject.ananya.kilkari.subscription.service;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangeScheduleRequest;
 
 public class ChangePackValidator {
 
-    public static void validate(Subscription subscription, ChangePackRequest changePackRequest) {
+    public static void validate(Subscription subscription, ChangeScheduleRequest changeScheduleRequest) {
         validateStatus(subscription);
-        validateSamePack(subscription, changePackRequest.getPack());
-        validatePossiblePack(subscription, changePackRequest);
-    }
-
-    private static void validatePossiblePack(Subscription subscription, ChangePackRequest changePackRequest) {
-        if(!subscription.isNewEarly()) {
-            if(subscription.getCurrentWeekOfSubscription() > changePackRequest.getPack().getStartWeek() )
-                throw new ValidationException("Subscripiton pack requested is not applicable for subscription " + subscription.getSubscriptionId());
-        }
+        validateSamePack(subscription, changeScheduleRequest.getPack());
     }
 
     private static void validateSamePack(Subscription existingSubscription, SubscriptionPack requestedPack) {

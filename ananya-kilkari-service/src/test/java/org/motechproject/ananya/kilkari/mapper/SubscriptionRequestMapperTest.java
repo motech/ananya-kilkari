@@ -2,11 +2,12 @@ package org.motechproject.ananya.kilkari.mapper;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.builder.ChangePackWebRequestBuilder;
+import org.motechproject.ananya.kilkari.builder.ChangeScheduleWebRequestBuilder;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
-import org.motechproject.ananya.kilkari.request.ChangePackWebRequest;
+import org.motechproject.ananya.kilkari.request.ChangeScheduleWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeType;
 import org.motechproject.ananya.kilkari.subscription.service.request.*;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
@@ -88,18 +89,23 @@ public class SubscriptionRequestMapperTest {
     }
 
     @Test
-    public void shouldMapToChangePackRequest() {
-        ChangePackWebRequest webRequest = new ChangePackWebRequestBuilder().withDefaults().withEDD("25-11-2013").build();
+    public void shouldMapToChangeScheduleRequest() {
+        ChangeScheduleWebRequest webRequest = new ChangeScheduleWebRequestBuilder().withDefaults()
+                .withChangeType("change schedule")
+                .withEDD("25-11-2013")
+                .build();
 
         String subscriptionId = "subscriptionId";
-        ChangePackRequest changePackRequest = SubscriptionRequestMapper.mapToChangePackRequest(webRequest, subscriptionId);
+        ChangeScheduleRequest changeScheduleRequest = SubscriptionRequestMapper.mapToChangeScheduleRequest(webRequest, subscriptionId);
 
-        assertEquals(webRequest.getMsisdn(), changePackRequest.getMsisdn());
-        assertEquals(subscriptionId, changePackRequest.getSubscriptionId());
-        assertEquals(webRequest.getPack(), changePackRequest.getPack().name());
-        assertEquals(webRequest.getChannel(), changePackRequest.getChannel().name());
-        assertEquals(new DateTime(2013, 11, 25, 0, 0, 0), changePackRequest.getExpectedDateOfDelivery());
-        assertNull(changePackRequest.getDateOfBirth());
-        assertEquals(webRequest.getCreatedAt(), changePackRequest.getCreatedAt());
+        assertEquals(webRequest.getMsisdn(), changeScheduleRequest.getMsisdn());
+        assertEquals(subscriptionId, changeScheduleRequest.getSubscriptionId());
+        assertEquals(webRequest.getPack(), changeScheduleRequest.getPack().name());
+        assertEquals(webRequest.getChannel(), changeScheduleRequest.getChannel().name());
+        assertEquals(new DateTime(2013, 11, 25, 0, 0, 0), changeScheduleRequest.getExpectedDateOfDelivery());
+        assertNull(changeScheduleRequest.getDateOfBirth());
+        assertEquals(webRequest.getCreatedAt(), changeScheduleRequest.getCreatedAt());
+        assertEquals(ChangeType.CHANGE_SCHEDULE, changeScheduleRequest.getChangeType());
+        assertEquals("reason for change pack", changeScheduleRequest.getReason());
     }
 }

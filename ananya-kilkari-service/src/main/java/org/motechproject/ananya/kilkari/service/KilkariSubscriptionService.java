@@ -14,6 +14,7 @@ import org.motechproject.ananya.kilkari.subscription.service.ChangePackService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangeScheduleRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
@@ -117,10 +118,13 @@ public class KilkariSubscriptionService {
         subscriptionService.updateSubscriberDetails(subscriberRequest);
     }
 
-    public void changePack(ChangePackWebRequest changePackWebRequest, String subscriptionId) {
-        Errors errors = changePackWebRequest.validate();
+    public void changeSchedule(ChangeScheduleWebRequest changeScheduleWebRequest, String subscriptionId) {
+        Errors errors = changeScheduleWebRequest.validate();
         raiseExceptionIfThereAreErrors(errors);
-        changePackService.process(SubscriptionRequestMapper.mapToChangePackRequest(changePackWebRequest, subscriptionId));
+        ChangeScheduleRequest changeScheduleRequest = SubscriptionRequestMapper.mapToChangeScheduleRequest(changeScheduleWebRequest, subscriptionId);
+        if(ChangeType.CHANGE_PACK == changeScheduleRequest.getChangeType()) {
+            changePackService.process(changeScheduleRequest);
+        }
     }
 
     public void changeMsisdn(ChangeMsisdnWebRequest changeMsisdnWebRequest) {

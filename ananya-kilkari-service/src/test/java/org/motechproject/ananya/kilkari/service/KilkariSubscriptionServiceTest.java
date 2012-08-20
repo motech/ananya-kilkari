@@ -6,7 +6,7 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.builder.ChangePackWebRequestBuilder;
+import org.motechproject.ananya.kilkari.builder.ChangeScheduleWebRequestBuilder;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
@@ -21,7 +21,7 @@ import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionReque
 import org.motechproject.ananya.kilkari.subscription.service.ChangePackService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
-import org.motechproject.ananya.kilkari.subscription.service.request.ChangePackRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangeScheduleRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
@@ -290,19 +290,19 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldProcessValidChangePackRequest() {
-        ChangePackWebRequest changePackWebRequest = new ChangePackWebRequestBuilder().withDefaults().withEDD(DateTime.now().plusMonths(5).toString("dd-MM-yyyy")).build();
+        ChangeScheduleWebRequest changeScheduleWebRequest = new ChangeScheduleWebRequestBuilder().withDefaults().withEDD(DateTime.now().plusMonths(5).toString("dd-MM-yyyy")).build();
         String subscriptionId = "subscriptionId";
-        kilkariSubscriptionService.changePack(changePackWebRequest, subscriptionId);
+        kilkariSubscriptionService.changeSchedule(changeScheduleWebRequest, subscriptionId);
 
-        ArgumentCaptor<ChangePackRequest> changePackRequestArgumentCaptor = ArgumentCaptor.forClass(ChangePackRequest.class);
+        ArgumentCaptor<ChangeScheduleRequest> changePackRequestArgumentCaptor = ArgumentCaptor.forClass(ChangeScheduleRequest.class);
         verify(changePackService).process(changePackRequestArgumentCaptor.capture());
-        ChangePackRequest changePackRequest = changePackRequestArgumentCaptor.getValue();
+        ChangeScheduleRequest changeScheduleRequest = changePackRequestArgumentCaptor.getValue();
 
-        assertEquals(changePackWebRequest.getMsisdn(), changePackRequest.getMsisdn());
-        assertEquals(subscriptionId, changePackRequest.getSubscriptionId());
-        assertEquals(changePackWebRequest.getPack(), changePackRequest.getPack().name());
-        assertEquals(changePackWebRequest.getChannel(), changePackRequest.getChannel().name());
-        assertEquals(changePackWebRequest.getCreatedAt(), changePackRequest.getCreatedAt());
+        assertEquals(changeScheduleWebRequest.getMsisdn(), changeScheduleRequest.getMsisdn());
+        assertEquals(subscriptionId, changeScheduleRequest.getSubscriptionId());
+        assertEquals(changeScheduleWebRequest.getPack(), changeScheduleRequest.getPack().name());
+        assertEquals(changeScheduleWebRequest.getChannel(), changeScheduleRequest.getChannel().name());
+        assertEquals(changeScheduleWebRequest.getCreatedAt(), changeScheduleRequest.getCreatedAt());
     }
 
     @Test
@@ -351,11 +351,25 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldThrowExceptionIfValidChangePackRequestIsInvalid() {
-        ChangePackWebRequest changePackWebRequest = new ChangePackWebRequest();
+        ChangeScheduleWebRequest changeScheduleWebRequest = new ChangeScheduleWebRequestBuilder().withDefaults()
+                .withChangeType("wrong change type")
+                .withMsisdn("123")
+                .build();
         expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Invalid msisdn 123,Invalid change type wrong change type");
 
-        kilkariSubscriptionService.changePack(changePackWebRequest, "subscriptionId");
+        kilkariSubscriptionService.changeSchedule(changeScheduleWebRequest, "subscriptionId");
 
-        verify(changePackService, never()).process(any(ChangePackRequest.class));
+        verify(changePackService, never()).process(any(ChangeScheduleRequest.class));
+    }
+
+    @Test
+    public void shouldProcessChangePackOnlyIfTypeOfChangeScheduleIsChangePack() {
+        ChangeScheduleWebRequest changeScheduleWebRequest = new ChangeScheduleWebRequestBuilder().withDefaults()
+                .withChangeType("change schedule")
+                .build();
+        kilkariSubscriptionService.changeSchedule(changeScheduleWebRequest, "subscriptionId");
+
+        verify(changePackService, never()).process(any(ChangeScheduleRequest.class));
     }
 }

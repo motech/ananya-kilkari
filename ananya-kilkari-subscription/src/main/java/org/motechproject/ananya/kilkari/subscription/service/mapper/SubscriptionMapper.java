@@ -22,20 +22,8 @@ public class SubscriptionMapper {
         SubscriberLocation subscriberLocation = new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
         Subscriber subscriber = subscriptionRequest.getSubscriber();
 
-        SubscriptionReportRequest subscriptionReportRequest = new SubscriptionReportRequest();
-        subscriptionReportRequest.setAgeOfBeneficiary(subscriber.getBeneficiaryAge());
-        subscriptionReportRequest.setChannel(channel.name());
-        subscriptionReportRequest.setName(subscriber.getBeneficiaryName());
-        subscriptionReportRequest.setSubscriptionId(subscription.getSubscriptionId());
-        subscriptionReportRequest.setSubscriptionStatus(subscription.getStatus().name());
-        subscriptionReportRequest.setCreatedAt(subscription.getCreationDate());
-        subscriptionReportRequest.setStartDate(subscription.getStartDate());
-        subscriptionReportRequest.setDateOfBirth(subscriber.getDateOfBirth());
-        subscriptionReportRequest.setEstimatedDateOfDelivery(subscriber.getExpectedDateOfDelivery());
-        subscriptionReportRequest.setLocation(subscriberLocation);
-        subscriptionReportRequest.setMsisdn(NumberUtils.createLong(subscription.getMsisdn()));
-        subscriptionReportRequest.setPack(subscription.getPack().name());
-        subscriptionReportRequest.setOldSubscriptionId(subscriptionRequest.getOldSubscriptionId());
+        Long msisdn = NumberUtils.createLong(subscription.getMsisdn());
+        SubscriptionReportRequest subscriptionReportRequest = new SubscriptionReportRequest(subscription.getSubscriptionId(), channel.name(), msisdn, subscription.getPack().name(), subscriber.getBeneficiaryName(), subscriber.getBeneficiaryAge(), subscription.getCreationDate(), subscription.getStatus().name(), subscriber.getExpectedDateOfDelivery(), subscriber.getDateOfBirth(), subscriberLocation, null, subscription.getStartDate(), subscriptionRequest.getOldSubscriptionId(), null);
 
         return subscriptionReportRequest;
     }

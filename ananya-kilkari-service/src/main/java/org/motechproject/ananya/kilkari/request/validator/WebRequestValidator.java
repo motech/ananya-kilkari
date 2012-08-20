@@ -3,10 +3,11 @@ package org.motechproject.ananya.kilkari.request.validator;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.motechproject.ananya.kilkari.domain.PhoneNumber;
 import org.motechproject.ananya.kilkari.subscription.domain.CampaignChangeReason;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeType;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.domain.PhoneNumber;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 
@@ -121,5 +122,11 @@ public class WebRequestValidator {
         if (allPackPresent) return;
 
         for (String pack : packs) validatePack(pack);
+    }
+
+    public void validateChangeType(String changeType) {
+        if(!ChangeType.isValid(changeType)) {
+            errors.add("Invalid change type %s", changeType);
+        }
     }
 }

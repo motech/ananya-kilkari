@@ -5,7 +5,6 @@ import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -53,5 +52,21 @@ public class DateUtilsTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage(String.format("Invalid format: \"%s\"","1234-343"));
         assertNull(DateUtils.parseDate("1234-343"));
+    }
+
+    @Test
+    public void shouldFormatDateToString() {
+        DateTime dateTime =  new DateTime(2012, 12, 13, 0, 0, 0);
+        String formattedDate = DateUtils.formatDate(dateTime);
+
+        assertEquals("13-12-2012", formattedDate);
+    }
+
+    @Test
+    public void shouldFormatDateTimeToString() {
+        DateTime dateTime =  new DateTime(2012, 12, 13, 23, 3, 56);
+        String formattedDate = DateUtils.formatDateTime(dateTime);
+
+        assertEquals("13-12-2012 23-03-56", formattedDate);
     }
 }

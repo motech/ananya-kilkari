@@ -64,8 +64,8 @@ public class RetryMessageComparatorTest {
 
     @Test
     public void shouldThrowExceptionIfMessageIdIsNotInCorrectFormat() {
-        final CampaignMessage campaignMessageWithInvalidMessageID = new CampaignMessage("subscripitonId1", "WEEK", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
-        final CampaignMessage campaignMessage = new CampaignMessage("subscripitonId2", "WEEK12", "1234567891", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageWithInvalidMessageID = new CampaignMessage("subscriptionId1", "WEEK", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessage = new CampaignMessage("subscriptionId2", "WEEK12", "1234567891", "IDEA", DateTime.now().minusWeeks(1));
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Wrong format for messageId: WEEK");

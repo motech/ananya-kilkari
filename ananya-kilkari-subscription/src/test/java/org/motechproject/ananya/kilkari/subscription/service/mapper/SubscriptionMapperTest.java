@@ -31,7 +31,7 @@ public class SubscriptionMapperTest {
 
     @Test
     public void shouldCreateOMSubscriptionRequest() {
-        OMSubscriptionRequest omSubscriptionRequest = new SubscriptionMapper().createOMSubscriptionRequest(subscription, channel);
+        OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, channel);
 
         assertEquals(subscription.getMsisdn(), omSubscriptionRequest.getMsisdn());
         assertEquals(subscription.getPack(), omSubscriptionRequest.getPack());
@@ -41,7 +41,7 @@ public class SubscriptionMapperTest {
 
     @Test
     public void shouldCreateReportingRequest() {
-        SubscriptionReportRequest request = new SubscriptionMapper().createSubscriptionCreationReportRequest(
+        SubscriptionReportRequest request = SubscriptionMapper.createSubscriptionCreationReportRequest(
                 subscription, channel, new SubscriptionRequest("msisdn", null, null, Location.NULL, Subscriber.NULL));
 
         assertEquals(subscription.getMsisdn(), request.getMsisdn().toString());

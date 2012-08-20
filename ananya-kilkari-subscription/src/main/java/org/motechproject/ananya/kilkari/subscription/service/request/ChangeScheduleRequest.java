@@ -2,10 +2,12 @@ package org.motechproject.ananya.kilkari.subscription.service.request;
 
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeType;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
-public class ChangePackRequest {
+public class ChangeScheduleRequest {
+    private ChangeType changeType;
     private String msisdn;
     private String subscriptionId;
     private SubscriptionPack pack;
@@ -13,9 +15,11 @@ public class ChangePackRequest {
     private DateTime createdAt;
     private DateTime expectedDateOfDelivery;
     private DateTime dateOfBirth;
+    private String reason;
 
-    public ChangePackRequest(String msisdn, String subscriptionId, SubscriptionPack pack, Channel channel, DateTime createdAt,
-                             DateTime expectedDateOfDelivery, DateTime dateOfBirth) {
+    public ChangeScheduleRequest(ChangeType changeType, String msisdn, String subscriptionId, SubscriptionPack pack, Channel channel, DateTime createdAt,
+                                 DateTime expectedDateOfDelivery, DateTime dateOfBirth, String reason) {
+        this.changeType = changeType;
         this.msisdn = msisdn;
         this.subscriptionId = subscriptionId;
         this.pack = pack;
@@ -23,6 +27,7 @@ public class ChangePackRequest {
         this.createdAt = createdAt;
         this.expectedDateOfDelivery = expectedDateOfDelivery;
         this.dateOfBirth = dateOfBirth;
+        this.reason = reason;
     }
 
     public String getMsisdn() {
@@ -49,6 +54,10 @@ public class ChangePackRequest {
         return expectedDateOfDelivery;
     }
 
+    public String getReason() {
+        return reason;
+    }
+
     public DateTime getDateOfBirth() {
         return dateOfBirth;
     }
@@ -59,5 +68,9 @@ public class ChangePackRequest {
 
     public void setDateOfBirth(DateTime dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public ChangeType getChangeType() {
+        return changeType;
     }
 }

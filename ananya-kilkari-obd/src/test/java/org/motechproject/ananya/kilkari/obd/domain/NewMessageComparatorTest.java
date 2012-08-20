@@ -54,9 +54,9 @@ public class NewMessageComparatorTest {
 
     @Test
     public void shouldReturnAnObjectWithLowerCampaignMessageWeek() {
-        final CampaignMessage campaignMessageForWeek1 = new CampaignMessage("subscripitonId", "WEEK1", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
-        final CampaignMessage campaignMessageForWeek2 = new CampaignMessage("subscripitonId", "WEEK2", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
-        final CampaignMessage campaignMessageForWeek3 = new CampaignMessage("subscripitonId", "WEEK3", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageForWeek1 = new CampaignMessage("subscriptionId", "WEEK1", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageForWeek2 = new CampaignMessage("subscriptionId", "WEEK2", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageForWeek3 = new CampaignMessage("subscriptionId", "WEEK3", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
 
         List<CampaignMessage> campaignMessages = new ArrayList<CampaignMessage>() {{
             add(campaignMessageForWeek3);
@@ -73,8 +73,8 @@ public class NewMessageComparatorTest {
 
     @Test
     public void shouldThrowExceptionIfMessageIdIsNotInCorrectFormat() {
-        final CampaignMessage campaignMessageWithInvalidMessageID = new CampaignMessage("subscripitonId1", "WEEK", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
-        final CampaignMessage campaignMessage = new CampaignMessage("subscripitonId2", "WEEK12", "1234567891", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageWithInvalidMessageID = new CampaignMessage("subscriptionId1", "WEEK", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessage = new CampaignMessage("subscriptionId2", "WEEK12", "1234567891", "IDEA", DateTime.now().minusWeeks(1));
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Wrong format for messageId: WEEK");
@@ -89,29 +89,29 @@ public class NewMessageComparatorTest {
 
     @Test
     public void shouldReturnAnObjectWithDNCBeforeNew_AndHigherRetryCount_AndLowerCampaignMessageWeek() {
-        final CampaignMessage campaignMessageWithPriority6 = new CampaignMessage("subscripitonId6", "WEEK17", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageWithPriority6 = new CampaignMessage("subscriptionId6", "WEEK17", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
         campaignMessageWithPriority6.setStatusCode(CampaignMessageStatus.NEW);
 
-        final CampaignMessage campaignMessageWithPriority7 = new CampaignMessage("subscripitonId7", "WEEK33", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageWithPriority7 = new CampaignMessage("subscriptionId7", "WEEK33", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
         campaignMessageWithPriority7.setStatusCode(CampaignMessageStatus.NEW);
 
-        final CampaignMessage campaignMessageWithPriority5 = new CampaignMessage("subscripitonId1", "WEEK12", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageWithPriority5 = new CampaignMessage("subscriptionId1", "WEEK12", "1234567890", "IDEA", DateTime.now().minusWeeks(1));
         campaignMessageWithPriority5.setStatusCode(CampaignMessageStatus.NEW);
 
-        final CampaignMessage campaignMessageWithPriority4 = new CampaignMessage("subscripitonId2", "WEEK1", "1234567891", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageWithPriority4 = new CampaignMessage("subscriptionId2", "WEEK1", "1234567891", "IDEA", DateTime.now().minusWeeks(1));
         campaignMessageWithPriority4.setStatusCode(CampaignMessageStatus.NEW);
 
-        final CampaignMessage campaignMessageWithPriority2 = new CampaignMessage("subscripitonId3", "WEEK7", "1234567893", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageWithPriority2 = new CampaignMessage("subscriptionId3", "WEEK7", "1234567893", "IDEA", DateTime.now().minusWeeks(1));
         campaignMessageWithPriority2.setStatusCode(CampaignMessageStatus.DNC);
         campaignMessageWithPriority2.markSent();
         campaignMessageWithPriority2.markSent();
 
-        final CampaignMessage campaignMessageWithPriority3 = new CampaignMessage("subscripitonId4", "WEEK12", "1234567894", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageWithPriority3 = new CampaignMessage("subscriptionId4", "WEEK12", "1234567894", "IDEA", DateTime.now().minusWeeks(1));
         campaignMessageWithPriority3.setStatusCode(CampaignMessageStatus.DNC);
         campaignMessageWithPriority3.markSent();
         campaignMessageWithPriority3.markSent();
 
-        final CampaignMessage campaignMessageWithPriority1 = new CampaignMessage("subscripitonId5", "WEEK6", "1234567895", "IDEA", DateTime.now().minusWeeks(1));
+        final CampaignMessage campaignMessageWithPriority1 = new CampaignMessage("subscriptionId5", "WEEK6", "1234567895", "IDEA", DateTime.now().minusWeeks(1));
         campaignMessageWithPriority1.setStatusCode(CampaignMessageStatus.DNC);
         campaignMessageWithPriority1.markSent();
         campaignMessageWithPriority1.markSent();

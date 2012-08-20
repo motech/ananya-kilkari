@@ -6,7 +6,9 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
-public class ChangePackWebRequest {
+public class ChangeScheduleWebRequest {
+    @JsonProperty
+    private String changeType;
     @JsonProperty
     private String msisdn;
     @JsonProperty
@@ -19,8 +21,10 @@ public class ChangePackWebRequest {
     private String expectedDateOfDelivery;
     @JsonProperty
     private String dateOfBirth;
+    @JsonProperty
+    private String reason;
 
-    public ChangePackWebRequest() {
+    public ChangeScheduleWebRequest() {
         this.createdAt = DateTime.now();
     }
 
@@ -48,6 +52,14 @@ public class ChangePackWebRequest {
         return dateOfBirth;
     }
 
+    public String getChangeType() {
+        return changeType;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
     public void setMsisdn(String msisdn) {
         this.msisdn = msisdn;
     }
@@ -68,6 +80,14 @@ public class ChangePackWebRequest {
         this.dateOfBirth = dateOfBirth;
     }
 
+    public void setChangeType(String changeType) {
+        this.changeType = changeType;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
     public Errors validate() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
         webRequestValidator.validateMsisdn(msisdn);
@@ -75,6 +95,9 @@ public class ChangePackWebRequest {
         webRequestValidator.validateChannel(channel);
         webRequestValidator.validateDOB(dateOfBirth, createdAt);
         webRequestValidator.validateEDD(expectedDateOfDelivery, createdAt);
+        webRequestValidator.validateOnlyOneOfEDDOrDOBIsPresent(expectedDateOfDelivery, dateOfBirth);
+        webRequestValidator.validateChangeType(changeType);
         return webRequestValidator.getErrors();
     }
+
 }

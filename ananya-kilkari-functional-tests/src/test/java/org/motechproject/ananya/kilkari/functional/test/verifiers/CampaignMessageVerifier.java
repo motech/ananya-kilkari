@@ -2,14 +2,12 @@ package org.motechproject.ananya.kilkari.functional.test.verifiers;
 
 import org.junit.Assert;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
+import org.motechproject.ananya.kilkari.functional.test.utils.EventHandler;
 import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunner;
 import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunnerResponse;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
-import org.motechproject.scheduler.domain.MotechEvent;
-import org.motechproject.server.event.annotations.MotechListener;
-import org.motechproject.server.messagecampaign.EventKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +20,8 @@ public class CampaignMessageVerifier {
     @Autowired
     private AllCampaignMessages allCampaignMessages;
 
-    private boolean campaignAlertRaised = false;
+    @Autowired
+    private EventHandler eventHandler;
 
     public void verifyCampaignMessageExists(final SubscriptionData subscriptionData, final String weekMessageId) {
         CampaignMessage campaignMessage = findCampaignMessageWithRetry(subscriptionData, weekMessageId);
@@ -46,10 +45,10 @@ public class CampaignMessageVerifier {
         return new TimedRunner<Boolean>(50, 2000) {
             @Override
             protected TimedRunnerResponse<Boolean> run() {
-                if (!CampaignMessageVerifier.this.campaignAlertRaised) {
+                if (!eventHandler.hasCampaignAlertBeenRaised()) {
                     return null;
                 }
-                return new TimedRunnerResponse<>(CampaignMessageVerifier.this.campaignAlertRaised);
+                return TimedRunnerResponse.EMPTY;
             }
         }.executeWithTimeout();
     }
@@ -62,12 +61,6 @@ public class CampaignMessageVerifier {
             e.printStackTrace();
         }
     }
-
-    @MotechListener(subjects = {EventKeys.SEND_MESSAGE})
-    public void handleCampaignAlert(MotechEvent motechEvent) {
-        campaignAlertRaised = true;
-    }
-
 
     public void verifyCampaignMessageFailedDueToDNP(SubscriptionData subscriptionData, String campaignId) {
         CampaignMessage campaignMessage = findCampaignMessageWithStatus(subscriptionData, campaignId, CampaignMessageStatus.DNP);
@@ -110,6 +103,6 @@ public class CampaignMessageVerifier {
     }
 
     public void reset() {
-        campaignAlertRaised = false;
+        eventHandler.reset();
     }
 }

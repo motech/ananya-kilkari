@@ -19,10 +19,6 @@ public class SubscriptionWebRequest implements Serializable {
     private String msisdn;
     @JsonProperty
     private String pack;
-    @JsonIgnore
-    private String channel;
-    @JsonIgnore
-    private DateTime createdAt;
     @JsonProperty
     private String beneficiaryName;
     @JsonProperty
@@ -35,6 +31,11 @@ public class SubscriptionWebRequest implements Serializable {
     private String week;
     @JsonProperty
     private LocationRequest location;
+
+    @JsonIgnore
+    private String channel;
+    @JsonIgnore
+    private DateTime createdAt;
 
     public SubscriptionWebRequest() {
         this.location = new LocationRequest();

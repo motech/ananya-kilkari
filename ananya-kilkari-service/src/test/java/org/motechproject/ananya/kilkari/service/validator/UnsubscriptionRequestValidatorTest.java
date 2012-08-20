@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.service.validator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.service.validator.UnsubscriptionRequestValidator;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -31,13 +31,13 @@ public class UnsubscriptionRequestValidatorTest {
 
     @Test
     public void shouldReturnValidIfUnsubscriptionRequestDetailsAreCorrect() {
-        String subscriptionId = "abcd1234";
-        Subscription subscription = new Subscription();
+
+        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
         subscription.setStatus(SubscriptionStatus.ACTIVE);
 
-        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(subscriptionService.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
 
-        assertTrue(unsubscriptionRequestValidator.validate(subscriptionId).hasNoErrors());
+        assertTrue(unsubscriptionRequestValidator.validate(subscription.getSubscriptionId()).hasNoErrors());
     }
 
     @Test

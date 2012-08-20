@@ -10,6 +10,7 @@ import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
@@ -52,8 +53,7 @@ public class CallbackRequestValidatorTest {
         new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now());
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now());
         when(subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper)).thenReturn(new DummySubscriptionStateHandler());
-        Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
         when(subscriptionService.findBySubscriptionId(callbackRequestWrapper.getSubscriptionId())).thenReturn(subscription);
 
         Errors errors = callbackRequestValidator.validate(callbackRequestWrapper);
@@ -68,8 +68,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setAction(CallbackAction.ACT.name());
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
         when(subscriptionStateHandlerFactory.getHandler(any(CallbackRequestWrapper.class))).thenReturn(new DummySubscriptionStateHandler());
-        Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
         when(subscriptionService.findBySubscriptionId(anyString())).thenReturn(subscription);
 
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
@@ -85,8 +84,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setAction(CallbackAction.ACT.name());
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
         when(subscriptionStateHandlerFactory.getHandler(any(CallbackRequestWrapper.class))).thenReturn(new DummySubscriptionStateHandler());
-        Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
         when(subscriptionService.findBySubscriptionId(anyString())).thenReturn(subscription);
 
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
@@ -102,8 +100,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setAction("invalid");
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
         when(subscriptionStateHandlerFactory.getHandler(any(CallbackRequestWrapper.class))).thenReturn(new DummySubscriptionStateHandler());
-        Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
         when(subscriptionService.findBySubscriptionId(anyString())).thenReturn(subscription);
 
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
@@ -121,8 +118,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setMsisdn("1234567890");
         callbackRequest.setOperator(Operator.AIRTEL.name());
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
-        final Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).build();
         when(subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper)).thenReturn(new DummySubscriptionStateHandler());
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -140,8 +136,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setAction(CallbackAction.ACT.name());
         callbackRequest.setStatus("invalid");
         when(subscriptionStateHandlerFactory.getHandler(any(CallbackRequestWrapper.class))).thenReturn(new DummySubscriptionStateHandler());
-        Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
         when(subscriptionService.findBySubscriptionId(anyString())).thenReturn(subscription);
 
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
@@ -158,8 +153,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
         callbackRequest.setOperator("invalid_operator");
         when(subscriptionStateHandlerFactory.getHandler(any(CallbackRequestWrapper.class))).thenReturn(new DummySubscriptionStateHandler());
-        Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
         when(subscriptionService.findBySubscriptionId(anyString())).thenReturn(subscription);
 
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
@@ -176,8 +170,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
         callbackRequest.setOperator(null);
         when(subscriptionStateHandlerFactory.getHandler(any(CallbackRequestWrapper.class))).thenReturn(new DummySubscriptionStateHandler());
-        Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
         when(subscriptionService.findBySubscriptionId(anyString())).thenReturn(subscription);
 
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now()));
@@ -208,8 +201,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setStatus(CallbackStatus.BAL_LOW.name());
         callbackRequest.setMsisdn("1234567890");
         callbackRequest.setOperator(Operator.AIRTEL.name());
-        final Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.NEW);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.NEW).build();
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
         when(subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper)).thenReturn(new DummySubscriptionStateHandler());
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -230,8 +222,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setMsisdn("1234567890");
         callbackRequest.setOperator(Operator.AIRTEL.name());
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
-        final Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).build();
         when(subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper)).thenReturn(new DummySubscriptionStateHandler());
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -251,8 +242,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setMsisdn("1234567890");
         callbackRequest.setOperator(Operator.AIRTEL.name());
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
-        final Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).build();
         when(subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper)).thenReturn(new DummySubscriptionStateHandler());
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -270,8 +260,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setMsisdn("1234567890");
         callbackRequest.setOperator(Operator.AIRTEL.name());
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
-        final Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.SUSPENDED);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.SUSPENDED).build();
         when(subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper)).thenReturn(new DummySubscriptionStateHandler());
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -289,8 +278,7 @@ public class CallbackRequestValidatorTest {
         callbackRequest.setMsisdn("1234567890");
         callbackRequest.setOperator(Operator.AIRTEL.name());
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
-        final Subscription subscription = new Subscription();
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).build();
         when(subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper)).thenReturn(null);
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 

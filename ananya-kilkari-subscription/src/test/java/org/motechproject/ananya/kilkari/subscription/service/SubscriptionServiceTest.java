@@ -328,15 +328,13 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldActivateRenewedSubscriptionWhichHadBeenSuspended() {
-        final String subscriptionId = "sub123";
+
         DateTime renewalDate = DateTime.now();
         int graceCount = 2;
 
-        Subscription subscription = new Subscription() {
-            public String getSubscriptionId() {
-                return subscriptionId;
-            }
-        };
+        Subscription subscription = new Subscription("123", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        final String subscriptionId = subscription.getSubscriptionId();
+
         subscription.setStatus(SubscriptionStatus.SUSPENDED);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -356,15 +354,13 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldSuspendRenewedSubscriptionWhichWasActive() {
-        final String subscriptionId = "subId";
+
         final DateTime renewalDate = DateTime.now();
         final String reason = "Balance Low";
         final int graceCount = 0;
-        Subscription subscription = new Subscription() {
-            public String getSubscriptionId() {
-                return subscriptionId;
-            }
-        };
+        Subscription subscription = new Subscription("1234", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+
+        final String subscriptionId = subscription.getSubscriptionId();
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 

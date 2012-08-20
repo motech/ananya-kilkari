@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -59,7 +60,7 @@ public class SubscriptionValidatorTest {
         LocationResponse existingLocation = new LocationResponse(location.getDistrict(), location.getBlock(), location.getPanchayat());
         when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(existingLocation);
 
-        Subscription existingActiveSubscription = new Subscription();
+        Subscription existingActiveSubscription = new SubscriptionBuilder().withDefaults().build();
         when(allSubscriptions.findSubscriptionInProgress(subscription.getMsisdn(), subscription.getPack())).thenReturn(existingActiveSubscription);
 
         expectedException.expect(ValidationException.class);
@@ -123,7 +124,7 @@ public class SubscriptionValidatorTest {
         Location location = new Location("district", "block", "panchayat");
         when(reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())).thenReturn(null);
         String subscriptionId = "subscriptionId";
-        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(new SubscriptionBuilder().withDefaults().build());
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Location does not exist for District[district] Block[block] and Panchayat[panchayat]");

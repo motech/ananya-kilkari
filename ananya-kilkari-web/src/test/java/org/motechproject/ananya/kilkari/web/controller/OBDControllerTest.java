@@ -11,6 +11,7 @@ import org.motechproject.ananya.kilkari.obd.request.InvalidOBDRequestEntry;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
@@ -53,7 +54,7 @@ public class OBDControllerTest {
         CallDurationWebRequest callDetailRecord = new CallDurationWebRequest("21-11-2012 22-10-15", "23-11-2012 22-10-15");
         OBDSuccessfulCallDetailsWebRequest successfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest("1234567890", "WEEK12", callDetailRecord, "HELP");
         byte[] requestBody = TestUtils.toJson(successfulCallDetailsRequest).getBytes();
-        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
+        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new SubscriptionBuilder().withDefaults().build());
 
         mockMvc(obdController)
                 .perform(post("/obd/calldetails/" + subscriptionId).body(requestBody).contentType(MediaType.APPLICATION_JSON))
@@ -101,7 +102,7 @@ public class OBDControllerTest {
         OBDSuccessfulCallDetailsWebRequest successfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest("1234567890", "WEEK13", callDetailRecord, "HELP");
         successfulCallDetailsRequest.setSubscriptionId(subscriptionId);
         byte[] requestBody = TestUtils.toJson(successfulCallDetailsRequest).getBytes();
-        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription());
+        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(new SubscriptionBuilder().withDefaults().build());
 
         mockMvc(obdController)
                 .perform(post("/obd/calldetails/" + subscriptionId).body(requestBody).contentType(MediaType.APPLICATION_JSON))

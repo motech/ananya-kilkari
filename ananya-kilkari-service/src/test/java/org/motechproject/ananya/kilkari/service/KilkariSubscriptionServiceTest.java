@@ -12,6 +12,7 @@ import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.validator.UnsubscriptionRequestValidator;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -150,8 +151,8 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldReturnSubscriptionGivenASubscriptionId() {
-        Subscription exptectedSubscription = new Subscription();
-        String susbscriptionid = "susbscriptionid";
+        Subscription exptectedSubscription = new SubscriptionBuilder().withDefaults().build();
+        String susbscriptionid = exptectedSubscription.getSubscriptionId();
         when(subscriptionService.findBySubscriptionId(susbscriptionid)).thenReturn(exptectedSubscription);
 
         Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(susbscriptionid);

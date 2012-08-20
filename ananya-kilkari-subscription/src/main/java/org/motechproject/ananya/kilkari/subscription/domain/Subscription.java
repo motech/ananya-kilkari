@@ -36,7 +36,8 @@ public class Subscription extends MotechBaseDataObject {
     @JsonProperty
     private DateTime startDate;
 
-    public Subscription() {
+    Subscription() {
+        //for serialization do not make it public
     }
 
     public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, DateTime startDate) {
@@ -59,6 +60,7 @@ public class Subscription extends MotechBaseDataObject {
     public DateTime getCreationDate() {
         return creationDate;
     }
+
 
     public SubscriptionStatus getStatus() {
         return status;
@@ -126,22 +128,17 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public boolean isInProgress() {
-        return status.isInProgress();
-    }
-
-    @JsonIgnore
-    public boolean isActive() {
-        return status.isActive();
+        return getStatus().isInProgress();
     }
 
     @JsonIgnore
     public boolean isNewEarly() {
-        return status.isNewEarly();
+        return getStatus().isNewEarly();
     }
 
     @JsonIgnore
     public boolean isActiveOrSuspended() {
-        return status.isActive() || status.isSuspended();
+        return getStatus().isActive() || getStatus().isSuspended();
     }
 
     public void activateOnRenewal() {
@@ -184,7 +181,7 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public boolean isSubscriptionCompletionRequestSent() {
-        return SubscriptionStatus.PENDING_COMPLETION.equals(status);
+        return SubscriptionStatus.PENDING_COMPLETION.equals(getStatus());
     }
 
     public void complete() {
@@ -197,7 +194,7 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public boolean isInDeactivatedState() {
-        return status.isInDeactivatedState();
+        return getStatus().isInDeactivatedState();
     }
 
     @JsonIgnore
@@ -212,7 +209,6 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public int getCurrentWeekOfSubscription() {
-//        if (!status.isActive()) return -1;
         return pack.getStartWeek() + getWeeksElapsedAfterStartDate();
     }
 
@@ -223,7 +219,9 @@ public class Subscription extends MotechBaseDataObject {
     @JsonIgnore
     public int getNextWeekNumber() {
         DateTime now = DateTime.now();
-        if (startDate.isAfter(now)) return 1;
+        if (startDate.isAfter(now)) {
+            return 1;
+        }
 
         return
                 1 +                                             // First week
@@ -232,7 +230,7 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     public boolean hasBeenActivated() {
-        return status.hasBeenActivated();
+        return getStatus().hasBeenActivated();
     }
 
     public void setMsisdn(String msisdn) {
@@ -256,5 +254,4 @@ public class Subscription extends MotechBaseDataObject {
     public boolean isEarlySubscription() {
         return startDate.isAfter(creationDate);
     }
-
 }

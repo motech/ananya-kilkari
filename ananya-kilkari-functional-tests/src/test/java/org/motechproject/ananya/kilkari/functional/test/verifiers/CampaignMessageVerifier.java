@@ -48,8 +48,14 @@ public class CampaignMessageVerifier {
                 if (!eventHandler.hasCampaignAlertBeenRaised()) {
                     return null;
                 }
-                return TimedRunnerResponse.EMPTY;
+                return new TimedRunnerResponse(Boolean.TRUE);
             }
+
+            @Override
+            protected Boolean defaultResponse() {
+                return Boolean.FALSE;
+            }
+
         }.executeWithTimeout();
     }
 

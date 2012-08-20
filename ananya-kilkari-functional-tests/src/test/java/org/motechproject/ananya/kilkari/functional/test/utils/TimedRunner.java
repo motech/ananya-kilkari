@@ -19,19 +19,22 @@ public abstract class TimedRunner<T>  {
     protected abstract TimedRunnerResponse<T> run();
 
     public T executeWithTimeout() {
-        TimedRunnerResponse<T> result = null;
         for (int i = 0; i < tries; i++) {
-            result = run();
-            if (result != null) break;
-
+            TimedRunnerResponse<T> result = run();
+            if (result != null) {
+                return result.getObj();
+            }
             try {
                 Thread.sleep(intervalSleep);
             } catch (InterruptedException e) {
                 throw new RuntimeException("Thread was interrupted.", e);
             }
         }
-        return result == null ? null : result.getObj();
+        return defaultResponse();
     }
 
+    protected T defaultResponse() {
+        return null;
+    }
 }
 

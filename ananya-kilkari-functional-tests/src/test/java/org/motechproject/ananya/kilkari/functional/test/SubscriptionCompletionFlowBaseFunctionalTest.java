@@ -85,6 +85,10 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
 
         and(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
         then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
+
+        then(user).canListenToThisWeeksInboxMessage(subscriptionData, "WEEK60");
+        and(time).isMovedToFuture(futureDateOfPackCompletion.plusWeeks(1));
+        then(user).cannotListenToPreviousWeeksInboxMessage(subscriptionData, "WEEK60");
     }
 
 

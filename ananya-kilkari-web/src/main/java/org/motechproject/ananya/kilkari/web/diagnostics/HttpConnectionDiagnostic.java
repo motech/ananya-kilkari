@@ -22,7 +22,7 @@ public class HttpConnectionDiagnostic {
         this.properties = properties;
     }
 
-    @Diagnostic(name = "HttpConnection")
+    @Diagnostic(name = "HttpConnection to Ananya-Reports")
     public DiagnosticsResult performDiagnosis() {
         HttpURLConnection connection;
         DiagnosticLog diagnosticLog = new DiagnosticLog();

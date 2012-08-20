@@ -43,8 +43,7 @@ public class OnMobileSubscriptionGatewayImpl implements OnMobileSubscriptionGate
         try {
             restTemplate.getForEntity(url, String.class, urlVariables);
         } catch (HttpClientErrorException ex) {
-            LOGGER.error(String.format("OnMobile subscription request failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()));
-            throw ex;
+            throw new RuntimeException(String.format("OnMobile subscription request failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()), ex);
         }
     }
 

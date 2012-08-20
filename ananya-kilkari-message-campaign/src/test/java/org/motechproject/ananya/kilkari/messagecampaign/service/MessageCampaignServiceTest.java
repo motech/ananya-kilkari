@@ -59,7 +59,7 @@ public class MessageCampaignServiceTest {
 
         assertEquals(externalId, campaignRequest.externalId());
         assertEquals(subscriptionPack, campaignRequest.campaignName());
-        assertEquals(subscriptionStartDate.toLocalDate().plusDays(campaignScheduleDeltaDays), campaignRequest.referenceDate());
+        assertEquals(subscriptionStartDate.plusMinutes(campaignScheduleDeltaMinutes).toLocalDate().plusDays(campaignScheduleDeltaDays), campaignRequest.referenceDate());
         assertEquals(new Time(subscriptionStartDate.toLocalTime().plusMinutes(campaignScheduleDeltaMinutes)), campaignRequest.deliverTime());
     }
 

@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.service.handler;
+package org.motechproject.ananya.kilkari.obd.service;
 
 
 import org.junit.Before;
@@ -10,9 +10,6 @@ import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
-import org.motechproject.ananya.kilkari.obd.service.CallDeliveryFailureEventKeys;
-import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
-import org.motechproject.ananya.kilkari.obd.service.OBDCallDetailsService;
 import org.motechproject.scheduler.domain.MotechEvent;
 
 import java.util.ArrayList;

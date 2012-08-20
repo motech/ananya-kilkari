@@ -223,9 +223,9 @@ public class KilkariCampaignServiceTest {
     public void shouldProcessInvalidCallRecords() {
         InvalidOBDRequestEntries invalidOBDRequestEntries = new InvalidOBDRequestEntries();
 
-        kilkariCampaignService.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
+        kilkariCampaignService.processInvalidOBDRequestEntries(invalidOBDRequestEntries);
 
-        verify(callDetailsRequestPublisher).publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
+        verify(obdService).processInvalidOBDRequestEntries(invalidOBDRequestEntries);
     }
 
     @Test

@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.service;
 
 import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.service.handler.OBDEventQueuePublisher;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidOBDRequestEntries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,5 +17,9 @@ public class OBDService {
 
     public void processCallDeliveryFailure(FailedCallReports failedCallReports) {
         obdEventQueuePublisher.publishCallDeliveryFailureRecord(failedCallReports);
+    }
+
+    public void processInvalidOBDRequestEntries(InvalidOBDRequestEntries invalidOBDRequestEntries) {
+        obdEventQueuePublisher.publishInvalidOBDRequestEntries(invalidOBDRequestEntries);
     }
 }

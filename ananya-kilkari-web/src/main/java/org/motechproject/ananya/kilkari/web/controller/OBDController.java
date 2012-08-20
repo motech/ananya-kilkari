@@ -36,7 +36,7 @@ public class OBDController {
     @RequestMapping(value = "/obd/invalidcallrecords", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse handleInvalidCallRecords(@RequestBody InvalidOBDRequestEntries invalidRecordsRequestEntries) {
-        kilkariCampaignService.publishInvalidCallRecordsRequest(invalidRecordsRequestEntries);
+        kilkariCampaignService.processInvalidOBDRequestEntries(invalidRecordsRequestEntries);
         return BaseResponse.success("OBD invalid call records received successfully");
     }
 }

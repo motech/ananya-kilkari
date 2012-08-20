@@ -11,16 +11,16 @@ import java.util.ArrayList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class CallRecordsServiceTest {
+public class InvalidOBDEntriesServiceTest {
     @Mock
     private AllInvalidCallRecords allInvalidCallRecords;
 
-    private CallRecordsService callRecordsService;
+    private InvalidOBDEntriesService invalidOBDEntriesService;
 
     @Before
     public void setUp() {
         initMocks(this);
-        callRecordsService = new CallRecordsService(allInvalidCallRecords);
+        invalidOBDEntriesService = new InvalidOBDEntriesService(allInvalidCallRecords);
     }
 
     @Test
@@ -31,10 +31,9 @@ public class CallRecordsServiceTest {
         invalidCallRecords.add(invalidCallRecord1);
         invalidCallRecords.add(invalidCallRecord2);
 
-        callRecordsService.processInvalidCallRecords(invalidCallRecords);
+        invalidOBDEntriesService.processInvalidCallRecords(invalidCallRecords);
 
         verify(allInvalidCallRecords).add(invalidCallRecord1);
         verify(allInvalidCallRecords).add(invalidCallRecord2);
     }
-
 }

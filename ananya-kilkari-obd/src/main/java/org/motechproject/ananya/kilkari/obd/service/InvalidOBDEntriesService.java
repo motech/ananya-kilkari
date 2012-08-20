@@ -10,13 +10,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CallRecordsService {
+class InvalidOBDEntriesService {
     private AllInvalidCallRecords allInvalidCallRecords;
 
-    private static final Logger logger = LoggerFactory.getLogger(CallRecordsService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InvalidOBDEntriesService.class);
 
     @Autowired
-    public CallRecordsService(AllInvalidCallRecords allInvalidCallRecords) {
+    InvalidOBDEntriesService(AllInvalidCallRecords allInvalidCallRecords) {
         this.allInvalidCallRecords = allInvalidCallRecords;
     }
 
@@ -24,7 +24,7 @@ public class CallRecordsService {
         if (invalidCallRecords.isEmpty()) {
             return;
         }
-        logger.error(String.format("Received obd callback for %s invalid call records.", invalidCallRecords.size()));
+        LOGGER.error(String.format("Received obd callback for %s invalid call records.", invalidCallRecords.size()));
         for (InvalidCallRecord record : invalidCallRecords) {
             allInvalidCallRecords.add(record);
         }

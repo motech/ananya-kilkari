@@ -129,7 +129,7 @@ public class OBDControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD invalid call records received successfully")));
 
         ArgumentCaptor<InvalidOBDRequestEntries> captor = ArgumentCaptor.forClass(InvalidOBDRequestEntries.class);
-        verify(kilkariCampaignService).publishInvalidCallRecordsRequest(captor.capture());
+        verify(kilkariCampaignService).processInvalidOBDRequestEntries(captor.capture());
         InvalidOBDRequestEntries actualRequestEntries = captor.getValue();
         List<InvalidOBDRequestEntry> callrecords = actualRequestEntries.getInvalidOBDRequestEntryList();
         assertEquals(2, callrecords.size());
@@ -159,7 +159,7 @@ public class OBDControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD invalid call records received successfully")));
 
         ArgumentCaptor<InvalidOBDRequestEntries> captor = ArgumentCaptor.forClass(InvalidOBDRequestEntries.class);
-        verify(kilkariCampaignService).publishInvalidCallRecordsRequest(captor.capture());
+        verify(kilkariCampaignService).processInvalidOBDRequestEntries(captor.capture());
         InvalidOBDRequestEntries actualRequestEntries = captor.getValue();
         List<InvalidOBDRequestEntry> callrecords = actualRequestEntries.getInvalidOBDRequestEntryList();
         assertTrue(callrecords.isEmpty());

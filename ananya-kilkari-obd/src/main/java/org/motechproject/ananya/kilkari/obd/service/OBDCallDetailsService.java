@@ -5,7 +5,6 @@ import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
-import org.motechproject.ananya.kilkari.obd.service.handler.OBDEventQueuePublisher;
 import org.motechproject.ananya.kilkari.obd.service.validator.CallDeliveryFailureRecordValidator;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class OBDCallDetailsService {
+class OBDCallDetailsService {
 
     private CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator;
     private ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper;
@@ -26,7 +25,7 @@ public class OBDCallDetailsService {
     }
 
     @Autowired
-    public OBDCallDetailsService(CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator,
+    OBDCallDetailsService(CallDeliveryFailureRecordValidator callDeliveryFailureRecordValidator,
                                  ValidCallDeliveryFailureRecordObjectMapper validCallDeliveryFailureRecordObjectMapper,
                                  OBDEventQueuePublisher obdEventQueuePublisher) {
         this.callDeliveryFailureRecordValidator = callDeliveryFailureRecordValidator;

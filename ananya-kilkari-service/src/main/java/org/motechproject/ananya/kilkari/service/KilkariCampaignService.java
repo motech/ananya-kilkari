@@ -161,16 +161,16 @@ public class KilkariCampaignService {
             throw new ValidationException("Invalid inbox call details request: Subscription not found");
     }
 
-    public void publishInvalidCallRecordsRequest(InvalidOBDRequestEntries invalidOBDRequestEntries) {
-        callDetailsRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
-    }
-
     public void publishInboxCallDetailsRequest(InboxCallDetailsWebRequest inboxCallDetailsWebRequest) {
         callDetailsRequestPublisher.publishInboxCallDetailsRequest(inboxCallDetailsWebRequest);
     }
 
     public void publishSuccessfulCallRequest(OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest) {
         callDetailsRequestPublisher.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
+    }
+
+    public void processInvalidOBDRequestEntries(InvalidOBDRequestEntries invalidOBDRequestEntries) {
+        obdService.processInvalidOBDRequestEntries(invalidOBDRequestEntries);
     }
 
     public void processCallDeliveryFailureRequest(FailedCallReports failedCallReports) {

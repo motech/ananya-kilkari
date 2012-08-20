@@ -12,7 +12,6 @@ import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
-import org.motechproject.ananya.kilkari.obd.service.handler.OBDEventQueuePublisher;
 import org.motechproject.ananya.kilkari.obd.service.validator.CallDeliveryFailureRecordValidator;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 

@@ -37,14 +37,6 @@ public class CallDetailsRequestPublisherTest {
     }
 
     @Test
-    public void shouldPublishInvalidCallRecordsRequest() {
-        InvalidOBDRequestEntries invalidOBDRequestEntries = new InvalidOBDRequestEntries();
-        callDetailsRequestPublisher.publishInvalidCallRecordsRequest(invalidOBDRequestEntries);
-
-        verify(eventContext).send(CallDetailsEventKeys.PROCESS_INVALID_CALL_RECORDS_REQUEST_SUBJECT, invalidOBDRequestEntries);
-    }
-
-    @Test
     public void shouldPublishInboxCallDetailsRequest() {
         InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest("1234567890", "WEEK12", new CallDurationWebRequest(), "choti_kilkari", "subscriptionId");
 

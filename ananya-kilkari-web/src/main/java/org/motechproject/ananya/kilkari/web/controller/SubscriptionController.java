@@ -79,9 +79,9 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public BaseResponse removeSubscription(@RequestBody UnsubscriptionRequest unsubscriptionRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
-        unsubscriptionRequest.setChannel(channel);
-        kilkariSubscriptionService.requestDeactivation(subscriptionId, unsubscriptionRequest);
+    public BaseResponse removeSubscription(@RequestBody UnSubscriptionWebRequest unSubscriptionWebRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
+        unSubscriptionWebRequest.setChannel(channel);
+        kilkariSubscriptionService.requestDeactivation(subscriptionId, unSubscriptionWebRequest);
         return BaseResponse.success("Subscription unsubscribed successfully");
     }
 

@@ -12,7 +12,7 @@ import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
 import org.motechproject.ananya.kilkari.request.ChangeMsisdnWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
-import org.motechproject.ananya.kilkari.request.UnsubscriptionRequest;
+import org.motechproject.ananya.kilkari.request.UnSubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
@@ -242,8 +242,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         OnMobileSubscriptionGateway onMobileSubscriptionGateway = mock(OnMobileSubscriptionGateway.class);
         onMobileSubscriptionService.setBehavior(onMobileSubscriptionGateway);
 
-        UnsubscriptionRequest expectedUnsubscriptionRequest = new UnsubscriptionRequest();
-        expectedUnsubscriptionRequest.setReason("Reason for deactivation");
+        UnSubscriptionWebRequest expectedUnSubscriptionWebRequest = new UnSubscriptionWebRequest();
+        expectedUnSubscriptionWebRequest.setReason("Reason for deactivation");
 
         Subscription expectedSubscription = new Subscription(msisdn, pack, DateTime.now().minusMonths(15), SubscriptionStatus.NEW);
         expectedSubscription.setStatus(SubscriptionStatus.ACTIVE);
@@ -255,7 +255,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         MvcResult result = mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)
                         .param("channel", channelString)
-                        .body(TestUtils.toJson(expectedUnsubscriptionRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                        .body(TestUtils.toJson(expectedUnSubscriptionWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andReturn();

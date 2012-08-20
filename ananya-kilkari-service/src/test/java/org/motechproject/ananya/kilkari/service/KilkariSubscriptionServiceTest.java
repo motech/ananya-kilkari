@@ -183,11 +183,11 @@ public class KilkariSubscriptionServiceTest {
     @Test
     public void shouldDeactivateSubscription() {
         String subscriptionId = "abcd1234";
-        UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
-        unsubscriptionRequest.setChannel(Channel.CALL_CENTER.name());
+        UnSubscriptionWebRequest unSubscriptionWebRequest = new UnSubscriptionWebRequest();
+        unSubscriptionWebRequest.setChannel(Channel.CALL_CENTER.name());
         when(unsubscriptionRequestValidator.validate(subscriptionId)).thenReturn(new Errors());
 
-        kilkariSubscriptionService.requestDeactivation(subscriptionId, unsubscriptionRequest);
+        kilkariSubscriptionService.requestDeactivation(subscriptionId, unSubscriptionWebRequest);
 
         ArgumentCaptor<DeactivationRequest> deactivationRequestArgumentCaptor = ArgumentCaptor.forClass(DeactivationRequest.class);
         verify(subscriptionService).requestDeactivation(deactivationRequestArgumentCaptor.capture());
@@ -199,15 +199,13 @@ public class KilkariSubscriptionServiceTest {
 
     @Test
     public void shouldValidateSubscriptionWhileDeactivatingSubscription() {
-        String subscriptionId = "abcd1234";
-        Errors errors = new Errors();
-        errors.add("some error");
-        when(unsubscriptionRequestValidator.validate(subscriptionId)).thenReturn(errors);
+        UnSubscriptionWebRequest unSubscriptionWebRequest = new UnSubscriptionWebRequest();
+        unSubscriptionWebRequest.setChannel("some channel");
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("some error");
+        expectedException.expectMessage("Invalid channel some channel");
 
-        kilkariSubscriptionService.requestDeactivation(subscriptionId, mock(UnsubscriptionRequest.class));
+        kilkariSubscriptionService.requestDeactivation("subscriptionId", unSubscriptionWebRequest);
 
         verify(subscriptionService, never()).requestDeactivation(any(DeactivationRequest.class));
     }

@@ -95,11 +95,11 @@ public class KilkariSubscriptionService {
         motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
     }
 
-    public void requestDeactivation(String subscriptionId, UnsubscriptionRequest unsubscriptionRequest) {
-        Errors validationErrors = unsubscriptionRequestValidator.validate(subscriptionId);
+    public void requestDeactivation(String subscriptionId, UnSubscriptionWebRequest unSubscriptionWebRequest) {
+        Errors validationErrors = unSubscriptionWebRequest.validate();
         raiseExceptionIfThereAreErrors(validationErrors);
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.from(unsubscriptionRequest.getChannel()), unsubscriptionRequest.getCreatedAt()));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.from(unSubscriptionWebRequest.getChannel()), unSubscriptionWebRequest.getCreatedAt()));
     }
 
     public void processCampaignChange(CampaignChangeRequest campaignChangeRequest, String subscriptionId) {

@@ -324,9 +324,9 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldUnsubscribeAUserGivenValidDetails() throws Exception {
         String subscriptionId = "abcd1234";
-        UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
-        unsubscriptionRequest.setReason("reason");
-        byte[] requestBody = TestUtils.toJson(unsubscriptionRequest).getBytes();
+        UnSubscriptionWebRequest unSubscriptionWebRequest = new UnSubscriptionWebRequest();
+        unSubscriptionWebRequest.setReason("reason");
+        byte[] requestBody = TestUtils.toJson(unSubscriptionWebRequest).getBytes();
 
         when(unsubscriptionRequestValidator.validate(subscriptionId)).thenReturn(new Errors());
 
@@ -338,25 +338,25 @@ public class SubscriptionControllerTest {
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription unsubscribed successfully")));
 
-        ArgumentCaptor<UnsubscriptionRequest> unsubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(UnsubscriptionRequest.class);
+        ArgumentCaptor<UnSubscriptionWebRequest> unsubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(UnSubscriptionWebRequest.class);
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(kilkariSubscriptionService).requestDeactivation(stringArgumentCaptor.capture(), unsubscriptionRequestArgumentCaptor.capture());
 
-        UnsubscriptionRequest actualUnsubscriptionRequest = unsubscriptionRequestArgumentCaptor.getValue();
+        UnSubscriptionWebRequest actualUnSubscriptionWebRequest = unsubscriptionRequestArgumentCaptor.getValue();
         String actualSubscriptionId = stringArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, actualSubscriptionId);
-        assertEquals(Channel.CALL_CENTER.name(), actualUnsubscriptionRequest.getChannel());
+        assertEquals(Channel.CALL_CENTER.name(), actualUnSubscriptionWebRequest.getChannel());
     }
 
     @Test
     public void shouldValidateUnsubscriptionRequestDetails() throws Exception {
         String subscriptionId = "abcd1234";
-        UnsubscriptionRequest unsubscriptionRequest = new UnsubscriptionRequest();
-        unsubscriptionRequest.setReason("reason");
-        byte[] requestBody = TestUtils.toJson(unsubscriptionRequest).getBytes();
+        UnSubscriptionWebRequest unSubscriptionWebRequest = new UnSubscriptionWebRequest();
+        unSubscriptionWebRequest.setReason("reason");
+        byte[] requestBody = TestUtils.toJson(unSubscriptionWebRequest).getBytes();
 
-        doThrow(new ValidationException("some error description")).when(kilkariSubscriptionService).requestDeactivation(anyString(), any(UnsubscriptionRequest.class));
+        doThrow(new ValidationException("some error description")).when(kilkariSubscriptionService).requestDeactivation(anyString(), any(UnSubscriptionWebRequest.class));
 
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)

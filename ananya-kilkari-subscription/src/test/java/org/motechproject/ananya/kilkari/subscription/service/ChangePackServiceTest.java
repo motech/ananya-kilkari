@@ -11,7 +11,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
-import org.motechproject.ananya.kilkari.subscription.service.request.ChangeScheduleRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionChangePackRequest;
@@ -51,12 +51,12 @@ public class ChangePackServiceTest {
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(existingSubscription);
 
 
-        ChangeScheduleRequest changeScheduleRequest = new ChangeScheduleRequest(ChangeType.CHANGE_PACK, existingSubscription.getMsisdn(), subscriptionId, SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth, reason);
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, existingSubscription.getMsisdn(), subscriptionId, SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth, reason);
 
-        Subscription newSubscription = new SubscriptionBuilder().withDefaults().withPack(changeScheduleRequest.getPack()).build();
+        Subscription newSubscription = new SubscriptionBuilder().withDefaults().withPack(changeSubscriptionRequest.getPack()).build();
         when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CALL_CENTER))).thenReturn(newSubscription);
 
-        changePackService.process(changeScheduleRequest);
+        changePackService.process(changeSubscriptionRequest);
 
         InOrder order = inOrder(subscriptionService, reportingService, subscriptionValidator);
         order.verify(subscriptionValidator).validateSubscriptionExists(subscriptionId);
@@ -67,7 +67,7 @@ public class ChangePackServiceTest {
 
         ArgumentCaptor<SubscriptionRequest> createSubscriptionCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
         order.verify(subscriptionService).createSubscription(createSubscriptionCaptor.capture(), eq(Channel.CALL_CENTER));
-        validateSubscriptionCreationRequest(createSubscriptionCaptor.getValue(), changeScheduleRequest, existingSubscription);
+        validateSubscriptionCreationRequest(createSubscriptionCaptor.getValue(), changeSubscriptionRequest, existingSubscription);
 
 
         ArgumentCaptor<SubscriptionChangePackRequest> reportRequestCaptor = ArgumentCaptor.forClass(SubscriptionChangePackRequest.class);
@@ -86,7 +86,7 @@ public class ChangePackServiceTest {
         SubscriberResponse subscriberResponse = new SubscriberResponse(null, null, dateOfBirth, null, null);
         when(reportingService.getSubscriber(subscriptionId)).thenReturn(subscriberResponse);
 
-        changePackService.process(new ChangeScheduleRequest(ChangeType.CHANGE_PACK, "1234567890", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CALL_CENTER, null, null, null, "reason"));
+        changePackService.process(new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1234567890", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CALL_CENTER, null, null, null, "reason"));
 
         verify(reportingService).getSubscriber(subscriptionId);
         ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);
@@ -110,9 +110,9 @@ public class ChangePackServiceTest {
         assertEquals(reason, reportRequest.getReason());
     }
 
-    private void validateSubscriptionCreationRequest(SubscriptionRequest subscriptionRequest, ChangeScheduleRequest changeScheduleRequest, Subscription existingSubscription) {
-        assertEquals(changeScheduleRequest.getDateOfBirth(), subscriptionRequest.getSubscriber().getDateOfBirth());
-        assertEquals(changeScheduleRequest.getExpectedDateOfDelivery(), subscriptionRequest.getSubscriber().getExpectedDateOfDelivery());
+    private void validateSubscriptionCreationRequest(SubscriptionRequest subscriptionRequest, ChangeSubscriptionRequest changeSubscriptionRequest, Subscription existingSubscription) {
+        assertEquals(changeSubscriptionRequest.getDateOfBirth(), subscriptionRequest.getSubscriber().getDateOfBirth());
+        assertEquals(changeSubscriptionRequest.getExpectedDateOfDelivery(), subscriptionRequest.getSubscriber().getExpectedDateOfDelivery());
     }
 
     private void validateDeactivationRequest(DeactivationRequest deactivationRequest, Subscription existingSubscription) {

@@ -416,24 +416,24 @@ public class SubscriptionControllerTest {
         String msisdn = "1234567890";
         String channel = Channel.CALL_CENTER.name();
         String pack = SubscriptionPack.BARI_KILKARI.name();
-        ChangeScheduleWebRequest changeScheduleWebRequest = new ChangeScheduleWebRequest();
-        changeScheduleWebRequest.setMsisdn(msisdn);
-        changeScheduleWebRequest.setPack(pack);
+        ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequest();
+        changeSubscriptionWebRequest.setMsisdn(msisdn);
+        changeSubscriptionWebRequest.setPack(pack);
 
-        byte[] requestBody = TestUtils.toJson(changeScheduleWebRequest).getBytes();
+        byte[] requestBody = TestUtils.toJson(changeSubscriptionWebRequest).getBytes();
 
         mockMvc(subscriptionController)
-                .perform(put("/subscription/" + subscriptionId + "/changeschedule")
+                .perform(put("/subscription/" + subscriptionId + "/changesubscription")
                         .param("channel", Channel.CALL_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Change Schedule successfully completed")));
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Change Subscription successfully completed")));
 
-        ArgumentCaptor<ChangeScheduleWebRequest> changePackWebRequestArgumentCaptor = ArgumentCaptor.forClass(ChangeScheduleWebRequest.class);
+        ArgumentCaptor<ChangeSubscriptionWebRequest> changePackWebRequestArgumentCaptor = ArgumentCaptor.forClass(ChangeSubscriptionWebRequest.class);
         ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
-        verify(kilkariSubscriptionService).changeSchedule(changePackWebRequestArgumentCaptor.capture(), subscriptionIdCaptor.capture());
-        ChangeScheduleWebRequest request = changePackWebRequestArgumentCaptor.getValue();
+        verify(kilkariSubscriptionService).changeSubscription(changePackWebRequestArgumentCaptor.capture(), subscriptionIdCaptor.capture());
+        ChangeSubscriptionWebRequest request = changePackWebRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, subscriptionIdCaptor.getValue());
         assertEquals(msisdn, request.getMsisdn());

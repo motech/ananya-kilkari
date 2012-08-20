@@ -11,7 +11,7 @@ import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
-import org.motechproject.ananya.kilkari.subscription.service.request.ChangeScheduleRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 
 import static org.mockito.Mockito.when;
 
@@ -28,13 +28,13 @@ public class ChangePackValidatorTest {
     public void shouldThrowExceptionIfSubscriptionOfPackChangeIsNotInActiveOrSuspendedState(){
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVATION_FAILED).build();
         String subscriptionId = subscription.getSubscriptionId();
-        ChangeScheduleRequest changeScheduleRequest = new ChangeScheduleRequest(ChangeType.CHANGE_PACK, "1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null, "reason");
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null, "reason");
         when(allSubscriptions.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Subscription is not active for subscription "+subscriptionId);
 
-        ChangePackValidator.validate(subscription, changeScheduleRequest);
+        ChangePackValidator.validate(subscription, changeSubscriptionRequest);
     }
 
     @Test
@@ -43,11 +43,11 @@ public class ChangePackValidatorTest {
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
 
-        ChangeScheduleRequest changeScheduleRequest = new ChangeScheduleRequest(ChangeType.CHANGE_PACK, "1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null, "reason");
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null, "reason");
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Subscription %s is already subscribed to requested pack ",subscriptionId));
 
-        ChangePackValidator.validate(subscription, changeScheduleRequest);
+        ChangePackValidator.validate(subscription, changeSubscriptionRequest);
     }
 }

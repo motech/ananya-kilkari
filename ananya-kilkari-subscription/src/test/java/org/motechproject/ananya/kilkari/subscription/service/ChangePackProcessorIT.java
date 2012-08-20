@@ -8,7 +8,7 @@ import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.SpringIntegrationTest;
-import org.motechproject.ananya.kilkari.subscription.service.request.ChangeScheduleRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -38,9 +38,9 @@ public class ChangePackProcessorIT extends SpringIntegrationTest {
     public void shouldChangePackForAnExistingSubscription() {
         Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(SubscriptionPack.BARI_KILKARI).build();
         allSubscriptions.add(existingSubscription);
-        ChangeScheduleRequest changeScheduleRequest = new ChangeScheduleRequest(ChangeType.CHANGE_PACK, msisdn, existingSubscription.getSubscriptionId(), SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now(), DateTime.now().plusMonths(1), null, "reason");
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, msisdn, existingSubscription.getSubscriptionId(), SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now(), DateTime.now().plusMonths(1), null, "reason");
 
-        changePackService.process(changeScheduleRequest);
+        changePackService.process(changeSubscriptionRequest);
 
         List<Subscription> subscriptions = allSubscriptions.findByMsisdn(msisdn);
         Subscription deactivatedSubscription = subscriptions.get(0);
@@ -49,6 +49,6 @@ public class ChangePackProcessorIT extends SpringIntegrationTest {
         assertEquals(deactivatedSubscription.getPack(), deactivatedSubscription.getPack());
         Subscription newSubscription = subscriptions.get(1);
         assertEquals(SubscriptionStatus.NEW_EARLY, newSubscription.getStatus());
-        assertEquals(changeScheduleRequest.getPack(), newSubscription.getPack());
+        assertEquals(changeSubscriptionRequest.getPack(), newSubscription.getPack());
     }
 }

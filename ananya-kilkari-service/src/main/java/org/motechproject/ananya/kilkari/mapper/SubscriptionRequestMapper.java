@@ -1,10 +1,10 @@
 package org.motechproject.ananya.kilkari.mapper;
 
 import org.apache.commons.lang.StringUtils;
-import org.motechproject.ananya.kilkari.request.ChangeScheduleWebRequest;
+import org.motechproject.ananya.kilkari.request.ChangeSubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.ChangeType;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.service.request.*;
@@ -34,8 +34,8 @@ public class SubscriptionRequestMapper {
                 DateUtils.parseDate(request.getDateOfBirth()), location);
     }
 
-    public static ChangeScheduleRequest mapToChangeScheduleRequest(ChangeScheduleWebRequest webRequest, String subscriptionId) {
-        return new ChangeScheduleRequest(ChangeType.from(webRequest.getChangeType()), webRequest.getMsisdn(), subscriptionId, SubscriptionPack.from(webRequest.getPack()), Channel.from(webRequest.getChannel()),
+    public static ChangeSubscriptionRequest mapToChangeSubscriptionRequest(ChangeSubscriptionWebRequest webRequest, String subscriptionId) {
+        return new ChangeSubscriptionRequest(ChangeSubscriptionType.from(webRequest.getChangeType()), webRequest.getMsisdn(), subscriptionId, SubscriptionPack.from(webRequest.getPack()), Channel.from(webRequest.getChannel()),
                 webRequest.getCreatedAt(), DateUtils.parseDate(webRequest.getExpectedDateOfDelivery()), DateUtils.parseDate(webRequest.getDateOfBirth()), webRequest.getReason());
     }
 

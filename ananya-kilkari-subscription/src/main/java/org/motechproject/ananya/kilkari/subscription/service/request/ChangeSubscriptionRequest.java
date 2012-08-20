@@ -2,12 +2,12 @@ package org.motechproject.ananya.kilkari.subscription.service.request;
 
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.subscription.domain.ChangeType;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
-public class ChangeScheduleRequest {
-    private ChangeType changeType;
+public class ChangeSubscriptionRequest {
+    private ChangeSubscriptionType changeType;
     private String msisdn;
     private String subscriptionId;
     private SubscriptionPack pack;
@@ -17,8 +17,8 @@ public class ChangeScheduleRequest {
     private DateTime dateOfBirth;
     private String reason;
 
-    public ChangeScheduleRequest(ChangeType changeType, String msisdn, String subscriptionId, SubscriptionPack pack, Channel channel, DateTime createdAt,
-                                 DateTime expectedDateOfDelivery, DateTime dateOfBirth, String reason) {
+    public ChangeSubscriptionRequest(ChangeSubscriptionType changeType, String msisdn, String subscriptionId, SubscriptionPack pack, Channel channel, DateTime createdAt,
+                                     DateTime expectedDateOfDelivery, DateTime dateOfBirth, String reason) {
         this.changeType = changeType;
         this.msisdn = msisdn;
         this.subscriptionId = subscriptionId;
@@ -70,7 +70,7 @@ public class ChangeScheduleRequest {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public ChangeType getChangeType() {
+    public ChangeSubscriptionType getChangeType() {
         return changeType;
     }
 }

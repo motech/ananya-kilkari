@@ -1,18 +1,18 @@
 package org.motechproject.ananya.kilkari.subscription.domain;
 
-public enum ChangeType {
+public enum ChangeSubscriptionType {
     CHANGE_PACK("change pack"), CHANGE_SCHEDULE("change schedule");
     private String description;
 
-    ChangeType(String description) {
+    ChangeSubscriptionType(String description) {
 
         this.description = description;
     }
 
-    public static ChangeType from(String changeType) {
-        for (ChangeType type : ChangeType.values()) {
-            if(type.description.equalsIgnoreCase(changeType)) {
-                return type;
+    public static ChangeSubscriptionType from(String changeType) {
+        for (ChangeSubscriptionType subscriptionType : ChangeSubscriptionType.values()) {
+            if(subscriptionType.description.equalsIgnoreCase(changeType)) {
+                return subscriptionType;
             }
         }
         throw new IllegalArgumentException(String.format("Wrong change type %s", changeType));

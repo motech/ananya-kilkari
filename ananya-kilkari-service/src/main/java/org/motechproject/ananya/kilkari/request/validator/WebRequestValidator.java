@@ -5,7 +5,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.domain.PhoneNumber;
 import org.motechproject.ananya.kilkari.subscription.domain.CampaignChangeReason;
-import org.motechproject.ananya.kilkari.subscription.domain.ChangeType;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.validators.Errors;
@@ -125,7 +125,7 @@ public class WebRequestValidator {
     }
 
     public void validateChangeType(String changeType) {
-        if(!ChangeType.isValid(changeType)) {
+        if(!ChangeSubscriptionType.isValid(changeType)) {
             errors.add("Invalid change type %s", changeType);
         }
     }

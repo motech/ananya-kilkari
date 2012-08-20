@@ -3,13 +3,13 @@ package org.motechproject.ananya.kilkari.subscription.service;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.service.request.ChangeScheduleRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 
 public class ChangePackValidator {
 
-    public static void validate(Subscription subscription, ChangeScheduleRequest changeScheduleRequest) {
+    public static void validate(Subscription subscription, ChangeSubscriptionRequest changeSubscriptionRequest) {
         validateStatus(subscription);
-        validateSamePack(subscription, changeScheduleRequest.getPack());
+        validateSamePack(subscription, changeSubscriptionRequest.getPack());
     }
 
     private static void validateSamePack(Subscription existingSubscription, SubscriptionPack requestedPack) {

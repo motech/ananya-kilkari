@@ -157,14 +157,6 @@ public class KilkariCampaignService {
         callDetailsRequestPublisher.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
     }
 
-    public void processInvalidOBDRequestEntries(InvalidOBDRequestEntries invalidOBDRequestEntries) {
-        obdService.processInvalidOBDRequestEntries(invalidOBDRequestEntries);
-    }
-
-    public void processCallDeliveryFailureRequest(FailedCallReports failedCallReports) {
-        obdService.processCallDeliveryFailure(failedCallReports);
-    }
-
     private OBDSuccessfulCallDetailsRequest validateSuccessfulCallRequest(OBDSuccessfulCallDetailsWebRequest webRequest) {
         Errors validationErrors = webRequest.validate();
         if (validationErrors.hasErrors()) {

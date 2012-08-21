@@ -193,14 +193,6 @@ public class KilkariCampaignServiceTest {
         verify(obdServiceOptionFactory, never()).getHandler(ServiceOption.HELP);
     }
 
-    @Test
-    public void shouldProcessInvalidCallRecords() {
-        InvalidOBDRequestEntries invalidOBDRequestEntries = new InvalidOBDRequestEntries();
-
-        kilkariCampaignService.processInvalidOBDRequestEntries(invalidOBDRequestEntries);
-
-        verify(obdService).processInvalidOBDRequestEntries(invalidOBDRequestEntries);
-    }
 
     @Test
     public void shouldScheduleUnsubscriptionWhenPackIsCompletedAndWhenStatusIsNotDeactivated() {
@@ -227,15 +219,6 @@ public class KilkariCampaignServiceTest {
         kilkariCampaignService.processCampaignCompletion(subscriptionId);
 
         verify(kilkariSubscriptionService, never()).processSubscriptionCompletion(subscription);
-    }
-
-    @Test
-    public void shouldPublishCallDeliveryFailureRecords() {
-        FailedCallReports failedCallReports = Mockito.mock(FailedCallReports.class);
-
-        kilkariCampaignService.processCallDeliveryFailureRequest(failedCallReports);
-
-        verify(obdService).processCallDeliveryFailure(failedCallReports);
     }
 
     @Test

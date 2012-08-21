@@ -64,9 +64,9 @@ public class SubscriberCareRequest implements Serializable {
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-                .append(this.msisdn)
-                .append(this.channel)
-                .append(this.channel)
+                .append("msisdn", this.msisdn)
+                .append("channel", this.channel)
+                .append("reason", this.reason)
                 .toString();
     }
 }

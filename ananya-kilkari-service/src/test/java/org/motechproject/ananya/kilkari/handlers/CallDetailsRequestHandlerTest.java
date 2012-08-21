@@ -45,7 +45,7 @@ public class CallDetailsRequestHandlerTest {
 
     @Before
     public void setUp() {
-        callDetailsRequestHandler = new CallDetailsRequestHandler(kilkariCampaignService, kilkariCallDetailsService);
+        callDetailsRequestHandler = new CallDetailsRequestHandler(kilkariCallDetailsService);
     }
 
     @Test
@@ -91,6 +91,6 @@ public class CallDetailsRequestHandlerTest {
 
         callDetailsRequestHandler.handleInboxCallDetailsRequest(new MotechEvent(CallDetailsEventKeys.PROCESS_INBOX_CALL_REQUEST_SUBJECT, parameters));
 
-        verify(kilkariCampaignService).processInboxCallDetailsRequest(inboxCallDetailsWebRequest);
+        verify(kilkariCallDetailsService).processInboxCallDetailsRequest(inboxCallDetailsWebRequest);
     }
 }

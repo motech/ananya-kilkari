@@ -12,12 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class OBDController {
-    private KilkariCampaignService kilkariCampaignService;
     private KilkariCallDetailsService kilkariCallDetailsService;
 
     @Autowired
-    public OBDController(KilkariCampaignService kilkariCampaignService, KilkariCallDetailsService kilkariCallDetailsService) {
-        this.kilkariCampaignService = kilkariCampaignService;
+    public OBDController(KilkariCallDetailsService kilkariCallDetailsService) {
         this.kilkariCallDetailsService = kilkariCallDetailsService;
     }
 
@@ -25,7 +23,7 @@ public class OBDController {
     @ResponseBody
     public BaseResponse handleSuccessfulResponse(@RequestBody OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest, @PathVariable String subscriptionId) {
         obdSuccessfulCallDetailsRequest.setSubscriptionId(subscriptionId);
-        kilkariCampaignService.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
+        kilkariCallDetailsService.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
         return BaseResponse.success("OBD call details received successfully for subscriptionId : " + subscriptionId);
     }
 

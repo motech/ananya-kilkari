@@ -6,7 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
-import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
+import org.motechproject.ananya.kilkari.service.KilkariCallDetailsService;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -27,11 +27,12 @@ public class InboxControllerTest {
     private InboxController inboxController;
 
     @Mock
-    private KilkariCampaignService kilkariCampaignService;
+    private KilkariCallDetailsService kilkariCallDetailsService;
+
     @Before
     public void setup(){
         initMocks(this);
-        inboxController = new InboxController(kilkariCampaignService);
+        inboxController = new InboxController(kilkariCallDetailsService);
     }
 
     @Test
@@ -43,7 +44,7 @@ public class InboxControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Inbox calldetails request submitted successfully")));
 
         ArgumentCaptor<InboxCallDetailsWebRequest> captor = ArgumentCaptor.forClass(InboxCallDetailsWebRequest.class);
-        verify(kilkariCampaignService, times(2)).publishInboxCallDetailsRequest(captor.capture());
+        verify(kilkariCallDetailsService, times(2)).publishInboxCallDetailsRequest(captor.capture());
         List<InboxCallDetailsWebRequest> requests = captor.getAllValues();
         assertEquals(createRequest("9740123425", "PCK1", "WEEK12", "21-12-2011 02-59-59", "22-12-2011 02-59-58", "subscriptionId1"), requests.get(0));
         assertEquals(createRequest("9740123426", "PCK2", "WEEK11", "22-12-2011 02-59-49", "23-12-2011 02-59-48", "subscriptionId2"), requests.get(1));

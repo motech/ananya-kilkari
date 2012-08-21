@@ -33,13 +33,8 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.c
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 
 public class OBDControllerTest {
-
     @Mock
     private SubscriptionService subscriptionService;
-
-    @Mock
-    private KilkariCampaignService kilkariCampaignService;
-
     @Mock
     private KilkariCallDetailsService kilkariCallDetailsService;
 
@@ -48,7 +43,7 @@ public class OBDControllerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        obdController = new OBDController(kilkariCampaignService, kilkariCallDetailsService);
+        obdController = new OBDController(kilkariCallDetailsService);
     }
 
     @Test
@@ -114,7 +109,7 @@ public class OBDControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "OBD call details received successfully for subscriptionId : " + subscriptionId)));
 
         ArgumentCaptor<OBDSuccessfulCallDetailsWebRequest> successfulCallRequestArgumentCaptor = ArgumentCaptor.forClass(OBDSuccessfulCallDetailsWebRequest.class);
-        verify(kilkariCampaignService).publishSuccessfulCallRequest(successfulCallRequestArgumentCaptor.capture());
+        verify(kilkariCallDetailsService).publishSuccessfulCallRequest(successfulCallRequestArgumentCaptor.capture());
         OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = successfulCallRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, obdSuccessfulCallDetailsRequest.getSubscriptionId());

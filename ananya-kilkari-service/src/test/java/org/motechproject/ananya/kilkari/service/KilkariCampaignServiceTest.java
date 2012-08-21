@@ -4,34 +4,21 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
-import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandler;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
-import org.motechproject.ananya.kilkari.obd.service.OBDService;
-import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
-import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
-import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
-import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
-import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +27,6 @@ import java.util.Map;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -56,8 +42,6 @@ public class KilkariCampaignServiceTest {
     @Mock
     private ReportingService reportingService;
     @Mock
-    private CallDetailsRequestPublisher callDetailsRequestPublisher;
-    @Mock
     private InboxService inboxService;
     @Mock
     private CampaignMessageAlertService campaignMessageAlertService;
@@ -69,8 +53,7 @@ public class KilkariCampaignServiceTest {
     public void setUp() {
         initMocks(this);
         kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService,
-                campaignMessageAlertService, reportingService, callDetailsRequestPublisher,
-                inboxService
+                campaignMessageAlertService, inboxService
         );
     }
 
@@ -119,17 +102,6 @@ public class KilkariCampaignServiceTest {
         assertThat(messageTimings, hasEntry(subscription1.getSubscriptionId(), dateTimes));
         assertThat(messageTimings, hasEntry(subscription2.getSubscriptionId(), dateTimes));
     }
-
-    @Test
-    public void shouldPublishObdCallbackRequest() {
-        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest();
-
-        kilkariCampaignService.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
-
-        verify(callDetailsRequestPublisher).publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
-    }
-
-
 
 
     @Test
@@ -321,70 +293,5 @@ public class KilkariCampaignServiceTest {
         verify(campaignMessageAlertService).scheduleCampaignMessageAlertForRenewal(subscriptionId, msisdn, operator.name());
     }
 
-    @Test
-    public void shouldPublishInboxCallDetails() {
-        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest();
 
-        kilkariCampaignService.publishInboxCallDetailsRequest(inboxCallDetailsWebRequest);
-
-        verify(callDetailsRequestPublisher).publishInboxCallDetailsRequest(inboxCallDetailsWebRequest);
-    }
-
-    @Test
-    public void shouldValidateSubscriptionIdIfRequestValidationIsSuccessful() {
-        String pack = "choti_kilkari";
-        String msisdn = "1234567890";
-        String subscriptionId = "subscriptionId";
-        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, "WEEK12", new CallDurationWebRequest("22-11-2011 11-55-35", "23-12-2012 12-59-34"), pack, subscriptionId);
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(null);
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Invalid inbox call details request: Subscription not found");
-
-        kilkariCampaignService.processInboxCallDetailsRequest(inboxCallDetailsWebRequest);
-    }
-
-    @Test
-    public void shouldReportInboxCallDetails() {
-        String pack = "choti_kilkari";
-        String msisdn = "1234567890";
-        String subscriptionId = "subscriptionId";
-        String campaignId = "WEEK12";
-        String startTime = "22-11-2011 11-55-35";
-        String endTime = "23-12-2012 12-59-34";
-        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, campaignId, new CallDurationWebRequest(startTime, endTime), pack, subscriptionId);
-        Subscription subscription = Mockito.mock(Subscription.class);
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(subscription.getSubscriptionId()).thenReturn(subscriptionId);
-
-        kilkariCampaignService.processInboxCallDetailsRequest(inboxCallDetailsWebRequest);
-
-        ArgumentCaptor<CallDetailsReportRequest> captor = ArgumentCaptor.forClass(CallDetailsReportRequest.class);
-        verify(reportingService).reportCampaignMessageDeliveryStatus(captor.capture());
-        CallDetailsReportRequest callDetailsReportRequest = captor.getValue();
-
-        Assert.assertEquals(msisdn, callDetailsReportRequest.getMsisdn());
-        Assert.assertEquals("INBOX", callDetailsReportRequest.getCallSource());
-        Assert.assertEquals(campaignId, callDetailsReportRequest.getCampaignId());
-        Assert.assertNull(callDetailsReportRequest.getRetryCount());
-        Assert.assertNull(callDetailsReportRequest.getServiceOption());
-        Assert.assertEquals(DateUtils.parseDateTime(startTime), callDetailsReportRequest.getStartTime());
-        Assert.assertEquals(DateUtils.parseDateTime(endTime), callDetailsReportRequest.getEndTime());
-        Assert.assertEquals("SUCCESS", callDetailsReportRequest.getStatus());
-        Assert.assertEquals(subscriptionId, callDetailsReportRequest.getSubscriptionId());
-
-        Assert.assertNull(callDetailsReportRequest.getServiceOption());
-    }
-
-    @Test
-    public void shouldValidateInboxCallDetailsRequest() {
-        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = Mockito.mock(InboxCallDetailsWebRequest.class);
-        Errors errors = new Errors();
-        String errorString = "some error";
-        errors.add(errorString);
-        when(inboxCallDetailsWebRequest.validate()).thenReturn(errors);
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Invalid inbox call details request: " + errorString);
-
-        kilkariCampaignService.processInboxCallDetailsRequest(inboxCallDetailsWebRequest);
-    }
 }

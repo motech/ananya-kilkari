@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.web.controller;
 
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequestsList;
+import org.motechproject.ananya.kilkari.service.KilkariCallDetailsService;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,18 +16,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class InboxController {
 
-    private KilkariCampaignService kilkariCampaignService;
+    private KilkariCallDetailsService kilkariCallDetailsService;
 
     @Autowired
-    public InboxController(KilkariCampaignService kilkariCampaignService) {
-        this.kilkariCampaignService = kilkariCampaignService;
+    public InboxController(KilkariCallDetailsService kilkariCallDetailsService) {
+        this.kilkariCallDetailsService = kilkariCallDetailsService;
     }
 
     @RequestMapping(value = "/inbox/calldetails", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse recordInboxCallDetails(@RequestBody InboxCallDetailsWebRequestsList inboxCallDetailsWebRequestsList) {
         for(InboxCallDetailsWebRequest callDetailsWebRequest : inboxCallDetailsWebRequestsList.getCallRecords()){
-            kilkariCampaignService.publishInboxCallDetailsRequest(callDetailsWebRequest);
+            kilkariCallDetailsService.publishInboxCallDetailsRequest(callDetailsWebRequest);
         }
         return BaseResponse.success("Inbox calldetails request submitted successfully");
     }

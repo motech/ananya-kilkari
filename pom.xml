@@ -360,6 +360,11 @@
                 <version>${motech-contrib.version}</version>
             </dependency>
             <dependency>
+                <groupId>junitperf</groupId>
+                <artifactId>junitperf</artifactId>
+                <version>1.8</version>
+            </dependency>
+            <dependency>
                 <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
                 <artifactId>motech-retry</artifactId>
                 <version>${motech-contrib.version}</version>

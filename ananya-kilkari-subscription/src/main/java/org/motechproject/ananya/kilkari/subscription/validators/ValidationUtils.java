@@ -52,7 +52,7 @@ public class ValidationUtils {
         return true;
     }
 
-    public static boolean assertOnlyOnePresent(String... args) {
+    public static boolean assertNotMoreThanOnePresent(String... args) {
         List<Boolean> checks = new ArrayList<>();
         for (String arg : args)
             checks.add(StringUtils.isNotEmpty(arg));
@@ -65,5 +65,20 @@ public class ValidationUtils {
         });
 
         return !(numberOfOptions > 1);
+    }
+
+  public static boolean assertExactlyOnePresent(String... args) {
+        List<Boolean> checks = new ArrayList<>();
+        for (String arg : args)
+            checks.add(StringUtils.isNotEmpty(arg));
+
+        int numberOfOptions = CollectionUtils.countMatches(checks, new Predicate() {
+            @Override
+            public boolean evaluate(Object o) {
+                return (Boolean) o;
+            }
+        });
+
+        return !(numberOfOptions != 1);
     }
 }

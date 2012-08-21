@@ -15,13 +15,11 @@ public class ValidationUtilsTest {
 
     @Test
     public void assertNumericShouldReturnFalseForAlphaNumericStrings() {
-
         assertFalse(ValidationUtils.assertNumeric("234a"));
     }
 
     @Test
     public void assertNumericShouldReturnFalseForNull() {
-
         assertFalse(ValidationUtils.assertNumeric(null));
     }
 
@@ -97,7 +95,6 @@ public class ValidationUtilsTest {
 
     @Test
     public void shouldReturnFalseWhenAssertingNotNullForNull() {
-
         assertFalse(ValidationUtils.assertNull(new Object()));
     }
 
@@ -108,12 +105,22 @@ public class ValidationUtilsTest {
 
     @Test
     public void shouldReturnFalseWhenDateNotBeforeNow() {
-
         assertFalse(ValidationUtils.assertDateBefore(DateTime.now().plusWeeks(3), DateTime.now()));
     }
 
     @Test
     public void shouldNotReturnFalseWhenDateBeforeNow() {
         assertTrue(ValidationUtils.assertDateBefore(DateTime.now().minusDays(4), DateTime.now()));
+    }
+
+    @Test
+    public void shouldAssertPresenceOfArguments() {
+        assertTrue(ValidationUtils.assertExactlyOnePresent("", "edd"));
+        assertFalse(ValidationUtils.assertExactlyOnePresent("dob", "edd"));
+        assertFalse(ValidationUtils.assertExactlyOnePresent(null, null));
+
+        assertFalse(ValidationUtils.assertNotMoreThanOnePresent("dob", "edd"));
+        assertTrue(ValidationUtils.assertNotMoreThanOnePresent(null, null));
+        assertTrue(ValidationUtils.assertNotMoreThanOnePresent(null, "edd"));
     }
 }

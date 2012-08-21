@@ -22,15 +22,19 @@ public class WebRequestValidator {
     }
 
     public void validateOnlyOneOfEDDOrDOBOrWeekNumberPresent(String... args) {
-        if (!ValidationUtils.assertOnlyOnePresent(args))
+        if (!ValidationUtils.assertNotMoreThanOnePresent(args))
             errors.add("Invalid request. Only one of expected date of delivery, date of birth and week number should be present");
 
     }
 
     public void validateOnlyOneOfEDDOrDOBIsPresent(String... args) {
-        if (!ValidationUtils.assertOnlyOnePresent(args))
+        if (!ValidationUtils.assertNotMoreThanOnePresent(args))
             errors.add("Invalid request. Only one of expected date of delivery or date of birth should be present");
+    }
 
+    public void validateExactlyOneOfEDDOrDOBIsPresent(String... args) {
+        if (!ValidationUtils.assertExactlyOnePresent(args))
+            errors.add("Invalid request. One of expected date of delivery or date of birth should be present");
     }
 
     public void validateCampaignChangeReason(String reason) {
@@ -115,7 +119,7 @@ public class WebRequestValidator {
 
         boolean allPackPresent = false;
         for (String pack : packs) {
-            if(StringUtils.trim(pack).toUpperCase().equals("ALL")) allPackPresent = true;
+            if (StringUtils.trim(pack).toUpperCase().equals("ALL")) allPackPresent = true;
         }
         if (allPackPresent && packs.size() != 1) errors.add("No other pack allowed when ALL specified");
 
@@ -124,9 +128,11 @@ public class WebRequestValidator {
         for (String pack : packs) validatePack(pack);
     }
 
-    public void validateChangeType(String changeType) {
-        if(!ChangeSubscriptionType.isValid(changeType)) {
+    public void validateChangeType(String changeType, String edd, String dob) {
+        if (!ChangeSubscriptionType.isValid(changeType)) {
             errors.add("Invalid change type %s", changeType);
+        } else if (changeType.equals(ChangeSubscriptionType.CHANGE_SCHEDULE.getDescription())) {
+            validateExactlyOneOfEDDOrDOBIsPresent(edd, dob);
         }
     }
 }

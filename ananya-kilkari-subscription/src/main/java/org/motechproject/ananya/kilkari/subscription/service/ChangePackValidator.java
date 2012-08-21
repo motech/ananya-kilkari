@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -9,10 +10,19 @@ public class ChangePackValidator {
 
     public static void validate(Subscription subscription, ChangeSubscriptionRequest changeSubscriptionRequest) {
         validateStatus(subscription);
-        validateSamePack(subscription, changeSubscriptionRequest.getPack());
+        if(changeSubscriptionRequest.getChangeType() == ChangeSubscriptionType.CHANGE_PACK)
+            validateExistingSubscriptionBelongsToDifferentPack(subscription, changeSubscriptionRequest.getPack());
+        else
+            validateRequestedPackIsSameAsExistingPack(subscription, changeSubscriptionRequest.getPack());
     }
 
-    private static void validateSamePack(Subscription existingSubscription, SubscriptionPack requestedPack) {
+    private static void validateRequestedPackIsSameAsExistingPack(Subscription existingSubscription, SubscriptionPack requestedPack) {
+        SubscriptionPack existingSubscriptionPack = existingSubscription.getPack();
+        if(existingSubscriptionPack != null && !existingSubscriptionPack.equals(requestedPack))
+            throw new ValidationException(String.format("Subscription %s is not subscribed to requested pack for change schedule",existingSubscription.getSubscriptionId()));
+    }
+
+    private static void validateExistingSubscriptionBelongsToDifferentPack(Subscription existingSubscription, SubscriptionPack requestedPack) {
         if(existingSubscription.getPack().equals(requestedPack))
             throw new ValidationException(String.format("Subscription %s is already subscribed to requested pack ",existingSubscription.getSubscriptionId()));
     }

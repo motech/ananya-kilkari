@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.request.validator;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,7 +109,7 @@ public class WebRequestValidatorTest {
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. Only one of expected date of delivery, date of birth and week number should be present"));
     }
-    
+
     @Test
     public void shouldReturnErrorIfMoreThanOneOfDobOrEddIsPresent() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
@@ -116,6 +117,24 @@ public class WebRequestValidatorTest {
 
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. Only one of expected date of delivery or date of birth should be present"));
+    }
+
+    @Test
+    public void shouldReturnErrorIfNoneOfDobOrEddIsPresent() {
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateExactlyOneOfEDDOrDOBIsPresent(null, "");
+
+        assertEquals(1, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. One of expected date of delivery or date of birth should be present"));
+    }
+
+    @Test
+    public void shouldReturnErrorIfChangeTypeIsChangeScheduleAndNoneOfDobOrEddIsPresent() {
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateChangeType("change schedule", null, null);
+
+        assertEquals(1, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. One of expected date of delivery or date of birth should be present"));
     }
 
     @Test

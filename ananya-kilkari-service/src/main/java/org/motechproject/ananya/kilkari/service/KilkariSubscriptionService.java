@@ -120,9 +120,7 @@ public class KilkariSubscriptionService {
         Errors errors = changeSubscriptionWebRequest.validate();
         raiseExceptionIfThereAreErrors(errors);
         ChangeSubscriptionRequest changeSubscriptionRequest = SubscriptionRequestMapper.mapToChangeSubscriptionRequest(changeSubscriptionWebRequest, subscriptionId);
-        if(ChangeSubscriptionType.CHANGE_PACK == changeSubscriptionRequest.getChangeType()) {
-            changePackService.process(changeSubscriptionRequest);
-        }
+        changePackService.process(changeSubscriptionRequest);
     }
 
     public void changeMsisdn(ChangeMsisdnWebRequest changeMsisdnWebRequest) {

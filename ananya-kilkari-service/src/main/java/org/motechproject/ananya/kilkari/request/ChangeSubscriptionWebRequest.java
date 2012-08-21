@@ -96,7 +96,7 @@ public class ChangeSubscriptionWebRequest {
         webRequestValidator.validateDOB(dateOfBirth, createdAt);
         webRequestValidator.validateEDD(expectedDateOfDelivery, createdAt);
         webRequestValidator.validateOnlyOneOfEDDOrDOBIsPresent(expectedDateOfDelivery, dateOfBirth);
-        webRequestValidator.validateChangeType(changeType);
+        webRequestValidator.validateChangeType(changeType, expectedDateOfDelivery, dateOfBirth);
         return webRequestValidator.getErrors();
     }
 

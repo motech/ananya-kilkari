@@ -39,7 +39,7 @@ public class ChangePackValidatorTest {
     }
 
     @Test
-    public void changePackRequestPackShouldBeDifferentFromCurrentPack() {
+    public void changePackRequestPackShouldBeDifferentFromCurrentPack_ForChangePack() {
         Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).build();
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
@@ -48,6 +48,20 @@ public class ChangePackValidatorTest {
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Subscription %s is already subscribed to requested pack ",subscriptionId));
+
+        ChangePackValidator.validate(subscription, changeSubscriptionRequest);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfPackIsDifferentFromCurrentPack_ForChangeSchedule() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).build();
+        String subscriptionId = subscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
+
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_SCHEDULE, "1111111111", subscriptionId, SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null, "reason");
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(String.format("Subscription %s is not subscribed to requested pack for change schedule",subscriptionId));
 
         ChangePackValidator.validate(subscription, changeSubscriptionRequest);
     }

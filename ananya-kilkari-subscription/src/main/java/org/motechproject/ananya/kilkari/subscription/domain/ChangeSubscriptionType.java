@@ -5,8 +5,11 @@ public enum ChangeSubscriptionType {
     private String description;
 
     ChangeSubscriptionType(String description) {
-
         this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public static ChangeSubscriptionType from(String changeType) {

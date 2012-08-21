@@ -361,14 +361,4 @@ public class KilkariSubscriptionServiceTest {
 
         verify(changePackService, never()).process(any(ChangeSubscriptionRequest.class));
     }
-
-    @Test
-    public void shouldProcessChangePackOnlyIfTypeOfChangeSubscriptionIsChangePack() {
-        ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequestBuilder().withDefaults()
-                .withChangeType("change schedule")
-                .build();
-        kilkariSubscriptionService.changeSubscription(changeSubscriptionWebRequest, "subscriptionId");
-
-        verify(changePackService, never()).process(any(ChangeSubscriptionRequest.class));
-    }
 }

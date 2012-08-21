@@ -38,8 +38,8 @@ public class SchedulerDiagnosticService {
     public boolean isSchedulerRunning() throws SchedulerException {
         List<JobDetails> jobDetailsList = getJobDetailsFor(ObdSchedulers.getAll());
         for (JobDetails jobDetails : jobDetailsList) {
-            DateTime previousFireTime = DateUtil.newDateTime(jobDetails.getPreviousFireTime());
-            if (previousFireTime.isBefore(DateTime.now().minusHours(25)))
+            if (jobDetails.getPreviousFireTime() != null &&
+                    DateUtil.newDateTime(jobDetails.getPreviousFireTime()).isBefore(DateTime.now().minusHours(25)))
                 return false;
         }
         return true;

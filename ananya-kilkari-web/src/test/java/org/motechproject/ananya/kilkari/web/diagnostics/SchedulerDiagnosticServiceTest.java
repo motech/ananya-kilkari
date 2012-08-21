@@ -114,4 +114,28 @@ public class SchedulerDiagnosticServiceTest {
 
         assertFalse(schedulerRunStatus);
     }
+
+    @Test
+    public void shouldFailIfOBDSchedulerDidNotRunYet() throws SchedulerException {
+        Set<TriggerKey> triggerKeys = new HashSet<>();
+        TriggerKey triggerKey = new TriggerKey("name1", "default");
+        triggerKeys.add(triggerKey);
+        when(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains(anyString()))).thenReturn(triggerKeys);
+
+        Trigger mockTrigger = mock(Trigger.class);
+        when(motechScheduler.getTrigger(triggerKey)).thenReturn(mockTrigger);
+        final String jobName1 = ObdSchedulers.getAll().get(0);
+        when(mockTrigger.getJobKey()).thenReturn(new JobKey(jobName1));
+
+        ArrayList jobKeyList = mock(ArrayList.class);
+        when(motechScheduler.getTriggersOfJob(any(JobKey.class))).thenReturn(jobKeyList);
+        when(jobKeyList.size()).thenReturn(2);
+
+        when(mockTrigger.getPreviousFireTime()).thenReturn(null);
+        when(mockTrigger.getNextFireTime()).thenReturn(DateTime.now().plusHours(4).toDate());
+
+        boolean schedulerRunStatus = schedulerDiagnosticService.isSchedulerRunning();
+
+        assertTrue(schedulerRunStatus);
+    }
 }

@@ -41,6 +41,12 @@ public class SchedulerDiagnosticController {
         response.getOutputStream().print(responseMessage);
     }
 
+    @RequestMapping(value = "/diagnostics/scheduler/obd", method = RequestMethod.GET)
+    @ResponseBody
+    public String obdSchedulerStatus() throws SchedulerException {
+        return schedulerDiagnosticService.isSchedulerRunning() ? "SUCCESS" : "FAILURE";
+    }
+
     private String createResponseMessage(DiagnosticsResponse diagnosticsResponse) {
         Template template = velocityEngine.getTemplate("/schedulerResponse.vm");
         VelocityContext context = new VelocityContext();

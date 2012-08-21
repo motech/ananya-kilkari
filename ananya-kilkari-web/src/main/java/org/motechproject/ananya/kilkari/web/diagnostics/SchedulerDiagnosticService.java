@@ -1,7 +1,9 @@
 package org.motechproject.ananya.kilkari.web.diagnostics;
 
+import org.joda.time.DateTime;
 import org.motechproject.diagnostics.diagnostics.DiagnosticLog;
 import org.motechproject.diagnostics.response.DiagnosticsResult;
+import org.motechproject.util.DateUtil;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,18 +26,37 @@ public class SchedulerDiagnosticService {
 
     public DiagnosticsResult diagnose(List<String> jobs) throws SchedulerException {
         DiagnosticLog diagnosticLog = new DiagnosticLog();
+        List<JobDetails> jobDetailsList = getJobDetailsFor(jobs);
+        for (JobDetails jobDetails : jobDetailsList) {
+            Date previousFireTime = jobDetails.getPreviousFireTime();
+            String previousFireStatus = previousFireTime == null ? "This scheduler has not yet run" : previousFireTime.toString();
+            diagnosticLog.add("\n" + jobDetails.getName() + "\nPrevious Fire Time : " + previousFireStatus + "\nNext Fire Time : " + jobDetails.getNextFireTime());
+        }
+        return new DiagnosticsResult(motechScheduler.isStarted(), diagnosticLog.toString());
+    }
 
+    public boolean isSchedulerRunning() throws SchedulerException {
+        List<JobDetails> jobDetailsList = getJobDetailsFor(ObdSchedulers.getAll());
+        for (JobDetails jobDetails : jobDetailsList) {
+            DateTime previousFireTime = DateUtil.newDateTime(jobDetails.getPreviousFireTime());
+            if (previousFireTime.isBefore(DateTime.now().minusHours(25)))
+                return false;
+        }
+        return true;
+    }
+
+    private List<JobDetails> getJobDetailsFor(List<String> jobs) throws SchedulerException {
         List<TriggerKey> triggerKeys = new ArrayList<>(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains("default")));
+        List<JobDetails> jobDetailsList = new ArrayList<>();
         for (TriggerKey triggerKey : triggerKeys) {
             Trigger trigger = motechScheduler.getTrigger(triggerKey);
             JobKey jobKey = trigger.getJobKey();
             if (motechScheduler.getTriggersOfJob(jobKey).size() > 0 && isForJob(jobKey.getName(), jobs)) {
                 Date previousFireTime = trigger.getPreviousFireTime();
-                String previousFireStatus = previousFireTime == null ? "This scheduler has not yet run" : previousFireTime.toString();
-                diagnosticLog.add("\n" + jobKey.getName() + "\nPrevious Fire Time : " + previousFireStatus + "\nNext Fire Time : " + trigger.getNextFireTime());
+                jobDetailsList.add(new JobDetails(previousFireTime, jobKey.getName(), trigger.getNextFireTime()));
             }
         }
-        return new DiagnosticsResult(motechScheduler.isStarted(), diagnosticLog.toString());
+        return jobDetailsList;
     }
 
     private boolean isForJob(String name, List<String> jobs) {

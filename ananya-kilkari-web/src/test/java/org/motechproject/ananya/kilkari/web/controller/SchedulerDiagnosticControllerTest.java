@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.verify;
@@ -38,7 +39,7 @@ public class SchedulerDiagnosticControllerTest extends SpringIntegrationTest {
     }
 
     @Test
-    public void shouldGetSchedulesForAGivenSubscriptionId() throws Exception{
+    public void shouldGetSchedulesForAGivenSubscriptionId() throws Exception {
         String expectedMessage = "Some message";
         schedulerDiagnosticController = new SchedulerDiagnosticController(schedulerDiagnosticService, velocityEngine);
         when(schedulerDiagnosticService.diagnose(anyList())).thenReturn(new DiagnosticsResult(true, expectedMessage));
@@ -50,5 +51,25 @@ public class SchedulerDiagnosticControllerTest extends SpringIntegrationTest {
         verify(servletOutputStream).print(captor.capture());
         String actualMessage = captor.getValue();
         assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void shouldReturnSuccessWhenObdSchedulesRunAsExpected() throws Exception {
+        schedulerDiagnosticController = new SchedulerDiagnosticController(schedulerDiagnosticService, velocityEngine);
+        when(schedulerDiagnosticService.isSchedulerRunning()).thenReturn(true);
+
+        String status = schedulerDiagnosticController.obdSchedulerStatus();
+
+        assertEquals("SUCCESS", status);
+    }
+
+    @Test
+    public void shouldReturnFailureWhenObdSchedulesDoNotRunAsExpected() throws Exception {
+        schedulerDiagnosticController = new SchedulerDiagnosticController(schedulerDiagnosticService, velocityEngine);
+        when(schedulerDiagnosticService.isSchedulerRunning()).thenReturn(false);
+
+        String status = schedulerDiagnosticController.obdSchedulerStatus();
+
+        assertEquals("FAILURE", status);
     }
 }

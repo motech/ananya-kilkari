@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.web.diagnostics.controller;
+package org.motechproject.ananya.kilkari.web.controller;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 
 @Controller
 public class SchedulerDiagnosticController {
@@ -32,8 +33,10 @@ public class SchedulerDiagnosticController {
 
     @RequestMapping(value = "/diagnostics/scheduler/{subscriptionId}", method = RequestMethod.GET)
     @ResponseBody
-    public void getSchedule(@PathVariable String subscriptionId, HttpServletResponse response) throws SchedulerException, IOException {
-        DiagnosticsResult diagnosticsResult = schedulerDiagnosticService.getSchedule(subscriptionId);
+    public void getSchedule(@PathVariable final String subscriptionId, final HttpServletResponse response) throws SchedulerException, IOException {
+        final DiagnosticsResult diagnosticsResult = schedulerDiagnosticService.diagnose(new ArrayList<String>() {{
+            add(subscriptionId);
+        }});
         String responseMessage = createResponseMessage(new DiagnosticsResponse("Schedulers for subscriptionId : " + subscriptionId, diagnosticsResult));
         response.getOutputStream().print(responseMessage);
     }

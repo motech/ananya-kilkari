@@ -1,9 +1,7 @@
 package org.motechproject.ananya.kilkari.web.diagnostics;
 
-import org.joda.time.DateTime;
 import org.motechproject.diagnostics.diagnostics.DiagnosticLog;
 import org.motechproject.diagnostics.response.DiagnosticsResult;
-import org.motechproject.util.DateUtil;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,40 +22,27 @@ public class SchedulerDiagnosticService {
         motechScheduler = schedulerFactoryBean.getScheduler();
     }
 
-    public DiagnosticsResult getSchedule(String subscriptionId) throws SchedulerException {
+    public DiagnosticsResult diagnose(List<String> jobs) throws SchedulerException {
         DiagnosticLog diagnosticLog = new DiagnosticLog();
 
-        List<TriggerKey> triggerKeys = new ArrayList<>(
-                motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains("default")));
+        List<TriggerKey> triggerKeys = new ArrayList<>(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains("default")));
         for (TriggerKey triggerKey : triggerKeys) {
             Trigger trigger = motechScheduler.getTrigger(triggerKey);
             JobKey jobKey = trigger.getJobKey();
-            if (motechScheduler.getTriggersOfJob(jobKey).size() > 0 && isForSubscription(jobKey.getName(), subscriptionId)) {
+            if (motechScheduler.getTriggersOfJob(jobKey).size() > 0 && isForJob(jobKey.getName(), jobs)) {
                 Date previousFireTime = trigger.getPreviousFireTime();
-                Date nextFireTime = trigger.getNextFireTime();
-                String previousFireStatus = null;
-                String nextFireTimeStatus;
-                if (previousFireTime == null)
-                    previousFireStatus = "This scheduler has not yet run";
-                if (isLastTrigger(trigger))
-                    nextFireTimeStatus = "This is the end of schedule";
-                else {
-                    previousFireStatus = previousFireTime.toString();
-                    nextFireTimeStatus = nextFireTime.toString();
-                }
-                diagnosticLog.add("\n" + jobKey.getName() + "\nPrevious Fire Time : " + previousFireStatus + "\nNext Fire Time : " + nextFireTimeStatus);
+                String previousFireStatus = previousFireTime == null ? "This scheduler has not yet run" : previousFireTime.toString();
+                diagnosticLog.add("\n" + jobKey.getName() + "\nPrevious Fire Time : " + previousFireStatus + "\nNext Fire Time : " + trigger.getNextFireTime());
             }
         }
         return new DiagnosticsResult(motechScheduler.isStarted(), diagnosticLog.toString());
     }
 
-    private boolean isForSubscription(String name, String subscriptionId) {
-        return name.contains(subscriptionId);
+    private boolean isForJob(String name, List<String> jobs) {
+        for (String job : jobs) {
+            if (name.contains(job))
+                return true;
+        }
+        return false;
     }
-
-    private boolean isLastTrigger(Trigger trigger) {
-        DateTime finalFireTime = DateUtil.newDateTime(trigger.getFinalFireTime());
-        return !DateTime.now().isBefore(finalFireTime);
-    }
-
 }

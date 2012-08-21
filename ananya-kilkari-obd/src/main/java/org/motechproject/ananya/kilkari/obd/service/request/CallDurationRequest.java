@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.request;
+package org.motechproject.ananya.kilkari.obd.service.request;
 
 import org.joda.time.DateTime;
 

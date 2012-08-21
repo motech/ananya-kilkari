@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.domain;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 
 public class DeactivationRequest {
 

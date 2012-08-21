@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.TimedRunner;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
 import org.motechproject.ananya.kilkari.request.ChangeMsisdnWebRequest;

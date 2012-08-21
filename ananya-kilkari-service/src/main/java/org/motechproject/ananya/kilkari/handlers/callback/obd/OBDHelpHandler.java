@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.handlers.callback.obd;
 
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
+import org.motechproject.ananya.kilkari.obd.service.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriberCareService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

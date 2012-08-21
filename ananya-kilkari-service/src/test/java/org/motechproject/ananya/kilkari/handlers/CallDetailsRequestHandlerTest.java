@@ -11,7 +11,7 @@ import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
+import org.motechproject.ananya.kilkari.obd.service.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.service.CallDetailsEventKeys;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;

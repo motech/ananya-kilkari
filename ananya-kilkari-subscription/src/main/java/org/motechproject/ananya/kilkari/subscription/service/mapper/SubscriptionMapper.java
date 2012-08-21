@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service.mapper;
 
 import org.apache.commons.lang.math.NumberUtils;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;

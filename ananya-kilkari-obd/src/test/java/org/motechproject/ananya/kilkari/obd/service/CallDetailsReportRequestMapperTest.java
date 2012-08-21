@@ -1,17 +1,11 @@
-package org.motechproject.ananya.kilkari.mapper;
+package org.motechproject.ananya.kilkari.obd.service;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
-import org.motechproject.ananya.kilkari.request.CallDurationRequest;
-import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
-import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
+import org.motechproject.ananya.kilkari.obd.service.request.CallDurationRequest;
+import org.motechproject.ananya.kilkari.obd.service.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 
 import static junit.framework.Assert.assertEquals;
@@ -66,29 +60,5 @@ public class CallDetailsReportRequestMapperTest {
         assertEquals(startTime, obdSuccessfulCallDetailsRequest.getCallDurationRequest().getStartTime());
         assertEquals(endTime, obdSuccessfulCallDetailsRequest.getCallDurationRequest().getEndTime());
         assertEquals("OBD", actualDeliveryReportRequest.getCallSource());
-    }
-
-    @Test
-    public void shouldMapInboxCallDetailsWebRequest() {
-        String startTime = DateTime.now().toString("dd-MM-yyyy HH-mm-ss");
-        String endTime = DateTime.now().plusMinutes(2).toString("dd-MM-yyyy HH-mm-ss");
-        String subscriptionId = "subscriptionId";
-        CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(startTime, endTime);
-        String msisdn = "1234567890";
-        String campaignId = "WEEK12";
-        String pack = SubscriptionPack.CHOTI_KILKARI.name();
-        InboxCallDetailsWebRequest webRequest = new InboxCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, pack, subscriptionId);
-
-        CallDetailsReportRequest actualDeliveryReportRequest = CallDetailsReportRequestMapper.mapFrom(webRequest);
-
-        assertEquals(subscriptionId, actualDeliveryReportRequest.getSubscriptionId());
-        assertEquals(msisdn, actualDeliveryReportRequest.getMsisdn());
-        assertEquals(campaignId, actualDeliveryReportRequest.getCampaignId());
-        assertNull(actualDeliveryReportRequest.getServiceOption());
-        assertEquals(CampaignMessageStatus.SUCCESS.name(), actualDeliveryReportRequest.getStatus());
-        assertNull(actualDeliveryReportRequest.getRetryCount());
-        assertEquals(DateUtils.parseDateTime(startTime), actualDeliveryReportRequest.getStartTime());
-        assertEquals(DateUtils.parseDateTime(endTime), actualDeliveryReportRequest.getEndTime());
-        assertEquals("INBOX", actualDeliveryReportRequest.getCallSource());
     }
 }

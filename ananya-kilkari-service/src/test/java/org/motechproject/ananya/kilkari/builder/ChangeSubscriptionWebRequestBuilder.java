@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.builder;
 
 import org.motechproject.ananya.kilkari.request.ChangeSubscriptionWebRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 public class ChangeSubscriptionWebRequestBuilder {

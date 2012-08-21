@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.mapper;
 
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.request.ChangeMsisdnWebRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
 

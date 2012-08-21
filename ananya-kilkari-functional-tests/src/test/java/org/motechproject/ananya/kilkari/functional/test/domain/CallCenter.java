@@ -4,7 +4,7 @@ import org.motechproject.ananya.kilkari.functional.test.builder.CampaignChangeRe
 import org.motechproject.ananya.kilkari.functional.test.utils.JsonUtils;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.ReportVerifier;
 import org.motechproject.ananya.kilkari.functional.test.verifiers.SubscriptionVerifier;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;

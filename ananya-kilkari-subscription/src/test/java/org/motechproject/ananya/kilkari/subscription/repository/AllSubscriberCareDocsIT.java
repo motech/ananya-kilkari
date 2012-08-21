@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareReasons;
 import org.springframework.beans.factory.annotation.Autowired;

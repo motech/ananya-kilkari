@@ -19,11 +19,20 @@ public class OBDServiceOptionFactoryTest {
     private OBDHelpHandler obdHelpHandler;
 
     @Test
-    public void shouldGetTheAppropriateHandler() {
+    public void shouldGetTheUnsubscriptionHandler() {
         OBDServiceOptionFactory obdServiceOptionFactory = new OBDServiceOptionFactory(obdDeactivateHandler, obdHelpHandler);
 
         ServiceOptionHandler handler = obdServiceOptionFactory.getHandler(ServiceOption.UNSUBSCRIBE);
 
         assertTrue(handler instanceof OBDDeactivateHandler);
+    }
+
+    @Test
+    public void shouldGetTheHelpHandler() {
+        OBDServiceOptionFactory obdServiceOptionFactory = new OBDServiceOptionFactory(obdDeactivateHandler, obdHelpHandler);
+
+        ServiceOptionHandler handler = obdServiceOptionFactory.getHandler(ServiceOption.HELP);
+
+        assertTrue(handler instanceof OBDHelpHandler);
     }
 }

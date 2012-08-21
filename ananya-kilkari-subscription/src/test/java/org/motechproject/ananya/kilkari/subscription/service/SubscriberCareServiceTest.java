@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriberCareDocs;

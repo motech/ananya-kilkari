@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.web;
 
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.springframework.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;

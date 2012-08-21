@@ -1,10 +1,10 @@
-package org.motechproject.ananya.kilkari.request;
+package org.motechproject.ananya.kilkari.obd.service.request;
 
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
-import org.motechproject.ananya.kilkari.subscription.domain.Channel;
 
 public class OBDSuccessfulCallDetailsRequest {
     private String msisdn;

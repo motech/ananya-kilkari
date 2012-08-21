@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.builder;
+package org.motechproject.ananya.kilkari.obd.service;
 
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.springframework.stereotype.Component;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class CampaignMessageCSVBuilder {
+class CampaignMessageCSVBuilder {
 
     public String getCSV(List<CampaignMessage> campaignMessages) {
         StringBuilder csvContent = new StringBuilder();

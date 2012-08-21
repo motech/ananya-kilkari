@@ -1,8 +1,9 @@
-package org.motechproject.ananya.kilkari.obd.builder;
+package org.motechproject.ananya.kilkari.obd.service;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageCSVBuilder;
 
 import java.util.ArrayList;
 

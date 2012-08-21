@@ -10,7 +10,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.factory.OBDServiceOptionFactory;
@@ -18,11 +17,7 @@ import org.motechproject.ananya.kilkari.handlers.callback.obd.ServiceOptionHandl
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
-import org.motechproject.ananya.kilkari.obd.domain.ServiceOption;
 import org.motechproject.ananya.kilkari.obd.service.OBDService;
-import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
-import org.motechproject.ananya.kilkari.obd.service.request.InvalidOBDRequestEntries;
-import org.motechproject.ananya.kilkari.obd.service.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
@@ -65,15 +60,8 @@ public class KilkariCampaignServiceTest {
     @Mock
     private InboxService inboxService;
     @Mock
-    private OBDServiceOptionFactory obdServiceOptionFactory;
-    @Mock
-    private ServiceOptionHandler serviceOptionHandler;
-    @Mock
-    private CallDetailsRequestValidator successfulCallDetailsRequestValidator;
-    @Mock
     private CampaignMessageAlertService campaignMessageAlertService;
-    @Mock
-    private OBDService obdService;
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -82,8 +70,8 @@ public class KilkariCampaignServiceTest {
         initMocks(this);
         kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService,
                 campaignMessageAlertService, reportingService, callDetailsRequestPublisher,
-                inboxService, obdServiceOptionFactory, successfulCallDetailsRequestValidator,
-                obdService);
+                inboxService
+        );
     }
 
     @Test
@@ -141,57 +129,7 @@ public class KilkariCampaignServiceTest {
         verify(callDetailsRequestPublisher).publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
     }
 
-    @Test
-    public void shouldProcessSuccessfulCampaignMessageDelivery() {
-        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsWebRequest = Mockito.mock(OBDSuccessfulCallDetailsWebRequest.class);
 
-        String subscriptionId = "subscriptionId";
-        String campaignId = "WEEK1";
-        String msisdn = "1234567890";
-        String serviceOption = ServiceOption.HELP.name();
-        String startTime = "25-12-2012 12-13-14";
-        String endTime = "27-12-2012 12-15-19";
-        CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(startTime, endTime);
-
-        when(obdSuccessfulCallDetailsWebRequest.getMsisdn()).thenReturn(msisdn);
-        when(obdSuccessfulCallDetailsWebRequest.getCampaignId()).thenReturn(campaignId);
-        when(obdSuccessfulCallDetailsWebRequest.getServiceOption()).thenReturn(serviceOption);
-        when(obdSuccessfulCallDetailsWebRequest.getCallDurationWebRequest()).thenReturn(callDurationWebRequest);
-        when(obdSuccessfulCallDetailsWebRequest.getSubscriptionId()).thenReturn(subscriptionId);
-
-        when(successfulCallDetailsRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
-        when(obdServiceOptionFactory.getHandler(ServiceOption.HELP)).thenReturn(serviceOptionHandler);
-        when(obdSuccessfulCallDetailsWebRequest.validate()).thenReturn(new Errors());
-        when(obdService.processSuccessfulCallDelivery(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(true);
-
-        kilkariCampaignService.processSuccessfulMessageDelivery(obdSuccessfulCallDetailsWebRequest);
-
-        InOrder inOrder = Mockito.inOrder(obdSuccessfulCallDetailsWebRequest, successfulCallDetailsRequestValidator, reportingService);
-        inOrder.verify(obdSuccessfulCallDetailsWebRequest).validate();
-        inOrder.verify(successfulCallDetailsRequestValidator).validate(any(OBDSuccessfulCallDetailsRequest.class));
-
-        verify(serviceOptionHandler).process(any(OBDSuccessfulCallDetailsRequest.class));
-    }
-
-    @Test
-    public void shouldNotProcessSuccessfulCampaignMessageDeliveryIfThereIsNoSubscriptionAvailable() {
-        String subscriptionId = "subscriptionId";
-        String campaignId = "WEEK1";
-        String msisdn = "1234567890";
-        String serviceOption = ServiceOption.HELP.name();
-        String startTime = "25-12-2012 12-13-14";
-        String endTime = "27-12-2012 12-15-19";
-        CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(startTime, endTime);
-        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, serviceOption);
-
-        obdSuccessfulCallDetailsRequest.setSubscriptionId(subscriptionId);
-        when(successfulCallDetailsRequestValidator.validate(any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(new Errors());
-        when(obdService.processSuccessfulCallDelivery(Mockito.any(OBDSuccessfulCallDetailsRequest.class))).thenReturn(false);
-
-        kilkariCampaignService.processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
-
-        verify(obdServiceOptionFactory, never()).getHandler(ServiceOption.HELP);
-    }
 
 
     @Test

@@ -39,9 +39,6 @@ public class KilkariCampaignService {
     private ReportingService reportingService;
     private CallDetailsRequestPublisher callDetailsRequestPublisher;
     private InboxService inboxService;
-    private OBDServiceOptionFactory obdServiceOptionFactory;
-    private CallDetailsRequestValidator callDetailsRequestValidator;
-    private OBDService obdService;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariCampaignService.class);
 
@@ -54,19 +51,13 @@ public class KilkariCampaignService {
                                   CampaignMessageAlertService campaignMessageAlertService,
                                   ReportingService reportingService,
                                   CallDetailsRequestPublisher callDetailsRequestPublisher,
-                                  InboxService inboxService,
-                                  OBDServiceOptionFactory obdServiceOptionFactory,
-                                  CallDetailsRequestValidator callDetailsRequestValidator,
-                                  OBDService obdService) {
+                                  InboxService inboxService) {
         this.messageCampaignService = messageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.campaignMessageAlertService = campaignMessageAlertService;
         this.reportingService = reportingService;
         this.callDetailsRequestPublisher = callDetailsRequestPublisher;
         this.inboxService = inboxService;
-        this.obdServiceOptionFactory = obdServiceOptionFactory;
-        this.callDetailsRequestValidator = callDetailsRequestValidator;
-        this.obdService = obdService;
     }
 
     public Map<String, List<DateTime>> getMessageTimings(String msisdn) {
@@ -121,19 +112,6 @@ public class KilkariCampaignService {
             kilkariSubscriptionService.processSubscriptionCompletion(subscription);
     }
 
-    public void processSuccessfulMessageDelivery(OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsWebRequest) {
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = validateSuccessfulCallRequest(obdSuccessfulCallDetailsWebRequest);
-        boolean processed = obdService.processSuccessfulCallDelivery(obdSuccessfulCallDetailsRequest);
-        if (!processed) {
-            return;
-        }
-
-        ServiceOptionHandler serviceOptionHandler = obdServiceOptionFactory.getHandler(obdSuccessfulCallDetailsRequest.getServiceOption());
-        if (serviceOptionHandler != null) {
-            serviceOptionHandler.process(obdSuccessfulCallDetailsRequest);
-        }
-    }
-
     public void processInboxCallDetailsRequest(InboxCallDetailsWebRequest inboxCallDetailsWebRequest) {
         Errors errors = inboxCallDetailsWebRequest.validate();
         if (errors.hasErrors())
@@ -155,24 +133,5 @@ public class KilkariCampaignService {
 
     public void publishSuccessfulCallRequest(OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest) {
         callDetailsRequestPublisher.publishSuccessfulCallRequest(obdSuccessfulCallDetailsRequest);
-    }
-
-    private OBDSuccessfulCallDetailsRequest validateSuccessfulCallRequest(OBDSuccessfulCallDetailsWebRequest webRequest) {
-        Errors validationErrors = webRequest.validate();
-        if (validationErrors.hasErrors()) {
-            throw new ValidationException(String.format("OBD Request Invalid: %s", validationErrors.allMessages()));
-        }
-
-        OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest = new CallDetailsRequestMapper().mapOBDRequest(webRequest);
-        validateSubscription(obdSuccessfulCallDetailsRequest);
-        return obdSuccessfulCallDetailsRequest;
-    }
-
-    private void validateSubscription(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
-        Errors validationErrors;
-        validationErrors = callDetailsRequestValidator.validate(obdSuccessfulCallDetailsRequest);
-        if (validationErrors.hasErrors()) {
-            throw new ValidationException(String.format("OBD Request Invalid: %s", validationErrors.allMessages()));
-        }
     }
 }

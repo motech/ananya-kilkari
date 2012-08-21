@@ -14,6 +14,7 @@ import org.motechproject.ananya.kilkari.request.InboxCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.obd.service.request.OBDSuccessfulCallDetailsRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.service.CallDetailsEventKeys;
+import org.motechproject.ananya.kilkari.service.KilkariCallDetailsService;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
 import org.motechproject.ananya.kilkari.service.validator.CallDetailsRequestValidator;
 import org.motechproject.scheduler.domain.MotechEvent;
@@ -37,12 +38,14 @@ public class CallDetailsRequestHandlerTest {
     private CallDetailsRequestValidator successfulCallDetailsRequestValidator;
     @Mock
     private CampaignMessageService campaignMessageService;
+    @Mock
+    private KilkariCallDetailsService kilkariCallDetailsService;
 
     private CallDetailsRequestHandler callDetailsRequestHandler;
 
     @Before
     public void setUp() {
-        callDetailsRequestHandler = new CallDetailsRequestHandler(kilkariCampaignService);
+        callDetailsRequestHandler = new CallDetailsRequestHandler(kilkariCampaignService, kilkariCallDetailsService);
     }
 
     @Test
@@ -54,7 +57,7 @@ public class CallDetailsRequestHandlerTest {
 
         callDetailsRequestHandler.handleOBDCallbackRequest(new MotechEvent(CallDetailsEventKeys.PROCESS_OBD_SUCCESSFUL_CALL_REQUEST_SUBJECT, stringObjectHashMap));
 
-        verify(kilkariCampaignService).processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
+        verify(kilkariCallDetailsService).processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
     }
 
     @Test
@@ -66,7 +69,7 @@ public class CallDetailsRequestHandlerTest {
 
         callDetailsRequestHandler.handleOBDCallbackRequest(new MotechEvent(CallDetailsEventKeys.PROCESS_OBD_SUCCESSFUL_CALL_REQUEST_SUBJECT, stringObjectHashMap));
 
-        verify(kilkariCampaignService).processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
+        verify(kilkariCallDetailsService).processSuccessfulMessageDelivery(obdSuccessfulCallDetailsRequest);
     }
 
     @Test

@@ -58,14 +58,13 @@ public class KilkariSubscriptionServiceTest {
     @Mock
     private KilkariPropertiesData kilkariPropertiesData;
     @Mock
-    private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
-    @Mock
     private ChangePackService changePackService;
 
     @Before
     public void setup() {
         initMocks(this);
-        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService, changePackService, kilkariPropertiesData, unsubscriptionRequestValidator);
+        kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService,
+                changePackService, kilkariPropertiesData);
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
     }
 
@@ -187,7 +186,6 @@ public class KilkariSubscriptionServiceTest {
         String subscriptionId = "abcd1234";
         UnSubscriptionWebRequest unSubscriptionWebRequest = new UnSubscriptionWebRequest();
         unSubscriptionWebRequest.setChannel(Channel.CALL_CENTER.name());
-        when(unsubscriptionRequestValidator.validate(subscriptionId)).thenReturn(new Errors());
 
         kilkariSubscriptionService.requestDeactivation(subscriptionId, unSubscriptionWebRequest);
 

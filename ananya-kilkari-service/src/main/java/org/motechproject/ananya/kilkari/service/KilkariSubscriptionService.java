@@ -37,7 +37,6 @@ public class KilkariSubscriptionService {
     private SubscriptionService subscriptionService;
     private MotechSchedulerService motechSchedulerService;
     private KilkariPropertiesData kilkariProperties;
-    private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
     private ChangePackService changePackService;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariSubscriptionService.class);
@@ -46,14 +45,12 @@ public class KilkariSubscriptionService {
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
                                       SubscriptionService subscriptionService,
                                       MotechSchedulerService motechSchedulerService,
-                                      ChangePackService changePackService, KilkariPropertiesData kilkariProperties,
-                                      UnsubscriptionRequestValidator unsubscriptionRequestValidator) {
+                                      ChangePackService changePackService, KilkariPropertiesData kilkariProperties) {
         this.subscriptionPublisher = subscriptionPublisher;
         this.subscriptionService = subscriptionService;
         this.motechSchedulerService = motechSchedulerService;
         this.changePackService = changePackService;
         this.kilkariProperties = kilkariProperties;
-        this.unsubscriptionRequestValidator = unsubscriptionRequestValidator;
     }
 
     public void createSubscriptionAsync(SubscriptionWebRequest subscriptionWebRequest) {

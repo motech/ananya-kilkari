@@ -24,10 +24,10 @@ public class IvrPerformanceTest extends BasePerformanceTest {
         super(testName);
     }
 
-    @LoadTest(concurrentUsers = 10)
+    @LoadTest(concurrentUsers = 100)
     public void shouldCreateAnIvrSubscription() throws InterruptedException {
 
-        SubscriptionService subscriptionService= new SubscriptionService();
+        SubscriptionService subscriptionService = new SubscriptionService();
         DateTime beforeTest = DateTime.now();
         String expectedStatus = "PENDING_ACTIVATION";
         Map<String, String> parametersMap = constructParameters();
@@ -39,13 +39,19 @@ public class IvrPerformanceTest extends BasePerformanceTest {
         assertNotNull(subscription);
         DateTime afterTest = DateTime.now();
         Period p = new Period(beforeTest, afterTest);
-        System.out.println(p.getMillis()+" ms");
+        System.out.println(p.getMillis() + " ms");
     }
 
+    @LoadTest(concurrentUsers = 5)
+    public void shouldCreateIvrSubscriptionsForBulkUsers() throws InterruptedException {
+        for (int i = 0; i < 100; i++) {
+            shouldCreateAnIvrSubscription();
+        }
+    }
 
     private Map<String, String> constructParameters() {
         Map<String, String> parametersMap = new HashMap<>();
-        parametersMap.put("msisdn", "1" + RandomStringUtils.randomNumeric(9));
+        parametersMap.put("msisdn", "9" + RandomStringUtils.randomNumeric(9));
         parametersMap.put("channel", "IVR");
         parametersMap.put("pack", "bari_kilkari");
         return parametersMap;

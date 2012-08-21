@@ -39,7 +39,7 @@ public class LoadRunner extends BlockJUnit4ClassRunner {
                 LoadTest loadTest = method.getAnnotation(LoadTest.class);
                 TestSuite testSuite = TestSuiteUtils.createTestSuite(loadTest.concurrentUsers(), method.getMethod().getDeclaringClass(), method.getMethod().getName());
                 TestResult testResult = TestRunner.run(testSuite);
-                assertTrue(testResult.failureCount()==0);
+                assertTrue(testResult.failureCount()==0 && testResult.errorCount()==0);
 
             }
         };

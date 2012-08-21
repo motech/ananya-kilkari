@@ -109,7 +109,7 @@ public class SubscriptionService {
     }
 
     public List<Subscription> findByMsisdn(String msisdn) {
-        return (List<Subscription>) (List<? extends Subscription>) allSubscriptions.findByMsisdn(msisdn);
+        return allSubscriptions.findByMsisdn(msisdn);
     }
 
     private DateTime getBufferedDateTime(DateTime dateTime) {

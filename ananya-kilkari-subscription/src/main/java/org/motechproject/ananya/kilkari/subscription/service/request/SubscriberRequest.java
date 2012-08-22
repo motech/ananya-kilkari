@@ -9,20 +9,16 @@ public class SubscriberRequest {
     private DateTime createdAt;
     private String beneficiaryName;
     private Integer beneficiaryAge;
-    private DateTime expectedDateOfDelivery;
-    private DateTime dateOfBirth;
     private Location location;
 
     public SubscriberRequest(String subscriptionId, String channel, DateTime createdAt,
-                             String beneficiaryName, Integer beneficiaryAge, DateTime expectedDateOfDelivery,
-                             DateTime dateOfBirth, Location location) {
+                             String beneficiaryName, Integer beneficiaryAge,
+                             Location location) {
         this.subscriptionId = subscriptionId;
         this.channel = channel;
         this.createdAt = createdAt;
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
-        this.expectedDateOfDelivery = expectedDateOfDelivery;
-        this.dateOfBirth = dateOfBirth;
         this.location = location;
     }
 
@@ -44,14 +40,6 @@ public class SubscriberRequest {
 
     public Integer getBeneficiaryAge() {
         return beneficiaryAge;
-    }
-
-    public DateTime getExpectedDateOfDelivery() {
-        return expectedDateOfDelivery;
-    }
-
-    public DateTime getDateOfBirth() {
-        return dateOfBirth;
     }
 
     public String getBlock() {

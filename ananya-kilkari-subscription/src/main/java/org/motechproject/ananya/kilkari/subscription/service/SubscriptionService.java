@@ -263,7 +263,7 @@ public class SubscriptionService {
 
         SubscriberLocation subscriberLocation = new SubscriberLocation(request.getDistrict(), request.getBlock(), request.getPanchayat());
         reportingService.reportSubscriberDetailsChange(request.getSubscriptionId(), new SubscriberReportRequest(request.getCreatedAt(),
-                request.getBeneficiaryName(), request.getBeneficiaryAge(), request.getExpectedDateOfDelivery(), request.getDateOfBirth(), subscriberLocation));
+                request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
     }
 
     public void unScheduleCampaign(Subscription subscription) {

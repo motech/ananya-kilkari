@@ -607,11 +607,9 @@ public class SubscriptionServiceTest {
     public void shouldPublishASubscriberUpdateEvent() {
         String subscriptionId = "subscriptionId";
         Location location = new Location("district", "block", "panchayat");
-        DateTime expectedDateOfDelivery = DateTime.now().plusYears(5);
-        DateTime dateOfBirth = DateTime.now().minusYears(5);
 
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CALL_CENTER.name(), DateTime.now(), "name", 23,
-                expectedDateOfDelivery, dateOfBirth, location));
+                location));
 
         ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
         ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
@@ -620,8 +618,6 @@ public class SubscriptionServiceTest {
         String actualSubscriptionId = subscriptionIdCaptor.getValue();
 
         assertEquals(subscriptionId, actualSubscriptionId);
-        assertEquals(expectedDateOfDelivery, reportRequest.getExpectedDateOfDelivery());
-        assertEquals(dateOfBirth, reportRequest.getDateOfBirth());
         assertEquals(23, (int) reportRequest.getBeneficiaryAge());
         assertEquals("name", reportRequest.getBeneficiaryName());
         assertEquals("district", reportRequest.getLocation().getDistrict());

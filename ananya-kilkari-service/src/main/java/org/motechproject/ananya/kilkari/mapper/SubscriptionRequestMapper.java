@@ -30,8 +30,7 @@ public class SubscriptionRequestMapper {
     public static SubscriberRequest mapToSubscriberRequest(SubscriberWebRequest request, String subscriptionId) {
         Location location = new Location(request.getDistrict(), request.getBlock(), request.getPanchayat());
         return new SubscriberRequest(subscriptionId, request.getChannel(), request.getCreatedAt(),
-                request.getBeneficiaryName(), convertToInteger(request.getBeneficiaryAge()), DateUtils.parseDate(request.getExpectedDateOfDelivery()),
-                DateUtils.parseDate(request.getDateOfBirth()), location);
+                request.getBeneficiaryName(), convertToInteger(request.getBeneficiaryAge()),location);
     }
 
     public static ChangeSubscriptionRequest mapToChangeSubscriptionRequest(ChangeSubscriptionWebRequest webRequest, String subscriptionId) {

@@ -11,9 +11,7 @@ import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
-import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.*;
-import org.motechproject.ananya.kilkari.service.validator.UnsubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
@@ -254,7 +252,6 @@ public class KilkariSubscriptionServiceTest {
         request.setBeneficiaryAge("23");
         request.setChannel(Channel.CALL_CENTER.name());
         request.setCreatedAt(DateTime.now());
-        request.setDateOfBirth("20-10-1985");
         request.setBlock("block");
         String subscriptionId = "subscriptionId";
 
@@ -270,7 +267,6 @@ public class KilkariSubscriptionServiceTest {
         request.setBeneficiaryAge("23");
         request.setChannel(Channel.IVR.name());
         request.setCreatedAt(DateTime.now());
-        request.setDateOfBirth("20-10-1985");
         request.setBlock("block");
         String subscriptionId = "subscriptionId";
 
@@ -282,7 +278,6 @@ public class KilkariSubscriptionServiceTest {
         assertEquals(Integer.valueOf(request.getBeneficiaryAge()), subscriberRequest.getBeneficiaryAge());
         assertEquals(request.getChannel(), subscriberRequest.getChannel());
         assertEquals(request.getCreatedAt(), subscriberRequest.getCreatedAt());
-        assertEquals(DateUtils.parseDate(request.getDateOfBirth()), subscriberRequest.getDateOfBirth());
         assertEquals(request.getBlock(), subscriberRequest.getBlock());
         assertEquals(subscriptionId, subscriberRequest.getSubscriptionId());
     }

@@ -75,7 +75,7 @@ public class ReportingServiceImplTest {
     @Test
     public void shouldReportASubscriberUpdate() {
         String subscriptionId = "subscriptionId";
-        SubscriberReportRequest subscriberReportRequest = new SubscriberReportRequest(null, "Name", null, null, null, null);
+        SubscriberReportRequest subscriberReportRequest = new SubscriberReportRequest(null, "Name", null, null);
 
         reportingServiceImpl.reportSubscriberDetailsChange(subscriptionId, subscriberReportRequest);
 

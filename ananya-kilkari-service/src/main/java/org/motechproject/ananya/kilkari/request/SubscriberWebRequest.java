@@ -21,10 +21,6 @@ public class SubscriberWebRequest implements Serializable {
     @JsonProperty
     private String beneficiaryAge;
     @JsonProperty
-    private String expectedDateOfDelivery;
-    @JsonProperty
-    private String dateOfBirth;
-    @JsonProperty
     private LocationRequest location;
 
     public SubscriberWebRequest() {
@@ -50,16 +46,6 @@ public class SubscriberWebRequest implements Serializable {
     @JsonIgnore
     public String getBeneficiaryAge() {
         return beneficiaryAge;
-    }
-
-    @JsonIgnore
-    public String getExpectedDateOfDelivery() {
-        return expectedDateOfDelivery;
-    }
-
-    @JsonIgnore
-    public String getDateOfBirth() {
-        return dateOfBirth;
     }
 
     @JsonIgnore
@@ -102,14 +88,6 @@ public class SubscriberWebRequest implements Serializable {
         this.beneficiaryAge = beneficiaryAge;
     }
 
-    public void setExpectedDateOfDelivery(String expectedDateOfDelivery) {
-        this.expectedDateOfDelivery = expectedDateOfDelivery;
-    }
-
-    public void setDateOfBirth(String dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
     public void setCreatedAt(DateTime createdAt) {
         this.createdAt = createdAt;
     }
@@ -122,9 +100,6 @@ public class SubscriberWebRequest implements Serializable {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
         webRequestValidator.validateChannel(channel, Channel.IVR);
         webRequestValidator.validateAge(beneficiaryAge);
-        webRequestValidator.validateDOB(dateOfBirth, createdAt);
-        webRequestValidator.validateEDD(expectedDateOfDelivery, createdAt);
-        webRequestValidator.validateOnlyOneOfEDDOrDOBIsPresent(expectedDateOfDelivery, dateOfBirth);
         return webRequestValidator.getErrors();
     }
 
@@ -139,8 +114,6 @@ public class SubscriberWebRequest implements Serializable {
                 .append(this.channel, that.channel)
                 .append(this.beneficiaryAge, that.beneficiaryAge)
                 .append(this.beneficiaryName, that.beneficiaryName)
-                .append(this.dateOfBirth, that.dateOfBirth)
-                .append(this.expectedDateOfDelivery, that.expectedDateOfDelivery)
                 .append(this.location, that.location)
                 .isEquals();
     }
@@ -151,8 +124,6 @@ public class SubscriberWebRequest implements Serializable {
                 .append(this.channel)
                 .append(this.beneficiaryAge)
                 .append(this.beneficiaryName)
-                .append(this.dateOfBirth)
-                .append(this.expectedDateOfDelivery)
                 .append(this.location)
                 .hashCode();
     }

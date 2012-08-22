@@ -56,15 +56,11 @@ public class SubscriptionRequestMapperTest {
         subscriberWebRequest.setPanchayat(panchayat);
         subscriberWebRequest.setChannel(call_center);
         subscriberWebRequest.setCreatedAt(createdAtTime);
-        subscriberWebRequest.setDateOfBirth(dob);
-        subscriberWebRequest.setExpectedDateOfDelivery(edd);
 
         SubscriberRequest subscriberRequest = SubscriptionRequestMapper.mapToSubscriberRequest(subscriberWebRequest, subscriptionId);
 
         assertEquals(name, subscriberRequest.getBeneficiaryName());
         assertEquals(Integer.valueOf(beneficiaryAge), subscriberRequest.getBeneficiaryAge());
-        assertEquals(DateUtils.parseDate(edd), subscriberRequest.getExpectedDateOfDelivery());
-        assertEquals(DateUtils.parseDate(dob), subscriberRequest.getDateOfBirth());
         assertEquals(district, subscriberRequest.getDistrict());
         assertEquals(block, subscriberRequest.getBlock());
         assertEquals(panchayat, subscriberRequest.getPanchayat());
@@ -80,8 +76,6 @@ public class SubscriptionRequestMapperTest {
 
         assertNull(subscriberRequest.getBeneficiaryName());
         assertNull(subscriberRequest.getBeneficiaryAge());
-        assertNull(subscriberRequest.getExpectedDateOfDelivery());
-        assertNull(subscriberRequest.getDateOfBirth());
         assertNull(subscriberRequest.getDistrict());
         assertNull(subscriberRequest.getBlock());
         assertNull(subscriberRequest.getPanchayat());

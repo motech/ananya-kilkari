@@ -198,7 +198,7 @@ public class ReportingGatewayImplTest {
     public void shouldReportASubscriberUpdate() {
         String subscriptionId = "subscriptionId";
         String beneficiaryName = "Name";
-        SubscriberReportRequest subscriberReportRequest = new SubscriberReportRequest(null, beneficiaryName, null, null, null, null);
+        SubscriberReportRequest subscriberReportRequest = new SubscriberReportRequest(null, beneficiaryName, null, null);
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
 
         reportingGateway.reportSubscriberDetailsChange(subscriptionId, subscriberReportRequest);

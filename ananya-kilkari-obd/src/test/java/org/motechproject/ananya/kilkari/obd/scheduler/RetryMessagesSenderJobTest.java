@@ -7,13 +7,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
+import org.motechproject.event.MotechEvent;
 import org.motechproject.retry.domain.RetryRequest;
 import org.motechproject.retry.service.RetryService;
 import org.motechproject.scheduler.domain.CronSchedulableJob;
-import org.motechproject.event.MotechEvent;
 
 import java.util.HashMap;
-import java.util.Properties;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -32,8 +31,8 @@ public class RetryMessagesSenderJobTest {
     @Before
     public void setUp() {
         initMocks(this);
-        DateTime startTime = DateTime.now().minusHours(1);
-        DateTime endTime = DateTime.now().plusHours(3);
+        DateTime startTime = DateTime.now().minusMinutes(1);
+        DateTime endTime = DateTime.now().plusMinutes(1);
 
         when(obdProperties.getSecondSlotStartTimeHour()).thenReturn(startTime.getHourOfDay());
         when(obdProperties.getSecondSlotStartTimeMinute()).thenReturn(startTime.getMinuteOfHour());

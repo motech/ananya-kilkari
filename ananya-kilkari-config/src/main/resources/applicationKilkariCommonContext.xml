@@ -20,5 +20,5 @@
             </bean>
         </constructor-arg>
     </bean>
-
+    <bean id="mockedServletContext" class="org.springframework.mock.web.MockServletContext"/>
 </beans>

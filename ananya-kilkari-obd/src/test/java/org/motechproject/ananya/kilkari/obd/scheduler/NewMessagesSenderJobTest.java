@@ -33,8 +33,8 @@ public class NewMessagesSenderJobTest {
     @Before
     public void setUp() {
         initMocks(this);
-        DateTime startTime = DateTime.now().minusHours(1);
-        DateTime endTime = DateTime.now().plusHours(3);
+        DateTime startTime = DateTime.now().minusMinutes(1);
+        DateTime endTime = DateTime.now().plusMinutes(1);
 
         when(obdProperties.getFirstSlotStartTimeHour()).thenReturn(startTime.getHourOfDay());
         when(obdProperties.getFirstSlotStartTimeMinute()).thenReturn(startTime.getMinuteOfHour());

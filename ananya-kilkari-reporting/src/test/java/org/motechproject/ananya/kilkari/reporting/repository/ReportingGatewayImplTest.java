@@ -236,6 +236,18 @@ public class ReportingGatewayImplTest {
     }
 
     @Test
+    public void shouldMakeSynchronousCallIfSourceIsCallCenter(){
+        String msisdn = "msisdn";
+        String subscriptionId = "subscriptionId";
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        HttpThreadContext.set("CALL_CENTER");
+
+        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+
+        verify(httpClientService).executeSync("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
+    }
+
+    @Test
     public void shouldInvokeReportingServiceWithGetSubscriberForAGivenSubscriptionId() {
         String subscriptionId = "subscriptionId";
         String url = "url/subscription/subscriber/subscriptionId";

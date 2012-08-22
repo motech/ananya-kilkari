@@ -289,6 +289,59 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    public void shouldUpdateInboxDuringActivationWhenMessageHasAlreadyBeenScheduled() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
+        String operator = subscription.getOperator().name();
+        DateTime activatedOn = DateTime.now();
+        String subscriptionId = subscription.getSubscriptionId();
+        int deltaDays = 2;
+        int deltaMinutes = 30;
+        String messageId = "mesasgeId";
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(kilkariPropertiesData.getCampaignScheduleDeltaDays()).thenReturn(deltaDays);
+        when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(deltaMinutes);
+        when(campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, subscription.getMsisdn(), operator)).thenReturn(messageId);
+
+        subscriptionService.activate(subscriptionId, activatedOn, operator);
+
+        verify(inboxService).newMessage(subscriptionId, messageId);
+    }
+
+    @Test
+    public void shouldNotUpdateInboxDuringActivationWhenMessageHasNotAlreadyBeenScheduled() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
+        String operator = subscription.getOperator().name();
+        DateTime activatedOn = DateTime.now();
+        String subscriptionId = subscription.getSubscriptionId();
+        int deltaDays = 2;
+        int deltaMinutes = 30;
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(kilkariPropertiesData.getCampaignScheduleDeltaDays()).thenReturn(deltaDays);
+        when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(deltaMinutes);
+
+        subscriptionService.activate(subscriptionId, activatedOn, operator);
+
+        verify(inboxService, never()).newMessage(anyString(), anyString());
+    }
+
+    @Test
+    public void shouldCallCampaignMessageAlertServiceOnActivation() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
+        String operator = subscription.getOperator().name();
+        DateTime activatedOn = DateTime.now();
+        String subscriptionId = subscription.getSubscriptionId();
+        int deltaDays = 2;
+        int deltaMinutes = 30;
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(kilkariPropertiesData.getCampaignScheduleDeltaDays()).thenReturn(deltaDays);
+        when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(deltaMinutes);
+
+        subscriptionService.activate(subscriptionId, activatedOn, operator);
+
+        verify(campaignMessageAlertService).scheduleCampaignMessageAlertForActivation(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
+    }
+
+    @Test
     public void shouldActivateSubscriptionAndScheduleCampaign() {
         Subscription subscription = new SubscriptionBuilder().withDefaults().build();
         String operator = "airtel";
@@ -329,7 +382,6 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldActivateRenewedSubscriptionWhichHadBeenSuspended() {
-
         DateTime renewalDate = DateTime.now();
         int graceCount = 2;
 
@@ -337,6 +389,7 @@ public class SubscriptionServiceTest {
         final String subscriptionId = subscription.getSubscriptionId();
 
         subscription.setStatus(SubscriptionStatus.SUSPENDED);
+        subscription.setOperator(Operator.AIRTEL);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         subscriptionService.renewSubscription(subscriptionId, renewalDate, graceCount);
@@ -784,7 +837,8 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldUnScheduleMessageCampaignAndDeleteCampaignMessageAlertOnSuccessfulDeactivationRequest() {
         DateTime createdAt = DateTime.now();
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.CHOTI_KILKARI, createdAt, DateTime.now());
+        DateTime startDate = DateTime.now().plus(123);
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.CHOTI_KILKARI, createdAt, startDate);
         subscription.setStatus(SubscriptionStatus.NEW);
 
         String subscriptionId = subscription.getSubscriptionId();
@@ -798,7 +852,7 @@ public class SubscriptionServiceTest {
         MessageCampaignRequest messageCampaignRequest = campaignRequestArgumentCaptor.getValue();
         assertEquals(subscriptionId, messageCampaignRequest.getExternalId());
         assertEquals(MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), messageCampaignRequest.getCampaignName());
-        assertEquals(createdAt, messageCampaignRequest.getSubscriptionStartDate());
+        assertEquals(startDate, messageCampaignRequest.getSubscriptionStartDate());
         verify(campaignMessageAlertService).deleteFor(subscriptionId);
     }
 
@@ -986,4 +1040,55 @@ public class SubscriptionServiceTest {
         assertEquals(graceCount, subscriptionStateChangeReportRequest.getGraceCount());
     }
 
+
+    @Test
+    public void shouldNotUpdateInboxDuringRenewalWhenMessageHasNotAlreadyBeenScheduled() {
+        String msisdn = "1234567890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        subscription.setStatus(SubscriptionStatus.NEW);
+        String subscriptionId = subscription.getSubscriptionId();
+        Operator operator = Operator.AIRTEL;
+        subscription.setOperator(operator);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.renewSubscription(subscriptionId, DateTime.now(), null);
+
+        verify(inboxService, never()).newMessage(anyString(), anyString());
+    }
+
+    @Test
+    public void shouldNotUpdateInboxDuringRenewalnWhenMessageHasAlreadyBeenScheduled() {
+        String msisdn = "1234567890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        subscription.setStatus(SubscriptionStatus.NEW);
+
+        String subscriptionId = subscription.getSubscriptionId();
+        Operator operator = Operator.AIRTEL;
+        subscription.setOperator(operator);
+        String messageId = "mesasgeId";
+
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, msisdn, operator.name())).thenReturn(messageId);
+
+        subscriptionService.renewSubscription(subscriptionId, DateTime.now(), null);
+
+        verify(inboxService, never()).newMessage(anyString(), anyString());
+    }
+
+    @Test
+    public void shouldCallCampaignMessageAlertServiceOnRenewal() {
+        String msisdn = "1234567890";
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        subscription.setStatus(SubscriptionStatus.NEW);
+
+        String subscriptionId = subscription.getSubscriptionId();
+        Operator operator = Operator.AIRTEL;
+        subscription.setOperator(operator);
+
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.renewSubscription(subscriptionId, DateTime.now(), null);
+
+        verify(campaignMessageAlertService).scheduleCampaignMessageAlertForRenewal(subscriptionId, msisdn, operator.name());
+    }
 }

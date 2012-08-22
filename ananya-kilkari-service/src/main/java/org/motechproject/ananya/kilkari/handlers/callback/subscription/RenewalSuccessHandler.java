@@ -21,6 +21,5 @@ public class RenewalSuccessHandler implements SubscriptionStateHandler {
     public void perform(CallbackRequestWrapper callbackRequestWrapper) {
         String subscriptionId = callbackRequestWrapper.getSubscriptionId();
         subscriptionService.renewSubscription(subscriptionId, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getGraceCount());
-        kilkariCampaignService.renewSchedule(subscriptionId);
     }
 }

@@ -254,4 +254,28 @@ public class Subscription extends MotechBaseDataObject {
     public boolean isEarlySubscription() {
         return startDate.isAfter(creationDate);
     }
+
+    public boolean canActivate() {
+        return status.canTransitionTo(SubscriptionStatus.ACTIVE);
+    }
+
+    public boolean canDeactivate() {
+        return status.canTransitionTo(SubscriptionStatus.DEACTIVATED);
+    }
+
+    public boolean canRequestDeactivation() {
+        return status.canTransitionTo(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED);
+    }
+
+    public boolean canSuspend() {
+        return status.canTransitionTo(SubscriptionStatus.SUSPENDED);
+    }
+
+    public boolean canCreateNewSubscription() {
+        return status.canTransitionTo(SubscriptionStatus.NEW);
+    }
+
+    public boolean canCreateANewEarlySubscription() {
+        return status.canTransitionTo(SubscriptionStatus.NEW_EARLY);
+    }
 }

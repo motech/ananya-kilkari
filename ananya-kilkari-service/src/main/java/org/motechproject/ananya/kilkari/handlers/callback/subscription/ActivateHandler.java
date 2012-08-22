@@ -20,6 +20,5 @@ public class ActivateHandler implements SubscriptionStateHandler {
     public void perform(CallbackRequestWrapper callbackRequestWrapper) {
         String subscriptionId = callbackRequestWrapper.getSubscriptionId();
         subscriptionService.activate(subscriptionId, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getOperator());
-        kilkariCampaignService.activateSchedule(subscriptionId);
     }
 }

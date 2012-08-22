@@ -127,6 +127,17 @@ public class SubscriptionService {
                 subscription.activate(operator, getBufferedDateTime(scheduleStartDateTime));
             }
         });
+        activateSchedule(subscription);
+    }
+
+    private void activateSchedule(Subscription subscription) {
+        String subscriptionId = subscription.getSubscriptionId();
+        logger.info(String.format("Processing activation for subscriptionId: %s", subscriptionId));
+
+        String currentMessageId = campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
+
+        if (currentMessageId != null)
+            inboxService.newMessage(subscriptionId, currentMessageId);
     }
 
     public void activationFailed(String subscriptionId, DateTime updatedOn, String reason, final String operator) {
@@ -181,6 +192,13 @@ public class SubscriptionService {
                 subscription.activateOnRenewal();
             }
         });
+        renewSchedule(subscriptionId);
+    }
+
+    private void renewSchedule(String subscriptionId) {
+        logger.info(String.format("Processing renewal for subscriptionId: %s", subscriptionId));
+        Subscription subscription = findBySubscriptionId(subscriptionId);
+        campaignMessageAlertService.scheduleCampaignMessageAlertForRenewal(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
     }
 
     public void suspendSubscription(String subscriptionId, final DateTime renewalDate, String reason, Integer graceCount) {
@@ -198,19 +216,6 @@ public class SubscriptionService {
             deactivateSubscription(subscriptionId, deactivationDate, reason, graceCount);
         else
             scheduleDeactivation(subscriptionId, deactivationDate, reason, graceCount);
-    }
-
-    private void scheduleDeactivation(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
-        String subjectKey = SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION;
-        Date startDate = DateTime.now().plusDays(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
-        HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put(MotechSchedulerService.JOB_ID_KEY, subscriptionId);
-        parameters.put("0", new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount));
-
-        MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
-        RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);
-
-        motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
     }
 
     public void deactivateSubscription(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
@@ -247,6 +252,21 @@ public class SubscriptionService {
         return allSubscriptions.findBySubscriptionId(subscriptionId);
     }
 
+    public void changeMsisdn(ChangeMsisdnRequest changeMsisdnRequest) {
+        changeMsisdnValidator.validate(changeMsisdnRequest);
+
+        String oldMsisdn = changeMsisdnRequest.getOldMsisdn();
+        List<Subscription> subscriptionsInProgress = allSubscriptions.findSubscriptionsInProgress(oldMsisdn);
+        for (Subscription subscription : subscriptionsInProgress) {
+            if (!shouldChangeMsisdn(subscription, changeMsisdnRequest)) continue;
+
+            if (subscription.getStatus().equals(SubscriptionStatus.NEW_EARLY))
+                changeMsisdnForEarlySubscription(subscription, changeMsisdnRequest);
+            else
+                migrateMsisdnToNewSubscription(subscription, changeMsisdnRequest);
+        }
+    }
+
     public void rescheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
         String subscriptionId = campaignRescheduleRequest.getSubscriptionId();
         subscriptionValidator.validateActiveSubscriptionExists(subscriptionId);
@@ -266,17 +286,30 @@ public class SubscriptionService {
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
     }
 
-    public void unScheduleCampaign(Subscription subscription) {
-        String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
-        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getStartDate());
-        messageCampaignService.stop(unEnrollRequest);
-    }
-
     private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest, DateTime nextAlertDateTime) {
         String campaignName = MessageCampaignPack.from(campaignRescheduleRequest.getReason().name()).getCampaignName();
         MessageCampaignRequest enrollRequest = new MessageCampaignRequest(campaignRescheduleRequest.getSubscriptionId(),
                 campaignName, nextAlertDateTime);
         messageCampaignService.start(enrollRequest, 0, kilkariPropertiesData.getCampaignScheduleDeltaMinutes());
+    }
+
+    private void scheduleDeactivation(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
+        String subjectKey = SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION;
+        Date startDate = DateTime.now().plusDays(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put(MotechSchedulerService.JOB_ID_KEY, subscriptionId);
+        parameters.put("0", new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount));
+
+        MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
+        RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);
+
+        motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+    }
+
+    private void unScheduleCampaign(Subscription subscription) {
+        String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
+        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getStartDate());
+        messageCampaignService.stop(unEnrollRequest);
     }
 
     private void scheduleCampaign(Subscription subscription, DateTime activatedOn) {
@@ -311,21 +344,6 @@ public class SubscriptionService {
 
         return changeMsisdnRequest.getPacks().contains(subscription.getPack());
 
-    }
-
-    public void changeMsisdn(ChangeMsisdnRequest changeMsisdnRequest) {
-        changeMsisdnValidator.validate(changeMsisdnRequest);
-
-        String oldMsisdn = changeMsisdnRequest.getOldMsisdn();
-        List<Subscription> subscriptionsInProgress = allSubscriptions.findSubscriptionsInProgress(oldMsisdn);
-        for (Subscription subscription : subscriptionsInProgress) {
-            if (!shouldChangeMsisdn(subscription, changeMsisdnRequest)) continue;
-
-            if (subscription.getStatus().equals(SubscriptionStatus.NEW_EARLY))
-                changeMsisdnForEarlySubscription(subscription, changeMsisdnRequest);
-            else
-                migrateMsisdnToNewSubscription(subscription, changeMsisdnRequest);
-        }
     }
 
     private void migrateMsisdnToNewSubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {

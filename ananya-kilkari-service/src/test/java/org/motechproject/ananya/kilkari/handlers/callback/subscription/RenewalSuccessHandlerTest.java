@@ -36,6 +36,5 @@ public class RenewalSuccessHandlerTest {
         renewalSuccessHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now));
 
         verify(subscriptionService).renewSubscription(subscriptionId, now, Integer.valueOf(graceCount));
-        verify(kilkariCampaignService).renewSchedule(subscriptionId);
     }
 }

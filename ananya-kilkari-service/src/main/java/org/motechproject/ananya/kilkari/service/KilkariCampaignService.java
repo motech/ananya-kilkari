@@ -68,23 +68,6 @@ public class KilkariCampaignService {
             inboxService.newMessage(subscriptionId, messageId);
     }
 
-    public void activateSchedule(String subscriptionId) {
-        logger.info(String.format("Processing activation for subscriptionId: %s", subscriptionId));
-
-        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
-
-        String currentMessageId = campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
-
-        if (currentMessageId != null)
-            inboxService.newMessage(subscriptionId, currentMessageId);
-    }
-
-    public void renewSchedule(String subscriptionId) {
-        logger.info(String.format("Processing activation for subscriptionId: %s", subscriptionId));
-        Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
-        campaignMessageAlertService.scheduleCampaignMessageAlertForRenewal(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
-    }
-
     public void processCampaignCompletion(String subscriptionId) {
         Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
         if (!subscription.isInDeactivatedState())

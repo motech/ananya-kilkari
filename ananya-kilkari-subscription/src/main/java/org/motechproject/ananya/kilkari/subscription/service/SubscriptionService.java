@@ -22,8 +22,8 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocat
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
-import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.event.MotechEvent;
+import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,13 +112,13 @@ public class SubscriptionService {
         return allSubscriptions.findByMsisdn(msisdn);
     }
 
-    private DateTime getBufferedDateTime(DateTime dateTime) {
-        return dateTime.plusDays(kilkariPropertiesData.getCampaignScheduleDeltaDays())
-                .plusMinutes(kilkariPropertiesData.getCampaignScheduleDeltaMinutes());
-    }
-
     public void activate(String subscriptionId, final DateTime activatedOn, final String operator) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        if (!subscription.canActivate()) {
+            logger.warn("Cannot ACTIVATE from state : " + subscription.getStatus());
+            return;
+        }
+
         final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(activatedOn);
         scheduleCampaign(subscription, scheduleStartDateTime);
         updateStatusAndReport(subscription, activatedOn, null, operator, null, new Action<Subscription>() {
@@ -130,18 +130,13 @@ public class SubscriptionService {
         activateSchedule(subscription);
     }
 
-    private void activateSchedule(Subscription subscription) {
-        String subscriptionId = subscription.getSubscriptionId();
-        logger.info(String.format("Processing activation for subscriptionId: %s", subscriptionId));
-
-        String currentMessageId = campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
-
-        if (currentMessageId != null)
-            inboxService.newMessage(subscriptionId, currentMessageId);
-    }
-
     public void activationFailed(String subscriptionId, DateTime updatedOn, String reason, final String operator) {
-        updateStatusAndReport(subscriptionId, updatedOn, reason, operator, null, new Action<Subscription>() {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        if (!subscription.canFailActivation()) {
+            logger.warn("Cannot move to ACTIVATION_FAILED state from state : " + subscription.getStatus());
+            return;
+        }
+        updateStatusAndReport(subscription, updatedOn, reason, operator, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.activationFailed(operator);
@@ -150,8 +145,14 @@ public class SubscriptionService {
     }
 
     public void activationRequested(OMSubscriptionRequest omSubscriptionRequest) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
+        if (!subscription.canSendActivationRequest()) {
+            logger.warn("Cannot move to PENDING_ACTIVATION state from state : " + subscription.getStatus());
+            return;
+        }
+
         onMobileSubscriptionGateway.activateSubscription(omSubscriptionRequest);
-        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), null, null, null, new Action<Subscription>() {
+        updateStatusAndReport(subscription, DateTime.now(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.activationRequestSent();
@@ -160,12 +161,12 @@ public class SubscriptionService {
     }
 
     public void requestDeactivation(DeactivationRequest deactivationRequest) {
-        String subscriptionId = deactivationRequest.getSubscriptionId();
-        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        if (!subscription.isInProgress()) {
-            logger.debug(String.format("Cannot unsubscribe. Subscription in %s status", subscription.getStatus()));
+        Subscription subscription = allSubscriptions.findBySubscriptionId(deactivationRequest.getSubscriptionId());
+        if (!subscription.canReceiveDeactivationRequest()) {
+            logger.warn("Cannot move to DEACTIVATION_REQUEST_RECEIVED state from state : " + subscription.getStatus());
             return;
         }
+
         updateStatusAndReport(subscription, deactivationRequest.getCreatedAt(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
@@ -176,6 +177,12 @@ public class SubscriptionService {
     }
 
     public void deactivationRequested(OMSubscriptionRequest omSubscriptionRequest) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
+        if (!subscription.canMoveToPendingDeactivation()) {
+            logger.warn("Cannot move to PENDING_DEACTIVATION state from state : " + subscription.getStatus());
+            return;
+        }
+
         onMobileSubscriptionGateway.deactivateSubscription(omSubscriptionRequest);
         updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), null, null, null, new Action<Subscription>() {
             @Override
@@ -186,23 +193,29 @@ public class SubscriptionService {
     }
 
     public void renewSubscription(String subscriptionId, final DateTime renewedDate, Integer graceCount) {
-        updateStatusAndReport(subscriptionId, renewedDate, null, null, graceCount, new Action<Subscription>() {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        if (!subscription.canActivate()) {
+            logger.warn("Cannot renew from state : " + subscription.getStatus());
+            return;
+        }
+
+        updateStatusAndReport(subscription, renewedDate, null, null, graceCount, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.activateOnRenewal();
             }
         });
-        renewSchedule(subscriptionId);
-    }
-
-    private void renewSchedule(String subscriptionId) {
-        logger.info(String.format("Processing renewal for subscriptionId: %s", subscriptionId));
-        Subscription subscription = findBySubscriptionId(subscriptionId);
-        campaignMessageAlertService.scheduleCampaignMessageAlertForRenewal(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
+        renewSchedule(subscription);
     }
 
     public void suspendSubscription(String subscriptionId, final DateTime renewalDate, String reason, Integer graceCount) {
-        updateStatusAndReport(subscriptionId, renewalDate, reason, null, graceCount, new Action<Subscription>() {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        if (!subscription.canSuspend()) {
+            logger.warn("Cannot suspend from state : " + subscription.getStatus());
+            return;
+        }
+
+        updateStatusAndReport(subscription, renewalDate, reason, null, graceCount, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.suspendOnRenewal();
@@ -219,6 +232,12 @@ public class SubscriptionService {
     }
 
     public void deactivateSubscription(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        if (!(subscription.canDeactivate() || subscription.canComplete())) {
+            logger.warn("Cannot deactivate from state : " + subscription.getStatus());
+            return;
+        }
+
         updateStatusAndReport(subscriptionId, deactivationDate, reason, null, graceCount, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
@@ -232,12 +251,12 @@ public class SubscriptionService {
 
     public void subscriptionComplete(OMSubscriptionRequest omSubscriptionRequest) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
-        if (subscription.isInDeactivatedState()) {
-            logger.info(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), subscription.getStatus()));
+        if (!subscription.canMoveToPendingCompletion()) {
+            logger.warn(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), subscription.getStatus()));
             return;
         }
-        onMobileSubscriptionGateway.deactivateSubscription(omSubscriptionRequest);
 
+        onMobileSubscriptionGateway.deactivateSubscription(omSubscriptionRequest);
         updateStatusAndReport(subscription, DateTime.now(), "Subscription completed", null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
@@ -286,6 +305,12 @@ public class SubscriptionService {
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
     }
 
+    private void renewSchedule(Subscription subscription) {
+        String subscriptionId = subscription.getSubscriptionId();
+        logger.info(String.format("Processing renewal for subscriptionId: %s", subscriptionId));
+        campaignMessageAlertService.scheduleCampaignMessageAlertForRenewal(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
+    }
+
     private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest, DateTime nextAlertDateTime) {
         String campaignName = MessageCampaignPack.from(campaignRescheduleRequest.getReason().name()).getCampaignName();
         MessageCampaignRequest enrollRequest = new MessageCampaignRequest(campaignRescheduleRequest.getSubscriptionId(),
@@ -322,6 +347,21 @@ public class SubscriptionService {
     private void removeScheduledMessagesFromOBD(String subscriptionId) {
         campaignMessageService.deleteCampaignMessagesFor(subscriptionId);
         campaignMessageAlertService.clearMessageId(subscriptionId);
+    }
+
+    private DateTime getBufferedDateTime(DateTime dateTime) {
+        return dateTime.plusDays(kilkariPropertiesData.getCampaignScheduleDeltaDays())
+                .plusMinutes(kilkariPropertiesData.getCampaignScheduleDeltaMinutes());
+    }
+
+    private void activateSchedule(Subscription subscription) {
+        String subscriptionId = subscription.getSubscriptionId();
+        logger.info(String.format("Processing activation for subscriptionId: %s", subscriptionId));
+
+        String currentMessageId = campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
+
+        if (currentMessageId != null)
+            inboxService.newMessage(subscriptionId, currentMessageId);
     }
 
     private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator,

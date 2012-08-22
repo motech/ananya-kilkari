@@ -7,6 +7,9 @@ import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SubscriptionTest {
 
@@ -256,7 +259,159 @@ public class SubscriptionTest {
 
         subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withStartDate(DateTime.now().minusWeeks(2)).build();
         assertEquals(35,subscription.getCurrentWeekOfSubscription());
+    }
 
-  
+    @Test
+    public void shouldCheckIfTransitionToActiveStateIsPossible(){
+        Subscription subscription = new Subscription();
+        SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
+        SubscriptionStatus toStatus = SubscriptionStatus.ACTIVE;
+        subscription.setStatus(currentStatus);
+        when(currentStatus.canTransitionTo(toStatus)).thenReturn(true);
+
+        boolean canActivate = subscription.canActivate();
+
+        assertTrue(canActivate);
+        verify(currentStatus).canTransitionTo(toStatus);
+    }
+
+    @Test
+    public void shouldCheckIfTransitionToDeactivateStateIsPossible(){
+        Subscription subscription = new Subscription();
+        SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
+        SubscriptionStatus toStatus = SubscriptionStatus.DEACTIVATED;
+        subscription.setStatus(currentStatus);
+        when(currentStatus.canTransitionTo(toStatus)).thenReturn(true);
+
+        boolean canDeactivate = subscription.canDeactivate();
+
+        assertTrue(canDeactivate);
+        verify(currentStatus).canTransitionTo(toStatus);
+    }
+
+    @Test
+    public void shouldCheckIfTransitionToDeactivationRequestReceivedIsPossible(){
+        Subscription subscription = new Subscription();
+        SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
+        SubscriptionStatus toStatus = SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED;
+        subscription.setStatus(currentStatus);
+        when(currentStatus.canTransitionTo(toStatus)).thenReturn(true);
+
+        boolean canReceiveDeactivationRequest = subscription.canReceiveDeactivationRequest();
+
+        assertTrue(canReceiveDeactivationRequest);
+        verify(currentStatus).canTransitionTo(toStatus);
+    }
+
+    @Test
+    public void shouldCheckIfTransitionToSuspensionStateIsPossible(){
+        Subscription subscription = new Subscription();
+        SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
+        SubscriptionStatus toStatus = SubscriptionStatus.SUSPENDED;
+        subscription.setStatus(currentStatus);
+        when(currentStatus.canTransitionTo(toStatus)).thenReturn(true);
+
+        boolean canSuspend = subscription.canSuspend();
+
+        assertTrue(canSuspend);
+        verify(currentStatus).canTransitionTo(toStatus);
+    }
+
+    @Test
+    public void shouldCheckIfTransitionToNewStateIsPossible(){
+        Subscription subscription = new Subscription();
+        SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
+        SubscriptionStatus toStatus = SubscriptionStatus.NEW;
+        subscription.setStatus(currentStatus);
+        when(currentStatus.canTransitionTo(toStatus)).thenReturn(true);
+
+        boolean result = subscription.canCreateNewSubscription();
+
+        assertTrue(result);
+        verify(currentStatus).canTransitionTo(toStatus);
+    }
+
+    @Test
+    public void shouldCheckIfTransitionToNewEarlyStateIsPossible(){
+        Subscription subscription = new Subscription();
+        SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
+        SubscriptionStatus toStatus = SubscriptionStatus.NEW_EARLY;
+        subscription.setStatus(currentStatus);
+        when(currentStatus.canTransitionTo(toStatus)).thenReturn(true);
+
+        boolean result = subscription.canCreateANewEarlySubscription();
+
+        assertTrue(result);
+        verify(currentStatus).canTransitionTo(toStatus);
+    }
+
+    @Test
+    public void shouldCheckIfTransitionToActivationFailedStateIsPossible(){
+        Subscription subscription = new Subscription();
+        SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
+        SubscriptionStatus toStatus = SubscriptionStatus.ACTIVATION_FAILED;
+        subscription.setStatus(currentStatus);
+        when(currentStatus.canTransitionTo(toStatus)).thenReturn(true);
+
+        boolean canFailActivation = subscription.canFailActivation();
+
+        assertTrue(canFailActivation);
+        verify(currentStatus).canTransitionTo(toStatus);
+    }
+
+    @Test
+    public void shouldCheckIfTransitionToPendingActivationStateIsPossible(){
+        Subscription subscription = new Subscription();
+        SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
+        SubscriptionStatus toStatus = SubscriptionStatus.PENDING_ACTIVATION;
+        subscription.setStatus(currentStatus);
+        when(currentStatus.canTransitionTo(toStatus)).thenReturn(true);
+
+        boolean canSendActivationRequest = subscription.canSendActivationRequest();
+
+        assertTrue(canSendActivationRequest);
+        verify(currentStatus).canTransitionTo(toStatus);
+    }
+
+    @Test
+    public void shouldCheckIfTransitionToPendingDeactivationStateIsPossible(){
+        Subscription subscription = new Subscription();
+        SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
+        SubscriptionStatus toStatus = SubscriptionStatus.PENDING_DEACTIVATION;
+        subscription.setStatus(currentStatus);
+        when(currentStatus.canTransitionTo(toStatus)).thenReturn(true);
+
+        boolean result = subscription.canMoveToPendingDeactivation();
+
+        assertTrue(result);
+        verify(currentStatus).canTransitionTo(toStatus);
+    }
+
+    @Test
+    public void shouldCheckIfTransitionToPendingCompletionStateIsPossible(){
+        Subscription subscription = new Subscription();
+        SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
+        SubscriptionStatus toStatus = SubscriptionStatus.PENDING_COMPLETION;
+        subscription.setStatus(currentStatus);
+        when(currentStatus.canTransitionTo(toStatus)).thenReturn(true);
+
+        boolean result = subscription.canMoveToPendingCompletion();
+
+        assertTrue(result);
+        verify(currentStatus).canTransitionTo(toStatus);
+    }
+
+    @Test
+    public void shouldCheckIfTransitionToCompleteStateIsPossible(){
+        Subscription subscription = new Subscription();
+        SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
+        SubscriptionStatus toStatus = SubscriptionStatus.COMPLETED;
+        subscription.setStatus(currentStatus);
+        when(currentStatus.canTransitionTo(toStatus)).thenReturn(true);
+
+        boolean canComplete = subscription.canComplete();
+
+        assertTrue(canComplete);
+        verify(currentStatus).canTransitionTo(toStatus);
     }
 }

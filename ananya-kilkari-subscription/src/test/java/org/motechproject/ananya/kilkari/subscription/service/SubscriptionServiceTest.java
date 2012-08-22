@@ -193,6 +193,7 @@ public class SubscriptionServiceTest {
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
+        when(mockedSubscription.canSendActivationRequest()).thenReturn(true);
 
         subscriptionService.activationRequested(omSubscriptionRequest);
 
@@ -218,6 +219,7 @@ public class SubscriptionServiceTest {
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(mockedSubscription.isInProgress()).thenReturn(true);
+        when(mockedSubscription.canReceiveDeactivationRequest()).thenReturn(true);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now()));
@@ -243,6 +245,7 @@ public class SubscriptionServiceTest {
         OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI, Channel.IVR, subscriptionId);
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+        when(mockedSubscription.canMoveToPendingDeactivation()).thenReturn(true);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
         subscriptionService.deactivationRequested(omSubscriptionRequest);
@@ -270,6 +273,7 @@ public class SubscriptionServiceTest {
 
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
+        when(mockedSubscription.canFailActivation()).thenReturn(true);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
         subscriptionService.activationFailed(subscriptionId, DateTime.now(), reason, operator);
@@ -537,9 +541,7 @@ public class SubscriptionServiceTest {
         String msisdn = "1234567890";
         SubscriptionPack pack = SubscriptionPack.NANHI_KILKARI;
         Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), DateTime.now());
-        subscription.setStatus(SubscriptionStatus.NEW);
-
-
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -568,8 +570,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldScheduleInboxDeletionUponSubscriptionDeactivation() {
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
-        subscription.setStatus(SubscriptionStatus.NEW);
-
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -839,7 +840,7 @@ public class SubscriptionServiceTest {
         DateTime createdAt = DateTime.now();
         DateTime startDate = DateTime.now().plus(123);
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.CHOTI_KILKARI, createdAt, startDate);
-        subscription.setStatus(SubscriptionStatus.NEW);
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
 
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -893,7 +894,6 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionRequest.getSubscriber().getDateOfBirth(), subscriptionCreationReportRequest.getDateOfBirth());
         assertEquals(SubscriptionStatus.NEW_EARLY.toString(), subscriptionCreationReportRequest.getSubscriptionStatus());
     }
-
 
     @Test
     public void shouldChangeMsisdn() {
@@ -957,6 +957,7 @@ public class SubscriptionServiceTest {
         assertEquals(beneficiaryAge, subscriptionReportRequest.getAgeOfBeneficiary());
         assertEquals(subscription1.getSubscriptionId(), subscriptionReportRequest.getOldSubscriptionId());
     }
+
 
     @Test
     public void shouldChangeMsisdnForEarlySubscription() {
@@ -1040,7 +1041,6 @@ public class SubscriptionServiceTest {
         assertEquals(graceCount, subscriptionStateChangeReportRequest.getGraceCount());
     }
 
-
     @Test
     public void shouldNotUpdateInboxDuringRenewalWhenMessageHasNotAlreadyBeenScheduled() {
         String msisdn = "1234567890";
@@ -1061,12 +1061,10 @@ public class SubscriptionServiceTest {
         String msisdn = "1234567890";
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
         subscription.setStatus(SubscriptionStatus.NEW);
-
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
         String messageId = "mesasgeId";
-
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, msisdn, operator.name())).thenReturn(messageId);
 
@@ -1079,12 +1077,10 @@ public class SubscriptionServiceTest {
     public void shouldCallCampaignMessageAlertServiceOnRenewal() {
         String msisdn = "1234567890";
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
-        subscription.setStatus(SubscriptionStatus.NEW);
-
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
         subscription.setOperator(operator);
-
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         subscriptionService.renewSubscription(subscriptionId, DateTime.now(), null);

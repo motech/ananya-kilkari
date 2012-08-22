@@ -263,7 +263,7 @@ public class Subscription extends MotechBaseDataObject {
         return status.canTransitionTo(SubscriptionStatus.DEACTIVATED);
     }
 
-    public boolean canRequestDeactivation() {
+    public boolean canReceiveDeactivationRequest() {
         return status.canTransitionTo(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED);
     }
 
@@ -277,5 +277,25 @@ public class Subscription extends MotechBaseDataObject {
 
     public boolean canCreateANewEarlySubscription() {
         return status.canTransitionTo(SubscriptionStatus.NEW_EARLY);
+    }
+
+    public boolean canFailActivation() {
+        return status.canTransitionTo(SubscriptionStatus.ACTIVATION_FAILED);
+    }
+
+    public boolean canSendActivationRequest() {
+        return status.canTransitionTo(SubscriptionStatus.PENDING_ACTIVATION);
+    }
+
+    public boolean canMoveToPendingDeactivation() {
+        return status.canTransitionTo(SubscriptionStatus.PENDING_DEACTIVATION);
+    }
+
+    public boolean canMoveToPendingCompletion() {
+        return status.canTransitionTo(SubscriptionStatus.PENDING_COMPLETION);
+    }
+
+    public boolean canComplete() {
+        return status.canTransitionTo(SubscriptionStatus.COMPLETED);
     }
 }

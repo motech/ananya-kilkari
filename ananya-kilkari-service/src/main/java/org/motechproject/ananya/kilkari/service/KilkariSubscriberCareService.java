@@ -13,12 +13,19 @@ public class KilkariSubscriberCareService {
     private SubscriptionPublisher subscriptionPublisher;
     private SubscriberCareService subscriberCareService;
 
-    @Autowired
     public KilkariSubscriberCareService(SubscriberCareService subscriberCareService, SubscriberCareRequestValidator careRequestValidator,
                                         SubscriptionPublisher subscriptionPublisher) {
         this.subscriberCareService = subscriberCareService;
         this.careRequestValidator = careRequestValidator;
         this.subscriptionPublisher = subscriptionPublisher;
+    }
+
+    @Autowired
+    public KilkariSubscriberCareService(SubscriberCareService subscriberCareService,
+                                        SubscriptionPublisher subscriptionPublisher) {
+        this.subscriberCareService = subscriberCareService;
+        this.subscriptionPublisher = subscriptionPublisher;
+        this.careRequestValidator = new SubscriberCareRequestValidator();
     }
 
     public void processSubscriberCareRequest(String msisdn, String reason, String channel, DateTime createdAt) {

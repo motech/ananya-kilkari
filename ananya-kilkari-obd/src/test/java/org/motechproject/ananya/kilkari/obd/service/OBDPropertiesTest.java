@@ -61,4 +61,47 @@ public class OBDPropertiesTest {
         when(properties.getProperty("campaign.message.dnp.status.codes")).thenReturn("");
         new OBDProperties(properties);
     }
+
+    @Test
+    public void shouldGetSlotStartAndEndTimes() {
+        when(properties.getProperty("campaign.message.dnp.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.dnc.status.codes")).thenReturn("");
+        when(properties.getProperty("obd.first.slot.start.time")).thenReturn("13:45");
+        when(properties.getProperty("obd.first.slot.end.time")).thenReturn("16:30");
+        when(properties.getProperty("obd.second.slot.start.time")).thenReturn("17:20");
+        when(properties.getProperty("obd.second.slot.end.time")).thenReturn("21:10");
+
+        OBDProperties obdProperties = new OBDProperties(properties);
+
+        assertEquals(13, obdProperties.getFirstSlotStartTimeHour());
+        assertEquals(45, obdProperties.getFirstSlotStartTimeMinute());
+        assertEquals(16, obdProperties.getFirstSlotEndTimeHour());
+        assertEquals(30, obdProperties.getFirstSlotEndTimeMinute());
+        assertEquals(17, obdProperties.getSecondSlotStartTimeHour());
+        assertEquals(20, obdProperties.getSecondSlotStartTimeMinute());
+        assertEquals(21, obdProperties.getSecondSlotEndTimeHour());
+        assertEquals(10, obdProperties.getSecondSlotEndTimeMinute());
+    }
+
+    @Test
+    public void shouldGetNewMessagesJobCronExpression() {
+        when(properties.getProperty("campaign.message.dnp.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.dnc.status.codes")).thenReturn("");
+        when(properties.getProperty("obd.new.messages.job.cron.expression")).thenReturn("****");
+
+        OBDProperties obdProperties = new OBDProperties(properties);
+
+        assertEquals("****", obdProperties.getNewMessageJobCronExpression());
+    }
+
+    @Test
+    public void shouldGetRetryMessagesJobCronExpression() {
+        when(properties.getProperty("campaign.message.dnp.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.dnc.status.codes")).thenReturn("");
+        when(properties.getProperty("obd.retry.messages.job.cron.expression")).thenReturn("****");
+
+        OBDProperties obdProperties = new OBDProperties(properties);
+
+        assertEquals("****", obdProperties.getRetryMessageJobCronExpression());
+    }
 }

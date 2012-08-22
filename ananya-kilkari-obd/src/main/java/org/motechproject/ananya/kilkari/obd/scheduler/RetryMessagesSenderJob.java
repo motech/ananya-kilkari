@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.obd.scheduler;
 
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.retry.EventKeys;
 import org.motechproject.retry.domain.RetryRequest;
 import org.motechproject.retry.service.RetryService;
@@ -19,8 +20,6 @@ import java.util.UUID;
 @Component
 public class RetryMessagesSenderJob extends MessagesSenderJob {
 
-    private static final String CRON_EXPRESSION_PROPERTY = "obd.retry.messages.job.cron.expression";
-
     private static final String SLOT_EVENT_SUBJECT = "obd.send.retry.messages";
     private static final String RETRY_EVENT_SUBJECT = "obd.send.retry.messages.with.retry";
 
@@ -30,16 +29,20 @@ public class RetryMessagesSenderJob extends MessagesSenderJob {
     private static final Logger logger = LoggerFactory.getLogger(RetryMessagesSenderJob.class);
     private CampaignMessageService campaignMessageService;
     private RetryService retryService;
+    private OBDProperties obdProperties;
 
     @Autowired
-    public RetryMessagesSenderJob(CampaignMessageService campaignMessageService, RetryService retryService, Properties obdProperties) {
-        super(RetryMessagesSenderJob.SLOT_EVENT_SUBJECT, obdProperties.getProperty(RetryMessagesSenderJob.CRON_EXPRESSION_PROPERTY));
+    public RetryMessagesSenderJob(CampaignMessageService campaignMessageService, RetryService retryService, OBDProperties obdProperties) {
+        super(RetryMessagesSenderJob.SLOT_EVENT_SUBJECT, obdProperties.getRetryMessageJobCronExpression());
         this.campaignMessageService = campaignMessageService;
         this.retryService = retryService;
+        this.obdProperties = obdProperties;
     }
 
     @MotechListener(subjects = {RetryMessagesSenderJob.SLOT_EVENT_SUBJECT})
     public void sendMessages(MotechEvent motechEvent) {
+        if (!isWithinSecondSlotTime())
+            return;
         logger.info("Handling send retry messages event");
         RetryRequest retryRequest = new RetryRequest(RetryMessagesSenderJob.RETRY_NAME, UUID.randomUUID().toString(), DateTime.now());
         retryService.schedule(retryRequest);
@@ -48,13 +51,20 @@ public class RetryMessagesSenderJob extends MessagesSenderJob {
     @MotechListener(subjects = {RetryMessagesSenderJob.RETRY_EVENT_SUBJECT})
     public void sendMessagesWithRetry(MotechEvent motechEvent) {
         logger.info("Handling send retry messages with retry event");
-        try{
+        try {
             campaignMessageService.sendRetryMessages();
-            Map<String,Object> parameters = motechEvent.getParameters();
+            Map<String, Object> parameters = motechEvent.getParameters();
             retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), RetryMessagesSenderJob.RETRY_GROUP_NAME);
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             logger.error("Error occurred while sending retry messages to obd.", ex);
         }
+    }
+
+    private boolean isWithinSecondSlotTime() {
+        DateTime now = DateTime.now();
+        DateTime secondSlotStartTime = now.withHourOfDay(obdProperties.getSecondSlotStartTimeHour()).withMinuteOfHour(obdProperties.getSecondSlotStartTimeMinute());
+        DateTime secondSlotEndTime = now.withHourOfDay(obdProperties.getSecondSlotEndTimeHour()).withMinuteOfHour(obdProperties.getSecondSlotEndTimeMinute());
+
+        return (now.isAfter(secondSlotStartTime) || now.isEqual(secondSlotStartTime)) && (now.isBefore(secondSlotEndTime) || now.isEqual(secondSlotEndTime));
     }
 }

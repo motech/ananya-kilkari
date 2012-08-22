@@ -6,13 +6,13 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.retry.domain.RetryRequest;
 import org.motechproject.retry.service.RetryService;
 import org.motechproject.scheduler.domain.CronSchedulableJob;
 import org.motechproject.event.MotechEvent;
 
 import java.util.HashMap;
-import java.util.Properties;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -20,25 +20,34 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class NewMessagesSenderJobTest {
     @Mock
-    private Properties obdProperties;
+    private OBDProperties obdProperties;
 
     @Mock
     private RetryService retryService;
 
     @Mock
     private CampaignMessageService campaignMessageService;
+    private NewMessagesSenderJob newMessagesSenderJob;
+    private String cronJobExpression = "mycronjobexpression";
 
     @Before
     public void setUp() {
         initMocks(this);
+        DateTime startTime = DateTime.now().minusHours(1);
+        DateTime endTime = DateTime.now().plusHours(3);
+
+        when(obdProperties.getFirstSlotStartTimeHour()).thenReturn(startTime.getHourOfDay());
+        when(obdProperties.getFirstSlotStartTimeMinute()).thenReturn(startTime.getMinuteOfHour());
+        when(obdProperties.getFirstSlotEndTimeHour()).thenReturn(endTime.getHourOfDay());
+        when(obdProperties.getFirstSlotEndTimeMinute()).thenReturn(endTime.getMinuteOfHour());
+        when(obdProperties.getNewMessageJobCronExpression()).thenReturn(cronJobExpression);
+
+        newMessagesSenderJob = new NewMessagesSenderJob(campaignMessageService, retryService, obdProperties);
     }
 
     @Test
     public void shouldScheduleCronJobsAtConstruction() {
-        String cronJobExpression = "mycronjobexpression";
-        when(obdProperties.getProperty("obd.new.messages.job.cron.expression")).thenReturn(cronJobExpression);
-
-        CronSchedulableJob cronSchedulableJob = new NewMessagesSenderJob(campaignMessageService, retryService, obdProperties).getCronJob();
+        CronSchedulableJob cronSchedulableJob = newMessagesSenderJob.getCronJob();
 
         assertEquals(cronJobExpression, cronSchedulableJob.getCronExpression());
         assertNull(cronSchedulableJob.getEndTime());
@@ -52,7 +61,6 @@ public class NewMessagesSenderJobTest {
 
     @Test
     public void shouldInvokeCampaignMessageServiceToSendNewMessagesToOBD() {
-        NewMessagesSenderJob newMessagesSenderJob = new NewMessagesSenderJob(campaignMessageService, retryService, obdProperties);
         DateTime before = DateTime.now();
 
         newMessagesSenderJob.sendMessages(new MotechEvent(""));
@@ -69,8 +77,25 @@ public class NewMessagesSenderJobTest {
     }
 
     @Test
+    public void shouldNotScheduleRetryJobIfTimeIsNotWithinTheNewMessagesSlot() {
+        DateTime startTime = DateTime.now().plusHours(1);
+        DateTime endTime = DateTime.now().plusHours(3);
+
+        when(obdProperties.getFirstSlotStartTimeHour()).thenReturn(startTime.getHourOfDay());
+        when(obdProperties.getFirstSlotStartTimeMinute()).thenReturn(startTime.getMinuteOfHour());
+        when(obdProperties.getFirstSlotEndTimeHour()).thenReturn(endTime.getHourOfDay());
+        when(obdProperties.getFirstSlotEndTimeMinute()).thenReturn(endTime.getMinuteOfHour());
+        when(obdProperties.getNewMessageJobCronExpression()).thenReturn(cronJobExpression);
+
+        newMessagesSenderJob = new NewMessagesSenderJob(campaignMessageService, retryService, obdProperties);
+
+        newMessagesSenderJob.sendMessages(new MotechEvent("subject"));
+
+        verify(retryService, never()).schedule(any(RetryRequest.class));
+    }
+
+    @Test
     public void shouldInvokeCampaignMessageServiceToSendNewMessagesWithRetryAndFulfillTheRetryIfSuccessful() {
-        NewMessagesSenderJob newMessagesSenderJob = new NewMessagesSenderJob(campaignMessageService, retryService, obdProperties);
         newMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>(){{
             put("EXTERNAL_ID", "myExternalId");
         }}));
@@ -82,7 +107,6 @@ public class NewMessagesSenderJobTest {
 
     @Test
     public void shouldInvokeCampaignMessageServiceToSendNewMessagesWithRetryAndNotFulfillTheRetryIfNotSuccessful() {
-        NewMessagesSenderJob newMessagesSenderJob = new NewMessagesSenderJob(campaignMessageService, retryService, obdProperties);
         doThrow(new RuntimeException("some exception")).when(campaignMessageService).sendNewMessages();
 
         newMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>(){{

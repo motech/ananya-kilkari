@@ -14,12 +14,9 @@ public class KilkariChannelInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws java.lang.Exception {
-
         String responsePrefix = HttpConstants.forRequest(request).getResponsePrefix();
         response.getOutputStream().print(responsePrefix);
-
         HttpThreadContext.set(getChannel(request));
-
         return true;
     }
 

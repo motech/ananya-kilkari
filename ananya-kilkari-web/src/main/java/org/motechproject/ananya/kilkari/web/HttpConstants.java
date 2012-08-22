@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 public enum HttpConstants {
 
     IVR(HttpHeaders.APPLICATION_JAVASCRIPT, HttpStatus.OK.value(), HttpStatus.OK.value(), "var response = "),
-
     CALL_CENTER(HttpHeaders.APPLICATION_JSON, HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.BAD_REQUEST.value(), "");
 
     private static final String CHANNEL_REQUEST_KEY = "channel";

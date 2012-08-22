@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.scheduler;
 
 import org.motechproject.scheduler.domain.CronSchedulableJob;
-import org.motechproject.scheduler.domain.MotechEvent;
+import org.motechproject.event.MotechEvent;
 
 public abstract class MessagesSenderJob {
 

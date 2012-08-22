@@ -14,18 +14,13 @@ import org.motechproject.server.messagecampaign.service.CampaignEnrollmentRecord
 import org.motechproject.server.messagecampaign.service.CampaignEnrollmentsQuery;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class MessageCampaignServiceTest {
@@ -89,14 +84,14 @@ public class MessageCampaignServiceTest {
         String subscriptionId = "abcd1234";
         MessageCampaignPack messageCampaignPack = MessageCampaignPack.NANHI_KILKARI;
         DateTime endDate = startDate.plusYears(2);
-        Date messageTime = DateTime.now().toDate();
+        DateTime messageTime = DateTime.now();
 
-        HashMap<String, List<Date>> campaignTimings = new HashMap<>();
-        ArrayList<Date> dates = new ArrayList<Date>();
+        HashMap<String, List<DateTime>> campaignTimings = new HashMap<>();
+        ArrayList<DateTime> dates = new ArrayList<DateTime>();
         dates.add(messageTime);
         campaignTimings.put(MessageCampaignService.CAMPAIGN_MESSAGE_NAME, dates);
         when(platformMessageCampaignService.getCampaignTimings(subscriptionId, messageCampaignPack.getCampaignName(),
-                startDate.toDate(), endDate.toDate())).thenReturn(campaignTimings);
+                startDate, endDate)).thenReturn(campaignTimings);
 
         ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<CampaignEnrollmentRecord>();
         campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(subscriptionId, MessageCampaignPack.BARI_KILKARI.getCampaignName(), startDate.toLocalDate(), CampaignEnrollmentStatus.COMPLETED));
@@ -107,7 +102,7 @@ public class MessageCampaignServiceTest {
                 subscriptionId, startDate, endDate);
 
         verify(platformMessageCampaignService).getCampaignTimings(subscriptionId, messageCampaignPack.getCampaignName(),
-                startDate.toDate(), endDate.toDate());
+                startDate, endDate);
 
         assertEquals(new DateTime(messageTime), messageTimings.get(0));
     }
@@ -122,7 +117,7 @@ public class MessageCampaignServiceTest {
 
         List<DateTime> messageTimings = this.messageCampaignService.getMessageTimings(subscriptionId, startDate, endDate);
 
-        verify(platformMessageCampaignService, never()).getCampaignTimings(anyString(), anyString(), any(Date.class), any(Date.class));
+        verify(platformMessageCampaignService, never()).getCampaignTimings(anyString(), anyString(), any(DateTime.class), any(DateTime.class));
         assertTrue(messageTimings.isEmpty());
     }
 

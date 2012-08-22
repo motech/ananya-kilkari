@@ -1,8 +1,8 @@
 package org.motechproject.ananya.kilkari.handlers;
 
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
-import org.motechproject.scheduler.domain.MotechEvent;
-import org.motechproject.server.event.annotations.MotechListener;
+import org.motechproject.event.MotechEvent;
+import org.motechproject.event.annotations.MotechListener;
 import org.motechproject.server.messagecampaign.EventKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

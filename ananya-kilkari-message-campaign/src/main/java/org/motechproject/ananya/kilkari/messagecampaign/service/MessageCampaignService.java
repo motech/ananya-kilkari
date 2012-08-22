@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +45,7 @@ public class MessageCampaignService {
     }
 
     public void stop(MessageCampaignRequest enrollRequest) {
-        if(StringUtils.isEmpty(enrollRequest.getCampaignName())) {
+        if (StringUtils.isEmpty(enrollRequest.getCampaignName())) {
             logger.warn("No active campaign found to unenroll for subscriptionId : " + enrollRequest.getExternalId());
             return;
         }
@@ -71,19 +70,19 @@ public class MessageCampaignService {
 
     public List<DateTime> getMessageTimings(String subscriptionId, DateTime startDate, DateTime endDate) {
         String campaignName = getActiveCampaignName(subscriptionId);
-        List < DateTime > alertTimings = new ArrayList<>();
+        List<DateTime> alertTimings = new ArrayList<>();
         if (StringUtils.isEmpty(campaignName))
             return alertTimings;
 
-        Map<String, List<Date>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
-                startDate.toDate(), endDate.toDate());
-        List<Date> campaignMessageTimings = campaignTimings.get(CAMPAIGN_MESSAGE_NAME);
+        Map<String, List<DateTime>> campaignTimings = campaignService.getCampaignTimings(subscriptionId, campaignName,
+                startDate, endDate);
+        List<DateTime> campaignMessageTimings = campaignTimings.get(CAMPAIGN_MESSAGE_NAME);
 
         if (campaignMessageTimings == null || campaignMessageTimings.isEmpty())
             return alertTimings;
 
-        for (Date date : campaignMessageTimings) {
-            alertTimings.add(new DateTime(date));
+        for (DateTime date : campaignMessageTimings) {
+            alertTimings.add(date);
         }
         return alertTimings;
     }
@@ -97,14 +96,14 @@ public class MessageCampaignService {
 
     public DateTime getActiveCampaignStartDate(String subscriptionId) {
         List<MessageCampaignEnrollment> activeCampaigns = getActiveCampaigns(subscriptionId);
-        if(activeCampaigns.isEmpty())
+        if (activeCampaigns.isEmpty())
             return null;
         return activeCampaigns.get(0).getStartDate();
     }
 
     public String getActiveCampaignName(String subscriptionId) {
         List<MessageCampaignEnrollment> activeCampaigns = getActiveCampaigns(subscriptionId);
-        if(activeCampaigns.isEmpty())
+        if (activeCampaigns.isEmpty())
             return null;
         return activeCampaigns.get(0).getCampaignName();
     }

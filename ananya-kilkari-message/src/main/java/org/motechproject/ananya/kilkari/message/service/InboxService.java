@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.message.domain.InboxMessage;
 import org.motechproject.ananya.kilkari.message.repository.AllInboxMessages;
 import org.motechproject.scheduler.MotechSchedulerService;
-import org.motechproject.scheduler.domain.MotechEvent;
+import org.motechproject.event.MotechEvent;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

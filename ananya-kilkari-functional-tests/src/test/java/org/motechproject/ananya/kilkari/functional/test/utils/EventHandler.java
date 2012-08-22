@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.functional.test.utils;
 
-import org.motechproject.scheduler.domain.MotechEvent;
-import org.motechproject.server.event.annotations.MotechListener;
+import org.motechproject.event.MotechEvent;
+import org.motechproject.event.annotations.MotechListener;
 import org.motechproject.server.messagecampaign.EventKeys;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,6 @@ public class EventHandler {
     public void handleCampaignAlert(MotechEvent motechEvent) {
         campaignAlertRaised = true;
     }
-
 
     public boolean hasCampaignAlertBeenRaised() {
         return campaignAlertRaised;

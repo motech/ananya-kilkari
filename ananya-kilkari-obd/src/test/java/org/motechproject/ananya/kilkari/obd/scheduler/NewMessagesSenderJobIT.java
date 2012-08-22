@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.obd.utils.SpringIntegrationTest;
 import org.motechproject.retry.dao.AllRetries;
-import org.motechproject.scheduler.domain.MotechEvent;
+import org.motechproject.event.MotechEvent;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;

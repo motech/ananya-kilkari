@@ -3,8 +3,8 @@ package org.motechproject.ananya.kilkari.obd.service;
 import org.motechproject.ananya.kilkari.obd.domain.InvalidCallRecord;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidOBDRequestEntries;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidOBDRequestEntry;
-import org.motechproject.scheduler.domain.MotechEvent;
-import org.motechproject.server.event.annotations.MotechListener;
+import org.motechproject.event.MotechEvent;
+import org.motechproject.event.annotations.MotechListener;
 
 import java.util.ArrayList;
 import java.util.List;

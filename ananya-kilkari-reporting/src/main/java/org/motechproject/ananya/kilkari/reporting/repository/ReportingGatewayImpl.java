@@ -102,7 +102,7 @@ public class ReportingGatewayImpl implements ReportingGateway {
 
     private <T> void performHttpRequestBasedOnChannel(String url, T postObject, Method method) {
         if (isCallCenterCall())
-            method.execute(restTemplate, url, postObject);
+            httpClientService.executeSync(url, postObject, method);
         else
             httpClientService.execute(url, postObject, method);
     }

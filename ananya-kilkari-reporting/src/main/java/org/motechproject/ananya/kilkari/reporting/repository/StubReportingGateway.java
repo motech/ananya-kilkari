@@ -56,11 +56,6 @@ public class StubReportingGateway implements ReportingGateway {
 
     }
 
-    public void reportSubscriptionChangePack(SubscriptionChangePackRequest changePackRequest) {
-        if (verify())
-            behavior.reportSubscriptionChangePack(changePackRequest);
-    }
-
     public void setBehavior(ReportingGateway behavior) {
         this.behavior = behavior;
     }

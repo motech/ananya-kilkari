@@ -69,12 +69,6 @@ public class ChangePackServiceTest {
         ArgumentCaptor<SubscriptionRequest> createSubscriptionCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
         order.verify(subscriptionService).createSubscription(createSubscriptionCaptor.capture(), eq(Channel.CALL_CENTER));
         validateSubscriptionCreationRequest(createSubscriptionCaptor.getValue(), changeSubscriptionRequest, existingSubscription);
-
-
-        ArgumentCaptor<SubscriptionChangePackRequest> reportRequestCaptor = ArgumentCaptor.forClass(SubscriptionChangePackRequest.class);
-        order.verify(reportingService).reportChangePack(reportRequestCaptor.capture());
-        SubscriptionChangePackRequest reportRequest = reportRequestCaptor.getValue();
-        validateReportsRequest(dateOfBirth, existingSubscription, newSubscription, reason, reportRequest);
     }
 
     @Test

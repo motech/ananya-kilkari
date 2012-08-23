@@ -110,7 +110,7 @@ public class SubscriptionServiceStateCheckTest {
     public void shouldNotGoToDeactivationRequestReceivedStateIfNotInTheRightState() {
         when(mockSubscription.canReceiveDeactivationRequest()).thenReturn(false);
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now()));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now(),null));
 
         verify(mockSubscription).canReceiveDeactivationRequest();
         verifySubscriptionStatusUpdation();
@@ -176,7 +176,7 @@ public class SubscriptionServiceStateCheckTest {
         when(mockSubscription.canCreateNewSubscription()).thenReturn(false);
         when(allSubscriptions.findSubscriptionInProgress(msisdn, subscriptionPack)).thenReturn(mockSubscription);
 
-        subscriptionService.createSubscription(new SubscriptionRequest(msisdn, null, subscriptionPack, null, null), Channel.IVR);
+        subscriptionService.createSubscription(new SubscriptionRequest(msisdn, null, subscriptionPack, null, null, null), Channel.IVR);
 
         verify(mockSubscription).canCreateANewEarlySubscription();
         verify(mockSubscription).canCreateNewSubscription();

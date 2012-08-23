@@ -64,12 +64,6 @@ public class StubReportingService implements ReportingService {
         }
     }
 
-    public void reportChangePack(SubscriptionChangePackRequest changePackRequest) {
-        if (verify()) {
-            behavior.reportChangePack(changePackRequest);
-        }
-    }
-
     public void setBehavior(ReportingService behavior) {
         this.behavior = behavior;
     }

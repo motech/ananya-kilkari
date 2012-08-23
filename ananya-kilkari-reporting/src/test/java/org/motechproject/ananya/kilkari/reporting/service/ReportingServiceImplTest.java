@@ -91,12 +91,4 @@ public class ReportingServiceImplTest {
 
         verify(reportGateway).reportChangeMsisdnForSubscriber(subscriptionId,msisdn);
     }
-
-    public void shouldReportASubscriptionChangePack() {
-        SubscriptionChangePackRequest changePackRequest = mock(SubscriptionChangePackRequest.class);
-
-        reportingServiceImpl.reportChangePack(changePackRequest);
-
-        verify(reportGateway).reportSubscriptionChangePack(changePackRequest);
-    }
 }

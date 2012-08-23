@@ -33,11 +33,7 @@ public class ChangePackService {
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, changeSubscriptionRequest.getChannel(),
                 changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getReason()));
         updateEddOrDob(changeSubscriptionRequest);
-        Subscription newSubscription = createSubscriptionWithNewPack(changeSubscriptionRequest);
-
-        reportingService.reportChangePack(new SubscriptionChangePackRequest(NumberUtils.createLong(newSubscription.getMsisdn()), newSubscription.getSubscriptionId(), subscriptionId, newSubscription.getPack().name(),
-                changeSubscriptionRequest.getChannel().name(), newSubscription.getStatus().name(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getExpectedDateOfDelivery(), changeSubscriptionRequest.getDateOfBirth(),
-                newSubscription.getStartDate(), changeSubscriptionRequest.getReason()));
+        createSubscriptionWithNewPack(changeSubscriptionRequest);
     }
 
     private void updateEddOrDob(ChangeSubscriptionRequest changeSubscriptionRequest) {

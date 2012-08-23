@@ -52,8 +52,4 @@ public class ReportingServiceImpl implements ReportingService {
     public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
         reportGateway.reportChangeMsisdnForSubscriber(subscriptionId,msisdn);
     }
-
-    public void reportChangePack(SubscriptionChangePackRequest changePackRequest) {
-        reportGateway.reportSubscriptionChangePack(changePackRequest);
-    }
 }

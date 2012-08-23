@@ -89,12 +89,6 @@ public class ReportingGatewayImpl implements ReportingGateway {
         performHttpRequestBasedOnChannel(url, null, Method.POST);
     }
 
-    @Override
-    public void reportSubscriptionChangePack(SubscriptionChangePackRequest changePackRequest) {
-        String url = String.format("%s%s", getBaseUrl(), SUBSCRIPTION_CHANGE_PACK_PATH);
-        performHttpRequestBasedOnChannel(url, changePackRequest, Method.POST);
-    }
-
     private boolean isCallCenterCall() {
         String channel = HttpThreadContext.get();
         return "CALL_CENTER".equalsIgnoreCase(channel);

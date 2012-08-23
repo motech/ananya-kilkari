@@ -215,16 +215,6 @@ public class ReportingGatewayImplTest {
     }
 
     @Test
-    public void shouldReportASubscriptionPackChange() {
-        SubscriptionChangePackRequest changePackRequest = mock(SubscriptionChangePackRequest.class);
-        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-
-        reportingGateway.reportSubscriptionChangePack(changePackRequest);
-
-        verify(httpClientService).execute("url/subscription/changepack", changePackRequest, Method.POST);
-    }
-
-    @Test
     public void shouldReportMsisdnChange() {
         String msisdn = "msisdn";
         String subscriptionId = "subscriptionId";

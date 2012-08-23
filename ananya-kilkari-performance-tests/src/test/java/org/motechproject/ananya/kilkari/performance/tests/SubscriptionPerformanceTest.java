@@ -10,11 +10,11 @@ import org.motechproject.ananya.kilkari.performance.tests.domain.BaseResponse;
 import org.motechproject.ananya.kilkari.performance.tests.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.performance.tests.utils.BasePerformanceTest;
 import org.motechproject.ananya.kilkari.performance.tests.utils.HttpUtils;
-import org.motechproject.ananya.kilkari.performance.tests.utils.runner.LoadRunner;
-import org.motechproject.ananya.kilkari.performance.tests.utils.runner.LoadTest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.performance.tests.LoadRunner;
+import org.motechproject.performance.tests.LoadTest;
 
 import java.util.*;
 

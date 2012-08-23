@@ -76,6 +76,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
+            <artifactId>motech-performance-tests</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -1,7 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
-import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -19,24 +18,23 @@ import java.util.List;
 @Component
 public class ChangeSubscriptionService {
     private SubscriptionService subscriptionService;
-    private SubscriptionValidator subscriptionValidator;
+    private ChangeSubscriptionValidator changeSubscriptionValidator;
     private ReportingService reportingService;
 
+
     @Autowired
-    public ChangeSubscriptionService(SubscriptionService subscriptionService, SubscriptionValidator subscriptionValidator, ReportingService reportingService) {
+    public ChangeSubscriptionService(SubscriptionService subscriptionService, ChangeSubscriptionValidator changeSubscriptionValidator, ReportingService reportingService) {
         this.subscriptionService = subscriptionService;
-        this.subscriptionValidator = subscriptionValidator;
+        this.changeSubscriptionValidator = changeSubscriptionValidator;
         this.reportingService = reportingService;
     }
 
     public void process(ChangeSubscriptionRequest changeSubscriptionRequest) {
+        changeSubscriptionValidator.validate(changeSubscriptionRequest);
+
         String subscriptionId = changeSubscriptionRequest.getSubscriptionId();
-        subscriptionValidator.validateSubscriptionExists(subscriptionId);
         Subscription existingSubscription = subscriptionService.findBySubscriptionId(subscriptionId);
         changeSubscriptionRequest.setMsisdn(existingSubscription.getMsisdn());
-        ChangeSubscriptionValidator.validate(existingSubscription, changeSubscriptionRequest);
-
-        validateSubscriptionExistsFor(changeSubscriptionRequest);
         modifyReasonForChangeSubscription(changeSubscriptionRequest);
 
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, changeSubscriptionRequest.getChannel(),
@@ -47,16 +45,6 @@ public class ChangeSubscriptionService {
 
     private void modifyReasonForChangeSubscription(ChangeSubscriptionRequest changeSubscriptionRequest) {
         changeSubscriptionRequest.setReason(String.format("%s - %s", changeSubscriptionRequest.getChangeType().getDescription(),changeSubscriptionRequest.getReason()));
-    }
-
-    private void validateSubscriptionExistsFor(ChangeSubscriptionRequest changeSubscriptionRequest) {
-        String msisdn = changeSubscriptionRequest.getMsisdn();
-        SubscriptionPack pack = changeSubscriptionRequest.getPack();
-        List<Subscription> subscriptionList = subscriptionService.findByMsisdnAndPack(msisdn, pack);
-        for (Subscription subscription : subscriptionList) {
-            if (subscription.isInProgress())
-                throw new ValidationException(String.format("Active subscription already exists for %s and %s", msisdn, pack));
-        }
     }
 
     private void updateEddOrDob(ChangeSubscriptionRequest changeSubscriptionRequest) {

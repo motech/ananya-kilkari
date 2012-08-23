@@ -150,7 +150,7 @@ public enum SubscriptionStatus {
         return equals(PENDING_ACTIVATION);
     }
     
-    public boolean canChangePack(){
+    public boolean canChangeSubscription(){
         return Arrays.asList(ACTIVE,SUSPENDED,NEW_EARLY).contains(this);
     }
 

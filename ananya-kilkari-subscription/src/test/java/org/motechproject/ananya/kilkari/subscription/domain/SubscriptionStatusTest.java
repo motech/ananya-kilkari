@@ -10,19 +10,19 @@ import static org.junit.Assert.*;
 public class SubscriptionStatusTest {
 
     @Test
-    public void canChangePackIfTheStatusIsValid() {
-        assertTrue(SubscriptionStatus.ACTIVE.canChangePack());
-        assertTrue(SubscriptionStatus.SUSPENDED.canChangePack());
-        assertTrue(SubscriptionStatus.NEW_EARLY.canChangePack());
+    public void canChangeSubscriptionIfTheStatusIsValid() {
+        assertTrue(SubscriptionStatus.ACTIVE.canChangeSubscription());
+        assertTrue(SubscriptionStatus.SUSPENDED.canChangeSubscription());
+        assertTrue(SubscriptionStatus.NEW_EARLY.canChangeSubscription());
 
-        assertFalse(SubscriptionStatus.DEACTIVATED.canChangePack());
-        assertFalse(SubscriptionStatus.NEW.canChangePack());
-        assertFalse(SubscriptionStatus.ACTIVATION_FAILED.canChangePack());
-        assertFalse(SubscriptionStatus.COMPLETED.canChangePack());
-        assertFalse(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED.canChangePack());
-        assertFalse(SubscriptionStatus.PENDING_ACTIVATION.canChangePack());
-        assertFalse(SubscriptionStatus.PENDING_COMPLETION.canChangePack());
-        assertFalse(SubscriptionStatus.PENDING_DEACTIVATION.canChangePack());
+        assertFalse(SubscriptionStatus.DEACTIVATED.canChangeSubscription());
+        assertFalse(SubscriptionStatus.NEW.canChangeSubscription());
+        assertFalse(SubscriptionStatus.ACTIVATION_FAILED.canChangeSubscription());
+        assertFalse(SubscriptionStatus.COMPLETED.canChangeSubscription());
+        assertFalse(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED.canChangeSubscription());
+        assertFalse(SubscriptionStatus.PENDING_ACTIVATION.canChangeSubscription());
+        assertFalse(SubscriptionStatus.PENDING_COMPLETION.canChangeSubscription());
+        assertFalse(SubscriptionStatus.PENDING_DEACTIVATION.canChangeSubscription());
     }
 
     @Test

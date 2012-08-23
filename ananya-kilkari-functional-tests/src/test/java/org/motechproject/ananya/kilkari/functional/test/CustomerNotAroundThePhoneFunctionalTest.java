@@ -25,7 +25,6 @@ public class CustomerNotAroundThePhoneFunctionalTest extends BaseFunctionalTest 
         DateTime futureDateForFirstDayFirstSlot = futureDateForFirstCampaignAlert.plusDays(1).withHourOfDay(13).withMinuteOfHour(30);
         DateTime futureDateForFirstDaySecondSlot = futureDateForFirstCampaignAlert.plusDays(1).withHourOfDay(18).withMinuteOfHour(30);
         DateTime futureDateForSecondDayFirstSlot = futureDateForFirstDaySecondSlot.plusDays(1).withHourOfDay(13).withMinuteOfHour(30);
-        DateTime futureDateForSecondDaySecondSlot = futureDateForSecondDayFirstSlot.withHourOfDay(18).withMinuteOfHour(30);
         String week1 = "WEEK1";
 
         SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
@@ -45,7 +44,7 @@ public class CustomerNotAroundThePhoneFunctionalTest extends BaseFunctionalTest 
 
         when(obd).doesNotCallTheUser(subscriptionData, week1);
         and(user).resetOnMobileOBDVerifier();
-        and(time).isMovedToFuture(futureDateForSecondDaySecondSlot);
+        and(time).isMovedToFuture(futureDateForSecondDayFirstSlot);
         then(user).messageWasDeliveredDuringFirstSlot(subscriptionData, week1);
     }
 }

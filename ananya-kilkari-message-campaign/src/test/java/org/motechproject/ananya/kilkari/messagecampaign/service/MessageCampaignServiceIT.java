@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationKilkariMessageCampaignContext.xml")
-@ActiveProfiles("test")
 public class MessageCampaignServiceIT {
 
     public static final int CONFIGURED_DELTA_MINUTES = 30;

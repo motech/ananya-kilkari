@@ -20,8 +20,4 @@
             </bean>
         </constructor-arg>
     </bean>
-
-    <beans profile="test">
-        <bean id="mockedServletContext" class="org.springframework.mock.web.MockServletContext"/>
-    </beans>
 </beans>

@@ -42,9 +42,6 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
-    <!--
-        Temporarily committing filter till filter issue is fixed.
-    -->
     <filter>
         <filter-name>HttpRequestLoggingFilter</filter-name>
         <filter-class>org.motechproject.web.filter.RequestResponseLoggingFilter</filter-class>

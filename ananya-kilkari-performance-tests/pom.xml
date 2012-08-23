@@ -19,6 +19,13 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
+            <artifactId>ananya-kilkari-service</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junitperf</groupId>
             <artifactId>junitperf</artifactId>
         </dependency>

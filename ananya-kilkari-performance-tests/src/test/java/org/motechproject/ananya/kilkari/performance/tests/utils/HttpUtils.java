@@ -34,9 +34,15 @@ public class HttpUtils {
     }
 
     public static BaseResponse httpGetWithJsonResponse(Map<String, String> parametersMap, String minusBaseUrl) {
-        ResponseEntity<String> responseEntity = new RestTemplate().getForEntity(constructUrl(ContextUtils.getConfiguration().baseUrl(), minusBaseUrl, parametersMap), String.class);
-        return  fromJsonWithResponse(responseEntity.getBody(), BaseResponse.class);
+        ResponseEntity<String> responseEntity = new RestTemplate().getForEntity(
+                constructUrl(ContextUtils.getConfiguration().baseUrl(), minusBaseUrl, parametersMap), String.class);
+        return fromJsonWithResponse(responseEntity.getBody(), BaseResponse.class);
 
     }
 
+    public static BaseResponse httpPostWithJsonResponse(Map<String, String> queryStringParametersMap, Object postParam, String urlPath) {
+        ResponseEntity<String> responseEntity = new RestTemplate().postForEntity(
+                constructUrl(ContextUtils.getConfiguration().baseUrl(), urlPath, queryStringParametersMap), postParam, String.class);
+        return fromJsonWithResponse(responseEntity.getBody(),BaseResponse.class);
+    }
 }

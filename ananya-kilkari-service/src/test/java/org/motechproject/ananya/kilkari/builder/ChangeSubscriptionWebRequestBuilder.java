@@ -20,7 +20,7 @@ public class ChangeSubscriptionWebRequestBuilder {
         changeSubscriptionWebRequest.setMsisdn("9876543210");
         changeSubscriptionWebRequest.setDateOfBirth(null);
         changeSubscriptionWebRequest.setExpectedDateOfDelivery(null);
-        changeSubscriptionWebRequest.setReason("reason for change pack");
+        changeSubscriptionWebRequest.setReason(null);
         return this;
     }
 

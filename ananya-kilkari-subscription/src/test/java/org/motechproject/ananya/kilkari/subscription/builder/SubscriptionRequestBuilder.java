@@ -22,6 +22,7 @@ public class SubscriptionRequestBuilder {
     private DateTime dob;
     private DateTime edd;
     private Integer week;
+    private String reason;
 
     public SubscriptionRequestBuilder withDefaults() {
         return withMsisdn("9876543210")
@@ -31,6 +32,7 @@ public class SubscriptionRequestBuilder {
                 .withBlock("block")
                 .withDistrict("district")
                 .withPanchayat("panchayat")
+                .withReason(null)
                 .withCreationDate(DateTime.now());
     }
 
@@ -75,6 +77,11 @@ public class SubscriptionRequestBuilder {
         return this;
     }
 
+    public SubscriptionRequestBuilder withReason(String reason) {
+        this.reason = reason;
+        return this;
+    }
+
 
     public SubscriptionRequestBuilder withBeneficiaryName(String beneficiaryName) {
         this.beneficiaryName = beneficiaryName;
@@ -104,6 +111,6 @@ public class SubscriptionRequestBuilder {
     public SubscriptionRequest build() {
         Location location = new Location(district, block, panchayat);
         Subscriber subscriber = new Subscriber(beneficiaryName, beneficiaryAge, dob, edd, week);
-        return new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber);
+        return new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber, reason);
     }
 }

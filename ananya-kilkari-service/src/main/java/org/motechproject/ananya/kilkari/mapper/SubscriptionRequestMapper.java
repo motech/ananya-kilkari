@@ -22,8 +22,8 @@ public class SubscriptionRequestMapper {
                 subscriptionWebRequest.getCreatedAt(),
                 SubscriptionPack.from(subscriptionWebRequest.getPack()),
                 location,
-                subscriber
-        );
+                subscriber,
+                null);
         return subscriptionRequest;
     }
 

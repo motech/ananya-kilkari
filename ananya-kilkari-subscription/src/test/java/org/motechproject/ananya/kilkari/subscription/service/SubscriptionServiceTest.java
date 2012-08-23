@@ -215,6 +215,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.ACTIVE;
         Subscription mockedSubscription = mock(Subscription.class);
+        String reason = "some reason";
 
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
@@ -222,7 +223,7 @@ public class SubscriptionServiceTest {
         when(mockedSubscription.canReceiveDeactivationRequest()).thenReturn(true);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now()));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now(), reason));
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
@@ -234,6 +235,7 @@ public class SubscriptionServiceTest {
 
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(reason, subscriptionStateChangeReportRequest.getReason());
         assertNull(subscriptionStateChangeReportRequest.getOperator());
     }
 
@@ -484,7 +486,7 @@ public class SubscriptionServiceTest {
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         Channel channel = Channel.IVR;
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, channel, DateTime.now()));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, channel, DateTime.now(), null));
 
         ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
         ArgumentCaptor<OMSubscriptionRequest> captor1 = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
@@ -685,7 +687,7 @@ public class SubscriptionServiceTest {
         Subscription mockedSubscription = mock(Subscription.class);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now()));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now(), null));
 
         verify(mockedSubscription, never()).deactivationRequestReceived();
         verify(onMobileSubscriptionManagerPublisher, never()).processDeactivation(Matchers.<OMSubscriptionRequest>any());

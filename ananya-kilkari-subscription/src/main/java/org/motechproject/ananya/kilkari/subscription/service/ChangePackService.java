@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
-import org.apache.commons.lang.math.NumberUtils;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -8,7 +7,6 @@ import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubsc
 import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionChangePackRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,12 +30,14 @@ public class ChangePackService {
         Subscription existingSubscription = subscriptionService.findBySubscriptionId(subscriptionId);
         ChangePackValidator.validate(existingSubscription, changeSubscriptionRequest);
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, changeSubscriptionRequest.getChannel(), changeSubscriptionRequest.getCreatedAt()));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, changeSubscriptionRequest.getChannel(),
+                changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getReason()));
         updateEddOrDob(changeSubscriptionRequest);
         Subscription newSubscription = createSubscriptionWithNewPack(changeSubscriptionRequest);
 
         reportingService.reportChangePack(new SubscriptionChangePackRequest(NumberUtils.createLong(newSubscription.getMsisdn()), newSubscription.getSubscriptionId(), subscriptionId, newSubscription.getPack().name(),
-                changeSubscriptionRequest.getChannel().name(), newSubscription.getStatus().name(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getExpectedDateOfDelivery(), changeSubscriptionRequest.getDateOfBirth(), newSubscription.getStartDate(), changeSubscriptionRequest.getReason()));
+                changeSubscriptionRequest.getChannel().name(), newSubscription.getStatus().name(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getExpectedDateOfDelivery(), changeSubscriptionRequest.getDateOfBirth(),
+                newSubscription.getStartDate(), changeSubscriptionRequest.getReason()));
     }
 
     private void updateEddOrDob(ChangeSubscriptionRequest changeSubscriptionRequest) {
@@ -50,7 +50,8 @@ public class ChangePackService {
 
     private Subscription createSubscriptionWithNewPack(ChangeSubscriptionRequest changeSubscriptionRequest) {
         Subscriber subscriber = new Subscriber(null, null, changeSubscriptionRequest.getDateOfBirth(), changeSubscriptionRequest.getExpectedDateOfDelivery(), null);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeSubscriptionRequest.getMsisdn(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getPack(), null, subscriber);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeSubscriptionRequest.getMsisdn(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getPack(), null, subscriber, changeSubscriptionRequest.getReason());
+        subscriptionRequest.setOldSubscriptionId(changeSubscriptionRequest.getSubscriptionId());
         return subscriptionService.createSubscription(subscriptionRequest, changeSubscriptionRequest.getChannel());
     }
 }

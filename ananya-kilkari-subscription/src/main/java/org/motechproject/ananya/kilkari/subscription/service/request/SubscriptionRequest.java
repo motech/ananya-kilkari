@@ -10,14 +10,16 @@ public class SubscriptionRequest {
     private Location location;
     private Subscriber subscriber;
     private String oldSubscriptionId;
+    private String reason;
 
     public SubscriptionRequest(String msisdn, DateTime creationDate,
-                               SubscriptionPack pack, Location location, Subscriber subscriber) {
+                               SubscriptionPack pack, Location location, Subscriber subscriber, String reason) {
         this.msisdn = msisdn;
         this.creationDate = creationDate;
         this.pack = pack;
         this.location = location;
         this.subscriber = subscriber;
+        this.reason = reason;
     }
 
     public String getMsisdn() {
@@ -38,6 +40,10 @@ public class SubscriptionRequest {
 
     public Subscriber getSubscriber() {
         return subscriber == null ? Subscriber.NULL : subscriber;
+    }
+
+    public String getReason() {
+        return reason;
     }
 
     public boolean hasLocation() {
@@ -70,5 +76,4 @@ public class SubscriptionRequest {
 
         return creationDate;
     }
-
 }

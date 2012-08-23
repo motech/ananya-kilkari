@@ -20,8 +20,8 @@ public class OBDDeactivateHandler implements ServiceOptionHandler {
         DeactivationRequest deactivationRequest = new DeactivationRequest(
                 obdSuccessfulCallDetailsRequest.getSubscriptionId(),
                 obdSuccessfulCallDetailsRequest.getChannel(),
-                obdSuccessfulCallDetailsRequest.getCreatedAt()
-        );
+                obdSuccessfulCallDetailsRequest.getCreatedAt(),
+                null);
         subscriptionService.requestDeactivation(deactivationRequest);
     }
 }

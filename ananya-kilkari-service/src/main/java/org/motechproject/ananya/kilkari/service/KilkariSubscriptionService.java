@@ -7,7 +7,6 @@ import org.motechproject.ananya.kilkari.mapper.ChangeMsisdnRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.*;
-import org.motechproject.ananya.kilkari.service.validator.UnsubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -98,7 +97,8 @@ public class KilkariSubscriptionService {
         Errors validationErrors = unSubscriptionWebRequest.validate();
         raiseExceptionIfThereAreErrors(validationErrors);
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.from(unSubscriptionWebRequest.getChannel()), unSubscriptionWebRequest.getCreatedAt()));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.from(unSubscriptionWebRequest.getChannel()),
+                unSubscriptionWebRequest.getCreatedAt(), unSubscriptionWebRequest.getReason()));
     }
 
     public void processCampaignChange(CampaignChangeRequest campaignChangeRequest, String subscriptionId) {

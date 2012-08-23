@@ -173,7 +173,7 @@ public class SubscriptionService {
             return;
         }
 
-        updateStatusAndReport(subscription, deactivationRequest.getCreatedAt(), null, null, null, new Action<Subscription>() {
+        updateStatusAndReport(subscription, deactivationRequest.getCreatedAt(), deactivationRequest.getReason(), null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.deactivationRequestReceived();
@@ -393,7 +393,7 @@ public class SubscriptionService {
     }
 
     private void migrateMsisdnToNewSubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
-        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now()));
+        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now(), null));
 
         SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
 
@@ -406,7 +406,7 @@ public class SubscriptionService {
                 subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getNextWeekNumber());
 
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeMsisdnRequest.getNewMsisdn(),
-                DateTime.now(), subscription.getPack(), location, subscriber);
+                DateTime.now(), subscription.getPack(), location, subscriber, null);
         subscriptionRequest.setOldSubscriptionId(subscription.getSubscriptionId());
 
         createSubscription(subscriptionRequest, changeMsisdnRequest.getChannel());

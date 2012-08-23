@@ -41,14 +41,16 @@ public class SubscriptionMapperTest {
 
     @Test
     public void shouldCreateReportingRequest() {
+        String reason = "some reason";
         SubscriptionReportRequest request = SubscriptionMapper.createSubscriptionCreationReportRequest(
-                subscription, channel, new SubscriptionRequest("msisdn", null, null, Location.NULL, Subscriber.NULL));
+                subscription, channel, new SubscriptionRequest("msisdn", null, null, Location.NULL, Subscriber.NULL, reason));
 
         assertEquals(subscription.getMsisdn(), request.getMsisdn().toString());
         assertEquals(subscription.getPack().name(), request.getPack());
         assertEquals(subscription.getSubscriptionId(), request.getSubscriptionId());
         assertEquals(subscription.getStartDate(), request.getStartDate());
         assertEquals(channel.name(), request.getChannel());
+        assertEquals(reason, request.getReason());
     }
 
     @Test
@@ -59,8 +61,8 @@ public class SubscriptionMapperTest {
         String district = "district";
         Location location = new Location(district, block, panchayat);
 
-        SubscriptionReportRequest request = new SubscriptionMapper().createSubscriptionCreationReportRequest(
-                subscription, channel, new SubscriptionRequest("msisdn", null, null, location, Subscriber.NULL));
+        SubscriptionReportRequest request = SubscriptionMapper.createSubscriptionCreationReportRequest(
+                subscription, channel, new SubscriptionRequest("msisdn", null, null, location, Subscriber.NULL, null));
 
         SubscriberLocation actualLocation = request.getLocation();
         assertEquals(panchayat, actualLocation.getPanchayat());

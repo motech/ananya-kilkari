@@ -24,6 +24,7 @@ public class SubscriptionRequestMapperTest {
         assertEquals(subscriptionWebRequest.getMsisdn(), subscriptionDomainRequest.getMsisdn());
         assertEquals(subscriptionWebRequest.getPack(), subscriptionDomainRequest.getPack().name());
         assertEquals(subscriptionWebRequest.getCreatedAt(), subscriptionDomainRequest.getCreationDate());
+        assertEquals(null, subscriptionDomainRequest.getReason());
         Location location = subscriptionDomainRequest.getLocation();
         assertEquals(subscriptionWebRequest.getLocation().getBlock(), location.getBlock());
         assertEquals(subscriptionWebRequest.getLocation().getDistrict(), location.getDistrict());
@@ -87,6 +88,7 @@ public class SubscriptionRequestMapperTest {
         ChangeSubscriptionWebRequest webRequest = new ChangeSubscriptionWebRequestBuilder().withDefaults()
                 .withChangeType("change schedule")
                 .withEDD("25-11-2013")
+                .withReason("reason for change subscription")
                 .build();
 
         String subscriptionId = "subscriptionId";
@@ -100,6 +102,6 @@ public class SubscriptionRequestMapperTest {
         assertNull(changeSubscriptionRequest.getDateOfBirth());
         assertEquals(webRequest.getCreatedAt(), changeSubscriptionRequest.getCreatedAt());
         assertEquals(ChangeSubscriptionType.CHANGE_SCHEDULE, changeSubscriptionRequest.getChangeType());
-        assertEquals("reason for change pack", changeSubscriptionRequest.getReason());
+        assertEquals("reason for change subscription", changeSubscriptionRequest.getReason());
     }
 }

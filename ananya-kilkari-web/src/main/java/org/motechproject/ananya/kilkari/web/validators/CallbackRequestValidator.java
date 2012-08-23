@@ -27,14 +27,14 @@ public class CallbackRequestValidator {
 
     public Errors validate(CallbackRequestWrapper callbackRequestWrapper) {
         Errors errors = new Errors();
-        final boolean isValidCallbackAction = validateCallbackAction(callbackRequestWrapper.getAction(), errors);
-        final boolean isValidCallbackStatus = validateCallbackStatus(callbackRequestWrapper.getStatus(), errors);
+        final boolean isValidCallbackAction = validateCallbackAction(callbackRequestWrapper, errors);
+        final boolean isValidCallbackStatus = validateCallbackStatus(callbackRequestWrapper, errors);
         if (isValidCallbackAction && isValidCallbackStatus) {
             errors.addAll(validateSubscriptionRequest(callbackRequestWrapper));
         }
 
-        validateMsisdn(callbackRequestWrapper.getMsisdn(), errors);
-        validateOperator(callbackRequestWrapper.getOperator(), errors);
+        validateMsisdn(callbackRequestWrapper, errors);
+        validateOperator(callbackRequestWrapper, errors);
 
         return errors;
     }
@@ -45,54 +45,58 @@ public class CallbackRequestValidator {
         final String requestAction = callbackRequestWrapper.getAction();
 
         if (subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper) == null) {
-            errors.add(String.format("Invalid status %s for action %s", requestStatus, requestAction));
+            errors.add(String.format("Invalid status %s for action %s for subscription %s", requestStatus, requestAction,callbackRequestWrapper.getSubscriptionId()));
         }
 
         Subscription subscription = subscriptionService.findBySubscriptionId(callbackRequestWrapper.getSubscriptionId());
         if (CallbackAction.REN.name().equals(requestAction)) {
             final SubscriptionStatus subscriptionStatus = subscription.getStatus();
             if(!subscriptionStatus.canRenew()) {
-                errors.add(String.format("Cannot renew. Subscription in %s status", subscriptionStatus));
+                errors.add(String.format("Cannot renew. Subscription %s in %s status", callbackRequestWrapper.getSubscriptionId(),subscriptionStatus));
             }
         }
 
         if (CallbackAction.DCT.name().equals(requestAction) && CallbackStatus.BAL_LOW.name().equals(requestStatus)) {
             final SubscriptionStatus subscriptionStatus = subscription.getStatus();
             if (!subscriptionStatus.canDeactivateOnRenewal())
-                errors.add(String.format("Cannot deactivate on renewal. Subscription in %s status", subscriptionStatus));
+                errors.add(String.format("Cannot deactivate on renewal. Subscription %s in %s status", callbackRequestWrapper.getSubscriptionId(),subscriptionStatus));
         }
 
         if (CallbackAction.ACT.name().equals(requestAction) && (CallbackStatus.SUCCESS.name().equals(requestStatus) || CallbackStatus.BAL_LOW.name().equals(requestStatus))) {
             final SubscriptionStatus subscriptionStatus = subscription.getStatus();
             if (!subscriptionStatus.canActivate())
-                errors.add(String.format("Cannot activate. Subscription in %s status", subscriptionStatus));
+                errors.add(String.format("Cannot activate. Subscription %s in %s status", callbackRequestWrapper.getSubscriptionId(),subscriptionStatus));
         }
 
         return errors;
     }
 
 
-    private void validateOperator(String operator, Errors errors) {
+    private void validateOperator(CallbackRequestWrapper callbackRequestWrapper, Errors errors) {
+        String operator = callbackRequestWrapper.getOperator();
         if (!Operator.isValid(operator))
-            errors.add(String.format("Invalid operator %s", operator));
+            errors.add(String.format("Invalid operator %s for subscription %s", callbackRequestWrapper.getOperator(),callbackRequestWrapper.getSubscriptionId()));
     }
 
-    private void validateMsisdn(String msisdn, Errors errors) {
+    private void validateMsisdn(CallbackRequestWrapper callbackRequestWrapper, Errors errors) {
+        String msisdn = callbackRequestWrapper.getMsisdn();
         if (PhoneNumber.isNotValid(msisdn))
-            errors.add(String.format("Invalid msisdn %s", msisdn));
+            errors.add(String.format("Invalid msisdn %s for subscription id %s", msisdn,callbackRequestWrapper.getSubscriptionId()));
     }
 
-    private boolean validateCallbackAction(String callbackAction, Errors errors) {
+    private boolean validateCallbackAction(CallbackRequestWrapper callbackRequestWrapper, Errors errors) {
+        String callbackAction = callbackRequestWrapper.getAction();
         if (!CallbackAction.isValid(callbackAction)) {
-            errors.add(String.format("Invalid callbackAction %s", callbackAction));
+            errors.add(String.format("Invalid callbackAction %s  for subscription %s", callbackAction,callbackRequestWrapper.getSubscriptionId()));
             return false;
         }
         return true;
     }
 
-    private boolean validateCallbackStatus(String callbackStatus, Errors errors) {
+    private boolean validateCallbackStatus(CallbackRequestWrapper callbackRequestWrapper, Errors errors) {
+        String callbackStatus = callbackRequestWrapper.getStatus();
         if (!CallbackStatus.isValid(callbackStatus)) {
-            errors.add(String.format("Invalid callbackStatus %s", callbackStatus));
+            errors.add(String.format("Invalid callbackStatus %s for subscription %s", callbackStatus,callbackRequestWrapper.getSubscriptionId()));
             return false;
         }
         return true;

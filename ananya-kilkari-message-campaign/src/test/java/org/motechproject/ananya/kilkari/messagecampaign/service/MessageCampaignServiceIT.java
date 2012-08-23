@@ -14,6 +14,7 @@ import org.motechproject.server.messagecampaign.dao.AllCampaignEnrollments;
 import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollment;
 import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -25,6 +26,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationKilkariMessageCampaignContext.xml")
+@ActiveProfiles("test")
 public class MessageCampaignServiceIT {
 
     public static final int CONFIGURED_DELTA_MINUTES = 30;

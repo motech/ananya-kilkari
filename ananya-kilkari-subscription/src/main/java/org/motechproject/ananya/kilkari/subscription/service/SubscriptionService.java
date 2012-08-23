@@ -397,7 +397,8 @@ public class SubscriptionService {
     }
 
     private void migrateMsisdnToNewSubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
-        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now(), null));
+        String reason = "change msisdn";
+        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now(), reason));
 
         SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
 
@@ -410,7 +411,7 @@ public class SubscriptionService {
                 subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getNextWeekNumber());
 
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeMsisdnRequest.getNewMsisdn(),
-                DateTime.now(), subscription.getPack(), location, subscriber, null);
+                DateTime.now(), subscription.getPack(), location, subscriber, reason);
         subscriptionRequest.setOldSubscriptionId(subscription.getSubscriptionId());
 
         createSubscription(subscriptionRequest, changeMsisdnRequest.getChannel());

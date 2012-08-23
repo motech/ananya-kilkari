@@ -37,4 +37,10 @@ public class ChangeSubscriptionTypeTest {
         assertTrue(ChangeSubscriptionType.isValid("Change pAck"));
         assertTrue(ChangeSubscriptionType.isValid("change schedule"));
     }
+
+    @Test
+    public void shouldCheckIfTypeIsChangePack() {
+        assertTrue(ChangeSubscriptionType.isChangePack(ChangeSubscriptionType.CHANGE_PACK));
+        assertFalse(ChangeSubscriptionType.isChangePack(ChangeSubscriptionType.CHANGE_SCHEDULE));
+    }
 }

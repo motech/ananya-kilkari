@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -36,11 +37,16 @@ public class ChangeSubscriptionService {
         ChangeSubscriptionValidator.validate(existingSubscription, changeSubscriptionRequest);
 
         validateSubscriptionExistsFor(changeSubscriptionRequest);
+        modifyReasonForChangeSubscription(changeSubscriptionRequest);
 
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, changeSubscriptionRequest.getChannel(),
                 changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getReason()));
         updateEddOrDob(changeSubscriptionRequest);
         createSubscriptionWithNewPack(changeSubscriptionRequest);
+    }
+
+    private void modifyReasonForChangeSubscription(ChangeSubscriptionRequest changeSubscriptionRequest) {
+        changeSubscriptionRequest.setReason(String.format("%s - %s", changeSubscriptionRequest.getChangeType().getDescription(),changeSubscriptionRequest.getReason()));
     }
 
     private void validateSubscriptionExistsFor(ChangeSubscriptionRequest changeSubscriptionRequest) {

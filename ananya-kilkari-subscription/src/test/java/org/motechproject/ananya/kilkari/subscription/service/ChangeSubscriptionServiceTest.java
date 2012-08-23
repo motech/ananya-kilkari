@@ -76,7 +76,7 @@ public class ChangeSubscriptionServiceTest {
 
         ArgumentCaptor<SubscriptionRequest> createSubscriptionCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
         order.verify(subscriptionService).createSubscription(createSubscriptionCaptor.capture(), eq(Channel.CALL_CENTER));
-        validateSubscriptionCreationRequest(createSubscriptionCaptor.getValue(), changeSubscriptionRequest, existingSubscription);
+        validateSubscriptionCreationRequest(createSubscriptionCaptor.getValue(), changeSubscriptionRequest, existingSubscription, reason);
     }
 
 
@@ -124,10 +124,11 @@ public class ChangeSubscriptionServiceTest {
         assertEquals(subscriberResponse.getDateOfBirth(), subscriptionRequest.getSubscriber().getDateOfBirth());
     }
 
-    private void validateSubscriptionCreationRequest(SubscriptionRequest subscriptionRequest, ChangeSubscriptionRequest changeSubscriptionRequest, Subscription existingSubscription) {
+    private void validateSubscriptionCreationRequest(SubscriptionRequest subscriptionRequest, ChangeSubscriptionRequest changeSubscriptionRequest, Subscription existingSubscription, String reason) {
         assertEquals(changeSubscriptionRequest.getDateOfBirth(), subscriptionRequest.getSubscriber().getDateOfBirth());
         assertEquals(changeSubscriptionRequest.getExpectedDateOfDelivery(), subscriptionRequest.getSubscriber().getExpectedDateOfDelivery());
         assertEquals(existingSubscription.getMsisdn(), subscriptionRequest.getMsisdn());
+        assertEquals("change pack - " + reason, subscriptionRequest.getReason());
     }
 
     private void validateDeactivationRequest(DeactivationRequest deactivationRequest, Subscription existingSubscription) {

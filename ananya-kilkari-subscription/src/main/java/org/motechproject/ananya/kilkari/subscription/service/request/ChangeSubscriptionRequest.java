@@ -77,4 +77,8 @@ public class ChangeSubscriptionRequest {
     public void setMsisdn(String msisdn) {
         this.msisdn = msisdn;
     }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 }

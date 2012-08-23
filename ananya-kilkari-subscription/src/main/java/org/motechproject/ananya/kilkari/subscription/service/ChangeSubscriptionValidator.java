@@ -10,7 +10,7 @@ public class ChangeSubscriptionValidator {
 
     public static void validate(Subscription subscription, ChangeSubscriptionRequest changeSubscriptionRequest) {
         validateStatus(subscription);
-        if(changeSubscriptionRequest.getChangeType() == ChangeSubscriptionType.CHANGE_PACK)
+        if(ChangeSubscriptionType.isChangePack(changeSubscriptionRequest.getChangeType()))
             validateExistingSubscriptionBelongsToDifferentPack(subscription, changeSubscriptionRequest.getPack());
         else
             validateRequestedPackIsSameAsExistingPack(subscription, changeSubscriptionRequest.getPack());

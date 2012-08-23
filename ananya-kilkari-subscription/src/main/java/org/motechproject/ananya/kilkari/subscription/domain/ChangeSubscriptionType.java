@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.domain;
 
+import org.apache.commons.lang.StringUtils;
+
 public enum ChangeSubscriptionType {
     CHANGE_PACK("change pack"), CHANGE_SCHEDULE("change schedule");
     private String description;
@@ -28,5 +30,9 @@ public enum ChangeSubscriptionType {
        } catch (IllegalArgumentException iae) {
            return false;
        }
+    }
+
+    public static boolean isChangePack(ChangeSubscriptionType type) {
+        return ChangeSubscriptionType.CHANGE_PACK.equals(type);
     }
 }

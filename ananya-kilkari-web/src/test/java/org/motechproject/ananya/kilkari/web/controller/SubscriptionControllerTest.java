@@ -414,7 +414,6 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldChangePackForTheGivenSubscriber() throws Exception {
         String subscriptionId = "abcd1234";
-        String msisdn = "1234567890";
         String channel = Channel.CALL_CENTER.name();
         String pack = SubscriptionPack.BARI_KILKARI.name();
         ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequest();

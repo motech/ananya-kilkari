@@ -3,10 +3,16 @@ package org.motechproject.ananya.kilkari.subscription.service;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
@@ -17,14 +23,16 @@ import java.util.List;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
-public class ChangePackServiceIT extends SpringIntegrationTest {
+public class ChangeSubscriptionServiceIT extends SpringIntegrationTest {
 
     @Autowired
-    private ChangePackService changePackService;
+    private ChangeSubscriptionService changeSubscriptionService;
 
     @Autowired
     private AllSubscriptions allSubscriptions;
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
     @Autowired
     private SubscriptionService subscriptionService;
     private String msisdn = "1111111111";
@@ -36,12 +44,12 @@ public class ChangePackServiceIT extends SpringIntegrationTest {
     }
 
     @Test
-    public void shouldChangePackForAnExistingSubscription() {
+    public void shouldChangeSubscriptionForAnExistingSubscription() {
         Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(SubscriptionPack.BARI_KILKARI).build();
         allSubscriptions.add(existingSubscription);
         ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, msisdn, existingSubscription.getSubscriptionId(), SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now(), DateTime.now().plusMonths(1), null, "reason");
 
-        changePackService.process(changeSubscriptionRequest);
+        changeSubscriptionService.process(changeSubscriptionRequest);
 
         List<Subscription> subscriptions = allSubscriptions.findByMsisdn(msisdn);
         Subscription deactivatedSubscription = subscriptions.get(0);
@@ -51,5 +59,20 @@ public class ChangePackServiceIT extends SpringIntegrationTest {
         Subscription newSubscription = subscriptions.get(1);
         assertEquals(SubscriptionStatus.NEW_EARLY, newSubscription.getStatus());
         assertEquals(changeSubscriptionRequest.getPack(), newSubscription.getPack());
+    }
+
+    @Test
+    public void shouldNotChangeSubscriptionIfActiveSubscriptionAlreadyExistsForTheRequestedPackAndMsisdn() {
+        Subscription existingSubscription1 = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(SubscriptionPack.BARI_KILKARI).build();
+        SubscriptionPack newPack = SubscriptionPack.CHOTI_KILKARI;
+        Subscription existingSubscription2 = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(newPack).build();
+        allSubscriptions.add(existingSubscription1);
+        allSubscriptions.add(existingSubscription2);
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, msisdn, existingSubscription1.getSubscriptionId(), newPack, Channel.CALL_CENTER, DateTime.now(), DateTime.now().plusMonths(1), null, "reason");
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(String.format("Active subscription already exists for %s and %s", msisdn, newPack));
+
+        changeSubscriptionService.process(changeSubscriptionRequest);
     }
 }

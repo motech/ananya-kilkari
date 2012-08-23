@@ -18,7 +18,7 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscri
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.service.ChangePackService;
+import org.motechproject.ananya.kilkari.subscription.service.ChangeSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
@@ -55,13 +55,13 @@ public class KilkariSubscriptionServiceTest {
     @Mock
     private KilkariPropertiesData kilkariPropertiesData;
     @Mock
-    private ChangePackService changePackService;
+    private ChangeSubscriptionService changeSubscriptionService;
 
     @Before
     public void setup() {
         initMocks(this);
         kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService,
-                changePackService, kilkariPropertiesData);
+                changeSubscriptionService, kilkariPropertiesData);
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
     }
 
@@ -288,7 +288,7 @@ public class KilkariSubscriptionServiceTest {
         kilkariSubscriptionService.changeSubscription(changeSubscriptionWebRequest, subscriptionId);
 
         ArgumentCaptor<ChangeSubscriptionRequest> changePackRequestArgumentCaptor = ArgumentCaptor.forClass(ChangeSubscriptionRequest.class);
-        verify(changePackService).process(changePackRequestArgumentCaptor.capture());
+        verify(changeSubscriptionService).process(changePackRequestArgumentCaptor.capture());
         ChangeSubscriptionRequest changeSubscriptionRequest = changePackRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, changeSubscriptionRequest.getSubscriptionId());
@@ -351,6 +351,6 @@ public class KilkariSubscriptionServiceTest {
 
         kilkariSubscriptionService.changeSubscription(changeSubscriptionWebRequest, "subscriptionId");
 
-        verify(changePackService, never()).process(any(ChangeSubscriptionRequest.class));
+        verify(changeSubscriptionService, never()).process(any(ChangeSubscriptionRequest.class));
     }
 }

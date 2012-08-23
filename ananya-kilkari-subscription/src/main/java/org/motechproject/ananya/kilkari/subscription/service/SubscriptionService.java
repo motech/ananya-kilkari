@@ -118,6 +118,10 @@ public class SubscriptionService {
         return allSubscriptions.findByMsisdn(msisdn);
     }
 
+    public List<Subscription> findByMsisdnAndPack(String msisdn, SubscriptionPack pack) {
+        return allSubscriptions.findByMsisdnAndPack(msisdn, pack);
+    }
+
     public void activate(String subscriptionId, final DateTime activatedOn, final String operator) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         if (!subscription.canActivate()) {

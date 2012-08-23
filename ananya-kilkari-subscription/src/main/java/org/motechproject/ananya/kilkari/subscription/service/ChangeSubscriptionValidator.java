@@ -6,7 +6,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 
-public class ChangePackValidator {
+public class ChangeSubscriptionValidator {
 
     public static void validate(Subscription subscription, ChangeSubscriptionRequest changeSubscriptionRequest) {
         validateStatus(subscription);

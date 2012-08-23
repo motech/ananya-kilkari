@@ -185,6 +185,30 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    public void shouldGetSubscriptionsForAGivenMsisdnAndPack() {
+        String msisdn = "1234567890";
+        ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
+        SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        Subscription subscription1 = new Subscription(msisdn, pack, DateTime.now(), DateTime.now());
+        subscription1.setStatus(SubscriptionStatus.NEW);
+        subscriptionsToBeReturned.add(subscription1);
+
+        Subscription subscription2 = new Subscription(msisdn, pack, DateTime.now(), DateTime.now());
+        subscription2.setStatus(SubscriptionStatus.NEW);
+        subscriptionsToBeReturned.add(subscription2);
+
+        when(allSubscriptions.findByMsisdnAndPack(msisdn, pack)).thenReturn(subscriptionsToBeReturned);
+
+        List<Subscription> subscriptions = subscriptionService.findByMsisdnAndPack(msisdn, pack);
+
+        assertEquals(2, subscriptions.size());
+        assertEquals(msisdn, subscriptions.get(0).getMsisdn());
+        assertEquals(pack, subscriptions.get(0).getPack());
+        assertEquals(msisdn, subscriptions.get(1).getMsisdn());
+        assertEquals(pack, subscriptions.get(1).getPack());
+    }
+
+    @Test
     public void shouldUpdateTheSubscriptionStatusToPendingActivation_WhenActivationIsRequested() {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.PENDING_ACTIVATION;

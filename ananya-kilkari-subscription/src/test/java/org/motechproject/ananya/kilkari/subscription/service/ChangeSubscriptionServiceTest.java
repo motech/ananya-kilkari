@@ -2,7 +2,9 @@ package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
@@ -12,21 +14,23 @@ import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionChangePackRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 
-import static junit.framework.Assert.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ChangePackServiceTest {
+public class ChangeSubscriptionServiceTest {
 
     @Mock
     private SubscriptionService subscriptionService;
@@ -34,11 +38,14 @@ public class ChangePackServiceTest {
     private ReportingService reportingService;
     @Mock
     private SubscriptionValidator subscriptionValidator;
-    ChangePackService changePackService;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    private ChangeSubscriptionService changeSubscriptionService;
 
     @Before
     public void setup() {
-        changePackService = new ChangePackService(subscriptionService, subscriptionValidator, reportingService);
+        changeSubscriptionService = new ChangeSubscriptionService(subscriptionService, subscriptionValidator, reportingService);
     }
 
     @Test
@@ -46,18 +53,19 @@ public class ChangePackServiceTest {
         DateTime dateOfBirth = DateTime.now();
         String reason = "some reason";
 
-        Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withMsisdn("9876543210").withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.BARI_KILKARI).build();
+        String msisdn = "9876543210";
+        SubscriptionPack newPack = SubscriptionPack.CHOTI_KILKARI;
+        Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.BARI_KILKARI).build();
         String subscriptionId = existingSubscription.getSubscriptionId();
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(existingSubscription);
-
-
-        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, null, subscriptionId, SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth, reason);
+        when(subscriptionService.findByMsisdnAndPack(msisdn, newPack)).thenReturn(new ArrayList<Subscription>());
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, null, subscriptionId, newPack, Channel.CALL_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth, reason);
 
         Subscription newSubscription = new SubscriptionBuilder().withDefaults().withPack(changeSubscriptionRequest.getPack()).build();
         when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CALL_CENTER))).thenReturn(newSubscription);
 
-        changePackService.process(changeSubscriptionRequest);
+        changeSubscriptionService.process(changeSubscriptionRequest);
 
         InOrder order = inOrder(subscriptionService, reportingService, subscriptionValidator);
         order.verify(subscriptionValidator).validateSubscriptionExists(subscriptionId);
@@ -71,6 +79,29 @@ public class ChangePackServiceTest {
         validateSubscriptionCreationRequest(createSubscriptionCaptor.getValue(), changeSubscriptionRequest, existingSubscription);
     }
 
+
+    @Test
+    public void shouldThrowExceptionIfChangeSubscriptionIsSentForExistingMsisdnAndPack() {
+        DateTime dateOfBirth = DateTime.now();
+        String reason = "some reason";
+        String msisdn = "9876543210";
+        SubscriptionPack newPack = SubscriptionPack.CHOTI_KILKARI;
+        Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.BARI_KILKARI).build();
+        String subscriptionId = existingSubscription.getSubscriptionId();
+
+        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(existingSubscription);
+        Subscription mockedSubscription = mock(Subscription.class);
+        when(subscriptionService.findByMsisdnAndPack(msisdn, newPack)).thenReturn(Arrays.asList(mockedSubscription));
+        when(mockedSubscription.isInProgress()).thenReturn(true);
+
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, null, subscriptionId, newPack, Channel.CALL_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth, reason);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(String.format("Active subscription already exists for %s and %s", msisdn, newPack));
+
+        changeSubscriptionService.process(changeSubscriptionRequest);
+    }
+
     @Test
     public void shouldGetEddOrDobFromReportingDBIfThePassedValuesAreNull() {
         DateTime dateOfBirth = DateTime.now();
@@ -81,7 +112,7 @@ public class ChangePackServiceTest {
         SubscriberResponse subscriberResponse = new SubscriberResponse(null, null, dateOfBirth, null, null);
         when(reportingService.getSubscriber(subscriptionId)).thenReturn(subscriberResponse);
 
-        changePackService.process(new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1234567890", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CALL_CENTER, null, null, null, "reason"));
+        changeSubscriptionService.process(new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1234567890", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CALL_CENTER, null, null, null, "reason"));
 
         verify(reportingService).getSubscriber(subscriptionId);
         ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);

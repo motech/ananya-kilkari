@@ -11,7 +11,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
-import org.motechproject.ananya.kilkari.subscription.service.ChangePackService;
+import org.motechproject.ananya.kilkari.subscription.service.ChangeSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
@@ -36,7 +36,7 @@ public class KilkariSubscriptionService {
     private SubscriptionService subscriptionService;
     private MotechSchedulerService motechSchedulerService;
     private KilkariPropertiesData kilkariProperties;
-    private ChangePackService changePackService;
+    private ChangeSubscriptionService changeSubscriptionService;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariSubscriptionService.class);
 
@@ -44,11 +44,11 @@ public class KilkariSubscriptionService {
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
                                       SubscriptionService subscriptionService,
                                       MotechSchedulerService motechSchedulerService,
-                                      ChangePackService changePackService, KilkariPropertiesData kilkariProperties) {
+                                      ChangeSubscriptionService changeSubscriptionService, KilkariPropertiesData kilkariProperties) {
         this.subscriptionPublisher = subscriptionPublisher;
         this.subscriptionService = subscriptionService;
         this.motechSchedulerService = motechSchedulerService;
-        this.changePackService = changePackService;
+        this.changeSubscriptionService = changeSubscriptionService;
         this.kilkariProperties = kilkariProperties;
     }
 
@@ -120,7 +120,7 @@ public class KilkariSubscriptionService {
         Errors errors = changeSubscriptionWebRequest.validate();
         raiseExceptionIfThereAreErrors(errors);
         ChangeSubscriptionRequest changeSubscriptionRequest = SubscriptionRequestMapper.mapToChangeSubscriptionRequest(changeSubscriptionWebRequest, subscriptionId);
-        changePackService.process(changeSubscriptionRequest);
+        changeSubscriptionService.process(changeSubscriptionRequest);
     }
 
     public void changeMsisdn(ChangeMsisdnWebRequest changeMsisdnWebRequest) {

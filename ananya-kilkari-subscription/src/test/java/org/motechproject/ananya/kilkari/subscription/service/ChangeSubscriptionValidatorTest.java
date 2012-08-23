@@ -17,7 +17,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubsc
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ChangePackValidatorTest {
+public class ChangeSubscriptionValidatorTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -35,7 +35,7 @@ public class ChangePackValidatorTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Subscription is not active for subscription "+subscriptionId);
 
-        ChangePackValidator.validate(subscription, changeSubscriptionRequest);
+        ChangeSubscriptionValidator.validate(subscription, changeSubscriptionRequest);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class ChangePackValidatorTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Subscription %s is already subscribed to requested pack ",subscriptionId));
 
-        ChangePackValidator.validate(subscription, changeSubscriptionRequest);
+        ChangeSubscriptionValidator.validate(subscription, changeSubscriptionRequest);
     }
 
     @Test
@@ -63,6 +63,6 @@ public class ChangePackValidatorTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Subscription %s is not subscribed to requested pack for change schedule",subscriptionId));
 
-        ChangePackValidator.validate(subscription, changeSubscriptionRequest);
+        ChangeSubscriptionValidator.validate(subscription, changeSubscriptionRequest);
     }
 }

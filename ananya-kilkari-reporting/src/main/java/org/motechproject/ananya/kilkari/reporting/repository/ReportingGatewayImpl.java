@@ -2,9 +2,7 @@ package org.motechproject.ananya.kilkari.reporting.repository;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
@@ -18,7 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -102,8 +103,18 @@ public class ReportingGatewayImpl implements ReportingGateway {
     }
 
     private String constructGetLocationUrl(List<NameValuePair> params) {
-        String url = String.format("%s%s", getBaseUrl(), GET_LOCATION_PATH);
-        return String.format("%s?%s", url, URLEncodedUtils.format(params, HTTP.UTF_8));
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance();
+        try {
+            uriComponentsBuilder.uri(new URI(getBaseUrl())).path(GET_LOCATION_PATH);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Error constructing reporting URI", e);
+        }
+
+        for(NameValuePair nameValuePair : params) {
+            uriComponentsBuilder.queryParam(nameValuePair.getName(), nameValuePair.getValue());
+        }
+
+        return uriComponentsBuilder.build().encode().toString();
     }
 
     private List<NameValuePair> constructParameterMap(String district, String block, String panchayat) {

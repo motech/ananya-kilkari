@@ -23,6 +23,8 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
 
     private List<Location> locationList;
 
+    private Random random = new Random();
+
     public SubscriptionPerformanceTest(String testName) {
         super(testName);
     }
@@ -94,17 +96,17 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
 
     /*
      * randomly returns regular, early or late subscription
-     * regular subscription - 7/11, early subscription 2/11, late subscription 2/11
+     * regular subscription - 70%, early subscription 15%, late subscription 15%
      */
     private SubscriptionWebRequest getSubscriptionWebRequest() {
-        int subscriptionType = new Random().nextInt(11);
-        if (subscriptionType < 7) return getRegularSubscription();
-        if (subscriptionType >= 7 && subscriptionType < 9) return getEarlySubscription();
+        double probability = Math.random();
+        if (probability <= 0.7) return getRegularSubscription();
+        if (probability > 0.7 && probability < 0.85) return getEarlySubscription();
         return getLateSubscription();
     }
 
     private SubscriptionWebRequest getRegularSubscription() {
-        Location location = locationList.get(new Random().nextInt(locationList.size()));
+        Location location = locationList.get(random.nextInt(locationList.size()));
         return new SubscriptionWebRequestBuilder()
                 .withDefaults()
                 .withDistrict(location.getDistrict()).withBlock(location.getBlock()).withPanchayat(location.getPanchayat())
@@ -114,14 +116,14 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
 
     private SubscriptionWebRequest getEarlySubscription() {
         SubscriptionWebRequest earlySubscription = getRegularSubscription();
-        earlySubscription.setDateOfBirth(DateTime.now().plusMonths(3).plusDays(new Random().nextInt(100)).toString("dd/MM/yyyy"));
+        earlySubscription.setDateOfBirth(DateTime.now().plusMonths(3).plusDays(random.nextInt(100)).toString("dd-MM-yyyy"));
         return earlySubscription;
     }
 
     private SubscriptionWebRequest getLateSubscription() {
         SubscriptionWebRequest lateSubscription = getRegularSubscription();
         // Date of Birth range is : -30 - DateTime.now - +30
-        lateSubscription.setDateOfBirth(DateTime.now().plusDays(-30 + new Random().nextInt(60)).toString("dd/MM/yyyy"));
+        lateSubscription.setDateOfBirth(DateTime.now().plusDays(-30 + random.nextInt(60)).toString("dd-MM-yyyy"));
         return lateSubscription;
     }
 

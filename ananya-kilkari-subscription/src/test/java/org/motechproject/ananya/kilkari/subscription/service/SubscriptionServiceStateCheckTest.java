@@ -20,8 +20,10 @@ import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.scheduler.MotechSchedulerService;
 
@@ -164,6 +166,22 @@ public class SubscriptionServiceStateCheckTest {
         verify(mockSubscription).canDeactivate();
         verify(mockSubscription).canComplete();
         verifySubscriptionStatusUpdation();
+    }
+
+    @Test
+    public void shouldNotCreateASubscriptionIfNotInTheRightState() {
+        String msisdn = "msisdn";
+        SubscriptionPack subscriptionPack = SubscriptionPack.NANHI_KILKARI;
+        when(mockSubscription.canCreateANewEarlySubscription()).thenReturn(false);
+        when(mockSubscription.canCreateNewSubscription()).thenReturn(false);
+        when(allSubscriptions.findSubscriptionInProgress(msisdn, subscriptionPack)).thenReturn(mockSubscription);
+
+        subscriptionService.createSubscription(new SubscriptionRequest(msisdn, null, subscriptionPack, null, null), Channel.IVR);
+
+        verify(mockSubscription).canCreateANewEarlySubscription();
+        verify(mockSubscription).canCreateNewSubscription();
+        verify(allSubscriptions, never()).add(any(Subscription.class));
+        verify(reportingServiceImpl, never()).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
     }
 
     private void verifySubscriptionStatusUpdation() {

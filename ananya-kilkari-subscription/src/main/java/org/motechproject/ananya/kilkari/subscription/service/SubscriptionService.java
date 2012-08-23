@@ -72,9 +72,15 @@ public class SubscriptionService {
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
+        Subscription subscription = allSubscriptions.findSubscriptionInProgress(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack());
+        if (subscription != null && !(subscription.canCreateNewSubscription() || subscription.canCreateANewEarlySubscription())) {
+            logger.warn("Cannot create new subscription from state : " + subscription.getStatus());
+            return subscription;
+        }
+
         subscriptionValidator.validate(subscriptionRequest);
 
-        Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
+        subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
                 subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate());
         allSubscriptions.add(subscription);
 

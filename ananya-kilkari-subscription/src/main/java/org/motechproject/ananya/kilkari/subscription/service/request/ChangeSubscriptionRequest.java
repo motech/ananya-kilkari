@@ -30,6 +30,10 @@ public class ChangeSubscriptionRequest {
         this.reason = reason;
     }
 
+    public ChangeSubscriptionType getChangeType() {
+        return changeType;
+    }
+
     public String getMsisdn() {
         return msisdn;
     }
@@ -70,7 +74,7 @@ public class ChangeSubscriptionRequest {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public ChangeSubscriptionType getChangeType() {
-        return changeType;
+    public void setMsisdn(String msisdn) {
+        this.msisdn = msisdn;
     }
 }

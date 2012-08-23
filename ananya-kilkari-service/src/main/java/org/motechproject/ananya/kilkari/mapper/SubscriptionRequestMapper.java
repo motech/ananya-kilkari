@@ -34,7 +34,7 @@ public class SubscriptionRequestMapper {
     }
 
     public static ChangeSubscriptionRequest mapToChangeSubscriptionRequest(ChangeSubscriptionWebRequest webRequest, String subscriptionId) {
-        return new ChangeSubscriptionRequest(ChangeSubscriptionType.from(webRequest.getChangeType()), webRequest.getMsisdn(), subscriptionId, SubscriptionPack.from(webRequest.getPack()), Channel.from(webRequest.getChannel()),
+        return new ChangeSubscriptionRequest(ChangeSubscriptionType.from(webRequest.getChangeType()), null, subscriptionId, SubscriptionPack.from(webRequest.getPack()), Channel.from(webRequest.getChannel()),
                 webRequest.getCreatedAt(), DateUtils.parseDate(webRequest.getExpectedDateOfDelivery()), DateUtils.parseDate(webRequest.getDateOfBirth()), webRequest.getReason());
     }
 

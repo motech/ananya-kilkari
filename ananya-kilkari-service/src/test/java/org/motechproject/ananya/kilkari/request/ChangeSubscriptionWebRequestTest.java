@@ -13,7 +13,6 @@ public class ChangeSubscriptionWebRequestTest {
     public void shouldValidateChangeSubscriptionRequest() {
         ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequest();
         changeSubscriptionWebRequest.setChangeType("wrong-type");
-        changeSubscriptionWebRequest.setMsisdn("some-msisdn");
         changeSubscriptionWebRequest.setPack("some-pack");
         changeSubscriptionWebRequest.setChannel("some-channel");
         changeSubscriptionWebRequest.setDateOfBirth("some-dob");
@@ -22,8 +21,7 @@ public class ChangeSubscriptionWebRequestTest {
         Errors errors = changeSubscriptionWebRequest.validate();
 
         assertTrue(errors.hasErrors());
-        assertEquals(7, errors.getCount());
-        assertTrue(errors.hasMessage("Invalid msisdn some-msisdn"));
+        assertEquals(6, errors.getCount());
         assertTrue(errors.hasMessage("Invalid subscription pack some-pack"));
         assertTrue(errors.hasMessage("Invalid channel some-channel"));
         assertTrue(errors.hasMessage("Invalid date of birth some-dob"));
@@ -36,7 +34,6 @@ public class ChangeSubscriptionWebRequestTest {
     public void shouldValidateValidChangePackRequest() {
         ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequest();
         changeSubscriptionWebRequest.setChangeType("change paCK");
-        changeSubscriptionWebRequest.setMsisdn("1234567890");
         changeSubscriptionWebRequest.setPack("choti_KilkarI");
         changeSubscriptionWebRequest.setChannel("call_center");
         changeSubscriptionWebRequest.setDateOfBirth(DateUtils.formatDate(DateTime.now().minusYears(1)));

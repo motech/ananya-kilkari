@@ -46,13 +46,13 @@ public class ChangePackServiceTest {
         DateTime dateOfBirth = DateTime.now();
         String reason = "some reason";
 
-        Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.BARI_KILKARI).build();
+        Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withMsisdn("9876543210").withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.BARI_KILKARI).build();
         String subscriptionId = existingSubscription.getSubscriptionId();
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(existingSubscription);
 
 
-        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, existingSubscription.getMsisdn(), subscriptionId, SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth, reason);
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, null, subscriptionId, SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth, reason);
 
         Subscription newSubscription = new SubscriptionBuilder().withDefaults().withPack(changeSubscriptionRequest.getPack()).build();
         when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CALL_CENTER))).thenReturn(newSubscription);
@@ -93,21 +93,10 @@ public class ChangePackServiceTest {
         assertEquals(subscriberResponse.getDateOfBirth(), subscriptionRequest.getSubscriber().getDateOfBirth());
     }
 
-    private void validateReportsRequest(DateTime dateOfBirth, Subscription existingSubscription, Subscription newSubscription, String reason, SubscriptionChangePackRequest reportRequest) {
-        assertEquals(existingSubscription.getMsisdn(), reportRequest.getMsisdn().toString());
-        assertEquals(newSubscription.getSubscriptionId(), reportRequest.getSubscriptionId());
-        assertEquals(newSubscription.getPack().name(), reportRequest.getPack());
-        assertEquals(Channel.CALL_CENTER.name(), reportRequest.getChannel());
-        assertEquals(newSubscription.getStatus().name(), reportRequest.getSubscriptionStatus());
-        assertEquals(dateOfBirth, reportRequest.getDateOfBirth());
-        assertEquals(newSubscription.getStartDate(), reportRequest.getStartDate());
-        assertNull(reportRequest.getExpectedDateOfDelivery());
-        assertEquals(reason, reportRequest.getReason());
-    }
-
     private void validateSubscriptionCreationRequest(SubscriptionRequest subscriptionRequest, ChangeSubscriptionRequest changeSubscriptionRequest, Subscription existingSubscription) {
         assertEquals(changeSubscriptionRequest.getDateOfBirth(), subscriptionRequest.getSubscriber().getDateOfBirth());
         assertEquals(changeSubscriptionRequest.getExpectedDateOfDelivery(), subscriptionRequest.getSubscriber().getExpectedDateOfDelivery());
+        assertEquals(existingSubscription.getMsisdn(), subscriptionRequest.getMsisdn());
     }
 
     private void validateDeactivationRequest(DeactivationRequest deactivationRequest, Subscription existingSubscription) {

@@ -10,8 +10,6 @@ public class ChangeSubscriptionWebRequest {
     @JsonProperty
     private String changeType;
     @JsonProperty
-    private String msisdn;
-    @JsonProperty
     private String pack;
     @JsonIgnore
     private String channel;
@@ -26,10 +24,6 @@ public class ChangeSubscriptionWebRequest {
 
     public ChangeSubscriptionWebRequest() {
         this.createdAt = DateTime.now();
-    }
-
-    public String getMsisdn() {
-        return msisdn;
     }
 
     public String getPack() {
@@ -60,10 +54,6 @@ public class ChangeSubscriptionWebRequest {
         return reason;
     }
 
-    public void setMsisdn(String msisdn) {
-        this.msisdn = msisdn;
-    }
-
     public void setPack(String pack) {
         this.pack = pack;
     }
@@ -90,7 +80,6 @@ public class ChangeSubscriptionWebRequest {
 
     public Errors validate() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
-        webRequestValidator.validateMsisdn(msisdn);
         webRequestValidator.validatePack(pack);
         webRequestValidator.validateChannel(channel);
         webRequestValidator.validateDOB(dateOfBirth, createdAt);

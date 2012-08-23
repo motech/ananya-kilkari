@@ -418,7 +418,6 @@ public class SubscriptionControllerTest {
         String channel = Channel.CALL_CENTER.name();
         String pack = SubscriptionPack.BARI_KILKARI.name();
         ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequest();
-        changeSubscriptionWebRequest.setMsisdn(msisdn);
         changeSubscriptionWebRequest.setPack(pack);
 
         byte[] requestBody = TestUtils.toJson(changeSubscriptionWebRequest).getBytes();
@@ -437,7 +436,6 @@ public class SubscriptionControllerTest {
         ChangeSubscriptionWebRequest request = changePackWebRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, subscriptionIdCaptor.getValue());
-        assertEquals(msisdn, request.getMsisdn());
         assertEquals(channel, request.getChannel());
         assertEquals(pack, request.getPack());
         assertNotNull(request.getCreatedAt());

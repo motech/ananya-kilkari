@@ -28,6 +28,7 @@ public class ChangePackService {
         String subscriptionId = changeSubscriptionRequest.getSubscriptionId();
         subscriptionValidator.validateSubscriptionExists(subscriptionId);
         Subscription existingSubscription = subscriptionService.findBySubscriptionId(subscriptionId);
+        changeSubscriptionRequest.setMsisdn(existingSubscription.getMsisdn());
         ChangePackValidator.validate(existingSubscription, changeSubscriptionRequest);
 
         subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, changeSubscriptionRequest.getChannel(),

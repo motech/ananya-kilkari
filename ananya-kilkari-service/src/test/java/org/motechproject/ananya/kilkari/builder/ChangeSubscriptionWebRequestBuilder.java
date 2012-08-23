@@ -17,7 +17,6 @@ public class ChangeSubscriptionWebRequestBuilder {
         changeSubscriptionWebRequest.setChangeType("change pack");
         changeSubscriptionWebRequest.setPack(SubscriptionPack.BARI_KILKARI.name());
         changeSubscriptionWebRequest.setChannel(Channel.CALL_CENTER.name());
-        changeSubscriptionWebRequest.setMsisdn("9876543210");
         changeSubscriptionWebRequest.setDateOfBirth(null);
         changeSubscriptionWebRequest.setExpectedDateOfDelivery(null);
         changeSubscriptionWebRequest.setReason(null);
@@ -31,11 +30,6 @@ public class ChangeSubscriptionWebRequestBuilder {
 
     public ChangeSubscriptionWebRequestBuilder withChannel(String channel) {
         changeSubscriptionWebRequest.setChannel(channel);
-        return this;
-    }
-
-    public ChangeSubscriptionWebRequestBuilder withMsisdn(String msisdn) {
-        changeSubscriptionWebRequest.setMsisdn(msisdn);
         return this;
     }
 

@@ -9,7 +9,6 @@ import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.service.request.*;
-import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -21,7 +20,6 @@ public class SubscriptionRequestMapperTest {
 
         SubscriptionRequest subscriptionDomainRequest = SubscriptionRequestMapper.mapToSubscriptionRequest(subscriptionWebRequest);
 
-        assertEquals(subscriptionWebRequest.getMsisdn(), subscriptionDomainRequest.getMsisdn());
         assertEquals(subscriptionWebRequest.getPack(), subscriptionDomainRequest.getPack().name());
         assertEquals(subscriptionWebRequest.getCreatedAt(), subscriptionDomainRequest.getCreationDate());
         assertEquals(null, subscriptionDomainRequest.getReason());
@@ -94,7 +92,6 @@ public class SubscriptionRequestMapperTest {
         String subscriptionId = "subscriptionId";
         ChangeSubscriptionRequest changeSubscriptionRequest = SubscriptionRequestMapper.mapToChangeSubscriptionRequest(webRequest, subscriptionId);
 
-        assertEquals(webRequest.getMsisdn(), changeSubscriptionRequest.getMsisdn());
         assertEquals(subscriptionId, changeSubscriptionRequest.getSubscriptionId());
         assertEquals(webRequest.getPack(), changeSubscriptionRequest.getPack().name());
         assertEquals(webRequest.getChannel(), changeSubscriptionRequest.getChannel().name());

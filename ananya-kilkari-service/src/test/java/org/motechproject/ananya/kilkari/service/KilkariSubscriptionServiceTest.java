@@ -24,7 +24,6 @@ import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisd
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
@@ -292,7 +291,6 @@ public class KilkariSubscriptionServiceTest {
         verify(changePackService).process(changePackRequestArgumentCaptor.capture());
         ChangeSubscriptionRequest changeSubscriptionRequest = changePackRequestArgumentCaptor.getValue();
 
-        assertEquals(changeSubscriptionWebRequest.getMsisdn(), changeSubscriptionRequest.getMsisdn());
         assertEquals(subscriptionId, changeSubscriptionRequest.getSubscriptionId());
         assertEquals(changeSubscriptionWebRequest.getPack(), changeSubscriptionRequest.getPack().name());
         assertEquals(changeSubscriptionWebRequest.getChannel(), changeSubscriptionRequest.getChannel().name());
@@ -347,10 +345,9 @@ public class KilkariSubscriptionServiceTest {
     public void shouldThrowExceptionIfValidChangePackRequestIsInvalid() {
         ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequestBuilder().withDefaults()
                 .withChangeType("wrong change type")
-                .withMsisdn("123")
                 .build();
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Invalid msisdn 123,Invalid change type wrong change type");
+        expectedException.expectMessage("Invalid change type wrong change type");
 
         kilkariSubscriptionService.changeSubscription(changeSubscriptionWebRequest, "subscriptionId");
 

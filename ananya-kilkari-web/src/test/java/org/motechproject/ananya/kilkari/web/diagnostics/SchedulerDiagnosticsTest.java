@@ -8,6 +8,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.diagnostics.response.DiagnosticsResult;
+import org.motechproject.diagnostics.response.DiagnosticsStatus;
 import org.quartz.SchedulerException;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class SchedulerDiagnosticsTest {
 
     @Test
     public void shouldGetAllOBDSchedulers() throws SchedulerException {
-        DiagnosticsResult expectedDiagnosticsResult = new DiagnosticsResult(true, "some message");
+        DiagnosticsResult expectedDiagnosticsResult = new DiagnosticsResult(DiagnosticsStatus.PASS, "some message");
         when(schedulerDiagnosticService.diagnose(anyList())).thenReturn(expectedDiagnosticsResult);
 
         DiagnosticsResult actualDiagnosticsResult = schedulerDiagnostics.performDiagnosis();

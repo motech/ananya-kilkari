@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.web.diagnostics;
 import org.joda.time.DateTime;
 import org.motechproject.diagnostics.diagnostics.DiagnosticLog;
 import org.motechproject.diagnostics.response.DiagnosticsResult;
+import org.motechproject.diagnostics.response.DiagnosticsStatus;
 import org.motechproject.util.DateUtil;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -32,7 +33,7 @@ public class SchedulerDiagnosticService {
             String previousFireStatus = previousFireTime == null ? "This scheduler has not yet run" : previousFireTime.toString();
             diagnosticLog.add("\n" + jobDetails.getName() + "\nPrevious Fire Time : " + previousFireStatus + "\nNext Fire Time : " + jobDetails.getNextFireTime());
         }
-        return new DiagnosticsResult(motechScheduler.isStarted(), diagnosticLog.toString());
+        return new DiagnosticsResult(motechScheduler.isStarted() ? DiagnosticsStatus.PASS : DiagnosticsStatus.FAIL, diagnosticLog.toString());
     }
 
     public boolean isSchedulerRunning() throws SchedulerException {

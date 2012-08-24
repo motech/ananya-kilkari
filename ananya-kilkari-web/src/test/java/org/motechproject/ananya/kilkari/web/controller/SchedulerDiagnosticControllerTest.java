@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.diagnostics.SchedulerDiagnosticService;
 import org.motechproject.diagnostics.response.DiagnosticsResult;
+import org.motechproject.diagnostics.response.DiagnosticsStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletOutputStream;
@@ -42,7 +43,7 @@ public class SchedulerDiagnosticControllerTest extends SpringIntegrationTest {
     public void shouldGetSchedulesForAGivenSubscriptionId() throws Exception {
         String expectedMessage = "Some message";
         schedulerDiagnosticController = new SchedulerDiagnosticController(schedulerDiagnosticService, velocityEngine);
-        when(schedulerDiagnosticService.diagnose(anyList())).thenReturn(new DiagnosticsResult(true, expectedMessage));
+        when(schedulerDiagnosticService.diagnose(anyList())).thenReturn(new DiagnosticsResult(DiagnosticsStatus.PASS, expectedMessage));
         when(httpServletResponse.getOutputStream()).thenReturn(servletOutputStream);
 
         schedulerDiagnosticController.getSchedule("subscriptionId", httpServletResponse);

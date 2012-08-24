@@ -172,11 +172,14 @@ public class SubscriptionService {
 
     public void requestDeactivation(DeactivationRequest deactivationRequest) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(deactivationRequest.getSubscriptionId());
+        if (subscription.isNewEarly() && subscription.canDeactivate()) {
+            deactivateAndUnschedule(subscription, deactivationRequest);
+            return;
+        }
         if (!subscription.canReceiveDeactivationRequest()) {
             logger.warn("Cannot move to DEACTIVATION_REQUEST_RECEIVED state from state : " + subscription.getStatus());
             return;
         }
-
         updateStatusAndReport(subscription, deactivationRequest.getCreatedAt(), deactivationRequest.getReason(), null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
@@ -184,6 +187,16 @@ public class SubscriptionService {
             }
         });
         onMobileSubscriptionManagerPublisher.processDeactivation(SubscriptionMapper.createOMSubscriptionRequest(subscription, deactivationRequest.getChannel()));
+    }
+
+    private void deactivateAndUnschedule(Subscription subscription, DeactivationRequest deactivationRequest) {
+        motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.EARLY_SUBSCRIPTION, deactivationRequest.getSubscriptionId());
+        updateStatusAndReport(subscription, deactivationRequest.getCreatedAt(), deactivationRequest.getReason(), null, null, new Action<Subscription>() {
+            @Override
+            public void perform(Subscription subscription) {
+                subscription.deactivate();
+            }
+        });
     }
 
     public void deactivationRequested(OMSubscriptionRequest omSubscriptionRequest) {
@@ -289,7 +302,7 @@ public class SubscriptionService {
         for (Subscription subscription : subscriptionsInProgress) {
             if (!shouldChangeMsisdn(subscription, changeMsisdnRequest)) continue;
 
-            if (subscription.getStatus().equals(SubscriptionStatus.NEW_EARLY))
+            if (subscription.isNewEarly())
                 changeMsisdnForEarlySubscription(subscription, changeMsisdnRequest);
             else
                 migrateMsisdnToNewSubscription(subscription, changeMsisdnRequest);

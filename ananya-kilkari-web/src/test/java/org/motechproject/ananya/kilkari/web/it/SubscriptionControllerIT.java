@@ -6,18 +6,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.TimedRunner;
+import org.motechproject.ananya.kilkari.builder.ChangeSubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.reporting.service.StubReportingService;
 import org.motechproject.ananya.kilkari.request.ChangeMsisdnWebRequest;
+import org.motechproject.ananya.kilkari.request.ChangeSubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnSubscriptionWebRequest;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
+import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
 import org.motechproject.ananya.kilkari.web.TestUtils;
@@ -200,7 +205,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("district", "block", "panchayat"));
         reportingService.setBehavior(mockedReportingService);
 
-        SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withEDD(edd.toString("dd-MM-yyyy")).withCreatedAt(now).build();
+        SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withMsisdn(msisdn).withEDD(edd.toString("dd-MM-yyyy")).withCreatedAt(now).build();
         MvcResult result = mockMvc(subscriptionController)
                 .perform(post("/subscription")
                         .param("channel", channelString)
@@ -230,6 +235,51 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         assertEquals(1, scheduledDates.size());
         assertEquals(expectedStartDate.toDate(), scheduledDates.get(0));
+    }
+
+    @Test
+    public void shouldUnscheduleNewEarlyJobWhenChangeSubscriptionRequestedForANewEarlySubscription() throws Exception {
+        final String msisdn = "9776655449";
+        final String channelString = Channel.CALL_CENTER.toString();
+        final SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
+        DateTime now = DateTime.now();
+        DateTime edd = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0).plusMonths(4);
+        DateTime expectedStartDate = SubscriptionPack.BARI_KILKARI.getStartDate(edd);
+
+        ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("district", "block", "panchayat"));
+        reportingService.setBehavior(mockedReportingService);
+
+        SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withMsisdn(msisdn).withEDD(edd.toString("dd-MM-yyyy")).withCreatedAt(now).build();
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(post("/subscription")
+                        .param("channel", channelString)
+                        .body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andReturn();
+
+        Subscription subscription = allSubscriptions.findSubscriptionInProgress(msisdn, pack);
+        String subscriptionId = subscription.getSubscriptionId();
+        List<Date> scheduledDates = motechSchedulerService.getScheduledJobTimingsWithPrefix(SubscriptionEventKeys.EARLY_SUBSCRIPTION,
+                subscription.getSubscriptionId(), DateTime.now().toDate(), DateTime.now().plusMonths(4).toDate());
+
+        assertEquals(1, scheduledDates.size());
+        assertEquals(expectedStartDate.toDate(), scheduledDates.get(0));
+
+        ChangeSubscriptionWebRequest expectedChangeSubscriptionWebRequest = new ChangeSubscriptionWebRequestBuilder().withDefaults().withChangeType("change schedule").withEDD(DateUtils.formatDate(DateTime.now().plusDays(1))).build();
+        result = mockMvc(subscriptionController)
+                .perform(put("/subscription/"+subscriptionId+"/changesubscription" )
+                        .param("channel", channelString)
+                        .body(TestUtils.toJson(expectedChangeSubscriptionWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andReturn();
+
+        scheduledDates = motechSchedulerService.getScheduledJobTimingsWithPrefix(SubscriptionEventKeys.EARLY_SUBSCRIPTION,
+                subscription.getSubscriptionId(), DateTime.now().toDate(), DateTime.now().plusMonths(4).toDate());
+
+        assertEquals(0, scheduledDates.size());
     }
 
     @Test

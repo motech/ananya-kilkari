@@ -248,14 +248,14 @@ public class KilkariSubscriptionServiceTest {
     @Test
     public void shouldValidateSubscriptionWebRequest() {
         SubscriberWebRequest request = new SubscriberWebRequest();
-        request.setBeneficiaryAge("23");
+        request.setBeneficiaryAge("23a");
         request.setChannel(Channel.CALL_CENTER.name());
         request.setCreatedAt(DateTime.now());
         request.setBlock("block");
         String subscriptionId = "subscriptionId";
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Invalid channel CALL_CENTER");
+        expectedException.expectMessage("Invalid beneficiary age 23a");
         kilkariSubscriptionService.updateSubscriberDetails(request, subscriptionId);
 
     }

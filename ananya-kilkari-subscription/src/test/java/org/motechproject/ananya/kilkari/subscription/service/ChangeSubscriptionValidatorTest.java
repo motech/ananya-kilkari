@@ -109,7 +109,7 @@ public class ChangeSubscriptionValidatorTest {
         ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_SCHEDULE, "1111111111", subscriptionId, SubscriptionPack.CHOTI_KILKARI, Channel.CALL_CENTER, DateTime.now(), null, null, "reason");
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("Subscription %s is not subscribed to requested pack for change schedule",subscriptionId));
+        expectedException.expectMessage(String.format("Subscription %s is not subscribed to requested pack",subscriptionId));
 
         changeSubscriptionValidator.validate(changeSubscriptionRequest);
     }

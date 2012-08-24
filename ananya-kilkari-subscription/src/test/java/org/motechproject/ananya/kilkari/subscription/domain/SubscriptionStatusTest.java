@@ -68,7 +68,7 @@ public class SubscriptionStatusTest {
         List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
             add(SubscriptionStatus.NEW_EARLY);
             add(SubscriptionStatus.PENDING_ACTIVATION);
-            add(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED);
+            add(SubscriptionStatus.DEACTIVATED);
         }};
 
         assertTransitions(fromState, validStates);

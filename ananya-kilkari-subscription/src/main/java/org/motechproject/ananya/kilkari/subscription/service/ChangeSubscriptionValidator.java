@@ -21,12 +21,11 @@ public class ChangeSubscriptionValidator {
     }
 
     public void validate(ChangeSubscriptionRequest changeSubscriptionRequest) {
-        validateSubscriptionExists(changeSubscriptionRequest.getSubscriptionId());
-        Subscription subscription = subscriptionService.findBySubscriptionId(changeSubscriptionRequest.getSubscriptionId());
+        Subscription subscription = validateAndReturnIfSubscriptionExists(changeSubscriptionRequest.getSubscriptionId());
         validateSubscriptionStatus(subscription);
 
         if (ChangeSubscriptionType.isChangePack(changeSubscriptionRequest.getChangeType()))
-            validateIfSubscriptionAlreadyExistsFor(changeSubscriptionRequest.getMsisdn(), changeSubscriptionRequest.getPack());
+            validateIfSubscriptionAlreadyExistsFor(subscription.getMsisdn(), changeSubscriptionRequest.getPack());
         else
             validateRequestedPackIsSameAsExistingPack(subscription, changeSubscriptionRequest.getPack());
     }
@@ -39,17 +38,18 @@ public class ChangeSubscriptionValidator {
         }
     }
 
-    public void validateSubscriptionExists(String subscriptionId) {
+    public Subscription validateAndReturnIfSubscriptionExists(String subscriptionId) {
         Subscription subscription = subscriptionService.findBySubscriptionId(subscriptionId);
         if (subscription == null) {
             throw new ValidationException(String.format("Subscription does not exist for subscriptionId %s", subscriptionId));
         }
+        return subscription;
     }
 
     private void validateRequestedPackIsSameAsExistingPack(Subscription existingSubscription, SubscriptionPack requestedPack) {
         SubscriptionPack existingSubscriptionPack = existingSubscription.getPack();
         if (existingSubscriptionPack != null && !existingSubscriptionPack.equals(requestedPack))
-            throw new ValidationException(String.format("Subscription %s is not subscribed to requested pack for change schedule", existingSubscription.getSubscriptionId()));
+            throw new ValidationException(String.format("Subscription %s is not subscribed to requested pack", existingSubscription.getSubscriptionId()));
     }
 
     private void validateSubscriptionStatus(Subscription subscription) {

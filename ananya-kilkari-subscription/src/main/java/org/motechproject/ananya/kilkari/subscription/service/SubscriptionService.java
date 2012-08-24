@@ -207,7 +207,7 @@ public class SubscriptionService {
         }
 
         onMobileSubscriptionGateway.deactivateSubscription(omSubscriptionRequest);
-        updateStatusAndReport(omSubscriptionRequest.getSubscriptionId(), DateTime.now(), null, null, null, new Action<Subscription>() {
+        updateStatusAndReport(subscription, DateTime.now(), null, null, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.deactivationRequestSent();
@@ -261,7 +261,7 @@ public class SubscriptionService {
             return;
         }
 
-        updateStatusAndReport(subscriptionId, deactivationDate, reason, null, graceCount, new Action<Subscription>() {
+        updateStatusAndReport(subscription, deactivationDate, reason, null, graceCount, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.deactivate();
@@ -385,12 +385,6 @@ public class SubscriptionService {
 
         if (currentMessageId != null)
             inboxService.newMessage(subscriptionId, currentMessageId);
-    }
-
-    private void updateStatusAndReport(String subscriptionId, DateTime updatedOn, String reason, String operator,
-                                       Integer graceCount, Action<Subscription> action) {
-        Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        updateStatusAndReport(subscription, updatedOn, reason, operator, graceCount, action);
     }
 
     private void updateStatusAndReport(Subscription subscription, DateTime updatedOn, String reason, String operator,

@@ -14,6 +14,7 @@
     <artifactId>ananya-kilkari-message-campaign</artifactId>
 
     <properties>
+        <db.name>motech-message-campaign</db.name>
         <main.basedir>${project.basedir}/../</main.basedir>
     </properties>
 
@@ -52,5 +53,33 @@
             <artifactId>postgresql</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>Clear Couchdb Before Integration Tests</id>
+                        <phase>pre-integration-test</phase>
+                        <configuration>
+                            <target>
+                                <echo message="Clearing Couchdb: START"/>
+                                <exec executable="sh">
+                                    <arg value="${main.basedir}/build/deleteCouchdb.sh"/>
+                                    <arg value="${db.server}:${db.port}"/>
+                                    <arg value="${db.name}"/>
+                                </exec>
+                                <echo message="Clearing Couchdb: END"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

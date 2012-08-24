@@ -12,6 +12,10 @@
     <artifactId>ananya-kilkari-performance-tests</artifactId>
     <name>Ananya Kilkari Performance Tests</name>
 
+    <properties>
+        <main.basedir>${project.basedir}/../</main.basedir>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.motechproject.ananya.kilkari</groupId>

@@ -99,19 +99,17 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>drop DB Before Integration Tests</id>
+                        <id>Clear Couchdb Before Integration Tests</id>
                         <phase>pre-integration-test</phase>
                         <configuration>
                             <target>
-                                <echo message="Dropping DB: START"/>
-                                <exec executable="curl">
-                                    <arg value="-s"/>
-                                    <arg value="-S"/>
-                                    <arg value="-X"/>
-                                    <arg value="DELETE"/>
-                                    <arg value="http://${db.server}:${db.port}/${db.name}"/>
+                                <echo message="Clearing Couchdb: START"/>
+                                <exec executable="sh">
+                                    <arg value="${main.basedir}/build/deleteCouchdb.sh"/>
+                                    <arg value="${db.server}:${db.port}"/>
+                                    <arg value="${db.name}"/>
                                 </exec>
-                                <echo message="Dropping DB: END"/>
+                                <echo message="Clearing Couchdb: END"/>
                             </target>
                         </configuration>
                         <goals>

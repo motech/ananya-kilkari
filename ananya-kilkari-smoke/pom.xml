@@ -13,9 +13,6 @@
     <name>Ananya Kilkari Smoke</name>
 
     <properties>
-        <db.server>localhost</db.server>
-        <db.name>motech-subscription</db.name>
-        <db.port>5984</db.port>
         <main.basedir>${project.basedir}/../</main.basedir>
     </properties>
 

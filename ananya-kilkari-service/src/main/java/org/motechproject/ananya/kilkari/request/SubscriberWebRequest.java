@@ -98,7 +98,6 @@ public class SubscriberWebRequest implements Serializable {
 
     public Errors validate() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
-        webRequestValidator.validateChannel(channel, Channel.IVR);
         webRequestValidator.validateAge(beneficiaryAge);
         return webRequestValidator.getErrors();
     }

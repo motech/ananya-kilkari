@@ -21,8 +21,7 @@ public class SubscriberWebRequestTest {
 
         Errors errors = subscriberWebRequest.validate();
 
-        assertEquals(2, errors.getCount());
-        assertTrue(errors.hasMessage("Invalid channel ivr"));
+        assertEquals(1, errors.getCount());
         assertTrue(errors.hasMessage("Invalid beneficiary age 23a"));
     }
 }

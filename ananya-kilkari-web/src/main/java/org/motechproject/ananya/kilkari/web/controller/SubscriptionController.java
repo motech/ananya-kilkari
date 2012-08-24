@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.web.controller;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.*;
+import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -65,8 +66,8 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscriber", method = RequestMethod.GET)
     @ResponseBody
     public SubscriptionWebResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
+        validateChannel(channel);
         SubscriptionWebResponse subscriptionWebResponse = new SubscriptionWebResponse();
-
         List<Subscription> subscriptions = kilkariSubscriptionService.findByMsisdn(msisdn);
 
         if (subscriptions != null) {
@@ -123,5 +124,11 @@ public class SubscriptionController {
         if (validationErrors.hasErrors()) {
             throw new ValidationException(validationErrors.allMessages());
         }
+    }
+
+    private void validateChannel(String channel) {
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateChannel(channel);
+        raiseExceptionIfThereAreErrors(webRequestValidator.getErrors());
     }
 }

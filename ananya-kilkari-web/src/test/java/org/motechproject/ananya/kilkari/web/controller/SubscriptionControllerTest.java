@@ -191,6 +191,18 @@ public class SubscriptionControllerTest {
     }
 
     @Test
+    public void shouldValidateChannelForGetSubscriptions() throws Exception {
+        String msisdn = "1234567890";
+        String channel = "invalidChannel";
+
+        mockMvc(subscriptionController)
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
+                .andExpect(status().is(400))
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andExpect(content().string(errorResponseMatcherForInvalidChannel(channel)));
+    }
+
+    @Test
     public void shouldCreateNewSubscriptionEvent() throws Exception {
         String msisdn = "1234567890";
         String channel = "ivr";
@@ -474,6 +486,19 @@ public class SubscriptionControllerTest {
         };
     }
 
+    private Matcher<String> errorResponseMatcherForInvalidChannel(final String channel) {
+        return new BaseMatcher<String>() {
+            @Override
+            public boolean matches(Object o) {
+                return assertErrorResponseForInvalidChannel((String) o, channel);
+            }
+
+            @Override
+            public void describeTo(Description matcherDescription) {
+            }
+        };
+    }
+
     private Matcher<String> errorResponseMatcherForRuntimeException(final String channel) {
         return new BaseMatcher<String>() {
             @Override
@@ -529,6 +554,15 @@ public class SubscriptionControllerTest {
 
         return baseResponse.isError() &&
                 baseResponse.getDescription().equals("Invalid Msisdn");
+    }
+
+    private boolean assertErrorResponseForInvalidChannel(String jsonContent, String channel) {
+        jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
+
+        BaseResponse baseResponse = TestUtils.fromJson(jsonContent, BaseResponse.class);
+
+        return baseResponse.isError() &&
+                baseResponse.getDescription().contains("Invalid channel");
     }
 
     private boolean assertErrorResponseForRuntimeException(String jsonContent, String channel) {

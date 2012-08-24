@@ -6,8 +6,7 @@ public class ContextUtils {
 
     private static ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationKilkariPerformanceContext.xml");
 
-    public static BaseConfiguration getConfiguration(){
-        return (BaseConfiguration)context.getBean("baseConfiguration");
-
+    public static BaseConfiguration getConfiguration() {
+        return (BaseConfiguration) context.getBean("baseConfiguration");
     }
 }

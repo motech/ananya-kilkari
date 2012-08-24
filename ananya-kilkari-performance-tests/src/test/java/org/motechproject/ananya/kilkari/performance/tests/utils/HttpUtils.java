@@ -37,7 +37,6 @@ public class HttpUtils {
         ResponseEntity<String> responseEntity = new RestTemplate().getForEntity(
                 constructUrl(ContextUtils.getConfiguration().baseUrl(), minusBaseUrl, parametersMap), String.class);
         return fromJsonWithResponse(responseEntity.getBody(), BaseResponse.class);
-
     }
 
     public static BaseResponse httpPostWithJsonResponse(Map<String, String> queryStringParametersMap, Object postParam, String urlPath) {

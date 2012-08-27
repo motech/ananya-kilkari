@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Map;
 
 public class HttpUtils {
@@ -42,6 +45,15 @@ public class HttpUtils {
     public static BaseResponse httpPostWithJsonResponse(Map<String, String> queryStringParametersMap, Object postParam, String urlPath) {
         ResponseEntity<String> responseEntity = new RestTemplate().postForEntity(
                 constructUrl(ContextUtils.getConfiguration().baseUrl(), urlPath, queryStringParametersMap), postParam, String.class);
-        return fromJsonWithResponse(responseEntity.getBody(),BaseResponse.class);
+        return fromJsonWithResponse(responseEntity.getBody(), BaseResponse.class);
+    }
+
+    public static void put(Object request, String urlPath) {
+        try {
+            String url = constructUrl(ContextUtils.getConfiguration().baseUrl(), urlPath, Collections.EMPTY_MAP);
+            new RestTemplate().put(new URI(url), request);
+        } catch (URISyntaxException e) {
+            System.out.println("INVALID URI!");
+        }
     }
 }

@@ -1,38 +1,63 @@
 package org.motechproject.ananya.kilkari.performance.tests;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.math.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.performance.tests.domain.BaseResponse;
 import org.motechproject.ananya.kilkari.performance.tests.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.performance.tests.utils.HttpUtils;
 import org.motechproject.ananya.kilkari.performance.tests.utils.TimedRunner;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static junit.framework.Assert.assertEquals;
 
 
 public class BackgroundJobsPerformanceTest {
 
-    private final static int numberOfSubscribers = 5000;
+    private final static int numberOfSubscribers = 100;
+    private SubscriptionService subscriptionService = new SubscriptionService();
 
     @Before
     public void setUp() {
         for (int i = 0; i < numberOfSubscribers; i++) {
-            createASubscription();
+            subscriptionService.createASubscription();
         }
         assertSubscriptionCreation();
     }
 
-
     @Test
-    public void should() {
+    public void shouldActivateBulkSubscriptionsOverADay() throws InterruptedException {
+        List<Subscription> subscriptions = subscriptionService.getAll();
+        while (!subscriptions.isEmpty()) {
+            int waitTimeInMillis = RandomUtils.nextInt(10000);
+            System.out.println("Waiting for " + waitTimeInMillis + "millis.");
+            Thread.sleep(waitTimeInMillis);
+            activateABatch(subscriptions);
+        }
+    }
 
+    private int getRandom(int min, int max) {
+        return min + RandomUtils.nextInt(max);
+    }
+
+    private void activateABatch(List<Subscription> subscriptions) {
+        int numberOfThreads = getRandom(5, 5);
+        int endPointer = numberOfThreads > subscriptions.size() ? subscriptions.size() : numberOfThreads;
+        List<Subscription> subscriptionList = subscriptions.subList(0, endPointer);
+        System.out.println("Executing batch of : " + numberOfThreads);
+        batchActivate(subscriptionList);
+        subscriptions.removeAll(subscriptionList);
+        System.out.println("Remaining Subscriptions : " + subscriptions.size());
+    }
+
+    private void batchActivate(List<Subscription> subscriptionList) {
+        for (final Subscription subscription : subscriptionList) {
+            new Thread() {
+                @Override
+                public void run() {
+                    subscriptionService.activate(subscription);
+                }
+            }.run();
+        }
     }
 
 
@@ -57,24 +82,5 @@ public class BackgroundJobsPerformanceTest {
 
     }
 
-    private void createASubscription() {
-        Map<String, String> parametersMap = constructParameters();
-
-        BaseResponse baseResponse = HttpUtils.httpGetWithJsonResponse(parametersMap, "subscription");
-        assertEquals("SUCCESS", baseResponse.getStatus());
-    }
-
-    private String getRandomMsisdn() {
-        return "9" + RandomStringUtils.randomNumeric(9);
-    }
-
-    private Map<String, String> constructParameters() {
-        Map<String, String> parametersMap = new HashMap<>();
-        parametersMap.put("msisdn", getRandomMsisdn());
-        parametersMap.put("channel", "IVR");
-        parametersMap.put("pack", "bari_kilkari");
-        return parametersMap;
-
-    }
 
 }

@@ -9,8 +9,4 @@ public class BasePerformanceTest extends TestCase {
         super(name);
     }
 
-    @After
-    public void after() {
-        ContextUtils.getConfiguration().getAllSubscriptions().removeAll();
-    }
 }

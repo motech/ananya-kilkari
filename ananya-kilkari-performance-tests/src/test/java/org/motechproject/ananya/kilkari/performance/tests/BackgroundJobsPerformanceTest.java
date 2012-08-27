@@ -13,7 +13,7 @@ import java.util.List;
 
 public class BackgroundJobsPerformanceTest {
 
-    private final static int numberOfSubscribers = 100;
+    private final static int numberOfSubscribers = 25000;
     private SubscriptionService subscriptionService = new SubscriptionService();
 
     @Before
@@ -28,7 +28,7 @@ public class BackgroundJobsPerformanceTest {
     public void shouldActivateBulkSubscriptionsOverADay() throws InterruptedException {
         List<Subscription> subscriptions = subscriptionService.getAll();
         while (!subscriptions.isEmpty()) {
-            int waitTimeInMillis = RandomUtils.nextInt(10000);
+            int waitTimeInMillis = RandomUtils.nextInt(120000);
             System.out.println("Waiting for " + waitTimeInMillis + "millis.");
             Thread.sleep(waitTimeInMillis);
             activateABatch(subscriptions);

@@ -22,9 +22,9 @@ public class CustomerNotAroundThePhoneFunctionalTest extends BaseFunctionalTest 
         int scheduleDeltaDays = kilkariProperties.getCampaignScheduleDeltaDays();
         int deltaMinutes = kilkariProperties.getCampaignScheduleDeltaMinutes();
         DateTime futureDateForFirstCampaignAlert = DateTime.now().plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1);
-        DateTime futureDateForFirstDayFirstSlot = futureDateForFirstCampaignAlert.plusDays(1).withHourOfDay(13).withMinuteOfHour(30);
-        DateTime futureDateForFirstDaySecondSlot = futureDateForFirstCampaignAlert.plusDays(1).withHourOfDay(18).withMinuteOfHour(30);
-        DateTime futureDateForSecondDayFirstSlot = futureDateForFirstDaySecondSlot.plusDays(1).withHourOfDay(13).withMinuteOfHour(30);
+        DateTime futureDateForFirstDayFirstSlot = futureDateForFirstCampaignAlert.plusDays(1).withHourOfDay(11).withMinuteOfHour(45);
+        DateTime futureDateForFirstDaySecondSlot = futureDateForFirstCampaignAlert.plusDays(1).withHourOfDay(16).withMinuteOfHour(45);
+        DateTime futureDateForSecondDayFirstSlot = futureDateForFirstDaySecondSlot.plusDays(1).withHourOfDay(11).withMinuteOfHour(45);
         String week1 = "WEEK1";
 
         SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();

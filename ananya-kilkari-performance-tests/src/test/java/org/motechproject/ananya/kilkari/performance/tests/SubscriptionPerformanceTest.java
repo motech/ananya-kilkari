@@ -74,7 +74,7 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
         }
     }
 
-    @LoadTest(concurrentUsers = 100)
+    @LoadTest(concurrentUsers = 300)
     public void shouldCreateACallCenterSubscription() throws InterruptedException {
         SubscriptionService subscriptionService = new SubscriptionService();
         DateTime beforeTest = DateTime.now();
@@ -86,8 +86,8 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
         BaseResponse baseResponse = HttpUtils.httpPostWithJsonResponse(parametersMap, subscriptionWebRequest, "subscription");
         assertEquals("SUCCESS", baseResponse.getStatus());
 
-        Subscription subscription = subscriptionService.getSubscriptionData(subscriptionWebRequest.getMsisdn(), expectedStatus);
-        assertNotNull(subscription);
+//        Subscription subscription = subscriptionService.getSubscriptionData(subscriptionWebRequest.getMsisdn(), expectedStatus);
+//        assertNotNull(subscription);
 
         DateTime afterTest = DateTime.now();
         Period p = new Period(beforeTest, afterTest);

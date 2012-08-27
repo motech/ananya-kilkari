@@ -28,14 +28,14 @@ public class OBDProperties {
 
     private void populateMapWithPropertyValue(String propertyName, CampaignMessageStatus campaignMessageStatus) {
         String propertyValue = obdProperties.getProperty(propertyName);
-        if(propertyValue == null) {
+        if (propertyValue == null) {
             throw new RuntimeException(String.format("%s property should be available.", propertyName));
         }
 
         String[] statusCodes = propertyValue.split(",");
         for (String statusCode : statusCodes) {
             statusCode = StringUtils.trim(statusCode);
-            if(StringUtils.isEmpty(statusCode)) continue;
+            if (StringUtils.isEmpty(statusCode)) continue;
             statusCodesMap.put(statusCode, campaignMessageStatus);
         }
     }
@@ -81,39 +81,7 @@ public class OBDProperties {
     }
 
     public CampaignMessageStatus getCampaignMessageStatusFor(String statusCode) {
-         return statusCodesMap.get(statusCode);
-    }
-
-    public int getFirstSlotStartTimeHour() {
-        return Integer.parseInt(obdProperties.getProperty("obd.first.slot.start.time").split(":")[0]);
-    }
-
-    public int getFirstSlotStartTimeMinute() {
-        return Integer.parseInt(obdProperties.getProperty("obd.first.slot.start.time").split(":")[1]);
-    }
-
-    public int getFirstSlotEndTimeHour() {
-        return Integer.parseInt(obdProperties.getProperty("obd.first.slot.end.time").split(":")[0]);
-    }
-
-    public int getFirstSlotEndTimeMinute() {
-        return Integer.parseInt(obdProperties.getProperty("obd.first.slot.end.time").split(":")[1]);
-    }
-
-    public int getSecondSlotStartTimeHour() {
-        return Integer.parseInt(obdProperties.getProperty("obd.second.slot.start.time").split(":")[0]);
-    }
-
-    public int getSecondSlotStartTimeMinute() {
-        return Integer.parseInt(obdProperties.getProperty("obd.second.slot.start.time").split(":")[1]);
-    }
-
-    public int getSecondSlotEndTimeHour() {
-        return Integer.parseInt(obdProperties.getProperty("obd.second.slot.end.time").split(":")[0]);
-    }
-
-    public int getSecondSlotEndTimeMinute() {
-        return Integer.parseInt(obdProperties.getProperty("obd.second.slot.end.time").split(":")[1]);
+        return statusCodesMap.get(statusCode);
     }
 
     public String getNewMessageJobCronExpression() {
@@ -123,5 +91,20 @@ public class OBDProperties {
     public String getRetryMessageJobCronExpression() {
         return obdProperties.getProperty("obd.retry.messages.job.cron.expression");
     }
-}
 
+    public int getNewMessageStartTimeLimitHours() {
+        return Integer.parseInt(obdProperties.getProperty("obd.new.message.start.time.limit").split(":")[0]);
+    }
+
+    public int getNewMessageStartTimeLimitMinute() {
+        return Integer.parseInt(obdProperties.getProperty("obd.new.message.start.time.limit").split(":")[1]);
+    }
+
+    public int getRetryMessageStartTimeLimitHours() {
+        return Integer.parseInt(obdProperties.getProperty("obd.retry.message.start.time.limit").split(":")[0]);
+    }
+
+    public int getRetryMessageStartTimeLimitMinute() {
+        return Integer.parseInt(obdProperties.getProperty("obd.retry.message.start.time.limit").split(":")[1]);
+    }
+}

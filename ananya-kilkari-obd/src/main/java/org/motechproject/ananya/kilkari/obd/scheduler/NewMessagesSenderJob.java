@@ -3,11 +3,11 @@ package org.motechproject.ananya.kilkari.obd.scheduler;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
+import org.motechproject.event.MotechEvent;
+import org.motechproject.event.annotations.MotechListener;
 import org.motechproject.retry.EventKeys;
 import org.motechproject.retry.domain.RetryRequest;
 import org.motechproject.retry.service.RetryService;
-import org.motechproject.event.MotechEvent;
-import org.motechproject.event.annotations.MotechListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class NewMessagesSenderJob extends MessagesSenderJob {
 
     @MotechListener(subjects = {NewMessagesSenderJob.SLOT_EVENT_SUBJECT})
     public void sendMessages(MotechEvent motechEvent) {
-        if (!isWithinFirstSlotTime())
+        if (!isBeforeFirstSlotStartTime())
             return;
         logger.info("Handling send new messages event");
         RetryRequest retryRequest = new RetryRequest(NewMessagesSenderJob.RETRY_NAME, UUID.randomUUID().toString(), DateTime.now());
@@ -59,11 +59,10 @@ public class NewMessagesSenderJob extends MessagesSenderJob {
         }
     }
 
-    private boolean isWithinFirstSlotTime() {
+    private boolean isBeforeFirstSlotStartTime() {
         DateTime now = DateTime.now();
-        DateTime firstSlotStartTime = now.withHourOfDay(obdProperties.getFirstSlotStartTimeHour()).withMinuteOfHour(obdProperties.getFirstSlotStartTimeMinute());
-        DateTime firstSlotEndTime = now.withHourOfDay(obdProperties.getFirstSlotEndTimeHour()).withMinuteOfHour(obdProperties.getFirstSlotEndTimeMinute());
+        DateTime firstSlotStartTimeLimit = now.withTime(obdProperties.getNewMessageStartTimeLimitHours(), obdProperties.getNewMessageStartTimeLimitMinute(), 0, 0);
 
-        return (now.isAfter(firstSlotStartTime) || now.isEqual(firstSlotStartTime)) && (now.isBefore(firstSlotEndTime) || now.isEqual(firstSlotEndTime));
+        return !now.isAfter(firstSlotStartTimeLimit);
     }
 }

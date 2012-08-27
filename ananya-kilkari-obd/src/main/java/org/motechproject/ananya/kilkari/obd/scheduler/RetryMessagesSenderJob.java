@@ -3,18 +3,17 @@ package org.motechproject.ananya.kilkari.obd.scheduler;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
+import org.motechproject.event.MotechEvent;
+import org.motechproject.event.annotations.MotechListener;
 import org.motechproject.retry.EventKeys;
 import org.motechproject.retry.domain.RetryRequest;
 import org.motechproject.retry.service.RetryService;
-import org.motechproject.event.MotechEvent;
-import org.motechproject.event.annotations.MotechListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 @Component
@@ -41,7 +40,7 @@ public class RetryMessagesSenderJob extends MessagesSenderJob {
 
     @MotechListener(subjects = {RetryMessagesSenderJob.SLOT_EVENT_SUBJECT})
     public void sendMessages(MotechEvent motechEvent) {
-        if (!isWithinSecondSlotTime())
+        if (!isBeforeSecondSlotStartTime())
             return;
         logger.info("Handling send retry messages event");
         RetryRequest retryRequest = new RetryRequest(RetryMessagesSenderJob.RETRY_NAME, UUID.randomUUID().toString(), DateTime.now());
@@ -60,11 +59,11 @@ public class RetryMessagesSenderJob extends MessagesSenderJob {
         }
     }
 
-    private boolean isWithinSecondSlotTime() {
+    private boolean isBeforeSecondSlotStartTime() {
         DateTime now = DateTime.now();
-        DateTime secondSlotStartTime = now.withHourOfDay(obdProperties.getSecondSlotStartTimeHour()).withMinuteOfHour(obdProperties.getSecondSlotStartTimeMinute());
-        DateTime secondSlotEndTime = now.withHourOfDay(obdProperties.getSecondSlotEndTimeHour()).withMinuteOfHour(obdProperties.getSecondSlotEndTimeMinute());
 
-        return (now.isAfter(secondSlotStartTime) || now.isEqual(secondSlotStartTime)) && (now.isBefore(secondSlotEndTime) || now.isEqual(secondSlotEndTime));
+        DateTime secondSlotStartTime = now.withTime(obdProperties.getRetryMessageStartTimeLimitHours(), obdProperties.getRetryMessageStartTimeLimitMinute(), 0, 0);
+
+        return !now.isAfter(secondSlotStartTime);
     }
 }

@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.scheduler;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -31,15 +32,7 @@ public class RetryMessagesSenderJobTest {
     @Before
     public void setUp() {
         initMocks(this);
-        DateTime startTime = DateTime.now().minusMinutes(1);
-        DateTime endTime = DateTime.now().plusMinutes(1);
-
-        when(obdProperties.getSecondSlotStartTimeHour()).thenReturn(startTime.getHourOfDay());
-        when(obdProperties.getSecondSlotStartTimeMinute()).thenReturn(startTime.getMinuteOfHour());
-        when(obdProperties.getSecondSlotEndTimeHour()).thenReturn(endTime.getHourOfDay());
-        when(obdProperties.getSecondSlotEndTimeMinute()).thenReturn(endTime.getMinuteOfHour());
         when(obdProperties.getRetryMessageJobCronExpression()).thenReturn(cronJobExpression);
-
         retryMessagesSenderJob = new RetryMessagesSenderJob(campaignMessageService, retryService, obdProperties);
     }
 
@@ -59,7 +52,11 @@ public class RetryMessagesSenderJobTest {
 
     @Test
     public void shouldInvokeCampaignMessageServiceToSendRetryMessagesToOBD() {
+        DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(16).withMinuteOfHour(0).getMillis());
+
         DateTime before = DateTime.now();
+        when(obdProperties.getRetryMessageStartTimeLimitHours()).thenReturn(16);
+        when(obdProperties.getRetryMessageStartTimeLimitMinute()).thenReturn(45);
 
         retryMessagesSenderJob.sendMessages(new MotechEvent(""));
 
@@ -68,11 +65,13 @@ public class RetryMessagesSenderJobTest {
         ArgumentCaptor<RetryRequest> captor = ArgumentCaptor.forClass(RetryRequest.class);
         verify(retryService).schedule(captor.capture());
         RetryRequest retryRequest = captor.getValue();
-        assertEquals("obd-send-retry-messages",retryRequest.getName() );
+        assertEquals("obd-send-retry-messages", retryRequest.getName());
         assertNotNull(retryRequest.getExternalId());
         DateTime referenceTime = retryRequest.getReferenceTime();
         assertTrue(after.isEqual(referenceTime) || after.isAfter(referenceTime));
         assertTrue(before.isEqual(referenceTime) || before.isBefore(referenceTime));
+
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
@@ -99,17 +98,16 @@ public class RetryMessagesSenderJobTest {
 
     @Test
     public void shouldNotScheduleRetryJobIfTimeIsNotWithinTheRetryMessagesSlot() {
-        DateTime startTime = DateTime.now().plusHours(1);
-        DateTime endTime = DateTime.now().plusHours(3);
+        DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(17).withMinuteOfHour(0).getMillis());
 
-        when(obdProperties.getSecondSlotStartTimeHour()).thenReturn(startTime.getHourOfDay());
-        when(obdProperties.getSecondSlotStartTimeMinute()).thenReturn(startTime.getMinuteOfHour());
-        when(obdProperties.getSecondSlotEndTimeHour()).thenReturn(endTime.getHourOfDay());
-        when(obdProperties.getSecondSlotEndTimeMinute()).thenReturn(endTime.getMinuteOfHour());
+        when(obdProperties.getRetryMessageStartTimeLimitHours()).thenReturn(16);
+        when(obdProperties.getRetryMessageStartTimeLimitMinute()).thenReturn(45);
         retryMessagesSenderJob = new RetryMessagesSenderJob(campaignMessageService, retryService, obdProperties);
 
         retryMessagesSenderJob.sendMessages(new MotechEvent("subject"));
 
         verify(retryService, never()).schedule(any(RetryRequest.class));
+
+        DateTimeUtils.setCurrentMillisSystem();
     }
 }

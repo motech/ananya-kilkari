@@ -6,7 +6,6 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
-import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
 import java.io.Serializable;
@@ -99,6 +98,7 @@ public class SubscriberWebRequest implements Serializable {
     public Errors validate() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
         webRequestValidator.validateAge(beneficiaryAge);
+        webRequestValidator.validateChannel(channel);
         return webRequestValidator.getErrors();
     }
 

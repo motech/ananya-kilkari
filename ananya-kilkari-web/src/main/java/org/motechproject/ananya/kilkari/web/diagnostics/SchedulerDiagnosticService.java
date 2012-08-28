@@ -33,7 +33,7 @@ public class SchedulerDiagnosticService {
             String previousFireStatus = previousFireTime == null ? "This scheduler has not yet run" : previousFireTime.toString();
             diagnosticLog.add("\n" + jobDetails.getName() + "\nPrevious Fire Time : " + previousFireStatus + "\nNext Fire Time : " + jobDetails.getNextFireTime());
         }
-        return new DiagnosticsResult(motechScheduler.isStarted() ? DiagnosticsStatus.PASS : DiagnosticsStatus.FAIL, diagnosticLog.toString());
+        return new DiagnosticsResult(motechScheduler.isStarted() && isSchedulerRunning() ? DiagnosticsStatus.PASS : DiagnosticsStatus.FAIL, diagnosticLog.toString());
     }
 
     public boolean isSchedulerRunning() throws SchedulerException {

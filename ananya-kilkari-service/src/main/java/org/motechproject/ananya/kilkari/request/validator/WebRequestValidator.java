@@ -135,4 +135,9 @@ public class WebRequestValidator {
             validateExactlyOneOfEDDOrDOBIsPresent(edd, dob);
         }
     }
+
+    public void validateOldAndNewMsisdnsAreDifferent(String oldMsisdn, String newMsisdn) {
+        if(oldMsisdn.equals(newMsisdn))
+            errors.add("Old and new msisdn cannot be same");
+    }
 }

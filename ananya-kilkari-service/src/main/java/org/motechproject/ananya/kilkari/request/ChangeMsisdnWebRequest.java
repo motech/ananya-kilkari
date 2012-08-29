@@ -36,6 +36,7 @@ public class ChangeMsisdnWebRequest {
         webRequestValidator.validateChannel(channel);
         webRequestValidator.validateMsisdn(oldMsisdn);
         webRequestValidator.validateMsisdn(newMsisdn);
+        webRequestValidator.validateOldAndNewMsisdnsAreDifferent(oldMsisdn, newMsisdn);
         webRequestValidator.validateSubscriptionPacksForChangeMsisdn(packs);
         return webRequestValidator.getErrors();
     }

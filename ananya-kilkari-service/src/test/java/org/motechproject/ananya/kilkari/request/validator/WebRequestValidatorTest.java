@@ -162,4 +162,13 @@ public class WebRequestValidatorTest {
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("At least one pack should be specified"));
     }
+
+    @Test
+    public void shouldReturnErrorIfOldAndNewMsisdnAreSameForChangeMsisdn() {
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateOldAndNewMsisdnsAreDifferent("9876543210", "9876543210");
+
+        assertEquals(1, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("Old and new msisdn cannot be same"));
+    }
 }

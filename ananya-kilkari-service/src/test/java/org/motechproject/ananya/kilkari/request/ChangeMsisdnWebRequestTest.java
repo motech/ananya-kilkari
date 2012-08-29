@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
@@ -15,14 +16,29 @@ public class ChangeMsisdnWebRequestTest {
     public void shouldValidateInvalidChangeMsisdnWebRequest() {
         ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
         changeMsisdnWebRequest.setChannel("InvalidChannel");
-        changeMsisdnWebRequest.setOldMsisdn("InvalidMsisdn");
-        changeMsisdnWebRequest.setNewMsisdn("InvalidMsisdn");
+        changeMsisdnWebRequest.setOldMsisdn("InvalidMsisdn1");
+        changeMsisdnWebRequest.setNewMsisdn("InvalidMsisdn2");
         changeMsisdnWebRequest.setPacks(Collections.EMPTY_LIST);
 
         Errors errors = changeMsisdnWebRequest.validate();
 
         assertTrue(errors.hasErrors());
         assertEquals(4, errors.getCount());
+    }
+
+    @Test
+    public void shouldValidateInvalidChangeMsisdnWebRequestWithSameMsisdn(){
+        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
+        changeMsisdnWebRequest.setChannel("call_center");
+        changeMsisdnWebRequest.setOldMsisdn("9876543210");
+        changeMsisdnWebRequest.setNewMsisdn("9876543210");
+        changeMsisdnWebRequest.setPacks(Arrays.asList("all"));
+
+        Errors errors = changeMsisdnWebRequest.validate();
+
+        assertTrue(errors.hasErrors());
+        assertEquals(1, errors.getCount());
+        assertTrue(errors.hasMessage("Old and new msisdn cannot be same"));
     }
 
     @Test

@@ -162,7 +162,7 @@ public class SubscriptionService {
         }
 
         onMobileSubscriptionGateway.activateSubscription(omSubscriptionRequest);
-        updateStatusAndReport(subscription, DateTime.now(), null, null, null, new Action<Subscription>() {
+        updateStatusWithoutReporting(subscription, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.activationRequestSent();
@@ -394,6 +394,12 @@ public class SubscriptionService {
         allSubscriptions.update(subscription);
         reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(),
                 subscription.getStatus().name(), reason, updatedOn, operator, graceCount));
+    }
+
+    private void updateStatusWithoutReporting(Subscription subscription, Action<Subscription> action) {
+        action.perform(subscription);
+        logger.info("Updating Subscription and reporting change " + subscription);
+        allSubscriptions.update(subscription);
     }
 
     private boolean shouldChangeMsisdn(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {

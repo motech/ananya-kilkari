@@ -226,12 +226,8 @@ public class SubscriptionServiceTest {
         order.verify(mockedSubscription).activationRequestSent();
         order.verify(allSubscriptions).update(mockedSubscription);
         ArgumentCaptor<SubscriptionStateChangeRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
-        order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
-        SubscriptionStateChangeRequest subscriptionStateChangeReportRequest = subscriptionStateChangeReportRequestArgumentCaptor.getValue();
         verify(onMobileSubscriptionGateway).activateSubscription(omSubscriptionRequest);
-        assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
-        assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
-        assertNull(subscriptionStateChangeReportRequest.getOperator());
+        verify(reportingServiceImpl, never()).reportSubscriptionStateChange(any(SubscriptionStateChangeRequest.class));
     }
 
     @Test

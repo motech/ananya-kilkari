@@ -298,8 +298,8 @@ public class SubscriptionService {
         changeMsisdnValidator.validate(changeMsisdnRequest);
 
         String oldMsisdn = changeMsisdnRequest.getOldMsisdn();
-        List<Subscription> subscriptionsInProgress = allSubscriptions.findSubscriptionsInProgress(oldMsisdn);
-        for (Subscription subscription : subscriptionsInProgress) {
+        List<Subscription> updatableSubscriptions = allSubscriptions.findUpdatableSubscriptions(oldMsisdn);
+        for (Subscription subscription : updatableSubscriptions) {
             if (!shouldChangeMsisdn(subscription, changeMsisdnRequest)) continue;
 
             if (subscription.isNewEarly())

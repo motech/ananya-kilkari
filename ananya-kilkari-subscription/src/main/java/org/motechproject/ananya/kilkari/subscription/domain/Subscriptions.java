@@ -27,4 +27,12 @@ public class Subscriptions extends ArrayList<Subscription> {
                 subscriptionsInProgress.add(subscription);
         return subscriptionsInProgress;
     }
+
+    public List<Subscription> updatableSubscriptions(){
+        List<Subscription> updatableSubscriptions = new ArrayList<>();
+        for(Subscription subscription : this)
+            if(subscription.isNewEarly()|| subscription.isActiveOrSuspended())
+                updatableSubscriptions.add(subscription);
+        return updatableSubscriptions;
+    }
 }

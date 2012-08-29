@@ -180,4 +180,30 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         assertTrue(subscriptionInProgress.contains(subscription3));
         assertFalse(subscriptionInProgress.contains(subscription2));
     }
+
+    @Test
+    public void shouldFindSubscriptionsThatAreUpdatable() {
+        String msisdn = "1234567890";
+
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), DateTime.now());
+        subscription1.setStatus(SubscriptionStatus.ACTIVE);
+        allSubscriptions.add(subscription1);
+
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
+        subscription2.setStatus(SubscriptionStatus.COMPLETED);
+        allSubscriptions.add(subscription2);
+
+        Subscription subscription3 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        subscription3.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+        allSubscriptions.add(subscription3);
+
+        markForDeletion(subscription1);
+        markForDeletion(subscription2);
+        markForDeletion(subscription3);
+
+        List<Subscription> updatableSubscriptions = allSubscriptions.findUpdatableSubscriptions(msisdn);
+
+        assertEquals(1, updatableSubscriptions.size());
+        assertTrue(updatableSubscriptions.contains(subscription1));
+    }
 }

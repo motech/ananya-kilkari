@@ -345,6 +345,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String newMsisdn = "9876543211";
         DateTime createdAt = DateTime.now().minusWeeks(4).minusHours(1);
         Subscription oldSubscription = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, createdAt, createdAt);
+        oldSubscription.setStatus(SubscriptionStatus.ACTIVE);
 
         allSubscriptions.add(oldSubscription);
 

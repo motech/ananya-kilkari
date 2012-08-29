@@ -934,7 +934,7 @@ public class SubscriptionServiceTest {
         Integer beneficiaryAge = 25;
         SubscriberResponse subscriberResponse = new SubscriberResponse(beneficiaryName, beneficiaryAge, null, null, null);
 
-        when(allSubscriptions.findSubscriptionsInProgress(oldMsisdn)).thenReturn(Arrays.asList(subscription1, subscription2));
+        when(allSubscriptions.findUpdatableSubscriptions(oldMsisdn)).thenReturn(Arrays.asList(subscription1, subscription2));
         when(allSubscriptions.findBySubscriptionId(subscription1.getSubscriptionId())).thenReturn(subscription1);
         when(reportingServiceImpl.getSubscriber(subscription1.getSubscriptionId())).thenReturn(subscriberResponse);
 
@@ -995,7 +995,7 @@ public class SubscriptionServiceTest {
         subscription2.setStatus(SubscriptionStatus.ACTIVE);
 
 
-        when(allSubscriptions.findSubscriptionsInProgress(oldMsisdn)).thenReturn(Arrays.asList(subscription1, subscription2));
+        when(allSubscriptions.findUpdatableSubscriptions(oldMsisdn)).thenReturn(Arrays.asList(subscription1, subscription2));
         when(allSubscriptions.findBySubscriptionId(subscription1.getSubscriptionId())).thenReturn(subscription1);
 
         subscriptionService.changeMsisdn(changeMsisdnRequest);

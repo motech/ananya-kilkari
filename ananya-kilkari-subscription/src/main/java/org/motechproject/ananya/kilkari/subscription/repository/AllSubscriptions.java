@@ -55,4 +55,10 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
         List<Subscription> subscriptions = db.queryView(viewQuery, Subscription.class);
         return new Subscriptions(subscriptions).subscriptionsInProgress();
     }
+
+    public List<Subscription> findUpdatableSubscriptions(String msisdn) {
+        ViewQuery viewQuery = createQuery("by_msisdn").key(msisdn).includeDocs(true);
+        List<Subscription> subscriptions = db.queryView(viewQuery, Subscription.class);
+        return new Subscriptions(subscriptions).updatableSubscriptions();
+    }
 }

@@ -4,8 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class SubscriptionsTest {
     private Subscriptions subscriptions;
@@ -31,5 +32,23 @@ public class SubscriptionsTest {
 
         subscriptions.add(new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.COMPLETED).build());
         assertNull(subscription);
+    }
+
+    @Test
+    public void shouldReturnUpdatableSubscriptions() {
+        subscriptions.add(new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.SUSPENDED).build());
+
+        List<Subscription> subscriptions = this.subscriptions.updatableSubscriptions();
+
+        assertEquals(1, subscriptions.size());
+    }
+
+    @Test
+    public void shouldReturnAnEmptyListIfNoUpdatableSubscriptionsPresent() {
+        subscriptions.add(new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_ACTIVATION).build());
+
+        List<Subscription> subscriptions = this.subscriptions.updatableSubscriptions();
+
+        assertEquals(0, subscriptions.size());
     }
 }

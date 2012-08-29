@@ -33,13 +33,13 @@ public class ChangeMsisdnValidator {
     public void validate(ChangeMsisdnRequest changeMsisdnRequest) {
         Errors errors = new Errors();
 
-        List<Subscription> allSubscriptionsByMsisdn = allSubscriptions.findSubscriptionsInProgress(changeMsisdnRequest.getOldMsisdn());
-        if(allSubscriptionsByMsisdn.isEmpty()) {
-            errors.add("Requested Msisdn has no subscriptions");
+        List<Subscription> updatableSubscriptionsByMsisdn = allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn());
+        if(updatableSubscriptionsByMsisdn.isEmpty()) {
+            errors.add("Requested Msisdn has no subscriptions in the updatable state");
             raiseExceptionIfThereAreErrors(errors);
         }
 
-        Collection<SubscriptionPack> packs = CollectionUtils.collect(allSubscriptionsByMsisdn, new Transformer() {
+        Collection<SubscriptionPack> packs = CollectionUtils.collect(updatableSubscriptionsByMsisdn, new Transformer() {
             @Override
             public Object transform(Object o) {
                 return ((Subscription) o).getPack();
@@ -51,7 +51,6 @@ public class ChangeMsisdnValidator {
                 errors.add("Requested Msisdn doesn't actively subscribe to all the packs which have been requested");
             }
         }
-
         raiseExceptionIfThereAreErrors(errors);
     }
 

@@ -26,17 +26,14 @@ public class ChangeMsisdnValidator {
     public void validate(ChangeMsisdnRequest changeMsisdnRequest) {
         if (changeMsisdnRequest.getShouldChangeAllPacks()) {
             List<Subscription> allSubscriptionsByMsisdn = allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn());
+            validateIfSubscriptionsExists(allSubscriptionsByMsisdn);
             for (Subscription subscription : allSubscriptionsByMsisdn) {
                 if (!subscription.isInUpdatableState())
                     throw new ValidationException("Requested Msisdn doesn't have all subscriptions in updatable state");
             }
         } else {
-
             List<Subscription> updatableSubscriptionsByMsisdn = allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn());
-            if (updatableSubscriptionsByMsisdn.isEmpty()) {
-                throw new ValidationException("Requested Msisdn has no subscriptions in the updatable state");
-            }
-
+            validateIfSubscriptionsExists(updatableSubscriptionsByMsisdn);
             Collection<SubscriptionPack> packs = CollectionUtils.collect(updatableSubscriptionsByMsisdn, new Transformer() {
                 @Override
                 public Object transform(Object o) {
@@ -45,7 +42,12 @@ public class ChangeMsisdnValidator {
             });
             if (!packs.containsAll(changeMsisdnRequest.getPacks()))
                 throw new ValidationException("Requested Msisdn doesn't actively subscribe to all the packs which have been requested");
+        }
+    }
 
+    private void validateIfSubscriptionsExists(List<Subscription> subscriptions) {
+        if (subscriptions.isEmpty()) {
+            throw new ValidationException("Requested Msisdn has no subscriptions in the updatable state");
         }
     }
 

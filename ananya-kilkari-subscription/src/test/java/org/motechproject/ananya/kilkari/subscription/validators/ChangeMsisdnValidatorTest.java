@@ -16,6 +16,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisd
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -128,6 +129,19 @@ public class ChangeMsisdnValidatorTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Requested Msisdn doesn't actively subscribe to all the packs which have been requested");
 
+        changeMsisdnValidator.validate(changeMsisdnRequest);
+    }
+
+    @Test
+    public void shouldValidateWhenAllPacksSpecifiedAndSubscriptionDoesNotExist() {
+        String oldMsisdn = "9876543210";
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CALL_CENTER);
+        changeMsisdnRequest.setShouldChangeAllPacks(true);
+
+        when(allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn())).thenReturn(Collections.EMPTY_LIST);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Requested Msisdn has no subscriptions in the updatable state");
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
 }

@@ -28,22 +28,50 @@ public class SchedulerDiagnosticService {
     public DiagnosticsResult diagnose(List<String> jobs) throws SchedulerException {
         DiagnosticLog diagnosticLog = new DiagnosticLog();
         List<JobDetails> jobDetailsList = getJobDetailsFor(jobs);
+
+        DiagnosticsStatus status = DiagnosticsStatus.PASS;
+
         for (JobDetails jobDetails : jobDetailsList) {
+            diagnosticLog.add("Job : " + jobDetails.getName());
             Date previousFireTime = jobDetails.getPreviousFireTime();
-            String previousFireStatus = previousFireTime == null ? "This scheduler has not yet run" : previousFireTime.toString();
-            diagnosticLog.add("\n" + jobDetails.getName() + "\nPrevious Fire Time : " + previousFireStatus + "\nNext Fire Time : " + jobDetails.getNextFireTime());
+            diagnosticLog.add("Previous Fire Time : " + (previousFireTime == null ? "This job has not yet run" : previousFireTime.toString()));
+            diagnosticLog.add("Next Fire Time : " + jobDetails.getNextFireTime());
+
+            if(!hasJobRunInPreviousDay(jobDetails, diagnosticLog)) {
+                status = DiagnosticsStatus.FAIL;
+            }
+            diagnosticLog.add("");
         }
-        return new DiagnosticsResult(motechScheduler.isStarted() && isSchedulerRunning() ? DiagnosticsStatus.PASS : DiagnosticsStatus.FAIL, diagnosticLog.toString());
+
+        if(!checkMotechScheduler(diagnosticLog)) {
+            status = DiagnosticsStatus.FAIL;
+        }
+
+        return new DiagnosticsResult(status, diagnosticLog.toString());
     }
 
-    public boolean isSchedulerRunning() throws SchedulerException {
-        List<JobDetails> jobDetailsList = getJobDetailsFor(ObdSchedulers.getAll());
-        for (JobDetails jobDetails : jobDetailsList) {
-            if (jobDetails.getPreviousFireTime() != null &&
-                    DateUtil.newDateTime(jobDetails.getPreviousFireTime()).isBefore(DateTime.now().minusHours(25)))
-                return false;
+    public boolean AreSchedulerJobsRunning() throws SchedulerException {
+        DiagnosticsResult diagnosticsResult = diagnose(ObdSchedulers.getAll());
+        return diagnosticsResult.getStatus() == DiagnosticsStatus.PASS;
+    }
+
+    private boolean checkMotechScheduler(DiagnosticLog diagnosticLog) throws SchedulerException {
+        boolean schedulerRunning = motechScheduler.isStarted();
+        diagnosticLog.add(String.format("Motech Scheduler: %s", schedulerRunning ? "Running": "Not Running"));
+        return schedulerRunning;
+    }
+
+    private boolean hasJobRunInPreviousDay(JobDetails jobDetails, DiagnosticLog diagnosticLog) {
+        String log = "Has job run in previous day : %s";
+        Date previousFireTime = jobDetails.getPreviousFireTime();
+        if(previousFireTime == null) {
+            diagnosticLog.add(String.format(log, "N/A"));
+            return true;
         }
-        return true;
+
+        boolean hasRunInPreviousDay = !DateUtil.newDateTime(previousFireTime).isBefore(DateTime.now().minusHours(25));
+        diagnosticLog.add(String.format(log, hasRunInPreviousDay ? "Yes" : "No"));
+        return hasRunInPreviousDay;
     }
 
     private List<JobDetails> getJobDetailsFor(List<String> jobs) throws SchedulerException {

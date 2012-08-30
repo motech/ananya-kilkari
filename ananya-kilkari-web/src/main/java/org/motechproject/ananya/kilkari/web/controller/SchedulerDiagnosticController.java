@@ -44,7 +44,7 @@ public class SchedulerDiagnosticController {
     @RequestMapping(value = "/diagnostics/scheduler/obd", method = RequestMethod.GET)
     @ResponseBody
     public String obdSchedulerStatus() throws SchedulerException {
-        return schedulerDiagnosticService.isSchedulerRunning() ? "SUCCESS" : "FAILURE";
+        return schedulerDiagnosticService.AreSchedulerJobsRunning() ? "SUCCESS" : "FAILURE";
     }
 
     private String createResponseMessage(DiagnosticsResponse diagnosticsResponse) {

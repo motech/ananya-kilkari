@@ -88,7 +88,7 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscription/{subscriptionId}/changecampaign", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResponse changeCampaign(@RequestBody CampaignChangeRequest campaignChangeRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
+    public BaseResponse changeCampaignForInfantDeathAndMiscarriage(@RequestBody CampaignChangeRequest campaignChangeRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
         campaignChangeRequest.setChannel(channel);
 
         kilkariSubscriptionService.processCampaignChange(campaignChangeRequest, subscriptionId);

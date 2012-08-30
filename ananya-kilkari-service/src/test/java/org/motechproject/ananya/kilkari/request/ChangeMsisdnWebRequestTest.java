@@ -1,15 +1,15 @@
 package org.motechproject.ananya.kilkari.request;
 
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
+import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ChangeMsisdnWebRequestTest {
     @Test
@@ -27,7 +27,7 @@ public class ChangeMsisdnWebRequestTest {
     }
 
     @Test
-    public void shouldValidateInvalidChangeMsisdnWebRequestWithSameMsisdn(){
+    public void shouldValidateInvalidChangeMsisdnWebRequestWithSameMsisdn() {
         ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
         changeMsisdnWebRequest.setChannel("call_center");
         changeMsisdnWebRequest.setOldMsisdn("9876543210");
@@ -47,10 +47,53 @@ public class ChangeMsisdnWebRequestTest {
         changeMsisdnWebRequest.setChannel("IVR");
         changeMsisdnWebRequest.setOldMsisdn("1234567890");
         changeMsisdnWebRequest.setNewMsisdn("1234456789");
-        changeMsisdnWebRequest.setPacks(new ArrayList<String>(){{add("NANHI_KILKARI");}});
+        changeMsisdnWebRequest.setPacks(new ArrayList<String>() {{
+            add("NANHI_KILKARI");
+        }});
 
         Errors errors = changeMsisdnWebRequest.validate();
 
         assertFalse(errors.hasErrors());
+    }
+
+    @Test
+    public void shouldValidateSubscriptionPackListForChangeMsisdn() {
+        String oldMsisdn = "9876543210";
+        String newMsisdn = "9876543211";
+        ChangeMsisdnWebRequest request = new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, null, Channel.CALL_CENTER.toString());
+
+        request.setPacks(Arrays.asList("All"));
+        Errors errors = request.validate();
+        assertEquals(0, errors.getCount());
+
+        request.setPacks(Arrays.asList("nanhi_kilkari", "choti_kilkari"));
+        errors = request.validate();
+        assertEquals(0, errors.getCount());
+
+        request.setPacks(Arrays.asList("All", "nanhi_kilkari"));
+        errors = request.validate();
+        assertEquals(1, errors.getCount());
+        assertTrue(errors.hasMessage("No other pack allowed when ALL specified"));
+
+        request.setPacks(Arrays.asList("bad_pack", "nanhi_kilkari"));
+        errors = request.validate();
+        assertEquals(1, errors.getCount());
+        assertTrue(errors.hasMessage("Invalid subscription pack bad_pack"));
+
+        request.setPacks(new ArrayList<String>());
+        errors = request.validate();
+        assertEquals(1, errors.getCount());
+        assertTrue(errors.hasMessage("At least one pack should be specified"));
+    }
+
+    @Test
+    public void shouldReturnErrorIfOldAndNewMsisdnAreSameForChangeMsisdn() {
+        String msisdn = "9876543210";
+        ChangeMsisdnWebRequest request = new ChangeMsisdnWebRequest(msisdn, msisdn, Arrays.asList("all"), Channel.CALL_CENTER.toString());
+
+        Errors errors = request.validate();
+
+        assertEquals(1, errors.getCount());
+        assertTrue(errors.hasMessage("Old and new msisdn cannot be same"));
     }
 }

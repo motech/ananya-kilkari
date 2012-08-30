@@ -3,15 +3,13 @@ package org.motechproject.ananya.kilkari.request.validator;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.domain.PhoneNumber;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.subscription.domain.CampaignChangeReason;
 import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
-import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
-
-import java.util.List;
 
 public class WebRequestValidator {
 
@@ -114,30 +112,11 @@ public class WebRequestValidator {
         return StringUtils.isNotEmpty(dateTime) ? DateTimeFormat.forPattern("dd-MM-yyyy").parseDateTime(dateTime) : null;
     }
 
-    public void validateSubscriptionPacksForChangeMsisdn(List<String> packs) {
-        if (packs.size() <= 0) errors.add("At least one pack should be specified");
-
-        boolean allPackPresent = false;
-        for (String pack : packs) {
-            if (StringUtils.trim(pack).toUpperCase().equals("ALL")) allPackPresent = true;
-        }
-        if (allPackPresent && packs.size() != 1) errors.add("No other pack allowed when ALL specified");
-
-        if (allPackPresent) return;
-
-        for (String pack : packs) validatePack(pack);
-    }
-
     public void validateChangeType(String changeType, String edd, String dob) {
         if (!ChangeSubscriptionType.isValid(changeType)) {
             errors.add("Invalid change type %s", changeType);
         } else if (changeType.equals(ChangeSubscriptionType.CHANGE_SCHEDULE.getDescription())) {
             validateExactlyOneOfEDDOrDOBIsPresent(edd, dob);
         }
-    }
-
-    public void validateOldAndNewMsisdnsAreDifferent(String oldMsisdn, String newMsisdn) {
-        if(oldMsisdn.equals(newMsisdn))
-            errors.add("Old and new msisdn cannot be same");
     }
 }

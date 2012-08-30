@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.request;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
@@ -32,13 +33,15 @@ public class ChangeMsisdnWebRequest {
     }
 
     public Errors validate() {
+        Errors errors;
         WebRequestValidator webRequestValidator = new WebRequestValidator();
         webRequestValidator.validateChannel(channel);
         webRequestValidator.validateMsisdn(oldMsisdn);
         webRequestValidator.validateMsisdn(newMsisdn);
-        webRequestValidator.validateOldAndNewMsisdnsAreDifferent(oldMsisdn, newMsisdn);
-        webRequestValidator.validateSubscriptionPacksForChangeMsisdn(packs);
-        return webRequestValidator.getErrors();
+        errors = webRequestValidator.getErrors();
+        validateOldAndNewMsisdnsAreDifferent(errors);
+        validateSubscriptionPacksForChangeMsisdn(errors);
+        return errors;
     }
 
     public String getOldMsisdn() {
@@ -72,4 +75,30 @@ public class ChangeMsisdnWebRequest {
     public void setChannel(String channel) {
         this.channel = channel;
     }
+
+    private void validateSubscriptionPacksForChangeMsisdn(Errors errors) {
+        if (packs.size() <= 0) errors.add("At least one pack should be specified");
+
+        boolean allPackPresent = false;
+        for (String pack : packs) {
+            if (StringUtils.trim(pack).toUpperCase().equals("ALL")) allPackPresent = true;
+        }
+        if (allPackPresent && packs.size() != 1) errors.add("No other pack allowed when ALL specified");
+
+        if (allPackPresent) return;
+
+        WebRequestValidator requestValidator = new WebRequestValidator();
+        for (String pack : packs) {
+            requestValidator.validatePack(pack);
+        }
+
+        if(requestValidator.getErrors().hasErrors())
+            errors.add(requestValidator.getErrors().allMessages());
+    }
+
+    private void validateOldAndNewMsisdnsAreDifferent(Errors errors) {
+        if(oldMsisdn.equals(newMsisdn))
+            errors.add("Old and new msisdn cannot be same");
+    }
+
 }

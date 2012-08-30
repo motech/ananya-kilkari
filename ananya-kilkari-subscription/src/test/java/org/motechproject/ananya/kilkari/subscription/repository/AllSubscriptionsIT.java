@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.subscription.repository;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -18,6 +19,11 @@ import static org.junit.Assert.*;
 public class AllSubscriptionsIT extends SpringIntegrationTest {
     @Autowired
     private AllSubscriptions allSubscriptions;
+
+    @Before
+    public void setup(){
+        allSubscriptions.removeAll();
+    }
 
     @Test
     public void shouldAddASubscriptionIntoDb() {

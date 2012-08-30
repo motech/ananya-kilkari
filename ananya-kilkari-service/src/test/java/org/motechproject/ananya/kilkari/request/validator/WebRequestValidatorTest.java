@@ -136,39 +136,4 @@ public class WebRequestValidatorTest {
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. One of expected date of delivery or date of birth should be present"));
     }
-
-    @Test
-    public void shouldValidateSubscriptionPackListForChangeMsisdn() {
-        WebRequestValidator webRequestValidator = new WebRequestValidator();
-        webRequestValidator.validateSubscriptionPacksForChangeMsisdn(Arrays.asList("All"));
-        assertEquals(0, webRequestValidator.getErrors().getCount());
-
-        webRequestValidator = new WebRequestValidator();
-        webRequestValidator.validateSubscriptionPacksForChangeMsisdn(Arrays.asList("nanhi_kilkari", "choti_kilkari"));
-        assertEquals(0, webRequestValidator.getErrors().getCount());
-
-        webRequestValidator = new WebRequestValidator();
-        webRequestValidator.validateSubscriptionPacksForChangeMsisdn(Arrays.asList("All", "nanhi_kilkari"));
-        assertEquals(1, webRequestValidator.getErrors().getCount());
-        assertTrue(webRequestValidator.getErrors().hasMessage("No other pack allowed when ALL specified"));
-
-        webRequestValidator = new WebRequestValidator();
-        webRequestValidator.validateSubscriptionPacksForChangeMsisdn(Arrays.asList("bad_pack", "nanhi_kilkari"));
-        assertEquals(1, webRequestValidator.getErrors().getCount());
-        assertTrue(webRequestValidator.getErrors().hasMessage("Invalid subscription pack bad_pack"));
-
-        webRequestValidator = new WebRequestValidator();
-        webRequestValidator.validateSubscriptionPacksForChangeMsisdn(new ArrayList<String>());
-        assertEquals(1, webRequestValidator.getErrors().getCount());
-        assertTrue(webRequestValidator.getErrors().hasMessage("At least one pack should be specified"));
-    }
-
-    @Test
-    public void shouldReturnErrorIfOldAndNewMsisdnAreSameForChangeMsisdn() {
-        WebRequestValidator webRequestValidator = new WebRequestValidator();
-        webRequestValidator.validateOldAndNewMsisdnsAreDifferent("9876543210", "9876543210");
-
-        assertEquals(1, webRequestValidator.getErrors().getCount());
-        assertTrue(webRequestValidator.getErrors().hasMessage("Old and new msisdn cannot be same"));
-    }
 }

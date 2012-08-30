@@ -7,7 +7,10 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.motechproject.ananya.reports.kilkari.contract.request.*;
+import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.http.client.domain.Method;
@@ -226,7 +229,7 @@ public class ReportingGatewayImplTest {
     }
 
     @Test
-    public void shouldMakeSynchronousCallIfSourceIsCallCenter(){
+    public void shouldMakeSynchronousCallIfSourceIsCallCenter() {
         String msisdn = "msisdn";
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
@@ -235,6 +238,19 @@ public class ReportingGatewayImplTest {
         reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
 
         verify(httpClientService).executeSync("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
+    }
+
+    @Test
+    public void shouldMakeAssynchronousCallIfSyncCallFailsForCallCenter() {
+        String msisdn = "msisdn";
+        String subscriptionId = "subscriptionId";
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        HttpThreadContext.set("CALL_CENTER");
+        doThrow(new RuntimeException()).when(httpClientService).executeSync(anyString(), anyObject(), any(Method.class));
+
+        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+
+        verify(httpClientService).execute("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
     }
 
     @Test

@@ -411,9 +411,9 @@ public class SubscriptionService {
 
     private void migrateMsisdnToNewSubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
         String reason = "change msisdn";
-        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now(), reason));
-
         SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
+
+        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now(), reason));
 
         Location location = null;
         if (subscriberResponse.getLocationResponse() != null) {

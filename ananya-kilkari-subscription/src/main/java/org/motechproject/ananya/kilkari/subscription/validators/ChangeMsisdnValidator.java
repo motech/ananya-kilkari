@@ -2,7 +2,6 @@ package org.motechproject.ananya.kilkari.subscription.validators;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
-import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -24,34 +23,30 @@ public class ChangeMsisdnValidator {
         this.allSubscriptions = allSubscriptions;
     }
 
-    private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
-        if (validationErrors.hasErrors()) {
-            throw new ValidationException(validationErrors.allMessages());
-        }
-    }
-
     public void validate(ChangeMsisdnRequest changeMsisdnRequest) {
-        Errors errors = new Errors();
-
-        List<Subscription> updatableSubscriptionsByMsisdn = allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn());
-        if(updatableSubscriptionsByMsisdn.isEmpty()) {
-            errors.add("Requested Msisdn has no subscriptions in the updatable state");
-            raiseExceptionIfThereAreErrors(errors);
-        }
-
-        Collection<SubscriptionPack> packs = CollectionUtils.collect(updatableSubscriptionsByMsisdn, new Transformer() {
-            @Override
-            public Object transform(Object o) {
-                return ((Subscription) o).getPack();
+        if (changeMsisdnRequest.getShouldChangeAllPacks()) {
+            List<Subscription> allSubscriptionsByMsisdn = allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn());
+            for (Subscription subscription : allSubscriptionsByMsisdn) {
+                if (!subscription.isInUpdatableState())
+                    throw new ValidationException("Requested Msisdn doesn't have all subscriptions in updatable state");
             }
-        });
+        } else {
 
-        if (!changeMsisdnRequest.getShouldChangeAllPacks()) {
-            if (!packs.containsAll(changeMsisdnRequest.getPacks())) {
-                errors.add("Requested Msisdn doesn't actively subscribe to all the packs which have been requested");
+            List<Subscription> updatableSubscriptionsByMsisdn = allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn());
+            if (updatableSubscriptionsByMsisdn.isEmpty()) {
+                throw new ValidationException("Requested Msisdn has no subscriptions in the updatable state");
             }
+
+            Collection<SubscriptionPack> packs = CollectionUtils.collect(updatableSubscriptionsByMsisdn, new Transformer() {
+                @Override
+                public Object transform(Object o) {
+                    return ((Subscription) o).getPack();
+                }
+            });
+            if (!packs.containsAll(changeMsisdnRequest.getPacks()))
+                throw new ValidationException("Requested Msisdn doesn't actively subscribe to all the packs which have been requested");
+
         }
-        raiseExceptionIfThereAreErrors(errors);
     }
 
 }

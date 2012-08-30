@@ -140,6 +140,10 @@ public class Subscription extends MotechBaseDataObject {
     public boolean isActiveOrSuspended() {
         return getStatus().isActive() || getStatus().isSuspended();
     }
+    @JsonIgnore
+    public boolean isInUpdatableState() {
+        return this.isNewEarly()|| this.isActiveOrSuspended();
+    }
 
     public void activateOnRenewal() {
         setStatus(SubscriptionStatus.ACTIVE);

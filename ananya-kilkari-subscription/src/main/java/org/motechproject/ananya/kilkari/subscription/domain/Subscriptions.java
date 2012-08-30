@@ -31,7 +31,7 @@ public class Subscriptions extends ArrayList<Subscription> {
     public List<Subscription> updatableSubscriptions(){
         List<Subscription> updatableSubscriptions = new ArrayList<>();
         for(Subscription subscription : this)
-            if(subscription.isNewEarly()|| subscription.isActiveOrSuspended())
+            if(subscription.isInUpdatableState())
                 updatableSubscriptions.add(subscription);
         return updatableSubscriptions;
     }

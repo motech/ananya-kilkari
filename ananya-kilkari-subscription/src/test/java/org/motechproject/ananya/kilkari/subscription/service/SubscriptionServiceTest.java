@@ -926,6 +926,7 @@ public class SubscriptionServiceTest {
 
         Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now().minusWeeks(2).minusHours(1), DateTime.now());
         subscription1.setStatus(SubscriptionStatus.ACTIVE);
+        String subscriptionId = subscription1.getSubscriptionId();
 
         Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), DateTime.now());
         subscription2.setStatus(SubscriptionStatus.ACTIVE);
@@ -935,49 +936,53 @@ public class SubscriptionServiceTest {
         SubscriberResponse subscriberResponse = new SubscriberResponse(beneficiaryName, beneficiaryAge, null, null, null);
 
         when(allSubscriptions.findUpdatableSubscriptions(oldMsisdn)).thenReturn(Arrays.asList(subscription1, subscription2));
-        when(allSubscriptions.findBySubscriptionId(subscription1.getSubscriptionId())).thenReturn(subscription1);
-        when(reportingServiceImpl.getSubscriber(subscription1.getSubscriptionId())).thenReturn(subscriberResponse);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription1);
+        when(reportingServiceImpl.getSubscriber(subscriptionId)).thenReturn(subscriberResponse);
 
         subscriptionService.changeMsisdn(changeMsisdnRequest);
 
         verify(changeMsisdnValidator).validate(changeMsisdnRequest);
 
+        InOrder order = inOrder(reportingServiceImpl, onMobileSubscriptionManagerPublisher, allSubscriptions);
+
+        order.verify(reportingServiceImpl).getSubscriber(subscriptionId);
+
         ArgumentCaptor<SubscriptionStateChangeRequest> subscriptionStateChangeRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
-        verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeRequestArgumentCaptor.capture());
+        order.verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeRequestArgumentCaptor.capture());
         SubscriptionStateChangeRequest subscriptionStateChangeRequest = subscriptionStateChangeRequestArgumentCaptor.getValue();
 
-        assertEquals(subscription1.getSubscriptionId(), subscriptionStateChangeRequest.getSubscriptionId());
+        assertEquals(subscriptionId, subscriptionStateChangeRequest.getSubscriptionId());
         assertEquals(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED.toString(), subscriptionStateChangeRequest.getSubscriptionStatus());
 
         ArgumentCaptor<OMSubscriptionRequest> deactivationRequest = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
-        verify(onMobileSubscriptionManagerPublisher).processDeactivation(deactivationRequest.capture());
+        order.verify(onMobileSubscriptionManagerPublisher).processDeactivation(deactivationRequest.capture());
         OMSubscriptionRequest actualDeactivationRequest = deactivationRequest.getValue();
 
         assertEquals(oldMsisdn, actualDeactivationRequest.getMsisdn());
         assertEquals(SubscriptionPack.NANHI_KILKARI, actualDeactivationRequest.getPack());
-        assertEquals(subscription1.getSubscriptionId(), actualDeactivationRequest.getSubscriptionId());
+        assertEquals(subscriptionId, actualDeactivationRequest.getSubscriptionId());
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
-        verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
+        order.verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription actualSubscription = subscriptionArgumentCaptor.getValue();
 
         assertEquals(newMsisdn, actualSubscription.getMsisdn());
         assertEquals(SubscriptionPack.NANHI_KILKARI, actualSubscription.getPack());
 
-        ArgumentCaptor<OMSubscriptionRequest> activationRequest = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
-        verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(activationRequest.capture());
-        OMSubscriptionRequest actualActivationRequest = activationRequest.getValue();
-
-        assertEquals(newMsisdn, actualActivationRequest.getMsisdn());
-        assertEquals(SubscriptionPack.NANHI_KILKARI, actualActivationRequest.getPack());
-
         ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
-        verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
+        order.verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
         SubscriptionReportRequest subscriptionReportRequest = subscriptionReportRequestArgumentCaptor.getValue();
 
         assertEquals(beneficiaryName, subscriptionReportRequest.getName());
         assertEquals(beneficiaryAge, subscriptionReportRequest.getAgeOfBeneficiary());
-        assertEquals(subscription1.getSubscriptionId(), subscriptionReportRequest.getOldSubscriptionId());
+        assertEquals(subscriptionId, subscriptionReportRequest.getOldSubscriptionId());
+
+        ArgumentCaptor<OMSubscriptionRequest> activationRequest = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
+        order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(activationRequest.capture());
+        OMSubscriptionRequest actualActivationRequest = activationRequest.getValue();
+
+        assertEquals(newMsisdn, actualActivationRequest.getMsisdn());
+        assertEquals(SubscriptionPack.NANHI_KILKARI, actualActivationRequest.getPack());
     }
 
 

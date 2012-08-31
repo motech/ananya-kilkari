@@ -34,6 +34,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberR
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
+import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
@@ -84,12 +85,14 @@ public class SubscriptionServiceTest {
     private MotechSchedulerService motechSchedulerService;
     @Mock
     private ChangeMsisdnValidator changeMsisdnValidator;
+    @Mock
+    private UnsubscriptionValidator unsubscriptionValidator;
 
     @Before
     public void setUp() {
         initMocks(this);
         subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl,
-                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator);
+                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator, unsubscriptionValidator);
     }
 
     @Test
@@ -497,7 +500,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldProcessDeactivation() {
+    public void shouldRequestDeactivation() {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
@@ -1113,5 +1116,23 @@ public class SubscriptionServiceTest {
         subscriptionService.renewSubscription(subscriptionId, DateTime.now(), null);
 
         verify(campaignMessageAlertService).scheduleCampaignMessageAlertForRenewal(subscriptionId, msisdn, operator.name());
+    }
+
+    @Test
+    public void shouldUnsubscribeASubscription(){
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.CHOTI_KILKARI, DateTime.now(), DateTime.now());
+        String subscriptionId = subscription.getSubscriptionId();
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        DeactivationRequest deactivationRequest = new DeactivationRequest(subscriptionId, Channel.CALL_CENTER, DateTime.now(), "Reason");
+
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.requestUnsubscription(deactivationRequest);
+
+        verify(unsubscriptionValidator).validate(subscriptionId);
+
+        verify(allSubscriptions).update(Matchers.<Subscription>any());
+        verify(onMobileSubscriptionManagerPublisher).processDeactivation(Matchers.<OMSubscriptionRequest>any());
+        verify(reportingServiceImpl).reportSubscriptionStateChange(Matchers.<SubscriptionStateChangeRequest>any());
     }
 }

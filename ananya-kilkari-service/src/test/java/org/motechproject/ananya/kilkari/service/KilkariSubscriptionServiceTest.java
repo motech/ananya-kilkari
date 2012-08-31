@@ -179,15 +179,15 @@ public class KilkariSubscriptionServiceTest {
     }
 
     @Test
-    public void shouldDeactivateSubscription() {
+    public void shouldUnsubscribe() {
         String subscriptionId = "abcd1234";
         UnSubscriptionWebRequest unSubscriptionWebRequest = new UnSubscriptionWebRequest();
         unSubscriptionWebRequest.setChannel(Channel.CALL_CENTER.name());
 
-        kilkariSubscriptionService.requestDeactivation(subscriptionId, unSubscriptionWebRequest);
+        kilkariSubscriptionService.requestUnsubscription(subscriptionId, unSubscriptionWebRequest);
 
         ArgumentCaptor<DeactivationRequest> deactivationRequestArgumentCaptor = ArgumentCaptor.forClass(DeactivationRequest.class);
-        verify(subscriptionService).requestDeactivation(deactivationRequestArgumentCaptor.capture());
+        verify(subscriptionService).requestUnsubscription(deactivationRequestArgumentCaptor.capture());
         DeactivationRequest deactivationRequest = deactivationRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, deactivationRequest.getSubscriptionId());
@@ -202,7 +202,7 @@ public class KilkariSubscriptionServiceTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid channel some channel");
 
-        kilkariSubscriptionService.requestDeactivation("subscriptionId", unSubscriptionWebRequest);
+        kilkariSubscriptionService.requestUnsubscription("subscriptionId", unSubscriptionWebRequest);
 
         verify(subscriptionService, never()).requestDeactivation(any(DeactivationRequest.class));
     }

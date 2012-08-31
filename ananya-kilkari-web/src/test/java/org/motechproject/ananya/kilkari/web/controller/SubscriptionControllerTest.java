@@ -17,7 +17,6 @@ import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.service.validator.UnsubscriptionRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -58,8 +57,6 @@ public class SubscriptionControllerTest {
     private SubscriptionService subscriptionService;
     @Mock
     private CallbackRequestValidator callbackRequestValidator;
-    @Mock
-    private UnsubscriptionRequestValidator unsubscriptionRequestValidator;
     @Mock
     private SubscriptionDetailsMapper mockedSubscriptionDetailsMapper;
 
@@ -341,8 +338,6 @@ public class SubscriptionControllerTest {
         unSubscriptionWebRequest.setReason("reason");
         byte[] requestBody = TestUtils.toJson(unSubscriptionWebRequest).getBytes();
 
-        when(unsubscriptionRequestValidator.validate(subscriptionId)).thenReturn(new Errors());
-
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)
                         .param("channel", Channel.CALL_CENTER.toString())
@@ -353,7 +348,7 @@ public class SubscriptionControllerTest {
 
         ArgumentCaptor<UnSubscriptionWebRequest> unsubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(UnSubscriptionWebRequest.class);
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        verify(kilkariSubscriptionService).requestDeactivation(stringArgumentCaptor.capture(), unsubscriptionRequestArgumentCaptor.capture());
+        verify(kilkariSubscriptionService).requestUnsubscription(stringArgumentCaptor.capture(), unsubscriptionRequestArgumentCaptor.capture());
 
         UnSubscriptionWebRequest actualUnSubscriptionWebRequest = unsubscriptionRequestArgumentCaptor.getValue();
         String actualSubscriptionId = stringArgumentCaptor.getValue();
@@ -369,7 +364,7 @@ public class SubscriptionControllerTest {
         unSubscriptionWebRequest.setReason("reason");
         byte[] requestBody = TestUtils.toJson(unSubscriptionWebRequest).getBytes();
 
-        doThrow(new ValidationException("some error description")).when(kilkariSubscriptionService).requestDeactivation(anyString(), any(UnSubscriptionWebRequest.class));
+        doThrow(new ValidationException("some error description")).when(kilkariSubscriptionService).requestUnsubscription(anyString(), any(UnSubscriptionWebRequest.class));
 
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)

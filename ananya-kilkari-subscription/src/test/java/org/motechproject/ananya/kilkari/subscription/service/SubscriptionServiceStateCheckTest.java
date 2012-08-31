@@ -23,6 +23,7 @@ import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionReque
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
+import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -63,6 +64,8 @@ public class SubscriptionServiceStateCheckTest {
     private MotechSchedulerService motechSchedulerService;
     @Mock
     private ChangeMsisdnValidator changeMsisdnValidator;
+    @Mock
+    private UnsubscriptionValidator unsubscriptionValidator;
     private String subscriptionId;
     private Subscription mockSubscription;
 
@@ -70,7 +73,7 @@ public class SubscriptionServiceStateCheckTest {
     public void setUp() {
         initMocks(this);
         subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl,
-                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator);
+                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator, unsubscriptionValidator);
         subscriptionId = "subscriptionId";
         mockSubscription = mock(Subscription.class);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockSubscription);

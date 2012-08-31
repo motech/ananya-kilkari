@@ -18,6 +18,7 @@ import org.motechproject.ananya.kilkari.subscription.service.mapper.Subscription
 import org.motechproject.ananya.kilkari.subscription.service.request.*;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
+import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocation;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
@@ -48,6 +49,7 @@ public class SubscriptionService {
     private KilkariPropertiesData kilkariPropertiesData;
     private MotechSchedulerService motechSchedulerService;
     private ChangeMsisdnValidator changeMsisdnValidator;
+    private UnsubscriptionValidator unsubscriptionValidator;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
@@ -56,7 +58,7 @@ public class SubscriptionService {
                                SubscriptionValidator subscriptionValidator, ReportingService reportingService,
                                InboxService inboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
                                CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData,
-                               MotechSchedulerService motechSchedulerService, ChangeMsisdnValidator changeMsisdnValidator) {
+                               MotechSchedulerService motechSchedulerService, ChangeMsisdnValidator changeMsisdnValidator, UnsubscriptionValidator unsubscriptionValidator) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
@@ -69,6 +71,7 @@ public class SubscriptionService {
         this.kilkariPropertiesData = kilkariPropertiesData;
         this.motechSchedulerService = motechSchedulerService;
         this.changeMsisdnValidator = changeMsisdnValidator;
+        this.unsubscriptionValidator = unsubscriptionValidator;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
@@ -187,6 +190,11 @@ public class SubscriptionService {
             }
         });
         onMobileSubscriptionManagerPublisher.processDeactivation(SubscriptionMapper.createOMSubscriptionRequest(subscription, deactivationRequest.getChannel()));
+    }
+
+    public void requestUnsubscription(DeactivationRequest deactivationRequest) {
+        unsubscriptionValidator.validate(deactivationRequest.getSubscriptionId());
+        requestDeactivation(deactivationRequest);
     }
 
     private void deactivateAndUnschedule(Subscription subscription, DeactivationRequest deactivationRequest) {

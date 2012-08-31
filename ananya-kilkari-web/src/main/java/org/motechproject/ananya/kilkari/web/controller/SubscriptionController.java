@@ -82,7 +82,7 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse removeSubscription(@RequestBody UnSubscriptionWebRequest unSubscriptionWebRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
         unSubscriptionWebRequest.setChannel(channel);
-        kilkariSubscriptionService.requestDeactivation(subscriptionId, unSubscriptionWebRequest);
+        kilkariSubscriptionService.requestUnsubscription(subscriptionId, unSubscriptionWebRequest);
         return BaseResponse.success("Subscription unsubscribed successfully");
     }
 

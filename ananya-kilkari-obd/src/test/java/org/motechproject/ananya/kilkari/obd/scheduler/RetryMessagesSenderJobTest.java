@@ -26,6 +26,7 @@ public class RetryMessagesSenderJobTest {
     private CampaignMessageService campaignMessageService;
     @Mock
     private RetryService retryService;
+
     private RetryMessagesSenderJob retryMessagesSenderJob;
     private String cronJobExpression = "mycronjobexpression";
 
@@ -51,12 +52,8 @@ public class RetryMessagesSenderJobTest {
     }
 
     @Test
-    public void shouldInvokeCampaignMessageServiceToSendRetryMessagesToOBD() {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(16).withMinuteOfHour(0).getMillis());
-
+    public void shouldScheduleToSendRetryMessagesToOBD() {
         DateTime before = DateTime.now();
-        when(obdProperties.getRetryMessageStartTimeLimitHours()).thenReturn(16);
-        when(obdProperties.getRetryMessageStartTimeLimitMinute()).thenReturn(45);
 
         retryMessagesSenderJob.sendMessages(new MotechEvent(""));
 
@@ -70,12 +67,15 @@ public class RetryMessagesSenderJobTest {
         DateTime referenceTime = retryRequest.getReferenceTime();
         assertTrue(after.isEqual(referenceTime) || after.isAfter(referenceTime));
         assertTrue(before.isEqual(referenceTime) || before.isBefore(referenceTime));
-
-        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
     public void shouldInvokeCampaignMessageServiceToSendRetryMessagesWithRetryAndFulfillTheRetryIfSuccessful() {
+        DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(16).withMinuteOfHour(0).getMillis());
+
+        when(obdProperties.getRetryMessageStartTimeLimitHours()).thenReturn(16);
+        when(obdProperties.getRetryMessageStartTimeLimitMinute()).thenReturn(45);
+
         retryMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
         }}));
@@ -83,10 +83,17 @@ public class RetryMessagesSenderJobTest {
         verify(campaignMessageService).sendRetryMessages();
 
         verify(retryService).fulfill("myExternalId", "obd-send-retry-messages-group");
+
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
     public void shouldInvokeCampaignMessageServiceToSendRetryMessagesWithRetryAndNotFulfillTheRetryIfNotSuccessful() {
+        DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(16).withMinuteOfHour(0).getMillis());
+
+        when(obdProperties.getRetryMessageStartTimeLimitHours()).thenReturn(16);
+        when(obdProperties.getRetryMessageStartTimeLimitMinute()).thenReturn(45);
+
         doThrow(new RuntimeException("some exception")).when(campaignMessageService).sendRetryMessages();
 
         retryMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
@@ -94,19 +101,22 @@ public class RetryMessagesSenderJobTest {
         }}));
 
         verifyZeroInteractions(retryService);
+
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
-    public void shouldNotScheduleRetryJobIfTimeIsNotWithinTheRetryMessagesSlot() {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(17).withMinuteOfHour(0).getMillis());
+    public void shouldNotSendRetryMessagesIfTimeIsAfterTheRetryMessagesSlot() {
+        DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(18).withMinuteOfHour(0).getMillis());
 
-        when(obdProperties.getRetryMessageStartTimeLimitHours()).thenReturn(16);
-        when(obdProperties.getRetryMessageStartTimeLimitMinute()).thenReturn(45);
-        retryMessagesSenderJob = new RetryMessagesSenderJob(campaignMessageService, retryService, obdProperties);
+        when(obdProperties.getNewMessageStartTimeLimitHours()).thenReturn(16);
+        when(obdProperties.getNewMessageStartTimeLimitMinute()).thenReturn(45);
 
-        retryMessagesSenderJob.sendMessages(new MotechEvent("subject"));
+        retryMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+            put("EXTERNAL_ID", "myExternalId");
+        }}));
 
-        verify(retryService, never()).schedule(any(RetryRequest.class));
+        verify(campaignMessageService,never()).sendNewMessages();
 
         DateTimeUtils.setCurrentMillisSystem();
     }

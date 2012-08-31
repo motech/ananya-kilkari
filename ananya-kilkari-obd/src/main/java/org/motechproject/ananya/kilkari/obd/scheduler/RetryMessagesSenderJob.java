@@ -40,8 +40,6 @@ public class RetryMessagesSenderJob extends MessagesSenderJob {
 
     @MotechListener(subjects = {RetryMessagesSenderJob.SLOT_EVENT_SUBJECT})
     public void sendMessages(MotechEvent motechEvent) {
-        if (!isBeforeSecondSlotStartTime())
-            return;
         logger.info("Handling send retry messages event");
         RetryRequest retryRequest = new RetryRequest(RetryMessagesSenderJob.RETRY_NAME, UUID.randomUUID().toString(), DateTime.now());
         retryService.schedule(retryRequest);
@@ -50,6 +48,10 @@ public class RetryMessagesSenderJob extends MessagesSenderJob {
     @MotechListener(subjects = {RetryMessagesSenderJob.RETRY_EVENT_SUBJECT})
     public void sendMessagesWithRetry(MotechEvent motechEvent) {
         logger.info("Handling send retry messages with retry event");
+        if (isAfterSecondSlotStartTime()){
+            logger.info("Current Time : " + DateTime.now() + " has passed the obd retry message schedule slot time");
+            return;
+        }
         try {
             campaignMessageService.sendRetryMessages();
             Map<String, Object> parameters = motechEvent.getParameters();
@@ -59,11 +61,9 @@ public class RetryMessagesSenderJob extends MessagesSenderJob {
         }
     }
 
-    private boolean isBeforeSecondSlotStartTime() {
+    private boolean isAfterSecondSlotStartTime() {
         DateTime now = DateTime.now();
-
         DateTime secondSlotStartTime = now.withTime(obdProperties.getRetryMessageStartTimeLimitHours(), obdProperties.getRetryMessageStartTimeLimitMinute(), 0, 0);
-
-        return !now.isAfter(secondSlotStartTime);
+        return !now.isBefore(secondSlotStartTime);
     }
 }

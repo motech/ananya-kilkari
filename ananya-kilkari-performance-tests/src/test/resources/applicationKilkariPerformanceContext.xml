@@ -10,6 +10,7 @@
     <util:properties id="performanceProperties" location="classpath:performance.properties"/>
 
     <util:properties id="couchdbProperties" location="classpath:couchdb.properties"/>
+    <util:properties id="obdPropertiesFile" location="classpath:obd.properties"/>
     <util:properties id="activemqProperties" location="classpath:activemq.properties"/>
 
     <context:component-scan base-package="org.motechproject.ananya.kilkari.performance.tests"/>
@@ -18,17 +19,47 @@
         <property name="properties" ref="couchdbProperties"/>
     </bean>
 
-    <bean id="kilkariSubscriptionDbInstance" class="org.ektorp.impl.StdCouchDbInstance">
+    <bean id="dbInstance" class="org.ektorp.impl.StdCouchDbInstance">
         <constructor-arg ref="httpClient"/>
     </bean>
 
     <bean id="kilkariSubscriptionDbConnector" class="org.ektorp.impl.StdCouchDbConnector">
         <constructor-arg value="motech-subscription"/>
-        <constructor-arg ref="kilkariSubscriptionDbInstance"/>
+        <constructor-arg ref="dbInstance"/>
     </bean>
 
     <bean id="allSubscriptions" class="org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions" >
         <constructor-arg ref="kilkariSubscriptionDbConnector"/>
     </bean>
+
+
+    <bean id="obdDbConnector" class="org.ektorp.impl.StdCouchDbConnector">
+        <constructor-arg value="motech-obd"/>
+        <constructor-arg ref="dbInstance"/>
+    </bean>
+
+    <bean id="allCampaignMessages" class="org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages" >
+        <constructor-arg ref="obdDbConnector"/>
+    </bean>
+
+    <bean id="campaignMessageService" class="org.motechproject.ananya.kilkari.obd.service.CampaignMessageService">
+        <constructor-arg ref="allCampaignMessages"/>
+        <constructor-arg ref="onMobileOBDGateway" />
+        <constructor-arg ref="campaignMessageCSVBuilder" />
+        <constructor-arg><null/></constructor-arg>
+        <constructor-arg ref="obdProperties"/>
+    </bean>
+
+    <bean id="onMobileOBDGateway" class="org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGatewayImpl">
+        <constructor-arg ref="mockHttpClient" />
+        <constructor-arg ref="obdProperties" />
+        <constructor-arg><null/></constructor-arg>
+    </bean>
+
+    <bean id="obdProperties" class="org.motechproject.ananya.kilkari.obd.service.OBDProperties">
+        <constructor-arg ref="obdPropertiesFile" />
+    </bean>
+
+    <bean id="campaignMessageCSVBuilder" class="org.motechproject.ananya.kilkari.obd.service.CampaignMessageCSVBuilder" />
 
  </beans>

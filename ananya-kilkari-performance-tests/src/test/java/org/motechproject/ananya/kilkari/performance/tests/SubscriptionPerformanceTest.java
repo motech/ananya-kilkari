@@ -76,18 +76,14 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
 
     @LoadTest(concurrentUsers = 300)
     public void shouldCreateACallCenterSubscription() throws InterruptedException {
-        SubscriptionService subscriptionService = new SubscriptionService();
         DateTime beforeTest = DateTime.now();
-        String expectedStatus = "PENDING_ACTIVATION";
+
         Map<String, String> parametersMap = constructParameters();
 
         SubscriptionWebRequest subscriptionWebRequest = getSubscriptionWebRequest();
 
         BaseResponse baseResponse = HttpUtils.httpPostWithJsonResponse(parametersMap, subscriptionWebRequest, "subscription");
         assertEquals("SUCCESS", baseResponse.getStatus());
-
-//        Subscription subscription = subscriptionService.getSubscriptionData(subscriptionWebRequest.getMsisdn(), expectedStatus);
-//        assertNotNull(subscription);
 
         DateTime afterTest = DateTime.now();
         Period p = new Period(beforeTest, afterTest);
@@ -137,6 +133,5 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
         parametersMap.put("channel", "IVR");
         parametersMap.put("pack", "bari_kilkari");
         return parametersMap;
-
     }
 }

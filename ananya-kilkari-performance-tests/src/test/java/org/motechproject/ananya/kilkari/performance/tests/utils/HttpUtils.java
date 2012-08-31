@@ -36,9 +36,9 @@ public class HttpUtils {
         return fromJson(jsonString.replace("var response = ", ""), subscriberResponseClass);
     }
 
-    public static BaseResponse httpGetWithJsonResponse(Map<String, String> parametersMap, String minusBaseUrl) {
+    public static BaseResponse httpGetWithJsonResponse(Map<String, String> parametersMap, String path) {
         ResponseEntity<String> responseEntity = new RestTemplate().getForEntity(
-                constructUrl(ContextUtils.getConfiguration().baseUrl(), minusBaseUrl, parametersMap), String.class);
+                constructUrl(ContextUtils.getConfiguration().baseUrl(), path, parametersMap), String.class);
         return fromJsonWithResponse(responseEntity.getBody(), BaseResponse.class);
     }
 

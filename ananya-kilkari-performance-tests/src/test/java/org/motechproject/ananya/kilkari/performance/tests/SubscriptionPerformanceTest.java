@@ -2,7 +2,6 @@ package org.motechproject.ananya.kilkari.performance.tests;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
@@ -13,8 +12,8 @@ import org.motechproject.ananya.kilkari.performance.tests.utils.HttpUtils;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.performance.tests.LoadPerf;
 import org.motechproject.performance.tests.LoadRunner;
-import org.motechproject.performance.tests.LoadTest;
 
 import java.util.*;
 
@@ -50,10 +49,9 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
         locationList.add(new Location("Begusarai", "Bhagwanpur", "Damodarpur"));
     }
 
-    @LoadTest(concurrentUsers = 100)
+    @LoadPerf(concurrentUsers = 100)
     public void shouldCreateAnIvrSubscription() throws InterruptedException {
         SubscriptionService subscriptionService = new SubscriptionService();
-        DateTime beforeTest = DateTime.now();
         String expectedStatus = "PENDING_ACTIVATION";
         Map<String, String> parametersMap = constructParameters();
 
@@ -62,22 +60,17 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
 
         Subscription subscription = subscriptionService.getSubscriptionData(parametersMap.get("msisdn"), expectedStatus);
         assertNotNull(subscription);
-        DateTime afterTest = DateTime.now();
-        Period p = new Period(beforeTest, afterTest);
-        System.out.println(p.getMillis() + " ms");
     }
 
-    @LoadTest(concurrentUsers = 5)
+    @LoadPerf(concurrentUsers = 5)
     public void shouldCreateIvrSubscriptionsForBulkUsers() throws InterruptedException {
         for (int i = 0; i < 100; i++) {
             shouldCreateAnIvrSubscription();
         }
     }
 
-    @LoadTest(concurrentUsers = 300)
+    @LoadPerf(concurrentUsers = 300)
     public void shouldCreateACallCenterSubscription() throws InterruptedException {
-        DateTime beforeTest = DateTime.now();
-
         Map<String, String> parametersMap = constructParameters();
 
         SubscriptionWebRequest subscriptionWebRequest = getSubscriptionWebRequest();
@@ -85,9 +78,6 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
         BaseResponse baseResponse = HttpUtils.httpPostWithJsonResponse(parametersMap, subscriptionWebRequest, "subscription");
         assertEquals("SUCCESS", baseResponse.getStatus());
 
-        DateTime afterTest = DateTime.now();
-        Period p = new Period(beforeTest, afterTest);
-        System.out.println(p.getMillis() + " ms");
     }
 
     /*

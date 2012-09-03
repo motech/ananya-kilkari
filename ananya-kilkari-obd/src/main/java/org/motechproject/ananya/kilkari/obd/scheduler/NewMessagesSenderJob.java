@@ -48,22 +48,19 @@ public class NewMessagesSenderJob extends MessagesSenderJob {
     @MotechListener(subjects = {NewMessagesSenderJob.RETRY_EVENT_SUBJECT})
     public void sendMessagesWithRetry(MotechEvent motechEvent) {
         logger.info("Handling send new messages with retry event");
-        if (isAfterFirstSlotStartTime()){
-            logger.info("Current Time : " + DateTime.now() + " has passed the obd new message schedule slot time");
+
+        Map<String, Object> parameters = motechEvent.getParameters();
+
+        if (!canSendMessages(obdProperties.getNewMessageStartTimeLimitHours(), obdProperties.getNewMessageStartTimeLimitMinute())){
+            retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), NewMessagesSenderJob.RETRY_GROUP_NAME);
             return;
         }
+
         try {
             campaignMessageService.sendNewMessages();
-            Map<String, Object> parameters = motechEvent.getParameters();
             retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), NewMessagesSenderJob.RETRY_GROUP_NAME);
         } catch (Exception ex) {
             logger.error("Error occurred while sending new messages to obd", ex);
         }
-    }
-
-    private boolean isAfterFirstSlotStartTime() {
-        DateTime now = DateTime.now();
-        DateTime firstSlotStartTimeLimit = now.withTime(obdProperties.getNewMessageStartTimeLimitHours(), obdProperties.getNewMessageStartTimeLimitMinute(), 0, 0);
-        return !now.isBefore(firstSlotStartTimeLimit);
     }
 }

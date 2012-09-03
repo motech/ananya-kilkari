@@ -117,6 +117,7 @@ public class RetryMessagesSenderJobTest {
         }}));
 
         verify(campaignMessageService,never()).sendNewMessages();
+        verify(retryService).fulfill("myExternalId", "obd-send-retry-messages-group");
 
         DateTimeUtils.setCurrentMillisSystem();
     }

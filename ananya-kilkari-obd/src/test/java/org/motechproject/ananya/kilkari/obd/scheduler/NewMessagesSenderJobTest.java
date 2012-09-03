@@ -120,6 +120,7 @@ public class NewMessagesSenderJobTest {
         }}));
 
         verify(campaignMessageService,never()).sendNewMessages();
+        verify(retryService).fulfill("myExternalId", "obd-send-new-messages-group");
 
         DateTimeUtils.setCurrentMillisSystem();
     }

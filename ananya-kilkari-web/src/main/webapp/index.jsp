@@ -1,5 +1,5 @@
 <html>
 <body>
-<h2>Hello Kilkari Again</h2>
+<h2>KilkariPingPage</h2>
 </body>
 </html>

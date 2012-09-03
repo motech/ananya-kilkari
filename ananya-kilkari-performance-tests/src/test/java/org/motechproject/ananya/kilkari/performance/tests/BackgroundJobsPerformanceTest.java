@@ -40,7 +40,7 @@ public class BackgroundJobsPerformanceTest extends BasePerformanceTest {
         createdSubscriptionsList = subscriptionService.getAll();
     }
 
-    @LoadPerfStaggered(totalNumberOfUsers = numberOfSubscribers,minMaxRandomBatchSizes = {"5","10"}, minDelayInMillis = 1000,delayVariation = 0)
+    @LoadPerfStaggered(totalNumberOfUsers = numberOfSubscribers,minMaxRandomBatchSizes = {"5","10"}, minDelayInMillis = 1000,delayVariation = 120000)
     public void shouldActivateBulkSubscriptionsOverADay() {
         Subscription subscription = getASubscriptionToBeActivated();
         subscriptionService.activate(subscription);

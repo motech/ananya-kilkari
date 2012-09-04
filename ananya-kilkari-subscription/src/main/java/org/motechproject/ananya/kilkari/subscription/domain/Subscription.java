@@ -43,8 +43,8 @@ public class Subscription extends MotechBaseDataObject {
     public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, DateTime startDate) {
         this.pack = pack;
         this.msisdn = msisdn;
-        this.creationDate = createdAt;
-        this.startDate = startDate;
+        this.creationDate = floorToExactMinutes(createdAt);
+        this.startDate = floorToExactMinutes(startDate);
         this.subscriptionId = UUID.randomUUID().toString();
         this.status = isEarlySubscription() ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW;
     }
@@ -85,11 +85,6 @@ public class Subscription extends MotechBaseDataObject {
     public DateTime getStartDate() {
         return startDate;
     }
-
-    public void setStartDate(DateTime startDate) {
-        this.startDate = startDate;
-    }
-
 
     @Override
     public boolean equals(Object o) {
@@ -156,7 +151,7 @@ public class Subscription extends MotechBaseDataObject {
     public void activate(String operator, DateTime scheduledStartDate) {
         setStatus(SubscriptionStatus.ACTIVE);
         setOperator(Operator.getFor(operator));
-        this.startDate = scheduledStartDate;
+        this.startDate = floorToExactMinutes(scheduledStartDate);
     }
 
     public void activationFailed(String operator) {
@@ -207,13 +202,8 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     @JsonIgnore
-    public int getWeeksElapsedAfterStartDate() {
+    private int getWeeksElapsedAfterStartDate() {
         return Weeks.weeksBetween(startDate, DateTime.now()).getWeeks();
-    }
-
-    @JsonIgnore
-    public int getCurrentWeekOfSubscription() {
-        return pack.getStartWeek() + getWeeksElapsedAfterStartDate();
     }
 
     /*
@@ -248,6 +238,8 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public DateTime getStartDateForSubscription(DateTime activatedOn) {
+        activatedOn = floorToExactMinutes(activatedOn);
+
         if (isLateSubscription())
             return startDate.plus(activatedOn.getMillis() - creationDate.getMillis());
 
@@ -301,5 +293,9 @@ public class Subscription extends MotechBaseDataObject {
 
     public boolean canComplete() {
         return status.canTransitionTo(SubscriptionStatus.COMPLETED);
+    }
+
+    private DateTime floorToExactMinutes(DateTime dateTime) {
+        return dateTime.withSecondOfMinute(0).withMillisOfSecond(0);
     }
 }

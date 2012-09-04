@@ -31,10 +31,9 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         DateTime createdAt = DateTime.now();
         DateTime startDate = createdAt.plusWeeks(2);
 
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, createdAt, DateTime.now());
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, createdAt, startDate);
         subscription.setStatus(SubscriptionStatus.NEW);
 
-        subscription.setStartDate(startDate);
         allSubscriptions.add(subscription);
 
         markForDeletion(subscription);
@@ -47,8 +46,8 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         assertNotNull(subscriptionFromDb.getSubscriptionId());
         assertEquals(SubscriptionPack.CHOTI_KILKARI, subscriptionFromDb.getPack());
         assertEquals(SubscriptionStatus.NEW, subscriptionFromDb.getStatus());
-        assertEquals(createdAt.withZone(DateTimeZone.UTC), subscriptionFromDb.getCreationDate());
-        assertEquals(startDate.withZone(DateTimeZone.UTC), subscriptionFromDb.getStartDate());
+        assertEquals(createdAt.withZone(DateTimeZone.UTC).withSecondOfMinute(0).withMillisOfSecond(0), subscriptionFromDb.getCreationDate());
+        assertEquals(startDate.withZone(DateTimeZone.UTC).withSecondOfMinute(0).withMillisOfSecond(0), subscriptionFromDb.getStartDate());
     }
 
     @Test

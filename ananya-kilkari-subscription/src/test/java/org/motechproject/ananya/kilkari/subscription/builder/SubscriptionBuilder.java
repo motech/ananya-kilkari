@@ -56,10 +56,9 @@ public class SubscriptionBuilder {
     }
 
     public Subscription build() {
-        Subscription subscription = new Subscription(msisdn, pack, creationDate, DateTime.now());
+        Subscription subscription = new Subscription(msisdn, pack, creationDate, startDate);
         subscription.setStatus(status);
         subscription.setOperator(operator);
-        subscription.setStartDate(startDate);
         return subscription;
     }
 }

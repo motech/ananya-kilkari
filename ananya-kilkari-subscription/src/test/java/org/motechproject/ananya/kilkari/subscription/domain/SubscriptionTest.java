@@ -7,9 +7,7 @@ import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class SubscriptionTest {
 
@@ -29,12 +27,12 @@ public class SubscriptionTest {
 
     @Test
     public void shouldInitializeSubscription() {
-        DateTime beforeCreation = DateTime.now();
+        DateTime beforeCreation = DateTime.now().withSecondOfMinute(0).withMillisOfSecond(0);
         String msisdn = "1234567890";
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
         subscription.setStatus(SubscriptionStatus.NEW);
 
-        DateTime afterCreation = DateTime.now();
+        DateTime afterCreation = DateTime.now().withSecondOfMinute(0).withMillisOfSecond(0);
 
         assertEquals(SubscriptionStatus.NEW, subscription.getStatus());
         assertEquals(msisdn, subscription.getMsisdn());
@@ -62,17 +60,16 @@ public class SubscriptionTest {
     public void shouldChangeStatusOfSubscriptionToActiveForSuccessfulActivation() {
         DateTime createdAt = DateTime.now();
         DateTime activatedOn = createdAt.plus(5000);
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, createdAt, DateTime.now());
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, createdAt, activatedOn);
         subscription.setStatus(SubscriptionStatus.NEW);
 
-        subscription.setStartDate(activatedOn);
         Operator operator = Operator.AIRTEL;
 
         subscription.activate(operator.name(), activatedOn);
 
         assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
         assertEquals(operator, subscription.getOperator());
-        assertEquals(createdAt.plus(5000), subscription.getStartDate());
+        assertEquals(createdAt.plus(5000).withSecondOfMinute(0).withMillisOfSecond(0), subscription.getStartDate());
     }
 
     @Test
@@ -267,18 +264,6 @@ public class SubscriptionTest {
         subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
         assertFalse(subscription.isInDeactivatedState());
     }
-    
-    @Test
-    public void shouldReturnCurrentWeekNumber(){
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withStartDate(DateTime.now().minusWeeks(10)).build();
-        assertEquals(11,subscription.getCurrentWeekOfSubscription());
-
-        subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withStartDate(DateTime.now().minusWeeks(2)).build();
-        assertEquals(15,subscription.getCurrentWeekOfSubscription());
-
-        subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withStartDate(DateTime.now().minusWeeks(2)).build();
-        assertEquals(35,subscription.getCurrentWeekOfSubscription());
-    }
 
     @Test
     public void shouldCheckIfTransitionToActiveStateIsPossible(){
@@ -432,5 +417,50 @@ public class SubscriptionTest {
 
         assertTrue(canComplete);
         verify(currentStatus).canTransitionTo(toStatus);
+    }
+
+    @Test
+    public void shouldFloorStartDateToExactMinutes() {
+        DateTime dateWithSeconds = DateTime.now().withMinuteOfHour(22).withSecondOfMinute(42);
+
+        SubscriptionBuilder builder = new SubscriptionBuilder().withDefaults();
+        Subscription subscription = builder.withStartDate(dateWithSeconds).build();
+        assertEquals(dateWithSeconds.withSecondOfMinute(0).withMillisOfSecond(0), subscription.getStartDate());
+
+        dateWithSeconds = DateTime.now().withMinuteOfHour(23).withSecondOfMinute(41);
+        subscription = builder.withStartDate(dateWithSeconds).build();
+        assertEquals(dateWithSeconds.withSecondOfMinute(0).withMillisOfSecond(0), subscription.getStartDate());
+
+        dateWithSeconds = DateTime.now().withMinuteOfHour(21).withSecondOfMinute(41);
+        subscription.activate("airtel", DateTime.now().withMinuteOfHour(21).withSecondOfMinute(41));
+        assertEquals(dateWithSeconds.withSecondOfMinute(0).withMillisOfSecond(0), subscription.getStartDate());
+    }
+
+    @Test
+    public void shouldFloorCreationDateToExactMinutes() {
+        DateTime dateWithSeconds = DateTime.now().withMinuteOfHour(22).withSecondOfMinute(42);
+
+        Subscription subscription = new Subscription("abcd", SubscriptionPack.BARI_KILKARI, dateWithSeconds, DateTime.now());
+        assertEquals(dateWithSeconds.withSecondOfMinute(0).withMillisOfSecond(0), subscription.getCreationDate());
+    }
+
+    @Test
+    public void shouldFloorStartDateForSubscriptionToExactMinutes_forLateSubscription() {
+        DateTime now = DateTime.now();
+        Subscription subscription = new Subscription("abcd", SubscriptionPack.BARI_KILKARI, now, now.minusWeeks(2));
+
+        DateTime startDateForSubscription = subscription.getStartDateForSubscription(now.plusWeeks(1));
+
+        assertEquals(now.minusWeeks(1).withSecondOfMinute(0).withMillisOfSecond(0), startDateForSubscription);
+    }
+
+    @Test
+    public void shouldFloorStartDateForSubscriptionToExactMinutes_forNonLateSubscription() {
+        DateTime now = DateTime.now();
+        Subscription subscription = new Subscription("abcd", SubscriptionPack.BARI_KILKARI, now.minusWeeks(2), now);
+
+        DateTime startDateForSubscription = subscription.getStartDateForSubscription(now.plusWeeks(1));
+
+        assertEquals(now.plusWeeks(1).withSecondOfMinute(0).withMillisOfSecond(0), startDateForSubscription);
     }
 }

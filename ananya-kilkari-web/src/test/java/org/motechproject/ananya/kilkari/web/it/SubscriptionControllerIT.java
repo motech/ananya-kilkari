@@ -16,11 +16,9 @@ import org.motechproject.ananya.kilkari.request.ChangeMsisdnWebRequest;
 import org.motechproject.ananya.kilkari.request.ChangeSubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnSubscriptionWebRequest;
-import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
-import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
@@ -365,7 +363,6 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         Subscription newSubscription = allSubscriptions.findSubscriptionInProgress(newMsisdn, SubscriptionPack.NANHI_KILKARI);
         assertNotNull(newSubscription);
-        assertEquals(38, newSubscription.getCurrentWeekOfSubscription());
 
         oldSubscription = allSubscriptions.findBySubscriptionId(oldSubscription.getSubscriptionId());
         assertTrue(oldSubscription.getStatus() == SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED || oldSubscription.getStatus() == SubscriptionStatus.PENDING_DEACTIVATION);

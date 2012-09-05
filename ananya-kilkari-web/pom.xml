@@ -26,8 +26,8 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <gitRevision>${gitRevision}</gitRevision>
-                            <hudsonBuildNumber>${buildNumber}</hudsonBuildNumber>
+                            <Git-Revision>${gitRevision}</Git-Revision>
+                            <Hudson-Build-Number>${buildNumber}</Hudson-Build-Number>
                         </manifestEntries>
                     </archive>
                 </configuration>

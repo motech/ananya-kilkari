@@ -28,7 +28,6 @@ import java.io.InputStreamReader;
 @Component
 @ProductionProfile
 public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
-
     public static final String START_DATE_PARAM_NAME = "startDate";
     public static final String END_DATE_PARAM_NAME = "endDate";
     private HttpClient obdHttpClient;
@@ -69,7 +68,8 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     }
 
     private void send(String content, String url, String slotStartDate, String slotEndDate) {
-        logger.info(String.format("Uploading the campaign messages to url: %s\nContent:\n%s", url, content));
+        logger.info(String.format("Uploading the campaign messages to url: %s", url));
+        logger.debug(String.format("Uploading campaign messages content : %s", content));
 
         String fileName = obdProperties.getMessageDeliveryFileName();
         String file = obdProperties.getMessageDeliveryFile();

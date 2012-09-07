@@ -16,7 +16,6 @@ import java.util.Arrays;
 public class GatewayLogger {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
     @Pointcut("execution(public * org.springframework.web.client.RestTemplate.*(..))")
     public void allExternalHttpCalls() {
     }

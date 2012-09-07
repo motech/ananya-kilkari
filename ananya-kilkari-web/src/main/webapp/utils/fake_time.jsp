@@ -2,6 +2,8 @@
 <%@page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
 <%
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    boolean success = false;
     try {
         if (request.getMethod().equals("POST")) {
             String offsetValue = System.getProperty("faketime.offset.seconds");
@@ -9,16 +11,17 @@
 
             String dateTime = request.getParameter("newDateTime");
 
-            Date newDateTime = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dateTime);
-            System.out.println("Current Time:" + new Date());
-            System.out.println("Request for Updated Time:" + newDateTime);
+            Date newDateTime = dateFormat.parse(dateTime);
+            System.out.println("Current Time: " + dateFormat.format(new Date()));
+            System.out.println("Request for Updated Time: " + dateFormat.format(newDateTime));
 
             long newOffset = ((newDateTime.getTime() - System.currentTimeMillis()) / 1000) + currentOffset;
             System.setProperty("faketime.offset.seconds", String.valueOf(newOffset));
 
-            System.out.println("Updated Time:" + new Date());
+            System.out.println("Updated Time: " + dateFormat.format(new Date()));
 
-
+            success = Math.abs(System.currentTimeMillis() - new Date().getTime()) < 2000;
+            System.out.println(success ? "SUCCESS" : "FAILED");
         }
     } catch (java.lang.Exception e) {
         out.println("Error: " + ExceptionUtils.getFullStackTrace(e));
@@ -78,11 +81,16 @@
 </head>
 
 <body>
-
 <div>
-
+<%
+    if (request.getMethod().equals("POST")) {
+%>
+        <div style="display:inline;background:<%=success ? "green" : "red"%>;"><%=success ? "SUCCESS" : "FAILED" %></div><br>
+<%
+    }
+%>
     <form action="fake_time.jsp" method="get">
-        Current Time : <%= new Date()%><input type="submit" value="Refresh"/>
+        Current Time : <%= dateFormat.format(new Date())%> <input type="submit" value="Refresh"/>
     </form>
 </div>
 
@@ -90,7 +98,7 @@
 
     <form action="fake_time.jsp" method="post">
         <label for="newDateTime">New Date Time</label>
-        <input type="text" name="newDateTime" id="newDateTime" value=""/>
+        <input type="text" name="newDateTime" id="newDateTime" value="<%=dateFormat.format(new Date())%>"/>
         <input type="submit"/>
     </form>
 </div>

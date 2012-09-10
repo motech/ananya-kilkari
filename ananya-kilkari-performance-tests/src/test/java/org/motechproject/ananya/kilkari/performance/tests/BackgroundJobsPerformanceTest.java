@@ -27,14 +27,14 @@ public class BackgroundJobsPerformanceTest extends BasePerformanceTest {
         super(name);
     }
 
-    @LoadPerfBefore(priority = 1)
+    @LoadPerfBefore(priority = 1,concurrentUsers = 100)
     public void firstBefore() {
-        for (int i = 0; i < numberOfSubscribers; i++) {
+        for (int i = 0; i < 250; i++) {
             subscriptionService.createASubscription();
         }
     }
 
-    @LoadPerfBefore(priority = 2)
+    @LoadPerfBefore(priority = 2,concurrentUsers = 1)
     public void secondBefore() {
         assertSubscriptionCreation();
         createdSubscriptionsList = subscriptionService.getAll();

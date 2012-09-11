@@ -6,12 +6,15 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
+    <import resource="classpath:applicationContextHttpClient.xml"/>
 
     <util:properties id="performanceProperties" location="classpath:performance.properties"/>
 
     <util:properties id="couchdbProperties" location="classpath:couchdb.properties"/>
     <util:properties id="obdPropertiesFile" location="classpath:obd.properties"/>
     <util:properties id="activemqProperties" location="classpath:activemq.properties"/>
+
+    <util:properties id="kilkariProperties" location="classpath:kilkari.properties"/>
 
     <context:component-scan base-package="org.motechproject.ananya.kilkari.performance.tests"/>
 
@@ -62,4 +65,17 @@
 
     <bean id="campaignMessageCSVBuilder" class="org.motechproject.ananya.kilkari.obd.service.CampaignMessageCSVBuilder" />
 
- </beans>
+    <bean id="restTemplateReporting" class="org.springframework.web.client.RestTemplate"/>
+
+    <bean id="httpClientService" class="org.motechproject.http.client.service.HttpClientServiceImpl" />
+
+    <bean id="reportGateway" class="org.motechproject.ananya.kilkari.reporting.repository.ReportingGatewayImpl">
+        <constructor-arg ref="restTemplateReporting" />
+        <constructor-arg ref="httpClientService" />
+        <constructor-arg ref="kilkariProperties" />
+    </bean>
+
+    <bean id="reportingService" class="org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl">
+        <constructor-arg ref="reportGateway" />
+    </bean>
+</beans>

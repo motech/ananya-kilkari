@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.performance.tests;
 
 import org.junit.runner.RunWith;
-import org.motechproject.ananya.kilkari.performance.tests.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.performance.tests.service.api.SubscriptionApiService;
 import org.motechproject.ananya.kilkari.performance.tests.utils.BasePerformanceTest;
 import org.motechproject.ananya.kilkari.performance.tests.utils.TimedRunner;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -19,7 +19,7 @@ public class BackgroundJobsPerformanceTest extends BasePerformanceTest {
 
     private final static int numberOfSubscribers = 25000;
     private static List createdSubscriptionsList = new ArrayList<Subscription>();
-    private SubscriptionService subscriptionService = new SubscriptionService();
+    private SubscriptionApiService subscriptionApiService = new SubscriptionApiService();
     private static int index=-1;
     private static String lockName="lock";
 
@@ -30,20 +30,20 @@ public class BackgroundJobsPerformanceTest extends BasePerformanceTest {
     @LoadPerfBefore(priority = 1,concurrentUsers = 100)
     public void firstBefore() {
         for (int i = 0; i < 250; i++) {
-            subscriptionService.createASubscription();
+            subscriptionApiService.createASubscription();
         }
     }
 
     @LoadPerfBefore(priority = 2,concurrentUsers = 1)
     public void secondBefore() {
         assertSubscriptionCreation();
-        createdSubscriptionsList = subscriptionService.getAll();
+        createdSubscriptionsList = subscriptionApiService.getAll();
     }
 
     @LoadPerfStaggered(totalNumberOfUsers = numberOfSubscribers,minMaxRandomBatchSizes = {"5","10"}, minDelayInMillis = 1000,delayVariation = 120000)
     public void shouldActivateBulkSubscriptionsOverADay() {
         Subscription subscription = getASubscriptionToBeActivated();
-        subscriptionService.activate(subscription);
+        subscriptionApiService.activate(subscription);
 
     }
 
@@ -63,8 +63,8 @@ public class BackgroundJobsPerformanceTest extends BasePerformanceTest {
             @Override
             protected Boolean run() {
                 boolean isComplete = true;
-                SubscriptionService subscriptionService = new SubscriptionService();
-                List<Subscription> subscriptions = subscriptionService.getAll();
+                SubscriptionApiService subscriptionApiService = new SubscriptionApiService();
+                List<Subscription> subscriptions = subscriptionApiService.getAll();
                 if (numberOfSubscribers != subscriptions.size()) return null;
                 for (Subscription subscription : subscriptions) {
                     if (!SubscriptionStatus.PENDING_ACTIVATION.equals(subscription.getStatus())) {

@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.performance.tests.utils;
 
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class BaseConfiguration {
     private AllCampaignMessages allCampaignMessages;
     @Autowired
     private CampaignMessageService campaignMessageService;
+    @Autowired
+    private ReportingService reportingService;
 
 
     public Properties getPerformanceProperties() {
@@ -40,5 +43,9 @@ public class BaseConfiguration {
 
     public CampaignMessageService getCampaignMessageService() {
         return campaignMessageService;
+    }
+
+    public ReportingService getReportingService() {
+        return reportingService;
     }
 }

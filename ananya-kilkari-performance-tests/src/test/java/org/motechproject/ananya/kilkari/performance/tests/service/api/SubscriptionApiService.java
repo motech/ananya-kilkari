@@ -1,6 +1,5 @@
-package org.motechproject.ananya.kilkari.performance.tests.service;
+package org.motechproject.ananya.kilkari.performance.tests.service.api;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.motechproject.ananya.kilkari.performance.tests.domain.BaseResponse;
 import org.motechproject.ananya.kilkari.performance.tests.utils.ContextUtils;
 import org.motechproject.ananya.kilkari.performance.tests.utils.HttpUtils;
@@ -14,8 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
+import static org.motechproject.ananya.kilkari.performance.tests.utils.TestUtils.getRandomMsisdn;
 
-public class SubscriptionService {
+public class SubscriptionApiService {
 
     public Subscription getSubscriptionData(final String msisdn, final String status) throws InterruptedException {
         return new TimedRunner<Subscription>(100, 1000) {
@@ -52,10 +52,6 @@ public class SubscriptionService {
         parametersMap.put("pack", "bari_kilkari");
         return parametersMap;
 
-    }
-
-    private String getRandomMsisdn() {
-        return "9" + RandomStringUtils.randomNumeric(9);
     }
 
     public List<Subscription> getAll() {

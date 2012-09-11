@@ -1,12 +1,11 @@
 package org.motechproject.ananya.kilkari.performance.tests;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.performance.tests.domain.BaseResponse;
-import org.motechproject.ananya.kilkari.performance.tests.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.performance.tests.service.api.SubscriptionApiService;
 import org.motechproject.ananya.kilkari.performance.tests.utils.BasePerformanceTest;
 import org.motechproject.ananya.kilkari.performance.tests.utils.HttpUtils;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
@@ -16,6 +15,8 @@ import org.motechproject.performance.tests.LoadPerf;
 import org.motechproject.performance.tests.LoadRunner;
 
 import java.util.*;
+
+import static org.motechproject.ananya.kilkari.performance.tests.utils.TestUtils.getRandomMsisdn;
 
 @RunWith(LoadRunner.class)
 public class SubscriptionPerformanceTest extends BasePerformanceTest {
@@ -51,14 +52,14 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
 
     @LoadPerf(concurrentUsers = 100)
     public void shouldCreateAnIvrSubscription() throws InterruptedException {
-        SubscriptionService subscriptionService = new SubscriptionService();
+        SubscriptionApiService subscriptionApiService = new SubscriptionApiService();
         String expectedStatus = "PENDING_ACTIVATION";
         Map<String, String> parametersMap = constructParameters();
 
         BaseResponse baseResponse = HttpUtils.httpGetWithJsonResponse(parametersMap, "subscription");
         assertEquals("SUCCESS", baseResponse.getStatus());
 
-        Subscription subscription = subscriptionService.getSubscriptionData(parametersMap.get("msisdn"), expectedStatus);
+        Subscription subscription = subscriptionApiService.getSubscriptionData(parametersMap.get("msisdn"), expectedStatus);
         assertNotNull(subscription);
     }
 
@@ -111,10 +112,6 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
         // Date of Birth range is : -30 - DateTime.now - +30
         lateSubscription.setDateOfBirth(DateTime.now().plusDays(-30 + random.nextInt(60)).toString("dd-MM-yyyy"));
         return lateSubscription;
-    }
-
-    private String getRandomMsisdn() {
-        return "9" + RandomStringUtils.randomNumeric(9);
     }
 
     private Map<String, String> constructParameters() {

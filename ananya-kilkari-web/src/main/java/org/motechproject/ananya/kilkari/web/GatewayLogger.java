@@ -14,7 +14,7 @@ import java.util.Arrays;
 @Aspect
 @Component
 public class GatewayLogger {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger("RequestResponseLogger");
 
     @Pointcut("execution(public * org.springframework.web.client.RestTemplate.*(..))")
     public void allExternalHttpCalls() {
@@ -41,5 +41,4 @@ public class GatewayLogger {
             logger.debug("After accessing external url: {} got response: {}", arguments, result);
         }
     }
-
 }

@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.performance.tests.service.api;
 
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.performance.tests.utils.ContextUtils;
 import org.motechproject.ananya.kilkari.performance.tests.utils.HttpUtils;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
@@ -21,5 +22,9 @@ public class OBDApiService {
 
     public void sendOBDCallbackRequest(OBDSuccessfulCallDetailsWebRequest request){
         HttpUtils.httpPostKilkariWithJsonResponse(new HashMap<String, String>(), request, "obd/calldetails/" + request.getSubscriptionId());
+    }
+
+    public void sendOBDFailedCallRecords(FailedCallReports failedCallReports) {
+        HttpUtils.httpPostKilkariWithJsonResponse(null, failedCallReports, "obd/calldetails");
     }
 }

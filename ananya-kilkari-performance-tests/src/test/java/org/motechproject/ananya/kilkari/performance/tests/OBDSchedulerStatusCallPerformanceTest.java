@@ -1,13 +1,18 @@
 package org.motechproject.ananya.kilkari.performance.tests;
 
+import org.apache.commons.lang.math.RandomUtils;
 import org.joda.time.DateTime;
 import org.junit.runner.RunWith;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
+import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.performance.tests.service.api.OBDApiService;
 import org.motechproject.ananya.kilkari.performance.tests.service.db.OBDDbService;
 import org.motechproject.ananya.kilkari.performance.tests.service.db.SubscriptionDbService;
 import org.motechproject.ananya.kilkari.performance.tests.utils.BasePerformanceTest;
+import org.motechproject.ananya.kilkari.performance.tests.utils.ContextUtils;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
@@ -25,8 +30,8 @@ import static org.motechproject.ananya.kilkari.performance.tests.utils.TestUtils
 @RunWith(LoadRunner.class)
 public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
     private Operator[] possibleOperators = Operator.values();
-    private final static int numberOfMessagesInDb = 25000;
-    private final static int numberOfObdRequests = 25000;
+    private final static int numberOfMessagesInDb = 100;
+    private final static int numberOfObdRequests = 100;
     private static String lockName = "lock";
     private static int index;
     private static List<CampaignMessage> campaignMessageList = new ArrayList<>();
@@ -39,9 +44,9 @@ public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
     private OBDApiService obdApiService = new OBDApiService();
     private OBDDbService obdDbService = new OBDDbService();
 
-    @LoadPerfBefore(priority = 1, concurrentUsers = 100)
+    @LoadPerfBefore(priority = 1, concurrentUsers = 10)
     public void loadSubscriptions() {
-        for (int i = 0; i < numberOfMessagesInDb / 100; i++) {
+        for (int i = 0; i < numberOfMessagesInDb / 10; i++) {
             DateTime now = DateTime.now();
             String msisdn = getRandomMsisdn();
             String week = getRandomCampaignId();
@@ -70,6 +75,12 @@ public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
         obdApiService.sendOBDCallbackRequest(request);
     }
 
+    @LoadPerfStaggered(totalNumberOfUsers = 1, minMaxRandomBatchSizes = {"1", "1"}, minDelayInMillis = 1000, delayVariation = 2000)
+    public void shouldPerformanceTestOBDFailedRecords() {
+        FailedCallReports failedCallReports = getFailedCallReports();
+        obdApiService.sendOBDFailedCallRecords(failedCallReports);
+    }
+
     private OBDSuccessfulCallDetailsWebRequest getOBDCallBackRequestToSend() {
         CampaignMessage campaignMessage = campaignMessageList.get(getIndex());
         OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsWebRequest =
@@ -79,10 +90,30 @@ public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
         return obdSuccessfulCallDetailsWebRequest;
     }
 
+    public FailedCallReports getFailedCallReports() {
+        FailedCallReports failedCallReports = new FailedCallReports();
+
+        List<FailedCallReport> failedCallReportList = new ArrayList<>();
+        for (CampaignMessage campaignMessage : campaignMessageList) {
+            failedCallReportList.add(
+                    new FailedCallReport(campaignMessage.getSubscriptionId(), campaignMessage.getMsisdn(),
+                            campaignMessage.getMessageId(), getRandomCampaignStatusCode()));
+        }
+        failedCallReports.setFailedCallReports(failedCallReportList);
+
+        return failedCallReports;
+    }
+
+    private String getRandomCampaignStatusCode() {
+        double statusCodeRandomizer = Math.random();
+        if (statusCodeRandomizer <= 0.9) return "Q.850_18";
+
+        return "INVALID";
+    }
+
     public int getIndex() {
         synchronized (lockName) {
             return index++;
         }
     }
-
 }

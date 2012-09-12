@@ -2,9 +2,11 @@ package org.motechproject.ananya.kilkari.obd.repository;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
@@ -13,8 +15,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.profile.ProductionProfile;
-import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
+import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 @Component
 @ProductionProfile
@@ -34,7 +37,9 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     private OBDProperties obdProperties;
     private RestTemplate restTemplate;
 
-    private static final Logger logger = LoggerFactory.getLogger(OnMobileOBDGatewayImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(OnMobileOBDGatewayImpl.class);
+    private final Logger requestResponseLogger = LoggerFactory.getLogger("RequestResponseLogger");
+
 
     @Autowired
     public OnMobileOBDGatewayImpl(HttpClient obdHttpClient, OBDProperties obdProperties, RestTemplate kilkariRestTemplate) {
@@ -81,6 +86,7 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
         try {
             reqEntity.addPart(START_DATE_PARAM_NAME, new StringBody(slotStartDate));
             reqEntity.addPart(END_DATE_PARAM_NAME, new StringBody(slotEndDate));
+            logRequest(url, slotStartDate, slotEndDate);
 
             httpPost.setEntity(reqEntity);
 
@@ -92,6 +98,10 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
             logger.error("Sending messages to OBD failed", ex);
             throw new RuntimeException(ex);
         }
+    }
+
+    private void logRequest(String url, String slotStartDate, String slotEndDate) {
+        requestResponseLogger.debug("Before request [" + url + "?" + START_DATE_PARAM_NAME + "=" + slotStartDate + "&" + END_DATE_PARAM_NAME + "=" + slotEndDate +"]");
     }
 
     private void validateResponse(HttpResponse response, String responseContent) {

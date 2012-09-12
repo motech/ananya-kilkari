@@ -21,9 +21,6 @@ public class BaseConfiguration {
     private AllCampaignMessages allCampaignMessages;
     @Autowired
     private CampaignMessageService campaignMessageService;
-    @Autowired
-    private ReportingService reportingService;
-
 
     public Properties getPerformanceProperties() {
         return performanceProperties;
@@ -41,11 +38,11 @@ public class BaseConfiguration {
         return performanceProperties.getProperty("baseurl");
     }
 
-    public CampaignMessageService getCampaignMessageService() {
-        return campaignMessageService;
+    public String reportsUrl() {
+        return performanceProperties.getProperty("report.baseurl");
     }
 
-    public ReportingService getReportingService() {
-        return reportingService;
+    public CampaignMessageService getCampaignMessageService() {
+        return campaignMessageService;
     }
 }

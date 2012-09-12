@@ -20,6 +20,6 @@ public class OBDApiService {
     }
 
     public void sendOBDCallbackRequest(OBDSuccessfulCallDetailsWebRequest request){
-        HttpUtils.httpPostWithJsonResponse(new HashMap<String, String>(), request, "obd/calldetails/" + request.getSubscriptionId());
+        HttpUtils.httpPostKilkariWithJsonResponse(new HashMap<String, String>(), request, "obd/calldetails/" + request.getSubscriptionId());
     }
 }

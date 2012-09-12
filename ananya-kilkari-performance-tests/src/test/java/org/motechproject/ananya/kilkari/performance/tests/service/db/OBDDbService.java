@@ -14,4 +14,14 @@ public class OBDDbService {
     public void add(CampaignMessage campaignMessage) {
         allCampaignMessages.add(campaignMessage);
     }
+
+    public void warmIndexes() {
+        for (int i = 0; i < 10; i++) {
+            try {
+                allCampaignMessages.findBySubscriptionId("asdasd");
+            } catch (Exception e) {
+                System.out.println("Exception warming indexes : " + e.toString());
+            }
+        }
+    }
 }

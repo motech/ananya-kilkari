@@ -32,7 +32,7 @@ public class SubscriptionApiService {
     public void createASubscription() {
         Map<String, String> parametersMap = constructParameters();
 
-        BaseResponse baseResponse = HttpUtils.httpGetWithJsonResponse(parametersMap, "subscription");
+        BaseResponse baseResponse = HttpUtils.httpGetKilkariWithJsonResponse(parametersMap, "subscription");
         assertEquals("SUCCESS", baseResponse.getStatus());
     }
 

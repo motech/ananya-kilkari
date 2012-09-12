@@ -56,7 +56,7 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
         String expectedStatus = "PENDING_ACTIVATION";
         Map<String, String> parametersMap = constructParameters();
 
-        BaseResponse baseResponse = HttpUtils.httpGetWithJsonResponse(parametersMap, "subscription");
+        BaseResponse baseResponse = HttpUtils.httpGetKilkariWithJsonResponse(parametersMap, "subscription");
         assertEquals("SUCCESS", baseResponse.getStatus());
 
         Subscription subscription = subscriptionApiService.getSubscriptionData(parametersMap.get("msisdn"), expectedStatus);
@@ -76,9 +76,8 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
 
         SubscriptionWebRequest subscriptionWebRequest = getSubscriptionWebRequest();
 
-        BaseResponse baseResponse = HttpUtils.httpPostWithJsonResponse(parametersMap, subscriptionWebRequest, "subscription");
+        BaseResponse baseResponse = HttpUtils.httpPostKilkariWithJsonResponse(parametersMap, subscriptionWebRequest, "subscription");
         assertEquals("SUCCESS", baseResponse.getStatus());
-
     }
 
     /*

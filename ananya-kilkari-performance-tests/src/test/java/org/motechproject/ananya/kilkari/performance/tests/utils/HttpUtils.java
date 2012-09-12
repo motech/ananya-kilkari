@@ -15,6 +15,7 @@ public class HttpUtils {
 
     public static String constructUrl(String url, String path, Map<String, String> parametersMap) {
         url += "/" + path + "?";
+        if (parametersMap == null) return url;
         for (String key : parametersMap.keySet()) {
             url += (key + "=" + parametersMap.get(key) + "&");
         }
@@ -36,16 +37,21 @@ public class HttpUtils {
         return fromJson(jsonString.replace("var response = ", ""), subscriberResponseClass);
     }
 
-    public static BaseResponse httpGetWithJsonResponse(Map<String, String> parametersMap, String path) {
+    public static BaseResponse httpGetKilkariWithJsonResponse(Map<String, String> parametersMap, String path) {
         ResponseEntity<String> responseEntity = new RestTemplate().getForEntity(
                 constructUrl(ContextUtils.getConfiguration().baseUrl(), path, parametersMap), String.class);
         return fromJsonWithResponse(responseEntity.getBody(), BaseResponse.class);
     }
 
-    public static BaseResponse httpPostWithJsonResponse(Map<String, String> queryStringParametersMap, Object postParam, String urlPath) {
+    public static BaseResponse httpPostKilkariWithJsonResponse(Map<String, String> queryStringParametersMap, Object postParam, String urlPath) {
         ResponseEntity<String> responseEntity = new RestTemplate().postForEntity(
                 constructUrl(ContextUtils.getConfiguration().baseUrl(), urlPath, queryStringParametersMap), postParam, String.class);
         return fromJsonWithResponse(responseEntity.getBody(), BaseResponse.class);
+    }
+
+    public static void httpPostReports(Map<String, String> queryStringParametersMap, Object postParam, String urlPath) {
+        new RestTemplate().postForEntity(
+                constructUrl(ContextUtils.getConfiguration().reportsUrl(), urlPath, queryStringParametersMap), postParam, String.class);
     }
 
     public static void put(Object request, String urlPath) {

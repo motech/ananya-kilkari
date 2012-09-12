@@ -20,9 +20,10 @@ public class SubscriptionDbService {
 
     public void addSubscription(Subscription subscription) {
         allSubscriptions.add(subscription);
-        reportingService.reportSubscriptionCreation(new SubscriptionReportRequest(subscription.getSubscriptionId(),
+        SubscriptionReportRequest subscriptionReportRequest = new SubscriptionReportRequest(subscription.getSubscriptionId(),
                 Channel.CALL_CENTER.toString(), Long.parseLong(subscription.getMsisdn()), subscription.getPack().toString(),
                 null, null, subscription.getCreationDate(), subscription.getStatus().toString(), null, null, null,
-                subscription.getOperator().toString(), subscription.getStartDate(), null, null));
+                subscription.getOperator().toString(), subscription.getStartDate(), null, null);
+        reportingService.reportSubscriptionCreation(subscriptionReportRequest);
     }
 }

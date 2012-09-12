@@ -49,14 +49,14 @@
         <constructor-arg ref="allCampaignMessages"/>
         <constructor-arg ref="onMobileOBDGateway" />
         <constructor-arg ref="campaignMessageCSVBuilder" />
-        <constructor-arg><null/></constructor-arg>
+        <constructor-arg ref="reportingService" />
         <constructor-arg ref="obdProperties"/>
     </bean>
 
     <bean id="onMobileOBDGateway" class="org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGatewayImpl">
-        <constructor-arg ref="mockHttpClient" />
+        <constructor-arg ref="obdHttpClient" />
         <constructor-arg ref="obdProperties" />
-        <constructor-arg><null/></constructor-arg>
+        <constructor-arg ref="restTemplateReporting" />
     </bean>
 
     <bean id="obdProperties" class="org.motechproject.ananya.kilkari.obd.service.OBDProperties">
@@ -77,5 +77,13 @@
 
     <bean id="reportingService" class="org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl">
         <constructor-arg ref="reportGateway" />
+    </bean>
+
+    <bean id="obdHttpClientConnectionManager" class="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager"/>
+
+    <bean id="obdHttpClient" class="org.motechproject.ananya.kilkari.obd.repository.OBDHttpClient">
+        <constructor-arg ref="obdHttpClientConnectionManager"/>
+        <constructor-arg value="${http.read.timeout}"/>
+        <constructor-arg value="${http.connect.timeout}"/>
     </bean>
 </beans>

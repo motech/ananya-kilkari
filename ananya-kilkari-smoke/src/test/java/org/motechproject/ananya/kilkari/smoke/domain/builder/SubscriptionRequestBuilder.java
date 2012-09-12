@@ -14,7 +14,6 @@ public class SubscriptionRequestBuilder {
 
     public SubscriptionRequestBuilder withDefaults() {
         request.setPack("bari_kilkari");
-        request.setChannel("CALL_CENTER");
         request.setMsisdn("9876543210");
         request.setBeneficiaryAge("25");
         request.setBeneficiaryName("name");
@@ -27,11 +26,6 @@ public class SubscriptionRequestBuilder {
 
     public SubscriptionRequestBuilder withPack(String pack) {
         request.setPack(pack);
-        return this;
-    }
-
-    public SubscriptionRequestBuilder withChannel(String channel) {
-        request.setChannel(channel);
         return this;
     }
 

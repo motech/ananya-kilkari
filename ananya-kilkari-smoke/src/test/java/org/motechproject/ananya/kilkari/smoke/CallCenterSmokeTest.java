@@ -15,6 +15,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static org.motechproject.ananya.kilkari.smoke.utils.TestUtils.constructUrl;
@@ -34,15 +36,18 @@ public class CallCenterSmokeTest extends BaseSmokeTest {
 
     @Test
     public void shouldPostHttpRequestAndVerifyEntriesInReportDbAndCouchDb() throws InterruptedException {
-        String expectedStatus = "PENDING_ACTIVATION";
+        String expectedStatus = "Pending Subscription";
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withEDD(null).withDOB(null).withLocation(null).build();
+        Map<String, String> parametersMap = new HashMap<>();
+        String channel = "CALL_CENTER";
+        parametersMap.put("channel", channel);
 
-        String responseEntity = restTemplate.postForObject(constructUrl(baseUrl(), "subscription"), subscriptionRequest, String.class);
+        String responseEntity = restTemplate.postForObject(constructUrl(baseUrl(), "subscription", parametersMap), subscriptionRequest, String.class);
 
         BaseResponse baseResponse = fromJsonWithResponse(responseEntity, BaseResponse.class);
         assertEquals("SUCCESS", baseResponse.getStatus());
 
-        SubscriberResponse response = subscriptionService.getSubscriptionData(subscriptionRequest.getMsisdn(), subscriptionRequest.getChannel(), expectedStatus);
+        SubscriberResponse response = subscriptionService.getSubscriptionData(subscriptionRequest.getMsisdn(), channel, expectedStatus);
         assertEquals(1, response.getSubscriptionDetails().size());
         assertKilkariData(subscriptionRequest.getPack(), expectedStatus, response);
     }

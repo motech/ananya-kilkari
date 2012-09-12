@@ -5,7 +5,6 @@ import org.joda.time.DateTime;
 public class SubscriptionRequest {
     private String msisdn;
     private String pack;
-    private String channel;
     private DateTime createdAt;
     private String beneficiaryName;
     private String beneficiaryAge;
@@ -17,10 +16,9 @@ public class SubscriptionRequest {
     public SubscriptionRequest() {
     }
 
-    public SubscriptionRequest(String msisdn, String pack, String channel, DateTime createdAt, String beneficiaryName, String beneficiaryAge, String expectedDateOfDelivery, String dateOfBirth, Location location) {
+    public SubscriptionRequest(String msisdn, String pack, DateTime createdAt, String beneficiaryName, String beneficiaryAge, String expectedDateOfDelivery, String dateOfBirth, Location location) {
         this.msisdn = msisdn;
         this.pack = pack;
-        this.channel = channel;
         this.createdAt = createdAt;
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
@@ -37,9 +35,6 @@ public class SubscriptionRequest {
         return pack;
     }
 
-    public String getChannel() {
-        return channel;
-    }
 
     public DateTime getCreatedAt() {
         return createdAt;
@@ -71,10 +66,6 @@ public class SubscriptionRequest {
 
     public void setPack(String pack) {
         this.pack = pack;
-    }
-
-    public void setChannel(String channel) {
-        this.channel = channel;
     }
 
     public void setCreatedAt(DateTime createdAt) {

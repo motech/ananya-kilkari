@@ -9,7 +9,6 @@ import org.motechproject.ananya.kilkari.smoke.domain.SubscriptionDetails;
 import org.motechproject.ananya.kilkari.smoke.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
@@ -39,7 +38,7 @@ public class IvrSmokeTest extends BaseSmokeTest {
         String channel = "IVR";
         String msisdn = "9000000001";
         String pack = "bari_kilkari";
-        String expectedStatus = "PENDING_ACTIVATION";
+        String expectedStatus = "Pending Subscription";
 
         Map<String, String> parametersMap = new HashMap<>();
         parametersMap.put("msisdn", msisdn);

@@ -30,8 +30,8 @@ import static org.motechproject.ananya.kilkari.performance.tests.utils.TestUtils
 @RunWith(LoadRunner.class)
 public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
     private Operator[] possibleOperators = Operator.values();
-    private final static int numberOfMessagesInDb = 100;
-    private final static int numberOfObdRequests = 100;
+    private final static int numberOfMessagesInDb = 25000;
+    private final static int numberOfObdRequests = 25000;
     private static String lockName = "lock";
     private static int index;
     private static List<CampaignMessage> campaignMessageList = new ArrayList<>();
@@ -44,9 +44,9 @@ public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
     private OBDApiService obdApiService = new OBDApiService();
     private OBDDbService obdDbService = new OBDDbService();
 
-    @LoadPerfBefore(priority = 1, concurrentUsers = 10)
+    @LoadPerfBefore(priority = 1, concurrentUsers = 100)
     public void loadSubscriptions() {
-        for (int i = 0; i < numberOfMessagesInDb / 10; i++) {
+        for (int i = 0; i < numberOfMessagesInDb / 100; i++) {
             DateTime now = DateTime.now();
             String msisdn = getRandomMsisdn();
             String week = getRandomCampaignId();

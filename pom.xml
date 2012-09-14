@@ -87,11 +87,6 @@
             <name>Repository for javax transaction API</name>
             <url>http://mvnrepository.com/artifact/javax.transaction/jta/1.1</url>
         </repository>
-        <repository>
-            <id>spring-test-mvc</id>
-            <name>Repository for Spring Test MVC framework</name>
-            <url>http://maven.springframework.org/snapshot</url>
-        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>

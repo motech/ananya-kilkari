@@ -378,6 +378,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = subscription.getSubscriptionId();
         int deltaDays = 2;
         int deltaMinutes = 30;
+        DateTime scheduleStartDate = activatedOn.plusDays(deltaDays).plusMinutes(deltaMinutes);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(kilkariPropertiesData.getCampaignScheduleDeltaDays()).thenReturn(deltaDays);
         when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(deltaMinutes);
@@ -389,6 +390,8 @@ public class SubscriptionServiceTest {
         Subscription actualSubscription = captor.getValue();
         assertEquals(SubscriptionStatus.ACTIVE, actualSubscription.getStatus());
         assertEquals(subscriptionId, actualSubscription.getSubscriptionId());
+        assertEquals(activatedOn.withSecondOfMinute(0).withMillisOfSecond(0), actualSubscription.getActivationDate());
+        assertEquals(scheduleStartDate.withSecondOfMinute(0).withMillisOfSecond(0), actualSubscription.getScheduleStartDate());
 
         ArgumentCaptor<SubscriptionStateChangeRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
         verify(reportingServiceImpl).reportSubscriptionStateChange(subscriptionStateChangeReportRequestArgumentCaptor.capture());
@@ -618,7 +621,7 @@ public class SubscriptionServiceTest {
         DateTime nextAlertDateTime = rescheduleRequestedDate.plusHours(1);
         String existingCampaignName = MessageCampaignPack.BARI_KILKARI.getCampaignName();
 
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).withStartDate(existingCampaignStartDate).build();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).withScheduleStartDate(existingCampaignStartDate).build();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId())).thenReturn(existingCampaignName);
         when(messageCampaignService.getMessageTimings(subscriptionId, rescheduleRequestedDate, rescheduleRequestedDate.plusMonths(1))).thenReturn(Arrays.asList(nextAlertDateTime, new DateTime()));
@@ -634,7 +637,7 @@ public class SubscriptionServiceTest {
         MessageCampaignRequest campaignRequest = campaignUnEnrollmentRequestArgumentCaptor.getValue();
         assertEquals(subscription.getSubscriptionId(), campaignRequest.getExternalId());
         assertEquals(existingCampaignName, campaignRequest.getCampaignName());
-        assertEquals(subscription.getStartDate(), campaignRequest.getSubscriptionStartDate());
+        assertEquals(subscription.getScheduleStartDate(), campaignRequest.getScheduleStartDate());
 
         order.verify(campaignMessageService).deleteCampaignMessagesFor(subscriptionId);
         order.verify(campaignMessageAlertService).clearMessageId(subscriptionId);
@@ -646,7 +649,7 @@ public class SubscriptionServiceTest {
         MessageCampaignRequest campaignEnrollmentRequest = campaignEnrollmentRequestArgumentCaptor.getValue();
         assertEquals(subscriptionId, campaignEnrollmentRequest.getExternalId());
         assertEquals(MessageCampaignPack.MISCARRIAGE.getCampaignName(), campaignEnrollmentRequest.getCampaignName());
-        assertEquals(nextAlertDateTime, campaignEnrollmentRequest.getSubscriptionStartDate());
+        assertEquals(nextAlertDateTime, campaignEnrollmentRequest.getScheduleStartDate());
         assertEquals(0, deltaDaysCaptor.getValue().intValue());
         assertEquals(deltaMinutes, deltaMinutesCaptor.getValue().intValue());
     }
@@ -863,8 +866,14 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldUnScheduleMessageCampaignAndDeleteCampaignMessageAlertOnSuccessfulDeactivationRequest() {
         DateTime createdAt = DateTime.now();
-        DateTime startDate = DateTime.now().plus(123);
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.CHOTI_KILKARI, createdAt, startDate);
+        DateTime scheduleStartDate = createdAt.plusDays(2);
+        Subscription subscription = new SubscriptionBuilder()
+                .withDefaults()
+                .withMsisdn("1234567890")
+                .withPack(SubscriptionPack.CHOTI_KILKARI)
+                .withCreationDate(createdAt)
+                .withStartDate(createdAt)
+                .withScheduleStartDate(scheduleStartDate).build();
         subscription.setStatus(SubscriptionStatus.ACTIVE);
 
         String subscriptionId = subscription.getSubscriptionId();
@@ -878,7 +887,7 @@ public class SubscriptionServiceTest {
         MessageCampaignRequest messageCampaignRequest = campaignRequestArgumentCaptor.getValue();
         assertEquals(subscriptionId, messageCampaignRequest.getExternalId());
         assertEquals(MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), messageCampaignRequest.getCampaignName());
-        assertEquals(startDate.withSecondOfMinute(0).withMillisOfSecond(0), messageCampaignRequest.getSubscriptionStartDate());
+        assertEquals(scheduleStartDate.withSecondOfMinute(0).withMillisOfSecond(0), messageCampaignRequest.getScheduleStartDate());
         verify(campaignMessageAlertService).deleteFor(subscriptionId);
     }
 

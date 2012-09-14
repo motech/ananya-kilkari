@@ -36,6 +36,12 @@ public class Subscription extends MotechBaseDataObject {
     @JsonProperty
     private DateTime startDate;
 
+    @JsonProperty
+    private DateTime activationDate;
+
+    @JsonProperty
+    private DateTime scheduleStartDate;
+
     Subscription() {
         //for serialization do not make it public
     }
@@ -86,6 +92,14 @@ public class Subscription extends MotechBaseDataObject {
         return startDate;
     }
 
+    public DateTime getActivationDate() {
+        return activationDate;
+    }
+
+    public DateTime getScheduleStartDate() {
+        return scheduleStartDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -118,6 +132,8 @@ public class Subscription extends MotechBaseDataObject {
                 .append(this.status)
                 .append(this.creationDate)
                 .append(this.startDate)
+                .append(this.activationDate)
+                .append(this.scheduleStartDate)
                 .toString();
     }
 
@@ -135,9 +151,10 @@ public class Subscription extends MotechBaseDataObject {
     public boolean isActiveOrSuspended() {
         return getStatus().isActive() || getStatus().isSuspended();
     }
+
     @JsonIgnore
     public boolean isInUpdatableState() {
-        return this.isNewEarly()|| this.isActiveOrSuspended();
+        return this.isNewEarly() || this.isActiveOrSuspended();
     }
 
     public void activateOnRenewal() {
@@ -148,10 +165,11 @@ public class Subscription extends MotechBaseDataObject {
         setStatus(SubscriptionStatus.SUSPENDED);
     }
 
-    public void activate(String operator, DateTime scheduledStartDate) {
+    public void activate(String operator, DateTime scheduleStartDate, DateTime activationDate) {
         setStatus(SubscriptionStatus.ACTIVE);
         setOperator(Operator.getFor(operator));
-        this.startDate = floorToExactMinutes(scheduledStartDate);
+        this.scheduleStartDate = floorToExactMinutes(scheduleStartDate);
+        this.activationDate = floorToExactMinutes(activationDate);
     }
 
     public void activationFailed(String operator) {
@@ -188,7 +206,7 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     public DateTime endDate() {
-        return getStartDate().plusWeeks(getPack().getTotalWeeks());
+        return getScheduleStartDate().plusWeeks(getPack().getTotalWeeks());
     }
 
     @JsonIgnore
@@ -198,12 +216,12 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public DateTime getCurrentWeeksMessageExpiryDate() {
-        return startDate.plusWeeks(getWeeksElapsedAfterStartDate() + 1);
+        return activationDate != null ? activationDate.plusWeeks(getWeeksElapsedAfterStartDate() + 1) : null;
     }
 
     @JsonIgnore
     private int getWeeksElapsedAfterStartDate() {
-        return Weeks.weeksBetween(startDate, DateTime.now()).getWeeks();
+        return Weeks.weeksBetween(activationDate, DateTime.now()).getWeeks();
     }
 
     /*
@@ -213,14 +231,13 @@ public class Subscription extends MotechBaseDataObject {
     @JsonIgnore
     public int getNextWeekNumber() {
         DateTime now = DateTime.now();
-        if (startDate.isAfter(now)) {
+        if (scheduleStartDate == null || scheduleStartDate.isAfter(now)) {
             return 1;
         }
 
-        return
-                1 +                                             // First week
-                        Weeks.weeksBetween(startDate, now).getWeeks() + // Weeks elapsed
-                        1;                                              // Next week increment
+        return Weeks.weeksBetween(scheduleStartDate, now).getWeeks()  // Weeks elapsed increment
+                + 1 // Current Week increment
+                + 1; // Next week increment
     }
 
     public boolean hasBeenActivated() {
@@ -296,6 +313,6 @@ public class Subscription extends MotechBaseDataObject {
     }
 
     private DateTime floorToExactMinutes(DateTime dateTime) {
-        return dateTime.withSecondOfMinute(0).withMillisOfSecond(0);
+        return dateTime != null ? dateTime.withSecondOfMinute(0).withMillisOfSecond(0) : null;
     }
 }

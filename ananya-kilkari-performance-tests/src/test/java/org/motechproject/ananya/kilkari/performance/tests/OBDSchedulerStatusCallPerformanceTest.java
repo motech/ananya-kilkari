@@ -1,18 +1,15 @@
 package org.motechproject.ananya.kilkari.performance.tests;
 
-import org.apache.commons.lang.math.RandomUtils;
 import org.joda.time.DateTime;
 import org.junit.runner.RunWith;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
-import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.performance.tests.service.api.OBDApiService;
 import org.motechproject.ananya.kilkari.performance.tests.service.db.OBDDbService;
 import org.motechproject.ananya.kilkari.performance.tests.service.db.SubscriptionDbService;
 import org.motechproject.ananya.kilkari.performance.tests.utils.BasePerformanceTest;
-import org.motechproject.ananya.kilkari.performance.tests.utils.ContextUtils;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
@@ -53,7 +50,7 @@ public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
             Operator operator = getRandomElementFromList(possibleOperators);
 
             Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, now, now);
-            subscription.activate(operator.toString(), now);
+            subscription.activate(operator.toString(), now, now);
             subscriptionDbService.addSubscription(subscription);
 
             CampaignMessage campaignMessage = new CampaignMessage(

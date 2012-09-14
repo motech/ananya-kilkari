@@ -60,16 +60,18 @@ public class SubscriptionTest {
     public void shouldChangeStatusOfSubscriptionToActiveForSuccessfulActivation() {
         DateTime createdAt = DateTime.now();
         DateTime activatedOn = createdAt.plus(5000);
+        DateTime scheduleStartDate = activatedOn.plusDays(2).plusMinutes(30);
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, createdAt, activatedOn);
         subscription.setStatus(SubscriptionStatus.NEW);
 
         Operator operator = Operator.AIRTEL;
 
-        subscription.activate(operator.name(), activatedOn);
+        subscription.activate(operator.name(), scheduleStartDate, activatedOn);
 
         assertEquals(SubscriptionStatus.ACTIVE, subscription.getStatus());
         assertEquals(operator, subscription.getOperator());
-        assertEquals(createdAt.plus(5000).withSecondOfMinute(0).withMillisOfSecond(0), subscription.getStartDate());
+        assertEquals(activatedOn.withSecondOfMinute(0).withMillisOfSecond(0), subscription.getActivationDate());
+        assertEquals(scheduleStartDate.withSecondOfMinute(0).withMillisOfSecond(0), subscription.getScheduleStartDate());
     }
 
     @Test
@@ -112,7 +114,7 @@ public class SubscriptionTest {
 
         assertEquals(SubscriptionStatus.DEACTIVATED, subscription.getStatus());
     }
-    
+
     @Test
     public void shouldChangeStatusToCompletedOnDeactivationOnlyIfPriorStatusIsPendingCompleted() {
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
@@ -203,30 +205,41 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void expiryDateShouldBeEndDateOfTheCurrentWeek() {
-        DateTime startedDate = DateTime.now().minusDays(3);
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withStartDate(startedDate).build();
+    public void expiryDateShouldBeEndDateOfTheCurrentWeek_inReferenceToActivationDate() {
+        DateTime activationDate = DateTime.now();
+        Subscription subscription = new SubscriptionBuilder()
+                .withDefaults()
+                .withStartDate(activationDate.minusWeeks(3))
+                .withActivationDate(activationDate)
+                .build();
 
         DateTime expiryDate = subscription.getCurrentWeeksMessageExpiryDate();
-        assertThat(expiryDate, is(subscription.getStartDate().plusWeeks(1)));
+        assertThat(expiryDate, is(subscription.getActivationDate().plusWeeks(1)));
+
+        subscription = new SubscriptionBuilder()
+                .withDefaults()
+                .withStartDate(activationDate.minusWeeks(3))
+                .withActivationDate(null)
+                .build();
+        assertNull(subscription.getCurrentWeeksMessageExpiryDate());
     }
 
     @Test
-    public void shouldReturnFalseForIsActiveWhenTheStatusIsPendingActivation(){
+    public void shouldReturnFalseForIsActiveWhenTheStatusIsPendingActivation() {
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.PENDING_ACTIVATION).build();
 
         assertFalse(subscription.hasBeenActivated());
     }
 
     @Test
-    public void shouldReturnFalseForIsActiveWhenTheStatusIsActivationFailed(){
+    public void shouldReturnFalseForIsActiveWhenTheStatusIsActivationFailed() {
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVATION_FAILED).build();
 
         assertFalse(subscription.hasBeenActivated());
     }
 
     @Test
-    public void shouldReturnTrueForIsActiveForAnyOtherStatus(){
+    public void shouldReturnTrueForIsActiveForAnyOtherStatus() {
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).build();
 
         assertTrue(subscription.hasBeenActivated());
@@ -266,7 +279,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldCheckIfTransitionToActiveStateIsPossible(){
+    public void shouldCheckIfTransitionToActiveStateIsPossible() {
         Subscription subscription = new Subscription();
         SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
         SubscriptionStatus toStatus = SubscriptionStatus.ACTIVE;
@@ -280,7 +293,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldCheckIfTransitionToDeactivateStateIsPossible(){
+    public void shouldCheckIfTransitionToDeactivateStateIsPossible() {
         Subscription subscription = new Subscription();
         SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
         SubscriptionStatus toStatus = SubscriptionStatus.DEACTIVATED;
@@ -294,7 +307,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldCheckIfTransitionToDeactivationRequestReceivedIsPossible(){
+    public void shouldCheckIfTransitionToDeactivationRequestReceivedIsPossible() {
         Subscription subscription = new Subscription();
         SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
         SubscriptionStatus toStatus = SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED;
@@ -308,7 +321,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldCheckIfTransitionToSuspensionStateIsPossible(){
+    public void shouldCheckIfTransitionToSuspensionStateIsPossible() {
         Subscription subscription = new Subscription();
         SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
         SubscriptionStatus toStatus = SubscriptionStatus.SUSPENDED;
@@ -322,7 +335,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldCheckIfTransitionToNewStateIsPossible(){
+    public void shouldCheckIfTransitionToNewStateIsPossible() {
         Subscription subscription = new Subscription();
         SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
         SubscriptionStatus toStatus = SubscriptionStatus.NEW;
@@ -336,7 +349,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldCheckIfTransitionToNewEarlyStateIsPossible(){
+    public void shouldCheckIfTransitionToNewEarlyStateIsPossible() {
         Subscription subscription = new Subscription();
         SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
         SubscriptionStatus toStatus = SubscriptionStatus.NEW_EARLY;
@@ -350,7 +363,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldCheckIfTransitionToActivationFailedStateIsPossible(){
+    public void shouldCheckIfTransitionToActivationFailedStateIsPossible() {
         Subscription subscription = new Subscription();
         SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
         SubscriptionStatus toStatus = SubscriptionStatus.ACTIVATION_FAILED;
@@ -364,7 +377,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldCheckIfTransitionToPendingActivationStateIsPossible(){
+    public void shouldCheckIfTransitionToPendingActivationStateIsPossible() {
         Subscription subscription = new Subscription();
         SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
         SubscriptionStatus toStatus = SubscriptionStatus.PENDING_ACTIVATION;
@@ -378,7 +391,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldCheckIfTransitionToPendingDeactivationStateIsPossible(){
+    public void shouldCheckIfTransitionToPendingDeactivationStateIsPossible() {
         Subscription subscription = new Subscription();
         SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
         SubscriptionStatus toStatus = SubscriptionStatus.PENDING_DEACTIVATION;
@@ -392,7 +405,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldCheckIfTransitionToPendingCompletionStateIsPossible(){
+    public void shouldCheckIfTransitionToPendingCompletionStateIsPossible() {
         Subscription subscription = new Subscription();
         SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
         SubscriptionStatus toStatus = SubscriptionStatus.PENDING_COMPLETION;
@@ -406,7 +419,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void shouldCheckIfTransitionToCompleteStateIsPossible(){
+    public void shouldCheckIfTransitionToCompleteStateIsPossible() {
         Subscription subscription = new Subscription();
         SubscriptionStatus currentStatus = mock(SubscriptionStatus.class);
         SubscriptionStatus toStatus = SubscriptionStatus.COMPLETED;
@@ -430,10 +443,18 @@ public class SubscriptionTest {
         dateWithSeconds = DateTime.now().withMinuteOfHour(23).withSecondOfMinute(41);
         subscription = builder.withStartDate(dateWithSeconds).build();
         assertEquals(dateWithSeconds.withSecondOfMinute(0).withMillisOfSecond(0), subscription.getStartDate());
+    }
 
-        dateWithSeconds = DateTime.now().withMinuteOfHour(21).withSecondOfMinute(41);
-        subscription.activate("airtel", DateTime.now().withMinuteOfHour(21).withSecondOfMinute(41));
-        assertEquals(dateWithSeconds.withSecondOfMinute(0).withMillisOfSecond(0), subscription.getStartDate());
+    @Test
+    public void shouldFloorActivationDateAndScheduleStartDateToExactMinutes() {
+        DateTime activationDateWithSeconds = DateTime.now().withMinuteOfHour(22).withSecondOfMinute(42);
+        DateTime scheduleDateWithSeconds = DateTime.now().withMinuteOfHour(25).withSecondOfMinute(22);
+
+        Subscription subscription = new SubscriptionBuilder().withDefaults().build();
+
+        subscription.activate("airtel", scheduleDateWithSeconds, activationDateWithSeconds);
+        assertEquals(activationDateWithSeconds.withSecondOfMinute(0).withMillisOfSecond(0), subscription.getActivationDate());
+        assertEquals(scheduleDateWithSeconds.withSecondOfMinute(0).withMillisOfSecond(0), subscription.getScheduleStartDate());
     }
 
     @Test
@@ -462,5 +483,30 @@ public class SubscriptionTest {
         DateTime startDateForSubscription = subscription.getStartDateForSubscription(now.plusWeeks(1));
 
         assertEquals(now.plusWeeks(1).withSecondOfMinute(0).withMillisOfSecond(0), startDateForSubscription);
+    }
+
+    @Test
+    public void shouldReturnNextWeek_basedOnScheduleStartDate() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withScheduleStartDate(DateTime.now().minusWeeks(3)).build();
+        int nextWeekNumber = subscription.getNextWeekNumber();
+        assertEquals(5, nextWeekNumber);
+
+        subscription = new SubscriptionBuilder().withDefaults().withScheduleStartDate(null).build();
+        nextWeekNumber = subscription.getNextWeekNumber();
+        assertEquals(1, nextWeekNumber);
+    }
+    
+    @Test
+    public void shouldReturnEndDate_withReferenceToScheduleStartDate() {
+        DateTime scheduleStartDate = DateTime.now().withSecondOfMinute(0).withMillisOfSecond(0).minusWeeks(3);
+        SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        Subscription subscription = new SubscriptionBuilder()
+                .withDefaults()
+                .withPack(pack)
+                .withScheduleStartDate(scheduleStartDate).build();
+
+        DateTime endDate = subscription.endDate();
+
+        assertEquals(scheduleStartDate.plusWeeks(pack.getTotalWeeks()), endDate);
     }
 }

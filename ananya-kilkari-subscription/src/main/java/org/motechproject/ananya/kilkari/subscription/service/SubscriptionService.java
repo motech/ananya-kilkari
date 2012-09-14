@@ -137,7 +137,7 @@ public class SubscriptionService {
         updateStatusAndReport(subscription, activatedOn, null, operator, null, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
-                subscription.activate(operator, getBufferedDateTime(scheduleStartDateTime));
+                subscription.activate(operator, getBufferedDateTime(scheduleStartDateTime), activatedOn);
             }
         });
         activateSchedule(subscription);
@@ -364,7 +364,7 @@ public class SubscriptionService {
 
     private void unScheduleCampaign(Subscription subscription) {
         String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
-        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getStartDate());
+        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getScheduleStartDate());
         messageCampaignService.stop(unEnrollRequest);
     }
 

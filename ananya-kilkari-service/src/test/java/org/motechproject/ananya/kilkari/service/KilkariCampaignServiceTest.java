@@ -66,9 +66,9 @@ public class KilkariCampaignServiceTest {
         DateTime subscriptionStartDate1 = now.plusWeeks(2);
         DateTime subscriptionStartDate2 = now.plusWeeks(3);
         Subscription subscription1 = new SubscriptionBuilder().withDefaults().withCreationDate(now)
-                .withStartDate(subscriptionStartDate1).withStatus(SubscriptionStatus.ACTIVE).build();
+                .withScheduleStartDate(subscriptionStartDate1).withStatus(SubscriptionStatus.ACTIVE).build();
         Subscription subscription2 = new SubscriptionBuilder().withDefaults().withCreationDate(now)
-                .withStartDate(subscriptionStartDate2).withStatus(SubscriptionStatus.ACTIVE).build();
+                .withScheduleStartDate(subscriptionStartDate2).withStatus(SubscriptionStatus.ACTIVE).build();
         subscriptions.add(subscription1);
         subscriptions.add(subscription2);
 
@@ -134,15 +134,16 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldCallCampaignMessageAlertServiceAndUpdateInboxToHoldLastScheduledMessage() {
         DateTime creationDate = DateTime.now();
+        DateTime activationDate = creationDate.plusDays(1);
+        DateTime scheduleStartDate = creationDate.plusDays(2);
         String messageId = "WEEK1";
         String campaignName = MessageCampaignService.FIFTEEN_MONTHS_CAMPAIGN_KEY;
         Operator operator = Operator.AIRTEL;
         String msisdn = "9988776655";
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, creationDate, DateTime.now());
-        subscription.setOperator(operator);
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        subscription.activate(operator.name(), scheduleStartDate, activationDate);
         String subscriptionId = subscription.getSubscriptionId();
-        DateTime expiryDate = creationDate.plusWeeks(1);
+        DateTime expiryDate = activationDate.plusWeeks(1);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(creationDate);
@@ -152,29 +153,6 @@ public class KilkariCampaignServiceTest {
         verify(campaignMessageAlertService).scheduleCampaignMessageAlert(eq(subscriptionId), eq(messageId), Mockito.argThat(dateMatches(expiryDate)), eq(msisdn), eq(operator.name()));
         verify(inboxService).newMessage(subscriptionId, messageId);
     }
-
-    @Test
-    public void shouldCallCampaignMessageAlertServiceAndNotUpdateInboxWhenSubscriptionIsNotActive() {
-        DateTime creationDate = DateTime.now();
-        String msisdn = "9988776655";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, creationDate, DateTime.now());
-        Operator operator = Operator.AIRTEL;
-        subscription.setOperator(operator);
-        subscription.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
-        String subscriptionId = subscription.getSubscriptionId();
-        String messageId = "WEEK1";
-        String campaignName = MessageCampaignService.FIFTEEN_MONTHS_CAMPAIGN_KEY;
-        DateTime expiryDate = creationDate.plusWeeks(1);
-
-        when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(creationDate);
-
-        kilkariCampaignService.scheduleWeeklyMessage(subscriptionId, campaignName);
-
-        verify(campaignMessageAlertService).scheduleCampaignMessageAlert(eq(subscriptionId), eq(messageId), Mockito.argThat(dateMatches(expiryDate)), eq(msisdn), eq(operator.name()));
-        verify(inboxService, never()).newMessage(subscriptionId, messageId);
-    }
-
 
     private Matcher<DateTime> dateMatches(final DateTime expiryDate) {
         return new TypeSafeMatcher<DateTime>() {

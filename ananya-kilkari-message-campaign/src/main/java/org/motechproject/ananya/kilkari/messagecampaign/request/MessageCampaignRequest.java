@@ -8,12 +8,12 @@ public class MessageCampaignRequest {
 
     private String externalId;
     private String campaignName;
-    private DateTime subscriptionStartDate;
+    private DateTime scheduleStartDate;
 
-    public MessageCampaignRequest(String externalId, String campaignName, DateTime subscriptionStartDate) {
+    public MessageCampaignRequest(String externalId, String campaignName, DateTime scheduleStartDate) {
         this.externalId = externalId;
         this.campaignName = campaignName;
-        this.subscriptionStartDate = subscriptionStartDate;
+        this.scheduleStartDate = scheduleStartDate;
     }
 
     public String getExternalId() {
@@ -24,8 +24,8 @@ public class MessageCampaignRequest {
         return campaignName;
     }
 
-    public DateTime getSubscriptionStartDate() {
-        return subscriptionStartDate;
+    public DateTime getScheduleStartDate() {
+        return scheduleStartDate;
     }
 
     @Override

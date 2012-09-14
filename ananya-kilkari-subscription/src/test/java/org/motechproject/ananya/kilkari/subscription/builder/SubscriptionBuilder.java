@@ -13,6 +13,8 @@ public class SubscriptionBuilder {
     private SubscriptionStatus status;
     private DateTime creationDate;
     private DateTime startDate;
+    private DateTime scheduleStartDate;
+    private DateTime activationDate;
 
     public SubscriptionBuilder withDefaults() {
         DateTime now = DateTime.now();
@@ -21,7 +23,19 @@ public class SubscriptionBuilder {
                 .withStatus(SubscriptionStatus.ACTIVE)
                 .withPack(SubscriptionPack.BARI_KILKARI)
                 .withCreationDate(now)
-                .withStartDate(now);
+                .withStartDate(now)
+                .withActivationDate(now)
+                .withScheduleStartDate(now);
+    }
+
+    public SubscriptionBuilder withScheduleStartDate(DateTime now) {
+        this.scheduleStartDate = now;
+        return this;
+    }
+
+    public SubscriptionBuilder withActivationDate(DateTime now) {
+        this.activationDate = now;
+        return this;
     }
 
     public SubscriptionBuilder withStartDate(DateTime now) {
@@ -57,6 +71,7 @@ public class SubscriptionBuilder {
 
     public Subscription build() {
         Subscription subscription = new Subscription(msisdn, pack, creationDate, startDate);
+        subscription.activate(operator.name(), scheduleStartDate, activationDate);
         subscription.setStatus(status);
         subscription.setOperator(operator);
         return subscription;

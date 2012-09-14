@@ -11,7 +11,7 @@ import java.util.TimeZone;
 public class MessageCampaignRequestMapper {
 
     public static CampaignRequest newRequestFrom(MessageCampaignRequest messageCampaignRequest, Integer campaignScheduleDeltaDays, Integer campaignScheduleDeltaMinutes) {
-        DateTime scheduleDateTimeWithDelta = messageCampaignRequest.getSubscriptionStartDate()
+        DateTime scheduleDateTimeWithDelta = messageCampaignRequest.getScheduleStartDate()
                 .plusDays(campaignScheduleDeltaDays)
                 .plusMinutes(campaignScheduleDeltaMinutes);
 

@@ -216,11 +216,11 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public DateTime getCurrentWeeksMessageExpiryDate() {
-        return activationDate != null ? activationDate.plusWeeks(getWeeksElapsedAfterStartDate() + 1) : null;
+        return activationDate != null ? activationDate.plusWeeks(getWeeksElapsedAfterActivationDate() + 1) : null;
     }
 
     @JsonIgnore
-    private int getWeeksElapsedAfterStartDate() {
+    private int getWeeksElapsedAfterActivationDate() {
         return Weeks.weeksBetween(activationDate, DateTime.now()).getWeeks();
     }
 

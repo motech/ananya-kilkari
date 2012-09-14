@@ -32,22 +32,21 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
     public void shouldGetVisualizationForGivenExternalId() throws Exception {
         String msisdn = "9876543210";
         SubscriptionPack subscriptionPack = SubscriptionPack.BARI_KILKARI;
-        Subscription subscription = new Subscription(msisdn, subscriptionPack, DateTime.now(), DateTime.now());
-        subscription.setStatus(SubscriptionStatus.NEW);
-
+        DateTime now = DateTime.now();
+        Subscription subscription = new Subscription(msisdn, subscriptionPack, now, now);
+        subscription.activate("airtel", now, now);
 
         allSubscriptions.add(subscription);
         markForDeletion(subscription);
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                subscription.getSubscriptionId(), MessageCampaignPack.BARI_KILKARI.getCampaignName(), subscription.getStartDate());
+                subscription.getSubscriptionId(), MessageCampaignPack.BARI_KILKARI.getCampaignName(), subscription.getScheduleStartDate());
         messageCampaignService.start(messageCampaignRequest, 0, 0);
 
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()
                 .perform(get("/messagecampaign/visualize").param("msisdn", msisdn))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON));
-
 
         messageCampaignService.stop(messageCampaignRequest);
     }

@@ -36,7 +36,7 @@ public class CallDeliveryFailureRecordHandler {
     @MotechListener(subjects = {CallDeliveryFailureEventKeys.PROCESS_VALID_CALL_DELIVERY_FAILURE_RECORD})
     public void handleValidCallDeliveryFailureRecord(MotechEvent motechEvent) {
         ValidFailedCallReport validFailedCallReport = (ValidFailedCallReport) motechEvent.getParameters().get("0");
-        logger.info("Handling OBD invalid call delivery failure records");
+        logger.info("Handling OBD valid call delivery failure records");
         campaignMessageService.processValidCallDeliveryFailureRecords(validFailedCallReport);
     }
 

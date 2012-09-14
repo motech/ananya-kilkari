@@ -89,7 +89,7 @@ public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
 
     public FailedCallReports getFailedCallReports() {
         FailedCallReports failedCallReports = new FailedCallReports();
-
+        campaignMessageList = obdDbService.getAll();
         List<FailedCallReport> failedCallReportList = new ArrayList<>();
         for (CampaignMessage campaignMessage : campaignMessageList) {
             failedCallReportList.add(

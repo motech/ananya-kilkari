@@ -82,9 +82,7 @@
 
     <bean id="obdHttpClient" class="org.motechproject.ananya.kilkari.obd.repository.OBDHttpClient">
         <constructor-arg ref="obdHttpClientConnectionManager"/>
-        <!--<constructor-arg value="${http.read.timeout}"/>-->
-        <!--<constructor-arg value="${http.connect.timeout}"/>-->
-        <constructor-arg value="30000"/>
-        <constructor-arg value="30000"/>
+        <constructor-arg value="${http.read.timeout}"/>
+        <constructor-arg value="${http.connect.timeout}"/>
     </bean>
 </beans>

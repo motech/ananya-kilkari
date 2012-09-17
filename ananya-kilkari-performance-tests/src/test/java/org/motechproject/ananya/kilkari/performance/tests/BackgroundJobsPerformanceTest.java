@@ -20,8 +20,7 @@ public class BackgroundJobsPerformanceTest extends BasePerformanceTest {
     private final static int numberOfSubscribers = 25000;
     private static List createdSubscriptionsList = new ArrayList<Subscription>();
     private SubscriptionApiService subscriptionApiService = new SubscriptionApiService();
-    private static int index=-1;
-    private static String lockName="lock";
+    private volatile static int index=-1;
 
     public BackgroundJobsPerformanceTest(String name) {
         super(name);
@@ -47,14 +46,12 @@ public class BackgroundJobsPerformanceTest extends BasePerformanceTest {
 
     }
 
-    public int getIndex(){
-        synchronized (lockName){
+    public static synchronized int getNextIndex(){
         return ++index;
-        }
-        
     }
+
     private Subscription getASubscriptionToBeActivated() {
-            return (Subscription) createdSubscriptionsList.get(getIndex());
+            return (Subscription) createdSubscriptionsList.get(BackgroundJobsPerformanceTest.getNextIndex());
     }
 
 

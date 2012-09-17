@@ -29,8 +29,7 @@ public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
     private Operator[] possibleOperators = Operator.values();
     private final static int numberOfMessagesInDb = 25000;
     private final static int numberOfObdRequests = 25000;
-    private static String lockName = "lock";
-    private static int index;
+    private static volatile int index;
     private static List<CampaignMessage> campaignMessageList = new ArrayList<>();
     private SubscriptionDbService subscriptionDbService = new SubscriptionDbService();
 
@@ -79,7 +78,7 @@ public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
     }
 
     private OBDSuccessfulCallDetailsWebRequest getOBDCallBackRequestToSend() {
-        CampaignMessage campaignMessage = campaignMessageList.get(getIndex());
+        CampaignMessage campaignMessage = campaignMessageList.get(OBDSchedulerStatusCallPerformanceTest.getNextIndex());
         OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsWebRequest =
                 new OBDSuccessfulCallDetailsWebRequest(campaignMessage.getMsisdn(), campaignMessage.getMessageId(),
                         new CallDurationWebRequest(dateString(DateTime.now().minusSeconds(30)), dateString(DateTime.now())), null);
@@ -108,9 +107,7 @@ public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
         return "INVALID";
     }
 
-    public int getIndex() {
-        synchronized (lockName) {
+    public static synchronized int getNextIndex() {
             return index++;
-        }
     }
 }

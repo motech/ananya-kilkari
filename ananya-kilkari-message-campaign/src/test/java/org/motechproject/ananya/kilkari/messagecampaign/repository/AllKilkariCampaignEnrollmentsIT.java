@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 @ContextConfiguration("classpath:applicationKilkariMessageCampaignContext.xml")
 @ActiveProfiles("test")
-public class AllKilkariCampaignEnrollmentsTest extends SpringIntegrationTest{
+public class AllKilkariCampaignEnrollmentsIT extends SpringIntegrationTest {
     @Autowired
     private AllKilkariCampaignEnrollments allKilkariCampaignEnrollments;
     @Autowired

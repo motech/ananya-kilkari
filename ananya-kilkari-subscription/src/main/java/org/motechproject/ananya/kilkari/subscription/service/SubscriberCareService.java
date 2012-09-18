@@ -19,4 +19,9 @@ public class SubscriberCareService {
     public void create(SubscriberCareRequest subscriberCareRequest) {
         allSubscriberCareDocs.addOrUpdate(SubscriberCareRequestMapper.map(subscriberCareRequest));
     }
+
+
+    public void deleteCareDocsFor(String msisdn) {
+        allSubscriberCareDocs.deleteFor(msisdn);
+    }
 }

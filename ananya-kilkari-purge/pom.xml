@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ananya-kilkari</artifactId>
+        <groupId>org.motechproject.ananya.kilkari</groupId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ananya-kilkari-purge</artifactId>
+    <packaging>jar</packaging>
+    <name>ananya-kilkari-purge</name>
+    <url>http://maven.apache.org</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
+            <artifactId>ananya-kilkari-message</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
+            <artifactId>ananya-kilkari-subscription</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
+            <artifactId>ananya-kilkari-obd</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
+            <artifactId>ananya-kilkari-subscription</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

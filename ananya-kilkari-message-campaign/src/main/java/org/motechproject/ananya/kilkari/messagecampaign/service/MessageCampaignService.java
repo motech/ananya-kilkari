@@ -4,6 +4,7 @@ import ch.lambdaj.Lambda;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.messagecampaign.repository.AllKilkariCampaignEnrollments;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequestMapper;
 import org.motechproject.ananya.kilkari.messagecampaign.response.MessageCampaignEnrollment;
@@ -34,10 +35,13 @@ public class MessageCampaignService {
 
     public static final String CAMPAIGN_MESSAGE_NAME = "Mother Child Health Care";
     private org.motechproject.server.messagecampaign.service.MessageCampaignService campaignService;
+    private AllKilkariCampaignEnrollments allKilkariCampaignEnrollments;
 
     @Autowired
-    public MessageCampaignService(org.motechproject.server.messagecampaign.service.MessageCampaignService campaignService) {
+    public MessageCampaignService(org.motechproject.server.messagecampaign.service.MessageCampaignService campaignService,
+                                  AllKilkariCampaignEnrollments allKilkariCampaignEnrollments) {
         this.campaignService = campaignService;
+        this.allKilkariCampaignEnrollments = allKilkariCampaignEnrollments;
     }
 
     public void start(MessageCampaignRequest campaignRequest, Integer campaignScheduleDeltaDays, Integer campaignScheduleDeltaMinutes) {
@@ -112,5 +116,9 @@ public class MessageCampaignService {
         return Lambda.select(searchEnrollments(subscriptionId),
                 having(on(MessageCampaignEnrollment.class).getStatus(),
                         Matchers.is(CampaignEnrollmentStatus.ACTIVE.name())));
+    }
+
+    public void deleteCampaignEnrollmentsFor(String subscriptionId) {
+        allKilkariCampaignEnrollments.deleteFor(subscriptionId);
     }
 }

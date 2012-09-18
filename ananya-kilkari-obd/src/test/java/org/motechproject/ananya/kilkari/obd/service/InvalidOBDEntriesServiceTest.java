@@ -36,4 +36,13 @@ public class InvalidOBDEntriesServiceTest {
         verify(allInvalidCallRecords).add(invalidCallRecord1);
         verify(allInvalidCallRecords).add(invalidCallRecord2);
     }
+
+    @Test
+    public void shouldDeleteAllInvalidCallRecordsForAnMsisdn() {
+        String subscriptionId = "1234";
+
+        invalidOBDEntriesService.deleteInvalidCallRecordsFor(subscriptionId);
+
+        verify(allInvalidCallRecords).deleteFor(subscriptionId);
+    }
 }

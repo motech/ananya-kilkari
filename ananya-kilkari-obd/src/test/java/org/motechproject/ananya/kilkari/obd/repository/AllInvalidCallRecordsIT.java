@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+
 
 public class AllInvalidCallRecordsIT extends SpringIntegrationTest {
 
@@ -29,6 +30,27 @@ public class AllInvalidCallRecordsIT extends SpringIntegrationTest {
         }
 
         fail("Should have found invalid call record in db");
+    }
+
+    @Test
+    public void shouldDeleteAllInvalidCallRecordsForASubscriptionId() {
+        String subscriptionId = "abcd1234";
+        allInvalidCallRecords.add(new InvalidCallRecord("1234", subscriptionId, "", "", ""));
+
+        allInvalidCallRecords.deleteFor(subscriptionId);
+
+        assertTrue(allInvalidCallRecords.findBySubscriptionId(subscriptionId).isEmpty());
+    }
+
+    @Test
+    public void shouldFindBySubscriptionId() {
+        String subscriptionId = "abcd1234";
+        String msisdn = "1234";
+        allInvalidCallRecords.add(new InvalidCallRecord(msisdn, subscriptionId, "", "", ""));
+
+        List<InvalidCallRecord> subscriptions = allInvalidCallRecords.findBySubscriptionId(subscriptionId);
+
+        assertEquals(msisdn, subscriptions.get(0).getMsisdn());
     }
 
     private boolean equals(InvalidCallRecord invalidCallRecord, InvalidCallRecord fromDB) {

@@ -336,6 +336,8 @@ public class SubscriptionService {
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
     }
 
+
+
     private void renewSchedule(Subscription subscription) {
         String subscriptionId = subscription.getSubscriptionId();
         logger.info(String.format("Processing renewal for subscriptionId: %s", subscriptionId));
@@ -442,5 +444,9 @@ public class SubscriptionService {
         subscription.setMsisdn(changeMsisdnRequest.getNewMsisdn());
         allSubscriptions.update(subscription);
         reportingService.reportChangeMsisdnForSubscriber(subscription.getSubscriptionId(), changeMsisdnRequest.getNewMsisdn());
+    }
+
+    public void deleteSubscriptionFor(String subscriptionId) {
+        allSubscriptions.deleteFor(subscriptionId);
     }
 }

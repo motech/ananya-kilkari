@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
+import org.motechproject.ananya.kilkari.messagecampaign.repository.AllKilkariCampaignEnrollments;
 import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
 import org.motechproject.model.Time;
 import org.motechproject.server.messagecampaign.contract.CampaignRequest;
@@ -29,11 +30,13 @@ public class MessageCampaignServiceTest {
 
     @Mock
     private org.motechproject.server.messagecampaign.service.MessageCampaignService platformMessageCampaignService;
+    @Mock
+    private AllKilkariCampaignEnrollments allKilkariCampaignEnrollments;
 
     @Before
     public void setUp() {
         initMocks(this);
-        this.messageCampaignService = new MessageCampaignService(platformMessageCampaignService);
+        this.messageCampaignService = new MessageCampaignService(platformMessageCampaignService, allKilkariCampaignEnrollments);
     }
 
     @Test
@@ -172,5 +175,14 @@ public class MessageCampaignServiceTest {
         messageCampaignService.stop(new MessageCampaignRequest("externalId", null, DateTime.now()));
         
         verify(platformMessageCampaignService, never()).stopAll(any(CampaignRequest.class));
+    }
+
+    @Test
+    public void shouldDeleteAllCampaignMessagedForAGivenSubscriptionId() {
+        String subscriptionId = "abcd";
+
+        messageCampaignService.deleteCampaignEnrollmentsFor(subscriptionId);
+
+        verify(allKilkariCampaignEnrollments).deleteFor(subscriptionId);
     }
 }

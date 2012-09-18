@@ -17,6 +17,7 @@
         <module>ananya-kilkari-message</module>
         <module>ananya-kilkari-functional-tests</module>
         <module>ananya-kilkari-performance-tests</module>
+        <module>ananya-kilkari-purge</module>
 
     </modules>
     <name>Ananya Kilkari</name>

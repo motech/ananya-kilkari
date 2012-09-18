@@ -61,4 +61,8 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
         List<Subscription> subscriptions = db.queryView(viewQuery, Subscription.class);
         return new Subscriptions(subscriptions).updatableSubscriptions();
     }
+
+    public void deleteFor(String subscriptionId) {
+        removeAll("subscriptionId", subscriptionId);
+    }
 }

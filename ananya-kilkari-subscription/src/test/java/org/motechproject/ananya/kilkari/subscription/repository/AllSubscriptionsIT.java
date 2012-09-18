@@ -211,4 +211,14 @@ public class AllSubscriptionsIT extends SpringIntegrationTest {
         assertEquals(1, updatableSubscriptions.size());
         assertTrue(updatableSubscriptions.contains(subscription1));
     }
+
+    @Test
+    public void shouldDeleteAllForSubscriptionID() {
+        Subscription subscription = new Subscription("1234", SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
+        allSubscriptions.add(subscription);
+
+        allSubscriptions.deleteFor(subscription.getSubscriptionId());
+
+        assertNull(allSubscriptions.findBySubscriptionId(subscription.getMsisdn()));
+    }
 }

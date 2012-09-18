@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-class InvalidOBDEntriesService {
+public class InvalidOBDEntriesService {
     private AllInvalidCallRecords allInvalidCallRecords;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InvalidOBDEntriesService.class);
@@ -28,5 +28,9 @@ class InvalidOBDEntriesService {
         for (InvalidCallRecord record : invalidCallRecords) {
             allInvalidCallRecords.add(record);
         }
+    }
+
+    public void deleteInvalidCallRecordsFor(String subscriptionId) {
+        allInvalidCallRecords.deleteFor(subscriptionId);
     }
 }

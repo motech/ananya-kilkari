@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-public class CouchDbPurgeService {
+public class KilkariPurgeService {
     private CampaignMessageAlertService campaignMessageAlertService;
     private SubscriptionService subscriptionService;
     private InboxService inboxService;
@@ -22,7 +22,7 @@ public class CouchDbPurgeService {
     private MessageCampaignService messageCampaignService;
 
     @Autowired
-    public CouchDbPurgeService(CampaignMessageAlertService campaignMessageAlertService,
+    public KilkariPurgeService(CampaignMessageAlertService campaignMessageAlertService,
                                SubscriptionService subscriptionService,
                                InboxService inboxService,
                                CampaignMessageService campaignMessageService,

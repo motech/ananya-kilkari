@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CouchDbPurgeServiceTest {
+public class KilkariPurgeServiceTest {
     @Mock
     private CampaignMessageAlertService campaignMessageAlertService;
     @Mock
@@ -38,13 +38,13 @@ public class CouchDbPurgeServiceTest {
     @Mock
     private MessageCampaignService messageCampaignService;
 
-    private CouchDbPurgeService couchdbPurgeService;
+    private KilkariPurgeService couchdbPurgeService;
     private String msisdn;
     private Subscription subscription;
 
     @Before
     public void setUp(){
-        couchdbPurgeService = new CouchDbPurgeService(campaignMessageAlertService, subscriptionService, inboxService, campaignMessageService, subscriberCareService, invalidOBDEntriesService, messageCampaignService);
+        couchdbPurgeService = new KilkariPurgeService(campaignMessageAlertService, subscriptionService, inboxService, campaignMessageService, subscriberCareService, invalidOBDEntriesService, messageCampaignService);
         msisdn = "234566";
         subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
 

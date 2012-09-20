@@ -9,9 +9,11 @@ import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriberCareService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class KilkariPurgeService {
     private CampaignMessageAlertService campaignMessageAlertService;
     private SubscriptionService subscriptionService;

@@ -95,14 +95,11 @@ public class MessageCampaignService {
         List<MessageCampaignEnrollment> enrollmentsForCampaign = Lambda.select(searchEnrollments(subscriptionId),
                 having(on(MessageCampaignEnrollment.class).getCampaignName(),
                         Matchers.is(campaignName)));
-        return enrollmentsForCampaign.get(0).getStartDate();
-    }
 
-    public DateTime getActiveCampaignStartDate(String subscriptionId) {
-        List<MessageCampaignEnrollment> activeCampaigns = getActiveCampaigns(subscriptionId);
-        if (activeCampaigns.isEmpty())
-            return null;
-        return activeCampaigns.get(0).getStartDate();
+        if(enrollmentsForCampaign.isEmpty())
+            throw new RuntimeException(String.format("No existing campaign for subscription : %s, campaign: %s", subscriptionId, campaignName));
+
+        return enrollmentsForCampaign.get(0).getStartDate();
     }
 
     public String getActiveCampaignName(String subscriptionId) {

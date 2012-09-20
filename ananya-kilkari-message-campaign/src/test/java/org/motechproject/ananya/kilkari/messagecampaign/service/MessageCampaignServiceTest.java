@@ -2,7 +2,9 @@ package org.motechproject.ananya.kilkari.messagecampaign.service;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
@@ -32,6 +34,9 @@ public class MessageCampaignServiceTest {
     private org.motechproject.server.messagecampaign.service.MessageCampaignService platformMessageCampaignService;
     @Mock
     private AllKilkariCampaignEnrollments allKilkariCampaignEnrollments;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
 
     @Before
     public void setUp() {
@@ -141,33 +146,15 @@ public class MessageCampaignServiceTest {
     }
 
     @Test
-    public void shouldGetActiveCampaignStartDateForGivenSubscriptionId() {
+    public void shouldThrowExceptionWithAppropriateMessageIfThereAreNoCampaigns() {
         String subscriptionId = "abcd1234";
-        String activeCampaignName = "twelve_months";
-        DateTime startDate = DateTime.now();
+        String campaignName = "twelve_months";
+        when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(new ArrayList<CampaignEnrollmentRecord>());
 
-        ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<>();
-        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, "fifteen_months", startDate.minusYears(1).toLocalDate(), CampaignEnrollmentStatus.COMPLETED));
-        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, activeCampaignName, startDate.toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
-        when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(campaignEnrollmentRecords);
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("No existing campaign for subscription : " + subscriptionId + ", campaign: " + campaignName);
 
-        DateTime actualCampaignStartDate = this.messageCampaignService.getActiveCampaignStartDate(subscriptionId);
-
-        assertEquals(startDate.toLocalDate(), actualCampaignStartDate.toLocalDate());
-    }
-
-    @Test
-    public void shouldReturnActiveCampaignStartDateAsNullForAnInActiveSubscription() {
-        String subscriptionId = "abcd1234";
-        DateTime startDate = DateTime.now();
-
-        ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<>();
-        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, "fifteen_months", startDate.minusYears(1).toLocalDate(), CampaignEnrollmentStatus.COMPLETED));
-        when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(campaignEnrollmentRecords);
-
-        DateTime actualCampaignStartDate = this.messageCampaignService.getActiveCampaignStartDate(subscriptionId);
-
-        assertNull(actualCampaignStartDate);
+        messageCampaignService.getCampaignStartDate(subscriptionId, campaignName);
     }
 
     @Test

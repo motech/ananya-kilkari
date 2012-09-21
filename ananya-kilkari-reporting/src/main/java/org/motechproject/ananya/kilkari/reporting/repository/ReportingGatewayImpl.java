@@ -93,6 +93,12 @@ public class ReportingGatewayImpl implements ReportingGateway {
         performHttpRequestBasedOnChannel(url, null, Method.POST);
     }
 
+    @Override
+    public void purgeSubscription(String msisdn) {
+        String url = String.format("%s%s/%s", getBaseUrl(), PURGE_SUBSCRIPTION_PATH, msisdn);
+        httpClientService.executeSync(url, null, Method.DELETE);
+    }
+
     private boolean isCallCenterCall() {
         String channel = HttpThreadContext.get();
         return "CALL_CENTER".equalsIgnoreCase(channel);

@@ -278,4 +278,13 @@ public class ReportingGatewayImplTest {
         verify(httpClientService, never()).execute("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
     }
 
+    @Test
+    public void shouldMakeSynchronourCallToPurgeSubscription() {
+        String msisdn = "1234567890";
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+
+        reportingGateway.purgeSubscription(msisdn);
+
+        verify(httpClientService).executeSync("url/subscription/" + msisdn, null, Method.DELETE);
+    }
 }

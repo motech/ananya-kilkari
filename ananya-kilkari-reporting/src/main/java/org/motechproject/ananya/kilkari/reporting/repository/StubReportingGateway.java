@@ -53,7 +53,12 @@ public class StubReportingGateway implements ReportingGateway {
     public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
         if (verify())
             behavior.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+    }
 
+    @Override
+    public void purgeSubscription(String msisdn) {
+        if (verify())
+            behavior.purgeSubscription(msisdn);
     }
 
     public void setBehavior(ReportingGateway behavior) {

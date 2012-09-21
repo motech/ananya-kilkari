@@ -19,4 +19,6 @@ public interface ReportingGateway {
     void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest);
 
     void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn);
+
+    void purgeSubscription(String msisdn);
 }

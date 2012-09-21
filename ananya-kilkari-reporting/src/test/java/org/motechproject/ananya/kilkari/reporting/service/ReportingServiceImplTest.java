@@ -91,4 +91,13 @@ public class ReportingServiceImplTest {
 
         verify(reportGateway).reportChangeMsisdnForSubscriber(subscriptionId,msisdn);
     }
+
+    @Test
+    public void shouldPurgeASubscription() {
+        String msisdn = "1243567890";
+
+        reportingServiceImpl.purge(msisdn);
+
+        verify(reportGateway).purgeSubscription(msisdn);
+    }
 }

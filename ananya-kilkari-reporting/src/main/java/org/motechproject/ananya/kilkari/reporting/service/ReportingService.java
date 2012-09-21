@@ -19,4 +19,6 @@ public interface ReportingService {
     void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest);
 
     void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn);
+
+    void purge(String msisdn);
 }

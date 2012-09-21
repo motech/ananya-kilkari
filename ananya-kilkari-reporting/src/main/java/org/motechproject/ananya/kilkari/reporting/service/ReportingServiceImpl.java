@@ -52,4 +52,9 @@ public class ReportingServiceImpl implements ReportingService {
     public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
         reportGateway.reportChangeMsisdnForSubscriber(subscriptionId,msisdn);
     }
+
+    @Override
+    public void purge(String msisdn) {
+        reportGateway.purgeSubscription(msisdn);
+    }
 }

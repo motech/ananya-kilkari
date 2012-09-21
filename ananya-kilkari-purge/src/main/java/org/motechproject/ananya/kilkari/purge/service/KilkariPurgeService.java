@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.purge;
+package org.motechproject.ananya.kilkari.purge.service;
 
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;

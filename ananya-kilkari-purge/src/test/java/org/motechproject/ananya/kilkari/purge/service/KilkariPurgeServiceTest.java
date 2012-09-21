@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.purge;
+package org.motechproject.ananya.kilkari.purge.service;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -11,6 +11,7 @@ import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.obd.service.InvalidOBDEntriesService;
+import org.motechproject.ananya.kilkari.purge.service.KilkariPurgeService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriberCareService;

@@ -25,7 +25,7 @@ public class OBDServiceOptionFactory {
 
     private void initializeHandlerMap() {
         handlerMappings = new HashMap<>();
-        handlerMappings.put(ServiceOption.UNSUBSCRIBE, obdDeactivateHandler);
+        handlerMappings.put(ServiceOption.UNSUBSCRIPTION, obdDeactivateHandler);
         handlerMappings.put(ServiceOption.HELP, obdHelpHandler);
     }
 

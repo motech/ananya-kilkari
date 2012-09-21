@@ -38,7 +38,7 @@ public class OBDSuccessfulCallDetailsRequestTest {
 
     @Test
     public void shouldValidateValidRequest(){
-        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest("1234567890","WEEK12",callDurationWebRequest,"Unsubscribe");
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest("1234567890","WEEK12",callDurationWebRequest,"Unsubscription");
 
         when(callDurationWebRequest.validate()).thenReturn(new Errors());
 

@@ -22,7 +22,7 @@ public class OBDServiceOptionFactoryTest {
     public void shouldGetTheUnsubscriptionHandler() {
         OBDServiceOptionFactory obdServiceOptionFactory = new OBDServiceOptionFactory(obdDeactivateHandler, obdHelpHandler);
 
-        ServiceOptionHandler handler = obdServiceOptionFactory.getHandler(ServiceOption.UNSUBSCRIBE);
+        ServiceOptionHandler handler = obdServiceOptionFactory.getHandler(ServiceOption.UNSUBSCRIPTION);
 
         assertTrue(handler instanceof OBDDeactivateHandler);
     }

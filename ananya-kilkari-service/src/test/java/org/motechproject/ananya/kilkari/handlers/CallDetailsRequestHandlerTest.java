@@ -63,7 +63,7 @@ public class CallDetailsRequestHandlerTest {
     @Test
     public void shouldHandleAOBDCallBackRequestWithDeactivation() {
         HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest(null, null, null, ServiceOption.UNSUBSCRIBE.name());
+        OBDSuccessfulCallDetailsWebRequest obdSuccessfulCallDetailsRequest = new OBDSuccessfulCallDetailsWebRequest(null, null, null, ServiceOption.UNSUBSCRIPTION.name());
         obdSuccessfulCallDetailsRequest.setSubscriptionId("subscriptionId");
         stringObjectHashMap.put("0", obdSuccessfulCallDetailsRequest);
 

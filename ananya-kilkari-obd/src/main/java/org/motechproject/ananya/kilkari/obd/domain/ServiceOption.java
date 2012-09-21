@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.obd.domain;
 import org.apache.commons.lang.StringUtils;
 
 public enum ServiceOption {
-    HELP, UNSUBSCRIBE, HANGUP;
+    HELP, UNSUBSCRIPTION, HANGUP;
 
     public static ServiceOption getFor(String option) {
         final String standardizedOption = StringUtils.trimToEmpty(option).toUpperCase();

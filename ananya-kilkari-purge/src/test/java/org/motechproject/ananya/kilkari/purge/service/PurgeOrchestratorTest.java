@@ -5,9 +5,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.motechproject.ananya.kilkari.purge.service.KilkariPurgeService;
-import org.motechproject.ananya.kilkari.purge.service.PurgeOrchestrator;
-import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,8 +16,6 @@ import static org.mockito.Mockito.verify;
 public class PurgeOrchestratorTest {
     @Mock
     private KilkariPurgeService kilkariPurgeService;
-    @Mock
-    private ReportingService reportingService;
 
     private PurgeOrchestrator purgeOrchestrator;
     private String filePath;
@@ -28,7 +23,7 @@ public class PurgeOrchestratorTest {
 
     @Before
     public void setUp() throws IOException {
-        purgeOrchestrator = new PurgeOrchestrator(kilkariPurgeService, reportingService);
+        purgeOrchestrator = new PurgeOrchestrator(kilkariPurgeService);
         tempFile = File.createTempFile("tmp", "txt");
         filePath = tempFile.getAbsolutePath();
     }
@@ -43,6 +38,5 @@ public class PurgeOrchestratorTest {
         purgeOrchestrator.purgeSubscriptionData(filePath);
 
         verify(kilkariPurgeService).purge(msisdn);
-        verify(reportingService).purge(msisdn);
     }
 }

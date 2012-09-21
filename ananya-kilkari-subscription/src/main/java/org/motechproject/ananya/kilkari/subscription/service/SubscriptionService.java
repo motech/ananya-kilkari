@@ -336,7 +336,11 @@ public class SubscriptionService {
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
     }
 
-
+    public void unScheduleCampaign(Subscription subscription) {
+        String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
+        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getScheduleStartDate());
+        messageCampaignService.stop(unEnrollRequest);
+    }
 
     private void renewSchedule(Subscription subscription) {
         String subscriptionId = subscription.getSubscriptionId();
@@ -362,12 +366,6 @@ public class SubscriptionService {
         RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);
 
         motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
-    }
-
-    private void unScheduleCampaign(Subscription subscription) {
-        String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
-        MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getScheduleStartDate());
-        messageCampaignService.stop(unEnrollRequest);
     }
 
     private void scheduleCampaign(Subscription subscription, DateTime activatedOn) {

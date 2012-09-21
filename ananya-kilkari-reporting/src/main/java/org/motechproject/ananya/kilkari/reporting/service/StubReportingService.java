@@ -64,13 +64,6 @@ public class StubReportingService implements ReportingService {
         }
     }
 
-    @Override
-    public void purge(String msisdn) {
-        if (verify()) {
-            behavior.purge(msisdn);
-        }
-    }
-
     public void setBehavior(ReportingService behavior) {
         this.behavior = behavior;
     }

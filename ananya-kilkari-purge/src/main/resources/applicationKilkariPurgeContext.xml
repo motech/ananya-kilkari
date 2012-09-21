@@ -8,5 +8,6 @@
     <import resource="classpath:applicationKilkariSubscriptionContext.xml"/>
     <import resource="classpath:applicationKilkariOBDContext.xml"/>
     <import resource="classpath:applicationKilkariReportingContext.xml"/>
+    <import resource="classpath:applicationContext-Diagnostics-Common.xml"/>
 </beans>
 

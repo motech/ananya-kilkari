@@ -33,6 +33,9 @@
             <artifactId>ananya-kilkari-subscription</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
+            <artifactId>motech-diagnostics</artifactId>
+        </dependency>
     </dependencies>
-
 </project>

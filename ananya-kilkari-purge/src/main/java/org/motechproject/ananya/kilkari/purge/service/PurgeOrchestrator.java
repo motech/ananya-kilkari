@@ -11,16 +11,19 @@ import java.util.List;
 @Component
 public class PurgeOrchestrator {
     private KilkariPurgeService kilkariPurgeService;
+    private QuartzSchedulerPurgeService quartzSchedulerPurgeService;
 
     @Autowired
-    public PurgeOrchestrator(KilkariPurgeService kilkariPurgeService) {
+    public PurgeOrchestrator(KilkariPurgeService kilkariPurgeService, QuartzSchedulerPurgeService quartzSchedulerPurgeService) {
         this.kilkariPurgeService = kilkariPurgeService;
+        this.quartzSchedulerPurgeService = quartzSchedulerPurgeService;
     }
 
     public void purgeSubscriptionData(String filePath) throws IOException {
         List<String> msisdnList = readFile(filePath);
 
         for (String msisdn : msisdnList) {
+            quartzSchedulerPurgeService.deleteFor(msisdn);
             kilkariPurgeService.purge(msisdn);
         }
     }

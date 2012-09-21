@@ -8,6 +8,8 @@ import org.motechproject.scheduler.MotechSchedulerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class QuartzSchedulerPurgeService {
 
@@ -20,14 +22,18 @@ public class QuartzSchedulerPurgeService {
         this.motechSchedulerService = motechSchedulerService;
     }
 
-    public void deleteFor(Subscription subscription) {
-        if (subscription.isNewEarly()) {
-            motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.EARLY_SUBSCRIPTION, subscription.getSubscriptionId());
-            return;
+    public void deleteFor(String msisdn) {
+        List<Subscription> subscriptionList = subscriptionService.findByMsisdn(msisdn);
+        for (Subscription subscription : subscriptionList) {
+            String subscriptionId = subscription.getSubscriptionId();
+            if (subscription.isNewEarly()) {
+                motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.EARLY_SUBSCRIPTION, subscriptionId);
+                return;
+            }
+            subscriptionService.unScheduleCampaign(subscription);
+            motechSchedulerService.safeUnscheduleRunOnceJob(InboxEventKeys.DELETE_INBOX, subscriptionId);
+            motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, subscriptionId);
+            motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, subscriptionId);
         }
-        subscriptionService.unScheduleCampaign(subscription);
-        motechSchedulerService.safeUnscheduleRunOnceJob(InboxEventKeys.DELETE_INBOX, subscription.getSubscriptionId());
-        motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, subscription.getSubscriptionId());
-        motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, subscription.getSubscriptionId());
     }
 }

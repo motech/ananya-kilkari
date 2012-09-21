@@ -7,5 +7,6 @@
     <import resource="classpath:applicationKilkariMessageCampaignContext.xml"/>
     <import resource="classpath:applicationKilkariSubscriptionContext.xml"/>
     <import resource="classpath:applicationKilkariOBDContext.xml"/>
+    <import resource="classpath:applicationKilkariReportingContext.xml"/>
 </beans>
 

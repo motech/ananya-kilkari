@@ -16,6 +16,8 @@ import org.motechproject.scheduler.MotechSchedulerService;
 import org.quartz.Scheduler;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import java.util.ArrayList;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,18 +32,23 @@ public class QuartzSchedulerPurgeServiceTest {
     @Mock
     private SchedulerFactoryBean schedulerFactoryBean;
     private QuartzSchedulerPurgeService quartzSchedulerPurgeService;
+    private String msisdn;
     private Subscription subscription;
 
     @Before
     public void setup() {
         when(schedulerFactoryBean.getScheduler()).thenReturn(motechScheduler);
         quartzSchedulerPurgeService = new QuartzSchedulerPurgeService(subscriptionService, motechSchedulerService);
-        subscription = new Subscription("123456", SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
+        msisdn = "123456";
+        subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
+        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(new ArrayList<Subscription>() {{
+            add(subscription);
+        }});
     }
 
     @Test
     public void shouldUnscheduleCampaignForAGivenSubscription() {
-        quartzSchedulerPurgeService.deleteFor(subscription);
+        quartzSchedulerPurgeService.deleteFor(msisdn);
 
         verify(subscriptionService).unScheduleCampaign(subscription);
     }
@@ -50,28 +57,28 @@ public class QuartzSchedulerPurgeServiceTest {
     public void shouldUnscheduleAnEarlySubscription() {
         subscription.setStatus(SubscriptionStatus.NEW_EARLY);
 
-        quartzSchedulerPurgeService.deleteFor(subscription);
+        quartzSchedulerPurgeService.deleteFor(msisdn);
 
         verify(motechSchedulerService).safeUnscheduleRunOnceJob(SubscriptionEventKeys.EARLY_SUBSCRIPTION, subscription.getSubscriptionId());
     }
 
     @Test
     public void shouldUnscheduleInboxDeletion() {
-        quartzSchedulerPurgeService.deleteFor(subscription);
+        quartzSchedulerPurgeService.deleteFor(msisdn);
 
         verify(motechSchedulerService).safeUnscheduleRunOnceJob(InboxEventKeys.DELETE_INBOX, subscription.getSubscriptionId());
     }
 
     @Test
     public void shouldUnscheduleDeactivationReqeust() {
-        quartzSchedulerPurgeService.deleteFor(subscription);
+        quartzSchedulerPurgeService.deleteFor(msisdn);
 
         verify(motechSchedulerService).safeUnscheduleRunOnceJob(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, subscription.getSubscriptionId());
     }
 
     @Test
     public void shouldUnscheduleSubscriptionCompletionEvent() {
-        quartzSchedulerPurgeService.deleteFor(subscription);
+        quartzSchedulerPurgeService.deleteFor(msisdn);
 
         verify(motechSchedulerService).safeUnscheduleRunOnceJob(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, subscription.getSubscriptionId());
     }

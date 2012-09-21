@@ -97,7 +97,7 @@ public class MessageCampaignService {
                         Matchers.is(campaignName)));
 
         if(enrollmentsForCampaign.isEmpty())
-            throw new RuntimeException(String.format("No existing campaign for subscription : %s, campaign: %s", subscriptionId, campaignName));
+            throw new RuntimeException(String.format("No existing campaign for subscription: %s, campaign: %s", subscriptionId, campaignName));
 
         return enrollmentsForCampaign.get(0).getStartDate();
     }

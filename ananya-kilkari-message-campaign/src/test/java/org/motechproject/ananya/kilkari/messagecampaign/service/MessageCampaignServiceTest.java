@@ -152,7 +152,7 @@ public class MessageCampaignServiceTest {
         when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(new ArrayList<CampaignEnrollmentRecord>());
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("No existing campaign for subscription : " + subscriptionId + ", campaign: " + campaignName);
+        expectedException.expectMessage("No existing campaign for subscription: " + subscriptionId + ", campaign: " + campaignName);
 
         messageCampaignService.getCampaignStartDate(subscriptionId, campaignName);
     }

@@ -4,53 +4,67 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.message.service.InboxEventKeys;
+import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignRequest;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
-import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.quartz.Scheduler;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import java.util.ArrayList;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuartzSchedulerPurgeServiceTest {
     @Mock
-    private SubscriptionService subscriptionService;
-    @Mock
     private MotechSchedulerService motechSchedulerService;
     @Mock
     private Scheduler motechScheduler;
     @Mock
     private SchedulerFactoryBean schedulerFactoryBean;
+    @Mock
+    private AllSubscriptions allSubscriptions;
+    @Mock
+    private MessageCampaignService messageCampaignService;
+
     private QuartzSchedulerPurgeService quartzSchedulerPurgeService;
     private String msisdn;
+
     private Subscription subscription;
 
     @Before
     public void setup() {
         when(schedulerFactoryBean.getScheduler()).thenReturn(motechScheduler);
-        quartzSchedulerPurgeService = new QuartzSchedulerPurgeService(subscriptionService, motechSchedulerService);
+        quartzSchedulerPurgeService = new QuartzSchedulerPurgeService(motechSchedulerService, messageCampaignService, allSubscriptions);
         msisdn = "123456";
         subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
-        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(new ArrayList<Subscription>() {{
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(new ArrayList<Subscription>() {{
             add(subscription);
         }});
     }
 
     @Test
     public void shouldUnscheduleCampaignForAGivenSubscription() {
+        String expectedCampaignName = "campaignName";
+        when(messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId())).thenReturn(expectedCampaignName);
+        
         quartzSchedulerPurgeService.deleteFor(msisdn);
 
-        verify(subscriptionService).unScheduleCampaign(subscription);
+        ArgumentCaptor<MessageCampaignRequest> requestCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
+        verify(messageCampaignService).stop(requestCaptor.capture());
+        MessageCampaignRequest actualRequest = requestCaptor.getValue();
+        assertEquals(expectedCampaignName, actualRequest.getCampaignName());
     }
 
     @Test

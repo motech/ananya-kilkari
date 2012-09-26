@@ -1,13 +1,13 @@
 package org.motechproject.ananya.kilkari.purge.service;
 
-import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
-import org.motechproject.ananya.kilkari.message.service.InboxService;
-import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
-import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
-import org.motechproject.ananya.kilkari.obd.service.InvalidOBDEntriesService;
+import org.motechproject.ananya.kilkari.message.repository.AllCampaignMessageAlerts;
+import org.motechproject.ananya.kilkari.message.repository.AllInboxMessages;
+import org.motechproject.ananya.kilkari.messagecampaign.repository.AllKilkariCampaignEnrollments;
+import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
+import org.motechproject.ananya.kilkari.obd.repository.AllInvalidCallRecords;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.service.SubscriberCareService;
-import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriberCareDocs;
+import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,53 +17,59 @@ import java.util.List;
 
 @Service
 public class KilkariPurgeService {
-    private CampaignMessageAlertService campaignMessageAlertService;
-    private SubscriptionService subscriptionService;
-    private InboxService inboxService;
-    private CampaignMessageService campaignMessageService;
-    private SubscriberCareService subscriberCareService;
-    private InvalidOBDEntriesService invalidOBDEntriesService;
-    private MessageCampaignService messageCampaignService;
+    private AllCampaignMessageAlerts allCampaignMessageAlerts;
+    private AllSubscriptions allSubscriptions;
+    private AllInboxMessages allInboxMessages;
+    private AllCampaignMessages allCampaignMessages;
+    private AllSubscriberCareDocs allSubscriberCareDocs;
+    private AllInvalidCallRecords allInvalidCallRecords;
+    private AllKilkariCampaignEnrollments allKilkariCampaignEnrollments;
     private final Logger logger = LoggerFactory.getLogger(KilkariPurgeService.class);
 
     @Autowired
-    public KilkariPurgeService(CampaignMessageAlertService campaignMessageAlertService,
-                               SubscriptionService subscriptionService,
-                               InboxService inboxService,
-                               CampaignMessageService campaignMessageService,
-                               SubscriberCareService subscriberCareService,
-                               InvalidOBDEntriesService invalidOBDEntriesService,
-                               MessageCampaignService messageCampaignService) {
-        this.campaignMessageAlertService = campaignMessageAlertService;
-        this.subscriptionService = subscriptionService;
-        this.inboxService = inboxService;
-        this.campaignMessageService = campaignMessageService;
-        this.subscriberCareService = subscriberCareService;
-        this.invalidOBDEntriesService = invalidOBDEntriesService;
-        this.messageCampaignService = messageCampaignService;
+    public KilkariPurgeService(AllCampaignMessageAlerts allCampaignMessageAlerts,
+                               AllSubscriptions allSubscriptions,
+                               AllInboxMessages allInboxMessages,
+                               AllCampaignMessages allCampaignMessages,
+                               AllSubscriberCareDocs allSubscriberCareDocs,
+                               AllInvalidCallRecords allInvalidCallRecords,
+                               AllKilkariCampaignEnrollments allKilkariCampaignEnrollments) {
+        this.allCampaignMessageAlerts = allCampaignMessageAlerts;
+        this.allSubscriptions = allSubscriptions;
+        this.allInboxMessages = allInboxMessages;
+        this.allCampaignMessages = allCampaignMessages;
+        this.allSubscriberCareDocs = allSubscriberCareDocs;
+        this.allInvalidCallRecords = allInvalidCallRecords;
+        this.allKilkariCampaignEnrollments = allKilkariCampaignEnrollments;
     }
 
     public void purge(String msisdn) {
         logger.info("Started purging kilkari records for msisdn : " + msisdn);
-        List<Subscription> subscriptionList = subscriptionService.findByMsisdn(msisdn);
-        deleteBySubscriptionId(subscriptionList);
         deleteByMsisdn(msisdn);
-        logger.info("Finished purging kilkari records for msisdn : " + msisdn);
+        List<Subscription> subscriptionList = allSubscriptions.findByMsisdn(msisdn);
+        if (subscriptionList.isEmpty()) {
+            logger.info(String.format("[CouchDB Purger] No subscription found for msisdn : %s", msisdn));
+            return;
+        }
+        deleteBySubscriptionId(subscriptionList);
+        logger.info("[CouchDB Purger] Finished purging kilkari records for msisdn : " + msisdn);
     }
 
     private void deleteByMsisdn(String msisdn) {
-        subscriberCareService.deleteCareDocsFor(msisdn);
+        logger.info(String.format("[CouchDB Purger] Deleting SubscriberCareDocs based on msisdn for: %s", msisdn));
+        allSubscriberCareDocs.deleteFor(msisdn);
     }
 
     private void deleteBySubscriptionId(List<Subscription> subscriptionList) {
         for (Subscription subscription : subscriptionList) {
             String subscriptionId = subscription.getSubscriptionId();
-            campaignMessageAlertService.deleteFor(subscriptionId);
-            inboxService.deleteInbox(subscriptionId);
-            campaignMessageService.deleteCampaignMessagesFor(subscriptionId);
-            subscriptionService.deleteSubscriptionFor(subscriptionId);
-            invalidOBDEntriesService.deleteInvalidCallRecordsFor(subscriptionId);
-            messageCampaignService.deleteCampaignEnrollmentsFor(subscriptionId);
+            logger.info(String.format("[CouchDB Purger] Deleting based on subscriptionId: %s, msisdn : %s", subscriptionId,subscription.getMsisdn()));
+            allCampaignMessageAlerts.deleteFor(subscriptionId);
+            allInboxMessages.deleteFor(subscriptionId);
+            allCampaignMessages.removeAll(subscriptionId);
+            allInvalidCallRecords.deleteFor(subscriptionId);
+            allKilkariCampaignEnrollments.deleteFor(subscriptionId);
+            allSubscriptions.deleteFor(subscriptionId);
         }
     }
 }

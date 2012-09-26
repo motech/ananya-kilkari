@@ -6,38 +6,38 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
-import org.motechproject.ananya.kilkari.message.service.InboxService;
-import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
-import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
-import org.motechproject.ananya.kilkari.obd.service.InvalidOBDEntriesService;
-import org.motechproject.ananya.kilkari.purge.service.KilkariPurgeService;
+import org.motechproject.ananya.kilkari.message.repository.AllCampaignMessageAlerts;
+import org.motechproject.ananya.kilkari.message.repository.AllInboxMessages;
+import org.motechproject.ananya.kilkari.messagecampaign.repository.AllKilkariCampaignEnrollments;
+import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
+import org.motechproject.ananya.kilkari.obd.repository.AllInvalidCallRecords;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.service.SubscriberCareService;
-import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriberCareDocs;
+import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 
 import java.util.Arrays;
+import java.util.Collections;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class KilkariPurgeServiceTest {
+
     @Mock
-    private CampaignMessageAlertService campaignMessageAlertService;
+    private AllCampaignMessageAlerts allCampaignMessageAlerts;
     @Mock
-    private SubscriptionService subscriptionService;
+    private AllSubscriptions allSubscriptions;
     @Mock
-    private InboxService inboxService;
+    private AllInboxMessages allInboxMessages;
     @Mock
-    private CampaignMessageService campaignMessageService;
+    private AllCampaignMessages allCampaignMessages;
     @Mock
-    private SubscriberCareService subscriberCareService;
+    private AllSubscriberCareDocs allSubscriberCareDocs;
     @Mock
-    private InvalidOBDEntriesService invalidOBDEntriesService;
+    private AllInvalidCallRecords allInvalidCallRecords;
     @Mock
-    private MessageCampaignService messageCampaignService;
+    private AllKilkariCampaignEnrollments allKilkariCampaignEnrollments;
 
     private KilkariPurgeService couchdbPurgeService;
     private String msisdn;
@@ -45,7 +45,7 @@ public class KilkariPurgeServiceTest {
 
     @Before
     public void setUp(){
-        couchdbPurgeService = new KilkariPurgeService(campaignMessageAlertService, subscriptionService, inboxService, campaignMessageService, subscriberCareService, invalidOBDEntriesService, messageCampaignService);
+        couchdbPurgeService = new KilkariPurgeService(allCampaignMessageAlerts, allSubscriptions, allInboxMessages, allCampaignMessages, allSubscriberCareDocs, allInvalidCallRecords, allKilkariCampaignEnrollments);
         msisdn = "234566";
         subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
 
@@ -53,62 +53,76 @@ public class KilkariPurgeServiceTest {
 
     @Test
     public void shouldDeleteCampaignMessageAlerts() {
-        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
 
         couchdbPurgeService.purge(msisdn);
 
-        verify(campaignMessageAlertService).deleteFor(subscription.getSubscriptionId());
+        verify(allCampaignMessageAlerts).deleteFor(subscription.getSubscriptionId());
     }
 
     @Test
     public void shouldDeleteInboxMessage() {
-        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
 
         couchdbPurgeService.purge(msisdn);
 
-        verify(inboxService).deleteInbox(subscription.getSubscriptionId());
+        verify(allInboxMessages).deleteFor(subscription.getSubscriptionId());
     }
 
     @Test
     public void shouldDeleteCampaignMessage() {
-        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
 
         couchdbPurgeService.purge(msisdn);
 
-        verify(campaignMessageService).deleteCampaignMessagesFor(subscription.getSubscriptionId());
+        verify(allCampaignMessages).removeAll(subscription.getSubscriptionId());
     }
 
     @Test
     public void shouldDeleteSubscriberCareDocs() {
         couchdbPurgeService.purge(msisdn);
 
-        verify(subscriberCareService).deleteCareDocsFor(msisdn);
+        verify(allSubscriberCareDocs).deleteFor(msisdn);
     }
 
     @Test
     public void shouldDeleteSubscription() {
-        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
 
         couchdbPurgeService.purge(msisdn);
 
-        verify(subscriptionService).deleteSubscriptionFor(subscription.getSubscriptionId());
+        verify(allSubscriptions).deleteFor(subscription.getSubscriptionId());
     }
 
     @Test
     public void shouldDeleteInvalidObdEntries() {
-        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
 
         couchdbPurgeService.purge(msisdn);
 
-        verify(invalidOBDEntriesService).deleteInvalidCallRecordsFor(subscription.getSubscriptionId());
+        verify(allInvalidCallRecords).deleteFor(subscription.getSubscriptionId());
     }
 
     @Test
     public void shouldDeleteCampaignEnrollments() {
-        when(subscriptionService.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(Arrays.asList(subscription));
 
         couchdbPurgeService.purge(msisdn);
 
-        verify(messageCampaignService).deleteCampaignEnrollmentsFor(subscription.getSubscriptionId());
+        verify(allCampaignMessages).removeAll(subscription.getSubscriptionId());
+    }
+    
+    @Test
+    public void shouldNotTryToDeleteBasedOnSubscriptionIdIfSubscriptionsDontExist(){
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(Collections.EMPTY_LIST);
+        
+        couchdbPurgeService.purge(msisdn);
+
+        verify(allCampaignMessageAlerts, never()).deleteFor(anyString());
+        verify(allInboxMessages, never()).deleteFor(anyString());
+        verify(allCampaignMessages, never()).removeAll(anyString());
+        verify(allInvalidCallRecords, never()).deleteFor(anyString());
+        verify(allKilkariCampaignEnrollments, never()).deleteFor(anyString());
+        verify(allSubscriptions, never()).deleteFor(anyString());
     }
 }

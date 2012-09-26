@@ -30,12 +30,15 @@
         </dependency>
         <dependency>
             <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-subscription</artifactId>
+            <artifactId>ananya-kilkari-config</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+            <classifier>tests</classifier>
         </dependency>
         <dependency>
-            <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
-            <artifactId>motech-diagnostics</artifactId>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
+            <artifactId>ananya-kilkari-config</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

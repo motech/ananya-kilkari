@@ -443,8 +443,4 @@ public class SubscriptionService {
         allSubscriptions.update(subscription);
         reportingService.reportChangeMsisdnForSubscriber(subscription.getSubscriptionId(), changeMsisdnRequest.getNewMsisdn());
     }
-
-    public void deleteSubscriptionFor(String subscriptionId) {
-        allSubscriptions.deleteFor(subscriptionId);
-    }
 }

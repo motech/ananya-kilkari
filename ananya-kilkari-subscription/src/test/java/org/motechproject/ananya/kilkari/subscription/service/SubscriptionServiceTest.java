@@ -1144,13 +1144,4 @@ public class SubscriptionServiceTest {
         verify(onMobileSubscriptionManagerPublisher).processDeactivation(Matchers.<OMSubscriptionRequest>any());
         verify(reportingServiceImpl).reportSubscriptionStateChange(Matchers.<SubscriptionStateChangeRequest>any());
     }
-
-    @Test
-    public void shouldRemoveAllSubscriptionsForASubscriptionId() {
-        String subscriptionId = "asdf123";
-
-        subscriptionService.deleteSubscriptionFor(subscriptionId);
-
-        verify(allSubscriptions).deleteFor(subscriptionId);
-    }
 }

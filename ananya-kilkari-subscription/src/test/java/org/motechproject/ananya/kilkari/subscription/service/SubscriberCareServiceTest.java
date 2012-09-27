@@ -45,13 +45,4 @@ public class SubscriberCareServiceTest {
         assertEquals(subscriberCareRequest.getMsisdn(), subscriberCareDoc.getMsisdn());
         assertEquals(subscriberCareRequest.getReason(), subscriberCareDoc.getReason().toString());
     }
-
-    @Test
-    public void shouldRemoveAllSubscriberCareDocsForAMsisdn() {
-        String msisdn = "1234";
-
-        subscriberCareService.deleteCareDocsFor(msisdn);
-
-        verify(allSubscriberCareDocs).deleteFor(msisdn);
-    }
 }

@@ -30,7 +30,7 @@ public class KilkariExceptionResolver extends SimpleMappingExceptionResolver {
                                               HttpServletResponse response,
                                               Object handler,
                                               Exception ex) {
-        log.error(getExceptionString(ex));
+        log.error(getExceptionString(ex), ex);
 
         return super.doResolveException(request, response, handler, ex);
     }

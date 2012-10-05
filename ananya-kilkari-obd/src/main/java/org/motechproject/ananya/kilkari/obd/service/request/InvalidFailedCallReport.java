@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.obd.service.request;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -32,5 +33,10 @@ public class InvalidFailedCallReport implements Serializable {
     @JsonIgnore
     public String getSubscriptionId() {
         return subscriptionId;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

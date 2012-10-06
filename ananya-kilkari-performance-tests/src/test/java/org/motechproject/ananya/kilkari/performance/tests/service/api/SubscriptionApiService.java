@@ -1,12 +1,14 @@
 package org.motechproject.ananya.kilkari.performance.tests.service.api;
 
 import org.motechproject.ananya.kilkari.performance.tests.domain.BaseResponse;
-import org.motechproject.ananya.kilkari.performance.tests.utils.ContextUtils;
 import org.motechproject.ananya.kilkari.performance.tests.utils.HttpUtils;
 import org.motechproject.ananya.kilkari.performance.tests.utils.TimedRunner;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,13 +17,20 @@ import java.util.Map;
 import static junit.framework.Assert.assertEquals;
 import static org.motechproject.ananya.kilkari.performance.tests.utils.TestUtils.getRandomMsisdn;
 
+@Service
 public class SubscriptionApiService {
+
+    @Autowired
+    private AllSubscriptions allSubscriptions;
+
+    @Autowired
+    private HttpUtils httpUtils;
 
     public Subscription getSubscriptionData(final String msisdn, final String status) throws InterruptedException {
         return new TimedRunner<Subscription>(100, 1000) {
             @Override
             protected Subscription run() {
-                List<Subscription> subscriptionList = ContextUtils.getConfiguration().getAllSubscriptions().findByMsisdn(msisdn);
+                List<Subscription> subscriptionList = allSubscriptions.findByMsisdn(msisdn);
                 if (subscriptionList.size() != 0 && subscriptionList.get(0).getStatus().name().equals(status))
                     return subscriptionList.get(0);
                 return null;
@@ -32,7 +41,7 @@ public class SubscriptionApiService {
     public void createASubscription() {
         Map<String, String> parametersMap = constructParameters();
 
-        BaseResponse baseResponse = HttpUtils.httpGetKilkariWithJsonResponse(parametersMap, "subscription");
+        BaseResponse baseResponse = httpUtils.httpGetKilkariWithJsonResponse(parametersMap, "subscription");
         assertEquals("SUCCESS", baseResponse.getStatus());
     }
 
@@ -42,7 +51,7 @@ public class SubscriptionApiService {
         request.setStatus("SUCCESS");
         request.setMsisdn(subscription.getMsisdn());
         request.setOperator(Operator.AIRTEL.name());
-        HttpUtils.put(request, "subscription/" + subscription.getSubscriptionId());
+        httpUtils.put(request, "subscription/" + subscription.getSubscriptionId());
     }
 
     private Map<String, String> constructParameters() {
@@ -55,6 +64,6 @@ public class SubscriptionApiService {
     }
 
     public List<Subscription> getAll() {
-        return ContextUtils.getConfiguration().getAllSubscriptions().getAll();
+        return allSubscriptions.getAll();
     }
 }

@@ -9,6 +9,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.performance.tests.LoadPerfBefore;
 import org.motechproject.performance.tests.LoadPerfStaggered;
 import org.motechproject.performance.tests.LoadRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,8 @@ public class BackgroundJobsPerformanceTest extends BasePerformanceTest {
 
     private final static int numberOfSubscribers = 25000;
     private static List createdSubscriptionsList = new ArrayList<Subscription>();
-    private SubscriptionApiService subscriptionApiService = new SubscriptionApiService();
+    @Autowired
+    private SubscriptionApiService subscriptionApiService;
     private volatile static int index=-1;
 
     public BackgroundJobsPerformanceTest(String name) {
@@ -60,7 +62,6 @@ public class BackgroundJobsPerformanceTest extends BasePerformanceTest {
             @Override
             protected Boolean run() {
                 boolean isComplete = true;
-                SubscriptionApiService subscriptionApiService = new SubscriptionApiService();
                 List<Subscription> subscriptions = subscriptionApiService.getAll();
                 if (numberOfSubscribers != subscriptions.size()) return null;
                 for (Subscription subscription : subscriptions) {

@@ -2,16 +2,15 @@ package org.motechproject.ananya.kilkari.performance.tests.service.db;
 
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
-import org.motechproject.ananya.kilkari.performance.tests.utils.ContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class OBDDbService {
+    @Autowired
     private AllCampaignMessages allCampaignMessages;
-
-    public OBDDbService() {
-        allCampaignMessages = ContextUtils.getConfiguration().getAllCampaignMessages();
-    }
 
     public void add(CampaignMessage campaignMessage) {
         allCampaignMessages.add(campaignMessage);

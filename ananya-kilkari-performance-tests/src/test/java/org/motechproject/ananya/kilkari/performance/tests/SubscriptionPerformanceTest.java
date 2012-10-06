@@ -13,6 +13,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.performance.tests.LoadPerf;
 import org.motechproject.performance.tests.LoadRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -22,6 +23,12 @@ import static org.motechproject.ananya.kilkari.performance.tests.utils.TestUtils
 public class SubscriptionPerformanceTest extends BasePerformanceTest {
 
     private List<Location> locationList;
+
+    @Autowired
+    private HttpUtils httpUtils;
+
+    @Autowired
+    private SubscriptionApiService subscriptionApiService;
 
     private Random random = new Random();
 
@@ -52,11 +59,10 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
 
     @LoadPerf(concurrentUsers = 100)
     public void shouldCreateAnIvrSubscription() throws InterruptedException {
-        SubscriptionApiService subscriptionApiService = new SubscriptionApiService();
         String expectedStatus = "PENDING_ACTIVATION";
         Map<String, String> parametersMap = constructParameters();
 
-        BaseResponse baseResponse = HttpUtils.httpGetKilkariWithJsonResponse(parametersMap, "subscription");
+        BaseResponse baseResponse = httpUtils.httpGetKilkariWithJsonResponse(parametersMap, "subscription");
         assertEquals("SUCCESS", baseResponse.getStatus());
 
         Subscription subscription = subscriptionApiService.getSubscriptionData(parametersMap.get("msisdn"), expectedStatus);
@@ -76,7 +82,7 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
 
         SubscriptionWebRequest subscriptionWebRequest = getSubscriptionWebRequest();
 
-        BaseResponse baseResponse = HttpUtils.httpPostKilkariWithJsonResponse(parametersMap, subscriptionWebRequest, "subscription");
+        BaseResponse baseResponse = httpUtils.httpPostKilkariWithJsonResponse(parametersMap, subscriptionWebRequest, "subscription");
         assertEquals("SUCCESS", baseResponse.getStatus());
     }
 

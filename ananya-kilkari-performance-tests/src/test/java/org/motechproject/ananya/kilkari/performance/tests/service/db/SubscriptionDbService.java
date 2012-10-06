@@ -1,19 +1,20 @@
 package org.motechproject.ananya.kilkari.performance.tests.service.db;
 
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
-import org.motechproject.ananya.kilkari.performance.tests.utils.ContextUtils;
 import org.motechproject.ananya.kilkari.performance.tests.utils.HttpUtils;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class SubscriptionDbService {
 
+    @Autowired
     private AllSubscriptions allSubscriptions;
-
-    public SubscriptionDbService() {
-        allSubscriptions = ContextUtils.getConfiguration().getAllSubscriptions();
-    }
+    @Autowired
+    private HttpUtils httpUtils;
 
     public void addSubscription(Subscription subscription) {
         allSubscriptions.add(subscription);
@@ -21,7 +22,7 @@ public class SubscriptionDbService {
                 Channel.CALL_CENTER.toString(), Long.parseLong(subscription.getMsisdn()), subscription.getPack().toString(),
                 null, null, subscription.getCreationDate(), subscription.getStatus().toString(), null, null, null,
                 subscription.getOperator().toString(), subscription.getStartDate(), null, null);
-        HttpUtils.httpPostReports(null, subscriptionReportRequest, "subscription");
+        httpUtils.httpPostReports(null, subscriptionReportRequest, "subscription");
     }
 
     public void warmIndexes() {

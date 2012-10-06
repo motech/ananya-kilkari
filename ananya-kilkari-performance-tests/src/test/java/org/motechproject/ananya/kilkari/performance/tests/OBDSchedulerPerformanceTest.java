@@ -12,6 +12,7 @@ import org.motechproject.ananya.kilkari.performance.tests.utils.BasePerformanceT
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.performance.tests.LoadPerf;
 import org.motechproject.performance.tests.LoadRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
@@ -27,8 +28,10 @@ public class OBDSchedulerPerformanceTest extends BasePerformanceTest {
         super(testName);
     }
 
-    private OBDApiService obdApiService = new OBDApiService();
-    private OBDDbService obdDbService = new OBDDbService();
+    @Autowired
+    private OBDApiService obdApiService;
+    @Autowired
+    private OBDDbService obdDbService;
 
     @Before
     public void setUp() {

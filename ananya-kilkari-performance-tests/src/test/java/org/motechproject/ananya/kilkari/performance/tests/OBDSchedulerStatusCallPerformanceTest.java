@@ -18,6 +18,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.performance.tests.LoadPerfBefore;
 import org.motechproject.performance.tests.LoadPerfStaggered;
 import org.motechproject.performance.tests.LoadRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,23 +27,28 @@ import static org.motechproject.ananya.kilkari.performance.tests.utils.TestUtils
 
 @RunWith(LoadRunner.class)
 public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
+    @Autowired
+    private SubscriptionDbService subscriptionDbService;
+    @Autowired
+    private OBDApiService obdApiService;
+    @Autowired
+    private OBDDbService obdDbService;
+
     private Operator[] possibleOperators = Operator.values();
     private final static int numberOfMessagesInDb = 25000;
     private final static int numberOfObdRequests = 25000;
     private static volatile int index;
     private static List<CampaignMessage> campaignMessageList = new ArrayList<>();
-    private SubscriptionDbService subscriptionDbService = new SubscriptionDbService();
+
 
     public OBDSchedulerStatusCallPerformanceTest(String testName) {
         super(testName);
     }
 
-    private OBDApiService obdApiService = new OBDApiService();
-    private OBDDbService obdDbService = new OBDDbService();
 
-    @LoadPerfBefore(priority = 1, concurrentUsers = 100)
+    @LoadPerfBefore(concurrentUsers = 100)
     public void loadSubscriptions() {
-        for (int i = 0; i < numberOfMessagesInDb / 100; i++) {
+        for (int i = 0; i < numberOfMessagesInDb/100; i++) {
             DateTime now = DateTime.now();
             String msisdn = getRandomMsisdn();
             String week = getRandomCampaignId();

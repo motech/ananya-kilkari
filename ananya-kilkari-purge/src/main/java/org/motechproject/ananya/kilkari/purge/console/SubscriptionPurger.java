@@ -26,6 +26,6 @@ public class SubscriptionPurger {
 
     private static void validateArguments(String[] args) throws WrongNumberArgsException {
         if (args.length != 1)
-            throw new WrongNumberArgsException("Wrong number of arguments. Arguments expected : <file_name>");
+            throw new WrongNumberArgsException("Wrong number of arguments. Arguments expected: <file_name>");
     }
 }

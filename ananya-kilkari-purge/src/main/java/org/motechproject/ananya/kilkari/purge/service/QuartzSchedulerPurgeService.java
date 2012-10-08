@@ -35,18 +35,18 @@ public class QuartzSchedulerPurgeService {
     public void deleteFor(String msisdn) {
         List<Subscription> subscriptionList = allSubscriptions.findByMsisdn(msisdn);
         if (subscriptionList.isEmpty()) {
-            logger.info(String.format("[Quartz Purger]No subscription found for msisdn : %s", msisdn));
+            logger.info(String.format("[Quartz Purger] No subscription found for msisdn: %s", msisdn));
             return;
         }
         for (Subscription subscription : subscriptionList)
             unscheduleForSubscription(subscription);
 
-        logger.info(String.format("[Quartz Purger] Finished unscheduling jobs for msisdn : %s", msisdn));
+        logger.info(String.format("[Quartz Purger] Finished unscheduling jobs for msisdn: %s", msisdn));
     }
 
     private void unscheduleForSubscription(Subscription subscription) {
         String subscriptionId = subscription.getSubscriptionId();
-        logger.info(String.format("[Quartz Purger]Deleting based on subscriptionId: %s, msisdn : %s",
+        logger.info(String.format("[Quartz Purger] Deleting based on subscriptionId: %s, msisdn: %s",
                 subscriptionId, subscription.getMsisdn()));
         if (subscription.isNewEarly()) {
             motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.EARLY_SUBSCRIPTION, subscriptionId);

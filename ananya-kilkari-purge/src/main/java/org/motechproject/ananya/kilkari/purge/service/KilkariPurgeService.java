@@ -44,15 +44,15 @@ public class KilkariPurgeService {
     }
 
     public void purge(String msisdn) {
-        logger.info("Started purging kilkari records for msisdn : " + msisdn);
+        logger.info("Started purging kilkari records for msisdn: " + msisdn);
         deleteByMsisdn(msisdn);
         List<Subscription> subscriptionList = allSubscriptions.findByMsisdn(msisdn);
         if (subscriptionList.isEmpty()) {
-            logger.info(String.format("[CouchDB Purger] No subscription found for msisdn : %s", msisdn));
+            logger.info(String.format("[CouchDB Purger] No subscription found for msisdn: %s", msisdn));
             return;
         }
         deleteBySubscriptionId(subscriptionList);
-        logger.info("[CouchDB Purger] Finished purging kilkari records for msisdn : " + msisdn);
+        logger.info("[CouchDB Purger] Finished purging kilkari records for msisdn: " + msisdn);
     }
 
     private void deleteByMsisdn(String msisdn) {
@@ -63,7 +63,7 @@ public class KilkariPurgeService {
     private void deleteBySubscriptionId(List<Subscription> subscriptionList) {
         for (Subscription subscription : subscriptionList) {
             String subscriptionId = subscription.getSubscriptionId();
-            logger.info(String.format("[CouchDB Purger] Deleting based on subscriptionId: %s, msisdn : %s", subscriptionId,subscription.getMsisdn()));
+            logger.info(String.format("[CouchDB Purger] Deleting based on subscriptionId: %s, msisdn: %s", subscriptionId,subscription.getMsisdn()));
             allCampaignMessageAlerts.deleteFor(subscriptionId);
             allInboxMessages.deleteFor(subscriptionId);
             allCampaignMessages.removeAll(subscriptionId);

@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.purge.service;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,9 +24,17 @@ public class PurgeOrchestrator {
         List<String> msisdnList = readFile(filePath);
 
         for (String msisdn : msisdnList) {
-            quartzSchedulerPurgeService.deleteFor(msisdn);
-            kilkariPurgeService.purge(msisdn);
+            purgeSubscriptionDataFor(msisdn);
         }
+    }
+
+    private void purgeSubscriptionDataFor(String msisdn) {
+        msisdn = msisdn.trim();
+        if(StringUtils.isEmpty(msisdn)) {
+            return;
+        }
+        quartzSchedulerPurgeService.deleteFor(msisdn);
+        kilkariPurgeService.purge(msisdn);
     }
 
     private List<String> readFile(String filePath) throws IOException {

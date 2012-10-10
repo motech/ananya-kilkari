@@ -148,7 +148,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     @Test
     public void shouldCreateSubscriptionForTheGivenMsisdnForTheCallCentreChannel() throws Exception {
         final String msisdn = "9876543210";
-        String channelString = Channel.CALL_CENTER.toString();
+        String channelString = Channel.CONTACT_CENTER.toString();
         final SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
@@ -192,7 +192,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     @Test
     public void shouldCreateAndScheduleAnEarlySubscription() throws Exception {
         final String msisdn = "9876543210";
-        final String channelString = Channel.CALL_CENTER.toString();
+        final String channelString = Channel.CONTACT_CENTER.toString();
         final SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         DateTime now = DateTime.now();
         DateTime edd = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0).plusMonths(4);
@@ -238,7 +238,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     @Test
     public void shouldUnscheduleNewEarlyJobWhenChangeSubscriptionRequestedForANewEarlySubscription() throws Exception {
         final String msisdn = "9776655449";
-        final String channelString = Channel.CALL_CENTER.toString();
+        final String channelString = Channel.CONTACT_CENTER.toString();
         final SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         DateTime now = DateTime.now();
         DateTime edd = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0).plusMonths(4);
@@ -283,7 +283,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     @Test
     public void shouldDeactivateSubscriptionForTheGivenMsisdnForTheCallCentreChannel() throws Exception {
         final String msisdn = "1111111111";
-        String channelString = Channel.CALL_CENTER.toString();
+        String channelString = Channel.CONTACT_CENTER.toString();
         final SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         BaseResponse expectedResponse = BaseResponse.success("Subscription unsubscribed successfully");
 
@@ -347,7 +347,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         allSubscriptions.add(oldSubscription);
 
-        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()), Channel.CALL_CENTER.toString());
+        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()), Channel.CONTACT_CENTER.toString());
 
         ReportingService mockReportingService = mock(ReportingService.class);
         reportingService.setBehavior(mockReportingService);
@@ -355,7 +355,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         MvcResult result = mockMvc(subscriptionController)
                 .perform(post("/subscription/changemsisdn")
-                        .param("channel", Channel.CALL_CENTER.toString())
+                        .param("channel", Channel.CONTACT_CENTER.toString())
                         .body(TestUtils.toJson(changeMsisdnWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))

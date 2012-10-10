@@ -19,7 +19,7 @@ public class SubscriptionDbService {
     public void addSubscription(Subscription subscription) {
         allSubscriptions.add(subscription);
         SubscriptionReportRequest subscriptionReportRequest = new SubscriptionReportRequest(subscription.getSubscriptionId(),
-                Channel.CALL_CENTER.toString(), Long.parseLong(subscription.getMsisdn()), subscription.getPack().toString(),
+                Channel.CONTACT_CENTER.toString(), Long.parseLong(subscription.getMsisdn()), subscription.getPack().toString(),
                 null, null, subscription.getCreationDate(), subscription.getStatus().toString(), null, null, null,
                 subscription.getOperator().toString(), subscription.getStartDate(), null, null);
         httpUtils.httpPostReports(null, subscriptionReportRequest, "subscription");

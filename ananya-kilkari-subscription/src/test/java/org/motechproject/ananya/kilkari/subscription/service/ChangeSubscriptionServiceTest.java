@@ -59,10 +59,10 @@ public class ChangeSubscriptionServiceTest {
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(existingSubscription);
 //        when(subscriptionService.findByMsisdnAndPack(msisdn, newPack)).thenReturn(new ArrayList<Subscription>());
-        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, null, subscriptionId, newPack, Channel.CALL_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth, reason);
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, null, subscriptionId, newPack, Channel.CONTACT_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth, reason);
 
         Subscription newSubscription = new SubscriptionBuilder().withDefaults().withPack(changeSubscriptionRequest.getPack()).build();
-        when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CALL_CENTER))).thenReturn(newSubscription);
+        when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CONTACT_CENTER))).thenReturn(newSubscription);
 
         changeSubscriptionService.process(changeSubscriptionRequest);
 
@@ -74,7 +74,7 @@ public class ChangeSubscriptionServiceTest {
         validateDeactivationRequest(deactivationRequestArgumentCaptor.getValue(), existingSubscription);
 
         ArgumentCaptor<SubscriptionRequest> createSubscriptionCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
-        order.verify(subscriptionService).createSubscription(createSubscriptionCaptor.capture(), eq(Channel.CALL_CENTER));
+        order.verify(subscriptionService).createSubscription(createSubscriptionCaptor.capture(), eq(Channel.CONTACT_CENTER));
         validateSubscriptionCreationRequest(createSubscriptionCaptor.getValue(), changeSubscriptionRequest, existingSubscription, reason);
     }
 
@@ -84,11 +84,11 @@ public class ChangeSubscriptionServiceTest {
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.BARI_KILKARI).build();
         String subscriptionId = subscription.getSubscriptionId();
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CALL_CENTER))).thenReturn(subscription);
+        when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CONTACT_CENTER))).thenReturn(subscription);
         SubscriberResponse subscriberResponse = new SubscriberResponse(null, null, dateOfBirth, null, null);
         when(reportingService.getSubscriber(subscriptionId)).thenReturn(subscriberResponse);
 
-        changeSubscriptionService.process(new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1234567890", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CALL_CENTER, null, null, null, "reason"));
+        changeSubscriptionService.process(new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1234567890", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CONTACT_CENTER, null, null, null, "reason"));
 
         verify(reportingService).getSubscriber(subscriptionId);
         ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);
@@ -110,7 +110,7 @@ public class ChangeSubscriptionServiceTest {
     private void validateDeactivationRequest(DeactivationRequest deactivationRequest, Subscription existingSubscription) {
 
         assertEquals(existingSubscription.getSubscriptionId(), deactivationRequest.getSubscriptionId());
-        assertEquals(Channel.CALL_CENTER, deactivationRequest.getChannel());
+        assertEquals(Channel.CONTACT_CENTER, deactivationRequest.getChannel());
         assertNotNull(deactivationRequest.getCreatedAt());
     }
 

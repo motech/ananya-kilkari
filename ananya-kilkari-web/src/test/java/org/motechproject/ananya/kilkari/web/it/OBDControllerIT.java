@@ -25,6 +25,7 @@ import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsRepo
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import java.io.IOException;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
@@ -117,7 +118,7 @@ public class OBDControllerIT extends SpringIntegrationTest {
         verifyReportingRequest();
     }
 
-    private void verifyOMGatewayRequest() {
+    private void verifyOMGatewayRequest() throws IOException {
         ArgumentCaptor<InvalidFailedCallReports> invalidCallDeliveryFailureRecordArgumentCaptor = ArgumentCaptor.forClass(InvalidFailedCallReports.class);
         verify(onMobileOBDGateway).sendInvalidFailureRecord(invalidCallDeliveryFailureRecordArgumentCaptor.capture());
         List<InvalidFailedCallReport> recordObjectFaileds = invalidCallDeliveryFailureRecordArgumentCaptor.getValue().getRecordObjectFaileds();

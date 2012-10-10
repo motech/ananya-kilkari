@@ -21,7 +21,7 @@ public class UnSubscriptionWebRequestTest {
         errors = unSubscriptionWebRequest.validate();
         assertTrue(errors.hasNoErrors());
 
-        unSubscriptionWebRequest.setChannel("CALL_CENTER");
+        unSubscriptionWebRequest.setChannel("CONTACT_CENTER");
         errors = unSubscriptionWebRequest.validate();
         assertTrue(errors.hasNoErrors());
     }

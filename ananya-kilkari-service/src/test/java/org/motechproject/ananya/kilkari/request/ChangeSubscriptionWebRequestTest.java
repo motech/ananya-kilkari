@@ -35,7 +35,7 @@ public class ChangeSubscriptionWebRequestTest {
         ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequest();
         changeSubscriptionWebRequest.setChangeType("change paCK");
         changeSubscriptionWebRequest.setPack("choti_KilkarI");
-        changeSubscriptionWebRequest.setChannel("call_center");
+        changeSubscriptionWebRequest.setChannel("CONTACT_CENTER");
         changeSubscriptionWebRequest.setDateOfBirth(DateUtils.formatDate(DateTime.now().minusYears(1)));
         changeSubscriptionWebRequest.setExpectedDateOfDelivery(null);
 

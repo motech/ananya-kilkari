@@ -33,7 +33,7 @@ public class CallCenter {
         mockMvc(subscriptionController)
                 .perform(post("/subscription/")
                         .body(JsonUtils.toJson(subscriptionData).getBytes())
-                        .param("channel", Channel.CALL_CENTER.name())
+                        .param("channel", Channel.CONTACT_CENTER.name())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -53,17 +53,17 @@ public class CallCenter {
                                         .forReason("INFANT_DEATH")
                                         .build()
                                         .getBytes()
-                        ).param("channel",Channel.CALL_CENTER.name()));
+                        ).param("channel",Channel.CONTACT_CENTER.name()));
         
     }
 
     public void unSubscribes(SubscriptionData subscriptionData) throws Exception {
         reportVerifier.setUpReportingExpectations(subscriptionData);
-        UnSubscriptionData unSubscriptionData = new UnSubscriptionData("CALL_CENTER", "reason");
+        UnSubscriptionData unSubscriptionData = new UnSubscriptionData("CONTACT_CENTER", "reason");
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/"+ subscriptionData.getSubscriptionId())
                         .body(JsonUtils.toJson(unSubscriptionData).getBytes())
-                        .param("channel",Channel.CALL_CENTER.name())
+                        .param("channel",Channel.CONTACT_CENTER.name())
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())

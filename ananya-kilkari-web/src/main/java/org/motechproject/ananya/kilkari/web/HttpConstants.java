@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 public enum HttpConstants {
 
     IVR(HttpHeaders.APPLICATION_JAVASCRIPT, HttpStatus.OK.value(), HttpStatus.OK.value(), "var response = "),
-    CALL_CENTER(HttpHeaders.APPLICATION_JSON, HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.BAD_REQUEST.value(), "");
+    CONTACT_CENTER(HttpHeaders.APPLICATION_JSON, HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.BAD_REQUEST.value(), "");
 
     private static final String CHANNEL_REQUEST_KEY = "channel";
 
@@ -38,7 +38,7 @@ public enum HttpConstants {
     }
 
     public static HttpConstants forRequest(HttpServletRequest request) {
-        return Channel.isIVR(request.getParameter(CHANNEL_REQUEST_KEY)) ? HttpConstants.IVR : HttpConstants.CALL_CENTER;
+        return Channel.isIVR(request.getParameter(CHANNEL_REQUEST_KEY)) ? HttpConstants.IVR : HttpConstants.CONTACT_CENTER;
     }
 
     public String getResponsePrefix() {

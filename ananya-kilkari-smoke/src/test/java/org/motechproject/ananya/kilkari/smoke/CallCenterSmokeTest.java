@@ -39,7 +39,7 @@ public class CallCenterSmokeTest extends BaseSmokeTest {
         String expectedStatus = "Pending Subscription";
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withEDD(null).withDOB(null).withLocation(null).build();
         Map<String, String> parametersMap = new HashMap<>();
-        String channel = "CALL_CENTER";
+        String channel = "CONTACT_CENTER";
         parametersMap.put("channel", channel);
 
         String responseEntity = restTemplate.postForObject(constructUrl(baseUrl(), "subscription", parametersMap), subscriptionRequest, String.class);

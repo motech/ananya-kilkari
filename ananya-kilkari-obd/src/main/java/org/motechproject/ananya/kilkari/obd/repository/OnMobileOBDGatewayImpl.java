@@ -2,10 +2,11 @@ package org.motechproject.ananya.kilkari.obd.repository;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
@@ -16,15 +17,16 @@ import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.profile.ProductionProfile;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
-import org.motechproject.ananya.kilkari.obd.service.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 @Component
 @ProductionProfile
@@ -33,14 +35,17 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     public static final String END_DATE_PARAM_NAME = "endDate";
     private HttpClient obdHttpClient;
     private OBDProperties obdProperties;
+    private RestTemplate restTemplate;
+
     private final Logger logger = LoggerFactory.getLogger(OnMobileOBDGatewayImpl.class);
     private final Logger requestResponseLogger = LoggerFactory.getLogger("RequestResponseLogger");
 
 
     @Autowired
-    public OnMobileOBDGatewayImpl(HttpClient obdHttpClient, OBDProperties obdProperties) {
+    public OnMobileOBDGatewayImpl(HttpClient obdHttpClient, OBDProperties obdProperties, RestTemplate kilkariRestTemplate) {
         this.obdHttpClient = obdHttpClient;
         this.obdProperties = obdProperties;
+        this.restTemplate = kilkariRestTemplate;
     }
 
     @Override
@@ -63,13 +68,8 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     }
 
     @Override
-    public void sendInvalidFailureRecord(InvalidFailedCallReports invalidFailedCallReports) throws IOException {
-        HttpPost httpPost = new HttpPost(obdProperties.getFailureReportUrl());
-        StringEntity entity = new StringEntity(JsonUtils.toJson(invalidFailedCallReports));
-        httpPost.setEntity(entity);
-        HttpResponse response = obdHttpClient.execute(httpPost);
-        String responseContent = readResponse(response);
-        validateResponse(response, responseContent, "Sending Invalid failure records to OBD failed.");
+    public void sendInvalidFailureRecord(InvalidFailedCallReports invalidFailedCallReports) {
+        restTemplate.postForLocation(obdProperties.getFailureReportUrl(), invalidFailedCallReports);
     }
 
     private void send(String content, String url, String slotStartDate, String slotEndDate) {
@@ -92,7 +92,7 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
 
             HttpResponse response = obdHttpClient.execute(httpPost);
             String responseContent = readResponse(response); //Read the response from stream first thing. As it should be read completely before making any other request.
-            validateResponse(response, responseContent, "Sending messages to OBD failed.");
+            validateResponse(response, responseContent);
             logger.info(String.format("Uploaded campaign messages successfully.\nResponse:\n%s", responseContent));
         } catch (IOException ex) {
             logger.error("Sending messages to OBD failed", ex);
@@ -101,15 +101,15 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     }
 
     private void logRequest(String url, String slotStartDate, String slotEndDate) {
-        requestResponseLogger.debug("Before request [" + url + "?" + START_DATE_PARAM_NAME + "=" + slotStartDate + "&" + END_DATE_PARAM_NAME + "=" + slotEndDate + "]");
+        requestResponseLogger.debug("Before request [" + url + "?" + START_DATE_PARAM_NAME + "=" + slotStartDate + "&" + END_DATE_PARAM_NAME + "=" + slotEndDate +"]");
     }
 
-    private void validateResponse(HttpResponse response, String responseContent, String failureMessage) {
+    private void validateResponse(HttpResponse response, String responseContent) {
         StatusLine statusLine = response.getStatusLine();
         int statusCode = statusLine.getStatusCode();
         String reasonPhrase = statusLine.getReasonPhrase();
         if (!isStatusOk(statusCode)) {
-            String errorMessage = String.format(failureMessage + System.lineSeparator() + "Error code: %s, reason: %s", statusCode, reasonPhrase);
+            String errorMessage = String.format("Sending messages to OBD failed with code: %s, reason: %s", statusCode, reasonPhrase);
             logger.error(errorMessage);
             logger.error(String.format("response:\n%s", responseContent));
             throw new RuntimeException(errorMessage);

@@ -12,7 +12,6 @@ import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallRep
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.motechproject.event.MotechEvent;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -38,7 +37,7 @@ public class CallDeliveryFailureRecordHandlerTest {
     }
 
     @Test
-    public void shouldSendInvalidCallDeliveryFailureRecordsToObd() throws IOException {
+    public void shouldSendInvalidCallDeliveryFailureRecordsToObd() {
         HashMap<String, Object> parameters = new HashMap<>();
         InvalidFailedCallReports failureRecordFailed = new InvalidFailedCallReports();
         ArrayList<InvalidFailedCallReport> recordObjectFaileds = new ArrayList<>();

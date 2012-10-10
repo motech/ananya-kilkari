@@ -233,7 +233,7 @@ public class ReportingGatewayImplTest {
         String msisdn = "msisdn";
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        HttpThreadContext.set("CALL_CENTER");
+        HttpThreadContext.set("CONTACT_CENTER");
 
         reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
 
@@ -245,7 +245,7 @@ public class ReportingGatewayImplTest {
         String msisdn = "msisdn";
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        HttpThreadContext.set("CALL_CENTER");
+        HttpThreadContext.set("CONTACT_CENTER");
         doThrow(new RuntimeException()).when(httpClientService).executeSync(anyString(), anyObject(), any(Method.class));
 
         reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
@@ -271,7 +271,7 @@ public class ReportingGatewayImplTest {
         String msisdn = "msisdn";
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        HttpThreadContext.set("CALL_CENTER");
+        HttpThreadContext.set("CONTACT_CENTER");
 
         reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
 

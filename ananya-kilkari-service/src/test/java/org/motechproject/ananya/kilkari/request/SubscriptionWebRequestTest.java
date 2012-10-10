@@ -120,49 +120,49 @@ public class SubscriptionWebRequestTest {
 
     @Test
     public void shouldAddErrorWhenNonNumericAgeIsGivenToCreateNewSubscriptionForCC() {
-        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CALL_CENTER.name(), "1a", "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
+        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CONTACT_CENTER.name(), "1a", "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
 
         validateErrors(1, subscriptionWebRequest.validate(), "Invalid beneficiary age 1a");
     }
 
     @Test
     public void shouldNotAddErrorWhenNoAgeIsGivenToCreateNewSubscriptionForCC() {
-        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CALL_CENTER.name(), "", "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
+        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CONTACT_CENTER.name(), "", "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
         validateErrors(0, subscriptionWebRequest.validate());
 
-        subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CALL_CENTER.name(), null, "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
+        subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CONTACT_CENTER.name(), null, "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
         validateErrors(0, subscriptionWebRequest.validate());
     }
 
     @Test
     public void shouldAddErrorWhenInvalidDOBIsGivenToCreateNewSubscriptionForCC() {
-        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CALL_CENTER.name(), "122", "NAME", "21-21-11", null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
+        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CONTACT_CENTER.name(), "122", "NAME", "21-21-11", null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
         validateErrors(1, subscriptionWebRequest.validate(), "Invalid date of birth 21-21-11");
     }
 
     @Test
     public void shouldNotAddErrorWhenEmptyDOBIsGivenToCreateNewSubscriptionForCC() {
         String edd = DateTime.now().plusDays(2).toString("dd-MM-yyyy");
-        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CALL_CENTER.name(), "122", "NAME", "", edd, "mydistrict", "myblock", "mypanchayat", DateTime.now());
+        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CONTACT_CENTER.name(), "122", "NAME", "", edd, "mydistrict", "myblock", "mypanchayat", DateTime.now());
         validateErrors(0, subscriptionWebRequest.validate());
 
-        subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CALL_CENTER.name(), "122", "NAME", null, edd, "mydistrict", "myblock", "mypanchayat", DateTime.now());
+        subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CONTACT_CENTER.name(), "122", "NAME", null, edd, "mydistrict", "myblock", "mypanchayat", DateTime.now());
         validateErrors(0, subscriptionWebRequest.validate());
     }
 
     @Test
     public void shouldAddErrorWhenInvalidEDDIsGivenToCreateNewSubscriptionForCC() {
-        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CALL_CENTER.name(), "122", "NAME", null, "21-21-11", "mydistrict", "myblock", "mypanchayat", DateTime.now());
+        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CONTACT_CENTER.name(), "122", "NAME", null, "21-21-11", "mydistrict", "myblock", "mypanchayat", DateTime.now());
         validateErrors(1, subscriptionWebRequest.validate(), "Invalid expected date of delivery 21-21-11");
     }
 
     @Test
     public void shouldNotAddErrorWhenEmptyEDDIsGivenToCreateNewSubscriptionForCC() {
         String dob = DateTime.now().minusDays(1).toString("dd-MM-yyyy");
-        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CALL_CENTER.name(), "122", "NAME", dob, "", "mydistrict", "myblock", "mypanchayat", DateTime.now());
+        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CONTACT_CENTER.name(), "122", "NAME", dob, "", "mydistrict", "myblock", "mypanchayat", DateTime.now());
         validateErrors(0, subscriptionWebRequest.validate());
 
-        subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CALL_CENTER.name(), "122", "NAME", dob, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
+        subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.CHOTI_KILKARI.name(), Channel.CONTACT_CENTER.name(), "122", "NAME", dob, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
         validateErrors(0, subscriptionWebRequest.validate());
     }
 
@@ -179,7 +179,7 @@ public class SubscriptionWebRequestTest {
         String dob = createdAt.plusMonths(4).toString("dd-MM-yyyy");
         String edd = null;
         SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI.name(),
-                Channel.CALL_CENTER.name(), "12", "myname", dob, edd, "mydistrict", "myblock", "mypanchayat", createdAt);
+                Channel.CONTACT_CENTER.name(), "12", "myname", dob, edd, "mydistrict", "myblock", "mypanchayat", createdAt);
         validateErrors(1, subscriptionWebRequest.validate(), "Invalid date of birth " + dob);
     }
 
@@ -189,7 +189,7 @@ public class SubscriptionWebRequestTest {
         String dob = null;
         String edd = createdAt.minusMonths(4).toString("dd-MM-yyyy");
         SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI.name(),
-                Channel.CALL_CENTER.name(), "12", "myname", dob, edd, "mydistrict", "myblock", "mypanchayat", createdAt);
+                Channel.CONTACT_CENTER.name(), "12", "myname", dob, edd, "mydistrict", "myblock", "mypanchayat", createdAt);
         validateErrors(1, subscriptionWebRequest.validate(), "Invalid expected date of delivery " + edd);
     }
 

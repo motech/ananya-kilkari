@@ -117,7 +117,7 @@ public class KilkariSubscriptionServiceTest {
         kilkariSubscriptionService.createSubscription(subscriptionWebRequest);
 
         ArgumentCaptor<SubscriptionRequest> subscriptionArgumentCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
-        verify(subscriptionService).createSubscription(subscriptionArgumentCaptor.capture(), eq(Channel.CALL_CENTER));
+        verify(subscriptionService).createSubscription(subscriptionArgumentCaptor.capture(), eq(Channel.CONTACT_CENTER));
         SubscriptionRequest actualSubscription = subscriptionArgumentCaptor.getValue();
         assertEquals(subscriptionWebRequest.getMsisdn(), actualSubscription.getMsisdn());
     }
@@ -182,7 +182,7 @@ public class KilkariSubscriptionServiceTest {
     public void shouldUnsubscribe() {
         String subscriptionId = "abcd1234";
         UnSubscriptionWebRequest unSubscriptionWebRequest = new UnSubscriptionWebRequest();
-        unSubscriptionWebRequest.setChannel(Channel.CALL_CENTER.name());
+        unSubscriptionWebRequest.setChannel(Channel.CONTACT_CENTER.name());
 
         kilkariSubscriptionService.requestUnsubscription(subscriptionId, unSubscriptionWebRequest);
 
@@ -191,7 +191,7 @@ public class KilkariSubscriptionServiceTest {
         DeactivationRequest deactivationRequest = deactivationRequestArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, deactivationRequest.getSubscriptionId());
-        assertEquals(Channel.CALL_CENTER, deactivationRequest.getChannel());
+        assertEquals(Channel.CONTACT_CENTER, deactivationRequest.getChannel());
     }
 
     @Test
@@ -229,7 +229,7 @@ public class KilkariSubscriptionServiceTest {
         CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
         String subscriptionId = "subscriptionId";
         String reason = "MISCARRIAGE";
-        String channel = Channel.CALL_CENTER.name();
+        String channel = Channel.CONTACT_CENTER.name();
         DateTime createdAt = DateTime.now();
         campaignChangeRequest.setReason(reason);
         campaignChangeRequest.setCreatedAt(createdAt);
@@ -249,7 +249,7 @@ public class KilkariSubscriptionServiceTest {
     public void shouldValidateSubscriptionWebRequest() {
         SubscriberWebRequest request = new SubscriberWebRequest();
         request.setBeneficiaryAge("23a");
-        request.setChannel(Channel.CALL_CENTER.name());
+        request.setChannel(Channel.CONTACT_CENTER.name());
         request.setCreatedAt(DateTime.now());
         request.setBlock("block");
         String subscriptionId = "subscriptionId";
@@ -319,7 +319,7 @@ public class KilkariSubscriptionServiceTest {
     public void shouldProcessChangeMsisdnRequest() {
         String oldMsisdn = "1234567890";
         String newMsisdn = "9876543210";
-        String channel = Channel.CALL_CENTER.name();
+        String channel = Channel.CONTACT_CENTER.name();
         String pack = SubscriptionPack.BARI_KILKARI.name();
         ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
         changeMsisdnWebRequest.setOldMsisdn(oldMsisdn);

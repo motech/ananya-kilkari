@@ -15,7 +15,7 @@ public class SubscriptionDataBuilder {
 
     public SubscriptionDataBuilder withDefaults() {
         subscriptionData.setPack(SubscriptionPack.BARI_KILKARI);
-        subscriptionData.setChannel("CALL_CENTER");
+        subscriptionData.setChannel("CONTACT_CENTER");
         subscriptionData.setMsisdn("1" + RandomStringUtils.randomNumeric(9));
         subscriptionData.setBeneficiaryAge("25");
         subscriptionData.setBeneficiaryName("Dumbledore");

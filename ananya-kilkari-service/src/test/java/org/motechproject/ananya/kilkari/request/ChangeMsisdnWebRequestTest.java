@@ -29,7 +29,7 @@ public class ChangeMsisdnWebRequestTest {
     @Test
     public void shouldValidateInvalidChangeMsisdnWebRequestWithSameMsisdn() {
         ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
-        changeMsisdnWebRequest.setChannel("call_center");
+        changeMsisdnWebRequest.setChannel("CONTACT_CENTER");
         changeMsisdnWebRequest.setOldMsisdn("9876543210");
         changeMsisdnWebRequest.setNewMsisdn("9876543210");
         changeMsisdnWebRequest.setPacks(Arrays.asList("all"));
@@ -60,7 +60,7 @@ public class ChangeMsisdnWebRequestTest {
     public void shouldValidateSubscriptionPackListForChangeMsisdn() {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
-        ChangeMsisdnWebRequest request = new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, null, Channel.CALL_CENTER.toString());
+        ChangeMsisdnWebRequest request = new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, null, Channel.CONTACT_CENTER.toString());
 
         request.setPacks(Arrays.asList("All"));
         Errors errors = request.validate();
@@ -89,7 +89,7 @@ public class ChangeMsisdnWebRequestTest {
     @Test
     public void shouldReturnErrorIfOldAndNewMsisdnAreSameForChangeMsisdn() {
         String msisdn = "9876543210";
-        ChangeMsisdnWebRequest request = new ChangeMsisdnWebRequest(msisdn, msisdn, Arrays.asList("all"), Channel.CALL_CENTER.toString());
+        ChangeMsisdnWebRequest request = new ChangeMsisdnWebRequest(msisdn, msisdn, Arrays.asList("all"), Channel.CONTACT_CENTER.toString());
 
         Errors errors = request.validate();
 

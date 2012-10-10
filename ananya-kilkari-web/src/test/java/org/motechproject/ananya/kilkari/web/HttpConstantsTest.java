@@ -35,11 +35,11 @@ public class HttpConstantsTest{
     @Test
     public void shouldCheckIfIVRChannelGivenInValidRequestParam() {
         when(request.getParameter("channel")).thenReturn("invalid");
-        assertEquals(HttpConstants.CALL_CENTER, HttpConstants.forRequest(request));
+        assertEquals(HttpConstants.CONTACT_CENTER, HttpConstants.forRequest(request));
     }
 
     @Test
     public void shouldCheckIfIVRChanneForRequestWhichDoesNotContainTheChannelKey() {
-        assertEquals(HttpConstants.CALL_CENTER, HttpConstants.forRequest(request));
+        assertEquals(HttpConstants.CONTACT_CENTER, HttpConstants.forRequest(request));
     }
 }

@@ -88,7 +88,7 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldGetSubscriptionsForGivenMsisdnForChannelOtherThanIvr() throws Exception {
         String msisdn = "1234567890";
-        String channel = "call_center";
+        String channel = "CONTACT_CENTER";
 
         mockSubscription(msisdn);
         ArrayList<Subscription> subscriptions = new ArrayList<>();
@@ -119,7 +119,7 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldGetEmptySubscriptionResponseIfThereAreNoSubscriptionsForAGivenMsisdnOtherThanIvr() throws Exception {
         String msisdn = "1234567890";
-        String channel = "call_center";
+        String channel = "CONTACT_CENTER";
 
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(null);
 
@@ -148,7 +148,7 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldReturnErrorResponseForInvalidMsisdnNumberOtherThanIvr() throws Exception {
         String msisdn = "12345";
-        String channel = "call_center";
+        String channel = "CONTACT_CENTER";
 
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
 
@@ -176,7 +176,7 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldReturnCorrectErrorResponseForRuntimeExceptionForOtherThanIvr() throws Exception {
         String msisdn = "1234567890";
-        String channel = "call_center";
+        String channel = "CONTACT_CENTER";
 
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenThrow(new RuntimeException("runtime exception"));
 
@@ -231,7 +231,7 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(post("/subscription")
-                        .param("channel", Channel.CALL_CENTER.toString())
+                        .param("channel", Channel.CONTACT_CENTER.toString())
                         .body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -304,9 +304,9 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldValidateChannelOnSubscriptionCreationRequest_FromCC() {
         SubscriptionWebRequest subscriptionWebRequest = mock(SubscriptionWebRequest.class);
-        when(subscriptionWebRequest.getChannel()).thenReturn("call_center");
+        when(subscriptionWebRequest.getChannel()).thenReturn("CONTACT_CENTER");
 
-        subscriptionController.createSubscription(subscriptionWebRequest, "call_center");
+        subscriptionController.createSubscription(subscriptionWebRequest, "CONTACT_CENTER");
 
         verify(subscriptionWebRequest).validateChannel();
     }
@@ -340,7 +340,7 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)
-                        .param("channel", Channel.CALL_CENTER.toString())
+                        .param("channel", Channel.CONTACT_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -354,7 +354,7 @@ public class SubscriptionControllerTest {
         String actualSubscriptionId = stringArgumentCaptor.getValue();
 
         assertEquals(subscriptionId, actualSubscriptionId);
-        assertEquals(Channel.CALL_CENTER.name(), actualUnSubscriptionWebRequest.getChannel());
+        assertEquals(Channel.CONTACT_CENTER.name(), actualUnSubscriptionWebRequest.getChannel());
     }
 
     @Test
@@ -368,7 +368,7 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)
-                        .param("channel", Channel.CALL_CENTER.toString())
+                        .param("channel", Channel.CONTACT_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -385,7 +385,7 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(post("/subscription/" + subscriptionId + "/changecampaign")
-                        .param("channel", Channel.CALL_CENTER.toString())
+                        .param("channel", Channel.CONTACT_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -408,20 +408,20 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(put("/subscriber/" + subscriptionId)
-                        .param("channel", Channel.CALL_CENTER.toString())
+                        .param("channel", Channel.CONTACT_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber Update request submitted successfully")));
 
-        subscriberWebRequest.setChannel(Channel.CALL_CENTER.name());
+        subscriberWebRequest.setChannel(Channel.CONTACT_CENTER.name());
         verify(kilkariSubscriptionService).updateSubscriberDetails(subscriberWebRequest, subscriptionId);
     }
 
     @Test
     public void shouldChangePackForTheGivenSubscriber() throws Exception {
         String subscriptionId = "abcd1234";
-        String channel = Channel.CALL_CENTER.name();
+        String channel = Channel.CONTACT_CENTER.name();
         String pack = SubscriptionPack.BARI_KILKARI.name();
         ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequest();
         changeSubscriptionWebRequest.setPack(pack);
@@ -430,7 +430,7 @@ public class SubscriptionControllerTest {
 
         mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId + "/changesubscription")
-                        .param("channel", Channel.CALL_CENTER.toString())
+                        .param("channel", Channel.CONTACT_CENTER.toString())
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
@@ -599,23 +599,23 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldSetCallCenterAsChannelInHttpThreadContext() throws Exception {
         ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest(
-                "1234567890", "1234567891", Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()), Channel.CALL_CENTER.toString());
+                "1234567890", "1234567891", Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()), Channel.CONTACT_CENTER.toString());
 
         mockMvc(subscriptionController).perform(
                 post("/subscription/changemsisdn")
-                        .param("channel", Channel.CALL_CENTER.toString())
+                        .param("channel", Channel.CONTACT_CENTER.toString())
                         .body(TestUtils.toJson(changeMsisdnWebRequest).getBytes())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
-        assertEquals(Channel.CALL_CENTER.toString(), HttpThreadContext.get());
+        assertEquals(Channel.CONTACT_CENTER.toString(), HttpThreadContext.get());
     }
 
     @Test
     public void shouldProcessChangeMsisdnRequestSuccessfully() throws Exception {
         String oldMsisdn = "1234567890";
         String newMsisdn = "9876543210";
-        String channel = Channel.CALL_CENTER.name();
+        String channel = Channel.CONTACT_CENTER.name();
 
         ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
         changeMsisdnWebRequest.setOldMsisdn(oldMsisdn);

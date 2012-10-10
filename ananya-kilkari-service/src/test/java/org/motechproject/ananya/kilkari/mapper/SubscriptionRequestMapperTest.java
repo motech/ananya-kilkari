@@ -44,7 +44,7 @@ public class SubscriptionRequestMapperTest {
         String district = "district";
         String block = "block";
         String panchayat = "panchayat";
-        String call_center = "CALL_CENTER";
+        String contactCenter = "CONTACT_CENTER";
         String dob = "01-11-2011";
         String edd = "01-01-2111";
         DateTime createdAtTime = DateTime.now();
@@ -53,7 +53,7 @@ public class SubscriptionRequestMapperTest {
         subscriberWebRequest.setDistrict(district);
         subscriberWebRequest.setBlock(block);
         subscriberWebRequest.setPanchayat(panchayat);
-        subscriberWebRequest.setChannel(call_center);
+        subscriberWebRequest.setChannel(contactCenter);
         subscriberWebRequest.setCreatedAt(createdAtTime);
 
         SubscriberRequest subscriberRequest = SubscriptionRequestMapper.mapToSubscriberRequest(subscriberWebRequest, subscriptionId);

@@ -32,7 +32,7 @@ public class SubscriberCareServiceTest {
     @Test
     public void shouldCreateSubscriptionCareDoc() {
         SubscriberCareRequest subscriberCareRequest = new SubscriberCareRequest(
-                "1234567890", SubscriberCareReasons.HELP.toString(), Channel.CALL_CENTER.toString(), DateTime.now());
+                "1234567890", SubscriberCareReasons.HELP.toString(), Channel.CONTACT_CENTER.toString(), DateTime.now());
 
         subscriberCareService.create(subscriberCareRequest);
 

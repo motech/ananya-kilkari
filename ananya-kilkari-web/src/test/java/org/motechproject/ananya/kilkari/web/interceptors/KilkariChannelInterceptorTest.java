@@ -39,7 +39,7 @@ public class KilkariChannelInterceptorTest {
     @Test
     public void shouldNotSetJavascriptResponseForCallCenterCalls() throws Exception {
         KilkariChannelInterceptor kilkariChannelInterceptor = new KilkariChannelInterceptor();
-        when(request.getParameter("channel")).thenReturn(Channel.CALL_CENTER.name());
+        when(request.getParameter("channel")).thenReturn(Channel.CONTACT_CENTER.name());
         when(response.getOutputStream()).thenReturn(outputStream);
 
         kilkariChannelInterceptor.preHandle(request, response, null);
@@ -50,18 +50,18 @@ public class KilkariChannelInterceptorTest {
     @Test
     public void shouldSetTheChannelInHttpThreadContext() throws Exception {
         KilkariChannelInterceptor kilkariChannelInterceptor = new KilkariChannelInterceptor();
-        when(request.getParameter("channel")).thenReturn(Channel.CALL_CENTER.name());
+        when(request.getParameter("channel")).thenReturn(Channel.CONTACT_CENTER.name());
         when(response.getOutputStream()).thenReturn(outputStream);
 
         kilkariChannelInterceptor.preHandle(request, response, null);
 
-        assertEquals(Channel.CALL_CENTER.name(), HttpThreadContext.get());
+        assertEquals(Channel.CONTACT_CENTER.name(), HttpThreadContext.get());
     }
 
     @Test
     public void shouldSetJSONResponseContentForCallCenter() throws Exception {
         KilkariChannelInterceptor kilkariChannelInterceptor = new KilkariChannelInterceptor();
-        when(request.getParameter("channel")).thenReturn(Channel.CALL_CENTER.name());
+        when(request.getParameter("channel")).thenReturn(Channel.CONTACT_CENTER.name());
 
         kilkariChannelInterceptor.postHandle(request, response, null, null);
 

@@ -95,7 +95,7 @@ public class ReportingGatewayImpl implements ReportingGateway {
 
     private boolean isCallCenterCall() {
         String channel = HttpThreadContext.get();
-        return "CALL_CENTER".equalsIgnoreCase(channel);
+        return "CONTACT_CENTER".equalsIgnoreCase(channel);
     }
 
     private <T> void performHttpRequestBasedOnChannel(String url, T postObject, Method method) {

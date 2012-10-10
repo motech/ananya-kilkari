@@ -17,7 +17,7 @@ public class ChangeMsisdnRequestMapperTest {
     public void shouldMapRequestWithALLAsPack() {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
-        Channel channel = Channel.CALL_CENTER;
+        Channel channel = Channel.CONTACT_CENTER;
 
         ChangeMsisdnRequest mappedRequest = ChangeMsisdnRequestMapper.mapFrom(new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList("alL"), channel.toString()));
 
@@ -31,7 +31,7 @@ public class ChangeMsisdnRequestMapperTest {
     public void shouldMapRequestWithPacks() {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
-        Channel channel = Channel.CALL_CENTER;
+        Channel channel = Channel.CONTACT_CENTER;
 
         ChangeMsisdnRequest mappedRequest = ChangeMsisdnRequestMapper.mapFrom(new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList("NANHI_KILKARI", "choti_kilkari"), channel.toString()));
 

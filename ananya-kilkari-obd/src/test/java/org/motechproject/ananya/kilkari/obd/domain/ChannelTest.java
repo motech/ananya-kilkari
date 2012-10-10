@@ -12,7 +12,7 @@ public class ChannelTest {
         assertEquals(Channel.from("ivr"), Channel.IVR);
         assertEquals(Channel.from("IVR"), Channel.IVR);
         assertEquals(Channel.from("IVr"), Channel.IVR);
-        assertEquals(Channel.from("call_center"), Channel.CALL_CENTER);
+        assertEquals(Channel.from("contact_center"), Channel.CONTACT_CENTER);
     }
 
     @Test
@@ -49,15 +49,15 @@ public class ChannelTest {
         assertFalse(Channel.isIVR(" "));
         assertFalse(Channel.isIVR(null));
         assertFalse(Channel.isIVR("abc"));
-        assertFalse(Channel.isIVR("CALL_CENTER"));
+        assertFalse(Channel.isIVR("CONTACT_CENTER"));
     }
 
     @Test
     public void shouldReturnTrueIfChannelIsCallCenter() {
-        assertTrue(Channel.isCallCenter("call_center"));
-        assertTrue(Channel.isCallCenter("CALL_CENTER"));
-        assertTrue(Channel.isCallCenter("CALL_center"));
-        assertTrue(Channel.isCallCenter(" Call_center "));
+        assertTrue(Channel.isCallCenter("contact_center"));
+        assertTrue(Channel.isCallCenter("CONTACT_CENTER"));
+        assertTrue(Channel.isCallCenter("CONTACT_center"));
+        assertTrue(Channel.isCallCenter(" Contact_center "));
     }
 
     @Test

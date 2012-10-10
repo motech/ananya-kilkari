@@ -4,6 +4,8 @@ import org.motechproject.ananya.kilkari.obd.profile.TestProfile;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 @Component
 @TestProfile
 public class StubOnMobileOBDGateway implements OnMobileOBDGateway {
@@ -26,7 +28,7 @@ public class StubOnMobileOBDGateway implements OnMobileOBDGateway {
     }
 
     @Override
-    public void sendInvalidFailureRecord(InvalidFailedCallReports invalidFailedCallReports) {
+    public void sendInvalidFailureRecord(InvalidFailedCallReports invalidFailedCallReports) throws IOException {
         if(verify()) {
             behavior.sendInvalidFailureRecord(invalidFailedCallReports);
             invalidFailureRecordCalled = true;

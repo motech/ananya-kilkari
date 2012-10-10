@@ -11,6 +11,8 @@ import org.motechproject.event.annotations.MotechListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 @Component
 public class CallDeliveryFailureRecordHandler {
     Logger logger = Logger.getLogger(CallDeliveryFailureRecordHandler.class);
@@ -27,7 +29,7 @@ public class CallDeliveryFailureRecordHandler {
     }
 
     @MotechListener(subjects = {CallDeliveryFailureEventKeys.PROCESS_INVALID_CALL_DELIVERY_FAILURE_RECORD})
-    public void handleInvalidCallDeliveryFailureRecord(MotechEvent motechEvent) {
+    public void handleInvalidCallDeliveryFailureRecord(MotechEvent motechEvent) throws IOException {
         InvalidFailedCallReports invalidFailedCallReports = (InvalidFailedCallReports) motechEvent.getParameters().get("0");
         logger.info("Handling OBD invalid call delivery failure records");
         onMobileOBDGateway.sendInvalidFailureRecord(invalidFailedCallReports);

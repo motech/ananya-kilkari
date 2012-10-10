@@ -1,15 +1,11 @@
 package org.motechproject.ananya.kilkari.obd.repository;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.message.BasicStatusLine;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -20,13 +16,14 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
-import org.motechproject.ananya.kilkari.obd.utils.JsonUtils;
+import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -40,9 +37,9 @@ public class OnMobileOBDGatewayImplTest {
     @Mock
     private HttpClient httpClient;
     @Mock
-    private OBDProperties obdProperties;
+    private RestTemplate restTemplate;
     @Mock
-    private HttpResponse httpResponse;
+    private OBDProperties obdProperties;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -60,7 +57,7 @@ public class OnMobileOBDGatewayImplTest {
         when(obdProperties.getRetryMessageSlotEndTime()).thenReturn("200000");
         when(obdProperties.getFailureReportUrl()).thenReturn("failureUrl");
 
-        onMobileOBDGateway = new OnMobileOBDGatewayImpl(httpClient, obdProperties);
+        onMobileOBDGateway = new OnMobileOBDGatewayImpl(httpClient, obdProperties, restTemplate);
     }
 
     @Test
@@ -130,8 +127,7 @@ public class OnMobileOBDGatewayImplTest {
     @Test
     public void shouldThrowExceptionForAFailureResponse() throws IOException {
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Sending messages to OBD failed.\n" +
-                "Error code: 500, reason: failed");
+        expectedException.expectMessage("Sending messages to OBD failed with code: 500, reason: failed");
 
         HttpResponse httpResponse = Mockito.mock(HttpResponse.class);
         StatusLine statusLine = Mockito.mock(StatusLine.class);
@@ -153,61 +149,35 @@ public class OnMobileOBDGatewayImplTest {
         BufferedReader bfr = new BufferedReader(new InputStreamReader(in));
         String line;
         String actualContent = "";
-        while ((line = bfr.readLine()) != null) {
+        while((line = bfr.readLine()) != null) {
             actualContent += line;
         }
         return actualContent;
     }
 
     @Test
-    public void shouldSendInvalidFailureRecordsToObd() throws IOException {
+    public void shouldSendInvalidFailureRecordsToObd() {
         InvalidFailedCallReports invalidFailedCallReports = new InvalidFailedCallReports();
         ArrayList<InvalidFailedCallReport> recordObjectFaileds = new ArrayList<>();
         recordObjectFaileds.add(new InvalidFailedCallReport("msisdn1", "subscriptionId1", "description1"));
         recordObjectFaileds.add(new InvalidFailedCallReport("msisdn2", "subscriptionId2", "description2"));
         invalidFailedCallReports.setRecordObjectFaileds(recordObjectFaileds);
-        when(httpResponse.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("http", 1, 1), 200, null) {
-        });
-        when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
 
         onMobileOBDGateway.sendInvalidFailureRecord(invalidFailedCallReports);
 
-        ArgumentCaptor<HttpPost> httpPostArgumentCaptor = ArgumentCaptor.forClass(HttpPost.class);
-        verify(httpClient).execute(httpPostArgumentCaptor.capture());
-        HttpPost httpPostArgumentCaptorValue = httpPostArgumentCaptor.getValue();
-        StringEntity entity = (StringEntity) httpPostArgumentCaptorValue.getEntity();
-        InvalidFailedCallReports actualRequest = getRequest(entity);
-        assertEquals(obdProperties.getFailureReportUrl(), httpPostArgumentCaptorValue.getURI().toString());
-        assertEquals(invalidFailedCallReports, actualRequest);
-    }
+        ArgumentCaptor<InvalidFailedCallReports> invalidCallDeliveryFailureRecordArgumentCaptor = ArgumentCaptor.forClass(InvalidFailedCallReports.class);
+        ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), invalidCallDeliveryFailureRecordArgumentCaptor.capture());
+        String actualUrl = urlArgumentCaptor.getValue();
+        List<InvalidFailedCallReport> actualRecordObjectFaileds = invalidCallDeliveryFailureRecordArgumentCaptor.getValue().getRecordObjectFaileds();
 
-    @Test
-    public void shouldThrowExceptionForErroredResponseForInvalidRecords() throws IOException {
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Sending Invalid failure records to OBD failed.\n" +
-                "Error code: 601, reason: failed");
-
-        HttpResponse httpResponse = Mockito.mock(HttpResponse.class);
-        StatusLine statusLine = Mockito.mock(StatusLine.class);
-        when(statusLine.getStatusCode()).thenReturn(601);
-        when(statusLine.getReasonPhrase()).thenReturn("failed");
-
-        when(httpResponse.getStatusLine()).thenReturn(statusLine);
-        when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
-
-        onMobileOBDGateway.sendInvalidFailureRecord(null);
-    }
-
-
-    private InvalidFailedCallReports getRequest(HttpEntity entity) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entity.getContent()));
-        String totalJson = "";
-        String currentLine = bufferedReader.readLine();
-        while (currentLine != null) {
-            totalJson += currentLine;
-            currentLine = bufferedReader.readLine();
-        }
-
-        return JsonUtils.fromJson(totalJson, InvalidFailedCallReports.class);
+        assertEquals("failureUrl", actualUrl);
+        assertEquals(2, actualRecordObjectFaileds.size());
+        assertEquals("msisdn1", actualRecordObjectFaileds.get(0).getMsisdn());
+        assertEquals("subscriptionId1", actualRecordObjectFaileds.get(0).getSubscriptionId());
+        assertEquals("description1", actualRecordObjectFaileds.get(0).getDescription());
+        assertEquals("msisdn2", actualRecordObjectFaileds.get(1).getMsisdn());
+        assertEquals("subscriptionId2", actualRecordObjectFaileds.get(1).getSubscriptionId());
+        assertEquals("description2", actualRecordObjectFaileds.get(1).getDescription());
     }
 }

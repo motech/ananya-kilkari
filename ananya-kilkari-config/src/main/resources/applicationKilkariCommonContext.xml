@@ -22,5 +22,10 @@
                 <property name="readTimeout" value="${http.read.timeout}"/>
             </bean>
         </constructor-arg>
+        <property name="interceptors">
+            <list>
+                <ref bean="kilkariRestTemplateInterceptor"/>
+            </list>
+        </property>
     </bean>
 </beans>

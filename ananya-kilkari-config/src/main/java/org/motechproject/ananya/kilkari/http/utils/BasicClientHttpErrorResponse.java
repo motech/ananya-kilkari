@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class BasicClientHttpErrorResponse implements ClientHttpResponse {
+    private String statusText;
     private ClientHttpResponse baseResponse;
 
-    public BasicClientHttpErrorResponse(ClientHttpResponse baseResponse) {
+    public BasicClientHttpErrorResponse(String statusText, ClientHttpResponse baseResponse) {
+        this.statusText = statusText;
         this.baseResponse = baseResponse;
     }
 
@@ -21,7 +23,7 @@ public class BasicClientHttpErrorResponse implements ClientHttpResponse {
 
     @Override
     public String getStatusText() throws IOException {
-        return baseResponse.getStatusText();
+        return statusText + baseResponse.getStatusText();
     }
 
     @Override

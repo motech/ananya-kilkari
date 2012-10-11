@@ -1,13 +1,11 @@
 package org.motechproject.ananya.kilkari.web;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.util.Arrays;
 
@@ -28,6 +26,11 @@ public class GatewayLogger {
                 logger.debug("Accessing external url: {}", Arrays.toString(args));
             }
         }
+    }
+
+    @AfterThrowing(value = "allExternalHttpCalls()", throwing = "e")
+    public void onRestCallException(JoinPoint joinPoint, HttpServerErrorException e) {
+        logger.error(e.getResponseBodyAsString());
     }
 
     @AfterReturning(pointcut = "allExternalHttpCalls()", returning = "result")

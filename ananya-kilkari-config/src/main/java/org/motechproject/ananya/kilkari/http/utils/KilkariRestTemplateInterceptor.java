@@ -16,7 +16,7 @@ public class KilkariRestTemplateInterceptor implements ClientHttpRequestIntercep
         try {
             httpResponse.getStatusCode().value();
         } catch (IllegalArgumentException e) {
-            return new BasicClientHttpErrorResponse(httpResponse);
+            return new BasicClientHttpErrorResponse(e.getMessage(), httpResponse);
         }
         return httpResponse;
     }

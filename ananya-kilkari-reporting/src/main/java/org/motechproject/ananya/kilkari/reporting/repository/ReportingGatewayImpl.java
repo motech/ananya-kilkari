@@ -121,7 +121,7 @@ public class ReportingGatewayImpl implements ReportingGateway {
             uriComponentsBuilder.queryParam(nameValuePair.getName(), nameValuePair.getValue());
         }
 
-        return uriComponentsBuilder.build().encode().toString();
+        return uriComponentsBuilder.build().toString();
     }
 
     private List<NameValuePair> constructParameterMap(String district, String block, String panchayat) {

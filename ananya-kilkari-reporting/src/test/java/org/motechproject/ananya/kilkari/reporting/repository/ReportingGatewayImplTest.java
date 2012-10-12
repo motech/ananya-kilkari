@@ -72,7 +72,7 @@ public class ReportingGatewayImplTest {
         assertTrue(url.startsWith("url/location?"));
         assertTrue(url.contains("district=mydistrict"));
         assertTrue(url.contains("block=myblock"));
-        assertTrue(url.contains("panchayat=my%20panchayat"));
+        assertTrue(url.contains("panchayat=my panchayat"));
     }
 
     @Test

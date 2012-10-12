@@ -16,9 +16,10 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
-import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
+import org.motechproject.ananya.kilkari.obd.service.utils.JsonUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
@@ -149,7 +150,7 @@ public class OnMobileOBDGatewayImplTest {
         BufferedReader bfr = new BufferedReader(new InputStreamReader(in));
         String line;
         String actualContent = "";
-        while((line = bfr.readLine()) != null) {
+        while ((line = bfr.readLine()) != null) {
             actualContent += line;
         }
         return actualContent;
@@ -165,19 +166,26 @@ public class OnMobileOBDGatewayImplTest {
 
         onMobileOBDGateway.sendInvalidFailureRecord(invalidFailedCallReports);
 
-        ArgumentCaptor<InvalidFailedCallReports> invalidCallDeliveryFailureRecordArgumentCaptor = ArgumentCaptor.forClass(InvalidFailedCallReports.class);
+        ArgumentCaptor<String> invalidCallDeliveryFailureRecordArgumentJsonCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), invalidCallDeliveryFailureRecordArgumentCaptor.capture());
+        verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), invalidCallDeliveryFailureRecordArgumentJsonCaptor.capture());
+        InvalidFailedCallReports actualRequest = constructJsonRequest(invalidCallDeliveryFailureRecordArgumentJsonCaptor);
         String actualUrl = urlArgumentCaptor.getValue();
-        List<InvalidFailedCallReport> actualRecordObjectFaileds = invalidCallDeliveryFailureRecordArgumentCaptor.getValue().getRecordObjectFaileds();
+        List<InvalidFailedCallReport> actualFailedRecordObjects = actualRequest.getRecordObjectFaileds();
 
         assertEquals("failureUrl", actualUrl);
-        assertEquals(2, actualRecordObjectFaileds.size());
-        assertEquals("msisdn1", actualRecordObjectFaileds.get(0).getMsisdn());
-        assertEquals("subscriptionId1", actualRecordObjectFaileds.get(0).getSubscriptionId());
-        assertEquals("description1", actualRecordObjectFaileds.get(0).getDescription());
-        assertEquals("msisdn2", actualRecordObjectFaileds.get(1).getMsisdn());
-        assertEquals("subscriptionId2", actualRecordObjectFaileds.get(1).getSubscriptionId());
-        assertEquals("description2", actualRecordObjectFaileds.get(1).getDescription());
+        assertEquals(2, actualFailedRecordObjects.size());
+        assertEquals("msisdn1", actualFailedRecordObjects.get(0).getMsisdn());
+        assertEquals("subscriptionId1", actualFailedRecordObjects.get(0).getSubscriptionId());
+        assertEquals("description1", actualFailedRecordObjects.get(0).getDescription());
+        assertEquals("msisdn2", actualFailedRecordObjects.get(1).getMsisdn());
+        assertEquals("subscriptionId2", actualFailedRecordObjects.get(1).getSubscriptionId());
+        assertEquals("description2", actualFailedRecordObjects.get(1).getDescription());
+    }
+
+    private InvalidFailedCallReports constructJsonRequest(ArgumentCaptor<String> invalidCallDeliveryFailureRecordArgumentJsonCaptor) {
+        String requestJson = invalidCallDeliveryFailureRecordArgumentJsonCaptor.getValue();
+        requestJson = requestJson.replaceFirst("=", ":");
+        return JsonUtils.fromJson("{" + requestJson + "}", InvalidFailedCallReports.class);
     }
 }

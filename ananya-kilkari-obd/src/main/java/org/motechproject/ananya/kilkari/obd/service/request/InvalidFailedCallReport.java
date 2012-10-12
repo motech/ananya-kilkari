@@ -8,11 +8,14 @@ import java.io.Serializable;
 
 public class InvalidFailedCallReport implements Serializable {
     @JsonProperty("mdn")
-    private final String msisdn;
+    private String msisdn;
     @JsonProperty("subscriptionId")
-    private final String subscriptionId;
+    private String subscriptionId;
     @JsonProperty("description")
-    private final String description;
+    private String description;
+
+    public InvalidFailedCallReport() {
+    }
 
     public InvalidFailedCallReport(String msisdn, String subscriptionId, String description) {
         this.msisdn = msisdn;

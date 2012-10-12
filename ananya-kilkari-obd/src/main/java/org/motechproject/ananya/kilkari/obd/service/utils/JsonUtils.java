@@ -16,4 +16,15 @@ public class JsonUtils {
         }
         return stringWriter.toString();
     }
+
+    public static <T> T fromJson(String jsonString, Class<T> subscriberResponseClass) {
+        ObjectMapper mapper = new ObjectMapper();
+        T serializedObject = null;
+        try {
+            serializedObject = mapper.readValue(jsonString, subscriberResponseClass);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return serializedObject;
+    }
 }

@@ -1,12 +1,11 @@
 package org.motechproject.ananya.kilkari.obd.repository;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
@@ -17,6 +16,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.profile.ProductionProfile;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
+import org.motechproject.ananya.kilkari.obd.service.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 @Component
 @ProductionProfile
@@ -69,7 +68,16 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
 
     @Override
     public void sendInvalidFailureRecord(InvalidFailedCallReports invalidFailedCallReports) {
-        restTemplate.postForLocation(obdProperties.getFailureReportUrl(), invalidFailedCallReports);
+        String request = formatRequest(invalidFailedCallReports);
+        restTemplate.postForLocation(obdProperties.getFailureReportUrl(), request);
+    }
+
+    private String formatRequest(InvalidFailedCallReports invalidFailedCallReports) {
+        String invalidFailedCallReportsJson = JsonUtils.toJson(invalidFailedCallReports);
+        invalidFailedCallReportsJson = invalidFailedCallReportsJson.replaceFirst(":", "=");
+        invalidFailedCallReportsJson = StringUtils.removeStart(invalidFailedCallReportsJson, "{");
+        invalidFailedCallReportsJson = StringUtils.removeEnd(invalidFailedCallReportsJson, "}");
+        return invalidFailedCallReportsJson;
     }
 
     private void send(String content, String url, String slotStartDate, String slotEndDate) {
@@ -101,7 +109,7 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     }
 
     private void logRequest(String url, String slotStartDate, String slotEndDate) {
-        requestResponseLogger.debug("Before request [" + url + "?" + START_DATE_PARAM_NAME + "=" + slotStartDate + "&" + END_DATE_PARAM_NAME + "=" + slotEndDate +"]");
+        requestResponseLogger.debug("Before request [" + url + "?" + START_DATE_PARAM_NAME + "=" + slotStartDate + "&" + END_DATE_PARAM_NAME + "=" + slotEndDate + "]");
     }
 
     private void validateResponse(HttpResponse response, String responseContent) {

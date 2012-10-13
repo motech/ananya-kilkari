@@ -28,11 +28,6 @@ public class GatewayLogger {
         }
     }
 
-    @AfterThrowing(value = "allExternalHttpCalls()", throwing = "e")
-    public void onRestCallException(JoinPoint joinPoint, HttpServerErrorException e) {
-        logger.error(e.getResponseBodyAsString());
-    }
-
     @AfterReturning(pointcut = "allExternalHttpCalls()", returning = "result")
     public void afterRESTCall(JoinPoint joinPoint, Object result) {
         if (logger.isDebugEnabled()) {

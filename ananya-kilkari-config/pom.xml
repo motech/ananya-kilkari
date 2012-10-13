@@ -26,6 +26,10 @@
             <artifactId>commons-codec</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.motechproject.contrib-ananya-kilkari</groupId>
             <artifactId>motech-web-utils</artifactId>
         </dependency>

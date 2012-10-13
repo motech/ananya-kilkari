@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpResponse;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,6 +25,8 @@ public class KilkariRestTemplateInterceptorTest {
     private ClientHttpRequestExecution execution;
     @Mock
     private ClientHttpResponse clientHttpResponse;
+    private String errorMessage = "Error message";
+    private int statusCode = 602;
 
     @Test
     public void shouldHandleCustomErrorCodes() throws IOException {
@@ -32,6 +35,8 @@ public class KilkariRestTemplateInterceptorTest {
         ClientHttpResponse response = new KilkariRestTemplateInterceptor().intercept(null, null, execution);
 
         assertEquals(500, response.getStatusCode().value());
+        assertEquals(BasicClientHttpErrorResponse.class, response.getClass());
+        assertEquals("Custom HTTP status code received :  [" + statusCode + "]" + System.lineSeparator() + errorMessage, response.getStatusText());
     }
 
     @Test
@@ -43,30 +48,31 @@ public class KilkariRestTemplateInterceptorTest {
 
         assertEquals(200, response.getStatusCode().value());
     }
-}
 
-class InvalidClientHttpResponse implements ClientHttpResponse {
-    @Override
-    public HttpStatus getStatusCode() throws IOException {
-        return HttpStatus.valueOf(602);
-    }
 
-    @Override
-    public String getStatusText() throws IOException {
-        return null;
-    }
+    class InvalidClientHttpResponse implements ClientHttpResponse {
+        @Override
+        public HttpStatus getStatusCode() throws IOException {
+            return HttpStatus.valueOf(statusCode);
+        }
 
-    @Override
-    public void close() {
-    }
+        @Override
+        public String getStatusText() throws IOException {
+            return null;
+        }
 
-    @Override
-    public InputStream getBody() throws IOException {
-        return null;
-    }
+        @Override
+        public void close() {
+        }
 
-    @Override
-    public HttpHeaders getHeaders() {
-        return null;
+        @Override
+        public InputStream getBody() throws IOException {
+            return new ByteArrayInputStream(errorMessage.getBytes("UTF-8"));
+        }
+
+        @Override
+        public HttpHeaders getHeaders() {
+            return null;
+        }
     }
 }

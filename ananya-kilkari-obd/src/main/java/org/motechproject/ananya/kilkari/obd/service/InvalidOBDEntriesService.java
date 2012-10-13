@@ -35,7 +35,7 @@ public class InvalidOBDEntriesService {
 
     private List<String> getListOfSubscriptionId(List<InvalidCallRecord> invalidCallRecords) {
         List<String> subscriptionIdList = new ArrayList<>();
-        for(InvalidCallRecord invalidCallRecord : invalidCallRecords) {
+        for (InvalidCallRecord invalidCallRecord : invalidCallRecords) {
             subscriptionIdList.add(invalidCallRecord.getSubscriptionId());
         }
         return subscriptionIdList;

@@ -75,6 +75,7 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     private String formatRequest(InvalidFailedCallReports invalidFailedCallReports) {
         String invalidFailedCallReportsJson = JsonUtils.toJson(invalidFailedCallReports);
         invalidFailedCallReportsJson = invalidFailedCallReportsJson.replaceFirst(":", "=");
+        invalidFailedCallReportsJson = invalidFailedCallReportsJson.replaceFirst("\"msisdn\"","msisdn");
         invalidFailedCallReportsJson = StringUtils.removeStart(invalidFailedCallReportsJson, "{");
         invalidFailedCallReportsJson = StringUtils.removeEnd(invalidFailedCallReportsJson, "}");
         return invalidFailedCallReportsJson;

@@ -186,6 +186,7 @@ public class OnMobileOBDGatewayImplTest {
     private InvalidFailedCallReports constructJsonRequest(ArgumentCaptor<String> invalidCallDeliveryFailureRecordArgumentJsonCaptor) {
         String requestJson = invalidCallDeliveryFailureRecordArgumentJsonCaptor.getValue();
         requestJson = requestJson.replaceFirst("=", ":");
+        requestJson = requestJson.replaceFirst("msisdn","\"msisdn\"");
         return JsonUtils.fromJson("{" + requestJson + "}", InvalidFailedCallReports.class);
     }
 }

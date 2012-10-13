@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.http.utils;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
@@ -23,7 +24,7 @@ public class BasicClientHttpErrorResponse implements ClientHttpResponse {
 
     @Override
     public String getStatusText() throws IOException {
-        return statusText + baseResponse.getStatusText();
+        return statusText + StringUtils.trimToEmpty(baseResponse.getStatusText());
     }
 
     @Override

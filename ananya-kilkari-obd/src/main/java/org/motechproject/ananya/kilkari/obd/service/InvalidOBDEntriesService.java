@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,11 +26,19 @@ public class InvalidOBDEntriesService {
         if (invalidCallRecords.isEmpty()) {
             return;
         }
-        logger.error(String.format("Received obd callback for %s invalid call records." + System.lineSeparator() + "Invalid call records are : %s" + System.lineSeparator(),
-                invalidCallRecords.size(), JsonUtils.toJson(invalidCallRecords)));
+        logger.error(String.format("Received obd callback for %s invalid call records." + System.lineSeparator() + "Subscription Id of Invalid call records are : %s" + System.lineSeparator(),
+                invalidCallRecords.size(), JsonUtils.toJson(getListOfSubscriptionId(invalidCallRecords))));
         for (InvalidCallRecord record : invalidCallRecords) {
             allInvalidCallRecords.add(record);
         }
+    }
+
+    private List<String> getListOfSubscriptionId(List<InvalidCallRecord> invalidCallRecords) {
+        List<String> subscriptionIdList = new ArrayList<>();
+        for(InvalidCallRecord invalidCallRecord : invalidCallRecords) {
+            subscriptionIdList.add(invalidCallRecord.getSubscriptionId());
+        }
+        return subscriptionIdList;
     }
 
     public void deleteInvalidCallRecordsFor(String subscriptionId) {

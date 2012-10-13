@@ -9,7 +9,7 @@
 
     <artifactId>ananya-kilkari-purge</artifactId>
     <packaging>jar</packaging>
-    <name>ananya-kilkari-purge</name>
+    <name>Ananya Kilkari Purge</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>

@@ -63,12 +63,18 @@ public class KilkariPurgeService {
     private void deleteBySubscriptionId(List<Subscription> subscriptionList) {
         for (Subscription subscription : subscriptionList) {
             String subscriptionId = subscription.getSubscriptionId();
-            logger.info(String.format("[CouchDB Purger] Deleting based on subscriptionId: %s, msisdn: %s", subscriptionId,subscription.getMsisdn()));
+            String baseLogMessage = String.format("[CouchDB Purger] Deleting %s for subscriptionId: %s, msisdn: %s", "%s",subscriptionId, subscription.getMsisdn());
+            logger.info(String.format(baseLogMessage,"Campaign Message Alert"));
             allCampaignMessageAlerts.deleteFor(subscriptionId);
+            logger.info(String.format(baseLogMessage,"Inbox Message"));
             allInboxMessages.deleteFor(subscriptionId);
+            logger.info(String.format(baseLogMessage,"Obd Campaign Message"));
             allCampaignMessages.removeAll(subscriptionId);
+            logger.info(String.format(baseLogMessage,"Invalid Call record"));
             allInvalidCallRecords.deleteFor(subscriptionId);
+            logger.info(String.format(baseLogMessage,"Campaign Enrollment"));
             allKilkariCampaignEnrollments.deleteFor(subscriptionId);
+            logger.info(String.format(baseLogMessage,"Subscription"));
             allSubscriptions.deleteFor(subscriptionId);
         }
     }

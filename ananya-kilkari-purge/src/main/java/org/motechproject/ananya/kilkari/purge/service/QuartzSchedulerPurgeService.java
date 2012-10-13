@@ -46,16 +46,24 @@ public class QuartzSchedulerPurgeService {
 
     private void unscheduleForSubscription(Subscription subscription) {
         String subscriptionId = subscription.getSubscriptionId();
-        logger.info(String.format("[Quartz Purger] Deleting based on subscriptionId: %s, msisdn: %s",
+        logger.info(String.format("[Quartz Purger] Unscheduling for subscriptionId: %s, msisdn: %s",
                 subscriptionId, subscription.getMsisdn()));
         if (subscription.isNewEarly()) {
+            logger.info(String.format("[Quartz Purger] Unscheduling from early subscription for subscriptionId: %s, msisdn: %s",
+                    subscriptionId, subscription.getMsisdn()));
             motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.EARLY_SUBSCRIPTION, subscriptionId);
             return;
         }
         unScheduleCampaign(subscription);
-        motechSchedulerService.safeUnscheduleRunOnceJob(InboxEventKeys.DELETE_INBOX, subscriptionId);
-        motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, subscriptionId);
-        motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, subscriptionId);
+        unscheduleFrom(subscription, InboxEventKeys.DELETE_INBOX, "Delete Inbox Job");
+        unscheduleFrom(subscription, SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, "Subscription Deactivation");
+        unscheduleFrom(subscription, SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, "Subscription Completion");
+    }
+
+    private void unscheduleFrom(Subscription subscription, String jobKey, String jobName) {
+        logger.info(String.format("[Quartz Purger] Unscheduling from"+ jobName +"for subscriptionId: %s, msisdn: %s",
+                subscription.getSubscriptionId(), subscription.getMsisdn()));
+        motechSchedulerService.safeUnscheduleRunOnceJob(jobKey, subscription.getSubscriptionId());
     }
 
     private void unScheduleCampaign(Subscription subscription) {
@@ -63,5 +71,8 @@ public class QuartzSchedulerPurgeService {
         MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(),
                 activeCampaignName, subscription.getScheduleStartDate());
         messageCampaignService.stop(unEnrollRequest);
+        logger.info(String.format("[Quartz Purger] Finished unscheduling Message Campaign Enrollment for subscriptionId: %s, msisdn: %s",
+                subscription.getSubscriptionId(), subscription.getMsisdn()));
+
     }
 }

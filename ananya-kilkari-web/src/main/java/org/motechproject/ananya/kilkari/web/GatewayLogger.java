@@ -48,7 +48,7 @@ public class GatewayLogger {
             Object[] args = joinPoint.getArgs();
             String arguments = "";
             if (args.length > 0) {
-                arguments = Arrays.toString(args);
+                arguments = getPrintableArgsList(args).toString();
             }
             logger.debug("After accessing external url: {} got response: {}", arguments, result);
         }

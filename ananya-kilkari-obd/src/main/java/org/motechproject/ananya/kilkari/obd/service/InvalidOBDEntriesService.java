@@ -26,17 +26,17 @@ public class InvalidOBDEntriesService {
         if (invalidCallRecords.isEmpty()) {
             return;
         }
-        logger.error(String.format("Received obd callback for %s invalid call records." + System.lineSeparator() + "Subscription Id of Invalid call records are : %s" + System.lineSeparator(),
-                invalidCallRecords.size(), JsonUtils.toJson(getListOfSubscriptionId(invalidCallRecords))));
         for (InvalidCallRecord record : invalidCallRecords) {
             allInvalidCallRecords.add(record);
         }
+        logger.error(String.format("Received obd callback for %s invalid call records." + System.lineSeparator() + "Subscription Id of Invalid call records are : %s" + System.lineSeparator(),
+                invalidCallRecords.size(), JsonUtils.toJson(getListOfSubscriptionId(invalidCallRecords))));
     }
 
     private List<String> getListOfSubscriptionId(List<InvalidCallRecord> invalidCallRecords) {
         List<String> subscriptionIdList = new ArrayList<>();
         for (InvalidCallRecord invalidCallRecord : invalidCallRecords) {
-            subscriptionIdList.add(invalidCallRecord.getSubscriptionId());
+            subscriptionIdList.add(invalidCallRecord.getId());
         }
         return subscriptionIdList;
     }

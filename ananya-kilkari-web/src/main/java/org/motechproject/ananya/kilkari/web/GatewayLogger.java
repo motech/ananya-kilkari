@@ -36,7 +36,7 @@ public class GatewayLogger {
         List<Object> listOfArguments = new ArrayList<>();
         for (int i = 0, len = args.length; i < len; i++) {
             Object arg = args[i];
-            String string = args instanceof Object[] ? Arrays.toString((Object[]) arg) : arg.toString();
+            String string = arg instanceof Object[] ? Arrays.toString((Object[]) arg) : arg.toString();
             listOfArguments.add(string);
         }
         return listOfArguments;

@@ -1,13 +1,17 @@
 package org.motechproject.ananya.kilkari.web;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpServerErrorException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Aspect
 @Component
@@ -23,9 +27,19 @@ public class GatewayLogger {
         if (logger.isDebugEnabled()) {
             Object[] args = joinPoint.getArgs();
             if (args.length > 0) {
-                logger.debug("Accessing external url: {}", Arrays.toString(args));
+                logger.debug("Accessing external url: {}", getPrintableArgsList(args));
             }
         }
+    }
+
+    private List<Object> getPrintableArgsList(Object[] args) {
+        List<Object> listOfArguments = new ArrayList<>();
+        for (int i = 0, len = args.length; i < len; i++) {
+            Object arg = args[i];
+            String string = args instanceof Object[] ? Arrays.toString((Object[]) arg) : arg.toString();
+            listOfArguments.add(string);
+        }
+        return listOfArguments;
     }
 
     @AfterReturning(pointcut = "allExternalHttpCalls()", returning = "result")

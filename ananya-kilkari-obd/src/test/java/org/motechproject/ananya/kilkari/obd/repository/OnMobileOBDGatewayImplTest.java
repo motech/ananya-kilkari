@@ -168,11 +168,14 @@ public class OnMobileOBDGatewayImplTest {
 
         ArgumentCaptor<String> invalidCallDeliveryFailureRecordArgumentJsonCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        verify(restTemplate).postForLocation(urlArgumentCaptor.capture(), invalidCallDeliveryFailureRecordArgumentJsonCaptor.capture());
+        ArgumentCaptor<Class> entityTypeCaptor = ArgumentCaptor.forClass(Class.class);
+        verify(restTemplate).postForEntity(urlArgumentCaptor.capture(), invalidCallDeliveryFailureRecordArgumentJsonCaptor.capture(), entityTypeCaptor.capture());
         InvalidFailedCallReports actualRequest = constructJsonRequest(invalidCallDeliveryFailureRecordArgumentJsonCaptor);
+
         String actualUrl = urlArgumentCaptor.getValue();
         List<InvalidFailedCallReport> actualFailedRecordObjects = actualRequest.getRecordObjectFaileds();
 
+        assertEquals(String.class, entityTypeCaptor.getValue());
         assertEquals("failureUrl", actualUrl);
         assertEquals(2, actualFailedRecordObjects.size());
         assertEquals("msisdn1", actualFailedRecordObjects.get(0).getMsisdn());

@@ -16,7 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class KilkariCampaignService {
@@ -36,7 +39,8 @@ public class KilkariCampaignService {
     public KilkariCampaignService(MessageCampaignService messageCampaignService,
                                   KilkariSubscriptionService kilkariSubscriptionService,
                                   CampaignMessageAlertService campaignMessageAlertService,
-                                  InboxService inboxService, MotechSchedulerService motechSchedulerService) {
+                                  InboxService inboxService,
+                                  MotechSchedulerService motechSchedulerService) {
         this.messageCampaignService = messageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.campaignMessageAlertService = campaignMessageAlertService;
@@ -47,13 +51,20 @@ public class KilkariCampaignService {
     public Map<String, List<DateTime>> getTimings(String msisdn) {
         List<Subscription> subscriptionList = kilkariSubscriptionService.findByMsisdn(msisdn);
         Map<String, List<DateTime>> subscriptionEventsMap = new HashMap<>();
+
         for (Subscription subscription : subscriptionList) {
             String subscriptionId = subscription.getSubscriptionId();
             try {
-                subscriptionEventsMap.put("Message Schedule: " + subscriptionId, getMessageTimings(subscription));
-                subscriptionEventsMap.put("Inbox Deletion: " + subscriptionId, getScheduleTimings(subscription, InboxEventKeys.DELETE_INBOX));
-                subscriptionEventsMap.put("Subscription Deactivation: " + subscriptionId, getScheduleTimings(subscription, SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION));
-                subscriptionEventsMap.put("Subscription Completion: " + subscriptionId, getScheduleTimings(subscription, SubscriptionEventKeys.SUBSCRIPTION_COMPLETE));
+                if (subscription.isEarlySubscription()) {
+                    subscriptionEventsMap.put("Early Subscription for " + subscriptionId, getSchedules(subscriptionId, SubscriptionEventKeys.EARLY_SUBSCRIPTION,
+                            subscription.getCreationDate().toDate(), subscription.getStartDate().toDate()));
+                    continue;
+                }
+                subscriptionEventsMap.put("Message Schedule for " + subscriptionId, getMessageTimings(subscription));
+                subscriptionEventsMap.put("Inbox Deletion for " + subscriptionId, getScheduleTimings(subscription, InboxEventKeys.DELETE_INBOX));
+                subscriptionEventsMap.put("Subscription Deactivation for " + subscriptionId, getScheduleTimings(subscription, SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION));
+                subscriptionEventsMap.put("Subscription Completion for " + subscriptionId, getScheduleTimings(subscription, SubscriptionEventKeys.SUBSCRIPTION_COMPLETE));
+
             } catch (NullPointerException ne) {
                 //ignore
             }
@@ -64,7 +75,11 @@ public class KilkariCampaignService {
     private List<DateTime> getScheduleTimings(Subscription subscription, String subject) {
         Date startDate = subscription.getCreationDate().toDate();
         Date endDate = subscription.endDate().plusWeeks(2).toDate();
-        List<Date> timings = motechSchedulerService.getScheduledJobTimingsWithPrefix(subject, subscription.getSubscriptionId(), startDate, endDate);
+        return getSchedules(subscription.getSubscriptionId(), subject, startDate, endDate);
+    }
+
+    private List<DateTime> getSchedules(String subscriptionId, String subject, Date startDate, Date endDate) {
+        List<Date> timings = motechSchedulerService.getScheduledJobTimingsWithPrefix(subject, subscriptionId, startDate, endDate);
 
         return (List<DateTime>) CollectionUtils.collect(timings, new Transformer() {
             @Override

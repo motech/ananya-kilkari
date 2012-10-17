@@ -2,8 +2,8 @@ package org.motechproject.ananya.kilkari.web.controller;
 
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
-import org.motechproject.ananya.kilkari.web.response.CampaignSchedule;
-import org.motechproject.ananya.kilkari.web.response.UserCampaignSchedule;
+import org.motechproject.ananya.kilkari.web.response.Schedule;
+import org.motechproject.ananya.kilkari.web.response.UserSchedule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,14 +27,18 @@ public class MessageCampaignVisualizationController {
 
     @RequestMapping(value = "/visualize", method = RequestMethod.GET)
     @ResponseBody
-    public UserCampaignSchedule getVisualizationForUser(@RequestParam String msisdn) {
-        Map<String, List<DateTime>> subscriptionCampaignMap = kilkariCampaignService.getMessageTimings(msisdn);
+    public UserSchedule getVisualizationForUser(@RequestParam String msisdn) {
+        Map<String, List<DateTime>> subscriptionCampaignMap = kilkariCampaignService.getTimings(msisdn);
 
-        UserCampaignSchedule userCampaignSchedule = new UserCampaignSchedule(msisdn);
-        for(String subscriptionId :subscriptionCampaignMap.keySet()){
-            userCampaignSchedule.addCampaignSchedule(new CampaignSchedule(subscriptionId, subscriptionCampaignMap.get(subscriptionId)));
+        UserSchedule userSchedule = new UserSchedule(msisdn);
+        for(String scheduleKey :subscriptionCampaignMap.keySet()){
+            Schedule schedule = new Schedule(scheduleKey, subscriptionCampaignMap.get(scheduleKey));
+            if(scheduleKey.contains("Message Schedule"))
+                userSchedule.addCampaignSchedule(schedule);
+            else
+                userSchedule.addSubscriptionSchedule(schedule);
         }
-        return userCampaignSchedule;
+        return userSchedule;
     }
 
 }

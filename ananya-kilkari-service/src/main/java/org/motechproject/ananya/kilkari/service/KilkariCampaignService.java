@@ -1,19 +1,22 @@
 package org.motechproject.ananya.kilkari.service;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
+import org.motechproject.ananya.kilkari.message.service.InboxEventKeys;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
+import org.motechproject.scheduler.MotechSchedulerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class KilkariCampaignService {
@@ -24,6 +27,7 @@ public class KilkariCampaignService {
     private InboxService inboxService;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariCampaignService.class);
+    private MotechSchedulerService motechSchedulerService;
 
     KilkariCampaignService() {
     }
@@ -32,28 +36,46 @@ public class KilkariCampaignService {
     public KilkariCampaignService(MessageCampaignService messageCampaignService,
                                   KilkariSubscriptionService kilkariSubscriptionService,
                                   CampaignMessageAlertService campaignMessageAlertService,
-                                  InboxService inboxService) {
+                                  InboxService inboxService, MotechSchedulerService motechSchedulerService) {
         this.messageCampaignService = messageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.campaignMessageAlertService = campaignMessageAlertService;
         this.inboxService = inboxService;
+        this.motechSchedulerService = motechSchedulerService;
     }
 
-    public Map<String, List<DateTime>> getMessageTimings(String msisdn) {
+    public Map<String, List<DateTime>> getTimings(String msisdn) {
         List<Subscription> subscriptionList = kilkariSubscriptionService.findByMsisdn(msisdn);
-        Map<String, List<DateTime>> campaignMessageMap = new HashMap<>();
+        Map<String, List<DateTime>> subscriptionEventsMap = new HashMap<>();
         for (Subscription subscription : subscriptionList) {
             String subscriptionId = subscription.getSubscriptionId();
-
             try {
-                List<DateTime> messageTimings = messageCampaignService.getMessageTimings(
-                        subscriptionId, subscription.getCreationDate(), subscription.endDate());
-                campaignMessageMap.put(subscriptionId, messageTimings);
+                subscriptionEventsMap.put("Message Schedule: " + subscriptionId, getMessageTimings(subscription));
+                subscriptionEventsMap.put("Inbox Deletion: " + subscriptionId, getScheduleTimings(subscription, InboxEventKeys.DELETE_INBOX));
+                subscriptionEventsMap.put("Subscription Deactivation: " + subscriptionId, getScheduleTimings(subscription, SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION));
+                subscriptionEventsMap.put("Subscription Completion: " + subscriptionId, getScheduleTimings(subscription, SubscriptionEventKeys.SUBSCRIPTION_COMPLETE));
             } catch (NullPointerException ne) {
                 //ignore
             }
         }
-        return campaignMessageMap;
+        return subscriptionEventsMap;
+    }
+
+    private List<DateTime> getScheduleTimings(Subscription subscription, String subject) {
+        Date startDate = subscription.getCreationDate().toDate();
+        Date endDate = subscription.endDate().plusWeeks(2).toDate();
+        List<Date> timings = motechSchedulerService.getScheduledJobTimingsWithPrefix(subject, subscription.getSubscriptionId(), startDate, endDate);
+
+        return (List<DateTime>) CollectionUtils.collect(timings, new Transformer() {
+            @Override
+            public Object transform(Object input) {
+                return new DateTime(input);
+            }
+        });
+    }
+
+    private List<DateTime> getMessageTimings(Subscription subscription) {
+        return messageCampaignService.getMessageTimings(subscription.getSubscriptionId(), subscription.getCreationDate(), subscription.endDate());
     }
 
     public void scheduleWeeklyMessage(String subscriptionId, String campaignName) {

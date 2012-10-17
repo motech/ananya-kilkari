@@ -7,16 +7,16 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CampaignSchedule {
+public class Schedule {
 
     @JsonProperty("mid")
-    private String subscriptionId;
+    private String scheduleKey;
 
     @JsonProperty("messages")
     private List<Long> scheduleTimings;
 
-    public CampaignSchedule(String subscriptionId, List<DateTime> scheduleTimings) {
-        this.subscriptionId = subscriptionId;
+    public Schedule(String scheduleKey, List<DateTime> scheduleTimings) {
+        this.scheduleKey = scheduleKey;
 
         this.scheduleTimings = new ArrayList<>();
         for (DateTime dateTime : scheduleTimings) {

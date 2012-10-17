@@ -8,19 +8,19 @@ import java.util.Arrays;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class UserCampaignScheduleTest {
+public class UserScheduleTest {
 
     @Test
     public void shouldFindTheEarliestDateOfAllCampaigns() {
-        UserCampaignSchedule userCampaignSchedule = new UserCampaignSchedule("123");
+        UserSchedule userSchedule = new UserSchedule("123");
         DateTime today = DateTime.now();
         DateTime tomorrow = DateTime.now().plusDays(1);
         DateTime yesterday = DateTime.now().minusDays(1);
 
-        userCampaignSchedule.addCampaignSchedule(new CampaignSchedule("1", Arrays.asList(today, tomorrow)));
-        userCampaignSchedule.addCampaignSchedule(new CampaignSchedule("1", Arrays.asList(tomorrow, yesterday)));
+        userSchedule.addCampaignSchedule(new Schedule("1", Arrays.asList(today, tomorrow)));
+        userSchedule.addCampaignSchedule(new Schedule("1", Arrays.asList(tomorrow, yesterday)));
 
-        Long earliestDateTimeInMillis = userCampaignSchedule.earliestCampaignDateTimeInMillis();
+        Long earliestDateTimeInMillis = userSchedule.earliestCampaignDateTimeInMillis();
         assertThat(earliestDateTimeInMillis, is(yesterday.getMillis()));
     }
 }

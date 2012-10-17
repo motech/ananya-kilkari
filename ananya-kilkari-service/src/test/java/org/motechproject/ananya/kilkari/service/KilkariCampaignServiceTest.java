@@ -11,16 +11,16 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
+import org.motechproject.ananya.kilkari.message.service.InboxEventKeys;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.domain.Operator;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
+import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.scheduler.MotechSchedulerService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +45,8 @@ public class KilkariCampaignServiceTest {
     private InboxService inboxService;
     @Mock
     private CampaignMessageAlertService campaignMessageAlertService;
+    @Mock
+    private MotechSchedulerService motechSchedulerService;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -53,56 +55,69 @@ public class KilkariCampaignServiceTest {
     public void setUp() {
         initMocks(this);
         kilkariCampaignService = new KilkariCampaignService(messageCampaignService, kilkariSubscriptionService,
-                campaignMessageAlertService, inboxService
-        );
+                campaignMessageAlertService, inboxService,
+                motechSchedulerService);
     }
 
     @Test
-    public void shouldGetMessageTimings() {
+    public void shouldGetAllScheduleTimesForAGivenMsisdn() {
         String msisdn = "1234567890";
         List<Subscription> subscriptions = new ArrayList<>();
 
-        DateTime now = DateTime.now();
-        DateTime subscriptionStartDate1 = now.plusWeeks(2);
-        DateTime subscriptionStartDate2 = now.plusWeeks(3);
-        Subscription subscription1 = new SubscriptionBuilder().withDefaults().withCreationDate(now)
-                .withScheduleStartDate(subscriptionStartDate1).withStatus(SubscriptionStatus.ACTIVE).build();
-        Subscription subscription2 = new SubscriptionBuilder().withDefaults().withCreationDate(now)
-                .withScheduleStartDate(subscriptionStartDate2).withStatus(SubscriptionStatus.ACTIVE).build();
-        subscriptions.add(subscription1);
-        subscriptions.add(subscription2);
+        final DateTime now = DateTime.now();
+        DateTime subscriptionStartDate = now.plusWeeks(2);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withCreationDate(now)
+                .withScheduleStartDate(subscriptionStartDate).withStatus(SubscriptionStatus.ACTIVE).build();
+        subscriptions.add(subscription);
+        String subscriptionId = subscription.getSubscriptionId();
+        DateTime endDate = subscription.endDate().plusWeeks(2);
 
-        List<DateTime> dateTimes = new ArrayList<>();
-        dateTimes.add(now);
+        List<DateTime> dateTimes = new ArrayList<DateTime>(){{ add(now);}};
+        List<Date> dates = new ArrayList<Date>(){{ add(now.toDate());}};
 
         when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
 
         when(messageCampaignService.getMessageTimings(
-                subscription1.getSubscriptionId(),
-                subscription1.getCreationDate(),
-                subscription1.endDate())).thenReturn(dateTimes);
-        when(messageCampaignService.getMessageTimings(
-                subscription2.getSubscriptionId(),
-                subscription2.getCreationDate(),
-                subscription2.endDate())).thenReturn(dateTimes);
+                subscriptionId,
+                subscription.getCreationDate(),
+                subscription.endDate())).thenReturn(dateTimes);
+        when(motechSchedulerService.getScheduledJobTimingsWithPrefix(
+                anyString(),
+                eq(subscriptionId),
+                eq(subscription.getCreationDate().toDate()),
+                eq(endDate.toDate()))).thenReturn(dates);
 
-        Map<String, List<DateTime>> messageTimings = kilkariCampaignService.getMessageTimings(msisdn);
-
-        verify(messageCampaignService).getMessageTimings(
-                eq(subscription1.getSubscriptionId()),
-                eq(subscription1.getCreationDate()),
-                eq(subscription1.endDate()));
+        Map<String, List<DateTime>> timings = kilkariCampaignService.getTimings(msisdn);
 
         verify(messageCampaignService).getMessageTimings(
-                eq(subscription2.getSubscriptionId()),
-                eq(subscription2.getCreationDate()),
-                eq(subscription2.endDate()));
+                eq(subscriptionId),
+                eq(subscription.getCreationDate()),
+                eq(subscription.endDate()));
 
-        assertThat(messageTimings.size(), is(2));
-        assertThat(messageTimings, hasEntry(subscription1.getSubscriptionId(), dateTimes));
-        assertThat(messageTimings, hasEntry(subscription2.getSubscriptionId(), dateTimes));
+        verify(motechSchedulerService).getScheduledJobTimingsWithPrefix(
+                InboxEventKeys.DELETE_INBOX,
+                subscriptionId,
+                subscription.getCreationDate().toDate(),
+                endDate.toDate());
+
+        verify(motechSchedulerService).getScheduledJobTimingsWithPrefix(
+                SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION,
+                subscriptionId,
+                subscription.getCreationDate().toDate(),
+                endDate.toDate());
+
+        verify(motechSchedulerService).getScheduledJobTimingsWithPrefix(
+                SubscriptionEventKeys.SUBSCRIPTION_COMPLETE,
+                subscriptionId,
+                subscription.getCreationDate().toDate(),
+                endDate.toDate());
+
+        assertThat(timings.size(), is(4));
+        assertThat(timings, hasEntry("Message Schedule: " + subscriptionId, dateTimes));
+        assertThat(timings, hasEntry("Inbox Deletion: " + subscriptionId, dateTimes));
+        assertThat(timings, hasEntry("Subscription Deactivation: " + subscriptionId, dateTimes));
+        assertThat(timings, hasEntry("Subscription Completion: " + subscriptionId, dateTimes));
     }
-
 
     @Test
     public void shouldScheduleUnsubscriptionWhenPackIsCompletedAndWhenStatusIsNotDeactivated() {

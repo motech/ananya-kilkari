@@ -102,27 +102,41 @@ function Schedule(startDate, numberOfTimelinesToDraw) {
         }
     };
 
+    var displayMessage = function (message) {
+        addToLegend("#ffffff", message);
+    };
+
     return {
 
         clear:function () {
             paper.clear();
         },
 
-        draw:function (campaign) {
+        draw:function (userSchedule) {
             for (var i = 0; i < numberOfTimelinesToDraw; i++) {
                 drawTimeline(20 * i, (heigthOfEachTimeline / 2) * ((2 * i) + 1));
             }
 
-            for (var schIndex = 0; schIndex < campaign.schedules.length; schIndex++) {
-                var schedule = campaign.schedules[schIndex];
+            for (var schIndex = 0; schIndex < userSchedule.campaignSchedules.length; schIndex++) {
+                var campaignSchedule = userSchedule.campaignSchedules[schIndex];
 
                 var dates = new Array();
-                for (var dtIndex = 0; dtIndex < schedule.messages.length; dtIndex++) {
-                    dates[dtIndex] = new Date(eval(schedule.messages[dtIndex]));
+                for (var dtIndex = 0; dtIndex < campaignSchedule.messages.length; dtIndex++) {
+                    dates[dtIndex] = new Date(eval(campaignSchedule.messages[dtIndex]));
                 }
 
-                addMessages(schedule.mid, schedule.mid, dates);
+                addMessages(campaignSchedule.mid, campaignSchedule.mid, dates);
             }
+
+            for(var scheduleIndex = 0; scheduleIndex < userSchedule.subscriptionSchedules.length ; scheduleIndex++){
+                var subscriptionSchedule = userSchedule.subscriptionSchedules[scheduleIndex];
+
+                for(var index = 0; index < subscriptionSchedule.messages.length; index++){
+                    var time = new Date(eval(subscriptionSchedule.messages[index]));
+                    displayMessage(subscriptionSchedule.mid + " at: " + time);
+                }
+            }
+
             return this;
         }
     };

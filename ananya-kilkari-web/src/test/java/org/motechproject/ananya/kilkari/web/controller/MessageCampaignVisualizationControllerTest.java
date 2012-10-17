@@ -40,14 +40,16 @@ public class MessageCampaignVisualizationControllerTest {
         messageTimings.add(new DateTime(2012, 12, 20, 12, 43, 53));
 
         HashMap<String, List<DateTime>> subscriptionCampaignMap = new HashMap<String, List<DateTime>>();
-        subscriptionCampaignMap.put("subid", messageTimings);
-        when(kilkariCampaignService.getMessageTimings(msisdn)).thenReturn(subscriptionCampaignMap);
+        subscriptionCampaignMap.put("Message Schedule: ", messageTimings);
+        subscriptionCampaignMap.put("Inbox Deletion: ", messageTimings);
+        when(kilkariCampaignService.getTimings(msisdn)).thenReturn(subscriptionCampaignMap);
 
         MockMvcBuilders.standaloneSetup(messageCampaignVisualizationController).build()
                 .perform(get("/messagecampaign/visualize").param("msisdn", msisdn))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string("{\"externalId\":\"msisdn\",\"schedules\":[{\"mid\":\"subid\",\"messages\":[1351160338000,1355987633000]}],\"startDate\":1351160338000}"));
+                .andExpect(content().string("{\"externalId\":\"msisdn\",\"campaignSchedules\":[{\"mid\":\"Message Schedule: \",\"messages\":[1351160338000,1355987633000]}]," +
+                        "\"subscriptionSchedules\":[{\"mid\":\"Inbox Deletion: \",\"messages\":[1351160338000,1355987633000]}],\"startDate\":1351160338000}"));
 
     }
 }

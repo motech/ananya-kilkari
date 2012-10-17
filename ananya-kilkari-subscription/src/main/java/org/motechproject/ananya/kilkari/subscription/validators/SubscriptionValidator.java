@@ -51,12 +51,6 @@ public class SubscriptionValidator {
         raiseExceptionIfThereAreErrors(errors);
     }
 
-    public void validateSubscriptionExists(String subscriptionId) {
-        Errors errors = new Errors();
-        checkIfSubscriptionExists(subscriptionId, errors);
-        raiseExceptionIfThereAreErrors(errors);
-    }
-
     private void checkIfSubscriptionExists(String subscriptionId, Errors errors) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         if (subscription == null) {

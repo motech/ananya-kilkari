@@ -47,8 +47,7 @@ public class ChangeSubscriptionValidator {
     }
 
     private void validateRequestedPackIsSameAsExistingPack(Subscription existingSubscription, SubscriptionPack requestedPack) {
-        SubscriptionPack existingSubscriptionPack = existingSubscription.getPack();
-        if (existingSubscriptionPack != null && !existingSubscriptionPack.equals(requestedPack))
+        if (existingSubscription.getPack() != requestedPack)
             throw new ValidationException(String.format("Subscription %s is not subscribed to requested pack", existingSubscription.getSubscriptionId()));
     }
 

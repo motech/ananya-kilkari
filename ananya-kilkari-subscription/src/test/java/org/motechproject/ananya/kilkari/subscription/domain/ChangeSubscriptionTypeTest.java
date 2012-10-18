@@ -15,15 +15,8 @@ public class ChangeSubscriptionTypeTest {
 
     @Test
     public void shouldReturnChangeType() {
-        assertEquals(ChangeSubscriptionType.CHANGE_PACK, ChangeSubscriptionType.from("change pack"));
-        assertEquals(ChangeSubscriptionType.CHANGE_SCHEDULE, ChangeSubscriptionType.from("change schedule"));
-    }
-
-    @Test
-    public void shouldThrowExceptionWhileGettingWrongChangeType() {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Wrong change type wrong change");
-        ChangeSubscriptionType.from("wrong change");
+        assertEquals(ChangeSubscriptionType.CHANGE_PACK, ChangeSubscriptionType.from("change_pack"));
+        assertEquals(ChangeSubscriptionType.CHANGE_SCHEDULE, ChangeSubscriptionType.from("change_schedule"));
     }
 
     @Test
@@ -31,11 +24,11 @@ public class ChangeSubscriptionTypeTest {
         assertFalse(ChangeSubscriptionType.isValid("Wrong type"));
         assertFalse(ChangeSubscriptionType.isValid(null));
         assertFalse(ChangeSubscriptionType.isValid(""));
-        assertFalse(ChangeSubscriptionType.isValid("change  pack"));
+        assertFalse(ChangeSubscriptionType.isValid("change _pack"));
 
-        assertTrue(ChangeSubscriptionType.isValid("change pack"));
-        assertTrue(ChangeSubscriptionType.isValid("Change pAck"));
-        assertTrue(ChangeSubscriptionType.isValid("change schedule"));
+        assertTrue(ChangeSubscriptionType.isValid("change_pack  "));
+        assertTrue(ChangeSubscriptionType.isValid("Change_pAck"));
+        assertTrue(ChangeSubscriptionType.isValid("change_schedule"));
     }
 
     @Test

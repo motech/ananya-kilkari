@@ -79,7 +79,7 @@ public class ChangeSubscriptionRequest {
     }
 
     public void prefixReasonWithChangeType() {
-        this.reason = String.format("%s - %s", changeType.getDescription(), reason);
+        this.reason = String.format("%s - %s", changeType.name(), reason);
     }
 
 }

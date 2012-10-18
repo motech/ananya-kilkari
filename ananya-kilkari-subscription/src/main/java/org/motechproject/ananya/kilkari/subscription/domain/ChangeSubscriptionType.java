@@ -3,33 +3,19 @@ package org.motechproject.ananya.kilkari.subscription.domain;
 import org.apache.commons.lang.StringUtils;
 
 public enum ChangeSubscriptionType {
-    CHANGE_PACK("change pack"), CHANGE_SCHEDULE("change schedule");
-    private String description;
-
-    ChangeSubscriptionType(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
+    CHANGE_PACK, CHANGE_SCHEDULE;
 
     public static ChangeSubscriptionType from(String changeType) {
-        for (ChangeSubscriptionType subscriptionType : ChangeSubscriptionType.values()) {
-            if(subscriptionType.description.equalsIgnoreCase(changeType)) {
-                return subscriptionType;
-            }
-        }
-        throw new IllegalArgumentException(String.format("Wrong change type %s", changeType));
+        return ChangeSubscriptionType.valueOf(StringUtils.trimToEmpty(changeType).toUpperCase());
     }
 
     public static boolean isValid(String changeType) {
-       try {
+        try {
             from(changeType);
-           return true;
-       } catch (IllegalArgumentException iae) {
-           return false;
-       }
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     public static boolean isChangePack(ChangeSubscriptionType type) {

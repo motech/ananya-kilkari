@@ -33,7 +33,7 @@ public class ChangeSubscriptionWebRequestTest {
     @Test
     public void shouldValidateValidChangePackRequest() {
         ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequest();
-        changeSubscriptionWebRequest.setChangeType("change paCK");
+        changeSubscriptionWebRequest.setChangeType("change_paCK");
         changeSubscriptionWebRequest.setPack("choti_KilkarI");
         changeSubscriptionWebRequest.setChannel("CONTACT_CENTER");
         changeSubscriptionWebRequest.setDateOfBirth(DateUtils.formatDate(DateTime.now().minusYears(1)));

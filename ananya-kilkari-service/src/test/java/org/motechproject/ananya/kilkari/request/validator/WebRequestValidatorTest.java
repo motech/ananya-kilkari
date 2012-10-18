@@ -2,10 +2,6 @@ package org.motechproject.ananya.kilkari.request.validator;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -131,7 +127,7 @@ public class WebRequestValidatorTest {
     @Test
     public void shouldReturnErrorIfChangeTypeIsChangeScheduleAndNoneOfDobOrEddIsPresent() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
-        webRequestValidator.validateChangeType("change schedule", null, null);
+        webRequestValidator.validateChangeType("change_schedule", null, null);
 
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. One of expected date of delivery or date of birth should be present"));

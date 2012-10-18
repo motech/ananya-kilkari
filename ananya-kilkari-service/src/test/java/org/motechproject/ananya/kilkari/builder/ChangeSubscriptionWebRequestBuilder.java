@@ -14,7 +14,7 @@ public class ChangeSubscriptionWebRequestBuilder {
 
     public ChangeSubscriptionWebRequestBuilder withDefaults() {
         changeSubscriptionWebRequest = new ChangeSubscriptionWebRequest();
-        changeSubscriptionWebRequest.setChangeType("change pack");
+        changeSubscriptionWebRequest.setChangeType("change_pack");
         changeSubscriptionWebRequest.setPack(SubscriptionPack.BARI_KILKARI.name());
         changeSubscriptionWebRequest.setChannel(Channel.CONTACT_CENTER.name());
         changeSubscriptionWebRequest.setDateOfBirth(null);

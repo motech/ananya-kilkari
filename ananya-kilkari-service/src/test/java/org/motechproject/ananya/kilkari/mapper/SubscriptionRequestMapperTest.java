@@ -84,7 +84,7 @@ public class SubscriptionRequestMapperTest {
     @Test
     public void shouldMapToChangeSubscriptionRequest() {
         ChangeSubscriptionWebRequest webRequest = new ChangeSubscriptionWebRequestBuilder().withDefaults()
-                .withChangeType("change schedule")
+                .withChangeType("change_schedule")
                 .withEDD("25-11-2013")
                 .withReason("reason for change subscription")
                 .build();

@@ -14,13 +14,9 @@ import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -48,7 +44,8 @@ public class ChangeSubscriptionServiceTest {
     }
 
     @Test
-    public void shouldChangeThePackOfAnSubscription() {
+    public void
+    shouldChangeThePackOfAnSubscription() {
         DateTime dateOfBirth = DateTime.now();
         String reason = "some reason";
 
@@ -104,7 +101,7 @@ public class ChangeSubscriptionServiceTest {
         assertEquals(changeSubscriptionRequest.getDateOfBirth(), subscriptionRequest.getSubscriber().getDateOfBirth());
         assertEquals(changeSubscriptionRequest.getExpectedDateOfDelivery(), subscriptionRequest.getSubscriber().getExpectedDateOfDelivery());
         assertEquals(existingSubscription.getMsisdn(), subscriptionRequest.getMsisdn());
-        assertEquals("change pack - " + reason, subscriptionRequest.getReason());
+        assertEquals("CHANGE_PACK - " + reason, subscriptionRequest.getReason());
     }
 
     private void validateDeactivationRequest(DeactivationRequest deactivationRequest, Subscription existingSubscription) {

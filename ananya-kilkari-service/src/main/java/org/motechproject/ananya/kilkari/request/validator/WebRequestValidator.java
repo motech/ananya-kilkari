@@ -115,7 +115,7 @@ public class WebRequestValidator {
     public void validateChangeType(String changeType, String edd, String dob) {
         if (!ChangeSubscriptionType.isValid(changeType)) {
             errors.add("Invalid change type %s", changeType);
-        } else if (changeType.equals(ChangeSubscriptionType.CHANGE_SCHEDULE.getDescription())) {
+        } else if (changeType.equalsIgnoreCase(ChangeSubscriptionType.CHANGE_SCHEDULE.name())) {
             validateExactlyOneOfEDDOrDOBIsPresent(edd, dob);
         }
     }

@@ -265,7 +265,7 @@ public class SubscriptionControllerTest {
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("ERROR", "Invalid msisdn invalidMsisdn,Invalid operator invalidOperator")));
+                .andExpect(content().string(baseResponseMatcher("FAILED", "Invalid msisdn invalidMsisdn,Invalid operator invalidOperator")));
 
 
         verifyZeroInteractions(kilkariSubscriptionService);
@@ -372,7 +372,7 @@ public class SubscriptionControllerTest {
                         .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("ERROR", "some error description")));
+                .andExpect(content().string(baseResponseMatcher("FAILED", "some error description")));
     }
 
     @Test

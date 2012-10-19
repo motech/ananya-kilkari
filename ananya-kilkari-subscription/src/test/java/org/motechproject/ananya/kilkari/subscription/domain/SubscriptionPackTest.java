@@ -35,7 +35,7 @@ public class SubscriptionPackTest {
     @Test
     public void shouldFailValidationIfWeekIsOutOfPacksRange() {
         assertFalse(SubscriptionPack.BARI_KILKARI.isValidWeekNumber(-1));
-        assertFalse(SubscriptionPack.BARI_KILKARI.isValidWeekNumber(61));
+        assertFalse(SubscriptionPack.BARI_KILKARI.isValidWeekNumber(65));
         assertTrue(SubscriptionPack.BARI_KILKARI.isValidWeekNumber(1));
 
         assertFalse(SubscriptionPack.CHOTI_KILKARI.isValidWeekNumber(50));
@@ -46,13 +46,13 @@ public class SubscriptionPackTest {
     }
 
     @Test
-    public void shouldSetStartDateThreeMonthsBeforeEDDForFifteenMonthsPack() {
+    public void shouldSetStartDateThreeMonthsBeforeEDDForSixteenMonthsPack() {
         DateTime now = DateTime.now();
         DateTime edd = now.plusMonths(2);
         DateTime startDate = SubscriptionPack.BARI_KILKARI.getStartDate(edd);
 
         assertEquals(edd.getDayOfWeek(), startDate.getDayOfWeek());
-        assertTrue(Weeks.weeksBetween(startDate, edd).getWeeks() >= 12);
+        assertEquals(16, Weeks.weeksBetween(startDate, edd).getWeeks());
     }
 
     @Test
@@ -75,7 +75,7 @@ public class SubscriptionPackTest {
     }
 
     @Test
-    public void shouldSetStartDateBasedOnTheCurrentWeekForFifteenMonthsPack() {
+    public void shouldSetStartDateBasedOnTheCurrentWeekForSixteenMonthsPack() {
         DateTime now = DateTime.now();
         Integer weekNumber = 4;
         DateTime startDate = SubscriptionPack.BARI_KILKARI.getStartDateForWeek(now, weekNumber);

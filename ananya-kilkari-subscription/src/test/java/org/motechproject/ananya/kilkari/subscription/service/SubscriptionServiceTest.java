@@ -731,11 +731,11 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        assertTrue(Weeks.weeksBetween(subscriptionArgumentCaptorValue.getStartDate(), edd).getWeeks() >= 12);
+        assertEquals(16, Weeks.weeksBetween(subscriptionArgumentCaptorValue.getStartDate(), edd).getWeeks());
     }
 
     @Test
-    public void shouldBackDateStartDateForALateSubscriptionWhenDOBIsGivenForFifteenMonthsPack() {
+    public void shouldBackDateStartDateForALateSubscriptionWhenDOBIsGivenForSixteenMonthsPack() {
         DateTime dob = DateTime.now().minusMonths(1);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withDateOfBirth(dob).build();
 
@@ -744,8 +744,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
-        assertTrue(Weeks.weeksBetween(subscriptionArgumentCaptorValue.getStartDate(), dob).getWeeks() >= 12);
-
+        assertEquals(16, Weeks.weeksBetween(subscriptionArgumentCaptorValue.getStartDate(), dob).getWeeks());
     }
 
     @Test
@@ -759,7 +758,6 @@ public class SubscriptionServiceTest {
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         Assert.assertEquals(dob.withSecondOfMinute(0).withMillisOfSecond(0), subscriptionArgumentCaptorValue.getStartDate());
-
     }
 
     @Test
@@ -773,7 +771,6 @@ public class SubscriptionServiceTest {
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         assertTrue(Weeks.weeksBetween(dob.withSecondOfMinute(0).withMillisOfSecond(0), subscriptionArgumentCaptorValue.getStartDate()).getWeeks() >= 20);
-
     }
 
     @Test
@@ -787,11 +784,10 @@ public class SubscriptionServiceTest {
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         assertEquals(subscriptionRequest.getCreationDate().minusWeeks(27).withSecondOfMinute(0).withMillisOfSecond(0), subscriptionArgumentCaptorValue.getStartDate());
-
     }
 
     @Test
-    public void shouldSetDateForAnEarlySubscriptionWhenEDDIsGivenForFifteenMonths() {
+    public void shouldSetDateForAnEarlySubscriptionWhenEDDIsGivenForSixteenMonths() {
         DateTime now = DateTime.now();
         DateTime edd = now.plusMonths(4);
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withExpectedDateOfDelivery(edd).build();
@@ -802,7 +798,7 @@ public class SubscriptionServiceTest {
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscription = subscriptionArgumentCaptor.getValue();
 
-        assertTrue(Weeks.weeksBetween(subscription.getStartDate(), edd).getWeeks() >= 12);
+        assertEquals(16, Weeks.weeksBetween(subscription.getStartDate(), edd).getWeeks());
         assertEquals(SubscriptionStatus.NEW_EARLY, subscription.getStatus());
     }
 
@@ -846,7 +842,6 @@ public class SubscriptionServiceTest {
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         assertEquals(dob.withSecondOfMinute(0).withMillisOfSecond(0), subscriptionArgumentCaptorValue.getStartDate());
-
     }
 
     @Test
@@ -860,7 +855,6 @@ public class SubscriptionServiceTest {
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionArgumentCaptorValue = subscriptionArgumentCaptor.getValue();
         assertTrue(Weeks.weeksBetween(dob.withSecondOfMinute(0).withMillisOfSecond(0), subscriptionArgumentCaptorValue.getStartDate()).getWeeks() >= 20);
-
     }
 
     @Test

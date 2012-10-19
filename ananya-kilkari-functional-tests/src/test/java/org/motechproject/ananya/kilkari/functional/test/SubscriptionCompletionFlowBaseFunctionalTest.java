@@ -53,7 +53,7 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
         DateTime futureDateForFirstCampaignAlertToBeRaised = DateTime.now().plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1);
         DateTime futureDateOfSecondCampaignAlert = futureDateForFirstCampaignAlertToBeRaised.plusWeeks(1);
         DateTime futureDateForThirdCampaignAlert = futureDateOfSecondCampaignAlert.plusWeeks(1);
-        DateTime futureDateOfPackCompletion = futureDateForFirstCampaignAlertToBeRaised.plusWeeks(59);
+        DateTime futureDateOfPackCompletion = futureDateForFirstCampaignAlertToBeRaised.plusWeeks(63);
         DateTime week2MessageExpiryDate = futureDateOfSecondCampaignAlert.plusWeeks(1);
 
         SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
@@ -81,14 +81,14 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
         when(user).resetCampaignMessageVerifier();
         and(time).isMovedToFuture(futureDateOfPackCompletion);
         then(subscriptionManager).renews(subscriptionData);
-        and(user).messageIsReady(subscriptionData, "WEEK60");
+        and(user).messageIsReady(subscriptionData, "WEEK64");
 
         and(time).isMovedToFuture(futureDateOfPackCompletion.plusHours(1));
         then(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
 
-        then(user).canListenToThisWeeksInboxMessage(subscriptionData, "WEEK60");
+        then(user).canListenToThisWeeksInboxMessage(subscriptionData, "WEEK64");
         and(time).isMovedToFuture(futureDateOfPackCompletion.plusWeeks(1));
-        then(user).cannotListenToPreviousWeeksInboxMessage(subscriptionData, "WEEK60");
+        then(user).cannotListenToPreviousWeeksInboxMessage(subscriptionData, "WEEK64");
     }
 
 
@@ -144,7 +144,7 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
         DateTime firstCampaignAlertDate = now.plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 5);
         DateTime secondCampaignAlertDate = firstCampaignAlertDate.plusWeeks(1);
         DateTime thirdCampaignAlertDate = secondCampaignAlertDate.plusWeeks(1);
-        DateTime lastCampaignAlertDate = firstCampaignAlertDate.plusWeeks(59);
+        DateTime lastCampaignAlertDate = firstCampaignAlertDate.plusWeeks(63);
 
         SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
 

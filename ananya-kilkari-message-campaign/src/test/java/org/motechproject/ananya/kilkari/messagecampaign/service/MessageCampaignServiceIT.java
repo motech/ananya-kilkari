@@ -14,7 +14,6 @@ import org.motechproject.server.messagecampaign.dao.AllCampaignEnrollments;
 import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollment;
 import org.motechproject.server.messagecampaign.domain.campaign.CampaignEnrollmentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -90,7 +89,7 @@ public class MessageCampaignServiceIT {
     }
 
     @Test
-    public void shouldCreateMessageCampaignForFifteenMonthCampaign() {
+    public void shouldCreateMessageCampaignForSixteenMonthCampaign() {
         DateTime referenceDate = DateTime.now().plusDays(1);
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
@@ -104,13 +103,13 @@ public class MessageCampaignServiceIT {
 
         LocalDate referenceDateWithDelta = referenceDate.toLocalDate().plusDays(CONFIGURED_DELTA_DAYS);
         LocalTime deliverTime = new LocalTime(referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getHourOfDay(), referenceDate.plusMinutes(CONFIGURED_DELTA_MINUTES).getMinuteOfHour());
-        assertThat(dateTimeList.size(), is(60));
+        assertThat(dateTimeList.size(), is(64));
 
         assertEquals(referenceDateWithDelta, dateTimeList.get(0).toLocalDate());
         assertEquals(deliverTime, dateTimeList.get(0).toLocalTime());
 
-        assertEquals(referenceDateWithDelta.plusWeeks(59), dateTimeList.get(59).toLocalDate());
-        assertEquals(deliverTime, dateTimeList.get(59).toLocalTime());
+        assertEquals(referenceDateWithDelta.plusWeeks(63), dateTimeList.get(63).toLocalDate());
+        assertEquals(deliverTime, dateTimeList.get(63).toLocalTime());
     }
 
     @Test
@@ -136,7 +135,7 @@ public class MessageCampaignServiceIT {
 
         MessageCampaignEnrollment inactiveEnrollment = enrollments.get(0);
         assertEquals(CampaignEnrollmentStatus.INACTIVE.name(), inactiveEnrollment.getStatus());
-        assertEquals(MessageCampaignService.FIFTEEN_MONTHS_CAMPAIGN_KEY, inactiveEnrollment.getCampaignName());
+        assertEquals(MessageCampaignService.SIXTEEN_MONTHS_CAMPAIGN_KEY, inactiveEnrollment.getCampaignName());
         assertEquals(externalId, inactiveEnrollment.getExternalId());
         assertEquals(referenceDate.plusDays(KILKARI_CAMPAIGN_SCHEDULE_DELTA_DAYS).toLocalDate(), inactiveEnrollment.getStartDate().toLocalDate());
 

@@ -136,7 +136,7 @@ public class MessageCampaignServiceTest {
         DateTime startDate = DateTime.now();
 
         ArrayList<CampaignEnrollmentRecord> campaignEnrollmentRecords = new ArrayList<>();
-        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, "fifteen_months", startDate.minusYears(1).toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
+        campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, "sixteen_months", startDate.minusYears(1).toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
         campaignEnrollmentRecords.add(new CampaignEnrollmentRecord(null, campaignName, startDate.toLocalDate(), CampaignEnrollmentStatus.ACTIVE));
         when(platformMessageCampaignService.search(any(CampaignEnrollmentsQuery.class))).thenReturn(campaignEnrollmentRecords);
 

@@ -5,18 +5,18 @@ import org.joda.time.DateTime;
 
 public enum SubscriptionPack {
 
-    BARI_KILKARI(1, 60) {
+    BARI_KILKARI(1, 64) {
         @Override
         public DateTime getStartDate(DateTime dob) {
-            return dob.minusWeeks(12);
+            return dob.minusWeeks(16);
         }
 
-    }, CHOTI_KILKARI(13, 48) {
+    }, CHOTI_KILKARI(17, 48) {
         @Override
         public DateTime getStartDate(DateTime dob) {
             return dob;
         }
-    }, NANHI_KILKARI(33, 28) {
+    }, NANHI_KILKARI(37, 28) {
         @Override
         public DateTime getStartDate(DateTime dob) {
             return dob.plusWeeks(20);

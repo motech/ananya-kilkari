@@ -1,8 +1,8 @@
 [
     {
-        "name" : "kilkari-mother-child-campaign-fifteen-months",
+        "name" : "kilkari-mother-child-campaign-sixteen-months",
         "type" : "REPEAT_INTERVAL",
-        "maxDuration" : "60 Weeks",
+        "maxDuration" : "64 Weeks",
         "messages" : [
             {
                 "name" : "Mother Child Health Care",

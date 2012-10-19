@@ -15,7 +15,7 @@
                 url:'/ananya-kilkari/messagecampaign/visualize?msisdn=' + $("#msisdn").val(),
                 success:function (data) {
                     if (schedule != null) schedule.clear();
-                    schedule = new Schedule(new Date(data.startDate), 3);
+                    schedule = new Schedule(new Date(data.startDate), 5);
                     schedule.draw(data);
                 }
             });

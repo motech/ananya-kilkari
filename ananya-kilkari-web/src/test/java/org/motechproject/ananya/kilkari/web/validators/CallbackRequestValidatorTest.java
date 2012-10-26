@@ -75,7 +75,7 @@ public class CallbackRequestValidatorTest {
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
 
         assertTrue(errors.hasErrors());
-        assertTrue(errors.hasMessage("Invalid msisdn 12345 for subscription id "+subscriptionId));
+        assertTrue(errors.hasMessage("Invalid msisdn 12345 for subscription id " + subscriptionId));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class CallbackRequestValidatorTest {
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
 
         assertTrue(errors.hasErrors());
-        assertTrue(errors.hasMessage("Invalid msisdn 123456789a for subscription id "+subscriptionId));
+        assertTrue(errors.hasMessage("Invalid msisdn 123456789a for subscription id " + subscriptionId));
     }
 
     @Test
@@ -109,7 +109,7 @@ public class CallbackRequestValidatorTest {
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
 
         assertTrue(errors.hasErrors());
-        assertTrue(errors.hasMessage("Invalid callbackAction invalid  for subscription "+subscriptionId));
+        assertTrue(errors.hasMessage("Invalid callbackAction invalid  for subscription " + subscriptionId));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class CallbackRequestValidatorTest {
 
         assertTrue(errors.hasErrors());
         assertEquals(1, errors.getCount());
-        assertTrue(errors.hasMessage(String.format("Cannot deactivate on renewal. Subscription %s in ACTIVE status",subscriptionId)));
+        assertTrue(errors.hasMessage(String.format("Cannot deactivate on renewal. Subscription %s in ACTIVE status", subscriptionId)));
     }
 
     @Test
@@ -146,7 +146,7 @@ public class CallbackRequestValidatorTest {
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
 
         assertTrue(errors.hasErrors());
-        assertTrue(errors.hasMessage("Invalid callbackStatus invalid for subscription "+subscriptionId));
+        assertTrue(errors.hasMessage("Invalid callbackStatus invalid for subscription " + subscriptionId));
     }
 
     @Test
@@ -164,7 +164,7 @@ public class CallbackRequestValidatorTest {
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
 
         assertTrue(errors.hasErrors());
-        assertTrue(errors.hasMessage("Invalid operator invalid_operator for subscription "+subscriptionId));
+        assertTrue(errors.hasMessage("Invalid operator invalid_operator for subscription " + subscriptionId));
     }
 
     @Test
@@ -182,7 +182,7 @@ public class CallbackRequestValidatorTest {
         Errors errors = callbackRequestValidator.validate(new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now()));
 
         assertTrue(errors.hasErrors());
-        assertTrue(errors.hasMessage("Invalid operator null for subscription "+subscriptionId));
+        assertTrue(errors.hasMessage("Invalid operator null for subscription " + subscriptionId));
     }
 
     @Test
@@ -216,7 +216,7 @@ public class CallbackRequestValidatorTest {
 
         assertTrue(errors.hasErrors());
         assertEquals(1, errors.getCount());
-        assertTrue(errors.hasMessage(String.format("Cannot renew. Subscription %s in NEW status",subscriptionId)));
+        assertTrue(errors.hasMessage(String.format("Cannot renew. Subscription %s in NEW status", subscriptionId)));
     }
 
     @Test
@@ -236,7 +236,7 @@ public class CallbackRequestValidatorTest {
 
         assertTrue(errors.hasErrors());
         assertEquals(1, errors.getCount());
-        assertTrue(errors.hasMessage(String.format("Cannot activate. Subscription %s in ACTIVE status",subscriptionId)));
+        assertTrue(errors.hasMessage(String.format("Cannot activate. Subscription %s in ACTIVE status", subscriptionId)));
     }
 
     @Test
@@ -292,6 +292,24 @@ public class CallbackRequestValidatorTest {
 
         assertTrue(errors.hasErrors());
         assertEquals(1, errors.getCount());
-        assertTrue(errors.hasMessage("Invalid status ERROR for action REN for subscription "+subscriptionId));
+        assertTrue(errors.hasMessage("Invalid status ERROR for action REN for subscription " + subscriptionId));
+    }
+
+    @Test
+    public void shouldReturnErrorIfSubscriptionIdIsNotPresent() {
+        String subscriptionId = "subscriptionId";
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setAction(CallbackAction.DCT.name());
+        callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
+        callbackRequest.setMsisdn("1234567890");
+        callbackRequest.setOperator(Operator.AIRTEL.name());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
+        when(subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper)).thenReturn(new DummySubscriptionStateHandler());
+        when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(null);
+
+        Errors errors = callbackRequestValidator.validate(callbackRequestWrapper);
+
+        assertEquals(1, errors.getCount());
+        assertEquals(String.format("No subscription for subscriptionId : %s", subscriptionId), errors.allMessages());
     }
 }

@@ -68,4 +68,11 @@ public class ChannelTest {
         assertFalse(Channel.isCallCenter("abc"));
         assertFalse(Channel.isCallCenter("ivr"));
     }
+
+    @Test
+    public void shouldGetOMSMNameForChannel() {
+        assertEquals("CC",Channel.CONTACT_CENTER.getOMSMName());
+        assertEquals("IVR",Channel.IVR.getOMSMName());
+        assertEquals("MOTECH",Channel.MOTECH.getOMSMName());
+    }
 }

@@ -44,7 +44,7 @@ public class OnMobileSubscriptionGatewayImplTest {
         HashMap<String, String> urlVariables = new HashMap<>();
         urlVariables.put("msisdn", msisdn);
         urlVariables.put("srvkey", pack.name());
-        urlVariables.put("mode", channel.name());
+        urlVariables.put("mode", channel.getOMSMName());
         urlVariables.put("refid", subscriptionId);
 
         verify(restTemplate).getForEntity("url", String.class, urlVariables);
@@ -54,12 +54,12 @@ public class OnMobileSubscriptionGatewayImplTest {
     public void shouldThrowExceptionWithAppropriateErrorMessage() {
         String msisdn = "msisdn";
         SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
-        Channel channel = Channel.IVR;
+        Channel channel = Channel.CONTACT_CENTER;
         String subscriptionId = "abcd1234";
         HashMap<String, String> urlVariables = new HashMap<>();
         urlVariables.put("msisdn", msisdn);
         urlVariables.put("srvkey", pack.name());
-        urlVariables.put("mode", channel.name());
+        urlVariables.put("mode", channel.getOMSMName());
         urlVariables.put("refid", subscriptionId);
 
         when(onMobileEndpoints.activateSubscriptionURL()).thenReturn("url");
@@ -85,7 +85,7 @@ public class OnMobileSubscriptionGatewayImplTest {
         HashMap<String, String> urlVariables = new HashMap<>();
         urlVariables.put("msisdn", msisdn);
         urlVariables.put("srvkey", pack.name());
-        urlVariables.put("mode", channel.name());
+        urlVariables.put("mode", channel.getOMSMName());
         urlVariables.put("refid", subscriptionId);
 
         verify(restTemplate).getForEntity("url", String.class, urlVariables);

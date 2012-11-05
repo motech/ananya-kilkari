@@ -50,7 +50,7 @@ public class SubscriptionStateHandlerFactoryTest {
     public void shouldReturnTheActivationFailedHandlerGivenAnActivationCallbackWithBalanceLow() {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("ACT");
-        callbackRequest.setStatus("BAL_LOW");
+        callbackRequest.setStatus("BAL-LOW");
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
 
         SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
@@ -74,7 +74,7 @@ public class SubscriptionStateHandlerFactoryTest {
     public void shouldReturnTheRenewalSuspensionHandlerGivenARenewalStatusBalanceLow() {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("REN");
-        callbackRequest.setStatus("BAL_LOW");
+        callbackRequest.setStatus("BAL-LOW");
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
 
         SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
@@ -86,7 +86,7 @@ public class SubscriptionStateHandlerFactoryTest {
     public void shouldReturnTheDeactivationHandlerGivenDeactivationRequestWithLowBalance() {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("DCT");
-        callbackRequest.setStatus("BAL_LOW");
+        callbackRequest.setStatus("BAL-LOW");
         CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
 
         SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);

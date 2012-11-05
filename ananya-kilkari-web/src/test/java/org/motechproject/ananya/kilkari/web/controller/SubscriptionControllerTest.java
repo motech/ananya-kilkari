@@ -277,7 +277,7 @@ public class SubscriptionControllerTest {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setMsisdn("1234567890");
         callbackRequest.setAction(CallbackAction.ACT.name());
-        callbackRequest.setStatus(CallbackStatus.SUCCESS.name());
+        callbackRequest.setStatus(CallbackStatus.SUCCESS.getStatus());
         callbackRequest.setReason("reason");
         callbackRequest.setOperator(Operator.AIRTEL.name());
         callbackRequest.setGraceCount("2");
@@ -297,7 +297,7 @@ public class SubscriptionControllerTest {
 
         assertEquals(subscriptionId, callbackRequestWrapper.getSubscriptionId());
         assertEquals(CallbackAction.ACT.name(), callbackRequestWrapper.getAction());
-        assertEquals(CallbackStatus.SUCCESS.name(), callbackRequestWrapper.getStatus());
+        assertEquals(CallbackStatus.SUCCESS.getStatus(), callbackRequestWrapper.getStatus());
         assertNotNull(callbackRequestWrapper.getCreatedAt());
     }
 

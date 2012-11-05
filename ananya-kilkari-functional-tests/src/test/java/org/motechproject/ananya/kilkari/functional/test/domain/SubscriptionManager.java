@@ -29,7 +29,7 @@ public class SubscriptionManager {
     }
 
     public void failsRenew(SubscriptionData subscriptionData) throws Exception {
-        callBackRequest(subscriptionData, "REN", "BAL_LOW");
+        callBackRequest(subscriptionData, "REN", "BAL-LOW");
         subscriptionVerifier.verifySubscriptionState(subscriptionData, SubscriptionStatus.SUSPENDED);
     }
 

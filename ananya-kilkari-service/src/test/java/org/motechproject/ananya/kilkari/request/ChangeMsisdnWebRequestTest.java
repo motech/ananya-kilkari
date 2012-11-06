@@ -3,7 +3,6 @@ package org.motechproject.ananya.kilkari.request;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
-import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +65,7 @@ public class ChangeMsisdnWebRequestTest {
         Errors errors = request.validate();
         assertEquals(0, errors.getCount());
 
-        request.setPacks(Arrays.asList("nanhi_kilkari", "choti_kilkari"));
+        request.setPacks(Arrays.asList("nanhi_kilkari", "navjaat_kilkari"));
         errors = request.validate();
         assertEquals(0, errors.getCount());
 

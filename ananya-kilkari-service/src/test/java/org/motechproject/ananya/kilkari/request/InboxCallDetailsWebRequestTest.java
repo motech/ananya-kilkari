@@ -26,7 +26,7 @@ public class InboxCallDetailsWebRequestTest {
         String startTime = DateTime.now().minusDays(1).toString("dd-MM-yyyy HH-mm-ss");
         String endTime = DateTime.now().toString("dd-MM-yyyy HH-mm-ss");
         CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(startTime, endTime);
-        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest("1234567890", "WEEK12", callDurationWebRequest, "choti_kilkari", "subscriptionId");
+        InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest("1234567890", "WEEK12", callDurationWebRequest, "navjaat_kilkari", "subscriptionId");
 
         Errors errors = inboxCallDetailsWebRequest.validate();
 

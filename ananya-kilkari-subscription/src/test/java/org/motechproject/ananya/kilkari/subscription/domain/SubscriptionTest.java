@@ -137,7 +137,7 @@ public class SubscriptionTest {
     @Test
     public void shouldReturnIsActiveBasedOnStatus() {
         String msisdn = "9876534211";
-        SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), DateTime.now());
 
         subscription.setStatus(SubscriptionStatus.ACTIVE);
@@ -168,7 +168,7 @@ public class SubscriptionTest {
     @Test
     public void shouldReturnIsActiveOrSuspendedBasedOnStatus() {
         String msisdn = "9876534211";
-        SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), DateTime.now());
         subscription.setStatus(SubscriptionStatus.ACTIVE);
 
@@ -188,7 +188,7 @@ public class SubscriptionTest {
     @Test
     public void shouldReturnIsUpdatableBasedOnStatus() {
         String msisdn = "9876534211";
-        SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), DateTime.now());
 
         subscription.setStatus(SubscriptionStatus.ACTIVE);
@@ -499,7 +499,7 @@ public class SubscriptionTest {
     @Test
     public void shouldReturnEndDate_withReferenceToScheduleStartDate() {
         DateTime scheduleStartDate = DateTime.now().withSecondOfMinute(0).withMillisOfSecond(0).minusWeeks(3);
-        SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         Subscription subscription = new SubscriptionBuilder()
                 .withDefaults()
                 .withPack(pack)

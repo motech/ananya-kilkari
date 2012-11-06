@@ -36,7 +36,7 @@ public class SubscriptionHandlerTest {
     @Test
     public void shouldInvokeReportingServiceToCreateASubscriptionRequest() {
         final String msisdn = "1234567890";
-        final SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         final Channel channel = Channel.IVR;
         final String subscriptionId = "abcd1234";
         final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId);
@@ -52,7 +52,7 @@ public class SubscriptionHandlerTest {
     @Test
     public void shouldRequestDeactivateSubscription() {
         final String msisdn = "msisdn";
-        final SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         final Channel channel = Channel.IVR;
         final String subscriptionId = "abcd1234";
         final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId);
@@ -84,7 +84,7 @@ public class SubscriptionHandlerTest {
     @Test
     public void shouldHandleSubscriptionComplete() {
         final String msisdn = "9988776655";
-        final SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         final String subscriptionId = "abcd1234";
         final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{
@@ -99,7 +99,7 @@ public class SubscriptionHandlerTest {
     @Test
     public void shouldHandleEarlySubscription() {
         final String msisdn = "9988776655";
-        final SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         final String subscriptionId = "abcd1234";
         final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{

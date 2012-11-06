@@ -11,7 +11,7 @@ public enum SubscriptionPack {
             return dob.minusWeeks(16);
         }
 
-    }, CHOTI_KILKARI(17, 48) {
+    }, NAVJAAT_KILKARI(17, 48) {
         @Override
         public DateTime getStartDate(DateTime dob) {
             return dob;

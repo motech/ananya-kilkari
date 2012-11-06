@@ -99,7 +99,7 @@ public class SubscriptionServiceTest {
     public void shouldCreateNewSubscription() {
         String msisdn = "1234567890";
         Channel channel = Channel.IVR;
-        SubscriptionPack subscriptionPack = SubscriptionPack.CHOTI_KILKARI;
+        SubscriptionPack subscriptionPack = SubscriptionPack.NAVJAAT_KILKARI;
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
@@ -143,7 +143,7 @@ public class SubscriptionServiceTest {
     public void shouldPublishNewAndPendingActivationReportingEventsOnCreatingSubscription() {
         String msisdn = "1234567890";
         Channel channel = Channel.IVR;
-        SubscriptionPack subscriptionPack = SubscriptionPack.CHOTI_KILKARI;
+        SubscriptionPack subscriptionPack = SubscriptionPack.NAVJAAT_KILKARI;
         ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
         ArgumentCaptor<OMSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
@@ -168,7 +168,7 @@ public class SubscriptionServiceTest {
     public void shouldGetSubscriptionsResponseForAGivenMsisdn() {
         String msisdn = "1234567890";
         ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
         subscription1.setStatus(SubscriptionStatus.NEW);
         subscriptionsToBeReturned.add(subscription1);
 
@@ -182,7 +182,7 @@ public class SubscriptionServiceTest {
 
         assertEquals(2, subscriptions.size());
         assertEquals(msisdn, subscriptions.get(0).getMsisdn());
-        assertEquals(SubscriptionPack.CHOTI_KILKARI, subscriptions.get(0).getPack());
+        assertEquals(SubscriptionPack.NAVJAAT_KILKARI, subscriptions.get(0).getPack());
         assertEquals(msisdn, subscriptions.get(1).getMsisdn());
         assertEquals(SubscriptionPack.BARI_KILKARI, subscriptions.get(1).getPack());
     }
@@ -191,7 +191,7 @@ public class SubscriptionServiceTest {
     public void shouldGetSubscriptionsForAGivenMsisdnAndPack() {
         String msisdn = "1234567890";
         ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
-        SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         Subscription subscription1 = new Subscription(msisdn, pack, DateTime.now(), DateTime.now());
         subscription1.setStatus(SubscriptionStatus.NEW);
         subscriptionsToBeReturned.add(subscription1);
@@ -531,7 +531,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldProcessSubscriptionCompletion() {
         final String msisdn = "9988776655";
-        final SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).withStartDate(DateTime.now().minusWeeks(4)).build();
         final String subscriptionId = subscription.getSubscriptionId();
         final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
@@ -583,7 +583,7 @@ public class SubscriptionServiceTest {
         final String msisdn = "9988776655";
         final Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.DEACTIVATED).build();
         final String subscriptionId = subscription.getSubscriptionId();
-        final SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         OMSubscriptionRequest value = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -750,7 +750,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldBackDateStartDateForALateSubscriptionWhenDOBIsGivenForTwelveMonthsPack() {
         DateTime dob = DateTime.now().minusMonths(1);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withDateOfBirth(dob).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NAVJAAT_KILKARI).withDateOfBirth(dob).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CONTACT_CENTER);
 
@@ -806,7 +806,7 @@ public class SubscriptionServiceTest {
     public void shouldSetDateForAnEarlySubscriptionWhenEDDIsGivenForTwelveMonths() {
         DateTime now = DateTime.now();
         DateTime edd = now.plusMonths(4);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withExpectedDateOfDelivery(edd).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NAVJAAT_KILKARI).withExpectedDateOfDelivery(edd).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CONTACT_CENTER);
 
@@ -834,7 +834,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldSetDateForAnEarlySubscriptionWhenDOBIsGivenForTwelveMonths() {
         DateTime dob = DateTime.now().plusMonths(3);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withDateOfBirth(dob).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NAVJAAT_KILKARI).withDateOfBirth(dob).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CONTACT_CENTER);
 
@@ -864,7 +864,7 @@ public class SubscriptionServiceTest {
         Subscription subscription = new SubscriptionBuilder()
                 .withDefaults()
                 .withMsisdn("1234567890")
-                .withPack(SubscriptionPack.CHOTI_KILKARI)
+                .withPack(SubscriptionPack.NAVJAAT_KILKARI)
                 .withCreationDate(createdAt)
                 .withStartDate(createdAt)
                 .withScheduleStartDate(scheduleStartDate).build();
@@ -872,7 +872,7 @@ public class SubscriptionServiceTest {
 
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        when(messageCampaignService.getActiveCampaignName(subscriptionId)).thenReturn(MessageCampaignPack.CHOTI_KILKARI.getCampaignName());
+        when(messageCampaignService.getActiveCampaignName(subscriptionId)).thenReturn(MessageCampaignPack.NAVJAAT_KILKARI.getCampaignName());
 
         subscriptionService.deactivateSubscription(subscriptionId, createdAt.plusWeeks(1), "Balance Low", null);
 
@@ -880,7 +880,7 @@ public class SubscriptionServiceTest {
         verify(messageCampaignService).stop(campaignRequestArgumentCaptor.capture());
         MessageCampaignRequest messageCampaignRequest = campaignRequestArgumentCaptor.getValue();
         assertEquals(subscriptionId, messageCampaignRequest.getExternalId());
-        assertEquals(MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), messageCampaignRequest.getCampaignName());
+        assertEquals(MessageCampaignPack.NAVJAAT_KILKARI.getCampaignName(), messageCampaignRequest.getCampaignName());
         assertEquals(scheduleStartDate.withSecondOfMinute(0).withMillisOfSecond(0), messageCampaignRequest.getScheduleStartDate());
         verify(campaignMessageAlertService).deleteFor(subscriptionId);
     }
@@ -902,7 +902,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldScheduleEarlySubscription() {
         DateTime dob = DateTime.now().plusMonths(3);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.CHOTI_KILKARI).withDateOfBirth(dob).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NAVJAAT_KILKARI).withDateOfBirth(dob).build();
 
         subscriptionService.createSubscription(subscriptionRequest, Channel.CONTACT_CENTER);
 
@@ -934,7 +934,7 @@ public class SubscriptionServiceTest {
         subscription1.setStatus(SubscriptionStatus.ACTIVE);
         String subscriptionId = subscription1.getSubscriptionId();
 
-        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
         subscription2.setStatus(SubscriptionStatus.ACTIVE);
 
         String beneficiaryName = "name";
@@ -1002,7 +1002,7 @@ public class SubscriptionServiceTest {
         Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
         subscription1.setStatus(SubscriptionStatus.NEW_EARLY);
 
-        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
         subscription2.setStatus(SubscriptionStatus.ACTIVE);
 
 
@@ -1123,7 +1123,7 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldUnsubscribeASubscription(){
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.CHOTI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         DeactivationRequest deactivationRequest = new DeactivationRequest(subscriptionId, Channel.CONTACT_CENTER, DateTime.now(), "Reason");

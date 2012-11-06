@@ -70,7 +70,7 @@ public class MessageCampaignServiceIT {
         DateTime referenceDate = DateTime.now().plusDays(1);
 
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
-                "my_id2", MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), referenceDate);
+                "my_id2", MessageCampaignPack.NAVJAAT_KILKARI.getCampaignName(), referenceDate);
 
         messageCampaignService.start(messageCampaignRequest, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
 
@@ -127,7 +127,7 @@ public class MessageCampaignServiceIT {
 
         DateTime referenceDate2 = referenceDate.plusMonths(1);
         MessageCampaignRequest messageCampaignRequest2 = new MessageCampaignRequest(
-                externalId, MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), referenceDate2);
+                externalId, MessageCampaignPack.NAVJAAT_KILKARI.getCampaignName(), referenceDate2);
 
         messageCampaignService.start(messageCampaignRequest2, CONFIGURED_DELTA_DAYS, CONFIGURED_DELTA_MINUTES);
 

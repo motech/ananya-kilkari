@@ -21,7 +21,7 @@ public class CampaignMessageIdStrategyTest {
     public void shouldCreateMessageIdIfPackWasSubscribedToday() {
         String campaignName = "kilkari-mother-child-campaign-twelve-months";
 
-        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now(), SubscriptionPack.CHOTI_KILKARI);
+        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now(), SubscriptionPack.NAVJAAT_KILKARI);
 
         assertEquals("WEEK17", messageId);
     }

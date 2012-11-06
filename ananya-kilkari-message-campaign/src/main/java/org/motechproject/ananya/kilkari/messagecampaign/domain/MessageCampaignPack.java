@@ -5,7 +5,7 @@ import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignS
 
 public enum MessageCampaignPack {
     BARI_KILKARI(MessageCampaignService.SIXTEEN_MONTHS_CAMPAIGN_KEY),
-    CHOTI_KILKARI(MessageCampaignService.TWELVE_MONTHS_CAMPAIGN_KEY),
+    NAVJAAT_KILKARI(MessageCampaignService.TWELVE_MONTHS_CAMPAIGN_KEY),
     NANHI_KILKARI(MessageCampaignService.SEVEN_MONTHS_CAMPAIGN_KEY),
     INFANT_DEATH(MessageCampaignService.INFANT_DEATH_CAMPAIGN_KEY),
     MISCARRIAGE(MessageCampaignService.MISCARRIAGE_CAMPAIGN_KEY);

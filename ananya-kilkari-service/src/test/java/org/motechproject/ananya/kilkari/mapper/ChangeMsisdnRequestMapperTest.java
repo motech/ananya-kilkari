@@ -33,14 +33,14 @@ public class ChangeMsisdnRequestMapperTest {
         String newMsisdn = "9876543211";
         Channel channel = Channel.CONTACT_CENTER;
 
-        ChangeMsisdnRequest mappedRequest = ChangeMsisdnRequestMapper.mapFrom(new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList("NANHI_KILKARI", "choti_kilkari"), channel.toString()));
+        ChangeMsisdnRequest mappedRequest = ChangeMsisdnRequestMapper.mapFrom(new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList("NANHI_KILKARI", "navjaat_kilkari"), channel.toString()));
 
         assertEquals(oldMsisdn, mappedRequest.getOldMsisdn());
         assertEquals(newMsisdn, mappedRequest.getNewMsisdn());
         assertEquals(channel, mappedRequest.getChannel());
         assertEquals(false, mappedRequest.getShouldChangeAllPacks());
         assertTrue(mappedRequest.getPacks().contains(SubscriptionPack.NANHI_KILKARI));
-        assertTrue(mappedRequest.getPacks().contains(SubscriptionPack.CHOTI_KILKARI));
+        assertTrue(mappedRequest.getPacks().contains(SubscriptionPack.NAVJAAT_KILKARI));
     }
 
 }

@@ -50,7 +50,7 @@ public class ChangeSubscriptionServiceTest {
         String reason = "some reason";
 
         String msisdn = "9876543210";
-        SubscriptionPack newPack = SubscriptionPack.CHOTI_KILKARI;
+        SubscriptionPack newPack = SubscriptionPack.NAVJAAT_KILKARI;
         Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).withPack(SubscriptionPack.BARI_KILKARI).build();
         String subscriptionId = existingSubscription.getSubscriptionId();
 

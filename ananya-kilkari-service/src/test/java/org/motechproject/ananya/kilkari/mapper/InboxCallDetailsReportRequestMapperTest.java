@@ -22,7 +22,7 @@ public class InboxCallDetailsReportRequestMapperTest {
         CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(startTime, endTime);
         String msisdn = "1234567890";
         String campaignId = "WEEK12";
-        String pack = SubscriptionPack.CHOTI_KILKARI.name();
+        String pack = SubscriptionPack.NAVJAAT_KILKARI.name();
         InboxCallDetailsWebRequest webRequest = new InboxCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, pack, subscriptionId);
 
         CallDetailsReportRequest actualDeliveryReportRequest = InboxCallDetailsReportRequestMapper.mapFrom(webRequest);

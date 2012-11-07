@@ -84,7 +84,7 @@ public class ChangeSubscriptionValidatorTest {
     public void changePackRequestPackShouldBeDifferentFromAnExistingActiveSubscriptionPack_ForChangePack() {
         String msisdn = "1111111111";
         SubscriptionPack requestedPack = SubscriptionPack.BARI_KILKARI;
-        Subscription subscription1 = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(SubscriptionPack.CHOTI_KILKARI).build();
+        Subscription subscription1 = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(SubscriptionPack.NAVJAAT_KILKARI).build();
         Subscription subscription2 = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(SubscriptionPack.BARI_KILKARI).withStatus(SubscriptionStatus.ACTIVE).build();
         Subscription subscription3 = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(SubscriptionPack.BARI_KILKARI).withStatus(SubscriptionStatus.DEACTIVATED).build();
         String subscriptionId = subscription1.getSubscriptionId();
@@ -106,7 +106,7 @@ public class ChangeSubscriptionValidatorTest {
         String subscriptionId = subscription.getSubscriptionId();
         when(subscriptionService.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
 
-        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_SCHEDULE, "1111111111", subscriptionId, SubscriptionPack.CHOTI_KILKARI, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason");
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_SCHEDULE, "1111111111", subscriptionId, SubscriptionPack.NAVJAAT_KILKARI, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason");
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Subscription %s is not subscribed to requested pack",subscriptionId));

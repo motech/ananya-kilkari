@@ -81,7 +81,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     public void shouldRetrieveSubscriptionDetailsFromDatabase() throws Exception {
         String msisdn = "9876543210";
         String channelString = Channel.IVR.toString();
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.CHOTI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
         Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
@@ -111,7 +111,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     public void shouldCreateSubscriptionForTheGivenMsisdnForTheIVRChannel() throws Exception {
         final String msisdn = "9876543210";
         String channelString = Channel.IVR.toString();
-        final SubscriptionPack pack = SubscriptionPack.CHOTI_KILKARI;
+        final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         reportingService.setBehavior(mock(ReportingService.class));

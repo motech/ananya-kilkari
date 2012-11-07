@@ -129,7 +129,7 @@ public class KilkariCallDetailsServiceTest {
 
     @Test
     public void shouldValidateSubscriptionIdIfRequestValidationIsSuccessful() {
-        String pack = "choti_kilkari";
+        String pack = "navjaat_kilkari";
         String msisdn = "1234567890";
         String subscriptionId = "subscriptionId";
         InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, "WEEK12", new CallDurationWebRequest("22-11-2011 11-55-35", "23-12-2012 12-59-34"), pack, subscriptionId);
@@ -142,7 +142,7 @@ public class KilkariCallDetailsServiceTest {
 
     @Test
     public void shouldReportInboxCallDetails() {
-        String pack = "choti_kilkari";
+        String pack = "navjaat_kilkari";
         String msisdn = "1234567890";
         String subscriptionId = "subscriptionId";
         String campaignId = "WEEK12";

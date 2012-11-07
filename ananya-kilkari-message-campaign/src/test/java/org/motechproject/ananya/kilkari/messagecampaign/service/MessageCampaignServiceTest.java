@@ -47,7 +47,7 @@ public class MessageCampaignServiceTest {
     @Test
     public void shouldStartNewCampaignForTheGivenRequest() {
         String externalId = "externalId";
-        String subscriptionPack = MessageCampaignPack.CHOTI_KILKARI.getCampaignName();
+        String subscriptionPack = MessageCampaignPack.NAVJAAT_KILKARI.getCampaignName();
         DateTime subscriptionStartDate = DateTime.now();
         int campaignScheduleDeltaDays = 2;
         int campaignScheduleDeltaMinutes = 30;
@@ -69,7 +69,7 @@ public class MessageCampaignServiceTest {
     @Test
     public void shouldStop() {
         String externalId = "externalId";
-        String subscriptionPack = MessageCampaignPack.CHOTI_KILKARI.getCampaignName();
+        String subscriptionPack = MessageCampaignPack.NAVJAAT_KILKARI.getCampaignName();
         DateTime subscriptionStartDate = DateTime.now();
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest(
                 externalId, subscriptionPack, subscriptionStartDate);

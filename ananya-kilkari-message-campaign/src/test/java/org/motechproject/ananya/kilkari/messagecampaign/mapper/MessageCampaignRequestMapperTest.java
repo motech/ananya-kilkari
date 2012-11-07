@@ -22,7 +22,7 @@ public class MessageCampaignRequestMapperTest {
         int deltaDays = 2;
         int deltaMinutes = 30;
         MessageCampaignRequest messageCampaignRequest = new MessageCampaignRequest("externalId",
-                MessageCampaignPack.CHOTI_KILKARI.getCampaignName(), new DateTime(2012, 5, 5, 20, 30, DateTimeZone.UTC));
+                MessageCampaignPack.NAVJAAT_KILKARI.getCampaignName(), new DateTime(2012, 5, 5, 20, 30, DateTimeZone.UTC));
 
         CampaignRequest campaignRequest = MessageCampaignRequestMapper.newRequestFrom(messageCampaignRequest, deltaDays, deltaMinutes);
 

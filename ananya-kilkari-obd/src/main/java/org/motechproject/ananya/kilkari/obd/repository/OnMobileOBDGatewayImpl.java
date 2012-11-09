@@ -70,8 +70,6 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     public void sendInvalidFailureRecord(InvalidFailedCallReports invalidFailedCallReports) {
         String request = formatRequest(invalidFailedCallReports);
         restTemplate.postForEntity(obdProperties.getFailureReportUrl(), request, String.class);
-
-        restTemplate.postForLocation(obdProperties.getFailureReportUrl(), request);
     }
 
     private String formatRequest(InvalidFailedCallReports invalidFailedCallReports) {

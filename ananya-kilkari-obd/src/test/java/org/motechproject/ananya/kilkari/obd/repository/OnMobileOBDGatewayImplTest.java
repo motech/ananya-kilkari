@@ -19,12 +19,11 @@ import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
-import org.motechproject.ananya.kilkari.obd.service.utils.JsonUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -166,30 +165,18 @@ public class OnMobileOBDGatewayImplTest {
 
         onMobileOBDGateway.sendInvalidFailureRecord(invalidFailedCallReports);
 
-        ArgumentCaptor<String> invalidCallDeliveryFailureRecordArgumentJsonCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> requestDataCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Class> entityTypeCaptor = ArgumentCaptor.forClass(Class.class);
-        verify(restTemplate).postForEntity(urlArgumentCaptor.capture(), invalidCallDeliveryFailureRecordArgumentJsonCaptor.capture(), entityTypeCaptor.capture());
-        InvalidFailedCallReports actualRequest = constructJsonRequest(invalidCallDeliveryFailureRecordArgumentJsonCaptor);
+        ArgumentCaptor<HashMap> urlVariablesCaptor = ArgumentCaptor.forClass(HashMap.class);
+        verify(restTemplate).postForEntity(urlCaptor.capture(), requestDataCaptor.capture(), entityTypeCaptor.capture(), urlVariablesCaptor.capture());
 
-        String actualUrl = urlArgumentCaptor.getValue();
-        List<InvalidFailedCallReport> actualFailedRecordObjects = actualRequest.getRecordObjectFaileds();
+        String actualUrl = urlCaptor.getValue();
+        String expectedUrl = String.format("%s?%s=%s", "failureUrl", "msisdn", "{msisdn}");
+        HashMap urlVariables = urlVariablesCaptor.getValue();
 
-        assertEquals(String.class, entityTypeCaptor.getValue());
-        assertEquals("failureUrl", actualUrl);
-        assertEquals(2, actualFailedRecordObjects.size());
-        assertEquals("msisdn1", actualFailedRecordObjects.get(0).getMsisdn());
-        assertEquals("subscriptionId1", actualFailedRecordObjects.get(0).getSubscriptionId());
-        assertEquals("description1", actualFailedRecordObjects.get(0).getDescription());
-        assertEquals("msisdn2", actualFailedRecordObjects.get(1).getMsisdn());
-        assertEquals("subscriptionId2", actualFailedRecordObjects.get(1).getSubscriptionId());
-        assertEquals("description2", actualFailedRecordObjects.get(1).getDescription());
-    }
-
-    private InvalidFailedCallReports constructJsonRequest(ArgumentCaptor<String> invalidCallDeliveryFailureRecordArgumentJsonCaptor) {
-        String requestJson = invalidCallDeliveryFailureRecordArgumentJsonCaptor.getValue();
-        requestJson = requestJson.replaceFirst("=", ":");
-        requestJson = requestJson.replaceFirst("msisdn","\"msisdn\"");
-        return JsonUtils.fromJson("{" + requestJson + "}", InvalidFailedCallReports.class);
+        assertEquals("[{\"subscriptionId\":\"subscriptionId1\",\"description\":\"description1\",\"mdn\":\"msisdn1\"},{\"subscriptionId\":\"subscriptionId2\",\"description\":\"description2\",\"mdn\":\"msisdn2\"}]", urlVariables.get("msisdn"));
+        assertEquals(expectedUrl, actualUrl);
+        assertEquals("", requestDataCaptor.getValue());
     }
 }

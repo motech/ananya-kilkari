@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.obd.repository;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -26,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 
 @Component
 @ProductionProfile
@@ -67,18 +67,16 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     }
 
     @Override
-    public void sendInvalidFailureRecord(InvalidFailedCallReports invalidFailedCallReports) {
-        String request = formatRequest(invalidFailedCallReports);
-        restTemplate.postForEntity(obdProperties.getFailureReportUrl(), request, String.class);
+    public void sendInvalidFailureRecord(final InvalidFailedCallReports invalidFailedCallReports) {
+        String url = String.format("%s?%s=%s", obdProperties.getFailureReportUrl(), "msisdn", "{msisdn}");
+        HashMap<String, String> urlVariables = new HashMap<String, String>() {{
+            put("msisdn", formatInvalidFailureRecordRequestParam(invalidFailedCallReports));
+        }};
+        restTemplate.postForEntity(url, "", String.class, urlVariables);
     }
 
-    private String formatRequest(InvalidFailedCallReports invalidFailedCallReports) {
-        String invalidFailedCallReportsJson = JsonUtils.toJson(invalidFailedCallReports);
-        invalidFailedCallReportsJson = invalidFailedCallReportsJson.replaceFirst(":", "=");
-        invalidFailedCallReportsJson = invalidFailedCallReportsJson.replaceFirst("\"msisdn\"","msisdn");
-        invalidFailedCallReportsJson = StringUtils.removeStart(invalidFailedCallReportsJson, "{");
-        invalidFailedCallReportsJson = StringUtils.removeEnd(invalidFailedCallReportsJson, "}");
-        return invalidFailedCallReportsJson;
+    private String formatInvalidFailureRecordRequestParam(InvalidFailedCallReports invalidFailedCallReports) {
+        return JsonUtils.toJson(invalidFailedCallReports.getRecordObjectFaileds());
     }
 
     private void send(String content, String url, String slotStartDate, String slotEndDate) {

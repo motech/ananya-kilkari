@@ -325,7 +325,7 @@ public class SubscriptionService {
     public void updateSubscriberDetails(SubscriberRequest request) {
         subscriptionValidator.validateSubscriberDetails(request);
 
-        SubscriberLocation subscriberLocation = new SubscriberLocation(request.getDistrict(), request.getBlock(), request.getPanchayat());
+        SubscriberLocation subscriberLocation = request.hasLocation() ? new SubscriberLocation(request.getDistrict(), request.getBlock(), request.getPanchayat()) : null;
         reportingService.reportSubscriberDetailsChange(request.getSubscriptionId(), new SubscriberReportRequest(request.getCreatedAt(),
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
     }

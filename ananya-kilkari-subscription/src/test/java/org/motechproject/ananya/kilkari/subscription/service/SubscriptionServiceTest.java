@@ -708,6 +708,25 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    public void shouldPublishASubscriberUpdateEventWithoutALocation() {
+        String subscriptionId = "subscriptionId";
+
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CONTACT_CENTER.name(), DateTime.now(), "name", 23,
+                null));
+
+        ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
+        ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
+        verify(reportingServiceImpl).reportSubscriberDetailsChange(subscriptionIdCaptor.capture(), requestCaptor.capture());
+        SubscriberReportRequest reportRequest = requestCaptor.getValue();
+        String actualSubscriptionId = subscriptionIdCaptor.getValue();
+        assertEquals(subscriptionId, actualSubscriptionId);
+        assertEquals(23, (int) reportRequest.getBeneficiaryAge());
+        assertEquals("name", reportRequest.getBeneficiaryName());
+        assertNull(reportRequest.getLocation());
+    }
+
+
+    @Test
     public void shouldNotProcessDeactivationRequestWhenSubscriptionIsNotInProgress() {
         String subscriptionId = "subsId";
         Subscription mockedSubscription = mock(Subscription.class);
@@ -1122,7 +1141,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldUnsubscribeASubscription(){
+    public void shouldUnsubscribeASubscription() {
         Subscription subscription = new Subscription("9988776655", SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
         String subscriptionId = subscription.getSubscriptionId();
         subscription.setStatus(SubscriptionStatus.ACTIVE);

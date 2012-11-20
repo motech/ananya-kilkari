@@ -15,6 +15,7 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocat
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class SubscriptionMapperTest {
 
@@ -51,6 +52,7 @@ public class SubscriptionMapperTest {
         assertEquals(subscription.getStartDate(), request.getStartDate());
         assertEquals(channel.name(), request.getChannel());
         assertEquals(reason, request.getReason());
+        assertNull(request.getLocation());
     }
 
     @Test

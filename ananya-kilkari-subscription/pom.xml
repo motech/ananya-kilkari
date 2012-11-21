@@ -52,6 +52,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.motechproject.ananya.kilkari</groupId>
+            <artifactId>ananya-kilkari-sync</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-platform-common-api</artifactId>
         </dependency>

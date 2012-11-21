@@ -3,8 +3,8 @@ package org.motechproject.ananya.kilkari.subscription.service.mapper;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
@@ -41,7 +41,7 @@ public class SubscriptionMapperTest {
     }
 
     @Test
-    public void shouldCreateReportingRequest() {
+    public void shouldCreateReportingRequestWithoutLocation() {
         String reason = "some reason";
         SubscriptionReportRequest request = SubscriptionMapper.createSubscriptionCreationReportRequest(
                 subscription, channel, new SubscriptionRequest("msisdn", null, null, Location.NULL, Subscriber.NULL, reason));
@@ -56,7 +56,7 @@ public class SubscriptionMapperTest {
     }
 
     @Test
-    public void shouldCreateReportingRequest_WithLocation() {
+    public void shouldCreateReportingRequestWithLocation() {
         subscription = new SubscriptionBuilder().withDefaults().build();
         String panchayat = "panchayat";
         String block = "block";

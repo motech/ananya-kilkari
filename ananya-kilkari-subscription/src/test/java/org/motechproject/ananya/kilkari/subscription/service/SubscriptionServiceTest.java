@@ -35,9 +35,12 @@ import org.motechproject.ananya.kilkari.subscription.service.request.Subscriptio
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
+import org.motechproject.ananya.kilkari.sync.service.LocationSyncService;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocation;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
@@ -87,12 +90,14 @@ public class SubscriptionServiceTest {
     private ChangeMsisdnValidator changeMsisdnValidator;
     @Mock
     private UnsubscriptionValidator unsubscriptionValidator;
+    @Mock
+    private LocationSyncService locationSyncService;
 
     @Before
     public void setUp() {
         initMocks(this);
         subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl,
-                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator, unsubscriptionValidator);
+                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator, unsubscriptionValidator, locationSyncService);
     }
 
     @Test
@@ -137,6 +142,7 @@ public class SubscriptionServiceTest {
         verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class), any(Integer.class), any(Integer.class));
         verify(reportingServiceImpl, never()).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
         verify(onMobileSubscriptionManagerPublisher, never()).sendActivationRequest(any(OMSubscriptionRequest.class));
+        verify(locationSyncService, never()).sync(any(SubscriberLocation.class));
     }
 
     @Test
@@ -682,16 +688,22 @@ public class SubscriptionServiceTest {
 
         subscriptionService.updateSubscriberDetails(request);
 
+        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
         verify(reportingServiceImpl, never()).reportSubscriberDetailsChange(request.getSubscriptionId(), any(SubscriberReportRequest.class));
     }
 
     @Test
-    public void shouldPublishASubscriberUpdateEvent() {
+    public void shouldPublishASubscriberUpdateEventWithLocation() {
         String subscriptionId = "subscriptionId";
-        Location location = new Location("district", "block", "panchayat");
+        String district = "district";
+        String block = "block";
+        String panchayat = "panchayat";
+        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
 
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CONTACT_CENTER.name(), DateTime.now(), "name", 23,
-                location));
+                new Location(district, block, panchayat)));
+
+        verify(reportingServiceImpl).getLocation(district, block, panchayat);
 
         ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
         ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
@@ -702,17 +714,18 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, actualSubscriptionId);
         assertEquals(23, (int) reportRequest.getBeneficiaryAge());
         assertEquals("name", reportRequest.getBeneficiaryName());
-        assertEquals("district", reportRequest.getLocation().getDistrict());
-        assertEquals("block", reportRequest.getLocation().getBlock());
-        assertEquals("panchayat", reportRequest.getLocation().getPanchayat());
+        assertEquals(district, reportRequest.getLocation().getDistrict());
+        assertEquals(block, reportRequest.getLocation().getBlock());
+        assertEquals(panchayat, reportRequest.getLocation().getPanchayat());
     }
 
     @Test
     public void shouldPublishASubscriberUpdateEventWithoutALocation() {
         String subscriptionId = "subscriptionId";
+        when(reportingServiceImpl.getLocation(anyString(), anyString(), anyString())).thenReturn(null);
 
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CONTACT_CENTER.name(), DateTime.now(), "name", 23,
-                null));
+                Location.NULL));
 
         ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
         ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
@@ -724,7 +737,6 @@ public class SubscriptionServiceTest {
         assertEquals("name", reportRequest.getBeneficiaryName());
         assertNull(reportRequest.getLocation());
     }
-
 
     @Test
     public void shouldNotProcessDeactivationRequestWhenSubscriptionIsNotInProgress() {
@@ -1156,5 +1168,91 @@ public class SubscriptionServiceTest {
         verify(allSubscriptions).update(Matchers.<Subscription>any());
         verify(onMobileSubscriptionManagerPublisher).processDeactivation(Matchers.<OMSubscriptionRequest>any());
         verify(reportingServiceImpl).reportSubscriptionStateChange(Matchers.<SubscriptionStateChangeRequest>any());
+    }
+
+    @Test
+    public void shouldSyncLocationIfItDoesNotExistWhenCreatingSubscription(){
+        String district = "d";
+        String block = "b";
+        String panchayat = "p";
+        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withDistrict(district).withBlock(block).withPanchayat(panchayat).build();
+        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
+
+        subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
+
+        InOrder order = inOrder(reportingServiceImpl, onMobileSubscriptionManagerPublisher, locationSyncService);
+        order.verify(reportingServiceImpl).getLocation(district, block, panchayat);
+        order.verify(reportingServiceImpl).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
+        order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(any(OMSubscriptionRequest.class));
+        ArgumentCaptor<SubscriberLocation> locationArgumentCaptor = ArgumentCaptor.forClass(SubscriberLocation.class);
+        order.verify(locationSyncService).sync(locationArgumentCaptor.capture());
+        SubscriberLocation location = locationArgumentCaptor.getValue();
+        assertEquals(district, location.getDistrict());
+        assertEquals(block, location.getBlock());
+        assertEquals(panchayat, location.getPanchayat());
+    }
+
+    @Test
+    public void shouldNotSyncWhenLocationAlreadyExistsWhenCreatingSubscription(){
+        String district = "d";
+        String block = "b";
+        String panchayat = "p";
+        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withDistrict(district).withBlock(block).withPanchayat(panchayat).build();
+        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(new LocationResponse());
+
+        subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
+
+        verify(locationSyncService, never()).sync(any(SubscriberLocation.class));
+    }
+
+    @Test
+    public void shouldNotFetchLocationIfTheRequestDoesNotHaveLocation_WhenUpdatingCreatingSubscription(){
+        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults()
+                                            .withDistrict(null).withBlock(null).withPanchayat(null).build();
+
+        subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
+
+        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
+        verify(locationSyncService).sync(null);
+    }
+
+    @Test
+    public void shouldSyncLocationIfItDoesNotExistWhenUpdatingSubscriberDetails(){
+        String district = "d";
+        String block = "b";
+        String panchayat = "p";
+        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
+
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(district, block, panchayat)));
+
+        InOrder order = inOrder(reportingServiceImpl, locationSyncService);
+        order.verify(reportingServiceImpl).getLocation(district, block, panchayat);
+        order.verify(reportingServiceImpl).reportSubscriberDetailsChange(anyString(), any(SubscriberReportRequest.class));
+        ArgumentCaptor<SubscriberLocation> locationArgumentCaptor = ArgumentCaptor.forClass(SubscriberLocation.class);
+        order.verify(locationSyncService).sync(locationArgumentCaptor.capture());
+        SubscriberLocation location = locationArgumentCaptor.getValue();
+        assertEquals(district, location.getDistrict());
+        assertEquals(block, location.getBlock());
+        assertEquals(panchayat, location.getPanchayat());
+    }
+
+    @Test
+    public void shouldNotSyncIfLocationAlreadyExistsWhenUpdatingSubscriberDetails(){
+        String district = "d";
+        String block = "b";
+        String panchayat = "p";
+        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(new LocationResponse());
+
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(district, block, panchayat)));
+
+        verify(locationSyncService, never()).sync(any(SubscriberLocation.class));
+    }
+
+    @Test
+    public void shouldNotFetchLocationIfRequestDoesNotHaveLocation_WhenUpdatingSubscriberDetails(){
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, Location.NULL));
+
+        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
+        verify(locationSyncService).sync(null);
     }
 }

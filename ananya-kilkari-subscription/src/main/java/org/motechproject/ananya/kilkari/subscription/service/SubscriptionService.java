@@ -19,9 +19,12 @@ import org.motechproject.ananya.kilkari.subscription.service.request.*;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
+import org.motechproject.ananya.kilkari.sync.service.LocationSyncService;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocation;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -50,6 +53,7 @@ public class SubscriptionService {
     private MotechSchedulerService motechSchedulerService;
     private ChangeMsisdnValidator changeMsisdnValidator;
     private UnsubscriptionValidator unsubscriptionValidator;
+    private LocationSyncService locationSyncService;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
@@ -58,7 +62,8 @@ public class SubscriptionService {
                                SubscriptionValidator subscriptionValidator, ReportingService reportingService,
                                InboxService inboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
                                CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData,
-                               MotechSchedulerService motechSchedulerService, ChangeMsisdnValidator changeMsisdnValidator, UnsubscriptionValidator unsubscriptionValidator) {
+                               MotechSchedulerService motechSchedulerService, ChangeMsisdnValidator changeMsisdnValidator, UnsubscriptionValidator unsubscriptionValidator,
+                               LocationSyncService locationSyncService) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
@@ -72,6 +77,7 @@ public class SubscriptionService {
         this.motechSchedulerService = motechSchedulerService;
         this.changeMsisdnValidator = changeMsisdnValidator;
         this.unsubscriptionValidator = unsubscriptionValidator;
+        this.locationSyncService = locationSyncService;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
@@ -81,20 +87,25 @@ public class SubscriptionService {
                 subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate());
         allSubscriptions.add(subscription);
 
-        reportingService.reportSubscriptionCreation(SubscriptionMapper.createSubscriptionCreationReportRequest(
-                subscription, channel, subscriptionRequest));
+        LocationResponse locationResponse = getLocation(subscriptionRequest);
+
+        SubscriptionReportRequest reportRequest = SubscriptionMapper.createSubscriptionCreationReportRequest(
+                subscription, channel, subscriptionRequest);
+        reportingService.reportSubscriptionCreation(reportRequest);
 
         OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, channel);
         if (subscription.isEarlySubscription()) {
             scheduleEarlySubscription(subscriptionRequest.getSubscriptionStartDate(), omSubscriptionRequest);
         } else
             initiateActivationRequest(omSubscriptionRequest);
+
+        if (locationResponse == null)
+            locationSyncService.sync(reportRequest.getLocation());
+
         return subscription;
     }
 
-
     private void scheduleEarlySubscription(DateTime startDate, OMSubscriptionRequest omSubscriptionRequest) {
-
         String subjectKey = SubscriptionEventKeys.EARLY_SUBSCRIPTION;
 
         HashMap<String, Object> parameters = new HashMap<>();
@@ -106,6 +117,7 @@ public class SubscriptionService {
 
         motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
     }
+
 
     public void initiateActivationRequest(OMSubscriptionRequest omSubscriptionRequest) {
         onMobileSubscriptionManagerPublisher.sendActivationRequest(omSubscriptionRequest);
@@ -325,15 +337,32 @@ public class SubscriptionService {
     public void updateSubscriberDetails(SubscriberRequest request) {
         subscriptionValidator.validateSubscriberDetails(request);
 
+        LocationResponse locationResponse = getLocation(request);
+
         SubscriberLocation subscriberLocation = request.hasLocation() ? new SubscriberLocation(request.getDistrict(), request.getBlock(), request.getPanchayat()) : null;
         reportingService.reportSubscriberDetailsChange(request.getSubscriptionId(), new SubscriberReportRequest(request.getCreatedAt(),
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
+
+        if (locationResponse == null)
+            locationSyncService.sync(subscriberLocation);
     }
 
     public void unScheduleCampaign(Subscription subscription) {
         String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
         MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getScheduleStartDate());
         messageCampaignService.stop(unEnrollRequest);
+    }
+
+    private LocationResponse getLocation(SubscriptionRequest subscriptionRequest) {
+        return subscriptionRequest.hasLocation()
+                ? reportingService.getLocation(subscriptionRequest.getLocation().getDistrict(), subscriptionRequest.getLocation().getBlock(), subscriptionRequest.getLocation().getPanchayat())
+                : null;
+    }
+
+    private LocationResponse getLocation(SubscriberRequest request) {
+        return request.hasLocation()
+                ? reportingService.getLocation(request.getLocation().getDistrict(), request.getLocation().getBlock(), request.getLocation().getPanchayat())
+                : null;
     }
 
     private void renewSchedule(Subscription subscription) {

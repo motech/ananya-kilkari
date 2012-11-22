@@ -251,13 +251,11 @@ public class KilkariSubscriptionServiceTest {
         request.setBeneficiaryAge("23a");
         request.setChannel(Channel.CONTACT_CENTER.name());
         request.setCreatedAt(DateTime.now());
-        request.setBlock("block");
         String subscriptionId = "subscriptionId";
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid beneficiary age 23a");
         kilkariSubscriptionService.updateSubscriberDetails(request, subscriptionId);
-
     }
 
     @Test
@@ -266,7 +264,12 @@ public class KilkariSubscriptionServiceTest {
         request.setBeneficiaryAge("23");
         request.setChannel(Channel.IVR.name());
         request.setCreatedAt(DateTime.now());
-        request.setBlock("block");
+        LocationRequest location = new LocationRequest(){{
+            setDistrict("district");
+            setBlock("block");
+            setPanchayat("panchayat");
+        }};
+        request.setLocation(location);
         String subscriptionId = "subscriptionId";
 
         kilkariSubscriptionService.updateSubscriberDetails(request, subscriptionId);
@@ -277,7 +280,7 @@ public class KilkariSubscriptionServiceTest {
         assertEquals(Integer.valueOf(request.getBeneficiaryAge()), subscriberRequest.getBeneficiaryAge());
         assertEquals(request.getChannel(), subscriberRequest.getChannel());
         assertEquals(request.getCreatedAt(), subscriberRequest.getCreatedAt());
-        assertEquals(request.getBlock(), subscriberRequest.getBlock());
+        assertEquals(request.getLocation().getBlock(), subscriberRequest.getLocation().getBlock());
         assertEquals(subscriptionId, subscriberRequest.getSubscriptionId());
     }
 

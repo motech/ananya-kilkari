@@ -12,7 +12,7 @@ import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 public class SubscriptionRequestMapper {
     public static SubscriptionRequest mapToSubscriptionRequest(SubscriptionWebRequest subscriptionWebRequest) {
-        Location location = new Location(subscriptionWebRequest.getDistrict(), subscriptionWebRequest.getBlock(), subscriptionWebRequest.getPanchayat());
+        Location location = subscriptionWebRequest.getLocation();
         Integer week = StringUtils.isBlank(subscriptionWebRequest.getWeek()) ? null : new Integer(subscriptionWebRequest.getWeek());
         Subscriber subscriber = new Subscriber(subscriptionWebRequest.getBeneficiaryName(), subscriptionWebRequest.getBeneficiaryAge(),
                 subscriptionWebRequest.getDateOfBirth(), subscriptionWebRequest.getExpectedDateOfDelivery(), week);
@@ -28,7 +28,7 @@ public class SubscriptionRequestMapper {
     }
 
     public static SubscriberRequest mapToSubscriberRequest(SubscriberWebRequest request, String subscriptionId) {
-        Location location = new Location(request.getDistrict(), request.getBlock(), request.getPanchayat());
+        Location location = request.getLocation();
         return new SubscriberRequest(subscriptionId, request.getChannel(), request.getCreatedAt(),
                 request.getBeneficiaryName(), convertToInteger(request.getBeneficiaryAge()),location);
     }

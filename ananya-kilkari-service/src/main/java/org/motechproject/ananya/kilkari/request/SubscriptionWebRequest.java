@@ -7,10 +7,11 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 
 import java.io.Serializable;
 
@@ -38,7 +39,6 @@ public class SubscriptionWebRequest implements Serializable {
     private DateTime createdAt;
 
     public SubscriptionWebRequest() {
-        this.location = new LocationRequest();
         this.createdAt = DateTime.now();
     }
 
@@ -83,40 +83,13 @@ public class SubscriptionWebRequest implements Serializable {
     }
 
     @JsonIgnore
-    public String getDistrict() {
-        return location == null ? null : location.getDistrict();
-    }
-
-    @JsonIgnore
-    public String getBlock() {
-        return location == null ? null : location.getBlock();
-    }
-
-    @JsonIgnore
-    public String getPanchayat() {
-        return location == null ? null : location.getPanchayat();
-    }
-
-    @JsonIgnore
-    public LocationRequest getLocation() {
-        return location;
+    public Location getLocation() {
+        return location == null ? null : new Location(location.getDistrict(), location.getBlock(), location.getPanchayat());
     }
 
     @JsonIgnore
     public String getWeek() {
         return week;
-    }
-
-    public void setDistrict(String district) {
-        location.setDistrict(district);
-    }
-
-    public void setBlock(String block) {
-        location.setBlock(block);
-    }
-
-    public void setPanchayat(String panchayat) {
-        location.setPanchayat(panchayat);
     }
 
     public void setBeneficiaryName(String beneficiaryName) {
@@ -155,12 +128,17 @@ public class SubscriptionWebRequest implements Serializable {
         this.msisdn = msisdn;
     }
 
+    public void setLocation(LocationRequest location) {
+        this.location = location;
+    }
+
     public Errors validate() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
         webRequestValidator.validateMsisdn(msisdn);
         webRequestValidator.validatePack(pack);
         webRequestValidator.validateChannel(channel);
         if (!Channel.isIVR(channel)) {
+            webRequestValidator.validateLocation(location);
             webRequestValidator.validateAge(beneficiaryAge);
             webRequestValidator.validateOnlyOneOfEDDOrDOBOrWeekNumberPresent(expectedDateOfDelivery, dateOfBirth, week);
             webRequestValidator.validateDOB(dateOfBirth, createdAt);

@@ -19,7 +19,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.*;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
-import org.motechproject.ananya.kilkari.sync.service.LocationSyncService;
+import org.motechproject.ananya.kilkari.sync.service.NewLocationSyncService;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocation;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
@@ -53,7 +53,7 @@ public class SubscriptionService {
     private MotechSchedulerService motechSchedulerService;
     private ChangeMsisdnValidator changeMsisdnValidator;
     private UnsubscriptionValidator unsubscriptionValidator;
-    private LocationSyncService locationSyncService;
+    private NewLocationSyncService newLocationSyncService;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
@@ -63,7 +63,7 @@ public class SubscriptionService {
                                InboxService inboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
                                CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData,
                                MotechSchedulerService motechSchedulerService, ChangeMsisdnValidator changeMsisdnValidator, UnsubscriptionValidator unsubscriptionValidator,
-                               LocationSyncService locationSyncService) {
+                               NewLocationSyncService newLocationSyncService) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
@@ -77,7 +77,7 @@ public class SubscriptionService {
         this.motechSchedulerService = motechSchedulerService;
         this.changeMsisdnValidator = changeMsisdnValidator;
         this.unsubscriptionValidator = unsubscriptionValidator;
-        this.locationSyncService = locationSyncService;
+        this.newLocationSyncService = newLocationSyncService;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
@@ -87,7 +87,8 @@ public class SubscriptionService {
                 subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate());
         allSubscriptions.add(subscription);
 
-        LocationResponse locationResponse = getLocation(subscriptionRequest);
+        Location location = subscriptionRequest.getLocation();
+        LocationResponse existingLocation = getExistingLocation(location);
 
         SubscriptionReportRequest reportRequest = SubscriptionMapper.createSubscriptionCreationReportRequest(
                 subscription, channel, subscriptionRequest);
@@ -99,8 +100,9 @@ public class SubscriptionService {
         } else
             initiateActivationRequest(omSubscriptionRequest);
 
-        if (locationResponse == null)
-            locationSyncService.sync(reportRequest.getLocation());
+        if (existingLocation == null && subscriptionRequest.hasLocation()) {
+            newLocationSyncService.sync(location.getDistrict(), location.getBlock(), location.getPanchayat());
+        }
 
         return subscription;
     }
@@ -337,14 +339,16 @@ public class SubscriptionService {
     public void updateSubscriberDetails(SubscriberRequest request) {
         subscriptionValidator.validateSubscriberDetails(request);
 
-        LocationResponse locationResponse = getLocation(request);
+        Location location = request.getLocation();
+        LocationResponse existingLocation = getExistingLocation(location);
 
-        SubscriberLocation subscriberLocation = request.hasLocation() ? new SubscriberLocation(request.getDistrict(), request.getBlock(), request.getPanchayat()) : null;
+        SubscriberLocation subscriberLocation = request.hasLocation() ? new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat()) : null;
         reportingService.reportSubscriberDetailsChange(request.getSubscriptionId(), new SubscriberReportRequest(request.getCreatedAt(),
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
 
-        if (locationResponse == null)
-            locationSyncService.sync(subscriberLocation);
+        if (existingLocation == null && request.hasLocation()) {
+            newLocationSyncService.sync(location.getDistrict(), location.getBlock(), location.getPanchayat());
+        }
     }
 
     public void unScheduleCampaign(Subscription subscription) {
@@ -353,16 +357,11 @@ public class SubscriptionService {
         messageCampaignService.stop(unEnrollRequest);
     }
 
-    private LocationResponse getLocation(SubscriptionRequest subscriptionRequest) {
-        return subscriptionRequest.hasLocation()
-                ? reportingService.getLocation(subscriptionRequest.getLocation().getDistrict(), subscriptionRequest.getLocation().getBlock(), subscriptionRequest.getLocation().getPanchayat())
-                : null;
-    }
+    private LocationResponse getExistingLocation(Location location) {
+        if (location == Location.NULL)
+            return null;
 
-    private LocationResponse getLocation(SubscriberRequest request) {
-        return request.hasLocation()
-                ? reportingService.getLocation(request.getLocation().getDistrict(), request.getLocation().getBlock(), request.getLocation().getPanchayat())
-                : null;
+        return reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
     }
 
     private void renewSchedule(Subscription subscription) {
@@ -437,7 +436,6 @@ public class SubscriptionService {
         if (changeMsisdnRequest.getShouldChangeAllPacks()) return true;
 
         return changeMsisdnRequest.getPacks().contains(subscription.getPack());
-
     }
 
     private void migrateMsisdnToNewSubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {

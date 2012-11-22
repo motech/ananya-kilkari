@@ -17,7 +17,7 @@ public class SubscriptionRequest {
         this.msisdn = msisdn;
         this.creationDate = creationDate;
         this.pack = pack;
-        this.location = location;
+        this.location = location == null ? Location.NULL : location;
         this.subscriber = subscriber;
         this.reason = reason;
     }
@@ -35,7 +35,7 @@ public class SubscriptionRequest {
     }
 
     public Location getLocation() {
-        return location == null ? Location.NULL : location;
+        return location;
     }
 
     public Subscriber getSubscriber() {
@@ -47,7 +47,7 @@ public class SubscriptionRequest {
     }
 
     public boolean hasLocation() {
-        return !Location.NULL.equals(getLocation());
+        return location != Location.NULL;
     }
 
     public String getOldSubscriptionId() {

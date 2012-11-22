@@ -7,10 +7,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
-import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
+import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 
 import static org.junit.Assert.*;
 
@@ -44,9 +45,8 @@ public class SubscriptionWebRequestTest {
         assertEquals(12, (int) subscriptionWebRequest.getBeneficiaryAge());
         assertEquals(dateTimeFormatter.parseDateTime(dob), subscriptionWebRequest.getDateOfBirth());
         assertEquals(dateTimeFormatter.parseDateTime(edd), subscriptionWebRequest.getExpectedDateOfDelivery());
-        assertEquals("mydistrict", subscriptionWebRequest.getDistrict());
-        assertEquals("myblock", subscriptionWebRequest.getBlock());
-        assertEquals("mypanchayat", subscriptionWebRequest.getPanchayat());
+
+        assertEquals(new Location("mydistrict", "myblock", "mypanchayat"), subscriptionWebRequest.getLocation());
         assertEquals(createdAt, subscriptionWebRequest.getCreatedAt());
     }
 
@@ -100,7 +100,7 @@ public class SubscriptionWebRequestTest {
     public void shouldAddErrorWhenInvalidChannelIsGivenToCreateNewSubscription() {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("1234567890").withPack(SubscriptionPack.NAVJAAT_KILKARI.name()).withChannel("Invalid-Channel").withCreatedAt(DateTime.now()).build();
 
-        validateErrors(1, subscriptionWebRequest.validate(), "Invalid channel Invalid-Channel");
+        validateErrors(2, subscriptionWebRequest.validate(), "Invalid channel Invalid-Channel");
     }
 
     @Test
@@ -237,10 +237,34 @@ public class SubscriptionWebRequestTest {
         subscriptionWebRequest.validateChannel();
     }
 
+    @Test
+    public void shouldReturnNullLocationIfLocationIsNotProvided(){
+        SubscriptionWebRequest webRequest = new SubscriptionWebRequestBuilder().withDefaults().withLocation(null).build();
+        assertNull(webRequest.getLocation());
+    }
+
+    @Test
+    public void shouldValidateLocationIfProvided() {
+        SubscriptionWebRequest webRequest = new SubscriptionWebRequestBuilder().withDefaults().withChannel("contact_center").withLocation(new LocationRequest()).build();
+        validateErrors(3, webRequest.validate(), "Missing district", "Missing block", "Missing panchayat");
+    }
+
+    @Test
+    public void shouldValidateLocationIfNotProvided() {
+        SubscriptionWebRequest webRequest = new SubscriptionWebRequestBuilder().withDefaults().withChannel("contact_center").withLocation(null).build();
+        validateErrors(1, webRequest.validate(), "Missing location");
+    }
+
+    @Test
+    public void shouldNotValidateLocationForRequestFromIVR(){
+        SubscriptionWebRequest webRequest = new SubscriptionWebRequestBuilder().withDefaults().withChannel("ivr").withLocation(new LocationRequest()).build();
+        validateErrors(0, webRequest.validate());
+    }
+
     private SubscriptionWebRequest createSubscriptionRequest(String msisdn, String pack, String channel, String age, String name, String dob, String edd, String district, String block, String panchayat, DateTime createdAt) {
         SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults()
                 .withPack(pack).withChannel(channel).withMsisdn(msisdn).withBeneficiaryAge(age)
-                .withBeneficiaryName(name).withDOB(dob).withEDD(edd).withDistrict(district).withBlock(block).withPanchayat(panchayat).withCreatedAt(createdAt).build();
+                .withBeneficiaryName(name).withDOB(dob).withEDD(edd).withLocation(district, block, panchayat).withCreatedAt(createdAt).build();
 
         return subscriptionWebRequest;
     }

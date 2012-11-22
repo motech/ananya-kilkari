@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>Ananya Kilkari Sync</name>
-    <artifactId>ananya-kilkari-sync</artifactId>
+    <artifactId>ananya-kilkari-refdata-sync</artifactId>
 
     <dependencies>
         <dependency>

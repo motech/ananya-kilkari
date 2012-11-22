@@ -35,7 +35,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.Subscriptio
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
-import org.motechproject.ananya.kilkari.sync.service.NewLocationSyncService;
+import org.motechproject.ananya.kilkari.sync.service.RefdataSyncService;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
@@ -90,13 +90,13 @@ public class SubscriptionServiceTest {
     @Mock
     private UnsubscriptionValidator unsubscriptionValidator;
     @Mock
-    private NewLocationSyncService newLocationSyncService;
+    private RefdataSyncService refdataSyncService;
 
     @Before
     public void setUp() {
         initMocks(this);
         subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl,
-                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator, unsubscriptionValidator, newLocationSyncService);
+                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator, unsubscriptionValidator, refdataSyncService);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class SubscriptionServiceTest {
         verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class), any(Integer.class), any(Integer.class));
         verify(reportingServiceImpl, never()).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
         verify(onMobileSubscriptionManagerPublisher, never()).sendActivationRequest(any(OMSubscriptionRequest.class));
-        verify(newLocationSyncService, never()).sync(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1179,11 +1179,11 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
 
-        InOrder order = inOrder(reportingServiceImpl, onMobileSubscriptionManagerPublisher, newLocationSyncService);
+        InOrder order = inOrder(reportingServiceImpl, onMobileSubscriptionManagerPublisher, refdataSyncService);
         order.verify(reportingServiceImpl).getLocation(district, block, panchayat);
         order.verify(reportingServiceImpl).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
         order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(any(OMSubscriptionRequest.class));
-        order.verify(newLocationSyncService).sync(district, block, panchayat);
+        order.verify(refdataSyncService).syncNewLocation(district, block, panchayat);
     }
 
     @Test
@@ -1192,7 +1192,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
 
-        verify(newLocationSyncService, never()).sync(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1205,7 +1205,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
 
-        verify(newLocationSyncService, never()).sync(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1216,7 +1216,7 @@ public class SubscriptionServiceTest {
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
 
         verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
-        verify(newLocationSyncService, never()).sync(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1228,17 +1228,17 @@ public class SubscriptionServiceTest {
 
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(district, block, panchayat)));
 
-        InOrder order = inOrder(reportingServiceImpl, newLocationSyncService);
+        InOrder order = inOrder(reportingServiceImpl, refdataSyncService);
         order.verify(reportingServiceImpl).getLocation(district, block, panchayat);
         order.verify(reportingServiceImpl).reportSubscriberDetailsChange(anyString(), any(SubscriberReportRequest.class));
-        order.verify(newLocationSyncService).sync(district, block, panchayat);
+        order.verify(refdataSyncService).syncNewLocation(district, block, panchayat);
     }
 
     @Test
     public void shouldNotSyncLocationIfNotProvidedWhileUpdatingSubscriberDetails() {
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, null));
 
-        verify(newLocationSyncService, never()).sync(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1250,7 +1250,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(district, block, panchayat)));
 
-        verify(newLocationSyncService, never()).sync(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1258,6 +1258,6 @@ public class SubscriptionServiceTest {
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, Location.NULL));
 
         verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
-        verify(newLocationSyncService, never()).sync(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
     }
 }

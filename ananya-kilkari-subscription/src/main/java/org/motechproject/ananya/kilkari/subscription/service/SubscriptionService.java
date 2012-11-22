@@ -19,7 +19,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.*;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
-import org.motechproject.ananya.kilkari.sync.service.NewLocationSyncService;
+import org.motechproject.ananya.kilkari.sync.service.RefdataSyncService;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocation;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
@@ -53,7 +53,7 @@ public class SubscriptionService {
     private MotechSchedulerService motechSchedulerService;
     private ChangeMsisdnValidator changeMsisdnValidator;
     private UnsubscriptionValidator unsubscriptionValidator;
-    private NewLocationSyncService newLocationSyncService;
+    private RefdataSyncService refdataSyncService;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
@@ -63,7 +63,7 @@ public class SubscriptionService {
                                InboxService inboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
                                CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData,
                                MotechSchedulerService motechSchedulerService, ChangeMsisdnValidator changeMsisdnValidator, UnsubscriptionValidator unsubscriptionValidator,
-                               NewLocationSyncService newLocationSyncService) {
+                               RefdataSyncService refdataSyncService) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
@@ -77,7 +77,7 @@ public class SubscriptionService {
         this.motechSchedulerService = motechSchedulerService;
         this.changeMsisdnValidator = changeMsisdnValidator;
         this.unsubscriptionValidator = unsubscriptionValidator;
-        this.newLocationSyncService = newLocationSyncService;
+        this.refdataSyncService = refdataSyncService;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
@@ -101,7 +101,7 @@ public class SubscriptionService {
             initiateActivationRequest(omSubscriptionRequest);
 
         if (existingLocation == null && subscriptionRequest.hasLocation()) {
-            newLocationSyncService.sync(location.getDistrict(), location.getBlock(), location.getPanchayat());
+            refdataSyncService.syncNewLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
         }
 
         return subscription;
@@ -347,7 +347,7 @@ public class SubscriptionService {
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
 
         if (existingLocation == null && request.hasLocation()) {
-            newLocationSyncService.sync(location.getDistrict(), location.getBlock(), location.getPanchayat());
+            refdataSyncService.syncNewLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
         }
     }
 

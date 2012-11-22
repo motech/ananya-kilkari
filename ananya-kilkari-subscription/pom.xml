@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>org.motechproject.ananya.kilkari</groupId>
-            <artifactId>ananya-kilkari-sync</artifactId>
+            <artifactId>ananya-kilkari-refdata-sync</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

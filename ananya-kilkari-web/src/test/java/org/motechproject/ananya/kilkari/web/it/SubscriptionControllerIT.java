@@ -81,8 +81,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     public void shouldRetrieveSubscriptionDetailsFromDatabase() throws Exception {
         String msisdn = "9876543210";
         String channelString = Channel.IVR.toString();
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
         markForDeletion(subscription1);
@@ -294,7 +294,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         UnSubscriptionWebRequest expectedUnSubscriptionWebRequest = new UnSubscriptionWebRequest();
         expectedUnSubscriptionWebRequest.setReason("Reason for deactivation");
 
-        Subscription expectedSubscription = new Subscription(msisdn, pack, DateTime.now().minusMonths(15), DateTime.now());
+        Subscription expectedSubscription = new Subscription(msisdn, pack, DateTime.now().minusMonths(15), DateTime.now(), null);
         expectedSubscription.setStatus(SubscriptionStatus.ACTIVE);
         allSubscriptions.add(expectedSubscription);
         markForDeletion(expectedSubscription);
@@ -342,7 +342,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
         DateTime createdAt = DateTime.now().minusWeeks(4).minusHours(1);
-        Subscription oldSubscription = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, createdAt, createdAt);
+        Subscription oldSubscription = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, createdAt, createdAt, null);
         oldSubscription.setStatus(SubscriptionStatus.ACTIVE);
 
         allSubscriptions.add(oldSubscription);

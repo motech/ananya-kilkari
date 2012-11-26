@@ -43,11 +43,11 @@ public class ChangeMsisdnValidatorTest {
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CONTACT_CENTER);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.BARI_KILKARI, SubscriptionPack.NAVJAAT_KILKARI));
 
-        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription1.setStatus(SubscriptionStatus.ACTIVE);
 
 
-        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription2.setStatus(SubscriptionStatus.SUSPENDED);
 
 
@@ -62,10 +62,10 @@ public class ChangeMsisdnValidatorTest {
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CONTACT_CENTER);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.BARI_KILKARI, SubscriptionPack.NAVJAAT_KILKARI, SubscriptionPack.NANHI_KILKARI));
 
-        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription1.setStatus(SubscriptionStatus.ACTIVE);
 
-        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription2.setStatus(SubscriptionStatus.NEW_EARLY);
 
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
@@ -82,13 +82,13 @@ public class ChangeMsisdnValidatorTest {
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CONTACT_CENTER);
         changeMsisdnRequest.setShouldChangeAllPacks(true);
 
-        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription1.setStatus(SubscriptionStatus.ACTIVE);
 
-        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription2.setStatus(SubscriptionStatus.SUSPENDED);
 
-        Subscription subscription3 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription3 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription3.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
 
         when(allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2, subscription3));
@@ -118,10 +118,10 @@ public class ChangeMsisdnValidatorTest {
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CONTACT_CENTER);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.BARI_KILKARI, SubscriptionPack.NAVJAAT_KILKARI));
 
-        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription1.setStatus(SubscriptionStatus.ACTIVE);
 
-        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription2.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
 
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1));

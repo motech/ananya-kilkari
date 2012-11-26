@@ -84,7 +84,7 @@ public class SubscriptionService {
         subscriptionValidator.validate(subscriptionRequest);
 
         Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
-                subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate());
+                subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate(), subscriptionRequest.getSubscriber().getWeek());
         allSubscriptions.add(subscription);
 
         Location location = subscriptionRequest.getLocation();

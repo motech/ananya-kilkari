@@ -77,7 +77,7 @@ public class ConsoleIT {
     }
 
     private void insertDataIntoDb() {
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
         String messageId = "WEEK3";
         subscriptionId = subscription.getSubscriptionId();
         allSubscriptions.add(subscription);

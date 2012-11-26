@@ -7,7 +7,6 @@ import org.motechproject.ananya.kilkari.messagecampaign.request.MessageCampaignR
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.SpringIntegrationTest;
@@ -33,7 +32,7 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
         String msisdn = "9876543210";
         SubscriptionPack subscriptionPack = SubscriptionPack.BARI_KILKARI;
         DateTime now = DateTime.now();
-        Subscription subscription = new Subscription(msisdn, subscriptionPack, now, now);
+        Subscription subscription = new Subscription(msisdn, subscriptionPack, now, now, null);
         subscription.activate("airtel", now, now);
 
         allSubscriptions.add(subscription);

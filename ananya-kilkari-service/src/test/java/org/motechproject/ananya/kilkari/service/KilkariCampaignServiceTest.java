@@ -130,7 +130,7 @@ public class KilkariCampaignServiceTest {
     public void shouldScheduleUnsubscriptionWhenPackIsCompletedAndWhenStatusIsNotDeactivated() {
         String subscriptionId = "abcd1234";
 
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.BARI_KILKARI, DateTime.now().minusWeeks(1), DateTime.now());
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.BARI_KILKARI, DateTime.now().minusWeeks(1), DateTime.now(), null);
         subscription.setStatus(SubscriptionStatus.ACTIVE);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -143,7 +143,7 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldNotScheduleUnsubscriptionWhenPackIsCompletedAndStatusIsDeactivated() {
         String subscriptionId = "abcd1234";
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.BARI_KILKARI, DateTime.now().minusWeeks(1), DateTime.now());
+        Subscription subscription = new Subscription("9988776655", SubscriptionPack.BARI_KILKARI, DateTime.now().minusWeeks(1), DateTime.now(), null);
         subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -162,7 +162,7 @@ public class KilkariCampaignServiceTest {
         String campaignName = MessageCampaignService.SIXTEEN_MONTHS_CAMPAIGN_KEY;
         Operator operator = Operator.AIRTEL;
         String msisdn = "9988776655";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, creationDate, DateTime.now());
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, creationDate, DateTime.now(), null);
         subscription.activate(operator.name(), scheduleStartDate, activationDate);
         String subscriptionId = subscription.getSubscriptionId();
         DateTime expiryDate = activationDate.plusWeeks(1);

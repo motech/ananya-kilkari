@@ -28,7 +28,12 @@ import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
-import org.motechproject.ananya.kilkari.subscription.service.request.*;
+import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionDetailsResponseMapper;
+import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
@@ -38,11 +43,13 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionRep
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
@@ -88,12 +95,14 @@ public class SubscriptionServiceTest {
     private UnsubscriptionValidator unsubscriptionValidator;
     @Mock
     private RefdataSyncService refdataSyncService;
+    @Mock
+    private SubscriptionDetailsResponseMapper subscriptionDetailsResponseMapper;
 
     @Before
     public void setUp() {
         initMocks(this);
         subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl,
-                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator, unsubscriptionValidator, refdataSyncService);
+                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator, unsubscriptionValidator, refdataSyncService, subscriptionDetailsResponseMapper);
     }
 
     @Test
@@ -104,7 +113,7 @@ public class SubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         Integer weekNumber = 7;
         SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn)
-                                            .withPack(subscriptionPack).withWeek(weekNumber).build();
+                .withPack(subscriptionPack).withWeek(weekNumber).build();
 
         Subscription createdSubscription = subscriptionService.createSubscription(subscription, channel);
 
@@ -1259,5 +1268,49 @@ public class SubscriptionServiceTest {
 
         verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
         verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void shouldGetSubscriptionDetailsAndAlsoFromReportIfChannelIsContactCenter() {
+        String msisdn = "1234567890";
+        SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).build();
+        SubscriptionResponse subscriptionFromReports = new SubscriptionResponse(Long.valueOf(msisdn), null, null, "name", null, null, null, null, null, null, null);
+        ArrayList<Subscription> subscriptionList = new ArrayList<>();
+        subscriptionList.add(subscription);
+        ArrayList<SubscriptionResponse> subscriptionResponseList = new ArrayList<>();
+        subscriptionResponseList.add(subscriptionFromReports);
+        ArrayList<SubscriptionDetailsResponse> expectedResponse = new ArrayList<>();
+        expectedResponse.add(new SubscriptionDetailsResponse(null, pack, null, null));
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionList);
+        when(reportingServiceImpl.getSubscriberByMsisdn(msisdn)).thenReturn(subscriptionResponseList);
+        when(subscriptionDetailsResponseMapper.map(subscriptionList, subscriptionResponseList)).thenReturn(expectedResponse);
+
+        List<SubscriptionDetailsResponse> actualResponse = subscriptionService.getSubscriptionDetails(msisdn, Channel.CONTACT_CENTER);
+
+        verify(allSubscriptions).findByMsisdn(msisdn);
+        verify(reportingServiceImpl).getSubscriberByMsisdn(msisdn);
+        verify(subscriptionDetailsResponseMapper).map(subscriptionList, subscriptionResponseList);
+        assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    public void shouldGetSubscriptionDetailsOnlyFromTransactionalDBAndNotFromReportIfChannelIsIVR() {
+        String msisdn = "1234567890";
+        SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).build();
+        ArrayList<Subscription> subscriptionList = new ArrayList<>();
+        subscriptionList.add(subscription);
+        ArrayList<SubscriptionDetailsResponse> expectedResponse = new ArrayList<>();
+        expectedResponse.add(new SubscriptionDetailsResponse(null, pack, null, null));
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionList);
+        when(subscriptionDetailsResponseMapper.map(subscriptionList, Collections.EMPTY_LIST)).thenReturn(expectedResponse);
+
+        List<SubscriptionDetailsResponse> actualResponse = subscriptionService.getSubscriptionDetails(msisdn, Channel.IVR);
+
+        verify(allSubscriptions).findByMsisdn(msisdn);
+        verify(reportingServiceImpl, never()).getSubscriberByMsisdn(anyString());
+        verify(subscriptionDetailsResponseMapper).map(subscriptionList, Collections.EMPTY_LIST);
+        assertEquals(expectedResponse, actualResponse);
     }
 }

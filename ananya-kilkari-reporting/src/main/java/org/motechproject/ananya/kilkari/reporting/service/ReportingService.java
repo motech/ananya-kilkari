@@ -1,9 +1,15 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
 
-import org.motechproject.ananya.reports.kilkari.contract.request.*;
+import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
+
+import java.util.List;
 
 public interface ReportingService {
     LocationResponse getLocation(String district, String block, String panchayat);
@@ -19,4 +25,6 @@ public interface ReportingService {
     void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest);
 
     void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn);
+
+    List<SubscriptionResponse> getSubscriberByMsisdn(String msisdn);
 }

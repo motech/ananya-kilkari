@@ -10,6 +10,7 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionRep
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.motechproject.http.client.domain.Method;
 import org.motechproject.http.client.service.HttpClientService;
 import org.motechproject.web.context.HttpThreadContext;
@@ -24,6 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -91,6 +93,12 @@ public class ReportingGatewayImpl implements ReportingGateway {
     public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
         String url = String.format("%s%s?subscriptionId=%s&msisdn=%s", getBaseUrl(), CHANGE_MSISDN_PATH, subscriptionId, msisdn);
         performHttpRequestBasedOnChannel(url, null, Method.POST);
+    }
+
+    @Override
+    public List<SubscriptionResponse> getSubscriberByMsisdn(String msisdn) {
+        String url = String.format("%s%s?msisdn=%s", getBaseUrl(), GET_SUBSCRIBER_BY_MSISDN_PATH, msisdn);
+        return Arrays.asList(restTemplate.getForEntity(url, SubscriptionResponse[].class).getBody());
     }
 
     private boolean isCallCenterCall() {

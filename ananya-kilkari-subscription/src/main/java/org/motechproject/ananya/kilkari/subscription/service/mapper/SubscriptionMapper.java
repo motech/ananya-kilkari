@@ -25,7 +25,7 @@ public class SubscriptionMapper {
         Long msisdn = NumberUtils.createLong(subscription.getMsisdn());
         SubscriptionReportRequest subscriptionReportRequest = new SubscriptionReportRequest(subscription.getSubscriptionId(), channel.name(), msisdn, subscription.getPack().name(),
                 subscriber.getBeneficiaryName(), subscriber.getBeneficiaryAge(), subscription.getCreationDate(), subscription.getStatus().name(), subscriber.getExpectedDateOfDelivery(),
-                subscriber.getDateOfBirth(), subscriberLocation, null, subscription.getStartDate(), subscriptionRequest.getOldSubscriptionId(), subscriptionRequest.getReason());
+                subscriber.getDateOfBirth(), subscriberLocation, null, subscription.getStartDate(), subscriptionRequest.getOldSubscriptionId(), subscriptionRequest.getReason(), subscriber.getWeek());
 
         return subscriptionReportRequest;
     }

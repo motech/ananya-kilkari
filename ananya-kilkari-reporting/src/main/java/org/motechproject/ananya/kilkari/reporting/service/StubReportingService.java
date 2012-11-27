@@ -4,7 +4,11 @@ import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
 import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @TestProfile
@@ -62,6 +66,14 @@ public class StubReportingService implements ReportingService {
         if (verify()) {
             behavior.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
         }
+    }
+
+    @Override
+    public List<SubscriptionResponse> getSubscriberByMsisdn(String msisdn) {
+        if (verify()) {
+            return behavior.getSubscriberByMsisdn(msisdn);
+        }
+        return Collections.EMPTY_LIST;
     }
 
     public void setBehavior(ReportingService behavior) {

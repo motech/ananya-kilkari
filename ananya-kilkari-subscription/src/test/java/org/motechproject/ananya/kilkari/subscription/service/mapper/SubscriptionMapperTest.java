@@ -43,8 +43,10 @@ public class SubscriptionMapperTest {
     @Test
     public void shouldCreateReportingRequestWithoutLocation() {
         String reason = "some reason";
+        Integer week = 33;
+        Subscriber subscriber = new Subscriber("name", null, null, null, week);
         SubscriptionReportRequest request = SubscriptionMapper.createSubscriptionCreationReportRequest(
-                subscription, channel, new SubscriptionRequest("msisdn", null, null, Location.NULL, Subscriber.NULL, reason));
+                subscription, channel, new SubscriptionRequest("msisdn", null, null, Location.NULL, subscriber, reason));
 
         assertEquals(subscription.getMsisdn(), request.getMsisdn().toString());
         assertEquals(subscription.getPack().name(), request.getPack());
@@ -52,6 +54,7 @@ public class SubscriptionMapperTest {
         assertEquals(subscription.getStartDate(), request.getStartDate());
         assertEquals(channel.name(), request.getChannel());
         assertEquals(reason, request.getReason());
+        assertEquals(week, request.getStartWeekNumber());
         assertNull(request.getLocation());
     }
 

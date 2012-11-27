@@ -3,11 +3,14 @@ package org.motechproject.ananya.kilkari.web.it;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.TimedRunner;
 import org.motechproject.ananya.kilkari.builder.ChangeSubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
+import org.motechproject.ananya.kilkari.message.domain.InboxMessage;
+import org.motechproject.ananya.kilkari.message.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
@@ -16,9 +19,13 @@ import org.motechproject.ananya.kilkari.request.ChangeMsisdnWebRequest;
 import org.motechproject.ananya.kilkari.request.ChangeSubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnSubscriptionWebRequest;
-import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.kilkari.subscription.service.stub.StubOnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
@@ -30,14 +37,13 @@ import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.server.MvcResult;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -65,34 +71,44 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
     private StubOnMobileSubscriptionGateway onMobileSubscriptionService;
 
     @Autowired
-    private SubscriptionDetailsMapper subscriptionDetailsMapper;
+    private MotechSchedulerService motechSchedulerService;
 
     @Autowired
-    private MotechSchedulerService motechSchedulerService;
+    private AllInboxMessages allInboxMessages;
 
     @Before
     public void setUp() {
         allSubscriptions.removeAll();
+        allInboxMessages.removeAll();
     }
 
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
 
     @Test
-    public void shouldRetrieveSubscriptionDetailsFromDatabase() throws Exception {
+    public void shouldRetrieveSubscriptionDetailsFromDatabaseForIVR() throws Exception {
         String msisdn = "9876543210";
-        String channelString = Channel.IVR.toString();
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
+        Channel channel = Channel.IVR;
+        String channelString = channel.toString();
+        final Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
+        final Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
+        final InboxMessage inboxMessage1 = new InboxMessage(subscription1.getSubscriptionId(), "WEEK23");
+        final InboxMessage inboxMessage2 = new InboxMessage(subscription2.getSubscriptionId(), "WEEK2");
+        allInboxMessages.add(inboxMessage1);
+        allInboxMessages.add(inboxMessage2);
         markForDeletion(subscription1);
         markForDeletion(subscription2);
-
-        SubscriptionWebResponse subscriptionWebResponse = new SubscriptionWebResponse();
-        subscriptionWebResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscription1));
-        subscriptionWebResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscription2));
-
+        markForDeletion(inboxMessage1);
+        markForDeletion(inboxMessage2);
+        ReportingService mockedReportingService = mock(ReportingService.class);
+        when(mockedReportingService.getSubscriberByMsisdn(msisdn)).thenReturn(Collections.EMPTY_LIST);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
+        reportingService.setBehavior(mockedReportingService);
+        SubscriptionWebResponse expectedResponse = SubscriptionDetailsMapper.mapFrom(new ArrayList<SubscriptionDetailsResponse>() {{
+            add(new SubscriptionDetailsResponse(subscription1.getSubscriptionId(), subscription1.getPack(), subscription1.getStatus(), inboxMessage1.getMessageId()));
+            add(new SubscriptionDetailsResponse(subscription2.getSubscriptionId(), subscription2.getPack(), subscription2.getStatus(), inboxMessage2.getMessageId()));
+        }}, channel);
 
         MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channelString))
@@ -104,7 +120,61 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
         SubscriptionWebResponse actualResponse = TestUtils.fromJson(responseString, SubscriptionWebResponse.class);
-        assertEquals(subscriptionWebResponse, actualResponse);
+        assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    @Ignore
+    public void shouldRetrieveSubscriptionDetailsFromDatabaseForCC() throws Exception {
+        final String msisdn = "9876543210";
+        Channel channel = Channel.CONTACT_CENTER;
+        String channelString = channel.toString();
+        final Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
+        final Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
+        allSubscriptions.add(subscription1);
+        allSubscriptions.add(subscription2);
+        final InboxMessage inboxMessage1 = new InboxMessage(subscription1.getSubscriptionId(), "WEEK23");
+        final InboxMessage inboxMessage2 = new InboxMessage(subscription2.getSubscriptionId(), "WEEK2");
+        allInboxMessages.add(inboxMessage1);
+        allInboxMessages.add(inboxMessage2);
+        markForDeletion(subscription1);
+        markForDeletion(subscription2);
+        markForDeletion(inboxMessage1);
+        markForDeletion(inboxMessage2);
+        ReportingService mockedReportingService = mock(ReportingService.class);
+        final SubscriptionResponse reportResponse1 = new SubscriptionResponse(Long.valueOf(msisdn), subscription1.getSubscriptionId(), subscription1.getPack().name(), "name1", subscription1.getStatus().name(), "1", "23", null, "11-11-2011",
+                null, 12);
+        final SubscriptionResponse reportResponse2 = new SubscriptionResponse(Long.valueOf(msisdn), subscription2.getSubscriptionId(), subscription2.getPack().name(), "name2", subscription2.getStatus().name(), "1", "23", "12-12-2012", null,
+                new LocationResponse("d", "b", "p"), 1);
+        ArrayList<SubscriptionResponse> reportResponseList = new ArrayList<SubscriptionResponse>() {{
+            add(reportResponse2);
+            add(reportResponse1);
+        }};
+        when(mockedReportingService.getSubscriberByMsisdn(msisdn)).thenReturn(reportResponseList);
+        reportingService.setBehavior(mockedReportingService);
+        onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
+
+        SubscriptionWebResponse expectedResponse = SubscriptionDetailsMapper.mapFrom(new ArrayList<SubscriptionDetailsResponse>() {{
+            SubscriptionDetailsResponse detailsResponse1 = new SubscriptionDetailsResponse(subscription1.getSubscriptionId(), subscription1.getPack(), subscription1.getStatus(), inboxMessage1.getMessageId());
+            detailsResponse1.updateSubscriberDetails(reportResponse1.getBeneficiaryName(), reportResponse1.getBeneficiaryAge(), reportResponse1.getStartWeekNumber(), reportResponse1.getDateOfBirth(),
+                    reportResponse1.getExpectedDateOfDelivery(), reportResponse1.getLocation());
+            SubscriptionDetailsResponse detailsResponse2 = new SubscriptionDetailsResponse(subscription2.getSubscriptionId(), subscription2.getPack(), subscription2.getStatus(), inboxMessage2.getMessageId());
+            detailsResponse2.updateSubscriberDetails(reportResponse2.getBeneficiaryName(), reportResponse2.getBeneficiaryAge(), reportResponse2.getStartWeekNumber(), reportResponse2.getDateOfBirth(),
+                    reportResponse2.getExpectedDateOfDelivery(), reportResponse2.getLocation());
+            add(detailsResponse1);
+            add(detailsResponse2);
+        }}, channel);
+
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channelString))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
+                .andReturn();
+
+        String responseString = result.getResponse().getContentAsString();
+        responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
+        SubscriptionWebResponse actualResponse = TestUtils.fromJson(responseString, SubscriptionWebResponse.class);
+        assertEquals(expectedResponse, actualResponse);
     }
 
     @Test
@@ -267,7 +337,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         ChangeSubscriptionWebRequest expectedChangeSubscriptionWebRequest = new ChangeSubscriptionWebRequestBuilder().withDefaults().withChangeType("change_schedule").withEDD(DateUtils.formatDate(DateTime.now().plusDays(1))).build();
         result = mockMvc(subscriptionController)
-                .perform(put("/subscription/"+subscriptionId+"/changesubscription" )
+                .perform(put("/subscription/" + subscriptionId + "/changesubscription")
                         .param("channel", channelString)
                         .body(TestUtils.toJson(expectedChangeSubscriptionWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -369,7 +439,6 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         markForDeletion(oldSubscription, newSubscription);
     }
-
 
     private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {
         if (Channel.isIVR(channel)) {

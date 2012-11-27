@@ -20,7 +20,7 @@ public class SubscriptionDetails {
     @JsonProperty
     private String lastCampaignId;
 
-    SubscriptionDetails() {
+    public SubscriptionDetails() {
     }
 
     public SubscriptionDetails(String subscriptionId, String pack, String status, String lastCampaignId) {

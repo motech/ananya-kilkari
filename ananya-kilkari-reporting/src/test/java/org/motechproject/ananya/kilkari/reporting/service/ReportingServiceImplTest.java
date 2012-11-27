@@ -6,8 +6,11 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.motechproject.http.client.service.HttpClientService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static junit.framework.Assert.assertEquals;
@@ -90,5 +93,20 @@ public class ReportingServiceImplTest {
         reportingServiceImpl.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
 
         verify(reportGateway).reportChangeMsisdnForSubscriber(subscriptionId,msisdn);
+    }
+
+    @Test
+    public void shouldGetSubscribersByMsisdn()
+    {
+        final String msisdn = "1234567890";
+        final ArrayList<SubscriptionResponse> expectedSubscriber = new ArrayList<SubscriptionResponse>(){{
+            add(new SubscriptionResponse(Long.valueOf(msisdn), null, null, null, null, null, null, null, null, null, null));
+        }};
+        when(reportGateway.getSubscriberByMsisdn(msisdn)).thenReturn(expectedSubscriber);
+
+        List<SubscriptionResponse> actualSubscriber = reportingServiceImpl.getSubscriberByMsisdn(msisdn);
+
+        verify(reportGateway).getSubscriberByMsisdn(msisdn);
+        assertEquals(expectedSubscriber, actualSubscriber);
     }
 }

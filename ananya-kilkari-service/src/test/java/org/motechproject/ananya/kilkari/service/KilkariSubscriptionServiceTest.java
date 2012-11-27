@@ -80,8 +80,10 @@ public class KilkariSubscriptionServiceTest {
     @Test
     public void shouldGetSubscriptionsFor() {
         String msisdn = "1234567890";
-        kilkariSubscriptionService.findByMsisdn(msisdn);
-        verify(subscriptionService).findByMsisdn(msisdn);
+
+        kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.IVR);
+
+        verify(subscriptionService).getSubscriptionDetails(msisdn, Channel.IVR);
     }
 
     @Test
@@ -89,7 +91,7 @@ public class KilkariSubscriptionServiceTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid msisdn 12345");
 
-        kilkariSubscriptionService.findByMsisdn("12345");
+        kilkariSubscriptionService.getSubscriptionDetails("12345", Channel.CONTACT_CENTER);
     }
 
     @Test
@@ -97,7 +99,7 @@ public class KilkariSubscriptionServiceTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid msisdn 123456789a");
 
-        kilkariSubscriptionService.findByMsisdn("123456789a");
+        kilkariSubscriptionService.getSubscriptionDetails("123456789a", Channel.CONTACT_CENTER);
     }
 
     @Test

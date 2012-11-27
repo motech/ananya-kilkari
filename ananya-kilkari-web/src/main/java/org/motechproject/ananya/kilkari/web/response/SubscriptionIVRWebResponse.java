@@ -9,12 +9,12 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubscriptionWebResponse {
+public class SubscriptionIVRWebResponse {
 
     @JsonProperty
     private List<SubscriptionDetails> subscriptionDetails;
 
-    public SubscriptionWebResponse() {
+    public SubscriptionIVRWebResponse() {
         this.subscriptionDetails = new ArrayList<>();
     }
 
@@ -26,13 +26,12 @@ public class SubscriptionWebResponse {
         return subscriptionDetails;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SubscriptionWebResponse)) return false;
+        if (!(o instanceof SubscriptionIVRWebResponse)) return false;
 
-        SubscriptionWebResponse that = (SubscriptionWebResponse) o;
+        SubscriptionIVRWebResponse that = (SubscriptionIVRWebResponse) o;
 
         return new EqualsBuilder().append(this.subscriptionDetails, that.subscriptionDetails)
                 .isEquals();

@@ -13,6 +13,7 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionRep
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.motechproject.http.client.domain.Method;
 import org.motechproject.http.client.service.HttpClientService;
 import org.motechproject.web.context.HttpThreadContext;
@@ -21,8 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -277,4 +277,24 @@ public class ReportingGatewayImplTest {
 
         verify(httpClientService, never()).execute("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
     }
+
+    @Test
+    public void shouldMakeAReportingCallToGetSubscriberByMsisdn() {
+        final String msisdn = "1234567890";
+        String expectedUrl = "url/subscriber?msisdn=" + msisdn;
+        ArrayList<SubscriptionResponse> expectedResponse = new ArrayList<SubscriptionResponse>() {{
+            add(new SubscriptionResponse(Long.valueOf(msisdn), UUID.randomUUID().toString(), "bari_kilkari", null, "new", "1", null, null, null, null, 1));
+        }};
+        ResponseEntity<SubscriptionResponse[]> responseEntity = new ResponseEntity(expectedResponse.toArray(), HttpStatus.OK);
+
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        when(restTemplate.getForEntity(expectedUrl, SubscriptionResponse[].class))
+                .thenReturn(responseEntity);
+
+        List<SubscriptionResponse> actualResponse = reportingGateway.getSubscriberByMsisdn(msisdn);
+
+        verify(restTemplate).getForEntity(expectedUrl, SubscriptionResponse[].class);
+        assertEquals(expectedResponse, actualResponse);
+    }
+
 }

@@ -14,8 +14,10 @@ import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionDetailsResponseMapper;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.*;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
@@ -26,6 +28,7 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionRep
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
@@ -34,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +58,7 @@ public class SubscriptionService {
     private ChangeMsisdnValidator changeMsisdnValidator;
     private UnsubscriptionValidator unsubscriptionValidator;
     private RefdataSyncService refdataSyncService;
+    private SubscriptionDetailsResponseMapper subscriptionDetailsResponseMapper;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
@@ -63,7 +68,7 @@ public class SubscriptionService {
                                InboxService inboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
                                CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData,
                                MotechSchedulerService motechSchedulerService, ChangeMsisdnValidator changeMsisdnValidator, UnsubscriptionValidator unsubscriptionValidator,
-                               RefdataSyncService refdataSyncService) {
+                               RefdataSyncService refdataSyncService, SubscriptionDetailsResponseMapper subscriptionDetailsResponseMapper) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
@@ -78,6 +83,7 @@ public class SubscriptionService {
         this.changeMsisdnValidator = changeMsisdnValidator;
         this.unsubscriptionValidator = unsubscriptionValidator;
         this.refdataSyncService = refdataSyncService;
+        this.subscriptionDetailsResponseMapper = subscriptionDetailsResponseMapper;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
@@ -355,6 +361,16 @@ public class SubscriptionService {
         String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
         MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getScheduleStartDate());
         messageCampaignService.stop(unEnrollRequest);
+    }
+
+    public List<SubscriptionDetailsResponse> getSubscriptionDetails(String msisdn, Channel channel) {
+        List<Subscription> subscriptionList = findByMsisdn(msisdn);
+        if(Channel.IVR.equals(channel)){
+            return subscriptionDetailsResponseMapper.map(subscriptionList, Collections.EMPTY_LIST);
+        }
+
+        List<SubscriptionResponse> subscriberDetailsList = reportingService.getSubscriberByMsisdn(msisdn);
+        return subscriptionDetailsResponseMapper.map(subscriptionList, subscriberDetailsList);
     }
 
     private LocationResponse getExistingLocation(Location location) {

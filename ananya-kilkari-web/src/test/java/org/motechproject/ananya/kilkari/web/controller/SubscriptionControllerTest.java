@@ -5,7 +5,6 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.joda.time.DateTime;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -34,8 +33,12 @@ import org.motechproject.ananya.kilkari.web.response.*;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
 import org.motechproject.web.context.HttpThreadContext;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.server.MvcResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -81,30 +84,54 @@ public class SubscriptionControllerTest {
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
 
-        mockMvc(subscriptionController)
+        MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JAVASCRIPT))
-                .andExpect(content().string(subscriberResponseMatcherWithSubscriptions(channel, subscriptionDetails)));
+                .andReturn();
+
+        String responseString = result.getResponse().getContentAsString();
+        responseString = performIVRChannelValidationAndCleanup(responseString, channel);
+        SubscriptionIVRWebResponse actualIVRResponse = TestUtils.fromJson(responseString, SubscriptionIVRWebResponse.class);
+        SubscriptionDetails actualDetailsResponse = actualIVRResponse.getSubscriptionDetails().get(0);
+        assertEquals(subscriptionDetails.getPack().name(), actualDetailsResponse.getPack());
+        assertEquals(subscriptionDetails.getStatus().name(), actualDetailsResponse.getStatus());
+        assertEquals(subscriptionDetails.getSubscriptionId(), actualDetailsResponse.getSubscriptionId());
+        assertEquals(subscriptionDetails.getCampaignId(), actualDetailsResponse.getLastCampaignId());
     }
 
     @Test
-    @Ignore
     public void shouldGetSubscriptionsForGivenMsisdnForChannelOtherThanIvr() throws Exception {
         String msisdn = "1234567890";
         String channel = "CONTACT_CENTER";
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
         subscriptionDetails.updateSubscriberDetails("name", "age", 23, "23-12-12", "12-12-12", new org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse("d", "b", "p"));
+        LocationResponse expectedLocation = new LocationResponse(subscriptionDetails.getLocation().getDistrict(), subscriptionDetails.getLocation().getBlock(), subscriptionDetails.getLocation().getPanchayat());
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
 
-        mockMvc(subscriptionController)
+        MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(subscriberResponseMatcherWithSubscriptions(channel, subscriptionDetails)));
+                .andReturn();
+
+        String responseString = result.getResponse().getContentAsString();
+        responseString = performIVRChannelValidationAndCleanup(responseString, channel);
+        SubscriptionCCWebResponse actualCCResponse = TestUtils.fromJson(responseString, SubscriptionCCWebResponse.class);
+        AllSubscriptionDetails actualDetailsResponse = actualCCResponse.getSubscriptionDetails().get(0);
+        assertEquals(subscriptionDetails.getPack().name(), actualDetailsResponse.getPack());
+        assertEquals(subscriptionDetails.getStatus().name(), actualDetailsResponse.getStatus());
+        assertEquals(subscriptionDetails.getSubscriptionId(), actualDetailsResponse.getSubscriptionId());
+        assertEquals(subscriptionDetails.getCampaignId(), actualDetailsResponse.getLastCampaignId());
+        assertEquals(subscriptionDetails.getBeneficiaryName(), actualDetailsResponse.getBeneficiaryName());
+        assertEquals(subscriptionDetails.getBeneficiaryAge(), actualDetailsResponse.getBeneficiaryAge());
+        assertEquals(subscriptionDetails.getStartWeekNumber().toString(), actualDetailsResponse.getWeekNumber());
+        assertEquals(subscriptionDetails.getDateOfBirth(), actualDetailsResponse.getDateOfBirth());
+        assertEquals(subscriptionDetails.getExpectedDateOfDelivery(), actualDetailsResponse.getExpectedDateOfDelivery());
+        assertEquals(expectedLocation, actualDetailsResponse.getLocation());
     }
 
     @Test
@@ -562,8 +589,8 @@ public class SubscriptionControllerTest {
     private boolean assertSubscriberResponse(String jsonContent, String channel, SubscriptionDetailsResponse subscriptionDetails) {
         jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
 
-        SubscriptionWebResponse subscriptionWebResponse = TestUtils.fromJson(jsonContent, SubscriptionWebResponse.class);
-        SubscriptionDetails actualDetailsResponse = subscriptionWebResponse.getSubscriptionDetails().get(0);
+        SubscriptionIVRWebResponse subscriptionIVRWebResponse = TestUtils.fromJson(jsonContent, SubscriptionIVRWebResponse.class);
+        SubscriptionDetails actualDetailsResponse = subscriptionIVRWebResponse.getSubscriptionDetails().get(0);
 
         Boolean result = actualDetailsResponse.getPack().equals(subscriptionDetails.getPack().name())
                 && actualDetailsResponse.getStatus().equals(subscriptionDetails.getStatus().name())
@@ -598,9 +625,9 @@ public class SubscriptionControllerTest {
     private boolean assertSubscriberResponseWithNoSubscriptions(String jsonContent, String channel) {
         jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
 
-        SubscriptionWebResponse subscriptionWebResponse = TestUtils.fromJson(jsonContent, SubscriptionWebResponse.class);
+        SubscriptionIVRWebResponse subscriptionIVRWebResponse = TestUtils.fromJson(jsonContent, SubscriptionIVRWebResponse.class);
 
-        return subscriptionWebResponse.getSubscriptionDetails().size() == 0;
+        return subscriptionIVRWebResponse.getSubscriptionDetails().size() == 0;
     }
 
     @Test

@@ -5,8 +5,7 @@ import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
-import org.motechproject.ananya.kilkari.web.response.AllSubscriptionDetails;
-import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
+import org.motechproject.ananya.kilkari.web.response.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 
 import java.util.ArrayList;
@@ -16,17 +15,36 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class SubscriptionDetailsMapperTest {
+
     @Test
-    public void shouldMapToWebResponseWithLocation() {
+    public void shouldMapToIVRWebResponse() {
+        SubscriptionDetailsResponse detailsResponse = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
+        ArrayList<SubscriptionDetailsResponse> responseList = new ArrayList<>();
+        responseList.add(detailsResponse);
+
+        SubscriptionBaseWebResponse webResponse = SubscriptionDetailsMapper.mapFrom(responseList, Channel.IVR);
+
+        SubscriptionIVRWebResponse ivrWebResponse = (SubscriptionIVRWebResponse) webResponse;
+        assertEquals(1, ivrWebResponse.getSubscriptionDetails().size());
+        SubscriptionDetails subscriptionDetails = ivrWebResponse.getSubscriptionDetails().get(0);
+        assertEquals(detailsResponse.getSubscriptionId(), subscriptionDetails.getSubscriptionId());
+        assertEquals(detailsResponse.getPack().name(), subscriptionDetails.getPack());
+        assertEquals(detailsResponse.getStatus().name(), subscriptionDetails.getStatus());
+        assertEquals(detailsResponse.getCampaignId(), subscriptionDetails.getLastCampaignId());
+    }
+
+    @Test
+    public void shouldMapToCCWebResponseWithLocation() {
         LocationResponse actualLocation = new LocationResponse("d", "b", "p");
         SubscriptionDetailsResponse detailsResponse = setupData(actualLocation);
         ArrayList<SubscriptionDetailsResponse> responseList = new ArrayList<>();
         responseList.add(detailsResponse);
 
-        SubscriptionWebResponse webResponse = SubscriptionDetailsMapper.mapFrom(responseList, Channel.CONTACT_CENTER);
+        SubscriptionBaseWebResponse webResponse = SubscriptionDetailsMapper.mapFrom(responseList, Channel.CONTACT_CENTER);
 
-        assertEquals(1, webResponse.getSubscriptionDetails().size());
-        AllSubscriptionDetails subscriptionDetails = (AllSubscriptionDetails) webResponse.getSubscriptionDetails().get(0);
+        SubscriptionCCWebResponse ccWebResponse = (SubscriptionCCWebResponse) webResponse;
+        assertEquals(1, ccWebResponse.getSubscriptionDetails().size());
+        AllSubscriptionDetails subscriptionDetails = ccWebResponse.getSubscriptionDetails().get(0);
         assertDetails(detailsResponse, subscriptionDetails);
         assertEquals(actualLocation.getDistrict(), subscriptionDetails.getLocation().getDistrict());
         assertEquals(actualLocation.getBlock(), subscriptionDetails.getLocation().getBlock());
@@ -34,15 +52,16 @@ public class SubscriptionDetailsMapperTest {
     }
 
     @Test
-    public void shouldMapToWebResponseWithoutLocation() {
+    public void shouldMapToCCWebResponseWithoutLocation() {
         SubscriptionDetailsResponse detailsResponse = setupData(null);
         ArrayList<SubscriptionDetailsResponse> responseList = new ArrayList<>();
         responseList.add(detailsResponse);
 
-        SubscriptionWebResponse webResponse = SubscriptionDetailsMapper.mapFrom(responseList, Channel.CONTACT_CENTER);
+        SubscriptionBaseWebResponse webResponse = SubscriptionDetailsMapper.mapFrom(responseList, Channel.CONTACT_CENTER);
 
-        assertEquals(1, webResponse.getSubscriptionDetails().size());
-        AllSubscriptionDetails subscriptionDetails = (AllSubscriptionDetails) webResponse.getSubscriptionDetails().get(0);
+        SubscriptionCCWebResponse ccWebResponse = (SubscriptionCCWebResponse) webResponse;
+        assertEquals(1, ccWebResponse.getSubscriptionDetails().size());
+        AllSubscriptionDetails subscriptionDetails = ccWebResponse.getSubscriptionDetails().get(0);
         assertDetails(detailsResponse, subscriptionDetails);
         assertNull(subscriptionDetails.getLocation());
     }
@@ -61,8 +80,8 @@ public class SubscriptionDetailsMapperTest {
         detailsResponse.updateSubscriberDetails(name, age, Integer.parseInt(week), dob, edd, actualLocation);
         return detailsResponse;
     }
-    
-    private void assertDetails(SubscriptionDetailsResponse detailsResponse, AllSubscriptionDetails subscriptionDetails){
+
+    private void assertDetails(SubscriptionDetailsResponse detailsResponse, AllSubscriptionDetails subscriptionDetails) {
         assertEquals(detailsResponse.getSubscriptionId(), subscriptionDetails.getSubscriptionId());
         assertEquals(detailsResponse.getPack().name(), subscriptionDetails.getPack());
         assertEquals(detailsResponse.getStatus().name(), subscriptionDetails.getStatus());

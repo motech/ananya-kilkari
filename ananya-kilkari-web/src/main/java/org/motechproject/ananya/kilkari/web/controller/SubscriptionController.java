@@ -10,7 +10,7 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationExcept
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
+import org.motechproject.ananya.kilkari.web.response.SubscriptionBaseWebResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -62,7 +62,7 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscriber", method = RequestMethod.GET)
     @ResponseBody
-    public SubscriptionWebResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
+    public SubscriptionBaseWebResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
         validateChannel(channel);
         List<SubscriptionDetailsResponse> subscriptionDetailsList = kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel));
         return SubscriptionDetailsMapper.mapFrom(subscriptionDetailsList, Channel.from(channel));

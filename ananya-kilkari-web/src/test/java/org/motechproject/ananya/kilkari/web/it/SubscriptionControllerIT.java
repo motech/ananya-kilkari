@@ -3,7 +3,6 @@ package org.motechproject.ananya.kilkari.web.it;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.motechproject.ananya.kilkari.TimedRunner;
@@ -34,7 +33,8 @@ import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.motechproject.ananya.kilkari.web.controller.SubscriptionController;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
+import org.motechproject.ananya.kilkari.web.response.SubscriptionCCWebResponse;
+import org.motechproject.ananya.kilkari.web.response.SubscriptionIVRWebResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
@@ -105,7 +105,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         when(mockedReportingService.getSubscriberByMsisdn(msisdn)).thenReturn(Collections.EMPTY_LIST);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
         reportingService.setBehavior(mockedReportingService);
-        SubscriptionWebResponse expectedResponse = SubscriptionDetailsMapper.mapFrom(new ArrayList<SubscriptionDetailsResponse>() {{
+        SubscriptionIVRWebResponse expectedIVRResponse = (SubscriptionIVRWebResponse) SubscriptionDetailsMapper.mapFrom(new ArrayList<SubscriptionDetailsResponse>() {{
             add(new SubscriptionDetailsResponse(subscription1.getSubscriptionId(), subscription1.getPack(), subscription1.getStatus(), inboxMessage1.getMessageId()));
             add(new SubscriptionDetailsResponse(subscription2.getSubscriptionId(), subscription2.getPack(), subscription2.getStatus(), inboxMessage2.getMessageId()));
         }}, channel);
@@ -119,12 +119,11 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
 
-        SubscriptionWebResponse actualResponse = TestUtils.fromJson(responseString, SubscriptionWebResponse.class);
-        assertEquals(expectedResponse, actualResponse);
+        SubscriptionIVRWebResponse actualIVRResponse = TestUtils.fromJson(responseString, SubscriptionIVRWebResponse.class);
+        assertEquals(expectedIVRResponse, actualIVRResponse);
     }
 
     @Test
-    @Ignore
     public void shouldRetrieveSubscriptionDetailsFromDatabaseForCC() throws Exception {
         final String msisdn = "9876543210";
         Channel channel = Channel.CONTACT_CENTER;
@@ -154,7 +153,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         reportingService.setBehavior(mockedReportingService);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 
-        SubscriptionWebResponse expectedResponse = SubscriptionDetailsMapper.mapFrom(new ArrayList<SubscriptionDetailsResponse>() {{
+        SubscriptionCCWebResponse expectedCCResponse = (SubscriptionCCWebResponse) SubscriptionDetailsMapper.mapFrom(new ArrayList<SubscriptionDetailsResponse>() {{
             SubscriptionDetailsResponse detailsResponse1 = new SubscriptionDetailsResponse(subscription1.getSubscriptionId(), subscription1.getPack(), subscription1.getStatus(), inboxMessage1.getMessageId());
             detailsResponse1.updateSubscriberDetails(reportResponse1.getBeneficiaryName(), reportResponse1.getBeneficiaryAge(), reportResponse1.getStartWeekNumber(), reportResponse1.getDateOfBirth(),
                     reportResponse1.getExpectedDateOfDelivery(), reportResponse1.getLocation());
@@ -173,8 +172,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
 
         String responseString = result.getResponse().getContentAsString();
         responseString = performIVRChannelValidationAndCleanup(responseString, channelString);
-        SubscriptionWebResponse actualResponse = TestUtils.fromJson(responseString, SubscriptionWebResponse.class);
-        assertEquals(expectedResponse, actualResponse);
+        SubscriptionCCWebResponse actualCCResponse = TestUtils.fromJson(responseString, SubscriptionCCWebResponse.class);
+        assertEquals(expectedCCResponse, actualCCResponse);
     }
 
     @Test

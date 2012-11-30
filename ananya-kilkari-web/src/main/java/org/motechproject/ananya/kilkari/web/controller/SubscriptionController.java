@@ -60,7 +60,7 @@ public class SubscriptionController {
         return BaseResponse.success("Callback request processed successfully");
     }
 
-    @RequestMapping(value = "/subscriber", method = RequestMethod.GET)
+    @RequestMapping(value = "/subscriber", method = RequestMethod.GET, produces = {"application/json", "application/xml"})
     @ResponseBody
     public SubscriptionBaseWebResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
         validateChannel(channel);

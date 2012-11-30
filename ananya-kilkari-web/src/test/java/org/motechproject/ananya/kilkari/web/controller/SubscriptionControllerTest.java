@@ -24,7 +24,6 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
-import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.TestUtils;
@@ -94,20 +93,16 @@ public class SubscriptionControllerTest {
         responseString = performIVRChannelValidationAndCleanup(responseString, channel);
         SubscriptionIVRWebResponse actualIVRResponse = TestUtils.fromJson(responseString, SubscriptionIVRWebResponse.class);
         SubscriptionDetails actualDetailsResponse = actualIVRResponse.getSubscriptionDetails().get(0);
-        assertEquals(subscriptionDetails.getPack().name(), actualDetailsResponse.getPack());
-        assertEquals(subscriptionDetails.getStatus().name(), actualDetailsResponse.getStatus());
-        assertEquals(subscriptionDetails.getSubscriptionId(), actualDetailsResponse.getSubscriptionId());
-        assertEquals(subscriptionDetails.getCampaignId(), actualDetailsResponse.getLastCampaignId());
+        assertSubscriberDetails(subscriptionDetails, actualDetailsResponse);
     }
 
     @Test
-    public void shouldGetSubscriptionsForGivenMsisdnForChannelOtherThanIvr() throws Exception {
+    public void shouldGetSubscriptionsForGivenMsisdnForChannelOtherThanIvrAsJson() throws Exception {
         String msisdn = "1234567890";
         String channel = "CONTACT_CENTER";
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
         subscriptionDetails.updateSubscriberDetails("name", "age", 23, "23-12-12", "12-12-12", new org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse("d", "b", "p"));
-        LocationResponse expectedLocation = new LocationResponse(subscriptionDetails.getLocation().getDistrict(), subscriptionDetails.getLocation().getBlock(), subscriptionDetails.getLocation().getPanchayat());
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -119,19 +114,34 @@ public class SubscriptionControllerTest {
                 .andReturn();
 
         String responseString = result.getResponse().getContentAsString();
-        responseString = performIVRChannelValidationAndCleanup(responseString, channel);
         SubscriptionCCWebResponse actualCCResponse = TestUtils.fromJson(responseString, SubscriptionCCWebResponse.class);
         AllSubscriptionDetails actualDetailsResponse = actualCCResponse.getSubscriptionDetails().get(0);
-        assertEquals(subscriptionDetails.getPack().name(), actualDetailsResponse.getPack());
-        assertEquals(subscriptionDetails.getStatus().name(), actualDetailsResponse.getStatus());
-        assertEquals(subscriptionDetails.getSubscriptionId(), actualDetailsResponse.getSubscriptionId());
-        assertEquals(subscriptionDetails.getCampaignId(), actualDetailsResponse.getLastCampaignId());
-        assertEquals(subscriptionDetails.getBeneficiaryName(), actualDetailsResponse.getBeneficiaryName());
-        assertEquals(subscriptionDetails.getBeneficiaryAge(), actualDetailsResponse.getBeneficiaryAge());
-        assertEquals(subscriptionDetails.getStartWeekNumber().toString(), actualDetailsResponse.getWeekNumber());
-        assertEquals(subscriptionDetails.getDateOfBirth(), actualDetailsResponse.getDateOfBirth());
-        assertEquals(subscriptionDetails.getExpectedDateOfDelivery(), actualDetailsResponse.getExpectedDateOfDelivery());
-        assertEquals(expectedLocation, actualDetailsResponse.getLocation());
+        assertSubscriberDetails(subscriptionDetails, actualDetailsResponse);
+        assertAdditionalSubscriberDetails(subscriptionDetails, actualDetailsResponse);
+    }
+
+    @Test
+    public void shouldGetSubscriptionsForGivenMsisdnForChannelOtherThanIvrAsXML() throws Exception {
+        String msisdn = "1234567890";
+        String channel = "CONTACT_CENTER";
+
+        SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
+        subscriptionDetails.updateSubscriberDetails("name", "age", 23, "23-12-12", "12-12-12", new org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse("d", "b", "p"));
+        ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
+        subscriptionDetailsResponses.add(subscriptionDetails);
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
+
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel).accept(MediaType.APPLICATION_XML))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_XML))
+                .andReturn();
+
+        String responseString = result.getResponse().getContentAsString();
+        SubscriptionCCWebResponse actualCCResponse = TestUtils.fromXml(responseString, SubscriptionCCWebResponse.class);
+        AllSubscriptionDetails actualDetailsResponse = actualCCResponse.getSubscriptionDetails().get(0);
+        assertSubscriberDetails(subscriptionDetails, actualDetailsResponse);
+        assertAdditionalSubscriberDetails(subscriptionDetails, actualDetailsResponse);
     }
 
     @Test
@@ -144,7 +154,7 @@ public class SubscriptionControllerTest {
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.IVR.getResponseContentType()))
+                .andExpect(content().type(HttpConstants.IVR.getResponseContentType(null)))
                 .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions(channel)));
     }
 
@@ -178,7 +188,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void shouldReturnErrorResponseForInvalidMsisdnNumberOtherThanIvr() throws Exception {
+    public void shouldReturnErrorResponseForInvalidMsisdnNumberOtherThanIvrAsJson() throws Exception {
         String msisdn = "12345";
         String channel = "CONTACT_CENTER";
 
@@ -189,6 +199,24 @@ public class SubscriptionControllerTest {
                 .andExpect(status().is(400))
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(errorResponseMatcherForInvalidMsisdn(channel)));
+    }
+
+    @Test
+    public void shouldReturnErrorResponseForInvalidMsisdnNumberOtherThanIvrAsXml() throws Exception {
+        String msisdn = "12345";
+        String channel = "CONTACT_CENTER";
+
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenThrow(new ValidationException("Invalid Msisdn"));
+
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel).accept(MediaType.APPLICATION_XML))
+                .andExpect(status().is(400))
+                .andExpect(content().type(HttpHeaders.APPLICATION_XML))
+                .andReturn();
+
+        BaseResponse actualResponse = TestUtils.fromXml(result.getResponse().getContentAsString(), BaseResponse.class);
+        assertTrue(actualResponse.isError());
+        assertEquals("Invalid Msisdn", actualResponse.getDescription());
     }
 
     @Test
@@ -206,7 +234,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void shouldReturnCorrectErrorResponseForRuntimeExceptionForOtherThanIvr() throws Exception {
+    public void shouldReturnCorrectErrorResponseForRuntimeExceptionForOtherThanIvrAsJson() throws Exception {
         String msisdn = "1234567890";
         String channel = "CONTACT_CENTER";
 
@@ -217,6 +245,24 @@ public class SubscriptionControllerTest {
                 .andExpect(status().is(500))
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(errorResponseMatcherForRuntimeException(channel)));
+    }
+
+    @Test
+    public void shouldReturnCorrectErrorResponseForRuntimeExceptionForOtherThanIvrAsXml() throws Exception {
+        String msisdn = "12345";
+        String channel = "CONTACT_CENTER";
+
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenThrow(new RuntimeException("runtime exception"));
+
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel).accept(MediaType.APPLICATION_XML))
+                .andExpect(status().is(500))
+                .andExpect(content().type(HttpHeaders.APPLICATION_XML))
+                .andReturn();
+
+        BaseResponse actualResponse = TestUtils.fromXml(result.getResponse().getContentAsString(), BaseResponse.class);
+        assertTrue(actualResponse.isError());
+        assertEquals("runtime exception", actualResponse.getDescription());
     }
 
     @Test
@@ -479,6 +525,23 @@ public class SubscriptionControllerTest {
         assertNotNull(request.getCreatedAt());
     }
 
+    private void assertSubscriberDetails(SubscriptionDetailsResponse subscriptionDetails, SubscriptionDetails actualDetailsResponse) {
+        assertEquals(subscriptionDetails.getPack().name(), actualDetailsResponse.getPack());
+        assertEquals(subscriptionDetails.getStatus().name(), actualDetailsResponse.getStatus());
+        assertEquals(subscriptionDetails.getSubscriptionId(), actualDetailsResponse.getSubscriptionId());
+        assertEquals(subscriptionDetails.getCampaignId(), actualDetailsResponse.getLastCampaignId());
+    }
+
+    private void assertAdditionalSubscriberDetails(SubscriptionDetailsResponse subscriptionDetails, AllSubscriptionDetails actualDetailsResponse) {
+        LocationResponse expectedLocation = new LocationResponse(subscriptionDetails.getLocation().getDistrict(), subscriptionDetails.getLocation().getBlock(), subscriptionDetails.getLocation().getPanchayat());
+        assertEquals(subscriptionDetails.getBeneficiaryName(), actualDetailsResponse.getBeneficiaryName());
+        assertEquals(subscriptionDetails.getBeneficiaryAge(), actualDetailsResponse.getBeneficiaryAge());
+        assertEquals(subscriptionDetails.getStartWeekNumber().toString(), actualDetailsResponse.getWeekNumber());
+        assertEquals(subscriptionDetails.getDateOfBirth(), actualDetailsResponse.getDateOfBirth());
+        assertEquals(subscriptionDetails.getExpectedDateOfDelivery(), actualDetailsResponse.getExpectedDateOfDelivery());
+        assertEquals(expectedLocation, actualDetailsResponse.getLocation());
+    }
+
     private void assertCreatedAt(DateTime beforeCreate, SubscriptionWebRequest subscriptionWebRequest) {
         DateTime createdAt = subscriptionWebRequest.getCreatedAt();
         DateTime afterCreate = DateTime.now();
@@ -538,19 +601,6 @@ public class SubscriptionControllerTest {
         };
     }
 
-    private BaseMatcher<String> subscriberResponseMatcherWithSubscriptions(final String channel, final SubscriptionDetailsResponse actualDetails) {
-        return new BaseMatcher<String>() {
-            @Override
-            public boolean matches(Object o) {
-                return assertSubscriberResponse((String) o, channel, actualDetails);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-            }
-        };
-    }
-
     private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {
         if (Channel.isIVR(channel)) {
             assertTrue(jsonContent.startsWith(IVR_RESPONSE_PREFIX));
@@ -584,42 +634,6 @@ public class SubscriptionControllerTest {
 
         return baseResponse.isError() &&
                 baseResponse.getDescription().equals("runtime exception");
-    }
-
-    private boolean assertSubscriberResponse(String jsonContent, String channel, SubscriptionDetailsResponse subscriptionDetails) {
-        jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
-
-        SubscriptionIVRWebResponse subscriptionIVRWebResponse = TestUtils.fromJson(jsonContent, SubscriptionIVRWebResponse.class);
-        SubscriptionDetails actualDetailsResponse = subscriptionIVRWebResponse.getSubscriptionDetails().get(0);
-
-        Boolean result = actualDetailsResponse.getPack().equals(subscriptionDetails.getPack().name())
-                && actualDetailsResponse.getStatus().equals(subscriptionDetails.getStatus().name())
-                && actualDetailsResponse.getSubscriptionId().equals(subscriptionDetails.getSubscriptionId())
-                && actualDetailsResponse.getLastCampaignId().equals(subscriptionDetails.getCampaignId());
-
-        if (Channel.isIVR(channel))
-            return result;
-
-        return result && assertCCResponse(subscriptionDetails, (AllSubscriptionDetails) actualDetailsResponse);
-    }
-
-    private boolean assertNullForIVRResponse(AllSubscriptionDetails subscriptionDetails) {
-        return ValidationUtils.assertNull(subscriptionDetails.getBeneficiaryName())
-                && ValidationUtils.assertNull(subscriptionDetails.getBeneficiaryAge())
-                && ValidationUtils.assertNull(subscriptionDetails.getWeekNumber())
-                && ValidationUtils.assertNull(subscriptionDetails.getDateOfBirth())
-                && ValidationUtils.assertNull(subscriptionDetails.getExpectedDateOfDelivery())
-                && ValidationUtils.assertNull(subscriptionDetails.getLocation());
-    }
-
-    private boolean assertCCResponse(SubscriptionDetailsResponse subscriptionDetails, AllSubscriptionDetails actualDetailsResponse) {
-        LocationResponse expectedLocation = new LocationResponse(subscriptionDetails.getLocation().getDistrict(), subscriptionDetails.getLocation().getBlock(), subscriptionDetails.getLocation().getPanchayat());
-        return actualDetailsResponse.getBeneficiaryName().equals(subscriptionDetails.getBeneficiaryName())
-                && actualDetailsResponse.getBeneficiaryAge().equals(subscriptionDetails.getBeneficiaryAge())
-                && actualDetailsResponse.getWeekNumber().equals(subscriptionDetails.getStartWeekNumber().toString())
-                && actualDetailsResponse.getDateOfBirth().equals(subscriptionDetails.getDateOfBirth())
-                && actualDetailsResponse.getExpectedDateOfDelivery().equals(subscriptionDetails.getExpectedDateOfDelivery())
-                && actualDetailsResponse.getLocation().equals(expectedLocation);
     }
 
     private boolean assertSubscriberResponseWithNoSubscriptions(String jsonContent, String channel) {

@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.web.views;
 
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
+import org.springframework.http.MediaType;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 import org.springframework.web.servlet.view.AbstractView;
 
@@ -19,12 +20,16 @@ public class ExceptionView extends AbstractView {
 
         Exception exceptionObject = (Exception) model.get(SimpleMappingExceptionResolver.DEFAULT_EXCEPTION_ATTRIBUTE);
 
-        String responseJson = BaseResponse.failure(exceptionObject.getMessage()).toJson();
-        response.getOutputStream().print(responseJson);
+        String acceptHeader = request.getHeader("accept");
+
+        String responseContent = MediaType.APPLICATION_XML.toString().equals(acceptHeader)
+                ? BaseResponse.failure(exceptionObject.getMessage()).toXml(request.getContentType())
+                : BaseResponse.failure(exceptionObject.getMessage()).toJson();
+        response.getOutputStream().print(responseContent);
 
         HttpConstants httpConstants = HttpConstants.forRequest(request);
 
         response.setStatus(httpConstants.getHttpStatusError());
-        response.setContentType(httpConstants.getResponseContentType());
+        response.setContentType(httpConstants.getResponseContentType(acceptHeader));
     }
 }

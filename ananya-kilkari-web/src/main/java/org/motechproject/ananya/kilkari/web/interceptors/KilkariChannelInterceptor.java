@@ -22,7 +22,7 @@ public class KilkariChannelInterceptor extends HandlerInterceptorAdapter {
 
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
             throws Exception {
-        String contentType = HttpConstants.forRequest(request).getResponseContentType();
+        String contentType = HttpConstants.forRequest(request).getResponseContentType(request.getHeader("accept"));
         response.setContentType(contentType);
     }
 

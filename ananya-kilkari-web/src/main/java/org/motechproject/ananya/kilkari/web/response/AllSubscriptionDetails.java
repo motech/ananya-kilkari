@@ -4,25 +4,35 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 //TODO: should get better class name
 
+@XmlRootElement
 public class AllSubscriptionDetails extends SubscriptionDetails {
     @JsonProperty
+    @XmlElement
     private String beneficiaryName;
 
     @JsonProperty
+    @XmlElement
     private String beneficiaryAge;
 
     @JsonProperty
+    @XmlElement(name = "week")
     private String weekNumber;
 
     @JsonProperty
+    @XmlElement
     private String expectedDateOfDelivery;
 
     @JsonProperty
+    @XmlElement
     private String dateOfBirth;
 
     @JsonProperty
+    @XmlElement
     private LocationResponse location;
 
     public AllSubscriptionDetails() {

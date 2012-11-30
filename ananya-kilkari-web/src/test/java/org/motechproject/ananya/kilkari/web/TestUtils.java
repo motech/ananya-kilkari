@@ -4,7 +4,11 @@ package org.motechproject.ananya.kilkari.web;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Ignore;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 
 @Ignore
@@ -29,5 +33,11 @@ public class TestUtils {
             e.printStackTrace();
         }
         return serializedObject;
+    }
+
+    public static <T> T fromXml(String xmlString, Class className) throws JAXBException {
+        JAXBContext jc = JAXBContext.newInstance(className);
+        Unmarshaller u = jc.createUnmarshaller();
+        return (T) u.unmarshal(new StringReader(xmlString));
     }
 }

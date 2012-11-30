@@ -3,14 +3,21 @@ package org.motechproject.ananya.kilkari.web.response;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class LocationResponse {
     @JsonProperty
+    @XmlElement
     private String district;
 
     @JsonProperty
+    @XmlElement
     private String block;
 
     @JsonProperty
+    @XmlElement
     private String panchayat;
 
     public LocationResponse() {

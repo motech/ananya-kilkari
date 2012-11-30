@@ -6,12 +6,18 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlRootElement(name = "subscriber")
 public class SubscriptionCCWebResponse extends SubscriptionBaseWebResponse {
 
     @JsonProperty
+    @XmlElementWrapper(name = "subscriptionDetails")
+    @XmlElement(name = "subscriptionDetail")
     private List<AllSubscriptionDetails> subscriptionDetails;
 
     public SubscriptionCCWebResponse() {

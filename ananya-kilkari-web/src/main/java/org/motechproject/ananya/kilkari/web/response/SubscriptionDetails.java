@@ -7,17 +7,25 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class SubscriptionDetails {
     @JsonProperty
+    @XmlElement
     private String subscriptionId;
 
     @JsonProperty
+    @XmlElement
     private String pack;
 
     @JsonProperty
+    @XmlElement
     private String status;
 
     @JsonProperty
+    @XmlElement
     private String lastCampaignId;
 
     public SubscriptionDetails() {

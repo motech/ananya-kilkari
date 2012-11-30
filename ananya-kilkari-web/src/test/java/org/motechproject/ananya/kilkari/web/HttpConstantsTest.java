@@ -42,4 +42,15 @@ public class HttpConstantsTest{
     public void shouldCheckIfIVRChanneForRequestWhichDoesNotContainTheChannelKey() {
         assertEquals(HttpConstants.CONTACT_CENTER, HttpConstants.forRequest(request));
     }
+
+    @Test
+    public void shouldReturnAppropriateResponseTypeForIvr(){
+        assertEquals(HttpHeaders.APPLICATION_JAVASCRIPT, HttpConstants.IVR.getResponseContentType(null));
+    }
+
+    @Test
+    public void shouldReturnAppropriateResponseTypeForContactCenter(){
+        assertEquals(HttpHeaders.APPLICATION_XML, HttpConstants.CONTACT_CENTER.getResponseContentType("application/xml"));
+        assertEquals(HttpHeaders.APPLICATION_JSON, HttpConstants.CONTACT_CENTER.getResponseContentType("application/json"));
+    }
 }

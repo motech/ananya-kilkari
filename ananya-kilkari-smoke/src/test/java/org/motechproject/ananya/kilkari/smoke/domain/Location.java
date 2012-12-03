@@ -1,9 +1,17 @@
 package org.motechproject.ananya.kilkari.smoke.domain;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 public class Location{
+    @JsonProperty
     private String district;
+    @JsonProperty
     private String block;
+    @JsonProperty
     private String panchayat;
+
+    public Location() {
+    }
 
     public Location(String district, String block, String panchayat) {
         this.district = district;

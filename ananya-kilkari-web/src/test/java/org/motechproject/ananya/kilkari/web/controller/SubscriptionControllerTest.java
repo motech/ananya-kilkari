@@ -527,7 +527,7 @@ public class SubscriptionControllerTest {
 
     private void assertSubscriberDetails(SubscriptionDetailsResponse subscriptionDetails, SubscriptionDetails actualDetailsResponse) {
         assertEquals(subscriptionDetails.getPack().name(), actualDetailsResponse.getPack());
-        assertEquals(subscriptionDetails.getStatus().name(), actualDetailsResponse.getStatus());
+        assertEquals(subscriptionDetails.getStatus().getDisplayString(), actualDetailsResponse.getStatus());
         assertEquals(subscriptionDetails.getSubscriptionId(), actualDetailsResponse.getSubscriptionId());
         assertEquals(subscriptionDetails.getCampaignId(), actualDetailsResponse.getLastCampaignId());
     }

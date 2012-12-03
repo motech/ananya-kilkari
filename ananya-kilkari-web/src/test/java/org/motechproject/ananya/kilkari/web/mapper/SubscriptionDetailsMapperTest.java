@@ -29,7 +29,7 @@ public class SubscriptionDetailsMapperTest {
         SubscriptionDetails subscriptionDetails = ivrWebResponse.getSubscriptionDetails().get(0);
         assertEquals(detailsResponse.getSubscriptionId(), subscriptionDetails.getSubscriptionId());
         assertEquals(detailsResponse.getPack().name(), subscriptionDetails.getPack());
-        assertEquals(detailsResponse.getStatus().name(), subscriptionDetails.getStatus());
+        assertEquals(detailsResponse.getStatus().getDisplayString(), subscriptionDetails.getStatus());
         assertEquals(detailsResponse.getCampaignId(), subscriptionDetails.getLastCampaignId());
     }
 
@@ -84,7 +84,7 @@ public class SubscriptionDetailsMapperTest {
     private void assertDetails(SubscriptionDetailsResponse detailsResponse, AllSubscriptionDetails subscriptionDetails) {
         assertEquals(detailsResponse.getSubscriptionId(), subscriptionDetails.getSubscriptionId());
         assertEquals(detailsResponse.getPack().name(), subscriptionDetails.getPack());
-        assertEquals(detailsResponse.getStatus().name(), subscriptionDetails.getStatus());
+        assertEquals(detailsResponse.getStatus().getDisplayString(), subscriptionDetails.getStatus());
         assertEquals(detailsResponse.getCampaignId(), subscriptionDetails.getLastCampaignId());
         assertEquals(detailsResponse.getBeneficiaryName(), subscriptionDetails.getBeneficiaryName());
         assertEquals(detailsResponse.getBeneficiaryAge(), subscriptionDetails.getBeneficiaryAge());

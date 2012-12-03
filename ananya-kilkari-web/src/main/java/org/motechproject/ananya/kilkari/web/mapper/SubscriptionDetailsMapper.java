@@ -18,7 +18,7 @@ public class SubscriptionDetailsMapper {
     private static SubscriptionBaseWebResponse mapToIvrResponse(List<SubscriptionDetailsResponse> subscriptionDetailsResponses) {
         SubscriptionIVRWebResponse ivrWebResponse = new SubscriptionIVRWebResponse();
         for (SubscriptionDetailsResponse detailsResponse : subscriptionDetailsResponses) {
-            ivrWebResponse.addSubscriptionDetail(new SubscriptionDetails(detailsResponse.getSubscriptionId(), detailsResponse.getPack().name(), detailsResponse.getStatus().name(), detailsResponse.getCampaignId()));
+            ivrWebResponse.addSubscriptionDetail(new SubscriptionDetails(detailsResponse.getSubscriptionId(), detailsResponse.getPack().name(), detailsResponse.getStatus().getDisplayString(), detailsResponse.getCampaignId()));
         }
         return ivrWebResponse;
     }
@@ -28,7 +28,7 @@ public class SubscriptionDetailsMapper {
         for (SubscriptionDetailsResponse detailsResponse : subscriptionDetailsResponses) {
             Location locationDetails = detailsResponse.getLocation();
             LocationResponse location = locationDetails != null ? new LocationResponse(locationDetails.getDistrict(), locationDetails.getBlock(), locationDetails.getPanchayat()) : null;
-            ccWebResponse.addSubscriptionDetail(new AllSubscriptionDetails(detailsResponse.getSubscriptionId(), detailsResponse.getPack().name(), detailsResponse.getStatus().name(), detailsResponse.getCampaignId(),
+            ccWebResponse.addSubscriptionDetail(new AllSubscriptionDetails(detailsResponse.getSubscriptionId(), detailsResponse.getPack().name(), detailsResponse.getStatus().getDisplayString(), detailsResponse.getCampaignId(),
                     detailsResponse.getBeneficiaryName(), detailsResponse.getBeneficiaryAge(), detailsResponse.weekNumber(), detailsResponse.getExpectedDateOfDelivery(), detailsResponse.getDateOfBirth(), location));
         }
         return ccWebResponse;

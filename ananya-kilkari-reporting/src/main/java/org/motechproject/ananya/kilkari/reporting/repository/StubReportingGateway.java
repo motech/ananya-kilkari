@@ -4,7 +4,6 @@ import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
 import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
-import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
@@ -60,9 +59,9 @@ public class StubReportingGateway implements ReportingGateway {
     }
 
     @Override
-    public List<SubscriptionResponse> getSubscriberByMsisdn(String msisdn) {
+    public List<SubscriberResponse> getSubscribersByMsisdn(String msisdn) {
         if (verify())
-            return behavior.getSubscriberByMsisdn(msisdn);
+            return behavior.getSubscribersByMsisdn(msisdn);
         return Collections.EMPTY_LIST;
     }
 

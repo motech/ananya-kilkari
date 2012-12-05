@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.web.response;
 
-
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -8,9 +9,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class LocationResponse {
-    @JsonProperty
-    @XmlElement
-    private String district;
 
     @JsonProperty
     @XmlElement
@@ -19,6 +17,10 @@ public class LocationResponse {
     @JsonProperty
     @XmlElement
     private String panchayat;
+
+    @JsonProperty
+    @XmlElement
+    private String district;
 
     public LocationResponse() {
     }
@@ -29,10 +31,6 @@ public class LocationResponse {
         this.panchayat = panchayat;
     }
 
-    public String getDistrict() {
-        return district;
-    }
-
     public String getBlock() {
         return block;
     }
@@ -41,27 +39,21 @@ public class LocationResponse {
         return panchayat;
     }
 
+    public String getDistrict() {
+        return district;
+    }
+
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        LocationResponse that = (LocationResponse) o;
-
-        if (block != null ? !block.equals(that.block) : that.block != null) return false;
-        if (district != null ? !district.equals(that.district) : that.district != null) return false;
-        if (panchayat != null ? !panchayat.equals(that.panchayat) : that.panchayat != null) return false;
-
-        return true;
+    public boolean equals(Object that) {
+        return EqualsBuilder.reflectionEquals(this, that);
     }
 
     @Override
     public int hashCode() {
-        int result = district != null ? district.hashCode() : 0;
-        result = 31 * result + (block != null ? block.hashCode() : 0);
-        result = 31 * result + (panchayat != null ? panchayat.hashCode() : 0);
-        return result;
+        return new HashCodeBuilder()
+                .append(this.district)
+                .append(this.block)
+                .append(this.panchayat)
+                .hashCode();
     }
 }
-
-

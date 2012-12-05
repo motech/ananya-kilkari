@@ -28,7 +28,6 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionRep
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
-import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
@@ -369,8 +368,8 @@ public class SubscriptionService {
             return subscriptionDetailsResponseMapper.map(subscriptionList, Collections.EMPTY_LIST);
         }
 
-        List<SubscriptionResponse> subscriberDetailsList = reportingService.getSubscriberByMsisdn(msisdn);
-        return subscriptionDetailsResponseMapper.map(subscriptionList, subscriberDetailsList);
+        List<SubscriberResponse> subscriberDetailsFromReports = reportingService.getSubscribersByMsisdn(msisdn);
+        return subscriptionDetailsResponseMapper.map(subscriptionList, subscriberDetailsFromReports);
     }
 
     private LocationResponse getExistingLocation(Location location) {

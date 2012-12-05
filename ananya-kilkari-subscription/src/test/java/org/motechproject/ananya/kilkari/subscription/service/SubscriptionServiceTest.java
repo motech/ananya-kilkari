@@ -43,7 +43,6 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionRep
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
-import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
@@ -978,7 +977,7 @@ public class SubscriptionServiceTest {
 
         String beneficiaryName = "name";
         Integer beneficiaryAge = 25;
-        SubscriberResponse subscriberResponse = new SubscriberResponse(beneficiaryName, beneficiaryAge, null, null, null);
+        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", beneficiaryName, beneficiaryAge, null, null, null);
 
         when(allSubscriptions.findUpdatableSubscriptions(oldMsisdn)).thenReturn(Arrays.asList(subscription1, subscription2));
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription1);
@@ -1275,22 +1274,22 @@ public class SubscriptionServiceTest {
         String msisdn = "1234567890";
         SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).build();
-        SubscriptionResponse subscriptionFromReports = new SubscriptionResponse(Long.valueOf(msisdn), null, null, "name", null, null, null, null, null, null, null);
+        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), new LocationResponse("d", "b", "p"));
         ArrayList<Subscription> subscriptionList = new ArrayList<>();
         subscriptionList.add(subscription);
-        ArrayList<SubscriptionResponse> subscriptionResponseList = new ArrayList<>();
-        subscriptionResponseList.add(subscriptionFromReports);
+        ArrayList<SubscriberResponse> subscriberResponseList = new ArrayList<>();
+        subscriberResponseList.add(subscriberResponse);
         ArrayList<SubscriptionDetailsResponse> expectedResponse = new ArrayList<>();
         expectedResponse.add(new SubscriptionDetailsResponse(null, pack, null, null));
         when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionList);
-        when(reportingServiceImpl.getSubscriberByMsisdn(msisdn)).thenReturn(subscriptionResponseList);
-        when(subscriptionDetailsResponseMapper.map(subscriptionList, subscriptionResponseList)).thenReturn(expectedResponse);
+        when(reportingServiceImpl.getSubscribersByMsisdn(msisdn)).thenReturn(subscriberResponseList);
+        when(subscriptionDetailsResponseMapper.map(subscriptionList, subscriberResponseList)).thenReturn(expectedResponse);
 
         List<SubscriptionDetailsResponse> actualResponse = subscriptionService.getSubscriptionDetails(msisdn, Channel.CONTACT_CENTER);
 
         verify(allSubscriptions).findByMsisdn(msisdn);
-        verify(reportingServiceImpl).getSubscriberByMsisdn(msisdn);
-        verify(subscriptionDetailsResponseMapper).map(subscriptionList, subscriptionResponseList);
+        verify(reportingServiceImpl).getSubscribersByMsisdn(msisdn);
+        verify(subscriptionDetailsResponseMapper).map(subscriptionList, subscriberResponseList);
         assertEquals(expectedResponse, actualResponse);
     }
 
@@ -1309,7 +1308,7 @@ public class SubscriptionServiceTest {
         List<SubscriptionDetailsResponse> actualResponse = subscriptionService.getSubscriptionDetails(msisdn, Channel.IVR);
 
         verify(allSubscriptions).findByMsisdn(msisdn);
-        verify(reportingServiceImpl, never()).getSubscriberByMsisdn(anyString());
+        verify(reportingServiceImpl, never()).getSubscribersByMsisdn(anyString());
         verify(subscriptionDetailsResponseMapper).map(subscriptionList, Collections.EMPTY_LIST);
         assertEquals(expectedResponse, actualResponse);
     }

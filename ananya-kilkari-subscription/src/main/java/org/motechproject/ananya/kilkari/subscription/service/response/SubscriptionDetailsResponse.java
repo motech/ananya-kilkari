@@ -1,9 +1,10 @@
 package org.motechproject.ananya.kilkari.subscription.service.response;
 
+import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
-import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
+
 
 public class SubscriptionDetailsResponse {
     private String subscriptionId;
@@ -11,7 +12,7 @@ public class SubscriptionDetailsResponse {
     private SubscriptionStatus status;
     private String campaignId;
     private String beneficiaryName;
-    private String beneficiaryAge;
+    private Integer beneficiaryAge;
     private Integer startWeekNumber;
     private String expectedDateOfDelivery;
     private String dateOfBirth;
@@ -44,16 +45,12 @@ public class SubscriptionDetailsResponse {
         return beneficiaryName;
     }
 
-    public String getBeneficiaryAge() {
+    public Integer getBeneficiaryAge() {
         return beneficiaryAge;
     }
 
     public Integer getStartWeekNumber() {
         return startWeekNumber;
-    }
-
-    public String weekNumber(){
-        return startWeekNumber == null ? null : startWeekNumber.toString();
     }
 
     public String getExpectedDateOfDelivery() {
@@ -68,12 +65,12 @@ public class SubscriptionDetailsResponse {
         return location;
     }
 
-    public void updateSubscriberDetails(String name, String age, Integer week, String dob, String edd, LocationResponse locationResponse) {
+    public void updateSubscriberDetails(String name, Integer age, DateTime dob, DateTime edd, Integer week, Location location) {
         beneficiaryName = name;
         beneficiaryAge = age;
         startWeekNumber = week;
-        dateOfBirth = dob;
-        expectedDateOfDelivery = edd;
-        location = locationResponse == null ? null : new Location(locationResponse.getDistrict(), locationResponse.getBlock(), locationResponse.getPanchayat());
+        dateOfBirth = dob == null ? null : dob.toString();
+        expectedDateOfDelivery = edd == null ? null : edd.toString();
+        this.location = location;
     }
 }

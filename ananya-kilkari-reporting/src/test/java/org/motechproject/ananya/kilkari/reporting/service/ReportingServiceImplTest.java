@@ -1,12 +1,16 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
-import org.motechproject.ananya.reports.kilkari.contract.request.*;
+import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
-import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.http.client.service.HttpClientService;
 
 import java.util.ArrayList;
@@ -86,27 +90,26 @@ public class ReportingServiceImplTest {
     }
 
     @Test
-    public void shouldReportChangeMsisdn(){
+    public void shouldReportChangeMsisdn() {
         String msisdn = "9876543210";
         String subscriptionId = "subscriptionId";
 
         reportingServiceImpl.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
 
-        verify(reportGateway).reportChangeMsisdnForSubscriber(subscriptionId,msisdn);
+        verify(reportGateway).reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
     }
 
     @Test
-    public void shouldGetSubscribersByMsisdn()
-    {
+    public void shouldGetSubscribersByMsisdn() {
         final String msisdn = "1234567890";
-        final ArrayList<SubscriptionResponse> expectedSubscriber = new ArrayList<SubscriptionResponse>(){{
-            add(new SubscriptionResponse(Long.valueOf(msisdn), null, null, null, null, null, null, null, null, null, null));
+        final ArrayList<SubscriberResponse> expectedSubscriber = new ArrayList<SubscriberResponse>() {{
+            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), new LocationResponse("d", "b", "p")));
         }};
-        when(reportGateway.getSubscriberByMsisdn(msisdn)).thenReturn(expectedSubscriber);
+        when(reportGateway.getSubscribersByMsisdn(msisdn)).thenReturn(expectedSubscriber);
 
-        List<SubscriptionResponse> actualSubscriber = reportingServiceImpl.getSubscriberByMsisdn(msisdn);
+        List<SubscriberResponse> actualSubscriber = reportingServiceImpl.getSubscribersByMsisdn(msisdn);
 
-        verify(reportGateway).getSubscriberByMsisdn(msisdn);
+        verify(reportGateway).getSubscribersByMsisdn(msisdn);
         assertEquals(expectedSubscriber, actualSubscriber);
     }
 }

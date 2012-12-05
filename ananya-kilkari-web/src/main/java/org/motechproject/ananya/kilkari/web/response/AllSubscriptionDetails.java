@@ -7,8 +7,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-//TODO: should get better class name
-
 @XmlRootElement
 public class AllSubscriptionDetails extends SubscriptionDetails {
     @JsonProperty
@@ -17,11 +15,11 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
 
     @JsonProperty
     @XmlElement
-    private String beneficiaryAge;
+    private Integer beneficiaryAge;
 
     @JsonProperty
     @XmlElement(name = "week")
-    private String weekNumber;
+    private Integer weekNumber;
 
     @JsonProperty
     @XmlElement
@@ -39,7 +37,7 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
     }
 
     public AllSubscriptionDetails(String subscriptionId, String pack, String status, String lastCampaignId,
-                                  String beneficiaryName, String beneficiaryAge, String weekNumber, String expectedDateOfDelivery, String dateOfBirth, LocationResponse location) {
+                                  String beneficiaryName, Integer beneficiaryAge, Integer weekNumber, String expectedDateOfDelivery, String dateOfBirth, LocationResponse location) {
         super(subscriptionId, pack, status, lastCampaignId);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
@@ -53,11 +51,11 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
         return beneficiaryName;
     }
 
-    public String getBeneficiaryAge() {
+    public Integer getBeneficiaryAge() {
         return beneficiaryAge;
     }
 
-    public String getWeekNumber() {
+    public Integer getWeekNumber() {
         return weekNumber;
     }
 

@@ -10,7 +10,6 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionRep
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
-import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.motechproject.http.client.domain.Method;
 import org.motechproject.http.client.service.HttpClientService;
 import org.motechproject.web.context.HttpThreadContext;
@@ -96,9 +95,9 @@ public class ReportingGatewayImpl implements ReportingGateway {
     }
 
     @Override
-    public List<SubscriptionResponse> getSubscriberByMsisdn(String msisdn) {
+    public List<SubscriberResponse> getSubscribersByMsisdn(String msisdn) {
         String url = String.format("%s%s?msisdn=%s", getBaseUrl(), GET_SUBSCRIBER_BY_MSISDN_PATH, msisdn);
-        return Arrays.asList(restTemplate.getForEntity(url, SubscriptionResponse[].class).getBody());
+        return Arrays.asList(restTemplate.getForEntity(url, SubscriberResponse[].class).getBody());
     }
 
     private boolean isCallCenterCall() {

@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,7 +14,6 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionRep
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
-import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.motechproject.http.client.domain.Method;
 import org.motechproject.http.client.service.HttpClientService;
 import org.motechproject.web.context.HttpThreadContext;
@@ -22,7 +22,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -282,18 +285,18 @@ public class ReportingGatewayImplTest {
     public void shouldMakeAReportingCallToGetSubscriberByMsisdn() {
         final String msisdn = "1234567890";
         String expectedUrl = "url/subscriber?msisdn=" + msisdn;
-        ArrayList<SubscriptionResponse> expectedResponse = new ArrayList<SubscriptionResponse>() {{
-            add(new SubscriptionResponse(Long.valueOf(msisdn), UUID.randomUUID().toString(), "bari_kilkari", null, "new", "1", null, null, null, null, 1));
+        ArrayList<SubscriberResponse> expectedResponse = new ArrayList<SubscriberResponse>() {{
+            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), new LocationResponse("d", "b", "p")));
         }};
-        ResponseEntity<SubscriptionResponse[]> responseEntity = new ResponseEntity(expectedResponse.toArray(), HttpStatus.OK);
+        ResponseEntity<SubscriberResponse[]> responseEntity = new ResponseEntity(expectedResponse.toArray(), HttpStatus.OK);
 
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        when(restTemplate.getForEntity(expectedUrl, SubscriptionResponse[].class))
+        when(restTemplate.getForEntity(expectedUrl, SubscriberResponse[].class))
                 .thenReturn(responseEntity);
 
-        List<SubscriptionResponse> actualResponse = reportingGateway.getSubscriberByMsisdn(msisdn);
+        List<SubscriberResponse> actualResponse = reportingGateway.getSubscribersByMsisdn(msisdn);
 
-        verify(restTemplate).getForEntity(expectedUrl, SubscriptionResponse[].class);
+        verify(restTemplate).getForEntity(expectedUrl, SubscriberResponse[].class);
         assertEquals(expectedResponse, actualResponse);
     }
 

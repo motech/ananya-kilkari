@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.subscription.service.mapper;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +13,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
-import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,11 +70,11 @@ public class SubscriptionDetailsResponseMapperTest {
             add(subscription1);
             add(subscription2);
         }};
-        final SubscriptionResponse subscriptionResponse1 = new SubscriptionResponse(Long.valueOf(msisdn), subscription1.getSubscriptionId(), subscription1.getPack().name(), "name 1", "ACTIVE", "23", "22", null, null, location, null);
-        final SubscriptionResponse subscriptionResponse2 = new SubscriptionResponse(Long.valueOf(msisdn), subscription2.getSubscriptionId(), subscription2.getPack().name(), "name 2", "NEW", "34", "33", null, null, location, null);
-        List<SubscriptionResponse> subscriberDetailsList = new ArrayList<SubscriptionResponse>() {{
-            add(subscriptionResponse2);
-            add(subscriptionResponse1);
+        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, DateTime.now(), DateTime.now().minusYears(1), location);
+        final SubscriberResponse subscriberResponse2 = new SubscriberResponse(subscription2.getSubscriptionId(), "name1", 24, DateTime.now(), DateTime.now().minusYears(1), location);
+        List<SubscriberResponse> subscriberDetailsList = new ArrayList<SubscriberResponse>() {{
+            add(subscriberResponse2);
+            add(subscriberResponse1);
         }};
         when(inboxService.getMessageFor(subscription1.getSubscriptionId())).thenReturn(messageId1);
         when(inboxService.getMessageFor(subscription2.getSubscriptionId())).thenReturn(messageId2);
@@ -83,23 +84,40 @@ public class SubscriptionDetailsResponseMapperTest {
         verify(inboxService).getMessageFor(subscription1.getSubscriptionId());
         verify(inboxService).getMessageFor(subscription2.getSubscriptionId());
         assertEquals(2, responseList.size());
-        assertResponse(messageId1, subscription1, subscriptionResponse1, responseList.get(0));
-        assertResponse(messageId2, subscription2, subscriptionResponse2, responseList.get(1));
+        assertResponse(messageId1, subscription1, subscriberResponse1, responseList.get(0));
+        assertResponse(messageId2, subscription2, subscriberResponse2, responseList.get(1));
     }
 
-    private void assertResponse(String messageId, Subscription subscription, SubscriptionResponse subscriptionResponse, SubscriptionDetailsResponse response) {
-        LocationResponse actualLocation = subscriptionResponse.getLocation();
+    @Test
+    public void shouldMapToAppropriateResponseWithoutLocation() {
+        final Subscription subscription1 = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.BARI_KILKARI).build();
+        List<Subscription> subscriptionList = new ArrayList<Subscription>() {{
+            add(subscription1);
+        }};
+        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, DateTime.now(), DateTime.now(), null);
+        List<SubscriberResponse> subscriberDetailsList = new ArrayList<SubscriberResponse>() {{
+            add(subscriberResponse1);
+        }};
+        when(inboxService.getMessageFor(subscription1.getSubscriptionId())).thenReturn("messageId 1");
+
+        List<SubscriptionDetailsResponse> responseList = subscriptionDetailsResponseMapper.map(subscriptionList, subscriberDetailsList);
+        assertEquals(1, responseList.size());
+        assertNull(responseList.get(0).getLocation());
+    }
+
+    private void assertResponse(String messageId, Subscription subscription, SubscriberResponse subscriberResponse, SubscriptionDetailsResponse response) {
+        LocationResponse actualLocation = subscriberResponse.getLocationResponse();
         Location expectedLocation = new Location(actualLocation.getDistrict(), actualLocation.getBlock(), actualLocation.getPanchayat());
 
         assertEquals(subscription.getSubscriptionId(), response.getSubscriptionId());
         assertEquals(subscription.getPack(), response.getPack());
         assertEquals(subscription.getStatus(), response.getStatus());
+        assertEquals(subscription.getStartWeekNumber(), response.getStartWeekNumber());
         assertEquals(messageId, response.getCampaignId());
-        assertEquals(subscriptionResponse.getBeneficiaryName(), response.getBeneficiaryName());
-        assertEquals(subscriptionResponse.getBeneficiaryAge(), response.getBeneficiaryAge());
-        assertEquals(subscriptionResponse.getStartWeekNumber(), response.getStartWeekNumber());
-        assertEquals(subscriptionResponse.getDateOfBirth(), response.getDateOfBirth());
-        assertEquals(subscriptionResponse.getExpectedDateOfDelivery(), response.getExpectedDateOfDelivery());
+        assertEquals(subscriberResponse.getBeneficiaryName(), response.getBeneficiaryName());
+        assertEquals(subscriberResponse.getBeneficiaryAge(), response.getBeneficiaryAge());
+        assertEquals(subscriberResponse.getDateOfBirth().toString(), response.getDateOfBirth());
+        assertEquals(subscriberResponse.getExpectedDateOfDelivery().toString(), response.getExpectedDateOfDelivery());
         assertEquals(expectedLocation, response.getLocation());
     }
 
@@ -111,7 +129,4 @@ public class SubscriptionDetailsResponseMapperTest {
         assertNotNull(responseList);
         assertTrue(responseList.isEmpty());
     }
-
-
-
 }

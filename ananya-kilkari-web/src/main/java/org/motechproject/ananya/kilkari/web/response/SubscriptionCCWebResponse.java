@@ -34,13 +34,7 @@ public class SubscriptionCCWebResponse extends SubscriptionBaseWebResponse {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SubscriptionCCWebResponse)) return false;
-
-        SubscriptionCCWebResponse that = (SubscriptionCCWebResponse) o;
-
-        return new EqualsBuilder().append(this.subscriptionDetails, that.subscriptionDetails)
-                .isEquals();
+        return EqualsBuilder.reflectionEquals(this,o);
     }
 
     @Override

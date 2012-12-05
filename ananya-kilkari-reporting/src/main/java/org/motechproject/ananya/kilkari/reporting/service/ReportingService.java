@@ -7,7 +7,6 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionRep
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
-import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 
 import java.util.List;
 
@@ -26,5 +25,5 @@ public interface ReportingService {
 
     void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn);
 
-    List<SubscriptionResponse> getSubscriberByMsisdn(String msisdn);
+    List<SubscriberResponse> getSubscribersByMsisdn(String msisdn);
 }

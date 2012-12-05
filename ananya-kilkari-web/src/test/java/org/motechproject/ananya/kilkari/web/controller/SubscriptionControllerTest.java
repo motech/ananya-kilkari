@@ -23,6 +23,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
@@ -77,7 +78,6 @@ public class SubscriptionControllerTest {
     public void shouldGetSubscriptionsForGivenMsisdnForChannelIvr() throws Exception {
         String msisdn = "1234567890";
         String channel = "ivr";
-
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
@@ -100,9 +100,10 @@ public class SubscriptionControllerTest {
     public void shouldGetSubscriptionsForGivenMsisdnForChannelOtherThanIvrAsJson() throws Exception {
         String msisdn = "1234567890";
         String channel = "CONTACT_CENTER";
+        int startWeekNumber = 4;
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
-        subscriptionDetails.updateSubscriberDetails("name", "age", 23, "23-12-12", "12-12-12", new org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse("d", "b", "p"));
+        subscriptionDetails.updateSubscriberDetails("name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"));
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -124,9 +125,10 @@ public class SubscriptionControllerTest {
     public void shouldGetSubscriptionsForGivenMsisdnForChannelOtherThanIvrAsXML() throws Exception {
         String msisdn = "1234567890";
         String channel = "CONTACT_CENTER";
+        int startWeekNumber = 4;
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
-        subscriptionDetails.updateSubscriberDetails("name", "age", 23, "23-12-12", "12-12-12", new org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse("d", "b", "p"));
+        subscriptionDetails.updateSubscriberDetails("name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"));
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -536,7 +538,7 @@ public class SubscriptionControllerTest {
         LocationResponse expectedLocation = new LocationResponse(subscriptionDetails.getLocation().getDistrict(), subscriptionDetails.getLocation().getBlock(), subscriptionDetails.getLocation().getPanchayat());
         assertEquals(subscriptionDetails.getBeneficiaryName(), actualDetailsResponse.getBeneficiaryName());
         assertEquals(subscriptionDetails.getBeneficiaryAge(), actualDetailsResponse.getBeneficiaryAge());
-        assertEquals(subscriptionDetails.getStartWeekNumber().toString(), actualDetailsResponse.getWeekNumber());
+        assertEquals(subscriptionDetails.getStartWeekNumber(), actualDetailsResponse.getWeekNumber());
         assertEquals(subscriptionDetails.getDateOfBirth(), actualDetailsResponse.getDateOfBirth());
         assertEquals(subscriptionDetails.getExpectedDateOfDelivery(), actualDetailsResponse.getExpectedDateOfDelivery());
         assertEquals(expectedLocation, actualDetailsResponse.getLocation());

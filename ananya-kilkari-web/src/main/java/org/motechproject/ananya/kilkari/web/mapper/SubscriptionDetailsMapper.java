@@ -28,8 +28,16 @@ public class SubscriptionDetailsMapper {
         for (SubscriptionDetailsResponse detailsResponse : subscriptionDetailsResponses) {
             Location locationDetails = detailsResponse.getLocation();
             LocationResponse location = locationDetails != null ? new LocationResponse(locationDetails.getDistrict(), locationDetails.getBlock(), locationDetails.getPanchayat()) : null;
-            ccWebResponse.addSubscriptionDetail(new AllSubscriptionDetails(detailsResponse.getSubscriptionId(), detailsResponse.getPack().name(), detailsResponse.getStatus().getDisplayString(), detailsResponse.getCampaignId(),
-                    detailsResponse.getBeneficiaryName(), detailsResponse.getBeneficiaryAge(), detailsResponse.weekNumber(), detailsResponse.getExpectedDateOfDelivery(), detailsResponse.getDateOfBirth(), location));
+            ccWebResponse.addSubscriptionDetail(new AllSubscriptionDetails(detailsResponse.getSubscriptionId(),
+                    detailsResponse.getPack().name(),
+                    detailsResponse.getStatus().getDisplayString(),
+                    detailsResponse.getCampaignId(),
+                    detailsResponse.getBeneficiaryName(),
+                    detailsResponse.getBeneficiaryAge(),
+                    detailsResponse.getStartWeekNumber(),
+                    detailsResponse.getExpectedDateOfDelivery(),
+                    detailsResponse.getDateOfBirth(),
+                    location));
         }
         return ccWebResponse;
     }

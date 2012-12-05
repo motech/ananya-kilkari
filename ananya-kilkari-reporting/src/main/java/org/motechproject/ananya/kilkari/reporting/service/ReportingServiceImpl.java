@@ -8,7 +8,6 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionRep
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
-import org.motechproject.ananya.reports.kilkari.contract.response.SubscriptionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +59,7 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public List<SubscriptionResponse> getSubscriberByMsisdn(String msisdn) {
-        return reportGateway.getSubscriberByMsisdn(msisdn);
+    public List<SubscriberResponse> getSubscribersByMsisdn(String msisdn) {
+        return reportGateway.getSubscribersByMsisdn(msisdn);
     }
 }

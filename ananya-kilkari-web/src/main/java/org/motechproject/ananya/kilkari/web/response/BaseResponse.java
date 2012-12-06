@@ -1,15 +1,9 @@
 package org.motechproject.ananya.kilkari.web.response;
 
-import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.http.MediaType;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
@@ -86,31 +80,5 @@ public class BaseResponse {
             e.printStackTrace();
         }
         return stringWriter.toString();
-    }
-
-    public String toXml(String contentType) throws JAXBException {
-        JAXBContext context = JAXBContext.newInstance(BaseResponse.class);
-        Marshaller marshaller = context.createMarshaller();
-        setNoHeaderOptionOnMarshaller(marshaller);
-        setCharset(contentType, marshaller);
-        StringWriter stringWriter = new StringWriter();
-        marshaller.marshal(this, stringWriter);
-        return stringWriter.toString();
-    }
-
-    private void setNoHeaderOptionOnMarshaller(Marshaller marshaller) throws PropertyException {
-        final String JAXB_FRAGMENT = "jaxb.fragment";
-        final String JAXB_FORMATTED_OUTPUT = "jaxb.formatted.output";
-        marshaller.setProperty(JAXB_FRAGMENT, Boolean.TRUE);
-        marshaller.setProperty(JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-    }
-
-    private void setCharset(String contentType, Marshaller marshaller) throws PropertyException {
-        if(StringUtils.isEmpty(contentType))
-            return;
-        MediaType mediaType = MediaType.parseMediaType(contentType);
-        if (mediaType != null && mediaType.getCharSet() != null) {
-            marshaller.setProperty(Marshaller.JAXB_ENCODING, mediaType.getCharSet().name());
-        }
     }
 }

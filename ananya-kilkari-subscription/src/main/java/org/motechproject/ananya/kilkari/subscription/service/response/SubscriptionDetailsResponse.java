@@ -27,10 +27,7 @@ public class SubscriptionDetailsResponse {
     }
 
     public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId, String beneficiaryName, Integer beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer startWeekNumber, Location location) {
-        this.subscriptionId = subscriptionId;
-        this.pack = pack;
-        this.status = status;
-        this.campaignId = campaignId;
+        this(subscriptionId, pack, status, campaignId);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
         this.dateOfBirth = DateUtils.formatDate(dateOfBirth);

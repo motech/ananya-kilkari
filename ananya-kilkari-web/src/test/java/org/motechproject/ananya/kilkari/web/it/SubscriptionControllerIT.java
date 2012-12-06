@@ -154,16 +154,14 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         reportingService.setBehavior(mockedReportingService);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<SubscriptionDetailsResponse>() {{
-            SubscriptionDetailsResponse detailsResponse1 = new SubscriptionDetailsResponse(subscription1.getSubscriptionId(), subscription1.getPack(),
-                    subscription1.getStatus(), inboxMessage1.getMessageId());
             LocationResponse locationResponse1 = reportResponse1.getLocationResponse();
             LocationResponse locationResponse2 = reportResponse2.getLocationResponse();
-            detailsResponse1.updateSubscriberDetails(reportResponse1.getBeneficiaryName(), reportResponse1.getBeneficiaryAge(), reportResponse1.getDateOfBirth(),
+            SubscriptionDetailsResponse detailsResponse1 = new SubscriptionDetailsResponse(subscription1.getSubscriptionId(), subscription1.getPack(),
+                    subscription1.getStatus(), inboxMessage1.getMessageId(), reportResponse1.getBeneficiaryName(), reportResponse1.getBeneficiaryAge(), reportResponse1.getDateOfBirth(),
                     reportResponse1.getExpectedDateOfDelivery(), startWeekNumber, new Location(locationResponse1.getDistrict(),
                     locationResponse1.getBlock(), locationResponse1.getPanchayat()));
             SubscriptionDetailsResponse detailsResponse2 = new SubscriptionDetailsResponse(subscription2.getSubscriptionId(),
-                    subscription2.getPack(), subscription2.getStatus(), inboxMessage2.getMessageId());
-            detailsResponse2.updateSubscriberDetails(reportResponse2.getBeneficiaryName(), reportResponse2.getBeneficiaryAge(), reportResponse2.getDateOfBirth(),
+                    subscription2.getPack(), subscription2.getStatus(), inboxMessage2.getMessageId(), reportResponse2.getBeneficiaryName(), reportResponse2.getBeneficiaryAge(), reportResponse2.getDateOfBirth(),
                     reportResponse2.getExpectedDateOfDelivery(), startWeekNumber, new Location(locationResponse2.getDistrict(),
                     locationResponse2.getBlock(), locationResponse2.getPanchayat()));
             add(detailsResponse1);

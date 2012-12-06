@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 
 public class SubscriptionDetailsResponse {
@@ -23,6 +24,19 @@ public class SubscriptionDetailsResponse {
         this.pack = pack;
         this.status = status;
         this.campaignId = campaignId;
+    }
+
+    public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId, String beneficiaryName, Integer beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer startWeekNumber, Location location) {
+        this.subscriptionId = subscriptionId;
+        this.pack = pack;
+        this.status = status;
+        this.campaignId = campaignId;
+        this.beneficiaryName = beneficiaryName;
+        this.beneficiaryAge = beneficiaryAge;
+        this.dateOfBirth = DateUtils.formatDate(dateOfBirth);
+        this.expectedDateOfDelivery = DateUtils.formatDate(expectedDateOfDelivery);
+        this.startWeekNumber = startWeekNumber;
+        this.location = location;
     }
 
     public String getSubscriptionId() {
@@ -63,14 +77,5 @@ public class SubscriptionDetailsResponse {
 
     public Location getLocation() {
         return location;
-    }
-
-    public void updateSubscriberDetails(String name, Integer age, DateTime dob, DateTime edd, Integer week, Location location) {
-        beneficiaryName = name;
-        beneficiaryAge = age;
-        startWeekNumber = week;
-        dateOfBirth = dob == null ? null : dob.toString();
-        expectedDateOfDelivery = edd == null ? null : edd.toString();
-        this.location = location;
     }
 }

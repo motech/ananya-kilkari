@@ -116,8 +116,8 @@ public class SubscriptionDetailsResponseMapperTest {
         assertEquals(messageId, response.getCampaignId());
         assertEquals(subscriberResponse.getBeneficiaryName(), response.getBeneficiaryName());
         assertEquals(subscriberResponse.getBeneficiaryAge(), response.getBeneficiaryAge());
-        assertEquals(subscriberResponse.getDateOfBirth().toString(), response.getDateOfBirth());
-        assertEquals(subscriberResponse.getExpectedDateOfDelivery().toString(), response.getExpectedDateOfDelivery());
+        assertEquals(subscriberResponse.getDateOfBirth().toString("dd-MM-yyyy"), response.getDateOfBirth());
+        assertEquals(subscriberResponse.getExpectedDateOfDelivery().toString("dd-MM-yyyy"), response.getExpectedDateOfDelivery());
         assertEquals(expectedLocation, response.getLocation());
     }
 

@@ -68,8 +68,8 @@ public class SubscriptionDetailsMapperTest {
     }
 
     private SubscriptionDetailsResponse setupData(Location actualLocation) {
-        SubscriptionDetailsResponse detailsResponse = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK33");
-        detailsResponse.updateSubscriberDetails("name", 10, DateTime.now(), DateTime.now(), 4, actualLocation);
+        SubscriptionDetailsResponse detailsResponse = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK33",
+                "name", 10, DateTime.now(), DateTime.now(), 4, actualLocation);
         return detailsResponse;
     }
 

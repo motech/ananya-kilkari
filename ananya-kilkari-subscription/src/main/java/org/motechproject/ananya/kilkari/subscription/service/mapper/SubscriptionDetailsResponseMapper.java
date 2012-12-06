@@ -33,17 +33,23 @@ public class SubscriptionDetailsResponseMapper {
     private SubscriptionDetailsResponse constructResponse(Subscription subscription, List<SubscriberResponse> subscriberDetailsFromReports) {
         String subscriptionId = subscription.getSubscriptionId();
         String messageId = inboxService.getMessageFor(subscriptionId);
-        SubscriptionDetailsResponse response = new SubscriptionDetailsResponse(subscriptionId, subscription.getPack(), subscription.getStatus(), messageId);
         SubscriberResponse subscriberDetails = findSubscriberDetailsFor(subscriptionId, subscriberDetailsFromReports);
-        if (subscriberDetails == null)
-            return response;
+        return getSubscriptionDetailsResponse(subscription, subscriptionId, messageId, subscriberDetails);
+    }
+
+    private SubscriptionDetailsResponse getSubscriptionDetailsResponse(Subscription subscription, String subscriptionId, String messageId, SubscriberResponse subscriberDetails) {
+        return subscriberDetails == null
+                ? new SubscriptionDetailsResponse(subscriptionId, subscription.getPack(), subscription.getStatus(), messageId)
+                : new SubscriptionDetailsResponse(subscriptionId, subscription.getPack(), subscription.getStatus(), messageId,
+                subscriberDetails.getBeneficiaryName(), subscriberDetails.getBeneficiaryAge(), subscriberDetails.getDateOfBirth(),
+                subscriberDetails.getExpectedDateOfDelivery(), subscription.getStartWeekNumber(), getLocation(subscriberDetails));
+    }
+
+    private Location getLocation(SubscriberResponse subscriberDetails) {
         LocationResponse subscriberLocationResponse = subscriberDetails.getLocationResponse();
-        Location subscriberLocation =
-                subscriberLocationResponse == null
+        return subscriberLocationResponse == null
                 ? null
                 : new Location(subscriberLocationResponse.getDistrict(), subscriberLocationResponse.getBlock(), subscriberLocationResponse.getPanchayat());
-        response.updateSubscriberDetails(subscriberDetails.getBeneficiaryName(), subscriberDetails.getBeneficiaryAge(), subscriberDetails.getDateOfBirth(), subscriberDetails.getExpectedDateOfDelivery(), subscription.getStartWeekNumber(), subscriberLocation);
-        return response;
     }
 
     private SubscriberResponse findSubscriberDetailsFor(String subscriptionId, List<SubscriberResponse> subscriberDetailsFromReports) {

@@ -102,8 +102,8 @@ public class SubscriptionControllerTest {
         String channel = "CONTACT_CENTER";
         int startWeekNumber = 4;
 
-        SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
-        subscriptionDetails.updateSubscriberDetails("name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"));
+        SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE,
+                "WEEK13", "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"));
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -127,8 +127,8 @@ public class SubscriptionControllerTest {
         String channel = "CONTACT_CENTER";
         int startWeekNumber = 4;
 
-        SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
-        subscriptionDetails.updateSubscriberDetails("name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"));
+        SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13",
+                "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"));
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);

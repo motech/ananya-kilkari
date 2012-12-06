@@ -15,7 +15,7 @@ public class DateUtils {
     }
 
     public static String formatDate(DateTime dateTime) {
-        return dateTime.toString(DATE_FORMAT);
+        return dateTime == null ? StringUtils.EMPTY : dateTime.toString(DATE_FORMAT);
     }
 
     public static DateTime parseDateTime(String dateTime) {
@@ -23,6 +23,6 @@ public class DateUtils {
     }
 
     public static String formatDateTime(DateTime dateTime) {
-        return dateTime.toString(DATE_TIME_FORMAT);
+        return dateTime == null ? StringUtils.EMPTY : dateTime.toString(DATE_TIME_FORMAT);
     }
 }

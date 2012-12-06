@@ -63,10 +63,24 @@ public class DateUtilsTest {
     }
 
     @Test
+    public void shouldFormatNullDateToEmptyString() {
+        String formattedDate = DateUtils.formatDate(null);
+
+        assertEquals("", formattedDate);
+    }
+
+    @Test
     public void shouldFormatDateTimeToString() {
         DateTime dateTime =  new DateTime(2012, 12, 13, 23, 3, 56);
         String formattedDate = DateUtils.formatDateTime(dateTime);
 
         assertEquals("13-12-2012 23-03-56", formattedDate);
+    }
+
+    @Test
+    public void shouldFormatNullDateTimeToEmptyString() {
+        String formattedDate = DateUtils.formatDateTime(null);
+
+        assertEquals("", formattedDate);
     }
 }

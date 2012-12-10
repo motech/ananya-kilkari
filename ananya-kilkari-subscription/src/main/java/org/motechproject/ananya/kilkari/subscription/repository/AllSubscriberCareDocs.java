@@ -5,6 +5,7 @@ import org.ektorp.CouchDbConnector;
 import org.ektorp.ViewQuery;
 import org.ektorp.support.GenerateView;
 import org.ektorp.support.View;
+import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
 import org.motechproject.dao.MotechBaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,13 @@ public class AllSubscriberCareDocs extends MotechBaseRepository<SubscriberCareDo
     @GenerateView
     public List<SubscriberCareDoc> findByMsisdn(String msisdn) {
         ViewQuery viewQuery = createQuery("by_msisdn").key(msisdn).includeDocs(true);
+        List<SubscriberCareDoc> subscriberCareDocs = db.queryView(viewQuery, SubscriberCareDoc.class);
+        return subscriberCareDocs == null ? Collections.EMPTY_LIST : subscriberCareDocs;
+    }
+
+    @GenerateView
+    public List<SubscriberCareDoc> findByCreatedAt(DateTime startDate, DateTime endDate) {
+        ViewQuery viewQuery = createQuery("by_createdAt").startKey(startDate).endKey(endDate).includeDocs(true);
         List<SubscriberCareDoc> subscriberCareDocs = db.queryView(viewQuery, SubscriberCareDoc.class);
         return subscriberCareDocs == null ? Collections.EMPTY_LIST : subscriberCareDocs;
     }

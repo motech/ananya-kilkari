@@ -5,14 +5,22 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
+import org.motechproject.ananya.kilkari.request.HelpWebRequest;
 import org.motechproject.ananya.kilkari.service.validator.SubscriberCareRequestValidator;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareReasons;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriberCareService;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
+import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class KilkariSubscriberCareServiceTest {
@@ -68,5 +76,20 @@ public class KilkariSubscriberCareServiceTest {
 
         assertEquals(msisdn, careRequest.getMsisdn());
         assertEquals(reason, careRequest.getReason());
+    }
+
+    @Test
+    public void shouldFetchSubscriberCareDocsInTheGivenDateRange() {
+        List<SubscriberCareDoc> expectedSubscriberCareDocs = new ArrayList<>();
+        expectedSubscriberCareDocs.add(new SubscriberCareDoc("msisdn1", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR));
+        String fromDate = "01-01-2012 01:01:01";
+        String toDate = "02-02-2012 02:02:02";
+        DateTime startDate = DateUtils.parseDateTimeForCC(fromDate);
+        DateTime endDate = DateUtils.parseDateTimeForCC(toDate);
+        when(subscriberCareService.getAllSortedByDate(startDate, endDate)).thenReturn(expectedSubscriberCareDocs);
+
+        List<SubscriberCareDoc> actualSubscriberCareDocs = kilkariSubscriberCareService.fetchSubscriberCareDocs(new HelpWebRequest(fromDate, toDate, Channel.CONTACT_CENTER.name()));
+
+        assertEquals(expectedSubscriberCareDocs, actualSubscriberCareDocs);
     }
 }

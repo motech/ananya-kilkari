@@ -1,11 +1,15 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.request.HelpWebRequest;
 import org.motechproject.ananya.kilkari.service.validator.SubscriberCareRequestValidator;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriberCareService;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class KilkariSubscriberCareService {
@@ -36,5 +40,9 @@ public class KilkariSubscriberCareService {
     public void createSubscriberCareRequest(SubscriberCareRequest subscriberCareRequest) {
         careRequestValidator.validate(subscriberCareRequest);
         subscriberCareService.create(subscriberCareRequest);
+    }
+
+    public List<SubscriberCareDoc> fetchSubscriberCareDocs(HelpWebRequest helpWebRequest) {
+        return subscriberCareService.getAllSortedByDate(helpWebRequest.getStartDate(), helpWebRequest.getEndDate());
     }
 }

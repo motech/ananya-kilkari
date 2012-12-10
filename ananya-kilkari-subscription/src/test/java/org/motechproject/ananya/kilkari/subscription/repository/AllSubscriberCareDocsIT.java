@@ -43,6 +43,35 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
     }
 
     @Test
+    public void shouldNotFetchCareDocsIfNotCreatedInTheRange() {
+        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR);
+        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
+
+        List<SubscriberCareDoc> allCareDocs = allSubscriberCareDocs.findByCreatedAt(DateTime.now().plusDays(1), DateTime.now().plusDays(2));
+
+        assertEquals(0, allCareDocs.size());
+    }
+
+    @Test
+    public void shouldCorrectlyFetchTheCareDocs() {
+        String msisdn = "9876543211";
+        SubscriberCareReasons reason = SubscriberCareReasons.HELP;
+        DateTime now = DateTime.now();
+        Channel ivrChannel = Channel.IVR;
+        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc(msisdn, reason, now, ivrChannel);
+        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
+
+        List<SubscriberCareDoc> allCareDocs = allSubscriberCareDocs.findByCreatedAt(DateTime.now().minusDays(1), DateTime.now());
+
+        assertEquals(1, allCareDocs.size());
+        SubscriberCareDoc fetchedSubscriberCareDoc = allCareDocs.get(0);
+        assertEquals(msisdn, fetchedSubscriberCareDoc.getMsisdn());
+        assertEquals(reason, fetchedSubscriberCareDoc.getReason());
+        assertEquals(now.getMillis(), fetchedSubscriberCareDoc.getCreatedAt().getMillis());
+        assertEquals(ivrChannel, fetchedSubscriberCareDoc.getChannel());
+    }
+
+    @Test
     public void shouldAddNewSubscriberCareDoc() {
         SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR);
         allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);

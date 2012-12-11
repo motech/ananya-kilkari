@@ -15,7 +15,7 @@
 
     <mvc:annotation-driven>
         <mvc:message-converters>
-            <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
+            <bean class="org.motechproject.web.message.converters.CustomMappingJacksonHttpMessageConverter"/>
             <bean class="org.motechproject.web.message.converters.CustomJaxb2RootElementHttpMessageConverter"/>
             <bean class="org.motechproject.web.message.converters.CSVHttpMessageConverter"/>
         </mvc:message-converters>

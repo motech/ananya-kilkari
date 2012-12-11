@@ -60,7 +60,7 @@ public class SubscriptionController {
         return BaseResponse.success("Callback request processed successfully");
     }
 
-    @RequestMapping(value = "/subscriber", method = RequestMethod.GET, produces = {"application/json", "application/xml"})
+    @RequestMapping(value = "/subscriber", method = RequestMethod.GET)
     @ResponseBody
     public SubscriptionBaseWebResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
         validateChannel(channel);
@@ -109,6 +109,7 @@ public class SubscriptionController {
         kilkariSubscriptionService.updateSubscriberDetails(subscriberWebRequest, subscriptionId);
         return BaseResponse.success("Subscriber Update request submitted successfully");
     }
+
 
     private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
         if (validationErrors.hasErrors()) {

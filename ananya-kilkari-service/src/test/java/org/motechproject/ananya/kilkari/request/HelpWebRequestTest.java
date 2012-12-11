@@ -42,4 +42,23 @@ public class HelpWebRequestTest {
 
         helpWebRequest.validate();
     }
+
+    @Test
+    public void shouldThrowExceptionIfStartDateIsAfterEndDate() throws Exception {
+        String startDate = "16-12-2012 00:00:00";
+        String endDate = "12-12-2012 00:00:00";
+        HelpWebRequest helpWebRequest = new HelpWebRequest(startDate, endDate, Channel.CONTACT_CENTER.name());
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(String.format("Start Date : %s is after End Date : %s", startDate, endDate));
+
+        helpWebRequest.validate();
+    }
+
+    @Test
+    public void shouldNotThrowExceptionIfEverythingIsValid() {
+        HelpWebRequest helpWebRequest = new HelpWebRequest("12-12-2012 00:00:00", "15-12-2012 00:00:00", Channel.CONTACT_CENTER.name());
+
+        helpWebRequest.validate();
+    }
 }

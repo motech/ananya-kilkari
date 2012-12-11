@@ -33,12 +33,16 @@ public class HelpWebRequest {
 
     public void validate() {
         Errors errors = new Errors();
-        if (!DateUtils.isValidForCC(startDate))
+        boolean isStartDateValid = DateUtils.isValidForCC(startDate);
+        boolean isEndDateValid = DateUtils.isValidForCC(endDate);
+        if (!isStartDateValid)
             errors.add(String.format("Invalid start date : %s", startDate));
-        if (!DateUtils.isValidForCC(endDate))
+        if (!isEndDateValid)
             errors.add(String.format("Invalid end date : %s", endDate));
         if (!Channel.isCallCenter(channel))
             errors.add(String.format("Invalid channel : %s", channel));
+        if (isStartDateValid && isEndDateValid && getEndDate().isBefore(getStartDate()))
+            errors.add(String.format("Start Date : %s is after End Date : %s", startDate, endDate));
         throwExceptionOnValidationFailure(errors);
     }
 

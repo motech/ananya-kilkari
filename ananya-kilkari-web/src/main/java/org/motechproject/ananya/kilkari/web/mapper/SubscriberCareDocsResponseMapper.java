@@ -15,7 +15,8 @@ public class SubscriberCareDocsResponseMapper {
         ArrayList<SubscriberCareDocResponse> subscriberCareDocResponses = new ArrayList<>();
         for (SubscriberCareDoc subscriberCareDoc : subscriberCareDocList) {
             DateTime createdAt = subscriberCareDoc.getCreatedAt();
-            subscriberCareDocResponses.add(new SubscriberCareDocResponse(subscriberCareDoc.getMsisdn(), DateUtils.formatDate(createdAt), DateUtils.formatTime(createdAt)));
+            subscriberCareDocResponses.add(new SubscriberCareDocResponse(subscriberCareDoc.getMsisdn(),
+                    DateUtils.formatDate(createdAt, DateUtils.ISTTimeZone), DateUtils.formatTime(createdAt, DateUtils.ISTTimeZone)));
         }
         return new SubscriberCareDocResponseList(subscriberCareDocResponses);
     }

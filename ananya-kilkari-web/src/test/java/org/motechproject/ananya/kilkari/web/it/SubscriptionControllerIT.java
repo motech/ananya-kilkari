@@ -339,7 +339,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         assertEquals(1, scheduledDates.size());
         assertEquals(expectedStartDate.toDate(), scheduledDates.get(0));
 
-        ChangeSubscriptionWebRequest expectedChangeSubscriptionWebRequest = new ChangeSubscriptionWebRequestBuilder().withDefaults().withChangeType("change_schedule").withEDD(DateUtils.formatDate(DateTime.now().plusDays(1))).build();
+        ChangeSubscriptionWebRequest expectedChangeSubscriptionWebRequest = new ChangeSubscriptionWebRequestBuilder().withDefaults().withChangeType("change_schedule").withEDD(DateUtils.formatDate(DateTime.now().plusDays(1), org.joda.time.tz.FixedDateTimeZone.forOffsetHoursMinutes(5, 30))).build();
         result = mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId + "/changesubscription")
                         .param("channel", channelString)

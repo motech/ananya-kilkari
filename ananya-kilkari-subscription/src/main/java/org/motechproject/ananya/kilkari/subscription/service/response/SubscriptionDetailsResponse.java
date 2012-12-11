@@ -30,8 +30,8 @@ public class SubscriptionDetailsResponse {
         this(subscriptionId, pack, status, campaignId);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
-        this.dateOfBirth = DateUtils.formatDate(dateOfBirth);
-        this.expectedDateOfDelivery = DateUtils.formatDate(expectedDateOfDelivery);
+        this.dateOfBirth = DateUtils.formatDate(dateOfBirth, DateUtils.ISTTimeZone);
+        this.expectedDateOfDelivery = DateUtils.formatDate(expectedDateOfDelivery, DateUtils.ISTTimeZone);
         this.startWeekNumber = startWeekNumber;
         this.location = location;
     }

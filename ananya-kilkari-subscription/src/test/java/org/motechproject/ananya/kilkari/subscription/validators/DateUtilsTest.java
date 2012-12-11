@@ -57,14 +57,14 @@ public class DateUtilsTest {
     public void shouldFormatDateToString() {
         DateTime dateTime = new DateTime(2012, 12, 13, 0, 0, 0);
 
-        String formattedDate = DateUtils.formatDate(dateTime);
+        String formattedDate = DateUtils.formatDate(dateTime, DateUtils.ISTTimeZone);
 
         assertEquals("13-12-2012", formattedDate);
     }
 
     @Test
     public void shouldFormatNullDateToNull() {
-        String formattedDate = DateUtils.formatDate(null);
+        String formattedDate = DateUtils.formatDate(null, DateUtils.ISTTimeZone);
 
         assertNull(formattedDate);
     }
@@ -117,14 +117,14 @@ public class DateUtilsTest {
 
     @Test
     public void shouldFormatTimeToString() {
-        String time = DateUtils.formatTime(new DateTime(2012, 12, 13, 23, 3, 56));
+        String time = DateUtils.formatTime(new DateTime(2012, 12, 13, 23, 3, 56), DateUtils.ISTTimeZone);
 
         assertEquals("23:03:56", time);
     }
 
     @Test
     public void shouldFormatNullDateTimeToNullString() {
-        String time = DateUtils.formatTime(null);
+        String time = DateUtils.formatTime(null, DateUtils.ISTTimeZone);
 
         assertNull(time);
     }

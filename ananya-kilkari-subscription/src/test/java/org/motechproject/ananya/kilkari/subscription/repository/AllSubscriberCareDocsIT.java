@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.subscription.repository;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +22,7 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
     private AllSubscriberCareDocs allSubscriberCareDocs;
 
     @Before
+    @After
     public void setUp() {
         allSubscriberCareDocs.removeAll();
     }

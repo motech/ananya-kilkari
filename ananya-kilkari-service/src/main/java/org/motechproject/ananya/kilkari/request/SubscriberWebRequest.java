@@ -9,18 +9,27 @@ import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 
+@XmlRootElement(name = "subscriber")
 public class SubscriberWebRequest implements Serializable {
     @JsonIgnore
+    @XmlTransient
     private String channel;
     @JsonIgnore
+    @XmlTransient
     private DateTime createdAt;
     @JsonProperty
+    @XmlElement
     private String beneficiaryName;
     @JsonProperty
+    @XmlElement
     private String beneficiaryAge;
     @JsonProperty
+    @XmlElement
     private LocationRequest location;
 
     public SubscriberWebRequest() {
@@ -28,26 +37,31 @@ public class SubscriberWebRequest implements Serializable {
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getChannel() {
         return channel;
     }
 
     @JsonIgnore
+    @XmlTransient
     public DateTime getCreatedAt() {
         return createdAt;
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getBeneficiaryName() {
         return beneficiaryName;
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getBeneficiaryAge() {
         return beneficiaryAge;
     }
 
     @JsonIgnore
+    @XmlTransient
     public Location getLocation() {
         return location == null ? null : new Location(location.getDistrict(), location.getBlock(), location.getPanchayat());
     }

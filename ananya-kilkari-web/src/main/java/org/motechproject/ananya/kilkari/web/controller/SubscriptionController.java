@@ -93,7 +93,7 @@ public class SubscriptionController {
         return BaseResponse.success("Change Subscription successfully completed");
     }
 
-    @RequestMapping(value = "/subscription/changemsisdn", method = RequestMethod.POST)
+    @RequestMapping(value = "/subscriber/changemsisdn", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse changeMsisdn(@RequestBody ChangeMsisdnWebRequest changeMsisdnWebRequest, @RequestParam String channel) {
         changeMsisdnWebRequest.setChannel(channel);

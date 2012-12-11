@@ -4,15 +4,23 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 
+@XmlRootElement
 public class LocationRequest implements Serializable {
     @JsonProperty
+    @XmlElement
     private String district;
     @JsonProperty
+    @XmlElement
     private String block;
     @JsonProperty
+    @XmlElement
     private String panchayat;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -36,6 +44,7 @@ public class LocationRequest implements Serializable {
                 .hashCode();
     }
 
+    @XmlTransient
     public String getDistrict() {
         return district;
     }
@@ -44,6 +53,7 @@ public class LocationRequest implements Serializable {
         this.district = district;
     }
 
+    @XmlTransient
     public String getBlock() {
         return block;
     }
@@ -52,6 +62,7 @@ public class LocationRequest implements Serializable {
         this.block = block;
     }
 
+    @XmlTransient
     public String getPanchayat() {
         return panchayat;
     }

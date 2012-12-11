@@ -13,29 +13,43 @@ import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 
+@XmlRootElement(name = "subscription")
 public class SubscriptionWebRequest implements Serializable {
     @JsonProperty
+    @XmlElement
     private String msisdn;
     @JsonProperty
+    @XmlElement
     private String pack;
     @JsonProperty
+    @XmlElement
     private String beneficiaryName;
     @JsonProperty
+    @XmlElement
     private String beneficiaryAge;
     @JsonProperty
+    @XmlElement
     private String expectedDateOfDelivery;
     @JsonProperty
+    @XmlElement
     private String dateOfBirth;
     @JsonProperty
+    @XmlElement
     private String week;
     @JsonProperty
+    @XmlElement
     private LocationRequest location;
 
     @JsonIgnore
+    @XmlTransient
     private String channel;
     @JsonIgnore
+    @XmlTransient
     private DateTime createdAt;
 
     public SubscriptionWebRequest() {
@@ -43,51 +57,61 @@ public class SubscriptionWebRequest implements Serializable {
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getMsisdn() {
         return msisdn;
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getPack() {
         return pack;
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getChannel() {
         return channel;
     }
 
     @JsonIgnore
+    @XmlTransient
     public DateTime getCreatedAt() {
         return createdAt;
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getBeneficiaryName() {
         return beneficiaryName;
     }
 
     @JsonIgnore
+    @XmlTransient
     public Integer getBeneficiaryAge() {
         return StringUtils.isNotEmpty(beneficiaryAge) ? Integer.parseInt(beneficiaryAge) : null;
     }
 
     @JsonIgnore
+    @XmlTransient
     public DateTime getExpectedDateOfDelivery() {
         return parseDateTime(expectedDateOfDelivery);
     }
 
     @JsonIgnore
+    @XmlTransient
     public DateTime getDateOfBirth() {
         return parseDateTime(dateOfBirth);
     }
 
     @JsonIgnore
+    @XmlTransient
     public Location getLocation() {
         return location == null ? null : new Location(location.getDistrict(), location.getBlock(), location.getPanchayat());
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getWeek() {
         return week;
     }

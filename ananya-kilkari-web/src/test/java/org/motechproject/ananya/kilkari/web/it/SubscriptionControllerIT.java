@@ -428,7 +428,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         when(mockReportingService.getSubscriber(oldSubscription.getSubscriptionId())).thenReturn(new SubscriberResponse("subscriptionId", "name", 25, null, null, null));
 
         MvcResult result = mockMvc(subscriptionController)
-                .perform(post("/subscription/changemsisdn")
+                .perform(post("/subscriber/changemsisdn")
                         .param("channel", Channel.CONTACT_CENTER.toString())
                         .body(TestUtils.toJson(changeMsisdnWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

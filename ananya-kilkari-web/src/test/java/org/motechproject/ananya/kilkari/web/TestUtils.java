@@ -6,6 +6,7 @@ import org.junit.Ignore;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.StringReader;
@@ -39,5 +40,15 @@ public class TestUtils {
         JAXBContext jc = JAXBContext.newInstance(className);
         Unmarshaller u = jc.createUnmarshaller();
         return (T) u.unmarshal(new StringReader(xmlString));
+    }
+
+    public static String toXml(Class className, Object objectToSerialize) throws JAXBException {
+        JAXBContext context = JAXBContext.newInstance(className);
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        m.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+        StringWriter stringWriter = new StringWriter();
+        m.marshal(objectToSerialize, stringWriter);
+        return stringWriter.toString();
     }
 }

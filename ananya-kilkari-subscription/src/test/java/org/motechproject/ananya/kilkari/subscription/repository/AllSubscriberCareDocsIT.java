@@ -33,7 +33,7 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
         SubscriberCareReasons reason = SubscriberCareReasons.HELP;
         DateTime createdAt = DateTime.now();
         SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc(msisdn, reason, createdAt, Channel.IVR);
-        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
+        allSubscriberCareDocs.add(subscriberCareDoc);
         markForDeletion(subscriberCareDoc);
 
         SubscriberCareDoc subscriberCareDocs = allSubscriberCareDocs.find(msisdn, reason.name());
@@ -47,7 +47,7 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
     @Test
     public void shouldNotFetchCareDocsIfNotCreatedInTheRange() {
         SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR);
-        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
+        allSubscriberCareDocs.add(subscriberCareDoc);
 
         List<SubscriberCareDoc> allCareDocs = allSubscriberCareDocs.findByCreatedAt(DateTime.now().plusDays(1), DateTime.now().plusDays(2));
 
@@ -61,7 +61,7 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
         DateTime now = DateTime.now();
         Channel ivrChannel = Channel.IVR;
         SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc(msisdn, reason, now, ivrChannel);
-        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
+        allSubscriberCareDocs.add(subscriberCareDoc);
 
         List<SubscriberCareDoc> allCareDocs = allSubscriberCareDocs.findByCreatedAt(DateTime.now().minusDays(1), DateTime.now());
 
@@ -71,31 +71,6 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
         assertEquals(reason, fetchedSubscriberCareDoc.getReason());
         assertEquals(now.getMillis(), fetchedSubscriberCareDoc.getCreatedAt().getMillis());
         assertEquals(ivrChannel, fetchedSubscriberCareDoc.getChannel());
-    }
-
-    @Test
-    public void shouldAddNewSubscriberCareDoc() {
-        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR);
-        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
-        markForDeletion(subscriberCareDoc);
-
-        List<SubscriberCareDoc> subscriberCareDocs = allSubscriberCareDocs.getAll();
-        assertEquals(1, subscriberCareDocs.size());
-    }
-
-    @Test
-    public void shouldUpdateAnExistingSubscriberCareDocIfMsisdnAndReasonAreSame() {
-        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR);
-        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
-        markForDeletion(subscriberCareDoc);
-
-        DateTime createdAt = DateTime.now().plusDays(1);
-        SubscriberCareDoc subscriberCareDoc2 = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, createdAt, Channel.IVR);
-        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc2);
-
-        List<SubscriberCareDoc> subscriberCareDocs = allSubscriberCareDocs.getAll();
-        assertEquals(1, subscriberCareDocs.size());
-        assertEquals(createdAt.withZone(DateTimeZone.UTC), subscriberCareDocs.get(0).getCreatedAt());
     }
 
     @Test

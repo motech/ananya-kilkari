@@ -22,7 +22,7 @@ public class SubscriberCareService {
     }
 
     public void create(SubscriberCareRequest subscriberCareRequest) {
-        allSubscriberCareDocs.addOrUpdate(SubscriberCareRequestMapper.map(subscriberCareRequest));
+        allSubscriberCareDocs.add(SubscriberCareRequestMapper.map(subscriberCareRequest));
     }
 
     public List<SubscriberCareDoc> getAllSortedByDate(DateTime startDate, DateTime endDate) {

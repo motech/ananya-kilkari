@@ -41,7 +41,7 @@ public class SubscriberCareServiceTest {
         subscriberCareService.create(subscriberCareRequest);
 
         ArgumentCaptor<SubscriberCareDoc> docArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareDoc.class);
-        verify(allSubscriberCareDocs).addOrUpdate(docArgumentCaptor.capture());
+        verify(allSubscriberCareDocs).add(docArgumentCaptor.capture());
         SubscriberCareDoc subscriberCareDoc = docArgumentCaptor.getValue();
 
         assertEquals(subscriberCareRequest.getChannel(), subscriberCareDoc.getChannel().toString());

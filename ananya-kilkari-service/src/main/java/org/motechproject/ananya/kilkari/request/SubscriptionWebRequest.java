@@ -170,7 +170,6 @@ public class SubscriptionWebRequest implements Serializable {
             webRequestValidator.validateWeekNumber(week);
         }
         return webRequestValidator.getErrors();
-
     }
 
     public void validateChannel() {

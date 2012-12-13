@@ -4,10 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
-import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.http.client.domain.Method;
@@ -98,6 +95,12 @@ public class ReportingGatewayImpl implements ReportingGateway {
     public List<SubscriberResponse> getSubscribersByMsisdn(String msisdn) {
         String url = String.format("%s%s?msisdn=%s", getBaseUrl(), GET_SUBSCRIBER_BY_MSISDN_PATH, msisdn);
         return Arrays.asList(restTemplate.getForEntity(url, SubscriberResponse[].class).getBody());
+    }
+
+    @Override
+    public void reportCampaignScheduleAlertReceived(CampaignScheduleAlertRequest campaignScheduleAlertRequest) {
+        String url = String.format("%s%s", getBaseUrl(), CAMPAIGN_SCHEDULE_ALERT_PATH);
+        performHttpRequestBasedOnChannel(url, campaignScheduleAlertRequest, Method.POST);
     }
 
     private boolean isCallCenterCall() {

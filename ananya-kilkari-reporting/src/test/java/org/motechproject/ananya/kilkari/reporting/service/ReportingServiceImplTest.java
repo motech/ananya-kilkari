@@ -5,10 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
-import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.http.client.service.HttpClientService;
@@ -111,5 +108,13 @@ public class ReportingServiceImplTest {
 
         verify(reportGateway).getSubscribersByMsisdn(msisdn);
         assertEquals(expectedSubscriber, actualSubscriber);
+    }
+
+    @Test
+    public void shouldReportOnReceivingACampaignScheduleAlert() {
+        CampaignScheduleAlertRequest campaignScheduleAlertRequest = new CampaignScheduleAlertRequest("subscriptionId", "campaignName", DateTime.now());
+        reportingServiceImpl.reportCampaignScheduleAlertReceived(campaignScheduleAlertRequest);
+
+        verify(reportGateway).reportCampaignScheduleAlertReceived(campaignScheduleAlertRequest);
     }
 }

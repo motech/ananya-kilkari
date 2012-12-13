@@ -1,10 +1,7 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
 import org.motechproject.ananya.kilkari.reporting.profile.TestProfile;
-import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.springframework.stereotype.Service;
@@ -67,6 +64,13 @@ public class StubReportingService implements ReportingService {
     public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
         if (verify()) {
             behavior.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        }
+    }
+
+    @Override
+    public void reportCampaignScheduleAlertReceived(CampaignScheduleAlertRequest campaignScheduleAlertRequest) {
+        if (verify()) {
+            behavior.reportCampaignScheduleAlertReceived(campaignScheduleAlertRequest);
         }
     }
 

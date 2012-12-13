@@ -1,10 +1,7 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
 
-import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 
@@ -26,4 +23,6 @@ public interface ReportingGateway {
     void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn);
 
     List<SubscriberResponse> getSubscribersByMsisdn(String msisdn);
+
+    void reportCampaignScheduleAlertReceived(CampaignScheduleAlertRequest campaignScheduleAlertRequest);
 }

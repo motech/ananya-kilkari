@@ -8,10 +8,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.http.client.domain.Method;
@@ -300,4 +297,14 @@ public class ReportingGatewayImplTest {
         assertEquals(expectedResponse, actualResponse);
     }
 
+    @Test
+    public void shouldReportReceivingOfACampaignScheduleAlert() {
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        CampaignScheduleAlertRequest campaignScheduleAlertRequest = new CampaignScheduleAlertRequest("subscripriptionId", "campaignName", DateTime.now());
+        HttpThreadContext.set("IVR");
+
+        reportingGateway.reportCampaignScheduleAlertReceived(campaignScheduleAlertRequest);
+
+        verify(httpClientService).execute("url/subscription/campaignScheduleAlert", campaignScheduleAlertRequest, Method.POST);
+    }
 }

@@ -52,7 +52,7 @@ public class SubscriptionWebRequestTest {
 
     @Test
     public void shouldNotValidateAgeDOBEDDForIVR() {
-        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("9876543210")
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("9876543210").withBeneficiaryName("Name")
                 .withChannel(Channel.IVR.name()).withPack(SubscriptionPack.BARI_KILKARI.name()).build();
 
         validateErrors(0, subscriptionWebRequest.validate());
@@ -60,23 +60,24 @@ public class SubscriptionWebRequestTest {
 
     @Test
     public void shouldNotAddErrorWhenGivenSubscriptionDetailsAreAllValid() {
-        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("1234567890").withPack(SubscriptionPack.BARI_KILKARI.name()).withChannel(Channel.IVR.name()).build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("1234567890").withPack(SubscriptionPack.BARI_KILKARI.name()).
+                withBeneficiaryName("Name").withChannel(Channel.IVR.name()).build();
         validateErrors(0, subscriptionWebRequest.validate());
 
         subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI.name(), Channel.IVR.name(), "12", "myname", "01-11-2013", "04-11-2016", "mydistrict", "myblock", "mypanchayat", DateTime.now());
         validateErrors(0, subscriptionWebRequest.validate());
 
-        subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI.name(), Channel.IVR.name(), null, null, null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
+        subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI.name(), Channel.IVR.name(), null, "Name", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
         validateErrors(0, subscriptionWebRequest.validate());
 
-        subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI.name(), Channel.IVR.name(), "", "", "", "", "mydistrict", "myblock", "mypanchayat", DateTime.now());
+        subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI.name(), Channel.IVR.name(), "", "Name", "", "", "mydistrict", "myblock", "mypanchayat", DateTime.now());
          
         validateErrors(0, subscriptionWebRequest.validate());
     }
 
     @Test
     public void shouldAddErrorWhenInvalidPackIsGivenToCreateNewSubscription() {
-        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("1234567890").withPack("Invalid-Pack").withChannel(Channel.IVR.name()).build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("1234567890").withPack("Invalid-Pack").withBeneficiaryName("Name").withChannel(Channel.IVR.name()).build();
         validateErrors(1, subscriptionWebRequest.validate(), "Invalid subscription pack Invalid-Pack");
     }
 
@@ -98,40 +99,37 @@ public class SubscriptionWebRequestTest {
 
     @Test
     public void shouldAddErrorWhenInvalidChannelIsGivenToCreateNewSubscription() {
-        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("1234567890").withPack(SubscriptionPack.NAVJAAT_KILKARI.name()).withChannel("Invalid-Channel").withCreatedAt(DateTime.now()).build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("1234567890").withBeneficiaryName("Name").withBeneficiaryAge("22").withPack(SubscriptionPack.NAVJAAT_KILKARI.name()).withChannel("Invalid-Channel").withCreatedAt(DateTime.now()).build();
 
         validateErrors(2, subscriptionWebRequest.validate(), "Invalid channel Invalid-Channel");
     }
 
     @Test
     public void shouldAddErrorWhenInvalidMsisdnNumberIsGivenToCreateNewSubscription() {
-        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("12345").withPack(SubscriptionPack.NAVJAAT_KILKARI.name()).withChannel(Channel.IVR.name()).build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("12345").withBeneficiaryName("Name").withPack(SubscriptionPack.NAVJAAT_KILKARI.name()).withChannel(Channel.IVR.name()).build();
 
         validateErrors(1, subscriptionWebRequest.validate(), "Invalid msisdn 12345");
     }
 
     @Test
     public void shouldAddErrorWhenNonNumericMsisdnNumberIsGivenToCreateNewSubscription() {
-        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("123456789a").withPack(SubscriptionPack.NAVJAAT_KILKARI.name()).withChannel(Channel.IVR.name()).build();
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withMsisdn("123456789a").withBeneficiaryName("Name").withPack(SubscriptionPack.NAVJAAT_KILKARI.name()).withChannel(Channel.IVR.name()).build();
 
         validateErrors(1, subscriptionWebRequest.validate(), "Invalid msisdn 123456789a");
     }
 
+    @Test
+    public void shouldAddErrorMessageWhenAgeIsNotGivenToTheNewSubscription() {
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryAge(null).build();
+
+        validateErrors(1, subscriptionWebRequest.validate(), "Missing beneficiary age");
+    }
 
     @Test
     public void shouldAddErrorWhenNonNumericAgeIsGivenToCreateNewSubscriptionForCC() {
         SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.NAVJAAT_KILKARI.name(), Channel.CONTACT_CENTER.name(), "1a", "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
 
         validateErrors(1, subscriptionWebRequest.validate(), "Invalid beneficiary age 1a");
-    }
-
-    @Test
-    public void shouldNotAddErrorWhenNoAgeIsGivenToCreateNewSubscriptionForCC() {
-        SubscriptionWebRequest subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.NAVJAAT_KILKARI.name(), Channel.CONTACT_CENTER.name(), "", "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
-        validateErrors(0, subscriptionWebRequest.validate());
-
-        subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.NAVJAAT_KILKARI.name(), Channel.CONTACT_CENTER.name(), null, "NAME", null, null, "mydistrict", "myblock", "mypanchayat", DateTime.now());
-        validateErrors(0, subscriptionWebRequest.validate());
     }
 
     @Test
@@ -259,6 +257,12 @@ public class SubscriptionWebRequestTest {
     public void shouldNotValidateLocationForRequestFromIVR(){
         SubscriptionWebRequest webRequest = new SubscriptionWebRequestBuilder().withDefaults().withChannel("ivr").withLocation(new LocationRequest()).build();
         validateErrors(0, webRequest.validate());
+    }
+
+    @Test
+    public void sholudNotValidateWebRequestWithInvalidName() {
+        SubscriptionWebRequest webRequest = new SubscriptionWebRequestBuilder().withDefaults().withBeneficiaryName("!@#$%^&").build();
+        validateErrors(1, webRequest.validate(), "Name is Invalid");
     }
 
     private SubscriptionWebRequest createSubscriptionRequest(String msisdn, String pack, String channel, String age, String name, String dob, String edd, String district, String block, String panchayat, DateTime createdAt) {

@@ -4,9 +4,7 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.request.LocationRequest;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 public class WebRequestValidatorTest {
     @Test
@@ -102,7 +100,7 @@ public class WebRequestValidatorTest {
     @Test
     public void shouldReturnErrorIfMoreThanOneOfDobOrEddOrWeekIsPresent() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
-        webRequestValidator.validateOnlyOneOfEDDOrDOBOrWeekNumberPresent("edd","dob","week");
+        webRequestValidator.validateOnlyOneOfEDDOrDOBOrWeekNumberPresent("edd", "dob", "week");
 
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. Only one of expected date of delivery, date of birth and week number should be present"));
@@ -133,6 +131,24 @@ public class WebRequestValidatorTest {
 
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. One of expected date of delivery or date of birth should be present"));
+    }
+
+    @Test
+    public void shouldReturnErrorForInvalidName(){
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+
+        webRequestValidator.validateName("");
+
+        assertTrue(webRequestValidator.getErrors().hasMessage("Missing Name"));
+    }
+
+    @Test
+    public void shouldReturnErrorForNonAlphaNumericName(){
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+
+        webRequestValidator.validateName("Missing Name !2.");
+
+        assertTrue(webRequestValidator.getErrors().hasMessage("Name is Invalid"));
     }
 
     @Test
@@ -177,11 +193,20 @@ public class WebRequestValidatorTest {
     public void shouldValidateAValidLocation(){
         WebRequestValidator webRequestValidator = new WebRequestValidator();
 
-        webRequestValidator.validateLocation(new LocationRequest(){{
+        webRequestValidator.validateLocation(new LocationRequest() {{
             setDistrict("d");
             setBlock("b");
             setPanchayat("   ");
         }});
+
+        assertFalse(webRequestValidator.getErrors().hasErrors());
+    }
+
+    @Test
+    public void shouldValidateAValidName(){
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+
+        webRequestValidator.validateName("Valid Name");
 
         assertFalse(webRequestValidator.getErrors().hasErrors());
     }

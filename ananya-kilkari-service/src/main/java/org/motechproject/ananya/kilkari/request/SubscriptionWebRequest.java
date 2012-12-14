@@ -163,6 +163,7 @@ public class SubscriptionWebRequest implements Serializable {
         webRequestValidator.validateChannel(channel);
         if (!Channel.isIVR(channel)) {
             webRequestValidator.validateLocation(location);
+            webRequestValidator.validateName(beneficiaryName);
             webRequestValidator.validateAge(beneficiaryAge);
             webRequestValidator.validateOnlyOneOfEDDOrDOBOrWeekNumberPresent(expectedDateOfDelivery, dateOfBirth, week);
             webRequestValidator.validateDOB(dateOfBirth, createdAt);

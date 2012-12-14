@@ -99,10 +99,17 @@ public class WebRequestValidator {
     }
 
     public void validateAge(String beneficiaryAge) {
-        if (StringUtils.isNotEmpty(beneficiaryAge)) {
-            if (!ValidationUtils.assertNumeric(beneficiaryAge))
-                errors.add("Invalid beneficiary age %s", beneficiaryAge);
-        }
+        if (addErrorMessageIfEmpty(beneficiaryAge, "Missing beneficiary age"))
+            return;
+        if (!ValidationUtils.assertNumeric(beneficiaryAge))
+            errors.add("Invalid beneficiary age %s", beneficiaryAge);
+    }
+
+    public void validateName(String name){
+        if(addErrorMessageIfEmpty(name, "Missing Name"))
+            return;
+        if(!ValidationUtils.assertAlphaWithDot(name))
+            errors.add("Name is Invalid");
     }
 
     public Errors getErrors() {
@@ -126,13 +133,16 @@ public class WebRequestValidator {
             errors.add("Missing location");
             return;
         }
-        validateMandatory(location.getDistrict(), "Missing district");
-        validateMandatory(location.getBlock(), "Missing block");
-        validateMandatory(location.getPanchayat(), "Missing panchayat");
+        addErrorMessageIfEmpty(location.getDistrict(), "Missing district");
+        addErrorMessageIfEmpty(location.getBlock(), "Missing block");
+        addErrorMessageIfEmpty(location.getPanchayat(), "Missing panchayat");
     }
 
-    private void validateMandatory(String value, String validationMessage) {
-        if (StringUtils.isEmpty(value))
+    private boolean addErrorMessageIfEmpty(String value, String validationMessage) {
+        if (StringUtils.isEmpty(value)) {
             errors.add(validationMessage);
+            return true;
+        }
+        return false;
     }
 }

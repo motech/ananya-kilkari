@@ -123,4 +123,14 @@ public class ValidationUtilsTest {
         assertTrue(ValidationUtils.assertNotMoreThanOnePresent(null, null));
         assertTrue(ValidationUtils.assertNotMoreThanOnePresent(null, "edd"));
     }
+
+    @Test
+    public void shouldNotReturnFalseWhenStringIsAlphaNumericOrDot() {
+        assertTrue(ValidationUtils.assertAlphaWithDot("Bond.James Bond"));
+    }
+
+    @Test
+    public void shouldReturnFalseWhenStringIsNotAlphaNumericOrDot() {
+        assertFalse(ValidationUtils.assertAlphaWithDot("My Name is !@##%"));
+    }
 }

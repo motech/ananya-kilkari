@@ -26,6 +26,7 @@ public class SubscriberWebRequestTest {
     @Test
     public void shouldValidateIfLocationHasMissingDetails(){
         SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
+        subscriberWebRequest.setBeneficiaryAge("22");
         subscriberWebRequest.setChannel("ivr");
         subscriberWebRequest.setLocation(new LocationRequest(){{
             setDistrict("d");

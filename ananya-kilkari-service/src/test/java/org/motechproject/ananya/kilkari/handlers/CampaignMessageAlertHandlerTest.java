@@ -1,19 +1,15 @@
 package org.motechproject.ananya.kilkari.handlers;
 
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.service.KilkariCampaignService;
-import org.motechproject.ananya.reports.kilkari.contract.request.CampaignScheduleAlertRequest;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.server.messagecampaign.EventKeys;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -44,11 +40,6 @@ public class CampaignMessageAlertHandlerTest {
         campaignMessageAlertHandler.handleAlertEvent(motechEvent);
 
         verify(kilkariCampaignService).scheduleWeeklyMessage(externalId, campaignName);
-        ArgumentCaptor<CampaignScheduleAlertRequest> captor = ArgumentCaptor.forClass(CampaignScheduleAlertRequest.class);
-        CampaignScheduleAlertRequest campaignScheduleAlertRequest = captor.getValue();
-        assertEquals(externalId, campaignScheduleAlertRequest.getSubscriptionId());
-        assertEquals(campaignName, campaignScheduleAlertRequest.getCampaignName());
-        assertEquals(DateTime.now().getMinuteOfDay(),campaignScheduleAlertRequest.getScheduledAt().getMinuteOfDay());
     }
 
     @Test

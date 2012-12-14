@@ -181,8 +181,8 @@ public class KilkariCampaignServiceTest {
         verify(reportingService).reportCampaignScheduleAlertReceived(captor.capture());
         CampaignScheduleAlertRequest campaignScheduleAlertRequest = captor.getValue();
         assertEquals(subscriptionId, campaignScheduleAlertRequest.getSubscriptionId());
-        assertEquals(messageId, campaignScheduleAlertRequest.getCampaignName());
-        assertEquals(DateTime.now().getMinuteOfDay(), campaignScheduleAlertRequest.getScheduledAt().getMinuteOfDay());
+        assertEquals(messageId, campaignScheduleAlertRequest.getCampaignId());
+        assertEquals(DateTime.now().getMinuteOfDay(), campaignScheduleAlertRequest.getScheduledTime().getMinuteOfDay());
 
     }
 

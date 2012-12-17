@@ -22,13 +22,15 @@ public class ValidationExceptionView extends AbstractView {
                 (ValidationException) model.get(SimpleMappingExceptionResolver.DEFAULT_EXCEPTION_ATTRIBUTE);
 
         String acceptHeader = request.getHeader("accept");
-        if (MediaType.APPLICATION_XML.toString().equals(acceptHeader))
-            new CustomJaxb2RootElementHttpMessageConverter().write(BaseResponse.failure(exceptionObject.getMessage()), MediaType.APPLICATION_XML, new ServletServerHttpResponse(response));
-        else
-            response.getOutputStream().print(BaseResponse.failure(exceptionObject.getMessage()).toJson());
-
         HttpConstants httpConstants = HttpConstants.forRequest(request);
         response.setStatus(httpConstants.getHttpStatusBadRequest());
+
+        if (MediaType.APPLICATION_XML.toString().equals(acceptHeader)) {
+            new CustomJaxb2RootElementHttpMessageConverter().write(BaseResponse.failure(exceptionObject.getMessage()), MediaType.APPLICATION_XML, new ServletServerHttpResponse(response));
+        }
+        else {
+            response.getOutputStream().print(BaseResponse.failure(exceptionObject.getMessage()).toJson());
+        }
         response.setContentType(httpConstants.getResponseContentType(acceptHeader));
     }
 }

@@ -108,7 +108,7 @@ public class WebRequestValidator {
     public void validateName(String name){
         if(addErrorMessageIfEmpty(name, "Missing Name"))
             return;
-        if(!ValidationUtils.assertAlphaWithDot(name))
+        if(!ValidationUtils.assertAlphanumericWithDot(name))
             errors.add("Name is Invalid");
     }
 

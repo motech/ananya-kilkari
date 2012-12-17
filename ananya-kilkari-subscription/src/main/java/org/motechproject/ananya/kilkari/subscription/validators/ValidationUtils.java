@@ -82,7 +82,7 @@ public class ValidationUtils {
         return !(numberOfOptions != 1);
     }
 
-    public static boolean assertAlphaWithDot(String value) {
-        return StringUtils.isAlphaSpace(StringUtils.replace(value, ".", ""));
+    public static boolean assertAlphanumericWithDot(String value) {
+        return StringUtils.isAlphanumericSpace(StringUtils.replace(value, ".", ""));
     }
 }

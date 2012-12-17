@@ -126,11 +126,11 @@ public class ValidationUtilsTest {
 
     @Test
     public void shouldNotReturnFalseWhenStringIsAlphaNumericOrDot() {
-        assertTrue(ValidationUtils.assertAlphaWithDot("Bond.James Bond"));
+        assertTrue(ValidationUtils.assertAlphanumericWithDot("Bond.James Bond 12"));
     }
 
     @Test
     public void shouldReturnFalseWhenStringIsNotAlphaNumericOrDot() {
-        assertFalse(ValidationUtils.assertAlphaWithDot("My Name is !@##%"));
+        assertFalse(ValidationUtils.assertAlphanumericWithDot("My Name is !@##%"));
     }
 }

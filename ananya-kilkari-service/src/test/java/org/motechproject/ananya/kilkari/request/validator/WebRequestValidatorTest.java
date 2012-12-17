@@ -206,7 +206,7 @@ public class WebRequestValidatorTest {
     public void shouldValidateAValidName(){
         WebRequestValidator webRequestValidator = new WebRequestValidator();
 
-        webRequestValidator.validateName("Valid Name");
+        webRequestValidator.validateName("Valid Name 12");
 
         assertFalse(webRequestValidator.getErrors().hasErrors());
     }

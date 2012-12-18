@@ -1074,6 +1074,8 @@ public class SubscriptionServiceTest {
         };
         subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        int bufferForDeactivationInDays = 2;
+        when(kilkariPropertiesData.getBufferDaysToAllowRenewalForDeactivation()).thenReturn(bufferForDeactivationInDays);
 
         subscriptionService.processDeactivation(subscriptionId, deactivationDate, reason, graceCount);
 
@@ -1082,6 +1084,8 @@ public class SubscriptionServiceTest {
         RunOnceSchedulableJob actualSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
         assertEquals(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, actualSchedulableJob.getMotechEvent().getSubject());
         ScheduleDeactivationRequest scheduleDeactivationRequest = (ScheduleDeactivationRequest) actualSchedulableJob.getMotechEvent().getParameters().get("0");
+        verify(kilkariPropertiesData).getBufferDaysToAllowRenewalForDeactivation();
+        verify(kilkariPropertiesData, times(0)).getBufferDaysToAllowRenewalForPackCompletion();
         assertEquals(new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount), scheduleDeactivationRequest);
     }
 

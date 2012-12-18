@@ -8,8 +8,6 @@ import java.util.Properties;
 
 @Component
 public class KilkariPropertiesData {
-
-
     private Properties kilkariProperties;
 
     @Autowired
@@ -28,7 +26,9 @@ public class KilkariPropertiesData {
 
     public int getBufferDaysToAllowRenewalForPackCompletion() {
         return Integer.parseInt(kilkariProperties.getProperty("buffer.days.to.allow.renewal.for.pack.completion"));
-
     }
 
+    public int getBufferDaysToAllowRenewalForDeactivation() {
+        return Integer.parseInt(kilkariProperties.getProperty("buffer.days.to.allow.renewal.for.pack.deactivation"));
+    }
 }

@@ -364,7 +364,7 @@ public class SubscriptionService {
 
     public List<SubscriptionDetailsResponse> getSubscriptionDetails(String msisdn, Channel channel) {
         List<Subscription> subscriptionList = findByMsisdn(msisdn);
-        if(Channel.IVR.equals(channel)){
+        if (Channel.IVR.equals(channel)) {
             return subscriptionDetailsResponseMapper.map(subscriptionList, Collections.EMPTY_LIST);
         }
 
@@ -394,7 +394,7 @@ public class SubscriptionService {
 
     private void scheduleDeactivation(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
         String subjectKey = SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION;
-        Date startDate = DateTime.now().plusDays(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
+        Date startDate = DateTime.now().plusDays(kilkariPropertiesData.getBufferDaysToAllowRenewalForDeactivation()).toDate();
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put(MotechSchedulerService.JOB_ID_KEY, subscriptionId);
         parameters.put("0", new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount));

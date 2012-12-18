@@ -5,50 +5,44 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 public class HelpWebRequest {
-    private String startDate;
-    private String endDate;
+    private String startDatetime;
+    private String endDatetime;
     private String channel;
 
-    public HelpWebRequest(String startDate, String endDate, String channel) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public HelpWebRequest(String startDatetime, String endDatetime, String channel) {
+        this.startDatetime = startDatetime;
+        this.endDatetime = endDatetime;
         this.channel = channel;
     }
 
-    public DateTime getStartDate() {
-        return DateUtils.parseDateTimeForCC(startDate);
+    public DateTime getStartDatetime() {
+        return DateUtils.parseDateTimeForCC(startDatetime);
     }
 
-    public DateTime getEndDate() {
-        return DateUtils.parseDateTimeForCC(endDate);
+    public DateTime getEndDatetime() {
+        return DateUtils.parseDateTimeForCC(endDatetime);
     }
 
     public String getChannel() {
         return channel;
     }
 
-    public void validate() {
+    public Errors validate() {
         Errors errors = new Errors();
-        boolean isStartDateValid = DateUtils.isValidForCC(startDate);
-        boolean isEndDateValid = DateUtils.isValidForCC(endDate);
+        boolean isStartDateValid = DateUtils.isValidForCC(startDatetime);
+        boolean isEndDateValid = DateUtils.isValidForCC(endDatetime);
         if (!isStartDateValid)
-            errors.add(String.format("Invalid start date : %s", startDate));
+            errors.add(String.format("Invalid start datetime %s", startDatetime));
         if (!isEndDateValid)
-            errors.add(String.format("Invalid end date : %s", endDate));
+            errors.add(String.format("Invalid end datetime %s", endDatetime));
         if (!Channel.isCallCenter(channel))
-            errors.add(String.format("Invalid channel : %s", channel));
-        if (isStartDateValid && isEndDateValid && getEndDate().isBefore(getStartDate()))
-            errors.add(String.format("Start Date : %s is after End Date : %s", startDate, endDate));
-        throwExceptionOnValidationFailure(errors);
-    }
-
-    private void throwExceptionOnValidationFailure(Errors errors) {
-        if (errors.hasErrors())
-            throw new ValidationException(errors.allMessages());
+            errors.add(String.format("Invalid channel %s", channel));
+        if (isStartDateValid && isEndDateValid && getEndDatetime().isBefore(getStartDatetime()))
+            errors.add(String.format("Start datetime %s is after end datetime %s", startDatetime, endDatetime));
+        return errors;
     }
 
     @Override

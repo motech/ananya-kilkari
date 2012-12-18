@@ -1,64 +1,49 @@
 package org.motechproject.ananya.kilkari.request;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class HelpWebRequestTest {
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void shouldThrowExceptionOnInvalidStartDate() throws Exception {
+    public void shouldInvalidateTheRequest() throws Exception {
         String startDate = "start";
-        HelpWebRequest helpWebRequest = new HelpWebRequest(startDate, "12-12-2012 00:00:00", Channel.CONTACT_CENTER.name());
-
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("Invalid start date : %s", startDate));
-
-        helpWebRequest.validate();
-    }
-
-    @Test
-    public void shouldThrowExceptionOnInvalidEndDate() throws Exception {
         String endDate = "end";
-        HelpWebRequest helpWebRequest = new HelpWebRequest("12-12-2012 00:00:00", endDate, Channel.CONTACT_CENTER.name());
+        String channel = "invalid_channel";
+        HelpWebRequest helpWebRequest = new HelpWebRequest(startDate, endDate, channel);
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("Invalid end date : %s", endDate));
+        Errors errors = helpWebRequest.validate();
 
-        helpWebRequest.validate();
+        assertEquals(3, errors.getCount());
+        assertTrue(errors.hasMessage(String.format("Invalid start datetime %s", startDate)));
+        assertTrue(errors.hasMessage(String.format("Invalid end datetime %s", endDate)));
+        assertTrue(errors.hasMessage(String.format("Invalid channel %s", channel)));
     }
 
     @Test
-    public void shouldThrowExceptionOnInvalidChannel() throws Exception {
-        String channel = "Bad Channel";
-        HelpWebRequest helpWebRequest = new HelpWebRequest("12-12-2012 00:00:00", "15-12-2012 00:00:00", channel);
+    public void shouldInvalidateTheRequestIfEndDateIsBeforeStartDate() throws Exception {
+        String startDate = "12-12-2012 00:00:00";
+        String endDate = "12-12-2011 00:00:00";
+        String channel = "invalid_channel";
+        HelpWebRequest helpWebRequest = new HelpWebRequest(startDate, endDate, channel);
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("Invalid channel : %s", channel));
+        Errors errors = helpWebRequest.validate();
 
-        helpWebRequest.validate();
+        assertEquals(2, errors.getCount());
+        assertTrue(errors.hasMessage(String.format("Invalid channel %s", channel)));
+        assertTrue(errors.hasMessage(String.format("Start datetime %s is after end datetime %s", startDate, endDate)));
     }
 
     @Test
-    public void shouldThrowExceptionIfStartDateIsAfterEndDate() throws Exception {
-        String startDate = "16-12-2012 00:00:00";
-        String endDate = "12-12-2012 00:00:00";
-        HelpWebRequest helpWebRequest = new HelpWebRequest(startDate, endDate, Channel.CONTACT_CENTER.name());
-
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("Start Date : %s is after End Date : %s", startDate, endDate));
-
-        helpWebRequest.validate();
-    }
-
-    @Test
-    public void shouldNotThrowExceptionIfEverythingIsValid() {
+    public void shouldNotInvalidateIfAllFieldsAreCorrect() {
         HelpWebRequest helpWebRequest = new HelpWebRequest("12-12-2012 00:00:00", "15-12-2012 00:00:00", Channel.CONTACT_CENTER.name());
 
-        helpWebRequest.validate();
+        Errors errors = helpWebRequest.validate();
+        assertFalse(errors.hasErrors()) ;
     }
 }

@@ -1,9 +1,11 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.HelpWebRequest;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriberCareService;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriberCareDocsResponseMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberCareDocResponseList;
@@ -35,10 +37,19 @@ public class HelpController {
 
     @RequestMapping(value = "/help/list", method = RequestMethod.GET, produces = "text/csv")
     @ResponseBody
-    public SubscriberCareDocResponseList getSubscriberCareDocs(@RequestParam String startDateTime, @RequestParam String endDateTime, @RequestParam String channel) {
-        HelpWebRequest helpWebRequest = new HelpWebRequest(startDateTime, endDateTime, channel);
-        helpWebRequest.validate();
+    public SubscriberCareDocResponseList getSubscriberCareDocs(@RequestParam String startDatetime, @RequestParam String endDatetime, @RequestParam String channel) {
+        HelpWebRequest helpWebRequest = new HelpWebRequest(startDatetime, endDatetime, channel);
+
+        Errors validationErrors = helpWebRequest.validate();
+        raiseExceptionIfThereAreErrors(validationErrors);
+
         List<SubscriberCareDoc> subscriberCareDocList = kilkariSubscriberCareService.fetchSubscriberCareDocs(helpWebRequest);
         return SubscriberCareDocsResponseMapper.mapToSubscriberDocsResponseList(subscriberCareDocList);
+    }
+
+    private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
+        if (validationErrors.hasErrors()) {
+            throw new ValidationException(validationErrors.allMessages());
+        }
     }
 }

@@ -35,8 +35,8 @@ public class HelpController {
 
     @RequestMapping(value = "/help/list", method = RequestMethod.GET, produces = "text/csv")
     @ResponseBody
-    public SubscriberCareDocResponseList getSubscriberCareDocs(@RequestParam String startDate, @RequestParam String endDate, @RequestParam String channel) {
-        HelpWebRequest helpWebRequest = new HelpWebRequest(startDate, endDate, channel);
+    public SubscriberCareDocResponseList getSubscriberCareDocs(@RequestParam String startDateTime, @RequestParam String endDateTime, @RequestParam String channel) {
+        HelpWebRequest helpWebRequest = new HelpWebRequest(startDateTime, endDateTime, channel);
         helpWebRequest.validate();
         List<SubscriberCareDoc> subscriberCareDocList = kilkariSubscriberCareService.fetchSubscriberCareDocs(helpWebRequest);
         return SubscriberCareDocsResponseMapper.mapToSubscriberDocsResponseList(subscriberCareDocList);

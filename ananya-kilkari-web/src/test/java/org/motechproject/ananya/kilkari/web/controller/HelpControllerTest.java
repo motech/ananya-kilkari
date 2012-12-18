@@ -65,7 +65,7 @@ public class HelpControllerTest {
         }});
 
         MvcResult mvcResult = MVCTestUtils.mockMvc(helpController)
-                .perform(get("/help/list").param("startDate", fromDate).param("endDate", toDate).param("channel", Channel.CONTACT_CENTER.name()).
+                .perform(get("/help/list").param("startDateTime", fromDate).param("endDateTime", toDate).param("channel", Channel.CONTACT_CENTER.name()).
                         accept(new MediaType("text", "csv", Charset.defaultCharset())))
                 .andExpect(status().isOk()).andReturn();
 
@@ -85,7 +85,7 @@ public class HelpControllerTest {
         }});
 
         MvcResult mvcResult = MVCTestUtils.mockMvc(helpController)
-                .perform(get("/help/list").param("startDate", fromDate).param("endDate", toDate).param("channel", Channel.CONTACT_CENTER.name()).
+                .perform(get("/help/list").param("startDateTime", fromDate).param("endDateTime", toDate).param("channel", Channel.CONTACT_CENTER.name()).
                         accept(new MediaType("text", "csv", Charset.defaultCharset())))
                 .andExpect(status().isBadRequest()).andReturn();
 

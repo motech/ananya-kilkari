@@ -130,6 +130,11 @@ public class SubscriptionService {
         onMobileSubscriptionManagerPublisher.sendActivationRequest(omSubscriptionRequest);
     }
 
+    public void initiateActivationRequestForEarlySubscription(OMSubscriptionRequest omSubscriptionRequest) {
+        updateToLatestMsisdn(omSubscriptionRequest);
+        onMobileSubscriptionManagerPublisher.sendActivationRequest(omSubscriptionRequest);
+    }
+
     public List<Subscription> findByMsisdn(String msisdn) {
         return allSubscriptions.findByMsisdn(msisdn);
     }
@@ -208,16 +213,6 @@ public class SubscriptionService {
     public void requestUnsubscription(DeactivationRequest deactivationRequest) {
         unsubscriptionValidator.validate(deactivationRequest.getSubscriptionId());
         requestDeactivation(deactivationRequest);
-    }
-
-    private void deactivateAndUnschedule(Subscription subscription, DeactivationRequest deactivationRequest) {
-        motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.EARLY_SUBSCRIPTION, deactivationRequest.getSubscriptionId());
-        updateStatusAndReport(subscription, deactivationRequest.getCreatedAt(), deactivationRequest.getReason(), null, null, new Action<Subscription>() {
-            @Override
-            public void perform(Subscription subscription) {
-                subscription.deactivate();
-            }
-        });
     }
 
     public void deactivationRequested(OMSubscriptionRequest omSubscriptionRequest) {
@@ -370,6 +365,21 @@ public class SubscriptionService {
 
         List<SubscriberResponse> subscriberDetailsFromReports = reportingService.getSubscribersByMsisdn(msisdn);
         return subscriptionDetailsResponseMapper.map(subscriptionList, subscriberDetailsFromReports);
+    }
+
+    private void updateToLatestMsisdn(OMSubscriptionRequest omSubscriptionRequest) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
+        omSubscriptionRequest.setMsisdn(subscription.getMsisdn());
+    }
+
+    private void deactivateAndUnschedule(Subscription subscription, DeactivationRequest deactivationRequest) {
+        motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.EARLY_SUBSCRIPTION, deactivationRequest.getSubscriptionId());
+        updateStatusAndReport(subscription, deactivationRequest.getCreatedAt(), deactivationRequest.getReason(), null, null, new Action<Subscription>() {
+            @Override
+            public void perform(Subscription subscription) {
+                subscription.deactivate();
+            }
+        });
     }
 
     private LocationResponse getExistingLocation(Location location) {

@@ -47,7 +47,7 @@ public class SubscriptionHandler {
     public void handleEarlySubscription(MotechEvent event) {
         OMSubscriptionRequest omSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
         logger.info(String.format("Handling early subscription for subscriptionid: %s, msisdn: %s, pack: %s", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
-        subscriptionService.initiateActivationRequest(omSubscriptionRequest);
+        subscriptionService.initiateActivationRequestForEarlySubscription(omSubscriptionRequest);
     }
 
     @MotechListener(subjects = {SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION})

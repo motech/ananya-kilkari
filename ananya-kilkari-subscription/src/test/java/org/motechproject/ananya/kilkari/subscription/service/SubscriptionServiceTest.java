@@ -1316,4 +1316,26 @@ public class SubscriptionServiceTest {
         verify(subscriptionDetailsResponseMapper).map(subscriptionList, Collections.EMPTY_LIST);
         assertEquals(expectedResponse, actualResponse);
     }
+
+    @Test
+    public void shouldUpdateToLatestMsisdnForAnEarlySubscriptionActivationSentToSMWhenMsisdnChanged() {
+        String subscriptionId = "subscriptionId";
+        String oldMsisdn = "123467890";
+        SubscriptionPack pack = SubscriptionPack.NANHI_KILKARI;
+        Channel channel = Channel.IVR;
+        String newMsisdn = "1234567891";
+        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(oldMsisdn, pack, channel, subscriptionId);
+        Subscription subscription = new Subscription(newMsisdn, pack, DateTime.now(), DateTime.now().plusDays(20), 1);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.initiateActivationRequestForEarlySubscription(omSubscriptionRequest);
+
+        ArgumentCaptor<OMSubscriptionRequest> captor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
+        verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(captor.capture());
+        OMSubscriptionRequest actualOMSubscriptionRequest = captor.getValue();
+        assertEquals(subscriptionId,actualOMSubscriptionRequest.getSubscriptionId());
+        assertEquals(newMsisdn,actualOMSubscriptionRequest.getMsisdn());
+        assertEquals(channel,actualOMSubscriptionRequest.getChannel());
+        assertEquals(pack,actualOMSubscriptionRequest.getPack());
+    }
 }

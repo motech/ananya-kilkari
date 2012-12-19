@@ -8,9 +8,9 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import java.io.Serializable;
 
 public class OMSubscriptionRequest implements Serializable {
-    private final String msisdn;
-    private final SubscriptionPack pack;
-    private final Channel channel;
+    private String msisdn;
+    private SubscriptionPack pack;
+    private Channel channel;
     private String subscriptionId;
 
     public OMSubscriptionRequest(String msisdn, SubscriptionPack pack, Channel channel, String subscriptionId) {
@@ -46,4 +46,7 @@ public class OMSubscriptionRequest implements Serializable {
                 .toString();
     }
 
+    public void setMsisdn(String msisdn) {
+        this.msisdn = msisdn;
+    }
 }

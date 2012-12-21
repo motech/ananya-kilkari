@@ -59,7 +59,7 @@ public class KilkariCampaignService {
         for (Subscription subscription : subscriptionList) {
             String subscriptionId = subscription.getSubscriptionId();
             try {
-                if (subscription.isEarlySubscription()) {
+                if (subscription.isNewEarly()) {
                     subscriptionEventsMap.put("Early Subscription for " + subscriptionId, getSchedules(subscriptionId, SubscriptionEventKeys.EARLY_SUBSCRIPTION,
                             subscription.getCreationDate().toDate(), subscription.getStartDate().toDate()));
                     continue;

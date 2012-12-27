@@ -197,6 +197,9 @@ public class SubscriptionTest {
         subscription.setStatus(SubscriptionStatus.SUSPENDED);
         assertTrue(subscription.isInUpdatableState());
 
+        subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
+        assertFalse(subscription.isInUpdatableState());
+
         subscription.setStatus(SubscriptionStatus.NEW);
         assertFalse(subscription.isInUpdatableState());
 

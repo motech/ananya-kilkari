@@ -94,7 +94,7 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2, subscription3));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Requested Msisdn doesn't have all subscriptions in updatable state");
+        expectedException.expectMessage("Requested Msisdn doesn't have all subscriptions in updatable state. " + subscription3.getSubscriptionId() + " in " + subscription3.getStatus());
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
 

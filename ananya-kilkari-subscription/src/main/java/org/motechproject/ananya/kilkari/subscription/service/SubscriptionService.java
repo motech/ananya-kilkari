@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.joda.time.DateTime;
+import org.joda.time.Weeks;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
@@ -448,7 +449,14 @@ public class SubscriptionService {
         logger.info("Updating Subscription and reporting change " + subscription);
         allSubscriptions.update(subscription);
         reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(),
-                subscription.getStatus().name(), reason, updatedOn, operator, graceCount));
+                subscription.getStatus().name(), reason, updatedOn, operator, graceCount, getSubscriptionWeekNumber(subscription, updatedOn)));
+    }
+
+    private Integer getSubscriptionWeekNumber(Subscription subscription, DateTime endDate) {
+        if (subscription.getActivationDate() == null)
+            return null;
+        Integer diffInWeeks = Weeks.weeksBetween(subscription.getActivationDate(), endDate).getWeeks();
+        return subscription.getPack().getStartWeek() + diffInWeeks;
     }
 
     private void updateStatusWithoutReporting(Subscription subscription, Action<Subscription> action) {

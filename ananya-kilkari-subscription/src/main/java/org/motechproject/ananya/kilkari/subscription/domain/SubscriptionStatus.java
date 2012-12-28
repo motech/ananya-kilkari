@@ -8,7 +8,7 @@ public enum SubscriptionStatus {
     NEW("New") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
-            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>(){{
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
                 add(SubscriptionStatus.NEW);
                 add(SubscriptionStatus.PENDING_ACTIVATION);
                 add(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED);
@@ -16,10 +16,10 @@ public enum SubscriptionStatus {
             return validStates.contains(toStatus);
         }
     },
-    NEW_EARLY("Early Subscription"){
+    NEW_EARLY("Early Subscription") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
-            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>(){{
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
                 add(SubscriptionStatus.NEW_EARLY);
                 add(SubscriptionStatus.PENDING_ACTIVATION);
                 add(SubscriptionStatus.DEACTIVATED);
@@ -27,10 +27,10 @@ public enum SubscriptionStatus {
             return validStates.contains(toStatus);
         }
     },
-    PENDING_ACTIVATION("Pending Subscription"){
+    PENDING_ACTIVATION("Pending Subscription") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
-            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>(){{
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
                 add(SubscriptionStatus.PENDING_ACTIVATION);
                 add(SubscriptionStatus.ACTIVATION_FAILED);
                 add(SubscriptionStatus.ACTIVE);
@@ -39,28 +39,28 @@ public enum SubscriptionStatus {
             return validStates.contains(toStatus);
         }
     },
-    ACTIVATION_FAILED("Activation Failed"){
+    ACTIVATION_FAILED("Activation Failed") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
-            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>(){{
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
                 add(SubscriptionStatus.ACTIVATION_FAILED);
             }};
             return validStates.contains(toStatus);
         }
     },
-    COMPLETED("Completed"){
+    COMPLETED("Completed") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
-            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>(){{
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
                 add(SubscriptionStatus.COMPLETED);
             }};
             return validStates.contains(toStatus);
         }
     },
-    ACTIVE("Activated"){
+    ACTIVE("Activated") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
-            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>(){{
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
                 add(SubscriptionStatus.ACTIVE);
                 add(SubscriptionStatus.SUSPENDED);
                 add(SubscriptionStatus.PENDING_COMPLETION);
@@ -70,10 +70,10 @@ public enum SubscriptionStatus {
             return validStates.contains(toStatus);
         }
     },
-    DEACTIVATION_REQUEST_RECEIVED("Deactivation Requested"){
+    DEACTIVATION_REQUEST_RECEIVED("Deactivation Requested") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
-            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>(){{
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
                 add(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED);
                 add(SubscriptionStatus.PENDING_COMPLETION);
                 add(SubscriptionStatus.PENDING_DEACTIVATION);
@@ -82,29 +82,29 @@ public enum SubscriptionStatus {
             return validStates.contains(toStatus);
         }
     },
-    PENDING_DEACTIVATION("Pending Deactivation"){
+    PENDING_DEACTIVATION("Pending Deactivation") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
-            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>(){{
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
                 add(SubscriptionStatus.PENDING_DEACTIVATION);
                 add(SubscriptionStatus.DEACTIVATED);
             }};
             return validStates.contains(toStatus);
         }
     },
-    DEACTIVATED("Deactivated"){
+    DEACTIVATED("Deactivated") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
-            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>(){{
-                    add(SubscriptionStatus.DEACTIVATED);
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
+                add(SubscriptionStatus.DEACTIVATED);
             }};
             return validStates.contains(toStatus);
         }
     },
-    SUSPENDED("Suspended"){
+    SUSPENDED("Suspended") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
-            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>(){{
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
                 add(SubscriptionStatus.SUSPENDED);
                 add(SubscriptionStatus.ACTIVE);
                 add(SubscriptionStatus.PENDING_COMPLETION);
@@ -114,10 +114,10 @@ public enum SubscriptionStatus {
             return validStates.contains(toStatus);
         }
     },
-    PENDING_COMPLETION("Pending Completion"){
+    PENDING_COMPLETION("Pending Completion") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
-            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>(){{
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
                 add(SubscriptionStatus.PENDING_COMPLETION);
                 add(SubscriptionStatus.COMPLETED);
                 add(SubscriptionStatus.DEACTIVATED);
@@ -149,9 +149,9 @@ public enum SubscriptionStatus {
     public boolean canActivate() {
         return equals(PENDING_ACTIVATION);
     }
-    
-    public boolean canChangeSubscription(){
-        return Arrays.asList(ACTIVE,SUSPENDED,NEW_EARLY).contains(this);
+
+    public boolean canChangeSubscription() {
+        return Arrays.asList(ACTIVE, SUSPENDED, NEW_EARLY).contains(this);
     }
 
     public boolean isActive() {

@@ -57,7 +57,6 @@ public class Subscription extends MotechBaseDataObject {
         this.startDate = floorToExactMinutes(startDate);
         this.subscriptionId = UUID.randomUUID().toString();
         this.status = isEarlySubscription() ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW;
-
     }
 
     public String getMsisdn() {
@@ -255,6 +254,10 @@ public class Subscription extends MotechBaseDataObject {
 
     public void setMsisdn(String msisdn) {
         this.msisdn = msisdn;
+    }
+
+    public void setActivationDate(DateTime activationDate) {
+        this.activationDate = activationDate;
     }
 
     @JsonIgnore

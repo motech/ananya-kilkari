@@ -8,6 +8,7 @@ import java.util.List;
 
 public class InvalidOBDRequestEntries implements Serializable {
 
+    private static final long serialVersionUID = -7820694103205706162L;
     @JsonProperty("callrecords")
     private List<InvalidOBDRequestEntry> invalidOBDRequestEntryList = new ArrayList<>();
 

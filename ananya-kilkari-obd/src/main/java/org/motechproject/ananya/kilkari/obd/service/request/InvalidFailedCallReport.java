@@ -7,6 +7,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.io.Serializable;
 
 public class InvalidFailedCallReport implements Serializable {
+    private static final long serialVersionUID = 6344662886285147690L;
     @JsonProperty("mdn")
     private String msisdn;
     @JsonProperty("subscriptionId")

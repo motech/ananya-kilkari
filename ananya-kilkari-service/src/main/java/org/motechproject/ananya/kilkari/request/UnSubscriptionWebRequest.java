@@ -13,6 +13,7 @@ import java.io.Serializable;
 
 @XmlRootElement(name = "subscription")
 public class UnSubscriptionWebRequest implements Serializable {
+    private static final long serialVersionUID = -3928159115917536538L;
     @JsonIgnore
     @XmlTransient
     private String channel;

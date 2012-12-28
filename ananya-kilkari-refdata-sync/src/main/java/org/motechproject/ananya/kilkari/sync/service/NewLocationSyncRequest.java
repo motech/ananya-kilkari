@@ -5,6 +5,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.io.Serializable;
 
 public class NewLocationSyncRequest implements Serializable {
+    private static final long serialVersionUID = 5630093949090637856L;
     @JsonProperty
     private String district;
     @JsonProperty

@@ -16,6 +16,7 @@ import java.io.Serializable;
 @XmlRootElement(name = "changeCampaign")
 public class CampaignChangeRequest implements Serializable {
 
+    private static final long serialVersionUID = 2969953054510171008L;
     @JsonProperty
     @XmlElement
     private String reason;

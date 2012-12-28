@@ -20,6 +20,7 @@ import java.io.Serializable;
 
 @XmlRootElement(name = "subscription")
 public class SubscriptionWebRequest implements Serializable {
+    private static final long serialVersionUID = -6320440975475940990L;
     @JsonProperty
     @XmlElement
     private String msisdn;

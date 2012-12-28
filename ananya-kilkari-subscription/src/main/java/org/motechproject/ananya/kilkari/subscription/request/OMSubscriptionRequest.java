@@ -8,6 +8,8 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import java.io.Serializable;
 
 public class OMSubscriptionRequest implements Serializable {
+
+    private static final long serialVersionUID = -3926690514453195727L;
     private String msisdn;
     private SubscriptionPack pack;
     private Channel channel;

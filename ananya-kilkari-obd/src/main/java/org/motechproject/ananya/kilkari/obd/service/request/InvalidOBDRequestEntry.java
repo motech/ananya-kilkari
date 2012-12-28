@@ -5,6 +5,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.io.Serializable;
 
 public class InvalidOBDRequestEntry implements Serializable {
+    private static final long serialVersionUID = 4645056348955036120L;
     @JsonProperty
     private String msisdn;
     @JsonProperty

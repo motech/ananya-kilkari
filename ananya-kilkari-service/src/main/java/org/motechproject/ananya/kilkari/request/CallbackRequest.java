@@ -6,6 +6,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.io.Serializable;
 
 public class CallbackRequest implements Serializable {
+    private static final long serialVersionUID = 4147977585542611809L;
     @JsonProperty
     private String msisdn;
     @JsonProperty

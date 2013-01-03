@@ -20,8 +20,8 @@ public class HelpWebRequestTest {
         Errors errors = helpWebRequest.validate();
 
         assertEquals(3, errors.getCount());
-        assertTrue(errors.hasMessage(String.format("Invalid start datetime %s", startDate)));
-        assertTrue(errors.hasMessage(String.format("Invalid end datetime %s", endDate)));
+        assertTrue(errors.hasMessage(String.format("Invalid start time %s", startDate)));
+        assertTrue(errors.hasMessage(String.format("Invalid end time %s", endDate)));
         assertTrue(errors.hasMessage(String.format("Invalid channel %s", channel)));
     }
 
@@ -36,7 +36,7 @@ public class HelpWebRequestTest {
 
         assertEquals(2, errors.getCount());
         assertTrue(errors.hasMessage(String.format("Invalid channel %s", channel)));
-        assertTrue(errors.hasMessage(String.format("Start datetime %s is after end datetime %s", startDate, endDate)));
+        assertTrue(errors.hasMessage(String.format("Start time %s is after end time %s", startDate, endDate)));
     }
 
     @Test

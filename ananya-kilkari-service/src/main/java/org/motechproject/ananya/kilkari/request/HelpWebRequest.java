@@ -8,22 +8,22 @@ import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 public class HelpWebRequest {
-    private String startDatetime;
-    private String endDatetime;
+    private String startTime;
+    private String endTime;
     private String channel;
 
-    public HelpWebRequest(String startDatetime, String endDatetime, String channel) {
-        this.startDatetime = startDatetime;
-        this.endDatetime = endDatetime;
+    public HelpWebRequest(String startTime, String endTime, String channel) {
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.channel = channel;
     }
 
-    public DateTime getStartDatetime() {
-        return DateUtils.parseDateTimeForCC(startDatetime);
+    public DateTime getStartTime() {
+        return DateUtils.parseDateTimeForCC(startTime);
     }
 
-    public DateTime getEndDatetime() {
-        return DateUtils.parseDateTimeForCC(endDatetime);
+    public DateTime getEndTime() {
+        return DateUtils.parseDateTimeForCC(endTime);
     }
 
     public String getChannel() {
@@ -32,16 +32,16 @@ public class HelpWebRequest {
 
     public Errors validate() {
         Errors errors = new Errors();
-        boolean isStartDateValid = DateUtils.isValidForCC(startDatetime);
-        boolean isEndDateValid = DateUtils.isValidForCC(endDatetime);
+        boolean isStartDateValid = DateUtils.isValidForCC(startTime);
+        boolean isEndDateValid = DateUtils.isValidForCC(endTime);
         if (!isStartDateValid)
-            errors.add(String.format("Invalid start datetime %s", startDatetime));
+            errors.add(String.format("Invalid start time %s", startTime));
         if (!isEndDateValid)
-            errors.add(String.format("Invalid end datetime %s", endDatetime));
+            errors.add(String.format("Invalid end time %s", endTime));
         if (!Channel.isCallCenter(channel))
             errors.add(String.format("Invalid channel %s", channel));
-        if (isStartDateValid && isEndDateValid && getEndDatetime().isBefore(getStartDatetime()))
-            errors.add(String.format("Start datetime %s is after end datetime %s", startDatetime, endDatetime));
+        if (isStartDateValid && isEndDateValid && getEndTime().isBefore(getStartTime()))
+            errors.add(String.format("Start time %s is after end time %s", startTime, endTime));
         return errors;
     }
 

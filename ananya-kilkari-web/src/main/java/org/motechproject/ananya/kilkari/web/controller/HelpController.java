@@ -38,8 +38,8 @@ public class HelpController {
 
     @RequestMapping(value = "/help/list", method = RequestMethod.GET, produces = "text/csv")
     @ResponseBody
-    public SubscriberCareDocResponseList getSubscriberCareDocs(@RequestParam String startDatetime, @RequestParam String endDatetime, @RequestParam String channel) {
-        HelpWebRequest helpWebRequest = new HelpWebRequest(startDatetime, endDatetime, channel);
+    public SubscriberCareDocResponseList getSubscriberCareDocs(@RequestParam String startTime, @RequestParam String endTime, @RequestParam String channel) {
+        HelpWebRequest helpWebRequest = new HelpWebRequest(startTime, endTime, channel);
 
         Errors validationErrors = helpWebRequest.validate();
         raiseExceptionIfThereAreErrors(validationErrors);

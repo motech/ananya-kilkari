@@ -44,6 +44,6 @@ public class KilkariSubscriberCareService {
     }
 
     public List<SubscriberCareDoc> fetchSubscriberCareDocs(HelpWebRequest helpWebRequest) {
-        return subscriberCareService.getAllSortedByDate(helpWebRequest.getStartDatetime(), helpWebRequest.getEndDatetime());
+        return subscriberCareService.getAllSortedByDate(helpWebRequest.getStartTime(), helpWebRequest.getEndTime());
     }
 }

@@ -20,7 +20,7 @@ public interface ReportingGateway {
 
     void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest);
 
-    void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn);
+    void reportChangeMsisdnForSubscriber(SubscriberChangeMsisdnReportRequest reportRequest);
 
     List<SubscriberResponse> getSubscribersByMsisdn(String msisdn);
 

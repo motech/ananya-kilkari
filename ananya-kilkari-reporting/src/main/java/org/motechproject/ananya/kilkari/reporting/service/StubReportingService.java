@@ -61,9 +61,9 @@ public class StubReportingService implements ReportingService {
     }
 
     @Override
-    public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
+    public void reportChangeMsisdnForEarlySubscription(SubscriberChangeMsisdnReportRequest reportRequest) {
         if (verify()) {
-            behavior.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+            behavior.reportChangeMsisdnForEarlySubscription(reportRequest);
         }
     }
 

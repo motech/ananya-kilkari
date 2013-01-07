@@ -51,8 +51,8 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
-        reportGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+    public void reportChangeMsisdnForEarlySubscription(SubscriberChangeMsisdnReportRequest reportRequest) {
+        reportGateway.reportChangeMsisdnForSubscriber(reportRequest);
     }
 
     @Override

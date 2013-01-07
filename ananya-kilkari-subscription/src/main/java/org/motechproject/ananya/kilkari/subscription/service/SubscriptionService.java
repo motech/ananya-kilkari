@@ -23,10 +23,7 @@ import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnVali
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
 import org.motechproject.ananya.kilkari.sync.service.RefdataSyncService;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocation;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.event.MotechEvent;
@@ -472,10 +469,9 @@ public class SubscriptionService {
     }
 
     private void migrateMsisdnToNewSubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
-        String reason = "CHANGE_MSISDN";
-        SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
+                SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
 
-        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now(), reason));
+        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now(), changeMsisdnRequest.getReason()));
 
         Location location = null;
         if (subscriberResponse.getLocationResponse() != null) {
@@ -486,7 +482,7 @@ public class SubscriptionService {
                 subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getNextWeekNumber());
 
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeMsisdnRequest.getNewMsisdn(),
-                DateTime.now(), subscription.getPack(), location, subscriber, reason);
+                DateTime.now(), subscription.getPack(), location, subscriber, changeMsisdnRequest.getReason());
         subscriptionRequest.setOldSubscriptionId(subscription.getSubscriptionId());
 
         createSubscription(subscriptionRequest, changeMsisdnRequest.getChannel());
@@ -495,6 +491,6 @@ public class SubscriptionService {
     private void changeMsisdnForEarlySubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
         subscription.setMsisdn(changeMsisdnRequest.getNewMsisdn());
         allSubscriptions.update(subscription);
-        reportingService.reportChangeMsisdnForSubscriber(subscription.getSubscriptionId(), changeMsisdnRequest.getNewMsisdn());
+        reportingService.reportChangeMsisdnForEarlySubscription(new SubscriberChangeMsisdnReportRequest(subscription.getSubscriptionId(), Long.valueOf(changeMsisdnRequest.getNewMsisdn()), changeMsisdnRequest.getReason()));
     }
 }

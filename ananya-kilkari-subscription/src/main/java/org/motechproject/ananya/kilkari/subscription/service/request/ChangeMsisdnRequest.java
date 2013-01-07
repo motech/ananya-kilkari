@@ -17,10 +17,13 @@ public class ChangeMsisdnRequest {
 
     private boolean shouldChangeAllPacks = false;
 
-    public ChangeMsisdnRequest(String oldMsisdn, String newMsisdn, Channel channel) {
+    private String reason;
+
+    public ChangeMsisdnRequest(String oldMsisdn, String newMsisdn, Channel channel, String reason) {
         this.oldMsisdn = oldMsisdn;
         this.newMsisdn = newMsisdn;
         this.channel = channel;
+        this.reason = reason;
     }
 
     public void setPacks(List<SubscriptionPack> packs) {
@@ -49,5 +52,9 @@ public class ChangeMsisdnRequest {
 
     public Channel getChannel() {
         return channel;
+    }
+
+    public String getReason() {
+        return reason;
     }
 }

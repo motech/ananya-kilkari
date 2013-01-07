@@ -219,38 +219,41 @@ public class ReportingGatewayImplTest {
 
     @Test
     public void shouldReportMsisdnChange() {
-        String msisdn = "msisdn";
+        long msisdn = 9988776655L;
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
 
-        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 
-        verify(httpClientService).execute("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
+        verify(httpClientService).execute("url/subscription/changemsisdn", reportRequest, Method.POST);
     }
 
     @Test
     public void shouldMakeSynchronousCallIfSourceIsCallCenter() {
-        String msisdn = "msisdn";
+        long msisdn = 9988776655L;
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         HttpThreadContext.set("CONTACT_CENTER");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
 
-        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 
-        verify(httpClientService).executeSync("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
+        verify(httpClientService).executeSync("url/subscription/changemsisdn", reportRequest, Method.POST);
     }
 
     @Test
     public void shouldMakeAssynchronousCallIfSyncCallFailsForCallCenter() {
-        String msisdn = "msisdn";
+        long msisdn = 9988776655L;
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         HttpThreadContext.set("CONTACT_CENTER");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
         doThrow(new RuntimeException()).when(httpClientService).executeSync(anyString(), anyObject(), any(Method.class));
 
-        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 
-        verify(httpClientService).execute("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
+        verify(httpClientService).execute("url/subscription/changemsisdn", reportRequest, Method.POST);
     }
 
     @Test
@@ -268,14 +271,15 @@ public class ReportingGatewayImplTest {
 
     @Test
     public void shouldMakeSynchronousCallToReportsForCallCenter() {
-        String msisdn = "msisdn";
+        long msisdn = 9988776655L;
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         HttpThreadContext.set("CONTACT_CENTER");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
 
-        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 
-        verify(httpClientService, never()).execute("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
+        verify(httpClientService, never()).execute("url/subscription/changemsisdn", reportRequest, Method.POST);
     }
 
     @Test

@@ -86,9 +86,9 @@ public class ReportingGatewayImpl implements ReportingGateway {
     }
 
     @Override
-    public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
-        String url = String.format("%s%s?subscriptionId=%s&msisdn=%s", getBaseUrl(), CHANGE_MSISDN_PATH, subscriptionId, msisdn);
-        performHttpRequestBasedOnChannel(url, null, Method.POST);
+    public void reportChangeMsisdnForSubscriber(SubscriberChangeMsisdnReportRequest reportRequest) {
+        String url = String.format("%s%s", getBaseUrl(), CHANGE_MSISDN_PATH);
+        performHttpRequestBasedOnChannel(url, reportRequest, Method.POST);
     }
 
     @Override

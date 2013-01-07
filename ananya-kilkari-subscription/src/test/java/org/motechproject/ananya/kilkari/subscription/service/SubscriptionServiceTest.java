@@ -38,6 +38,7 @@ import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnVali
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
 import org.motechproject.ananya.kilkari.sync.service.RefdataSyncService;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberChangeMsisdnReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
@@ -977,7 +978,7 @@ public class SubscriptionServiceTest {
     public void shouldChangeMsisdn() {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER);
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER, null);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.NANHI_KILKARI));
 
         Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now().minusWeeks(2).minusHours(1), DateTime.now(), null);
@@ -1048,7 +1049,7 @@ public class SubscriptionServiceTest {
     public void shouldChangeMsisdnForEarlySubscription() {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER);
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER, null);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.NANHI_KILKARI));
 
         Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now(), null);
@@ -1072,7 +1073,10 @@ public class SubscriptionServiceTest {
         assertEquals(subscription1.getMsisdn(), updatedSubscription.getMsisdn());
 
         verifyZeroInteractions(onMobileSubscriptionManagerPublisher);
-        verify(reportingServiceImpl).reportChangeMsisdnForSubscriber(subscription1.getSubscriptionId(), newMsisdn);
+        ArgumentCaptor<SubscriberChangeMsisdnReportRequest> requestArgumentCaptor = ArgumentCaptor.forClass(SubscriberChangeMsisdnReportRequest.class);
+        verify(reportingServiceImpl).reportChangeMsisdnForEarlySubscription(requestArgumentCaptor.capture());
+        SubscriberChangeMsisdnReportRequest reportRequest = requestArgumentCaptor.getValue();
+        assertEquals(newMsisdn, reportRequest.getMsisdn().toString());
     }
 
     @Test

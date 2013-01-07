@@ -28,6 +28,10 @@ public class ChangeMsisdnWebRequest {
     private String newMsisdn;
 
     @JsonProperty
+    @XmlElement
+    private String reason;
+
+    @JsonProperty
     @XmlElementWrapper(name = "packs")
     @XmlElement(name = "pack")
     private List<String> packs;
@@ -35,11 +39,12 @@ public class ChangeMsisdnWebRequest {
 
     public ChangeMsisdnWebRequest() { }
 
-    public ChangeMsisdnWebRequest(String oldMsisdn, String newMsisdn, List<String> packs, String channel) {
+    public ChangeMsisdnWebRequest(String oldMsisdn, String newMsisdn, List<String> packs, String channel, String reason) {
         this.oldMsisdn = oldMsisdn;
         this.newMsisdn = newMsisdn;
         this.packs = packs;
         this.channel = channel;
+        this.reason = reason;
     }
 
     public Errors validate() {
@@ -88,6 +93,15 @@ public class ChangeMsisdnWebRequest {
 
     public void setChannel(String channel) {
         this.channel = channel;
+    }
+
+    @XmlTransient
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     private void validateSubscriptionPacksForChangeMsisdn(Errors errors) {

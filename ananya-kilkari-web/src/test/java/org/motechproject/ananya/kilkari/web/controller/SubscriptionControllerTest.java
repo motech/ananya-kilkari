@@ -724,7 +724,7 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldSetCallCenterAsChannelInHttpThreadContext() throws Exception {
         ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest(
-                "1234567890", "1234567891", Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()), Channel.CONTACT_CENTER.toString());
+                "1234567890", "1234567891", Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()), Channel.CONTACT_CENTER.toString(), "reason");
 
         mockMvc(subscriptionController).perform(
                 post("/subscriber/changemsisdn")

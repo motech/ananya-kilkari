@@ -88,12 +88,14 @@ public class ReportingServiceImplTest {
 
     @Test
     public void shouldReportChangeMsisdn() {
-        String msisdn = "9876543210";
+        Long msisdn = 9876543210L;
         String subscriptionId = "subscriptionId";
+        String reason = "reason";
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, reason);
 
-        reportingServiceImpl.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        reportingServiceImpl.reportChangeMsisdnForEarlySubscription(reportRequest);
 
-        verify(reportGateway).reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        verify(reportGateway).reportChangeMsisdnForSubscriber(reportRequest);
     }
 
     @Test

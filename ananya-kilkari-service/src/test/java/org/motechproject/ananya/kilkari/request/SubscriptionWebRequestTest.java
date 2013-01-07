@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.request;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Rule;
@@ -12,6 +13,7 @@ import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 
 import static org.junit.Assert.*;
 
@@ -83,10 +85,10 @@ public class SubscriptionWebRequestTest {
 
     @Test
     public void shouldAddErrorWhenMoreThanOneOfEddDobOrWeekNumberIsGivenToCreateNewSubscription() {
-        SubscriptionWebRequest subscriptionWebRequestWithDobEdd = new SubscriptionWebRequestBuilder().withDefaults().withDOB("01-01-2012").withEDD("31-12-2012").build();
-        SubscriptionWebRequest subscriptionWebRequestWithEddWeek = new SubscriptionWebRequestBuilder().withDefaults().withWeek("4").withEDD("31-12-2012").build();
+        SubscriptionWebRequest subscriptionWebRequestWithDobEdd = new SubscriptionWebRequestBuilder().withDefaults().withDOB("01-01-2012").withEDD(DateUtils.formatDate(DateTime.now().plusDays(2), DateTimeZone.UTC)).build();
+        SubscriptionWebRequest subscriptionWebRequestWithEddWeek = new SubscriptionWebRequestBuilder().withDefaults().withWeek("4").withEDD(DateUtils.formatDate(DateTime.now().plusDays(2), DateTimeZone.UTC)).build();
         SubscriptionWebRequest subscriptionWebRequestWithDobWeek = new SubscriptionWebRequestBuilder().withDefaults().withWeek("4").withDOB("31-12-2011").build();
-        SubscriptionWebRequest subscriptionWebRequestWithDobEddWeek = new SubscriptionWebRequestBuilder().withDefaults().withWeek("4").withDOB("31-12-2011").withEDD("31-12-2012").build();
+        SubscriptionWebRequest subscriptionWebRequestWithDobEddWeek = new SubscriptionWebRequestBuilder().withDefaults().withWeek("4").withDOB("31-12-2011").withEDD(DateUtils.formatDate(DateTime.now().plusDays(2), DateTimeZone.UTC)).build();
 
         validateErrors(1, subscriptionWebRequestWithDobEdd.validate(), "Invalid request. Only one of expected date of delivery, date of birth and week number should be present");
 

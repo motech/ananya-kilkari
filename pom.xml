@@ -19,6 +19,7 @@
         <module>ananya-kilkari-performance-tests</module>
         <module>ananya-kilkari-purge</module>
         <module>ananya-kilkari-refdata-sync</module>
+        <module>ananya-kilkari-test-data</module>
 
     </modules>
     <name>Ananya Kilkari</name>

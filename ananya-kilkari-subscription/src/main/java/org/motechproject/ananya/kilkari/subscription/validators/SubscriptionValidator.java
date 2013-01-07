@@ -22,6 +22,8 @@ public class SubscriptionValidator {
         Errors errors = new Errors();
         validateWeek(subscriptionRequest, errors);
         validateActiveSubscriptionDoesNotExist(subscriptionRequest, errors);
+        validateDob(subscriptionRequest, errors);
+
         raiseExceptionIfThereAreErrors(errors);
     }
 
@@ -30,7 +32,7 @@ public class SubscriptionValidator {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         if (subscription == null)
             errors.add(String.format("Subscription does not exist for subscriptionId %s", subscriptionId));
-        else if(!subscription.isActiveOrSuspended())
+        else if (!subscription.isActiveOrSuspended())
             errors.add(String.format("Subscription is not active for subscriptionId %s", subscriptionId));
         raiseExceptionIfThereAreErrors(errors);
     }
@@ -52,6 +54,13 @@ public class SubscriptionValidator {
         if (subscriptionRequest.getSubscriber().getWeek() != null) {
             if (!subscriptionRequest.getPack().isValidWeekNumber(subscriptionRequest.getSubscriber().getWeek()))
                 errors.add(String.format("Given week[%s] is not within the pack[%s] range", subscriptionRequest.getSubscriber().getWeek(), subscriptionRequest.getPack().name()));
+        }
+    }
+
+    private void validateDob(SubscriptionRequest subscriptionRequest, Errors errors) {
+        if (subscriptionRequest.getSubscriber().getDateOfBirth() != null) {
+            if (!subscriptionRequest.getPack().isValidDateOfBirth(subscriptionRequest.getSubscriber().getDateOfBirth(), subscriptionRequest.getCreationDate()))
+                errors.add(String.format("Given dateOfBirth[%s] is not within the pack[%s] range", subscriptionRequest.getSubscriber().getDateOfBirth(), subscriptionRequest.getPack().name()));
         }
     }
 

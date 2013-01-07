@@ -51,6 +51,18 @@ public class SubscriptionValidatorTest {
     }
 
     @Test
+    public void shouldValidateIfDOBIsWithinPacksWeekRange() {
+        DateTime now = DateTime.now();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withCreationDate(now).withDateOfBirth(now.minusWeeks(48)).withPack(SubscriptionPack.BARI_KILKARI).build();
+        when(allSubscriptions.findSubscriptionInProgress(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack())).thenReturn(null);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(String.format("Given dateOfBirth[%s] is not within the pack[%s] range", subscriptionRequest.getSubscriber().getDateOfBirth(), subscriptionRequest.getPack()));
+
+        subscriptionValidator.validate(subscriptionRequest);
+    }
+
+    @Test
     public void shouldFailValidationIfWeekNumberIsOutsidePacksRange() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(SubscriptionPack.NANHI_KILKARI).withWeek(30).build();
 

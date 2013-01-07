@@ -84,6 +84,22 @@ public class SubscriptionPackTest {
     }
 
     @Test
+    public void shouldValidateDobForAPack() {
+        DateTime now = DateTime.now();
+        assertFalse(SubscriptionPack.BARI_KILKARI.isValidDateOfBirth(now.minusWeeks(48), now));
+        assertTrue(SubscriptionPack.BARI_KILKARI.isValidDateOfBirth(now.minusWeeks(1), now));
+        assertTrue(SubscriptionPack.BARI_KILKARI.isValidDateOfBirth(now, now));
+
+        assertFalse(SubscriptionPack.NAVJAAT_KILKARI.isValidDateOfBirth(now.minusWeeks(48), now));
+        assertTrue(SubscriptionPack.NAVJAAT_KILKARI.isValidDateOfBirth(now.minusWeeks(1), now));
+        assertTrue(SubscriptionPack.NAVJAAT_KILKARI.isValidDateOfBirth(now, now));
+
+        assertFalse(SubscriptionPack.NANHI_KILKARI.isValidDateOfBirth(now.minusWeeks(48), now));
+        assertTrue(SubscriptionPack.NANHI_KILKARI.isValidDateOfBirth(now.minusWeeks(1), now));
+        assertTrue(SubscriptionPack.NANHI_KILKARI.isValidDateOfBirth(now, now));
+    }
+
+    @Test
     public void shouldCheckIfAPackIsPriorToTheCurrentPack() {
         assertTrue(SubscriptionPack.BARI_KILKARI.startsBefore(SubscriptionPack.NAVJAAT_KILKARI));
         assertTrue(SubscriptionPack.BARI_KILKARI.startsBefore(SubscriptionPack.NANHI_KILKARI));

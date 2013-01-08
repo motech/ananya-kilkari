@@ -33,11 +33,15 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
     @XmlElement
     private LocationResponse location;
 
+    @JsonProperty
+    @XmlElement
+    private String lastWeeklyMessageScheduledDate;
+
     public AllSubscriptionDetails() {
     }
 
     public AllSubscriptionDetails(String subscriptionId, String pack, String status, String lastCampaignId,
-                                  String beneficiaryName, Integer beneficiaryAge, Integer weekNumber, String expectedDateOfDelivery, String dateOfBirth, LocationResponse location) {
+                                  String beneficiaryName, Integer beneficiaryAge, Integer weekNumber, String expectedDateOfDelivery, String dateOfBirth, LocationResponse location, String lastWeeklyMessageScheduledDate) {
         super(subscriptionId, pack, status, lastCampaignId);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
@@ -45,6 +49,7 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
         this.expectedDateOfDelivery = expectedDateOfDelivery;
         this.dateOfBirth = dateOfBirth;
         this.location = location;
+        this.lastWeeklyMessageScheduledDate = lastWeeklyMessageScheduledDate;
     }
 
     public String getBeneficiaryName() {
@@ -79,5 +84,9 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
     @Override
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    public String getLastWeeklyMessageScheduledDate() {
+        return lastWeeklyMessageScheduledDate;
     }
 }

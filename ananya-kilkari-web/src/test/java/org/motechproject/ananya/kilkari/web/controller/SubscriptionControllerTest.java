@@ -103,7 +103,7 @@ public class SubscriptionControllerTest {
         int startWeekNumber = 4;
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE,
-                "WEEK13", "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"));
+                "WEEK13", "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"), DateTime.now());
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -128,7 +128,7 @@ public class SubscriptionControllerTest {
         int startWeekNumber = 4;
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13",
-                "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"));
+                "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"), DateTime.now());
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);

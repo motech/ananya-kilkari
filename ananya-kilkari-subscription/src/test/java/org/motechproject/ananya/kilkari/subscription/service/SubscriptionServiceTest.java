@@ -992,7 +992,7 @@ public class SubscriptionServiceTest {
 
         String beneficiaryName = "name";
         Integer beneficiaryAge = 25;
-        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", beneficiaryName, beneficiaryAge, null, null, null);
+        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", beneficiaryName, beneficiaryAge, null, null, null, null);
 
         when(allSubscriptions.findUpdatableSubscriptions(oldMsisdn)).thenReturn(Arrays.asList(subscription1, subscription2));
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription1);
@@ -1299,7 +1299,7 @@ public class SubscriptionServiceTest {
         String msisdn = "1234567890";
         SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).build();
-        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), new LocationResponse("d", "b", "p"));
+        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), null, new LocationResponse("d", "b", "p"));
         ArrayList<Subscription> subscriptionList = new ArrayList<>();
         subscriptionList.add(subscription);
         ArrayList<SubscriberResponse> subscriberResponseList = new ArrayList<>();
@@ -1357,7 +1357,7 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, actualOMSubscriptionRequest.getSubscriptionId());
         assertEquals(newMsisdn, actualOMSubscriptionRequest.getMsisdn());
         assertEquals(channel, actualOMSubscriptionRequest.getChannel());
-        assertEquals(pack,actualOMSubscriptionRequest.getPack());
+        assertEquals(pack, actualOMSubscriptionRequest.getPack());
     }
 
     @Test

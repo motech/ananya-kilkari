@@ -42,7 +42,8 @@ public class SubscriptionDetailsResponseMapper {
                 ? new SubscriptionDetailsResponse(subscriptionId, subscription.getPack(), subscription.getStatus(), messageId)
                 : new SubscriptionDetailsResponse(subscriptionId, subscription.getPack(), subscription.getStatus(), messageId,
                 subscriberDetails.getBeneficiaryName(), subscriberDetails.getBeneficiaryAge(), subscriberDetails.getDateOfBirth(),
-                subscriberDetails.getExpectedDateOfDelivery(), subscription.getStartWeekNumber(), getLocation(subscriberDetails));
+                subscriberDetails.getExpectedDateOfDelivery(), subscription.getStartWeekNumber(), getLocation(subscriberDetails),
+                subscriberDetails.getLastScheduledMessageDate());
     }
 
     private Location getLocation(SubscriberResponse subscriberDetails) {

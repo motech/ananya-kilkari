@@ -56,6 +56,7 @@ public class SubscriptionDetailsResponseMapperTest {
         assertNull(responseList.get(0).getDateOfBirth());
         assertNull(responseList.get(0).getExpectedDateOfDelivery());
         assertNull(responseList.get(0).getLocation());
+        assertNull(responseList.get(0).getLastWeeklyMessageScheduledDate());
     }
 
     @Test
@@ -70,8 +71,8 @@ public class SubscriptionDetailsResponseMapperTest {
             add(subscription1);
             add(subscription2);
         }};
-        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, DateTime.now(), DateTime.now().minusYears(1), location);
-        final SubscriberResponse subscriberResponse2 = new SubscriberResponse(subscription2.getSubscriptionId(), "name1", 24, DateTime.now(), DateTime.now().minusYears(1), location);
+        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, DateTime.now(), DateTime.now().minusYears(1), DateTime.now(), location);
+        final SubscriberResponse subscriberResponse2 = new SubscriberResponse(subscription2.getSubscriptionId(), "name1", 24, DateTime.now(), DateTime.now().minusYears(1), DateTime.now(), location);
         List<SubscriberResponse> subscriberDetailsList = new ArrayList<SubscriberResponse>() {{
             add(subscriberResponse2);
             add(subscriberResponse1);
@@ -94,7 +95,7 @@ public class SubscriptionDetailsResponseMapperTest {
         List<Subscription> subscriptionList = new ArrayList<Subscription>() {{
             add(subscription1);
         }};
-        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, DateTime.now(), DateTime.now(), null);
+        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, DateTime.now(), DateTime.now(), DateTime.now(), null);
         List<SubscriberResponse> subscriberDetailsList = new ArrayList<SubscriberResponse>() {{
             add(subscriberResponse1);
         }};
@@ -119,11 +120,11 @@ public class SubscriptionDetailsResponseMapperTest {
         assertEquals(subscriberResponse.getDateOfBirth().toString("dd-MM-yyyy"), response.getDateOfBirth());
         assertEquals(subscriberResponse.getExpectedDateOfDelivery().toString("dd-MM-yyyy"), response.getExpectedDateOfDelivery());
         assertEquals(expectedLocation, response.getLocation());
+        assertEquals(subscriberResponse.getLastScheduledMessageDate().toString("dd-MM-yyyy HH-mm-ss"), response.getLastWeeklyMessageScheduledDate());
     }
 
     @Test
-    public void shouldReturnAnEmptyListIfBothResponsesAreEmpty()
-    {
+    public void shouldReturnAnEmptyListIfBothResponsesAreEmpty() {
         List<SubscriptionDetailsResponse> responseList = subscriptionDetailsResponseMapper.map(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
 
         assertNotNull(responseList);

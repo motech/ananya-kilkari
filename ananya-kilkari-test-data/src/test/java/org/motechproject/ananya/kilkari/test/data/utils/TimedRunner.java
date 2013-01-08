@@ -1,7 +1,5 @@
 package org.motechproject.ananya.kilkari.test.data.utils;
 
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
-
 public abstract class TimedRunner<T>  {
 
     private int tries;
@@ -18,11 +16,11 @@ public abstract class TimedRunner<T>  {
      * Function to run within the timeout. It returns a boolean. If the value is true, the code
      * will break out of the loop immediately else try again within the timeout period.
      */
-    protected abstract TimedRunnerResponse<CampaignMessage> run();
+    protected abstract TimedRunnerResponse<Boolean> run();
 
     public T executeWithTimeout() {
         for (int i = 0; i < tries; i++) {
-            TimedRunnerResponse<CampaignMessage> result = run();
+            TimedRunnerResponse<Boolean> result = run();
             if (result != null) {
                 return (T) result.getObj();
             }

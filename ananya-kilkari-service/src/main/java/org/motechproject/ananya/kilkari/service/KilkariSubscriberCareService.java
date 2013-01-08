@@ -1,11 +1,12 @@
 package org.motechproject.ananya.kilkari.service;
 
-import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.request.HelpWebRequest;
 import org.motechproject.ananya.kilkari.service.validator.SubscriberCareRequestValidator;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriberCareService;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,8 @@ public class KilkariSubscriberCareService {
     private SubscriberCareRequestValidator careRequestValidator;
     private SubscriptionPublisher subscriptionPublisher;
     private SubscriberCareService subscriberCareService;
+
+    private static final Logger logger = LoggerFactory.getLogger(KilkariSubscriberCareService.class);
 
     public KilkariSubscriberCareService(SubscriberCareService subscriberCareService, SubscriberCareRequestValidator careRequestValidator,
                                         SubscriptionPublisher subscriptionPublisher) {
@@ -32,12 +35,10 @@ public class KilkariSubscriberCareService {
         this.careRequestValidator = new SubscriberCareRequestValidator();
     }
 
-    public void processSubscriberCareRequest(String msisdn, String reason, String channel, DateTime createdAt) {
-        subscriptionPublisher.processSubscriberCareRequest(
-                new SubscriberCareRequest(msisdn, reason, channel, createdAt));
-    }
-
     public void createSubscriberCareRequest(SubscriberCareRequest subscriberCareRequest) {
+        logger.info(String.format("Create subscriber care request event for msisdn: %s, reason: %s, channel:%s, createdAt: %s",
+                subscriberCareRequest.getMsisdn(), subscriberCareRequest.getReason(),
+                subscriberCareRequest.getChannel(), subscriberCareRequest.getCreatedAt()));
         careRequestValidator.validate(subscriberCareRequest);
         subscriberCareService.create(subscriberCareRequest);
     }

@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.web.controller;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
@@ -10,6 +11,7 @@ import org.motechproject.ananya.kilkari.request.HelpWebRequest;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriberCareService;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareReasons;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.MVCTestUtils;
 import org.springframework.http.MediaType;
@@ -20,8 +22,6 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.motechproject.ananya.kilkari.web.controller.ResponseMatchers.baseResponseMatcher;
@@ -44,15 +44,23 @@ public class HelpControllerTest {
 
     @Test
     public void shouldProcessCareRequest() throws Exception {
+        String channel = "ivr";
+        String msisdn = "1234567890";
+        String reason = "help";
+
         MVCTestUtils.mockMvc(helpController)
-                .perform(get("/help").param("msisdn", "1234567890").param("reason", "help").param("channel", "ivr"))
+                .perform(get("/help").param("msisdn", msisdn).param("reason", reason).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JAVASCRIPT))
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber care request processed successfully")));
 
 
-        verify(kilkariSubscriberCareService).processSubscriberCareRequest(
-                eq("1234567890"), eq("help"), eq("ivr"), any(DateTime.class));
+        ArgumentCaptor<SubscriberCareRequest> captor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
+        verify(kilkariSubscriberCareService).createSubscriberCareRequest(captor.capture());
+        SubscriberCareRequest actualRequest = captor.getValue();
+        assertEquals(channel, actualRequest.getChannel());
+        assertEquals(msisdn, actualRequest.getMsisdn());
+        assertEquals(reason, actualRequest.getReason());
     }
 
     @Test
@@ -71,8 +79,8 @@ public class HelpControllerTest {
 
         verify(kilkariSubscriberCareService).fetchSubscriberCareDocs(new HelpWebRequest(fromDate, toDate, Channel.CONTACT_CENTER.name()));
         String contentAsString = mvcResult.getResponse().getContentAsString();
-        assertTrue(contentAsString.contains("msisdn,date,time"));
-        assertTrue(contentAsString.contains(String.format("msisdn,%s,%s", now.toString("dd-MM-yyyy"), now.toString("HH:mm:ss"))));
+        assertTrue(contentAsString.contains("msisdn,reason,date,time"));
+        assertTrue(contentAsString.contains(String.format("msisdn,%s,%s,%s", SubscriberCareReasons.HELP.name(), now.toString("dd-MM-yyyy"), now.toString("HH:mm:ss"))));
     }
 
     @Test

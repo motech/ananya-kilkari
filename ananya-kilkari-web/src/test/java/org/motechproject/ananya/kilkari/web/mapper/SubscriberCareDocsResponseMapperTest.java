@@ -16,7 +16,7 @@ public class SubscriberCareDocsResponseMapperTest {
     public void shouldMapFromSubscriberCareDocsToSubscriberCareDocsResponseList() {
         ArrayList<SubscriberCareDoc> subscriberCareDocs = new ArrayList<>();
         SubscriberCareDoc subscriberCareDoc1 = new SubscriberCareDoc("msisdn1", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR);
-        SubscriberCareDoc subscriberCareDoc2 = new SubscriberCareDoc("msisdn2", SubscriberCareReasons.HELP, DateTime.now().minusHours(5), Channel.IVR);
+        SubscriberCareDoc subscriberCareDoc2 = new SubscriberCareDoc("msisdn2", SubscriberCareReasons.NEW_SUBSCRIPTION, DateTime.now().minusHours(5), Channel.IVR);
         subscriberCareDocs.add(subscriberCareDoc2);
         subscriberCareDocs.add(subscriberCareDoc1);
 
@@ -29,6 +29,7 @@ public class SubscriberCareDocsResponseMapperTest {
 
     private void assertSubscriberCareDocsResponse(SubscriberCareDoc expectedSubscriberCareDoc, SubscriberCareDocResponse actualSubscriberCareDoc) {
         assertEquals(expectedSubscriberCareDoc.getMsisdn(), actualSubscriberCareDoc.getMsisdn());
+        assertEquals(expectedSubscriberCareDoc.getReason().name(), actualSubscriberCareDoc.getReason());
         assertEquals(expectedSubscriberCareDoc.getCreatedAt().toString("HH:mm:ss"), actualSubscriberCareDoc.getTime());
         assertEquals(expectedSubscriberCareDoc.getCreatedAt().toString("dd-MM-yyyy"), actualSubscriberCareDoc.getDate());
     }

@@ -6,6 +6,7 @@ import org.motechproject.ananya.kilkari.request.HelpWebRequest;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriberCareService;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriberCareDoc;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriberCareDocsResponseMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriberCareDocResponseList;
@@ -31,7 +32,7 @@ public class HelpController {
     @RequestMapping(value = "/help", method = RequestMethod.GET)
     @ResponseBody
     public BaseResponse createSubscriberCareRequest(@RequestParam String msisdn, @RequestParam String reason, @RequestParam String channel) {
-        kilkariSubscriberCareService.processSubscriberCareRequest(msisdn, reason, channel, DateTime.now());
+        kilkariSubscriberCareService.createSubscriberCareRequest(new SubscriberCareRequest(msisdn, reason, channel, DateTime.now()));
         return BaseResponse.success("Subscriber care request processed successfully");
     }
 

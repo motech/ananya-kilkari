@@ -63,22 +63,6 @@ public class KilkariSubscriberCareServiceTest {
     }
 
     @Test
-    public void shouldPublishSubscriberCareRequestEvent() {
-        String msisdn = "1234566789";
-        String reason = SubscriberCareReasons.HELP.name();
-        String channel = "ivr";
-
-        kilkariSubscriberCareService.processSubscriberCareRequest(msisdn, reason, channel, DateTime.now());
-
-        ArgumentCaptor<SubscriberCareRequest> subscriberCareRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriberCareRequest.class);
-        verify(subscriptionPublisher).processSubscriberCareRequest(subscriberCareRequestArgumentCaptor.capture());
-        SubscriberCareRequest careRequest = subscriberCareRequestArgumentCaptor.getValue();
-
-        assertEquals(msisdn, careRequest.getMsisdn());
-        assertEquals(reason, careRequest.getReason());
-    }
-
-    @Test
     public void shouldFetchSubscriberCareDocsInTheGivenDateRange() {
         List<SubscriberCareDoc> expectedSubscriberCareDocs = new ArrayList<>();
         expectedSubscriberCareDocs.add(new SubscriberCareDoc("msisdn1", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR));

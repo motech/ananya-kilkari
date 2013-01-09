@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.test.data;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.message.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
@@ -41,6 +43,9 @@ public class BaseDataSetup {
 
     @Autowired
     private AllCampaignMessages allCampaignMessages;
+
+    @Autowired
+    private AllCampaignMessageAlerts allCampaignMessageAlerts;
 
     @Autowired
     private AllSubscriptions allSubscriptions;
@@ -107,15 +112,28 @@ public class BaseDataSetup {
         callbackRequest.setOperator(operator);
         callbackRequest.setStatus(status);
         restTemplate.put(constructUrl(baseUrl(), "subscription/" + subscriptionId, parametersMap), callbackRequest);
-        waitForSubscription(msisdn, "Activated");
+        String toCheckStatus = "SUCCESS".equals(status)?"Activated":"Suspended";
+        waitForSubscription(msisdn, toCheckStatus);
         System.out.println("Subscription renewed");
     }
 
-    protected void waitForCampaignAlert(final String subscriptionId, final String weekMessageId) {
+    protected void waitForCampaignMessage(final String subscriptionId, final String weekMessageId) {
         Boolean result = new TimedRunner<Boolean>(120, 1000) {
             public TimedRunnerResponse<Boolean> run() {
                 CampaignMessage campaignMessage = findOBDCampaignMessage(subscriptionId, weekMessageId);
                 return campaignMessage == null ? null : new TimedRunnerResponse<>(true);
+            }
+        }.executeWithTimeout();
+
+        assertNotNull(result);
+        assertTrue(result);
+    }
+
+    protected void waitForCampaignMessageAlert(final String subscriptionId, final String weekMessageId) {
+        Boolean result = new TimedRunner<Boolean>(120, 1000) {
+            public TimedRunnerResponse<Boolean> run() {
+                CampaignMessageAlert campaignMessageAlert = findOBDCampaignMessageAlert(subscriptionId, weekMessageId);
+                return campaignMessageAlert == null ? null : new TimedRunnerResponse<>(true);
             }
         }.executeWithTimeout();
 
@@ -150,6 +168,7 @@ public class BaseDataSetup {
         Boolean result = new TimedRunner<Boolean>(20, 6000) {
             public TimedRunnerResponse<Boolean> run() {
                 SubscriptionDetails subscriptionDetails = getSubscriptionDetails(msisdn);
+                System.out.println("Current status "+subscriptionDetails.getStatus());
                 return subscriptionDetails != null && subscriptionDetails.getStatus().equals(status) ? new TimedRunnerResponse<>(true) : null;
             }
         }.executeWithTimeout();
@@ -160,6 +179,12 @@ public class BaseDataSetup {
     private CampaignMessage findOBDCampaignMessage(String subscriptionId, String weekMessageId) {
         return allCampaignMessages.find(subscriptionId, weekMessageId);
     }
+
+    private CampaignMessageAlert findOBDCampaignMessageAlert(String subscriptionId, String weekMessageId) {
+        CampaignMessageAlert campaignMessageAlert = allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
+        return campaignMessageAlert !=null && campaignMessageAlert.getMessageId().equals(weekMessageId) ? campaignMessageAlert : null;
+    }
+
     protected String baseUrl() {
         return testDataConfig.baseUrl();
     }

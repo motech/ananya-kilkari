@@ -13,7 +13,7 @@ public class SubscriptionRequestBuilder {
         request = new SubscriptionRequest();
     }
 
-    public SubscriptionRequestBuilder withDefaults() {
+    public SubscriptionRequestBuilder withDefaultsForCallCentre() {
         request.setPack("bari_kilkari");
         String msisdn = "1"+ RandomStringUtils.randomNumeric(9);
         request.setMsisdn(msisdn);
@@ -22,6 +22,14 @@ public class SubscriptionRequestBuilder {
         request.setLocation(new Location("D1","B1","P1"));
         request.setDateOfBirth(DateTime.now().minusYears(24).toString("dd-MM-yyyy"));
         request.setExpectedDateOfDelivery(DateTime.now().plusDays(30).toString("dd-MM-yyyy"));
+        request.setCreatedAt(DateTime.now());
+        return this;
+    }
+
+    public SubscriptionRequestBuilder withDefaultsForIVR() {
+        request.setPack("bari_kilkari");
+        String msisdn = "1"+ RandomStringUtils.randomNumeric(9);
+        request.setMsisdn(msisdn);
         request.setCreatedAt(DateTime.now());
         return this;
     }

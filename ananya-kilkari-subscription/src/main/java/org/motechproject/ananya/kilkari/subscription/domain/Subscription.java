@@ -256,10 +256,6 @@ public class Subscription extends MotechBaseDataObject {
         this.msisdn = msisdn;
     }
 
-    public void setActivationDate(DateTime activationDate) {
-        this.activationDate = activationDate;
-    }
-
     @JsonIgnore
     public boolean isLateSubscription() {
         return startDate.isBefore(creationDate);

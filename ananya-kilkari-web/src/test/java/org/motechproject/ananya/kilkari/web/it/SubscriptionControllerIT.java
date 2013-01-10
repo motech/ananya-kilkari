@@ -18,6 +18,7 @@ import org.motechproject.ananya.kilkari.request.ChangeMsisdnWebRequest;
 import org.motechproject.ananya.kilkari.request.ChangeSubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.UnSubscriptionWebRequest;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -368,8 +369,9 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         UnSubscriptionWebRequest expectedUnSubscriptionWebRequest = new UnSubscriptionWebRequest();
         expectedUnSubscriptionWebRequest.setReason("Reason for deactivation");
 
-        Subscription expectedSubscription = new Subscription(msisdn, pack, DateTime.now().minusMonths(15), DateTime.now(), null);
-        expectedSubscription.setStatus(SubscriptionStatus.ACTIVE);
+        DateTime now = DateTime.now();
+        Subscription expectedSubscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(pack)
+                .withCreationDate(now.minusMonths(15)).withStartDate(now).withScheduleStartDate(now).withStatus(SubscriptionStatus.ACTIVE).build();
         allSubscriptions.add(expectedSubscription);
         markForDeletion(expectedSubscription);
 
@@ -416,7 +418,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
         DateTime createdAt = DateTime.now().minusWeeks(4).minusHours(1);
-        Subscription oldSubscription = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, createdAt, createdAt, null);
+        Subscription oldSubscription = new SubscriptionBuilder().withDefaults().withMsisdn(oldMsisdn).withPack(SubscriptionPack.NANHI_KILKARI).withStatus(SubscriptionStatus.ACTIVE)
+                .withCreationDate(createdAt).withStartDate(createdAt).withScheduleStartDate(createdAt).build();
         oldSubscription.setStatus(SubscriptionStatus.ACTIVE);
 
         allSubscriptions.add(oldSubscription);

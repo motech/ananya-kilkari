@@ -450,9 +450,9 @@ public class SubscriptionService {
     }
 
     private Integer getSubscriptionWeekNumber(Subscription subscription, DateTime endDate) {
-        if (subscription.getActivationDate() == null)
+        if (subscription.getScheduleStartDate() == null)
             return null;
-        Integer diffInWeeks = Weeks.weeksBetween(subscription.getActivationDate(), endDate).getWeeks();
+        Integer diffInWeeks = Weeks.weeksBetween(subscription.getScheduleStartDate(), endDate).getWeeks();
         return subscription.getPack().getStartWeek() + diffInWeeks;
     }
 
@@ -469,7 +469,7 @@ public class SubscriptionService {
     }
 
     private void migrateMsisdnToNewSubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
-                SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
+        SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
 
         requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now(), changeMsisdnRequest.getReason()));
 

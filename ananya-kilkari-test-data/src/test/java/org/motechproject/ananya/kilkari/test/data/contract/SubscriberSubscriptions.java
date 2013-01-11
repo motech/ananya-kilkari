@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubscriberSubscriptions {
-    private List<AllSubscriptionDetails> subscriptionDetails;
+    private List<AllSubscriptionDetails> subscriptionsDetails;
 
     public SubscriberSubscriptions() {
-        this.subscriptionDetails = new ArrayList<>();
+        this.subscriptionsDetails = new ArrayList<>();
     }
 
     public List<AllSubscriptionDetails> getSubscriptionDetails() {
-        return subscriptionDetails;
+        return subscriptionsDetails;
     }
 }

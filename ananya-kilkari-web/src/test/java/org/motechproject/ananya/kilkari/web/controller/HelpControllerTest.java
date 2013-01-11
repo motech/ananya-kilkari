@@ -73,7 +73,7 @@ public class HelpControllerTest {
         }});
 
         MvcResult mvcResult = MVCTestUtils.mockMvc(helpController)
-                .perform(get("/help/list").param("startDatetime", fromDate).param("endDatetime", toDate).param("channel", Channel.CONTACT_CENTER.name()).
+                .perform(get("/help/list").param("startTime", fromDate).param("endTime", toDate).param("channel", Channel.CONTACT_CENTER.name()).
                         accept(new MediaType("text", "csv", Charset.defaultCharset())))
                 .andExpect(status().isOk()).andReturn();
 
@@ -93,11 +93,11 @@ public class HelpControllerTest {
         }});
 
         MvcResult mvcResult = MVCTestUtils.mockMvc(helpController)
-                .perform(get("/help/list").param("startDatetime", fromDate).param("endDatetime", toDate).param("channel", Channel.CONTACT_CENTER.name()).
+                .perform(get("/help/list").param("startTime", fromDate).param("endTime", toDate).param("channel", Channel.CONTACT_CENTER.name()).
                         accept(new MediaType("text", "csv", Charset.defaultCharset())))
                 .andExpect(status().isBadRequest()).andReturn();
 
         String contentAsString = mvcResult.getResponse().getContentAsString();
-        assertEquals("{\"status\":\"FAILED\",\"description\":\"Invalid start datetime blah,Invalid end datetime everon\"}", contentAsString);
+        assertEquals("{\"status\":\"FAILED\",\"description\":\"Invalid start time blah,Invalid end time everon\"}", contentAsString);
     }
 }

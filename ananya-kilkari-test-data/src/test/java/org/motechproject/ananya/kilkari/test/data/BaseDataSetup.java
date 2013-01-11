@@ -12,6 +12,7 @@ import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.ChangeSubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
@@ -149,23 +150,18 @@ public class BaseDataSetup {
     }
 
     protected String changeSchedule(String msisdn, String subscriptionId, String pack, DateTime modifiedEDD, DateTime modifiedDOB) {
-        Map<String, String> parametersMap = new HashMap<String, String>(){{
-            put("channel", "contact_center");
-        }};
-        ChangeSubscriptionWebRequest request = new ChangeSubscriptionWebRequest();
-        request.setChangeType("change_schedule");
-        request.setPack(pack);
-        if(modifiedDOB !=null) request.setDateOfBirth(modifiedDOB.toString("dd-MM-yyyy"));
-        if(modifiedEDD !=null) request.setExpectedDateOfDelivery(modifiedEDD.toString("dd-MM-yyyy"));
-        request.setReason("Change by script");
-
-        restTemplate.put(constructUrl(baseUrl(),"/subscription/"+subscriptionId+"/changesubscription",parametersMap), request,String.class);
-        waitForSubscription(msisdn, subscriptionId, SubscriptionStatus.PENDING_DEACTIVATION.getDisplayString());
-        SubscriberSubscriptions subscriptionDetails = getSubscriptionDetails(msisdn);
-        List<AllSubscriptionDetails> subscriptions = subscriptionDetails.getSubscriptionDetails();
-
+        List<AllSubscriptionDetails> subscriptions = makeChangeSubscriptionRequest(msisdn, subscriptionId, pack, modifiedEDD, modifiedDOB, ChangeSubscriptionType.CHANGE_SCHEDULE.name());
         for(AllSubscriptionDetails subscription:subscriptions) {
-           if(SubscriptionStatus.PENDING_ACTIVATION.getDisplayString().equals(subscription.getStatus()))
+            if(SubscriptionStatus.PENDING_ACTIVATION.getDisplayString().equals(subscription.getStatus()))
+                return subscription.getSubscriptionId();
+        }
+        return null;
+    }
+
+    protected String changePack(String msisdn, String subscriptionId, String pack, DateTime modifiedEDD, DateTime modifiedDOB) {
+        List<AllSubscriptionDetails> subscriptions = makeChangeSubscriptionRequest(msisdn, subscriptionId, pack, modifiedEDD, modifiedDOB, ChangeSubscriptionType.CHANGE_PACK.name());
+        for(AllSubscriptionDetails subscription:subscriptions) {
+            if(SubscriptionStatus.NEW_EARLY.getDisplayString().equals(subscription.getStatus()))
                 return subscription.getSubscriptionId();
         }
         return null;
@@ -233,7 +229,8 @@ public class BaseDataSetup {
         Boolean result = new TimedRunner<Boolean>(20, 6000) {
             public TimedRunnerResponse<Boolean> run() {
                 SubscriptionDetails subscriptionDetails = getSubscriptionDetails(msisdn,subscriptionId);
-                System.out.println("Current status "+subscriptionDetails.getStatus() +" for "+subscriptionId);
+                if(subscriptionDetails !=null)
+                    System.out.println("Current status "+subscriptionDetails.getStatus() +" for "+subscriptionId);
                 return subscriptionDetails != null && subscriptionDetails.getStatus().equals(status) ? new TimedRunnerResponse<>(true) : null;
             }
         }.executeWithTimeout();
@@ -251,5 +248,25 @@ public class BaseDataSetup {
         }
 
         return null;
+    }
+
+    private List<AllSubscriptionDetails> makeChangeSubscriptionRequest(String msisdn, String subscriptionId, String pack, DateTime modifiedEDD, DateTime modifiedDOB, String changeType) {
+        Map<String, String> parametersMap = new HashMap<String, String>(){{
+            put("channel", "contact_center");
+        }};
+        ChangeSubscriptionWebRequest request = new ChangeSubscriptionWebRequest();
+        request.setChangeType(changeType);
+        request.setPack(pack);
+        if(modifiedDOB !=null) request.setDateOfBirth(modifiedDOB.toString("dd-MM-yyyy"));
+        if(modifiedEDD !=null) request.setExpectedDateOfDelivery(modifiedEDD.toString("dd-MM-yyyy"));
+        request.setReason("Change by script");
+
+        restTemplate.put(constructUrl(baseUrl(),"/subscription/"+subscriptionId+"/changesubscription",parametersMap), request,String.class);
+        waitForSubscription(msisdn, subscriptionId, SubscriptionStatus.PENDING_DEACTIVATION.getDisplayString());
+        SubscriberSubscriptions subscriptionDetails = getSubscriptionDetails(msisdn);
+        List<AllSubscriptionDetails> subscriptions = subscriptionDetails.getSubscriptionDetails();
+
+
+        return subscriptions;
     }
 }

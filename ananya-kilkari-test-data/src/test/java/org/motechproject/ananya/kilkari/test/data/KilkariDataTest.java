@@ -285,8 +285,8 @@ public class KilkariDataTest extends BaseDataSetup {
         deactivateSubscription(msisdn,subscriptionId,operator);
 
         moveToTime(eddToChange);
-        waitForSubscription(msisdn,otherSubscriptionId,SubscriptionStatus.PENDING_ACTIVATION.getDisplayString());
-        activateSubscription(msisdn,otherSubscriptionId,operator);
+        waitForSubscription(msisdn, otherSubscriptionId, SubscriptionStatus.PENDING_ACTIVATION.getDisplayString());
+        activateSubscription(msisdn, otherSubscriptionId, operator);
 
         moveToTime(week17);
         currentCampaignId = "WEEK17";
@@ -294,7 +294,50 @@ public class KilkariDataTest extends BaseDataSetup {
         makeOBDCallBack(msisdn, otherSubscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
     }
 
+    @Test
+    public void createCase6(){
+        String operator = getRandomOperator();
+        String pack = SubscriptionPack.BARI_KILKARI.name();
 
+        DateTime activationDate = DateTime.now();
+        DateTime edd = DateTime.now().plusWeeks(2).plusDays(1);
+        DateTime week18 = edd.plusWeeks(1);
+        DateTime week15 = activationDate.plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1).plusDays(1);
+        DateTime week16 = week15.plusWeeks(1);
+
+        moveToTime(DateTime.now());
+
+        String msisdn = createSubscriptionForCallCenter(pack, null, edd.toString("dd-MM-yyyy"));
+        SubscriptionDetails subscriptionDetails = getSubscriptionDetails(msisdn).getSubscriptionDetails().get(0);
+        String subscriptionId = subscriptionDetails.getSubscriptionId();
+        System.out.println(subscriptionId + " " + msisdn);
+
+        moveToTime(activationDate);
+        activateSubscription(msisdn, subscriptionId, operator);
+
+        moveToTime(week15);
+        String currentCampaignId = "WEEK15";
+        waitForCampaignMessage(subscriptionId, currentCampaignId);
+        makeOBDCallBack(msisdn, subscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
+
+        moveToTime(week16);
+        renewSubscription(msisdn, subscriptionId, operator);
+        currentCampaignId = "WEEK16";
+        waitForCampaignMessage(subscriptionId, currentCampaignId);
+        makeOBDCallBack(msisdn, subscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
+
+        String otherSubscriptionId = changePack(msisdn, subscriptionId, SubscriptionPack.NAVJAAT_KILKARI.name(), null, null);
+        deactivateSubscription(msisdn,subscriptionId,operator);
+
+        moveToTime(edd.plusDays(1));
+        waitForSubscription(msisdn, otherSubscriptionId, SubscriptionStatus.PENDING_ACTIVATION.getDisplayString());
+        activateSubscription(msisdn,otherSubscriptionId,operator);
+
+        moveToTime(week18.plusDays(1));
+        currentCampaignId = "WEEK18";
+        waitForCampaignMessage(otherSubscriptionId, currentCampaignId);
+        makeOBDCallBack(msisdn, otherSubscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
+    }
 
 
 }

@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.test.data;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -17,6 +18,7 @@ public class KilkariDataTest extends BaseDataSetup {
 
     private int scheduleDeltaDays;
     private int deltaMinutes;
+
 
     @Before
     public void setUp() {
@@ -343,8 +345,51 @@ public class KilkariDataTest extends BaseDataSetup {
 
     @Test
     public void createCase7() {
+        DateTime startDate = DateTime.now();
+        String operator = getRandomOperator();
+        DateTime activationDate = startDate.plusDays(2);
+        DateTime week1 = activationDate.plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1);
+        DateTime week2 = week1.plusWeeks(1);
+        DateTime week3 = week2.plusWeeks(1);
+        String pack = SubscriptionPack.BARI_KILKARI.name();
+
+        moveToTime(DateTime.now());
+        String msisdn = createSubscriptionForIVR(pack);
+        SubscriptionDetails subscriptionDetails = getSubscriptionDetails(msisdn).getSubscriptionDetails().get(0);
+        String subscriptionId = subscriptionDetails.getSubscriptionId();
+        System.out.println(subscriptionId + " " + msisdn);
+
+        moveToTime(activationDate);
+        activateSubscription(msisdn, subscriptionId, operator);
+
+        moveToTime(week1);
+        String currentCampaignId = "WEEK1";
+        waitForCampaignMessage(subscriptionId, currentCampaignId);
+        makeOBDCallBack(msisdn, subscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
+
+        moveToTime(week2);
+        renewSubscription(msisdn, subscriptionId, operator);
+        currentCampaignId = "WEEK2";
+        waitForCampaignMessage(subscriptionId, currentCampaignId);
+        makeOBDCallBack(msisdn, subscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
+
+        String modifiedMsisdn = "1" + RandomStringUtils.randomNumeric(9);
+        String modifiedSubscriptionId = changeMsisdn(msisdn, modifiedMsisdn, pack);
+        System.out.println("Modified "+modifiedSubscriptionId+" "+modifiedMsisdn);
+
+        waitForSubscription(msisdn, subscriptionId, SubscriptionStatus.PENDING_DEACTIVATION.getDisplayString());
+        deactivateSubscription(msisdn,subscriptionId,operator);
+
+        waitForSubscription(modifiedMsisdn,modifiedSubscriptionId,SubscriptionStatus.PENDING_ACTIVATION.getDisplayString());
+
+        moveToTime(week3);
+        activateSubscription(modifiedMsisdn,modifiedSubscriptionId,operator);
+        currentCampaignId = "WEEK3";
+        waitForCampaignMessage(modifiedSubscriptionId, currentCampaignId);
+        makeOBDCallBack(modifiedMsisdn, modifiedSubscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
 
     }
+
 
 
 }

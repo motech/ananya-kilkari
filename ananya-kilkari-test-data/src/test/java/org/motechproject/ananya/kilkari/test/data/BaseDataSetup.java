@@ -8,10 +8,7 @@ import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.message.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
-import org.motechproject.ananya.kilkari.request.CallDurationWebRequest;
-import org.motechproject.ananya.kilkari.request.CallbackRequest;
-import org.motechproject.ananya.kilkari.request.ChangeSubscriptionWebRequest;
-import org.motechproject.ananya.kilkari.request.OBDSuccessfulCallDetailsWebRequest;
+import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
@@ -165,6 +162,23 @@ public class BaseDataSetup {
                 return subscription.getSubscriptionId();
         }
         return null;
+    }
+
+
+    protected String changeMsisdn(String msisdn, String modifiedMsisdn, final String pack) {
+        Map<String, String> parametersMap = new HashMap<String, String>(){{
+            put("channel", "contact_center");
+        }};
+
+        ArrayList<String> packs = new ArrayList<String>() {{
+            add(pack);
+        }};
+        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest(msisdn, modifiedMsisdn, packs, "contact_center", "Changing MSISDN by script");
+        String response = restTemplate.postForObject(constructUrl(baseUrl(), "/subscriber/changemsisdn", parametersMap), changeMsisdnWebRequest, String.class);
+        System.out.println(response);
+
+        SubscriberSubscriptions subscriptionDetails = getSubscriptionDetails(modifiedMsisdn);
+        return subscriptionDetails.getSubscriptionDetails().get(0).getSubscriptionId();
     }
 
     protected String getRandomOperator(){

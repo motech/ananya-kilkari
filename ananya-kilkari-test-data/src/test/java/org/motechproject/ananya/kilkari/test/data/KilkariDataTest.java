@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.test.data;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -11,6 +12,7 @@ import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@Ignore
 public class KilkariDataTest extends BaseDataSetup {
 
     private int scheduleDeltaDays;
@@ -337,6 +339,11 @@ public class KilkariDataTest extends BaseDataSetup {
         currentCampaignId = "WEEK18";
         waitForCampaignMessage(otherSubscriptionId, currentCampaignId);
         makeOBDCallBack(msisdn, otherSubscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
+    }
+
+    @Test
+    public void createCase7() {
+
     }
 
 

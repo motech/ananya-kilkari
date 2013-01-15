@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service.response;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
@@ -35,7 +36,7 @@ public class SubscriptionDetailsResponse {
         this.expectedDateOfDelivery = DateUtils.formatDate(expectedDateOfDelivery, DateUtils.ISTTimeZone);
         this.startWeekNumber = startWeekNumber;
         this.location = location;
-        this.lastWeeklyMessageScheduledDate = DateUtils.formatDateTime(lastWeeklyMessageScheduledDate);
+        this.lastWeeklyMessageScheduledDate = DateUtils.formatDate(lastWeeklyMessageScheduledDate, DateTimeZone.UTC);
     }
 
     public String getSubscriptionId() {

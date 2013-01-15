@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service.mapper;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +13,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
+import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 
@@ -120,7 +122,7 @@ public class SubscriptionDetailsResponseMapperTest {
         assertEquals(subscriberResponse.getDateOfBirth().toString("dd-MM-yyyy"), response.getDateOfBirth());
         assertEquals(subscriberResponse.getExpectedDateOfDelivery().toString("dd-MM-yyyy"), response.getExpectedDateOfDelivery());
         assertEquals(expectedLocation, response.getLocation());
-        assertEquals(subscriberResponse.getLastScheduledMessageDate().toString("dd-MM-yyyy HH-mm-ss"), response.getLastWeeklyMessageScheduledDate());
+        assertEquals(DateUtils.formatDate(subscriberResponse.getLastScheduledMessageDate(), DateTimeZone.UTC), response.getLastWeeklyMessageScheduledDate());
     }
 
     @Test

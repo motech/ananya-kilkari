@@ -66,7 +66,7 @@ public class BaseDataSetup {
         String channel = "CONTACT_CENTER";
         parametersMap.put("channel", channel);
         restTemplate.postForEntity(constructUrl(baseUrl(), "subscription", parametersMap), subscriptionRequest, String.class);
-//        waitForSubscription(msisdn, , SubscriptionStatus.PENDING_ACTIVATION.getDisplayString());
+        waitForSubscriptionToBeCreated(msisdn);
         return msisdn;
     }
 
@@ -78,6 +78,7 @@ public class BaseDataSetup {
             put("pack",subscriptionRequest.getPack());
         }};
         restTemplate.getForEntity(constructUrl(baseUrl(), "subscription", parametersMap), String.class);
+        waitForSubscriptionToBeCreated(subscriptionRequest.getMsisdn());
         return subscriptionRequest.getMsisdn();
     }
 
@@ -246,6 +247,19 @@ public class BaseDataSetup {
                 if(subscriptionDetails !=null)
                     System.out.println("Current status "+subscriptionDetails.getStatus() +" for "+subscriptionId);
                 return subscriptionDetails != null && subscriptionDetails.getStatus().equals(status) ? new TimedRunnerResponse<>(true) : null;
+            }
+        }.executeWithTimeout();
+        assertNotNull(result);
+        assertTrue(result);
+    }
+
+    protected void waitForSubscriptionToBeCreated(final String msisdn) {
+        Boolean result = new TimedRunner<Boolean>(20, 6000) {
+            public TimedRunnerResponse<Boolean> run() {
+                SubscriberSubscriptions subscriberSubscriptions = getSubscriptionDetails(msisdn);
+                return subscriberSubscriptions != null &&
+                        subscriberSubscriptions.getSubscriptionDetails()!=null &&
+                        subscriberSubscriptions.getSubscriptionDetails().size() > 0 ? new TimedRunnerResponse<>(true) : null;
             }
         }.executeWithTimeout();
         assertNotNull(result);

@@ -4,7 +4,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -13,12 +12,10 @@ import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@Ignore
 public class KilkariDataTest extends BaseDataSetup {
 
     private int scheduleDeltaDays;
     private int deltaMinutes;
-
 
     @Before
     public void setUp() {
@@ -32,7 +29,7 @@ public class KilkariDataTest extends BaseDataSetup {
     }
 
     @Test
-    public void createCase1() {
+    public void shouldCreateDeactivatedSubscription() {
         DateTime startDate = DateTime.now();
         String operator = getRandomOperator();
         DateTime activationDate = startDate.plusDays(2);
@@ -99,7 +96,7 @@ public class KilkariDataTest extends BaseDataSetup {
     }
 
     @Test
-    public void createCase2() {
+    public void shouldCreateDeactivatedSubscriptionDueToSuspension() {
         DateTime startDate = DateTime.now();
         DateTime activationDate = startDate.plusDays(2);
         DateTime week1 = activationDate.plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1);
@@ -155,7 +152,7 @@ public class KilkariDataTest extends BaseDataSetup {
     }
 
     @Test
-    public void createCase3() {
+    public void shouldCreateSubscriptionWhichGoesToCompletion() {
         DateTime startDate = DateTime.now();
 
         DateTime dateOfBirth = startDate.minusWeeks(44).plusDays(1);
@@ -210,7 +207,7 @@ public class KilkariDataTest extends BaseDataSetup {
     }
 
     @Test
-    public void createCase4() {
+    public void shouldCreateSubscriptionWithNewEarly() {
         DateTime startDate = DateTime.now().minusWeeks(1).plusDays(1);
         String operator = getRandomOperator();
 
@@ -253,7 +250,7 @@ public class KilkariDataTest extends BaseDataSetup {
     }
 
     @Test
-    public void createCase5(){
+    public void shouldCreateSubscriptionWithScheduleChange(){
         DateTime startDate = DateTime.now();
         String operator = getRandomOperator();
         String pack = SubscriptionPack.BARI_KILKARI.name();
@@ -299,7 +296,7 @@ public class KilkariDataTest extends BaseDataSetup {
     }
 
     @Test
-    public void createCase6(){
+    public void shouldCreateSubscriptionWithPackChange(){
         String operator = getRandomOperator();
         String pack = SubscriptionPack.BARI_KILKARI.name();
 
@@ -344,7 +341,7 @@ public class KilkariDataTest extends BaseDataSetup {
     }
 
     @Test
-    public void createCase7() {
+    public void shouldCreateSubscriptionWithMSISDNChange() {
         DateTime startDate = DateTime.now();
         String operator = getRandomOperator();
         DateTime activationDate = startDate.plusDays(2);
@@ -389,8 +386,6 @@ public class KilkariDataTest extends BaseDataSetup {
         makeOBDCallBack(modifiedMsisdn, modifiedSubscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
 
     }
-
-
 
 }
 

@@ -33,6 +33,7 @@ public class KilkariDataTest extends BaseDataSetup {
         DateTime startDate = DateTime.now();
         String operator = getRandomOperator();
         DateTime activationDate = startDate.plusDays(2);
+        String pack = SubscriptionPack.BARI_KILKARI.name();
         DateTime week1 = activationDate.plusDays(scheduleDeltaDays).plusMinutes(deltaMinutes + 1);
         DateTime week2 = week1.plusWeeks(1);
         DateTime week3 = week2.plusWeeks(1);
@@ -41,7 +42,7 @@ public class KilkariDataTest extends BaseDataSetup {
         DateTime week6 = week5.plusWeeks(1);
 
         moveToTime(startDate);
-        String msisdn = createSubscriptionForIVR(SubscriptionPack.BARI_KILKARI.name());
+        String msisdn = createSubscriptionForIVR(pack);
         SubscriptionDetails subscriptionDetails = getSubscriptionDetails(msisdn).getSubscriptionDetails().get(0);
         String subscriptionId = subscriptionDetails.getSubscriptionId();
         System.out.println(subscriptionId + " " + msisdn);
@@ -53,6 +54,7 @@ public class KilkariDataTest extends BaseDataSetup {
         String currentCampaignId = "WEEK1";
         waitForCampaignMessage(subscriptionId, currentCampaignId);
         makeOBDCallBack(msisdn, subscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
+        makeInboxCall(msisdn, currentCampaignId, DateTime.now().plusMinutes(15), pack, subscriptionId );
 
         moveToTime(week2);
         renewSubscription(msisdn, subscriptionId, operator);

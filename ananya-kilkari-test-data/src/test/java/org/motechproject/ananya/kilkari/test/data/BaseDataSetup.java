@@ -14,6 +14,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
+import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
 import org.motechproject.ananya.kilkari.test.data.contract.SubscriberSubscriptions;
 import org.motechproject.ananya.kilkari.test.data.contract.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.test.data.contract.builders.SubscriptionRequestBuilder;
@@ -33,6 +34,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 import static org.motechproject.ananya.kilkari.test.data.utils.TestUtils.constructUrl;
 import static org.motechproject.ananya.kilkari.test.data.utils.TestUtils.fromJson;
+import org.motechproject.ananya.kilkari.test.data.contract.InboxCallDetailsWebRequestsList;
 
 @ContextConfiguration("classpath:applicationKilkariTestDataContext.xml")
 @ActiveProfiles("production")
@@ -251,6 +253,23 @@ public class BaseDataSetup {
         }.executeWithTimeout();
         assertNotNull(result);
         assertTrue(result);
+    }
+
+    protected void makeInboxCall(String msisdn, String campaignId, DateTime startTime, String pack, String subscriptionId){
+        Integer maxCallDurationInSeconds = 240;
+        DateTime endTime = startTime.plusSeconds(RandomUtils.nextInt(maxCallDurationInSeconds + 1));
+        CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(DateUtils.formatDateTime(startTime), DateUtils.formatDateTime(endTime));
+        final InboxCallDetailsWebRequest inboxCallDetailsWebRequest = new InboxCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, pack, subscriptionId);
+        InboxCallDetailsWebRequestsList inboxCallDetailsWebRequestsList = new InboxCallDetailsWebRequestsList(new ArrayList<InboxCallDetailsWebRequest>() {{
+            add(inboxCallDetailsWebRequest);
+        }});
+
+        Map<String, String> parametersMap = new HashMap<String, String>(){{
+            put("channel", "ivr");
+
+        }};
+        String response = restTemplate.postForObject(constructUrl(baseUrl(), "inbox/calldetails", parametersMap), inboxCallDetailsWebRequestsList, String.class);
+        System.out.println(response);
     }
 
     protected void waitForSubscriptionToBeCreated(final String msisdn) {

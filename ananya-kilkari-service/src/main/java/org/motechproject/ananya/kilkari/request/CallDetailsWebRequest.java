@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 public class CallDetailsWebRequest implements Serializable {
 
+    private static final long serialVersionUID = -5560971605975834166L;
     @JsonProperty
     private String msisdn;
     @JsonProperty

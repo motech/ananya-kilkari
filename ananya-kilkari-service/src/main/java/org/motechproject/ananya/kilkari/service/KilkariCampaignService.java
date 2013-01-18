@@ -7,9 +7,11 @@ import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertServ
 import org.motechproject.ananya.kilkari.message.service.InboxEventKeys;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
+import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
+import org.motechproject.ananya.reports.kilkari.contract.request.CampaignScheduleAlertRequest;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,7 @@ public class KilkariCampaignService {
     private MessageCampaignService messageCampaignService;
     private KilkariSubscriptionService kilkariSubscriptionService;
     private CampaignMessageAlertService campaignMessageAlertService;
+    private ReportingService reportingService;
     private InboxService inboxService;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariCampaignService.class);
@@ -39,11 +42,12 @@ public class KilkariCampaignService {
     public KilkariCampaignService(MessageCampaignService messageCampaignService,
                                   KilkariSubscriptionService kilkariSubscriptionService,
                                   CampaignMessageAlertService campaignMessageAlertService,
-                                  InboxService inboxService,
+                                  ReportingService reportingService, InboxService inboxService,
                                   MotechSchedulerService motechSchedulerService) {
         this.messageCampaignService = messageCampaignService;
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.campaignMessageAlertService = campaignMessageAlertService;
+        this.reportingService = reportingService;
         this.inboxService = inboxService;
         this.motechSchedulerService = motechSchedulerService;
     }
@@ -55,7 +59,7 @@ public class KilkariCampaignService {
         for (Subscription subscription : subscriptionList) {
             String subscriptionId = subscription.getSubscriptionId();
             try {
-                if (subscription.isEarlySubscription()) {
+                if (subscription.isNewEarly()) {
                     subscriptionEventsMap.put("Early Subscription for " + subscriptionId, getSchedules(subscriptionId, SubscriptionEventKeys.EARLY_SUBSCRIPTION,
                             subscription.getCreationDate().toDate(), subscription.getStartDate().toDate()));
                     continue;
@@ -99,6 +103,7 @@ public class KilkariCampaignService {
         final String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId, campaignName), subscription.getPack());
         final DateTime messageExpiryDate = subscription.getCurrentWeeksMessageExpiryDate();
 
+        reportingService.reportCampaignScheduleAlertReceived(new CampaignScheduleAlertRequest(subscriptionId, messageId, DateTime.now()));
         campaignMessageAlertService.scheduleCampaignMessageAlert(subscriptionId, messageId, messageExpiryDate, subscription.getMsisdn(), subscription.getOperator().name());
 
         if (subscription.hasBeenActivated())

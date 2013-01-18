@@ -67,7 +67,7 @@ public class ValidationUtils {
         return !(numberOfOptions > 1);
     }
 
-  public static boolean assertExactlyOnePresent(String... args) {
+    public static boolean assertExactlyOnePresent(String... args) {
         List<Boolean> checks = new ArrayList<>();
         for (String arg : args)
             checks.add(StringUtils.isNotEmpty(arg));
@@ -80,5 +80,9 @@ public class ValidationUtils {
         });
 
         return !(numberOfOptions != 1);
+    }
+
+    public static boolean assertAlphanumericWithDot(String value) {
+        return StringUtils.isAlphanumericSpace(StringUtils.replace(value, ".", ""));
     }
 }

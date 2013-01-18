@@ -1,8 +1,9 @@
 package org.motechproject.ananya.kilkari.builder;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
+import org.motechproject.ananya.kilkari.request.LocationRequest;
+import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 public class SubscriptionWebRequestBuilder {
@@ -19,10 +20,10 @@ public class SubscriptionWebRequestBuilder {
         subscriptionWebRequest.setChannel(Channel.CONTACT_CENTER.name());
         subscriptionWebRequest.setMsisdn("9876543210");
         subscriptionWebRequest.setBeneficiaryAge("25");
+
+        withLocation("district", "block", "panchayat");
+
         subscriptionWebRequest.setBeneficiaryName("name");
-        subscriptionWebRequest.setDistrict("district");
-        subscriptionWebRequest.setBlock("block");
-        subscriptionWebRequest.setPanchayat("panchayat");
         subscriptionWebRequest.setDateOfBirth(null);
         subscriptionWebRequest.setExpectedDateOfDelivery(null);
         subscriptionWebRequest.setCreatedAt(DateTime.now());
@@ -73,19 +74,17 @@ public class SubscriptionWebRequestBuilder {
         return subscriptionWebRequest;
     }
 
-    public SubscriptionWebRequestBuilder withDistrict(String district) {
-        subscriptionWebRequest.setDistrict(district);
+    public SubscriptionWebRequestBuilder withLocation(LocationRequest location) {
+        subscriptionWebRequest.setLocation(location);
         return this;
     }
 
-    public SubscriptionWebRequestBuilder withBlock(String block) {
-        subscriptionWebRequest.setBlock(block);
-        return this;
-    }
-
-    public SubscriptionWebRequestBuilder withPanchayat(String panchayat) {
-        subscriptionWebRequest.setPanchayat(panchayat);
-        return this;
+    public SubscriptionWebRequestBuilder withLocation(final String district, final String block, final String panchayat) {
+        return withLocation(new LocationRequest() {{
+            setDistrict(district);
+            setBlock(block);
+            setPanchayat(panchayat);
+        }});
     }
 
     public SubscriptionWebRequestBuilder withCreatedAt(DateTime createdAt) {

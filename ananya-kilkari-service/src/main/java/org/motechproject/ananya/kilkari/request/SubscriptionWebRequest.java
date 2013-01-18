@@ -7,116 +7,114 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 
+@XmlRootElement(name = "subscription")
 public class SubscriptionWebRequest implements Serializable {
+    private static final long serialVersionUID = -6320440975475940990L;
     @JsonProperty
+    @XmlElement
     private String msisdn;
     @JsonProperty
+    @XmlElement
     private String pack;
     @JsonProperty
+    @XmlElement
     private String beneficiaryName;
     @JsonProperty
+    @XmlElement
     private String beneficiaryAge;
     @JsonProperty
+    @XmlElement
     private String expectedDateOfDelivery;
     @JsonProperty
+    @XmlElement
     private String dateOfBirth;
     @JsonProperty
+    @XmlElement
     private String week;
     @JsonProperty
+    @XmlElement
     private LocationRequest location;
 
     @JsonIgnore
+    @XmlTransient
     private String channel;
     @JsonIgnore
+    @XmlTransient
     private DateTime createdAt;
 
     public SubscriptionWebRequest() {
-        this.location = new LocationRequest();
         this.createdAt = DateTime.now();
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getMsisdn() {
         return msisdn;
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getPack() {
         return pack;
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getChannel() {
         return channel;
     }
 
     @JsonIgnore
+    @XmlTransient
     public DateTime getCreatedAt() {
         return createdAt;
     }
 
     @JsonIgnore
+    @XmlTransient
     public String getBeneficiaryName() {
         return beneficiaryName;
     }
 
     @JsonIgnore
+    @XmlTransient
     public Integer getBeneficiaryAge() {
         return StringUtils.isNotEmpty(beneficiaryAge) ? Integer.parseInt(beneficiaryAge) : null;
     }
 
     @JsonIgnore
+    @XmlTransient
     public DateTime getExpectedDateOfDelivery() {
         return parseDateTime(expectedDateOfDelivery);
     }
 
     @JsonIgnore
+    @XmlTransient
     public DateTime getDateOfBirth() {
         return parseDateTime(dateOfBirth);
     }
 
     @JsonIgnore
-    public String getDistrict() {
-        return location == null ? null : location.getDistrict();
+    @XmlTransient
+    public Location getLocation() {
+        return location == null ? null : new Location(location.getDistrict(), location.getBlock(), location.getPanchayat());
     }
 
     @JsonIgnore
-    public String getBlock() {
-        return location == null ? null : location.getBlock();
-    }
-
-    @JsonIgnore
-    public String getPanchayat() {
-        return location == null ? null : location.getPanchayat();
-    }
-
-    @JsonIgnore
-    public LocationRequest getLocation() {
-        return location;
-    }
-
-    @JsonIgnore
+    @XmlTransient
     public String getWeek() {
         return week;
-    }
-
-    public void setDistrict(String district) {
-        location.setDistrict(district);
-    }
-
-    public void setBlock(String block) {
-        location.setBlock(block);
-    }
-
-    public void setPanchayat(String panchayat) {
-        location.setPanchayat(panchayat);
     }
 
     public void setBeneficiaryName(String beneficiaryName) {
@@ -155,12 +153,18 @@ public class SubscriptionWebRequest implements Serializable {
         this.msisdn = msisdn;
     }
 
+    public void setLocation(LocationRequest location) {
+        this.location = location;
+    }
+
     public Errors validate() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
         webRequestValidator.validateMsisdn(msisdn);
         webRequestValidator.validatePack(pack);
         webRequestValidator.validateChannel(channel);
         if (!Channel.isIVR(channel)) {
+            webRequestValidator.validateLocation(location);
+            webRequestValidator.validateName(beneficiaryName);
             webRequestValidator.validateAge(beneficiaryAge);
             webRequestValidator.validateOnlyOneOfEDDOrDOBOrWeekNumberPresent(expectedDateOfDelivery, dateOfBirth, week);
             webRequestValidator.validateDOB(dateOfBirth, createdAt);
@@ -168,7 +172,6 @@ public class SubscriptionWebRequest implements Serializable {
             webRequestValidator.validateWeekNumber(week);
         }
         return webRequestValidator.getErrors();
-
     }
 
     public void validateChannel() {

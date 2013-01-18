@@ -28,22 +28,28 @@ import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionDetailsResponseMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
+import org.motechproject.ananya.kilkari.sync.service.RefdataSyncService;
+import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberChangeMsisdnReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
@@ -87,12 +93,16 @@ public class SubscriptionServiceTest {
     private ChangeMsisdnValidator changeMsisdnValidator;
     @Mock
     private UnsubscriptionValidator unsubscriptionValidator;
+    @Mock
+    private RefdataSyncService refdataSyncService;
+    @Mock
+    private SubscriptionDetailsResponseMapper subscriptionDetailsResponseMapper;
 
     @Before
     public void setUp() {
         initMocks(this);
         subscriptionService = new SubscriptionService(allSubscriptions, onMobileSubscriptionManagerPublisher, subscriptionValidator, reportingServiceImpl,
-                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator, unsubscriptionValidator);
+                inboxService, messageCampaignService, onMobileSubscriptionGateway, campaignMessageService, campaignMessageAlertService, kilkariPropertiesData, motechSchedulerService, changeMsisdnValidator, unsubscriptionValidator, refdataSyncService, subscriptionDetailsResponseMapper);
     }
 
     @Test
@@ -101,7 +111,9 @@ public class SubscriptionServiceTest {
         Channel channel = Channel.IVR;
         SubscriptionPack subscriptionPack = SubscriptionPack.NAVJAAT_KILKARI;
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
-        SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
+        Integer weekNumber = 7;
+        SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn)
+                .withPack(subscriptionPack).withWeek(weekNumber).build();
 
         Subscription createdSubscription = subscriptionService.createSubscription(subscription, channel);
 
@@ -109,6 +121,7 @@ public class SubscriptionServiceTest {
         verify(allSubscriptions).add(subscriptionArgumentCaptor.capture());
         Subscription subscriptionSaved = subscriptionArgumentCaptor.getValue();
         assertEquals(msisdn, subscriptionSaved.getMsisdn());
+        assertEquals(weekNumber, subscriptionSaved.getStartWeekNumber());
         assertEquals(subscriptionPack, subscriptionSaved.getPack());
         assertEquals(createdSubscription, subscriptionSaved);
     }
@@ -137,6 +150,7 @@ public class SubscriptionServiceTest {
         verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class), any(Integer.class), any(Integer.class));
         verify(reportingServiceImpl, never()).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
         verify(onMobileSubscriptionManagerPublisher, never()).sendActivationRequest(any(OMSubscriptionRequest.class));
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -168,11 +182,11 @@ public class SubscriptionServiceTest {
     public void shouldGetSubscriptionsResponseForAGivenMsisdn() {
         String msisdn = "1234567890";
         ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
-        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription1.setStatus(SubscriptionStatus.NEW);
         subscriptionsToBeReturned.add(subscription1);
 
-        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription2.setStatus(SubscriptionStatus.NEW);
         subscriptionsToBeReturned.add(subscription2);
 
@@ -192,11 +206,11 @@ public class SubscriptionServiceTest {
         String msisdn = "1234567890";
         ArrayList<Subscription> subscriptionsToBeReturned = new ArrayList<>();
         SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
-        Subscription subscription1 = new Subscription(msisdn, pack, DateTime.now(), DateTime.now());
+        Subscription subscription1 = new Subscription(msisdn, pack, DateTime.now(), DateTime.now(), null);
         subscription1.setStatus(SubscriptionStatus.NEW);
         subscriptionsToBeReturned.add(subscription1);
 
-        Subscription subscription2 = new Subscription(msisdn, pack, DateTime.now(), DateTime.now());
+        Subscription subscription2 = new Subscription(msisdn, pack, DateTime.now(), DateTime.now(), null);
         subscription2.setStatus(SubscriptionStatus.NEW);
         subscriptionsToBeReturned.add(subscription2);
 
@@ -315,6 +329,7 @@ public class SubscriptionServiceTest {
         assertEquals(status.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(reason, subscriptionStateChangeReportRequest.getReason());
         assertEquals(operator, subscriptionStateChangeReportRequest.getOperator());
+        assertNull(subscriptionStateChangeReportRequest.getWeekNumber());
     }
 
     @Test
@@ -399,6 +414,7 @@ public class SubscriptionServiceTest {
         assertEquals(operator, stateChangeReportRequest.getOperator());
         assertEquals(subscriptionId, stateChangeReportRequest.getSubscriptionId());
         assertEquals(SubscriptionStatus.ACTIVE.name(), stateChangeReportRequest.getSubscriptionStatus());
+        assertEquals(1, (int) stateChangeReportRequest.getWeekNumber());
 
         ArgumentCaptor<MessageCampaignRequest> messageCampaignRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
         ArgumentCaptor<Integer> actualDeltaDays = ArgumentCaptor.forClass(Integer.class);
@@ -417,7 +433,8 @@ public class SubscriptionServiceTest {
         DateTime renewalDate = DateTime.now();
         int graceCount = 2;
 
-        Subscription subscription = new Subscription("123", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("123").withPack(SubscriptionPack.NAVJAAT_KILKARI)
+                .withScheduleStartDate(DateTime.now().minusWeeks(3)).build();
         final String subscriptionId = subscription.getSubscriptionId();
 
         subscription.setStatus(SubscriptionStatus.SUSPENDED);
@@ -436,6 +453,7 @@ public class SubscriptionServiceTest {
         assertEquals(SubscriptionStatus.ACTIVE.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(renewalDate, subscriptionStateChangeReportRequest.getCreatedAt());
         assertEquals((Integer) graceCount, subscriptionStateChangeReportRequest.getGraceCount());
+        assertEquals(20, (int) subscriptionStateChangeReportRequest.getWeekNumber());
     }
 
     @Test
@@ -444,7 +462,8 @@ public class SubscriptionServiceTest {
         final DateTime renewalDate = DateTime.now();
         final String reason = "Balance Low";
         final int graceCount = 0;
-        Subscription subscription = new Subscription("1234", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("123").withPack(SubscriptionPack.NAVJAAT_KILKARI)
+                .withScheduleStartDate(DateTime.now().minusWeeks(3)).build();
 
         final String subscriptionId = subscription.getSubscriptionId();
         subscription.setStatus(SubscriptionStatus.ACTIVE);
@@ -462,19 +481,17 @@ public class SubscriptionServiceTest {
         assertEquals(SubscriptionStatus.SUSPENDED.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(renewalDate, subscriptionStateChangeReportRequest.getCreatedAt());
         assertEquals((Integer) graceCount, subscriptionStateChangeReportRequest.getGraceCount());
+        assertEquals(20, (int) subscriptionStateChangeReportRequest.getWeekNumber());
     }
 
     @Test
     public void shouldDeactivateSubscriptionWithAppropriateReason() {
-        final String subscriptionId = "sub123";
         DateTime date = DateTime.now();
         String reason = "balance is low";
         Integer graceCount = 7;
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now()) {
-            public String getSubscriptionId() {
-                return subscriptionId;
-            }
-        };
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.BARI_KILKARI)
+                .withScheduleStartDate(date.minusWeeks(4)).build();
+        String subscriptionId = subscription.getSubscriptionId();
         subscription.setStatus(SubscriptionStatus.SUSPENDED);
 
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -490,6 +507,7 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(SubscriptionStatus.DEACTIVATED.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(date, subscriptionStateChangeReportRequest.getCreatedAt());
+        assertEquals(5, (int) subscriptionStateChangeReportRequest.getWeekNumber());
         assertEquals(graceCount, subscriptionStateChangeReportRequest.getGraceCount());
     }
 
@@ -506,9 +524,9 @@ public class SubscriptionServiceTest {
     public void shouldRequestDeactivation() {
         String subscriptionId = "subscriptionId";
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn)
+                .withScheduleStartDate(DateTime.now()).build();
         subscription.setStatus(SubscriptionStatus.NEW);
-
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         Channel channel = Channel.IVR;
 
@@ -551,6 +569,7 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, subscriptionStateChangeReportRequest.getSubscriptionId());
         assertEquals(SubscriptionStatus.PENDING_COMPLETION.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals("Subscription completed", subscriptionStateChangeReportRequest.getReason());
+        assertNotNull(subscriptionStateChangeReportRequest.getWeekNumber());
 
         ArgumentCaptor<OMSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         verify(onMobileSubscriptionGateway).deactivateSubscription(processSubscriptionRequestArgumentCaptor.capture());
@@ -568,7 +587,8 @@ public class SubscriptionServiceTest {
     public void shouldScheduleInboxDeletionUponSubscriptionCompletion() {
         String msisdn = "1234567890";
         SubscriptionPack pack = SubscriptionPack.NANHI_KILKARI;
-        Subscription subscription = new Subscription(msisdn, pack, DateTime.now(), DateTime.now());
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(pack)
+                .withScheduleStartDate(DateTime.now()).build();
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -597,7 +617,8 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldScheduleInboxDeletionUponSubscriptionDeactivation() {
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890")
+                .withScheduleStartDate(DateTime.now()).build();
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
@@ -682,16 +703,22 @@ public class SubscriptionServiceTest {
 
         subscriptionService.updateSubscriberDetails(request);
 
+        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
         verify(reportingServiceImpl, never()).reportSubscriberDetailsChange(request.getSubscriptionId(), any(SubscriberReportRequest.class));
     }
 
     @Test
-    public void shouldPublishASubscriberUpdateEvent() {
+    public void shouldPublishASubscriberUpdateEventWithLocation() {
         String subscriptionId = "subscriptionId";
-        Location location = new Location("district", "block", "panchayat");
+        String district = "district";
+        String block = "block";
+        String panchayat = "panchayat";
+        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
 
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CONTACT_CENTER.name(), DateTime.now(), "name", 23,
-                location));
+                new Location(district, block, panchayat)));
+
+        verify(reportingServiceImpl).getLocation(district, block, panchayat);
 
         ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
         ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
@@ -702,9 +729,28 @@ public class SubscriptionServiceTest {
         assertEquals(subscriptionId, actualSubscriptionId);
         assertEquals(23, (int) reportRequest.getBeneficiaryAge());
         assertEquals("name", reportRequest.getBeneficiaryName());
-        assertEquals("district", reportRequest.getLocation().getDistrict());
-        assertEquals("block", reportRequest.getLocation().getBlock());
-        assertEquals("panchayat", reportRequest.getLocation().getPanchayat());
+        assertEquals(district, reportRequest.getLocation().getDistrict());
+        assertEquals(block, reportRequest.getLocation().getBlock());
+        assertEquals(panchayat, reportRequest.getLocation().getPanchayat());
+    }
+
+    @Test
+    public void shouldPublishASubscriberUpdateEventWithoutALocation() {
+        String subscriptionId = "subscriptionId";
+        when(reportingServiceImpl.getLocation(anyString(), anyString(), anyString())).thenReturn(null);
+
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CONTACT_CENTER.name(), DateTime.now(), "name", 23,
+                Location.NULL));
+
+        ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
+        ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
+        verify(reportingServiceImpl).reportSubscriberDetailsChange(subscriptionIdCaptor.capture(), requestCaptor.capture());
+        SubscriberReportRequest reportRequest = requestCaptor.getValue();
+        String actualSubscriptionId = subscriptionIdCaptor.getValue();
+        assertEquals(subscriptionId, actualSubscriptionId);
+        assertEquals(23, (int) reportRequest.getBeneficiaryAge());
+        assertEquals("name", reportRequest.getBeneficiaryName());
+        assertNull(reportRequest.getLocation());
     }
 
     @Test
@@ -927,19 +973,22 @@ public class SubscriptionServiceTest {
     public void shouldChangeMsisdn() {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER);
+        DateTime now = DateTime.now();
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER, null);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.NANHI_KILKARI));
 
-        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now().minusWeeks(2).minusHours(1), DateTime.now());
+        Subscription subscription1 = new SubscriptionBuilder().withDefaults().withMsisdn(oldMsisdn).withPack(SubscriptionPack.NANHI_KILKARI)
+                .withCreationDate(now.minusWeeks(2).minusHours(1)).withStartDate(now).withScheduleStartDate(now).build();
         subscription1.setStatus(SubscriptionStatus.ACTIVE);
         String subscriptionId = subscription1.getSubscriptionId();
 
-        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription2 = new SubscriptionBuilder().withDefaults().withMsisdn(oldMsisdn).withPack(SubscriptionPack.NAVJAAT_KILKARI)
+                .withCreationDate(now).withStartDate(now).withScheduleStartDate(now).build();
         subscription2.setStatus(SubscriptionStatus.ACTIVE);
 
         String beneficiaryName = "name";
         Integer beneficiaryAge = 25;
-        SubscriberResponse subscriberResponse = new SubscriberResponse(beneficiaryName, beneficiaryAge, null, null, null);
+        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", beneficiaryName, beneficiaryAge, null, null, null, null);
 
         when(allSubscriptions.findUpdatableSubscriptions(oldMsisdn)).thenReturn(Arrays.asList(subscription1, subscription2));
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription1);
@@ -991,18 +1040,17 @@ public class SubscriptionServiceTest {
         assertEquals(SubscriptionPack.NANHI_KILKARI, actualActivationRequest.getPack());
     }
 
-
     @Test
     public void shouldChangeMsisdnForEarlySubscription() {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER);
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER, null);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.NANHI_KILKARI));
 
-        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription1.setStatus(SubscriptionStatus.NEW_EARLY);
 
-        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription2.setStatus(SubscriptionStatus.ACTIVE);
 
 
@@ -1020,7 +1068,10 @@ public class SubscriptionServiceTest {
         assertEquals(subscription1.getMsisdn(), updatedSubscription.getMsisdn());
 
         verifyZeroInteractions(onMobileSubscriptionManagerPublisher);
-        verify(reportingServiceImpl).reportChangeMsisdnForSubscriber(subscription1.getSubscriptionId(), newMsisdn);
+        ArgumentCaptor<SubscriberChangeMsisdnReportRequest> requestArgumentCaptor = ArgumentCaptor.forClass(SubscriberChangeMsisdnReportRequest.class);
+        verify(reportingServiceImpl).reportChangeMsisdnForEarlySubscription(requestArgumentCaptor.capture());
+        SubscriberChangeMsisdnReportRequest reportRequest = requestArgumentCaptor.getValue();
+        assertEquals(newMsisdn, reportRequest.getMsisdn().toString());
     }
 
     @Test
@@ -1029,13 +1080,15 @@ public class SubscriptionServiceTest {
         final String subscriptionId = "subscriptionId";
         String reason = "Some reason";
         DateTime deactivationDate = DateTime.now();
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now()) {
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null) {
             public String getSubscriptionId() {
                 return subscriptionId;
             }
         };
         subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        int bufferForDeactivationInDays = 2;
+        when(kilkariPropertiesData.getBufferDaysToAllowRenewalForDeactivation()).thenReturn(bufferForDeactivationInDays);
 
         subscriptionService.processDeactivation(subscriptionId, deactivationDate, reason, graceCount);
 
@@ -1044,20 +1097,19 @@ public class SubscriptionServiceTest {
         RunOnceSchedulableJob actualSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
         assertEquals(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, actualSchedulableJob.getMotechEvent().getSubject());
         ScheduleDeactivationRequest scheduleDeactivationRequest = (ScheduleDeactivationRequest) actualSchedulableJob.getMotechEvent().getParameters().get("0");
+        verify(kilkariPropertiesData).getBufferDaysToAllowRenewalForDeactivation();
+        verify(kilkariPropertiesData, times(0)).getBufferDaysToAllowRenewalForPackCompletion();
         assertEquals(new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount), scheduleDeactivationRequest);
     }
 
     @Test
     public void processDeactivationForSubscriptionCompletionShouldNotScheduleDeactivation() {
-        final String subscriptionId = "sub123";
         DateTime date = DateTime.now();
         String reason = "balance is low";
         Integer graceCount = 7;
-        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now()) {
-            public String getSubscriptionId() {
-                return subscriptionId;
-            }
-        };
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.BARI_KILKARI)
+                .withScheduleStartDate(date.minusWeeks(12)).build();
+        String subscriptionId = subscription.getSubscriptionId();
         subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -1072,12 +1124,13 @@ public class SubscriptionServiceTest {
         assertEquals(SubscriptionStatus.COMPLETED.name(), subscriptionStateChangeReportRequest.getSubscriptionStatus());
         assertEquals(date, subscriptionStateChangeReportRequest.getCreatedAt());
         assertEquals(graceCount, subscriptionStateChangeReportRequest.getGraceCount());
+        assertEquals(13, (int) subscriptionStateChangeReportRequest.getWeekNumber());
     }
 
     @Test
     public void shouldNotUpdateInboxDuringRenewalWhenMessageHasNotAlreadyBeenScheduled() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription.setStatus(SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
@@ -1092,7 +1145,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldNotUpdateInboxDuringRenewalnWhenMessageHasAlreadyBeenScheduled() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
         subscription.setStatus(SubscriptionStatus.NEW);
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
@@ -1109,7 +1162,8 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldCallCampaignMessageAlertServiceOnRenewal() {
         String msisdn = "1234567890";
-        Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now());
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn)
+                .withScheduleStartDate(DateTime.now()).build();
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         String subscriptionId = subscription.getSubscriptionId();
         Operator operator = Operator.AIRTEL;
@@ -1122,8 +1176,8 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldUnsubscribeASubscription(){
-        Subscription subscription = new Subscription("9988776655", SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now());
+    public void shouldUnsubscribeASubscription() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("9988776655").withScheduleStartDate(DateTime.now()).build();
         String subscriptionId = subscription.getSubscriptionId();
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         DeactivationRequest deactivationRequest = new DeactivationRequest(subscriptionId, Channel.CONTACT_CENTER, DateTime.now(), "Reason");
@@ -1137,5 +1191,194 @@ public class SubscriptionServiceTest {
         verify(allSubscriptions).update(Matchers.<Subscription>any());
         verify(onMobileSubscriptionManagerPublisher).processDeactivation(Matchers.<OMSubscriptionRequest>any());
         verify(reportingServiceImpl).reportSubscriptionStateChange(Matchers.<SubscriptionStateChangeRequest>any());
+    }
+
+    @Test
+    public void shouldSyncLocationIfItDoesNotExistWhenCreatingSubscription() {
+        String district = "d";
+        String block = "b";
+        String panchayat = "p";
+        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withLocation(district, block, panchayat).build();
+        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
+
+        subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
+
+        InOrder order = inOrder(reportingServiceImpl, onMobileSubscriptionManagerPublisher, refdataSyncService);
+        order.verify(reportingServiceImpl).getLocation(district, block, panchayat);
+        order.verify(reportingServiceImpl).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
+        order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(any(OMSubscriptionRequest.class));
+        order.verify(refdataSyncService).syncNewLocation(district, block, panchayat);
+    }
+
+    @Test
+    public void shouldNotSyncLocationIfNotProvidedWhileCreatingSubscription() {
+        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withLocation(Location.NULL).build();
+
+        subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
+
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void shouldNotSyncWhenLocationAlreadyExistsWhenCreatingSubscription() {
+        String district = "d";
+        String block = "b";
+        String panchayat = "p";
+        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withLocation(district, block, panchayat).build();
+        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(new LocationResponse());
+
+        subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
+
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void shouldNotFetchLocationIfTheRequestDoesNotHaveLocation_WhenCreatingSubscription() {
+        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults()
+                .withLocation(Location.NULL).build();
+
+        subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
+
+        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void shouldSyncLocationIfItDoesNotExistWhenUpdatingSubscriberDetails() {
+        String district = "d";
+        String block = "b";
+        String panchayat = "p";
+        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
+
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(district, block, panchayat)));
+
+        InOrder order = inOrder(reportingServiceImpl, refdataSyncService);
+        order.verify(reportingServiceImpl).getLocation(district, block, panchayat);
+        order.verify(reportingServiceImpl).reportSubscriberDetailsChange(anyString(), any(SubscriberReportRequest.class));
+        order.verify(refdataSyncService).syncNewLocation(district, block, panchayat);
+    }
+
+    @Test
+    public void shouldNotSyncLocationIfNotProvidedWhileUpdatingSubscriberDetails() {
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, null));
+
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void shouldNotSyncIfLocationAlreadyExistsWhenUpdatingSubscriberDetails() {
+        String district = "d";
+        String block = "b";
+        String panchayat = "p";
+        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(new LocationResponse());
+
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(district, block, panchayat)));
+
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void shouldNotFetchLocationIfTheRequestDoesNotHaveLocation_WhenUpdatingSubscriberDetails() {
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, Location.NULL));
+
+        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void shouldGetSubscriptionDetailsAndAlsoFromReportIfChannelIsContactCenter() {
+        String msisdn = "1234567890";
+        SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).build();
+        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), null, new LocationResponse("d", "b", "p"));
+        ArrayList<Subscription> subscriptionList = new ArrayList<>();
+        subscriptionList.add(subscription);
+        ArrayList<SubscriberResponse> subscriberResponseList = new ArrayList<>();
+        subscriberResponseList.add(subscriberResponse);
+        ArrayList<SubscriptionDetailsResponse> expectedResponse = new ArrayList<>();
+        expectedResponse.add(new SubscriptionDetailsResponse(null, pack, null, null));
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionList);
+        when(reportingServiceImpl.getSubscribersByMsisdn(msisdn)).thenReturn(subscriberResponseList);
+        when(subscriptionDetailsResponseMapper.map(subscriptionList, subscriberResponseList)).thenReturn(expectedResponse);
+
+        List<SubscriptionDetailsResponse> actualResponse = subscriptionService.getSubscriptionDetails(msisdn, Channel.CONTACT_CENTER);
+
+        verify(allSubscriptions).findByMsisdn(msisdn);
+        verify(reportingServiceImpl).getSubscribersByMsisdn(msisdn);
+        verify(subscriptionDetailsResponseMapper).map(subscriptionList, subscriberResponseList);
+        assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    public void shouldGetSubscriptionDetailsOnlyFromTransactionalDBAndNotFromReportIfChannelIsIVR() {
+        String msisdn = "1234567890";
+        SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).build();
+        ArrayList<Subscription> subscriptionList = new ArrayList<>();
+        subscriptionList.add(subscription);
+        ArrayList<SubscriptionDetailsResponse> expectedResponse = new ArrayList<>();
+        expectedResponse.add(new SubscriptionDetailsResponse(null, pack, null, null));
+        when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionList);
+        when(subscriptionDetailsResponseMapper.map(subscriptionList, Collections.EMPTY_LIST)).thenReturn(expectedResponse);
+
+        List<SubscriptionDetailsResponse> actualResponse = subscriptionService.getSubscriptionDetails(msisdn, Channel.IVR);
+
+        verify(allSubscriptions).findByMsisdn(msisdn);
+        verify(reportingServiceImpl, never()).getSubscribersByMsisdn(anyString());
+        verify(subscriptionDetailsResponseMapper).map(subscriptionList, Collections.EMPTY_LIST);
+        assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    public void shouldUpdateToLatestMsisdnForAnEarlySubscriptionActivationSentToSMWhenMsisdnChanged() {
+        String subscriptionId = "subscriptionId";
+        String oldMsisdn = "123467890";
+        SubscriptionPack pack = SubscriptionPack.NANHI_KILKARI;
+        Channel channel = Channel.IVR;
+        String newMsisdn = "1234567891";
+        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(oldMsisdn, pack, channel, subscriptionId);
+        Subscription subscription = new Subscription(newMsisdn, pack, DateTime.now(), DateTime.now().plusDays(20), 1);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.initiateActivationRequestForEarlySubscription(omSubscriptionRequest);
+
+        ArgumentCaptor<OMSubscriptionRequest> captor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
+        verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(captor.capture());
+        OMSubscriptionRequest actualOMSubscriptionRequest = captor.getValue();
+        assertEquals(subscriptionId, actualOMSubscriptionRequest.getSubscriptionId());
+        assertEquals(newMsisdn, actualOMSubscriptionRequest.getMsisdn());
+        assertEquals(channel, actualOMSubscriptionRequest.getChannel());
+        assertEquals(pack, actualOMSubscriptionRequest.getPack());
+    }
+
+    @Test
+    public void shouldCalculateWeekNumberBasedOnPackAndActivationDateIfTheSubscriptionIsActive() {
+        DateTime now = DateTime.now();
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withScheduleStartDate(now.minusWeeks(4)).withPack(SubscriptionPack.NAVJAAT_KILKARI).withStatus(SubscriptionStatus.ACTIVE).build();
+        String subscriptionId = subscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.renewSubscription(subscription.getSubscriptionId(), now, null);
+
+        ArgumentCaptor<SubscriptionStateChangeRequest> reportRequestCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
+        verify(reportingServiceImpl).reportSubscriptionStateChange(reportRequestCaptor.capture());
+        SubscriptionStateChangeRequest request = reportRequestCaptor.getValue();
+        assertEquals(Integer.valueOf(21), request.getWeekNumber());
+    }
+
+    @Test
+    public void shouldReturnNullWeekNumberIfScheduleStartDateIsNull_WhenSubscriptionHasNotBeenActivated(){
+        DateTime now = DateTime.now();
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.NANHI_KILKARI, now, now.plusWeeks(4), null);
+        subscription.setStatus(SubscriptionStatus.NEW_EARLY);
+        String subscriptionId = subscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.CONTACT_CENTER, now.plusDays(2), "Reason"));
+
+        ArgumentCaptor<SubscriptionStateChangeRequest> reportRequestCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
+        verify(reportingServiceImpl).reportSubscriptionStateChange(reportRequestCaptor.capture());
+        SubscriptionStateChangeRequest request = reportRequestCaptor.getValue();
+        assertNull(request.getWeekNumber());
     }
 }

@@ -19,7 +19,7 @@ public class SubscriberRequest {
         this.createdAt = createdAt;
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
-        this.location = location;
+        this.location = location == null ? Location.NULL : location;
     }
 
     public String getSubscriptionId() {
@@ -42,23 +42,11 @@ public class SubscriberRequest {
         return beneficiaryAge;
     }
 
-    public String getBlock() {
-        return location.getBlock();
-    }
-
-    public String getDistrict() {
-        return location.getDistrict();
-    }
-
-    public String getPanchayat() {
-        return location.getPanchayat();
-    }
-
     public Location getLocation() {
-        return location == null ? Location.NULL : location;
+        return location;
     }
 
     public boolean hasLocation() {
-        return !Location.NULL.equals(getLocation());
+        return location != Location.NULL;
     }
 }

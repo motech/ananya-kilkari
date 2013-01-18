@@ -101,7 +101,7 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
         Location location = locationList.get(random.nextInt(locationList.size()));
         return new SubscriptionWebRequestBuilder()
                 .withDefaults()
-                .withDistrict(location.getDistrict()).withBlock(location.getBlock()).withPanchayat(location.getPanchayat())
+                .withLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())
                 .withMsisdn(getRandomMsisdn())
                 .build();
     }

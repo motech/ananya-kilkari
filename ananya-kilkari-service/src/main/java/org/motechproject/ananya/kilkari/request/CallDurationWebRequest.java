@@ -11,6 +11,7 @@ import org.motechproject.ananya.kilkari.subscription.validators.ValidationUtils;
 import java.io.Serializable;
 
 public class CallDurationWebRequest implements Serializable {
+    private static final long serialVersionUID = 3563680146653893106L;
     @JsonProperty
     private String startTime;
     @JsonProperty

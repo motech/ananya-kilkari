@@ -18,6 +18,8 @@
         <module>ananya-kilkari-functional-tests</module>
         <module>ananya-kilkari-performance-tests</module>
         <module>ananya-kilkari-purge</module>
+        <module>ananya-kilkari-refdata-sync</module>
+        <module>ananya-kilkari-test-data</module>
 
     </modules>
     <name>Ananya Kilkari</name>
@@ -451,6 +453,11 @@
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-mapper-asl</artifactId>
+                <version>1.9.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
                 <version>1.9.7</version>
             </dependency>
         </dependencies>

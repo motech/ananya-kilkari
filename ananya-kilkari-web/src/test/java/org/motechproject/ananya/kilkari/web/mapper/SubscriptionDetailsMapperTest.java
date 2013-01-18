@@ -1,49 +1,88 @@
 package org.motechproject.ananya.kilkari.web.mapper;
 
 import org.joda.time.DateTime;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.message.service.InboxService;
-import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
+import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
+import org.motechproject.ananya.kilkari.web.response.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class SubscriptionDetailsMapperTest {
-    private SubscriptionDetailsMapper subscriptionDetailsMapper;
-    @Mock
-    private InboxService inboxService;
 
-    @Before
-    public void setup() {
-        initMocks(this);
-        subscriptionDetailsMapper = new SubscriptionDetailsMapper(inboxService);
+    @Test
+    public void shouldMapToIVRWebResponse() {
+        SubscriptionDetailsResponse detailsResponse = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
+        ArrayList<SubscriptionDetailsResponse> responseList = new ArrayList<>();
+        responseList.add(detailsResponse);
+
+        SubscriptionBaseWebResponse webResponse = SubscriptionDetailsMapper.mapFrom(responseList, Channel.IVR);
+
+        SubscriptionIVRWebResponse ivrWebResponse = (SubscriptionIVRWebResponse) webResponse;
+        assertEquals(1, ivrWebResponse.getSubscriptionDetails().size());
+        SubscriptionDetails subscriptionDetails = ivrWebResponse.getSubscriptionDetails().get(0);
+        assertEquals(detailsResponse.getSubscriptionId(), subscriptionDetails.getSubscriptionId());
+        assertEquals(detailsResponse.getPack().name(), subscriptionDetails.getPack());
+        assertEquals(detailsResponse.getStatus().getDisplayString(), subscriptionDetails.getStatus());
+        assertEquals(detailsResponse.getCampaignId(), subscriptionDetails.getLastCampaignId());
     }
 
     @Test
-    public void shouldMapFromSubscriptionToSubscriptionDetails() {
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.BARI_KILKARI).withCreationDate(DateTime.now()).build();
+    public void shouldMapToCCWebResponseWithLocation() {
+        Location actualLocation = new Location("d", "b", "p");
+        SubscriptionDetailsResponse detailsResponse = setupData(actualLocation);
+        ArrayList<SubscriptionDetailsResponse> responseList = new ArrayList<>();
+        responseList.add(detailsResponse);
 
-        SubscriptionDetails subscriptionDetails = subscriptionDetailsMapper.mapFrom(subscription);
+        SubscriptionBaseWebResponse webResponse = SubscriptionDetailsMapper.mapFrom(responseList, Channel.CONTACT_CENTER);
 
-        assertEquals(subscription.getSubscriptionId(), subscriptionDetails.getSubscriptionId());
-        assertEquals(subscription.getPack().name(), subscriptionDetails.getPack());
-        assertEquals(subscription.getStatus().getDisplayString(), subscriptionDetails.getStatus());
+        SubscriptionCCWebResponse ccWebResponse = (SubscriptionCCWebResponse) webResponse;
+        assertEquals(1, ccWebResponse.getSubscriptionDetails().size());
+        AllSubscriptionDetails subscriptionDetails = ccWebResponse.getSubscriptionDetails().get(0);
+        assertDetails(detailsResponse, subscriptionDetails);
+        assertEquals(actualLocation.getDistrict(), subscriptionDetails.getLocation().getDistrict());
+        assertEquals(actualLocation.getBlock(), subscriptionDetails.getLocation().getBlock());
+        assertEquals(actualLocation.getPanchayat(), subscriptionDetails.getLocation().getPanchayat());
     }
 
     @Test
-    public void shouldIncludeLastCampaignIdInTheSubscriptionDetails() {
-        String messageId = "week3";
-        Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("9988776655").withPack(SubscriptionPack.BARI_KILKARI).withCreationDate(DateTime.now().minusWeeks(3)).build();
-        when(inboxService.getMessageFor(subscription.getSubscriptionId())).thenReturn(messageId);
+    public void shouldMapToCCWebResponseWithoutLocation() {
+        SubscriptionDetailsResponse detailsResponse = setupData(null);
+        ArrayList<SubscriptionDetailsResponse> responseList = new ArrayList<>();
+        responseList.add(detailsResponse);
 
-        SubscriptionDetails subscriptionDetails = subscriptionDetailsMapper.mapFrom(subscription);
+        SubscriptionBaseWebResponse webResponse = SubscriptionDetailsMapper.mapFrom(responseList, Channel.CONTACT_CENTER);
 
-        assertEquals(messageId, subscriptionDetails.getLastCampaignId());
+        SubscriptionCCWebResponse ccWebResponse = (SubscriptionCCWebResponse) webResponse;
+        assertEquals(1, ccWebResponse.getSubscriptionDetails().size());
+        AllSubscriptionDetails subscriptionDetails = ccWebResponse.getSubscriptionDetails().get(0);
+        assertDetails(detailsResponse, subscriptionDetails);
+        assertNull(subscriptionDetails.getLocation());
+    }
+
+    private SubscriptionDetailsResponse setupData(Location actualLocation) {
+        SubscriptionDetailsResponse detailsResponse = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK33",
+                "name", 10, DateTime.now(), DateTime.now(), 4, actualLocation, DateTime.now());
+        return detailsResponse;
+    }
+
+    private void assertDetails(SubscriptionDetailsResponse detailsResponse, AllSubscriptionDetails subscriptionDetails) {
+        assertEquals(detailsResponse.getSubscriptionId(), subscriptionDetails.getSubscriptionId());
+        assertEquals(detailsResponse.getPack().name(), subscriptionDetails.getPack());
+        assertEquals(detailsResponse.getStatus().getDisplayString(), subscriptionDetails.getStatus());
+        assertEquals(detailsResponse.getCampaignId(), subscriptionDetails.getLastCampaignId());
+        assertEquals(detailsResponse.getBeneficiaryName(), subscriptionDetails.getBeneficiaryName());
+        assertEquals(detailsResponse.getBeneficiaryAge(), subscriptionDetails.getBeneficiaryAge());
+        assertEquals(detailsResponse.getStartWeekNumber(), subscriptionDetails.getWeekNumber());
+        assertEquals(detailsResponse.getDateOfBirth(), subscriptionDetails.getDateOfBirth());
+        assertEquals(detailsResponse.getExpectedDateOfDelivery(), subscriptionDetails.getExpectedDateOfDelivery());
+        assertEquals(detailsResponse.getLastWeeklyMessageScheduledDate(), subscriptionDetails.getLastWeeklyMessageScheduledDate());
     }
 }

@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.joda.time.DateTime;
+import org.joda.time.Weeks;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
 import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
@@ -14,14 +15,16 @@ import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionDetailsResponseMapper;
 import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.*;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocation;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.kilkari.sync.service.RefdataSyncService;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
+import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -31,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +54,8 @@ public class SubscriptionService {
     private MotechSchedulerService motechSchedulerService;
     private ChangeMsisdnValidator changeMsisdnValidator;
     private UnsubscriptionValidator unsubscriptionValidator;
+    private RefdataSyncService refdataSyncService;
+    private SubscriptionDetailsResponseMapper subscriptionDetailsResponseMapper;
 
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
@@ -58,7 +64,8 @@ public class SubscriptionService {
                                SubscriptionValidator subscriptionValidator, ReportingService reportingService,
                                InboxService inboxService, MessageCampaignService messageCampaignService, OnMobileSubscriptionGateway onMobileSubscriptionGateway,
                                CampaignMessageService campaignMessageService, CampaignMessageAlertService campaignMessageAlertService, KilkariPropertiesData kilkariPropertiesData,
-                               MotechSchedulerService motechSchedulerService, ChangeMsisdnValidator changeMsisdnValidator, UnsubscriptionValidator unsubscriptionValidator) {
+                               MotechSchedulerService motechSchedulerService, ChangeMsisdnValidator changeMsisdnValidator, UnsubscriptionValidator unsubscriptionValidator,
+                               RefdataSyncService refdataSyncService, SubscriptionDetailsResponseMapper subscriptionDetailsResponseMapper) {
         this.allSubscriptions = allSubscriptions;
         this.onMobileSubscriptionManagerPublisher = onMobileSubscriptionManagerPublisher;
         this.subscriptionValidator = subscriptionValidator;
@@ -72,29 +79,38 @@ public class SubscriptionService {
         this.motechSchedulerService = motechSchedulerService;
         this.changeMsisdnValidator = changeMsisdnValidator;
         this.unsubscriptionValidator = unsubscriptionValidator;
+        this.refdataSyncService = refdataSyncService;
+        this.subscriptionDetailsResponseMapper = subscriptionDetailsResponseMapper;
     }
 
     public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
         subscriptionValidator.validate(subscriptionRequest);
 
         Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
-                subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate());
+                subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate(), subscriptionRequest.getSubscriber().getWeek());
         allSubscriptions.add(subscription);
 
-        reportingService.reportSubscriptionCreation(SubscriptionMapper.createSubscriptionCreationReportRequest(
-                subscription, channel, subscriptionRequest));
+        Location location = subscriptionRequest.getLocation();
+        LocationResponse existingLocation = getExistingLocation(location);
+
+        SubscriptionReportRequest reportRequest = SubscriptionMapper.createSubscriptionCreationReportRequest(
+                subscription, channel, subscriptionRequest);
+        reportingService.reportSubscriptionCreation(reportRequest);
 
         OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, channel);
         if (subscription.isEarlySubscription()) {
             scheduleEarlySubscription(subscriptionRequest.getSubscriptionStartDate(), omSubscriptionRequest);
         } else
             initiateActivationRequest(omSubscriptionRequest);
+
+        if (existingLocation == null && subscriptionRequest.hasLocation()) {
+            refdataSyncService.syncNewLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
+        }
+
         return subscription;
     }
 
-
     private void scheduleEarlySubscription(DateTime startDate, OMSubscriptionRequest omSubscriptionRequest) {
-
         String subjectKey = SubscriptionEventKeys.EARLY_SUBSCRIPTION;
 
         HashMap<String, Object> parameters = new HashMap<>();
@@ -107,7 +123,13 @@ public class SubscriptionService {
         motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
     }
 
+
     public void initiateActivationRequest(OMSubscriptionRequest omSubscriptionRequest) {
+        onMobileSubscriptionManagerPublisher.sendActivationRequest(omSubscriptionRequest);
+    }
+
+    public void initiateActivationRequestForEarlySubscription(OMSubscriptionRequest omSubscriptionRequest) {
+        updateToLatestMsisdn(omSubscriptionRequest);
         onMobileSubscriptionManagerPublisher.sendActivationRequest(omSubscriptionRequest);
     }
 
@@ -189,16 +211,6 @@ public class SubscriptionService {
     public void requestUnsubscription(DeactivationRequest deactivationRequest) {
         unsubscriptionValidator.validate(deactivationRequest.getSubscriptionId());
         requestDeactivation(deactivationRequest);
-    }
-
-    private void deactivateAndUnschedule(Subscription subscription, DeactivationRequest deactivationRequest) {
-        motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.EARLY_SUBSCRIPTION, deactivationRequest.getSubscriptionId());
-        updateStatusAndReport(subscription, deactivationRequest.getCreatedAt(), deactivationRequest.getReason(), null, null, new Action<Subscription>() {
-            @Override
-            public void perform(Subscription subscription) {
-                subscription.deactivate();
-            }
-        });
     }
 
     public void deactivationRequested(OMSubscriptionRequest omSubscriptionRequest) {
@@ -325,15 +337,54 @@ public class SubscriptionService {
     public void updateSubscriberDetails(SubscriberRequest request) {
         subscriptionValidator.validateSubscriberDetails(request);
 
-        SubscriberLocation subscriberLocation = new SubscriberLocation(request.getDistrict(), request.getBlock(), request.getPanchayat());
+        Location location = request.getLocation();
+        LocationResponse existingLocation = getExistingLocation(location);
+
+        SubscriberLocation subscriberLocation = request.hasLocation() ? new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat()) : null;
         reportingService.reportSubscriberDetailsChange(request.getSubscriptionId(), new SubscriberReportRequest(request.getCreatedAt(),
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
+
+        if (existingLocation == null && request.hasLocation()) {
+            refdataSyncService.syncNewLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
+        }
     }
 
     public void unScheduleCampaign(Subscription subscription) {
         String activeCampaignName = messageCampaignService.getActiveCampaignName(subscription.getSubscriptionId());
         MessageCampaignRequest unEnrollRequest = new MessageCampaignRequest(subscription.getSubscriptionId(), activeCampaignName, subscription.getScheduleStartDate());
         messageCampaignService.stop(unEnrollRequest);
+    }
+
+    public List<SubscriptionDetailsResponse> getSubscriptionDetails(String msisdn, Channel channel) {
+        List<Subscription> subscriptionList = findByMsisdn(msisdn);
+        if (Channel.IVR.equals(channel)) {
+            return subscriptionDetailsResponseMapper.map(subscriptionList, Collections.EMPTY_LIST);
+        }
+
+        List<SubscriberResponse> subscriberDetailsFromReports = reportingService.getSubscribersByMsisdn(msisdn);
+        return subscriptionDetailsResponseMapper.map(subscriptionList, subscriberDetailsFromReports);
+    }
+
+    private void updateToLatestMsisdn(OMSubscriptionRequest omSubscriptionRequest) {
+        Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
+        omSubscriptionRequest.setMsisdn(subscription.getMsisdn());
+    }
+
+    private void deactivateAndUnschedule(Subscription subscription, DeactivationRequest deactivationRequest) {
+        motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.EARLY_SUBSCRIPTION, deactivationRequest.getSubscriptionId());
+        updateStatusAndReport(subscription, deactivationRequest.getCreatedAt(), deactivationRequest.getReason(), null, null, new Action<Subscription>() {
+            @Override
+            public void perform(Subscription subscription) {
+                subscription.deactivate();
+            }
+        });
+    }
+
+    private LocationResponse getExistingLocation(Location location) {
+        if (location == Location.NULL)
+            return null;
+
+        return reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
     }
 
     private void renewSchedule(Subscription subscription) {
@@ -351,7 +402,7 @@ public class SubscriptionService {
 
     private void scheduleDeactivation(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
         String subjectKey = SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION;
-        Date startDate = DateTime.now().plusDays(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
+        Date startDate = DateTime.now().plusDays(kilkariPropertiesData.getBufferDaysToAllowRenewalForDeactivation()).toDate();
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put(MotechSchedulerService.JOB_ID_KEY, subscriptionId);
         parameters.put("0", new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount));
@@ -395,7 +446,14 @@ public class SubscriptionService {
         logger.info("Updating Subscription and reporting change " + subscription);
         allSubscriptions.update(subscription);
         reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(),
-                subscription.getStatus().name(), reason, updatedOn, operator, graceCount));
+                subscription.getStatus().name(), reason, updatedOn, operator, graceCount, getSubscriptionWeekNumber(subscription, updatedOn)));
+    }
+
+    private Integer getSubscriptionWeekNumber(Subscription subscription, DateTime endDate) {
+        if (subscription.getScheduleStartDate() == null)
+            return null;
+        Integer diffInWeeks = Weeks.weeksBetween(subscription.getScheduleStartDate(), endDate).getWeeks();
+        return subscription.getPack().getStartWeek() + diffInWeeks;
     }
 
     private void updateStatusWithoutReporting(Subscription subscription, Action<Subscription> action) {
@@ -408,14 +466,12 @@ public class SubscriptionService {
         if (changeMsisdnRequest.getShouldChangeAllPacks()) return true;
 
         return changeMsisdnRequest.getPacks().contains(subscription.getPack());
-
     }
 
     private void migrateMsisdnToNewSubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
-        String reason = "change msisdn";
         SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
 
-        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now(), reason));
+        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now(), changeMsisdnRequest.getReason()));
 
         Location location = null;
         if (subscriberResponse.getLocationResponse() != null) {
@@ -426,7 +482,7 @@ public class SubscriptionService {
                 subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getNextWeekNumber());
 
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeMsisdnRequest.getNewMsisdn(),
-                DateTime.now(), subscription.getPack(), location, subscriber, reason);
+                DateTime.now(), subscription.getPack(), location, subscriber, changeMsisdnRequest.getReason());
         subscriptionRequest.setOldSubscriptionId(subscription.getSubscriptionId());
 
         createSubscription(subscriptionRequest, changeMsisdnRequest.getChannel());
@@ -435,6 +491,6 @@ public class SubscriptionService {
     private void changeMsisdnForEarlySubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
         subscription.setMsisdn(changeMsisdnRequest.getNewMsisdn());
         allSubscriptions.update(subscription);
-        reportingService.reportChangeMsisdnForSubscriber(subscription.getSubscriptionId(), changeMsisdnRequest.getNewMsisdn());
+        reportingService.reportChangeMsisdnForEarlySubscription(new SubscriberChangeMsisdnReportRequest(subscription.getSubscriptionId(), Long.valueOf(changeMsisdnRequest.getNewMsisdn()), changeMsisdnRequest.getReason()));
     }
 }

@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.reporting.repository;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -7,10 +8,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.http.client.domain.Method;
@@ -21,7 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
@@ -219,38 +219,41 @@ public class ReportingGatewayImplTest {
 
     @Test
     public void shouldReportMsisdnChange() {
-        String msisdn = "msisdn";
+        long msisdn = 9988776655L;
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
 
-        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 
-        verify(httpClientService).execute("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
+        verify(httpClientService).execute("url/subscription/changemsisdn", reportRequest, Method.POST);
     }
 
     @Test
     public void shouldMakeSynchronousCallIfSourceIsCallCenter() {
-        String msisdn = "msisdn";
+        long msisdn = 9988776655L;
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         HttpThreadContext.set("CONTACT_CENTER");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
 
-        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 
-        verify(httpClientService).executeSync("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
+        verify(httpClientService).executeSync("url/subscription/changemsisdn", reportRequest, Method.POST);
     }
 
     @Test
     public void shouldMakeAssynchronousCallIfSyncCallFailsForCallCenter() {
-        String msisdn = "msisdn";
+        long msisdn = 9988776655L;
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         HttpThreadContext.set("CONTACT_CENTER");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
         doThrow(new RuntimeException()).when(httpClientService).executeSync(anyString(), anyObject(), any(Method.class));
 
-        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 
-        verify(httpClientService).execute("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
+        verify(httpClientService).execute("url/subscription/changemsisdn", reportRequest, Method.POST);
     }
 
     @Test
@@ -268,13 +271,44 @@ public class ReportingGatewayImplTest {
 
     @Test
     public void shouldMakeSynchronousCallToReportsForCallCenter() {
-        String msisdn = "msisdn";
+        long msisdn = 9988776655L;
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         HttpThreadContext.set("CONTACT_CENTER");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
 
-        reportingGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 
-        verify(httpClientService, never()).execute("url/subscription/changemsisdn?subscriptionId=" + subscriptionId + "&msisdn=" + msisdn, null, Method.POST);
+        verify(httpClientService, never()).execute("url/subscription/changemsisdn", reportRequest, Method.POST);
+    }
+
+    @Test
+    public void shouldMakeAReportingCallToGetSubscriberByMsisdn() {
+        final String msisdn = "1234567890";
+        String expectedUrl = "url/subscriber?msisdn=" + msisdn;
+        ArrayList<SubscriberResponse> expectedResponse = new ArrayList<SubscriberResponse>() {{
+            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), DateTime.now(), new LocationResponse("d", "b", "p")));
+        }};
+        ResponseEntity<SubscriberResponse[]> responseEntity = new ResponseEntity(expectedResponse.toArray(), HttpStatus.OK);
+
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        when(restTemplate.getForEntity(expectedUrl, SubscriberResponse[].class))
+                .thenReturn(responseEntity);
+
+        List<SubscriberResponse> actualResponse = reportingGateway.getSubscribersByMsisdn(msisdn);
+
+        verify(restTemplate).getForEntity(expectedUrl, SubscriberResponse[].class);
+        assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    public void shouldReportReceivingOfACampaignScheduleAlert() {
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+        CampaignScheduleAlertRequest campaignScheduleAlertRequest = new CampaignScheduleAlertRequest("subscripriptionId", "campaignName", DateTime.now());
+        HttpThreadContext.set("IVR");
+
+        reportingGateway.reportCampaignScheduleAlertReceived(campaignScheduleAlertRequest);
+
+        verify(httpClientService).execute("url/subscription/campaignScheduleAlert", campaignScheduleAlertRequest, Method.POST);
     }
 }

@@ -2,9 +2,9 @@ package org.motechproject.ananya.kilkari.request.validator;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.request.LocationRequest;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 public class WebRequestValidatorTest {
     @Test
@@ -100,7 +100,7 @@ public class WebRequestValidatorTest {
     @Test
     public void shouldReturnErrorIfMoreThanOneOfDobOrEddOrWeekIsPresent() {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
-        webRequestValidator.validateOnlyOneOfEDDOrDOBOrWeekNumberPresent("edd","dob","week");
+        webRequestValidator.validateOnlyOneOfEDDOrDOBOrWeekNumberPresent("edd", "dob", "week");
 
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. Only one of expected date of delivery, date of birth and week number should be present"));
@@ -131,5 +131,83 @@ public class WebRequestValidatorTest {
 
         assertEquals(1, webRequestValidator.getErrors().getCount());
         assertTrue(webRequestValidator.getErrors().hasMessage("Invalid request. One of expected date of delivery or date of birth should be present"));
+    }
+
+    @Test
+    public void shouldReturnErrorForInvalidName(){
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+
+        webRequestValidator.validateName("");
+
+        assertTrue(webRequestValidator.getErrors().hasMessage("Missing Name"));
+    }
+
+    @Test
+    public void shouldReturnErrorForNonAlphaNumericName(){
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+
+        webRequestValidator.validateName("Missing Name !2.");
+
+        assertTrue(webRequestValidator.getErrors().hasMessage("Name is Invalid"));
+    }
+
+    @Test
+    public void shouldValidateLocationIfProvided(){
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+
+        webRequestValidator.validateLocation(new LocationRequest());
+
+        assertEquals(3, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("Missing district"));
+        assertTrue(webRequestValidator.getErrors().hasMessage("Missing block"));
+        assertTrue(webRequestValidator.getErrors().hasMessage("Missing panchayat"));
+    }
+
+    @Test
+    public void shouldValidateLocationForBlankDetails(){
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+
+        webRequestValidator.validateLocation(new LocationRequest(){{
+            setDistrict("");
+            setBlock("");
+            setPanchayat("");
+        }});
+
+        assertEquals(3, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("Missing district"));
+        assertTrue(webRequestValidator.getErrors().hasMessage("Missing block"));
+        assertTrue(webRequestValidator.getErrors().hasMessage("Missing panchayat"));
+    }
+
+    @Test
+    public void shouldValidateLocationIfNotProvided(){
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+
+        webRequestValidator.validateLocation(null);
+
+        assertEquals(1, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("Missing location"));
+    }
+
+    @Test
+    public void shouldValidateAValidLocation(){
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+
+        webRequestValidator.validateLocation(new LocationRequest() {{
+            setDistrict("d");
+            setBlock("b");
+            setPanchayat("   ");
+        }});
+
+        assertFalse(webRequestValidator.getErrors().hasErrors());
+    }
+
+    @Test
+    public void shouldValidateAValidName(){
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+
+        webRequestValidator.validateName("Valid Name 12");
+
+        assertFalse(webRequestValidator.getErrors().hasErrors());
     }
 }

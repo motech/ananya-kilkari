@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.subscription.repository;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +22,7 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
     private AllSubscriberCareDocs allSubscriberCareDocs;
 
     @Before
+    @After
     public void setUp() {
         allSubscriberCareDocs.removeAll();
     }
@@ -31,7 +33,7 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
         SubscriberCareReasons reason = SubscriberCareReasons.HELP;
         DateTime createdAt = DateTime.now();
         SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc(msisdn, reason, createdAt, Channel.IVR);
-        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
+        allSubscriberCareDocs.add(subscriberCareDoc);
         markForDeletion(subscriberCareDoc);
 
         SubscriberCareDoc subscriberCareDocs = allSubscriberCareDocs.find(msisdn, reason.name());
@@ -43,28 +45,32 @@ public class AllSubscriberCareDocsIT extends SpringIntegrationTest {
     }
 
     @Test
-    public void shouldAddNewSubscriberCareDoc() {
+    public void shouldNotFetchCareDocsIfNotCreatedInTheRange() {
         SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR);
-        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
-        markForDeletion(subscriberCareDoc);
+        allSubscriberCareDocs.add(subscriberCareDoc);
 
-        List<SubscriberCareDoc> subscriberCareDocs = allSubscriberCareDocs.getAll();
-        assertEquals(1, subscriberCareDocs.size());
+        List<SubscriberCareDoc> allCareDocs = allSubscriberCareDocs.findByCreatedAt(DateTime.now().plusDays(1), DateTime.now().plusDays(2));
+
+        assertEquals(0, allCareDocs.size());
     }
 
     @Test
-    public void shouldUpdateAnExistingSubscriberCareDocIfMsisdnAndReasonAreSame() {
-        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, DateTime.now(), Channel.IVR);
-        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc);
-        markForDeletion(subscriberCareDoc);
+    public void shouldCorrectlyFetchTheCareDocs() {
+        String msisdn = "9876543211";
+        SubscriberCareReasons reason = SubscriberCareReasons.HELP;
+        DateTime now = DateTime.now();
+        Channel ivrChannel = Channel.IVR;
+        SubscriberCareDoc subscriberCareDoc = new SubscriberCareDoc(msisdn, reason, now, ivrChannel);
+        allSubscriberCareDocs.add(subscriberCareDoc);
 
-        DateTime createdAt = DateTime.now().plusDays(1);
-        SubscriberCareDoc subscriberCareDoc2 = new SubscriberCareDoc("9876543211", SubscriberCareReasons.HELP, createdAt, Channel.IVR);
-        allSubscriberCareDocs.addOrUpdate(subscriberCareDoc2);
+        List<SubscriberCareDoc> allCareDocs = allSubscriberCareDocs.findByCreatedAt(DateTime.now().minusDays(1), DateTime.now());
 
-        List<SubscriberCareDoc> subscriberCareDocs = allSubscriberCareDocs.getAll();
-        assertEquals(1, subscriberCareDocs.size());
-        assertEquals(createdAt.withZone(DateTimeZone.UTC), subscriberCareDocs.get(0).getCreatedAt());
+        assertEquals(1, allCareDocs.size());
+        SubscriberCareDoc fetchedSubscriberCareDoc = allCareDocs.get(0);
+        assertEquals(msisdn, fetchedSubscriberCareDoc.getMsisdn());
+        assertEquals(reason, fetchedSubscriberCareDoc.getReason());
+        assertEquals(now.getMillis(), fetchedSubscriberCareDoc.getCreatedAt().getMillis());
+        assertEquals(ivrChannel, fetchedSubscriberCareDoc.getChannel());
     }
 
     @Test

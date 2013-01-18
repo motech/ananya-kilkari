@@ -29,7 +29,7 @@ public class ChangeMsisdnValidator {
             validateIfSubscriptionsExists(allSubscriptionsByMsisdn);
             for (Subscription subscription : allSubscriptionsByMsisdn) {
                 if (!subscription.isInUpdatableState())
-                    throw new ValidationException("Requested Msisdn doesn't have all subscriptions in updatable state");
+                    throw new ValidationException(String.format("Requested Msisdn doesn't have all subscriptions in updatable state. %s in %s status", subscription.getSubscriptionId(), subscription.getStatus()));
             }
         } else {
             List<Subscription> updatableSubscriptionsByMsisdn = allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn());

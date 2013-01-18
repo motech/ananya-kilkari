@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 import java.io.Serializable;
 
 public class ScheduleDeactivationRequest implements Serializable {
+    private static final long serialVersionUID = 1345054206621372774L;
     private String subscriptionId;
     private DateTime deactivationDate;
     private String reason;

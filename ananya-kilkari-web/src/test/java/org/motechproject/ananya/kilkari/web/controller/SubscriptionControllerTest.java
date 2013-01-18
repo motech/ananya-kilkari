@@ -17,22 +17,28 @@ import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.domain.Operator;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.kilkari.web.HttpConstants;
 import org.motechproject.ananya.kilkari.web.HttpHeaders;
 import org.motechproject.ananya.kilkari.web.TestUtils;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
-import org.motechproject.ananya.kilkari.web.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
-import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
+import org.motechproject.ananya.kilkari.web.response.*;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
 import org.motechproject.web.context.HttpThreadContext;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.server.MvcResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -65,41 +71,79 @@ public class SubscriptionControllerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, callbackRequestValidator, mockedSubscriptionDetailsMapper);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService, callbackRequestValidator);
     }
 
     @Test
     public void shouldGetSubscriptionsForGivenMsisdnForChannelIvr() throws Exception {
         String msisdn = "1234567890";
         String channel = "ivr";
+        SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
+        ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
+        subscriptionDetailsResponses.add(subscriptionDetails);
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
 
-        mockSubscription(msisdn);
-        ArrayList<Subscription> subscriptions = new ArrayList<>();
-        subscriptions.add(mockedSubscription);
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
-
-        mockMvc(subscriptionController)
+        MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JAVASCRIPT))
-                .andExpect(content().string(subscriberResponseMatcherWithSubscriptions(channel)));
+                .andReturn();
+
+        String responseString = result.getResponse().getContentAsString();
+        responseString = performIVRChannelValidationAndCleanup(responseString, channel);
+        SubscriptionIVRWebResponse actualIVRResponse = TestUtils.fromJson(responseString, SubscriptionIVRWebResponse.class);
+        SubscriptionDetails actualDetailsResponse = actualIVRResponse.getSubscriptionDetails().get(0);
+        assertSubscriberDetails(subscriptionDetails, actualDetailsResponse);
     }
 
     @Test
-    public void shouldGetSubscriptionsForGivenMsisdnForChannelOtherThanIvr() throws Exception {
+    public void shouldGetSubscriptionsForGivenMsisdnForChannelOtherThanIvrAsJson() throws Exception {
         String msisdn = "1234567890";
         String channel = "CONTACT_CENTER";
+        int startWeekNumber = 4;
 
-        mockSubscription(msisdn);
-        ArrayList<Subscription> subscriptions = new ArrayList<>();
-        subscriptions.add(mockedSubscription);
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(subscriptions);
+        SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE,
+                "WEEK13", "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"), DateTime.now());
+        ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
+        subscriptionDetailsResponses.add(subscriptionDetails);
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
 
-        mockMvc(subscriptionController)
+        MvcResult result = mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(subscriberResponseMatcherWithSubscriptions(channel)));
+                .andReturn();
+
+        String responseString = result.getResponse().getContentAsString();
+        SubscriptionCCWebResponse actualCCResponse = TestUtils.fromJson(responseString, SubscriptionCCWebResponse.class);
+        AllSubscriptionDetails actualDetailsResponse = actualCCResponse.getSubscriptionDetails().get(0);
+        assertSubscriberDetails(subscriptionDetails, actualDetailsResponse);
+        assertAdditionalSubscriberDetails(subscriptionDetails, actualDetailsResponse);
+    }
+
+    @Test
+    public void shouldGetSubscriptionsForGivenMsisdnForChannelOtherThanIvrAsXML() throws Exception {
+        String msisdn = "1234567890";
+        String channel = "CONTACT_CENTER";
+        int startWeekNumber = 4;
+
+        SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13",
+                "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"), DateTime.now());
+        ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
+        subscriptionDetailsResponses.add(subscriptionDetails);
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
+
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel).accept(MediaType.APPLICATION_XML))
+                .andExpect(status().isOk())
+                .andExpect(content().type(HttpHeaders.APPLICATION_XML))
+                .andReturn();
+
+        String responseString = result.getResponse().getContentAsString();
+        SubscriptionCCWebResponse actualCCResponse = TestUtils.fromXml(responseString, SubscriptionCCWebResponse.class);
+        AllSubscriptionDetails actualDetailsResponse = actualCCResponse.getSubscriptionDetails().get(0);
+        assertSubscriberDetails(subscriptionDetails, actualDetailsResponse);
+        assertAdditionalSubscriberDetails(subscriptionDetails, actualDetailsResponse);
     }
 
     @Test
@@ -107,12 +151,12 @@ public class SubscriptionControllerTest {
         String msisdn = "1234567890";
         String channel = "ivr";
 
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(null);
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(Collections.EMPTY_LIST);
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpConstants.IVR.getResponseContentType()))
+                .andExpect(content().type(HttpConstants.IVR.getResponseContentType(null)))
                 .andExpect(content().string(subscriberResponseMatcherWithNoSubscriptions(channel)));
     }
 
@@ -121,7 +165,7 @@ public class SubscriptionControllerTest {
         String msisdn = "1234567890";
         String channel = "CONTACT_CENTER";
 
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenReturn(null);
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(Collections.EMPTY_LIST);
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -135,22 +179,21 @@ public class SubscriptionControllerTest {
         String msisdn = "12345";
         String channel = "ivr";
 
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenThrow(new ValidationException("Invalid Msisdn"));
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().isOk())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JAVASCRIPT))
                 .andExpect(content().string(errorResponseMatcherForInvalidMsisdn(channel)));
-
     }
 
     @Test
-    public void shouldReturnErrorResponseForInvalidMsisdnNumberOtherThanIvr() throws Exception {
+    public void shouldReturnErrorResponseForInvalidMsisdnNumberOtherThanIvrAsJson() throws Exception {
         String msisdn = "12345";
         String channel = "CONTACT_CENTER";
 
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenThrow(new ValidationException("Invalid Msisdn"));
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenThrow(new ValidationException("Invalid Msisdn"));
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -160,11 +203,29 @@ public class SubscriptionControllerTest {
     }
 
     @Test
+    public void shouldReturnErrorResponseForInvalidMsisdnNumberOtherThanIvrAsXml() throws Exception {
+        String msisdn = "12345";
+        String channel = "CONTACT_CENTER";
+
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenThrow(new ValidationException("Invalid Msisdn"));
+
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel).accept(MediaType.APPLICATION_XML))
+                .andExpect(status().is(400))
+                .andExpect(content().type(HttpHeaders.APPLICATION_XML))
+                .andReturn();
+
+        BaseResponse actualResponse = TestUtils.fromXml(result.getResponse().getContentAsString(), BaseResponse.class);
+        assertTrue(actualResponse.isError());
+        assertEquals("Invalid Msisdn", actualResponse.getDescription());
+    }
+
+    @Test
     public void shouldReturnCorrectErrorResponseForRuntimeExceptionForIvr() throws Exception {
         String msisdn = "1234567890";
         String channel = "ivr";
 
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenThrow(new RuntimeException("runtime exception"));
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenThrow(new RuntimeException("runtime exception"));
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
@@ -174,17 +235,35 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void shouldReturnCorrectErrorResponseForRuntimeExceptionForOtherThanIvr() throws Exception {
+    public void shouldReturnCorrectErrorResponseForRuntimeExceptionForOtherThanIvrAsJson() throws Exception {
         String msisdn = "1234567890";
         String channel = "CONTACT_CENTER";
 
-        when(kilkariSubscriptionService.findByMsisdn(msisdn)).thenThrow(new RuntimeException("runtime exception"));
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenThrow(new RuntimeException("runtime exception"));
 
         mockMvc(subscriptionController)
                 .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel))
                 .andExpect(status().is(500))
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(errorResponseMatcherForRuntimeException(channel)));
+    }
+
+    @Test
+    public void shouldReturnCorrectErrorResponseForRuntimeExceptionForOtherThanIvrAsXml() throws Exception {
+        String msisdn = "12345";
+        String channel = "CONTACT_CENTER";
+
+        when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenThrow(new RuntimeException("runtime exception"));
+
+        MvcResult result = mockMvc(subscriptionController)
+                .perform(get("/subscriber").param("msisdn", msisdn).param("channel", channel).accept(MediaType.APPLICATION_XML))
+                .andExpect(status().is(500))
+                .andExpect(content().type(HttpHeaders.APPLICATION_XML))
+                .andReturn();
+
+        BaseResponse actualResponse = TestUtils.fromXml(result.getResponse().getContentAsString(), BaseResponse.class);
+        assertTrue(actualResponse.isError());
+        assertEquals("runtime exception", actualResponse.getDescription());
     }
 
     @Test
@@ -226,16 +305,30 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldCreateNewSubscriptionEventForCC() throws Exception {
         DateTime createdAt = DateTime.now();
-
         SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withCreatedAt(createdAt).build();
+        byte[] requestBody = TestUtils.toJson(expectedWebRequest).getBytes();
 
+        assertSubscriptionWebRequest(createdAt, expectedWebRequest, requestBody, MediaType.APPLICATION_JSON, HttpHeaders.APPLICATION_JSON);
+    }
+
+    @Test
+    public void shouldCreateNewSubscriptionEventForCC_WithXMLRequest() throws Exception {
+        DateTime createdAt = DateTime.now();
+        SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withCreatedAt(createdAt).build();
+        byte[] requestBody = TestUtils.toXml(SubscriptionWebRequest.class, expectedWebRequest).getBytes();
+
+        assertSubscriptionWebRequest(createdAt, expectedWebRequest, requestBody, MediaType.APPLICATION_XML, HttpHeaders.APPLICATION_XML);
+    }
+
+    private void assertSubscriptionWebRequest(DateTime createdAt, SubscriptionWebRequest expectedWebRequest, byte[] requestBody, MediaType mediaType, String contentType) throws Exception {
         mockMvc(subscriptionController)
                 .perform(post("/subscription")
                         .param("channel", Channel.CONTACT_CENTER.toString())
-                        .body(TestUtils.toJson(expectedWebRequest).getBytes()).contentType(MediaType.APPLICATION_JSON))
+                        .body(requestBody).contentType(mediaType)
+                        .accept(mediaType))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully")));
+                .andExpect(content().type(contentType))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription request submitted successfully", contentType)));
 
         ArgumentCaptor<SubscriptionWebRequest> subscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionWebRequest.class);
         verify(kilkariSubscriptionService).createSubscription(subscriptionRequestArgumentCaptor.capture());
@@ -333,18 +426,32 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldUnsubscribeAUserGivenValidDetails() throws Exception {
-        String subscriptionId = "abcd1234";
         UnSubscriptionWebRequest unSubscriptionWebRequest = new UnSubscriptionWebRequest();
         unSubscriptionWebRequest.setReason("reason");
         byte[] requestBody = TestUtils.toJson(unSubscriptionWebRequest).getBytes();
 
+        assertUnsubscriptionWebRequest(requestBody, MediaType.APPLICATION_JSON, HttpHeaders.APPLICATION_JSON);
+    }
+
+    @Test
+    public void shouldUnsubscribeAUserGivenValidDetailsInXML() throws Exception {
+        UnSubscriptionWebRequest unSubscriptionWebRequest = new UnSubscriptionWebRequest();
+        unSubscriptionWebRequest.setReason("reason");
+        byte[] requestBody = TestUtils.toXml(UnSubscriptionWebRequest.class, unSubscriptionWebRequest).getBytes();
+
+        assertUnsubscriptionWebRequest(requestBody, MediaType.APPLICATION_XML, HttpHeaders.APPLICATION_XML);
+    }
+
+    public void assertUnsubscriptionWebRequest(byte[] requestBody, MediaType mediaType, String headerType) throws Exception {
+        String subscriptionId = "abcd1234";
+
         mockMvc(subscriptionController)
                 .perform(delete("/subscription/" + subscriptionId)
                         .param("channel", Channel.CONTACT_CENTER.toString())
-                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                        .body(requestBody).contentType(mediaType).accept(mediaType))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription unsubscribed successfully")));
+                .andExpect(content().type(headerType))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscription unsubscribed successfully", headerType)));
 
         ArgumentCaptor<UnSubscriptionWebRequest> unsubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(UnSubscriptionWebRequest.class);
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -378,24 +485,38 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldProcessValidCampaignChangeRequest() throws Exception {
         CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
-        String subscriptionId = "subscriptionId";
         String reason = "INFANT_DEATH";
         campaignChangeRequest.setReason(reason);
         byte[] requestBody = TestUtils.toJson(campaignChangeRequest).getBytes();
 
+        assertCampaignChangeRequest(reason, requestBody, MediaType.APPLICATION_JSON, HttpHeaders.APPLICATION_JSON);
+    }
+
+    @Test
+    public void shouldProcessValidCampaignChangeXMLRequest() throws Exception {
+        CampaignChangeRequest campaignChangeRequest = new CampaignChangeRequest();
+        String reason = "INFANT_DEATH";
+        campaignChangeRequest.setReason(reason);
+        byte[] requestBody = TestUtils.toXml(CampaignChangeRequest.class, campaignChangeRequest).getBytes();
+
+        assertCampaignChangeRequest(reason, requestBody, MediaType.APPLICATION_XML, HttpHeaders.APPLICATION_XML);
+    }
+
+    private void assertCampaignChangeRequest(String reason, byte[] requestBody, MediaType mediaType, String contentType) throws Exception {
+        String subscriptionId = "subscriptionId";
+
         mockMvc(subscriptionController)
                 .perform(post("/subscription/" + subscriptionId + "/changecampaign")
                         .param("channel", Channel.CONTACT_CENTER.toString())
-                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                        .body(requestBody).contentType(mediaType).accept(mediaType))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Campaign Change successfully completed")));
+                .andExpect(content().type(contentType))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Campaign Change successfully completed", contentType)));
 
         ArgumentCaptor<CampaignChangeRequest> campaignChangeRequestArgumentCaptor = ArgumentCaptor.forClass(CampaignChangeRequest.class);
         ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
         verify(kilkariSubscriptionService).processCampaignChange(campaignChangeRequestArgumentCaptor.capture(), subscriptionIdCaptor.capture());
         CampaignChangeRequest changeRequest = campaignChangeRequestArgumentCaptor.getValue();
-
         assertEquals(subscriptionId, subscriptionIdCaptor.getValue());
         assertEquals(reason, changeRequest.getReason());
     }
@@ -404,15 +525,28 @@ public class SubscriptionControllerTest {
     public void shouldUpdateSubscriberDetails() throws Exception {
         SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
         byte[] requestBody = TestUtils.toJson(subscriberWebRequest).getBytes();
+
+        assertUpdateSubscriberRequest(subscriberWebRequest, requestBody, MediaType.APPLICATION_JSON, HttpHeaders.APPLICATION_JSON);
+    }
+
+    @Test
+    public void shouldUpdateSubscriberDetailsWithXMLRequest() throws Exception {
+        SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
+        byte[] requestBody = TestUtils.toXml(SubscriberWebRequest.class, subscriberWebRequest).getBytes();
+
+        assertUpdateSubscriberRequest(subscriberWebRequest, requestBody, MediaType.APPLICATION_XML, HttpHeaders.APPLICATION_XML);
+    }
+
+    private void assertUpdateSubscriberRequest(SubscriberWebRequest subscriberWebRequest, byte[] requestBody, MediaType mediaType, String contentType) throws Exception {
         String subscriptionId = "subscription-id";
 
         mockMvc(subscriptionController)
                 .perform(put("/subscriber/" + subscriptionId)
                         .param("channel", Channel.CONTACT_CENTER.toString())
-                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                        .body(requestBody).contentType(mediaType).accept(mediaType))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber Update request submitted successfully")));
+                .andExpect(content().type(contentType))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber Update request submitted successfully", contentType)));
 
         subscriberWebRequest.setChannel(Channel.CONTACT_CENTER.name());
         verify(kilkariSubscriptionService).updateSubscriberDetails(subscriberWebRequest, subscriptionId);
@@ -420,21 +554,34 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldChangePackForTheGivenSubscriber() throws Exception {
-        String subscriptionId = "abcd1234";
-        String channel = Channel.CONTACT_CENTER.name();
         String pack = SubscriptionPack.BARI_KILKARI.name();
         ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequest();
         changeSubscriptionWebRequest.setPack(pack);
-
         byte[] requestBody = TestUtils.toJson(changeSubscriptionWebRequest).getBytes();
 
+        assertChangePackRequest(pack, requestBody, MediaType.APPLICATION_JSON, HttpHeaders.APPLICATION_JSON);
+    }
+
+    @Test
+    public void shouldChangePackForTheGivenSubscriberWithXMLRequest() throws Exception {
+        String pack = SubscriptionPack.BARI_KILKARI.name();
+        ChangeSubscriptionWebRequest changeSubscriptionWebRequest = new ChangeSubscriptionWebRequest();
+        changeSubscriptionWebRequest.setPack(pack);
+        byte[] requestBody = TestUtils.toXml(ChangeSubscriptionWebRequest.class, changeSubscriptionWebRequest).getBytes();
+
+        assertChangePackRequest(pack, requestBody, MediaType.APPLICATION_XML, HttpHeaders.APPLICATION_XML);
+    }
+
+    private void assertChangePackRequest(String pack, byte[] requestBody, MediaType mediaType, String contentType) throws Exception {
+        String subscriptionId = "abcd1234";
+        String channel = Channel.CONTACT_CENTER.name();
         mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId + "/changesubscription")
                         .param("channel", Channel.CONTACT_CENTER.toString())
-                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                        .body(requestBody).contentType(mediaType).accept(mediaType))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Change Subscription successfully completed")));
+                .andExpect(content().type(contentType))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Change Subscription successfully completed", contentType)));
 
         ArgumentCaptor<ChangeSubscriptionWebRequest> changePackWebRequestArgumentCaptor = ArgumentCaptor.forClass(ChangeSubscriptionWebRequest.class);
         ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
@@ -447,17 +594,21 @@ public class SubscriptionControllerTest {
         assertNotNull(request.getCreatedAt());
     }
 
-    private void mockSubscription(String msisdn) {
-        String subscriptionId = "subscription-id";
-        SubscriptionPack subscriptionPack = SubscriptionPack.BARI_KILKARI;
-        SubscriptionStatus subscriptionStatus = SubscriptionStatus.NEW;
+    private void assertSubscriberDetails(SubscriptionDetailsResponse subscriptionDetails, SubscriptionDetails actualDetailsResponse) {
+        assertEquals(subscriptionDetails.getPack().name(), actualDetailsResponse.getPack());
+        assertEquals(subscriptionDetails.getStatus().getDisplayString(), actualDetailsResponse.getStatus());
+        assertEquals(subscriptionDetails.getSubscriptionId(), actualDetailsResponse.getSubscriptionId());
+        assertEquals(subscriptionDetails.getCampaignId(), actualDetailsResponse.getLastCampaignId());
+    }
 
-        when(mockedSubscription.getMsisdn()).thenReturn(msisdn);
-        when(mockedSubscription.getPack()).thenReturn(subscriptionPack);
-        when(mockedSubscription.getStatus()).thenReturn(subscriptionStatus);
-        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
-
-        when(mockedSubscriptionDetailsMapper.mapFrom(mockedSubscription)).thenReturn(new SubscriptionDetails(subscriptionId, subscriptionPack.name(), subscriptionStatus.name(), null));
+    private void assertAdditionalSubscriberDetails(SubscriptionDetailsResponse subscriptionDetails, AllSubscriptionDetails actualDetailsResponse) {
+        LocationResponse expectedLocation = new LocationResponse(subscriptionDetails.getLocation().getDistrict(), subscriptionDetails.getLocation().getBlock(), subscriptionDetails.getLocation().getPanchayat());
+        assertEquals(subscriptionDetails.getBeneficiaryName(), actualDetailsResponse.getBeneficiaryName());
+        assertEquals(subscriptionDetails.getBeneficiaryAge(), actualDetailsResponse.getBeneficiaryAge());
+        assertEquals(subscriptionDetails.getStartWeekNumber(), actualDetailsResponse.getWeekNumber());
+        assertEquals(subscriptionDetails.getDateOfBirth(), actualDetailsResponse.getDateOfBirth());
+        assertEquals(subscriptionDetails.getExpectedDateOfDelivery(), actualDetailsResponse.getExpectedDateOfDelivery());
+        assertEquals(expectedLocation, actualDetailsResponse.getLocation());
     }
 
     private void assertCreatedAt(DateTime beforeCreate, SubscriptionWebRequest subscriptionWebRequest) {
@@ -466,7 +617,6 @@ public class SubscriptionControllerTest {
         assertTrue(createdAt.isEqual(beforeCreate) || createdAt.isAfter(beforeCreate));
         assertTrue(createdAt.isEqual(afterCreate) || createdAt.isBefore(afterCreate));
     }
-
 
     private Matcher<String> errorResponseMatcherForInvalidMsisdn(final String channel) {
         return new BaseMatcher<String>() {
@@ -520,20 +670,6 @@ public class SubscriptionControllerTest {
         };
     }
 
-    private BaseMatcher<String> subscriberResponseMatcherWithSubscriptions(final String channel) {
-        return new BaseMatcher<String>() {
-            @Override
-            public boolean matches(Object o) {
-                return assertSubscriberResponse((String) o, channel);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-            }
-        };
-    }
-
-
     private String performIVRChannelValidationAndCleanup(String jsonContent, String channel) {
         if (Channel.isIVR(channel)) {
             assertTrue(jsonContent.startsWith(IVR_RESPONSE_PREFIX));
@@ -569,23 +705,12 @@ public class SubscriptionControllerTest {
                 baseResponse.getDescription().equals("runtime exception");
     }
 
-    private boolean assertSubscriberResponse(String jsonContent, String channel) {
-        jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
-
-        SubscriptionWebResponse subscriptionWebResponse = TestUtils.fromJson(jsonContent, SubscriptionWebResponse.class);
-        SubscriptionDetails subscriptionDetails = subscriptionWebResponse.getSubscriptionDetails().get(0);
-
-        return subscriptionDetails.getPack().equals(mockedSubscription.getPack().name())
-                && subscriptionDetails.getStatus().equals(mockedSubscription.getStatus().name())
-                && subscriptionDetails.getSubscriptionId().equals(mockedSubscription.getSubscriptionId());
-    }
-
     private boolean assertSubscriberResponseWithNoSubscriptions(String jsonContent, String channel) {
         jsonContent = performIVRChannelValidationAndCleanup(jsonContent, channel);
 
-        SubscriptionWebResponse subscriptionWebResponse = TestUtils.fromJson(jsonContent, SubscriptionWebResponse.class);
+        SubscriptionIVRWebResponse subscriptionIVRWebResponse = TestUtils.fromJson(jsonContent, SubscriptionIVRWebResponse.class);
 
-        return subscriptionWebResponse.getSubscriptionDetails().size() == 0;
+        return subscriptionIVRWebResponse.getSubscriptionDetails().size() == 0;
     }
 
     @Test
@@ -599,10 +724,10 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldSetCallCenterAsChannelInHttpThreadContext() throws Exception {
         ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest(
-                "1234567890", "1234567891", Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()), Channel.CONTACT_CENTER.toString());
+                "1234567890", "1234567891", Arrays.asList(SubscriptionPack.NANHI_KILKARI.toString()), Channel.CONTACT_CENTER.toString(), "reason");
 
         mockMvc(subscriptionController).perform(
-                post("/subscription/changemsisdn")
+                post("/subscriber/changemsisdn")
                         .param("channel", Channel.CONTACT_CENTER.toString())
                         .body(TestUtils.toJson(changeMsisdnWebRequest).getBytes())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -615,8 +740,6 @@ public class SubscriptionControllerTest {
     public void shouldProcessChangeMsisdnRequestSuccessfully() throws Exception {
         String oldMsisdn = "1234567890";
         String newMsisdn = "9876543210";
-        String channel = Channel.CONTACT_CENTER.name();
-
         ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
         changeMsisdnWebRequest.setOldMsisdn(oldMsisdn);
         changeMsisdnWebRequest.setNewMsisdn(newMsisdn);
@@ -625,13 +748,33 @@ public class SubscriptionControllerTest {
         changeMsisdnWebRequest.setPacks(packs);
         byte[] requestBody = TestUtils.toJson(changeMsisdnWebRequest).getBytes();
 
+        assertChangeMsisdnRequest(oldMsisdn, newMsisdn, requestBody, MediaType.APPLICATION_JSON, HttpHeaders.APPLICATION_JSON);
+    }
+
+    @Test
+    public void shouldProcessChangeMsisdnRequestWithXmlSuccessfully() throws Exception {
+        String oldMsisdn = "1234567890";
+        String newMsisdn = "9876543210";
+        ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest();
+        changeMsisdnWebRequest.setOldMsisdn(oldMsisdn);
+        changeMsisdnWebRequest.setNewMsisdn(newMsisdn);
+        ArrayList<String> packs = new ArrayList<>();
+        packs.add(SubscriptionPack.BARI_KILKARI.name());
+        changeMsisdnWebRequest.setPacks(packs);
+        byte[] requestBody = TestUtils.toXml(ChangeMsisdnWebRequest.class, changeMsisdnWebRequest).getBytes();
+
+        assertChangeMsisdnRequest(oldMsisdn, newMsisdn, requestBody, MediaType.APPLICATION_XML, HttpHeaders.APPLICATION_XML);
+    }
+
+    private void assertChangeMsisdnRequest(String oldMsisdn, String newMsisdn, byte[] requestBody, MediaType mediaType, String contentType) throws Exception {
+        String channel = Channel.CONTACT_CENTER.name();
         mockMvc(subscriptionController)
-                .perform(post("/subscription/changemsisdn")
+                .perform(post("/subscriber/changemsisdn")
                         .param("channel", channel)
-                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                        .body(requestBody).contentType(mediaType).accept(mediaType))
                 .andExpect(status().isOk())
-                .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
-                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Change Msisdn request submitted successfully")));
+                .andExpect(content().type(contentType))
+                .andExpect(content().string(baseResponseMatcher("SUCCESS", "Change Msisdn request submitted successfully", contentType)));
 
         ArgumentCaptor<ChangeMsisdnWebRequest> changeMsisdnWebRequestArgumentCaptor = ArgumentCaptor.forClass(ChangeMsisdnWebRequest.class);
         verify(kilkariSubscriptionService).changeMsisdn(changeMsisdnWebRequestArgumentCaptor.capture());

@@ -8,6 +8,7 @@
     <import resource="classpath*:applicationKilkariCommonContext.xml"/>
     <import resource="classpath*:applicationKilkariMessageCampaignContext.xml"/>
     <import resource="classpath*:applicationKilkariMessageContext.xml"/>
+    <import resource="classpath*:applicationKilkariRefdataSyncContext.xml"/>
 
     <util:properties id="couchdbProperties" location="classpath:couchdb.properties"/>
     <bean id="httpClient" class="org.ektorp.spring.HttpClientFactoryBean">

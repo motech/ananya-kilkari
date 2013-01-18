@@ -1,15 +1,16 @@
 package org.motechproject.ananya.kilkari.web.controller;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
-import org.motechproject.ananya.kilkari.web.response.SubscriptionWebResponse;
+import org.motechproject.ananya.kilkari.web.response.SubscriptionBaseWebResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,17 +23,13 @@ public class SubscriptionController {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
     private CallbackRequestValidator callbackRequestValidator;
-    private SubscriptionDetailsMapper subscriptionDetailsMapper;
 
     @Autowired
     public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService,
-                                  CallbackRequestValidator callbackRequestValidator,
-                                  SubscriptionDetailsMapper subscriptionDetailsMapper) {
+                                  CallbackRequestValidator callbackRequestValidator) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.callbackRequestValidator = callbackRequestValidator;
-        this.subscriptionDetailsMapper = subscriptionDetailsMapper;
     }
-
 
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
     @ResponseBody
@@ -65,17 +62,10 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/subscriber", method = RequestMethod.GET)
     @ResponseBody
-    public SubscriptionWebResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
+    public SubscriptionBaseWebResponse getSubscriptions(@RequestParam String msisdn, @RequestParam String channel) {
         validateChannel(channel);
-        SubscriptionWebResponse subscriptionWebResponse = new SubscriptionWebResponse();
-        List<Subscription> subscriptions = kilkariSubscriptionService.findByMsisdn(msisdn);
-
-        if (subscriptions != null) {
-            for (Subscription subscription : subscriptions)
-                subscriptionWebResponse.addSubscriptionDetail(subscriptionDetailsMapper.mapFrom(subscription));
-        }
-
-        return subscriptionWebResponse;
+        List<SubscriptionDetailsResponse> subscriptionDetailsList = kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel));
+        return SubscriptionDetailsMapper.mapFrom(subscriptionDetailsList, Channel.from(channel));
     }
 
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.DELETE)
@@ -103,7 +93,7 @@ public class SubscriptionController {
         return BaseResponse.success("Change Subscription successfully completed");
     }
 
-    @RequestMapping(value = "/subscription/changemsisdn", method = RequestMethod.POST)
+    @RequestMapping(value = "/subscriber/changemsisdn", method = RequestMethod.POST)
     @ResponseBody
     public BaseResponse changeMsisdn(@RequestBody ChangeMsisdnWebRequest changeMsisdnWebRequest, @RequestParam String channel) {
         changeMsisdnWebRequest.setChannel(channel);
@@ -119,6 +109,7 @@ public class SubscriptionController {
         kilkariSubscriptionService.updateSubscriberDetails(subscriberWebRequest, subscriptionId);
         return BaseResponse.success("Subscriber Update request submitted successfully");
     }
+
 
     private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
         if (validationErrors.hasErrors()) {

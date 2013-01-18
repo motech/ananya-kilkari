@@ -6,6 +6,9 @@ import org.motechproject.ananya.reports.kilkari.contract.response.LocationRespon
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
+
 @Service
 @TestProfile
 public class StubReportingService implements ReportingService {
@@ -58,10 +61,25 @@ public class StubReportingService implements ReportingService {
     }
 
     @Override
-    public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
+    public void reportChangeMsisdnForEarlySubscription(SubscriberChangeMsisdnReportRequest reportRequest) {
         if (verify()) {
-            behavior.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+            behavior.reportChangeMsisdnForEarlySubscription(reportRequest);
         }
+    }
+
+    @Override
+    public void reportCampaignScheduleAlertReceived(CampaignScheduleAlertRequest campaignScheduleAlertRequest) {
+        if (verify()) {
+            behavior.reportCampaignScheduleAlertReceived(campaignScheduleAlertRequest);
+        }
+    }
+
+    @Override
+    public List<SubscriberResponse> getSubscribersByMsisdn(String msisdn) {
+        if (verify()) {
+            return behavior.getSubscribersByMsisdn(msisdn);
+        }
+        return Collections.EMPTY_LIST;
     }
 
     public void setBehavior(ReportingService behavior) {

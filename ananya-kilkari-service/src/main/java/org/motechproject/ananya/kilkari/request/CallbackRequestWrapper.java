@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 public class CallbackRequestWrapper implements Serializable {
 
+    private static final long serialVersionUID = -9004591146178155518L;
     private CallbackRequest callbackRequest;
     private String subscriptionId;
     private DateTime createdAt;

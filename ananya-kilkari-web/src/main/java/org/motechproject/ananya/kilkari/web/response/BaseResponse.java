@@ -4,17 +4,22 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
 import java.io.StringWriter;
 
+@XmlRootElement(name = "response")
 public class BaseResponse {
 
     private static final String FAILED = "FAILED";
     private static final String SUCCESS = "SUCCESS";
 
     @JsonProperty
+    @XmlElement
     protected String status;
     @JsonProperty
+    @XmlElement
     protected String description;
 
     private BaseResponse(String status, String description) {

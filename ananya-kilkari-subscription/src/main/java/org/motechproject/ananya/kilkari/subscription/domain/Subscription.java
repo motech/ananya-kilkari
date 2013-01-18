@@ -42,13 +42,17 @@ public class Subscription extends MotechBaseDataObject {
     @JsonProperty
     private DateTime scheduleStartDate;
 
+    @JsonProperty
+    private Integer startWeekNumber;
+
     Subscription() {
         //for serialization do not make it public
     }
 
-    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, DateTime startDate) {
+    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, DateTime startDate, Integer startWeekNumber) {
         this.pack = pack;
         this.msisdn = msisdn;
+        this.startWeekNumber = startWeekNumber;
         this.creationDate = floorToExactMinutes(createdAt);
         this.startDate = floorToExactMinutes(startDate);
         this.subscriptionId = UUID.randomUUID().toString();
@@ -67,10 +71,10 @@ public class Subscription extends MotechBaseDataObject {
         return creationDate;
     }
 
-
     public SubscriptionStatus getStatus() {
         return status;
     }
+
 
     public SubscriptionPack getPack() {
         return pack;
@@ -98,6 +102,10 @@ public class Subscription extends MotechBaseDataObject {
 
     public DateTime getScheduleStartDate() {
         return scheduleStartDate;
+    }
+
+    public Integer getStartWeekNumber() {
+        return startWeekNumber;
     }
 
     @Override
@@ -154,7 +162,7 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     public boolean isInUpdatableState() {
-        return this.isNewEarly() || this.isActiveOrSuspended();
+        return (this.isNewEarly() || this.isActiveOrSuspended()) && !this.isInDeactivatedState();
     }
 
     public void activateOnRenewal() {

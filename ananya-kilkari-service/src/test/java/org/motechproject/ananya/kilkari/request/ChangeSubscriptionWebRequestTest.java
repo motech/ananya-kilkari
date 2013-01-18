@@ -36,7 +36,7 @@ public class ChangeSubscriptionWebRequestTest {
         changeSubscriptionWebRequest.setChangeType("change_paCK");
         changeSubscriptionWebRequest.setPack("navjaat_KilkarI");
         changeSubscriptionWebRequest.setChannel("CONTACT_CENTER");
-        changeSubscriptionWebRequest.setDateOfBirth(DateUtils.formatDate(DateTime.now().minusYears(1)));
+        changeSubscriptionWebRequest.setDateOfBirth(DateUtils.formatDate(DateTime.now().minusYears(1), org.joda.time.tz.FixedDateTimeZone.forOffsetHoursMinutes(5, 30)));
         changeSubscriptionWebRequest.setExpectedDateOfDelivery(null);
 
         Errors errors = changeSubscriptionWebRequest.validate();

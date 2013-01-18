@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 public class FailedCallReport implements Serializable {
 
+    private static final long serialVersionUID = -7535126347892474071L;
     @JsonProperty
     private String subscriptionId;
     @JsonProperty

@@ -4,7 +4,6 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
 public enum SubscriptionPack {
-
     BARI_KILKARI(1, 64) {
         @Override
         public DateTime getStartDate(DateTime dob) {
@@ -23,6 +22,7 @@ public enum SubscriptionPack {
         }
     };
 
+    private static final int NUMBER_OF_WEEKS_IN_12_MONTHS = 48;
     private int startWeek;
     private int totalWeeks;
 
@@ -64,5 +64,9 @@ public enum SubscriptionPack {
 
     public DateTime getStartDateForWeek(DateTime startDate, Integer weekNumber) {
         return startDate.minusWeeks(weekNumber - 1);
+    }
+
+    public boolean isValidDateOfBirth(DateTime dateOfBirth, DateTime createdAt) {
+        return createdAt.minusWeeks(NUMBER_OF_WEEKS_IN_12_MONTHS).isBefore(dateOfBirth);
     }
 }

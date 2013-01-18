@@ -1,9 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.builder;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
@@ -11,39 +9,21 @@ import org.motechproject.ananya.kilkari.subscription.service.request.Subscriptio
 public class SubscriptionRequestBuilder {
     private String msisdn;
     private SubscriptionPack pack;
-    private Operator operator;
-    private SubscriptionStatus status;
     private DateTime creationDate;
-    private String district;
-    private String panchayat;
-    private String block;
     private String beneficiaryName;
     private int beneficiaryAge;
     private DateTime dob;
     private DateTime edd;
     private Integer week;
     private String reason;
+    private Location location;
 
     public SubscriptionRequestBuilder withDefaults() {
         return withMsisdn("9876543210")
-                .withOperator(Operator.AIRTEL)
-                .withStatus(SubscriptionStatus.ACTIVE)
                 .withPack(SubscriptionPack.BARI_KILKARI)
-                .withBlock("block")
-                .withDistrict("district")
-                .withPanchayat("panchayat")
+                .withLocation("district", "block", "panchayat")
                 .withReason(null)
                 .withCreationDate(DateTime.now());
-    }
-
-    public SubscriptionRequestBuilder withStatus(SubscriptionStatus status) {
-        this.status = status;
-        return this;
-    }
-
-    public SubscriptionRequestBuilder withOperator(Operator operator) {
-        this.operator = operator;
-        return this;
     }
 
     public SubscriptionRequestBuilder withMsisdn(String msisdn) {
@@ -56,24 +36,13 @@ public class SubscriptionRequestBuilder {
         return this;
     }
 
-
     public SubscriptionRequestBuilder withCreationDate(DateTime creationDate) {
         this.creationDate = creationDate;
         return this;
     }
 
-    public SubscriptionRequestBuilder withDistrict(String district) {
-        this.district = district;
-        return this;
-    }
-
-    public SubscriptionRequestBuilder withPanchayat(String panchayat) {
-        this.panchayat = panchayat;
-        return this;
-    }
-
-    public SubscriptionRequestBuilder withBlock(String block) {
-        this.block = block;
+    public SubscriptionRequestBuilder withLocation(String district, String block, String panchayat) {
+        this.location =  new Location(district, block, panchayat);
         return this;
     }
 
@@ -81,7 +50,6 @@ public class SubscriptionRequestBuilder {
         this.reason = reason;
         return this;
     }
-
 
     public SubscriptionRequestBuilder withBeneficiaryName(String beneficiaryName) {
         this.beneficiaryName = beneficiaryName;
@@ -108,8 +76,12 @@ public class SubscriptionRequestBuilder {
         return this;
     }
 
+    public SubscriptionRequestBuilder withLocation(Location location) {
+        this.location = location;
+        return this;
+    }
+
     public SubscriptionRequest build() {
-        Location location = new Location(district, block, panchayat);
         Subscriber subscriber = new Subscriber(beneficiaryName, beneficiaryAge, dob, edd, week);
         return new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber, reason);
     }

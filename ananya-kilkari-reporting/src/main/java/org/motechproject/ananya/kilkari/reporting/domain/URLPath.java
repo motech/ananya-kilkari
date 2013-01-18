@@ -9,4 +9,6 @@ public class URLPath {
     public static final String GET_SUBSCRIBER_PATH = "subscription/subscriber";
     public static final String CHANGE_MSISDN_PATH = "subscription/changemsisdn";
     public static final String PURGE_SUBSCRIPTION_PATH = "subscription";
+    public static final String GET_SUBSCRIBER_BY_MSISDN_PATH = "subscriber";
+    public static final String CAMPAIGN_SCHEDULE_ALERT_PATH = "subscription/campaignScheduleAlert";
 }

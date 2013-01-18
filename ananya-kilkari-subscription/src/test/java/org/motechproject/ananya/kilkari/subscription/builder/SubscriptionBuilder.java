@@ -15,6 +15,7 @@ public class SubscriptionBuilder {
     private DateTime startDate;
     private DateTime scheduleStartDate;
     private DateTime activationDate;
+    private Integer startWeekNumber;
 
     public SubscriptionBuilder withDefaults() {
         DateTime now = DateTime.now();
@@ -25,7 +26,8 @@ public class SubscriptionBuilder {
                 .withCreationDate(now)
                 .withStartDate(now)
                 .withActivationDate(now)
-                .withScheduleStartDate(now);
+                .withScheduleStartDate(now)
+                .withStartWeekNumber(1);
     }
 
     public SubscriptionBuilder withScheduleStartDate(DateTime now) {
@@ -69,8 +71,13 @@ public class SubscriptionBuilder {
         return this;
     }
 
+    public SubscriptionBuilder withStartWeekNumber(Integer startWeekNumber) {
+        this.startWeekNumber = startWeekNumber;
+        return this;
+    }
+
     public Subscription build() {
-        Subscription subscription = new Subscription(msisdn, pack, creationDate, startDate);
+        Subscription subscription = new Subscription(msisdn, pack, creationDate, startDate, startWeekNumber);
         subscription.activate(operator.name(), scheduleStartDate, activationDate);
         subscription.setStatus(status);
         subscription.setOperator(operator);

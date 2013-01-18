@@ -6,6 +6,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.domain.PhoneNumber;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
+import org.motechproject.ananya.kilkari.request.LocationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.CampaignChangeReason;
 import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -98,10 +99,17 @@ public class WebRequestValidator {
     }
 
     public void validateAge(String beneficiaryAge) {
-        if (StringUtils.isNotEmpty(beneficiaryAge)) {
-            if (!ValidationUtils.assertNumeric(beneficiaryAge))
-                errors.add("Invalid beneficiary age %s", beneficiaryAge);
-        }
+        if (addErrorMessageIfEmpty(beneficiaryAge, "Missing beneficiary age"))
+            return;
+        if (!ValidationUtils.assertNumeric(beneficiaryAge))
+            errors.add("Invalid beneficiary age %s", beneficiaryAge);
+    }
+
+    public void validateName(String name){
+        if(addErrorMessageIfEmpty(name, "Missing Name"))
+            return;
+        if(!ValidationUtils.assertAlphanumericWithDot(name))
+            errors.add("Name is Invalid");
     }
 
     public Errors getErrors() {
@@ -118,5 +126,23 @@ public class WebRequestValidator {
         } else if (changeType.equalsIgnoreCase(ChangeSubscriptionType.CHANGE_SCHEDULE.name())) {
             validateExactlyOneOfEDDOrDOBIsPresent(edd, dob);
         }
+    }
+
+    public void validateLocation(LocationRequest location) {
+        if (location == null) {
+            errors.add("Missing location");
+            return;
+        }
+        addErrorMessageIfEmpty(location.getDistrict(), "Missing district");
+        addErrorMessageIfEmpty(location.getBlock(), "Missing block");
+        addErrorMessageIfEmpty(location.getPanchayat(), "Missing panchayat");
+    }
+
+    private boolean addErrorMessageIfEmpty(String value, String validationMessage) {
+        if (StringUtils.isEmpty(value)) {
+            errors.add(validationMessage);
+            return true;
+        }
+        return false;
     }
 }

@@ -7,7 +7,7 @@ import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.model.MotechBaseDataObject;
 
 @TypeDiscriminator("doc.type === 'SubscriberCareDoc'")
-public class SubscriberCareDoc extends MotechBaseDataObject {
+public class SubscriberCareDoc extends MotechBaseDataObject implements Comparable<SubscriberCareDoc> {
     @JsonProperty
     private String msisdn;
 
@@ -48,5 +48,10 @@ public class SubscriberCareDoc extends MotechBaseDataObject {
 
     public void setCreatedAt(DateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Override
+    public int compareTo(SubscriberCareDoc other) {
+        return createdAt.compareTo(other.getCreatedAt());
     }
 }

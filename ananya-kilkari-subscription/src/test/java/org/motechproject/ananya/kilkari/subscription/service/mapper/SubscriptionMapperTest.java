@@ -3,8 +3,8 @@ package org.motechproject.ananya.kilkari.subscription.service.mapper;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
@@ -15,6 +15,7 @@ import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocat
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class SubscriptionMapperTest {
 
@@ -40,10 +41,12 @@ public class SubscriptionMapperTest {
     }
 
     @Test
-    public void shouldCreateReportingRequest() {
+    public void shouldCreateReportingRequestWithoutLocation() {
         String reason = "some reason";
+        Integer week = 33;
+        Subscriber subscriber = new Subscriber("name", null, null, null, week);
         SubscriptionReportRequest request = SubscriptionMapper.createSubscriptionCreationReportRequest(
-                subscription, channel, new SubscriptionRequest("msisdn", null, null, Location.NULL, Subscriber.NULL, reason));
+                subscription, channel, new SubscriptionRequest("msisdn", null, null, Location.NULL, subscriber, reason));
 
         assertEquals(subscription.getMsisdn(), request.getMsisdn().toString());
         assertEquals(subscription.getPack().name(), request.getPack());
@@ -51,10 +54,12 @@ public class SubscriptionMapperTest {
         assertEquals(subscription.getStartDate(), request.getStartDate());
         assertEquals(channel.name(), request.getChannel());
         assertEquals(reason, request.getReason());
+        assertEquals(week, request.getStartWeekNumber());
+        assertNull(request.getLocation());
     }
 
     @Test
-    public void shouldCreateReportingRequest_WithLocation() {
+    public void shouldCreateReportingRequestWithLocation() {
         subscription = new SubscriptionBuilder().withDefaults().build();
         String panchayat = "panchayat";
         String block = "block";

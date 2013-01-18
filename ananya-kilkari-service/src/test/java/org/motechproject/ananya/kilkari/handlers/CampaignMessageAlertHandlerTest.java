@@ -27,17 +27,19 @@ public class CampaignMessageAlertHandlerTest {
     }
 
     @Test
-    public void shouldInvokeCampaignServiceWhenMilestoneAlertIsRaised() {
+    public void shouldInvokeCampaignServiceAndReportWhenMilestoneAlertIsRaised() {
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put(EventKeys.EXTERNAL_ID_KEY, "myexternalid");
+        String externalId = "myexternalid";
+        String campaignName = "mypack";
+        parameters.put(EventKeys.EXTERNAL_ID_KEY, externalId);
         parameters.put(EventKeys.MESSAGE_KEY, "mymessagekey");
-        parameters.put(EventKeys.CAMPAIGN_NAME_KEY, "mypack");
+        parameters.put(EventKeys.CAMPAIGN_NAME_KEY, campaignName);
         parameters.put(EventKeys.MESSAGE_NAME_KEY, "mymessagenamekey");
-
         MotechEvent motechEvent = new MotechEvent(EventKeys.SEND_MESSAGE, parameters);
 
         campaignMessageAlertHandler.handleAlertEvent(motechEvent);
-        verify(kilkariCampaignService).scheduleWeeklyMessage("myexternalid", "mypack");
+
+        verify(kilkariCampaignService).scheduleWeeklyMessage(externalId, campaignName);
     }
 
     @Test

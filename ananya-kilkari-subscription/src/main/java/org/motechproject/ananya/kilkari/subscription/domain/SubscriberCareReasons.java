@@ -3,7 +3,7 @@ package org.motechproject.ananya.kilkari.subscription.domain;
 import org.apache.commons.lang.StringUtils;
 
 public enum SubscriberCareReasons {
-    HELP;
+    HELP, NEW_SUBSCRIPTION;
 
     public static SubscriberCareReasons getFor(String reason) {
         final String standardizedReason = StringUtils.trimToEmpty(reason).toUpperCase();
@@ -11,7 +11,7 @@ public enum SubscriberCareReasons {
     }
 
     public static boolean isValid(String subscriberCareReason) {
-        return (subscriberCareReason != null && SubscriberCareReasons.contains(subscriberCareReason));
+        return SubscriberCareReasons.contains(subscriberCareReason);
     }
 
     private static boolean contains(String value) {

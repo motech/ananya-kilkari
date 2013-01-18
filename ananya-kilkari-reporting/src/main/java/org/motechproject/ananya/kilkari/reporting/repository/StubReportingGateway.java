@@ -6,6 +6,9 @@ import org.motechproject.ananya.reports.kilkari.contract.response.LocationRespon
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
+import java.util.List;
+
 @Repository
 @TestProfile
 public class StubReportingGateway implements ReportingGateway {
@@ -50,9 +53,22 @@ public class StubReportingGateway implements ReportingGateway {
     }
 
     @Override
-    public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
+    public void reportChangeMsisdnForSubscriber(SubscriberChangeMsisdnReportRequest reportRequest) {
         if (verify())
-            behavior.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+            behavior.reportChangeMsisdnForSubscriber(reportRequest);
+    }
+
+    @Override
+    public void reportCampaignScheduleAlertReceived(CampaignScheduleAlertRequest campaignScheduleAlertRequest) {
+        if (verify())
+            behavior.reportCampaignScheduleAlertReceived(campaignScheduleAlertRequest);
+    }
+
+    @Override
+    public List<SubscriberResponse> getSubscribersByMsisdn(String msisdn) {
+        if (verify())
+            return behavior.getSubscribersByMsisdn(msisdn);
+        return Collections.EMPTY_LIST;
     }
 
     public void setBehavior(ReportingGateway behavior) {

@@ -9,6 +9,7 @@ import org.joda.time.DateTime;
 import java.io.Serializable;
 
 public class SubscriberCareRequest implements Serializable {
+    private static final long serialVersionUID = 8394921863732255779L;
     private String msisdn;
     private String reason;
     private String channel;

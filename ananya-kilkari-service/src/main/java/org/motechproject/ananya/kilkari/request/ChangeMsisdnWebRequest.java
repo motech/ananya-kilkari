@@ -6,30 +6,45 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.List;
 
+@XmlRootElement(name = "subscriber")
 public class ChangeMsisdnWebRequest {
 
     @JsonIgnore
+    @XmlTransient
     private String channel;
 
     @JsonProperty
+    @XmlElement
     private String oldMsisdn;
 
     @JsonProperty
+    @XmlElement
     private String newMsisdn;
 
     @JsonProperty
+    @XmlElement
+    private String reason;
+
+    @JsonProperty
+    @XmlElementWrapper(name = "packs")
+    @XmlElement(name = "pack")
     private List<String> packs;
 
 
     public ChangeMsisdnWebRequest() { }
 
-    public ChangeMsisdnWebRequest(String oldMsisdn, String newMsisdn, List<String> packs, String channel) {
+    public ChangeMsisdnWebRequest(String oldMsisdn, String newMsisdn, List<String> packs, String channel, String reason) {
         this.oldMsisdn = oldMsisdn;
         this.newMsisdn = newMsisdn;
         this.packs = packs;
         this.channel = channel;
+        this.reason = reason;
     }
 
     public Errors validate() {
@@ -44,18 +59,22 @@ public class ChangeMsisdnWebRequest {
         return errors;
     }
 
+    @XmlTransient
     public String getOldMsisdn() {
         return oldMsisdn;
     }
 
+    @XmlTransient
     public String getNewMsisdn() {
         return newMsisdn;
     }
 
+    @XmlTransient
     public List<String> getPacks() {
         return packs;
     }
 
+    @XmlTransient
     public String getChannel() {
         return channel;
     }
@@ -74,6 +93,15 @@ public class ChangeMsisdnWebRequest {
 
     public void setChannel(String channel) {
         this.channel = channel;
+    }
+
+    @XmlTransient
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     private void validateSubscriptionPacksForChangeMsisdn(Errors errors) {
@@ -100,5 +128,4 @@ public class ChangeMsisdnWebRequest {
         if(oldMsisdn.equals(newMsisdn))
             errors.add("Old and new msisdn cannot be same");
     }
-
 }

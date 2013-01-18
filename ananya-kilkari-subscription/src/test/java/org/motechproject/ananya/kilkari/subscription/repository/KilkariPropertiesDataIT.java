@@ -16,12 +16,12 @@ public class KilkariPropertiesDataIT {
 
     @Autowired
     private KilkariPropertiesData kilkariProperties;
+
     @Test
-    public void shouldBeAbleToLoadThePropertiesFromTheKilkariPropertiesFile(){
-        assertEquals(0,kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion());
-        assertEquals(2,kilkariProperties.getCampaignScheduleDeltaDays());
-        assertEquals(30,kilkariProperties.getCampaignScheduleDeltaMinutes());
-
+    public void shouldBeAbleToLoadThePropertiesFromTheKilkariPropertiesFile() {
+        assertEquals(0, kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion());
+        assertEquals(0, kilkariProperties.getCampaignScheduleDeltaDays());
+        assertEquals(1, kilkariProperties.getCampaignScheduleDeltaMinutes());
+        assertEquals(0, kilkariProperties.getBufferDaysToAllowRenewalForDeactivation());
     }
-
 }

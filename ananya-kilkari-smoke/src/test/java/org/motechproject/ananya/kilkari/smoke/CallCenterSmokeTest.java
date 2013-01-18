@@ -37,7 +37,7 @@ public class CallCenterSmokeTest extends BaseSmokeTest {
     @Test
     public void shouldPostHttpRequestAndVerifyEntriesInReportDbAndCouchDb() throws InterruptedException {
         String expectedStatus = "Pending Subscription";
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withEDD(null).withDOB(null).withLocation(null).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withEDD(null).withDOB(null).build();
         Map<String, String> parametersMap = new HashMap<>();
         String channel = "CONTACT_CENTER";
         parametersMap.put("channel", channel);

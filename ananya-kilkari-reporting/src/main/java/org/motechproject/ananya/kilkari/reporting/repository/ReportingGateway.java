@@ -5,6 +5,8 @@ import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 
+import java.util.List;
+
 public interface ReportingGateway {
     LocationResponse getLocation(String district, String block, String panchayat);
 
@@ -18,5 +20,9 @@ public interface ReportingGateway {
 
     void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest);
 
-    void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn);
+    void reportChangeMsisdnForSubscriber(SubscriberChangeMsisdnReportRequest reportRequest);
+
+    List<SubscriberResponse> getSubscribersByMsisdn(String msisdn);
+
+    void reportCampaignScheduleAlertReceived(CampaignScheduleAlertRequest campaignScheduleAlertRequest);
 }

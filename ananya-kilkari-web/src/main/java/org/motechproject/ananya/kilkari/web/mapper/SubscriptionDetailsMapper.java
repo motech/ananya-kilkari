@@ -1,22 +1,45 @@
 package org.motechproject.ananya.kilkari.web.mapper;
 
-import org.motechproject.ananya.kilkari.message.service.InboxService;
-import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
-import org.motechproject.ananya.kilkari.web.response.SubscriptionDetails;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.motechproject.ananya.kilkari.obd.domain.Channel;
+import org.motechproject.ananya.kilkari.subscription.service.request.Location;
+import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
+import org.motechproject.ananya.kilkari.web.response.*;
 
-@Component
+import java.util.List;
+
 public class SubscriptionDetailsMapper {
-    private InboxService inboxService;
+    public static SubscriptionBaseWebResponse mapFrom(List<SubscriptionDetailsResponse> subscriptionDetailsResponses, Channel channel) {
+        if (Channel.IVR.equals(channel))
+            return mapToIvrResponse(subscriptionDetailsResponses);
 
-    @Autowired
-    public SubscriptionDetailsMapper(InboxService inboxService) {
-        this.inboxService = inboxService;
+        return mapToContactCenterResponse(subscriptionDetailsResponses);
     }
 
-    public SubscriptionDetails mapFrom(Subscription subscription) {
-        String messageId = inboxService.getMessageFor(subscription.getSubscriptionId());
-        return new SubscriptionDetails(subscription.getSubscriptionId(), subscription.getPack().name(), subscription.getStatus().getDisplayString(), messageId);
+    private static SubscriptionBaseWebResponse mapToIvrResponse(List<SubscriptionDetailsResponse> subscriptionDetailsResponses) {
+        SubscriptionIVRWebResponse ivrWebResponse = new SubscriptionIVRWebResponse();
+        for (SubscriptionDetailsResponse detailsResponse : subscriptionDetailsResponses) {
+            ivrWebResponse.addSubscriptionDetail(new SubscriptionDetails(detailsResponse.getSubscriptionId(), detailsResponse.getPack().name(), detailsResponse.getStatus().getDisplayString(), detailsResponse.getCampaignId()));
+        }
+        return ivrWebResponse;
+    }
+
+    private static SubscriptionBaseWebResponse mapToContactCenterResponse(List<SubscriptionDetailsResponse> subscriptionDetailsResponses) {
+        SubscriptionCCWebResponse ccWebResponse = new SubscriptionCCWebResponse();
+        for (SubscriptionDetailsResponse detailsResponse : subscriptionDetailsResponses) {
+            Location locationDetails = detailsResponse.getLocation();
+            LocationResponse location = locationDetails != null ? new LocationResponse(locationDetails.getDistrict(), locationDetails.getBlock(), locationDetails.getPanchayat()) : null;
+            ccWebResponse.addSubscriptionDetail(new AllSubscriptionDetails(detailsResponse.getSubscriptionId(),
+                    detailsResponse.getPack().name(),
+                    detailsResponse.getStatus().getDisplayString(),
+                    detailsResponse.getCampaignId(),
+                    detailsResponse.getBeneficiaryName(),
+                    detailsResponse.getBeneficiaryAge(),
+                    detailsResponse.getStartWeekNumber(),
+                    detailsResponse.getExpectedDateOfDelivery(),
+                    detailsResponse.getDateOfBirth(),
+                    location,
+                    detailsResponse.getLastWeeklyMessageScheduledDate()));
+        }
+        return ccWebResponse;
     }
 }

@@ -4,10 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
-import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.http.client.domain.Method;
@@ -24,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -88,9 +86,21 @@ public class ReportingGatewayImpl implements ReportingGateway {
     }
 
     @Override
-    public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
-        String url = String.format("%s%s?subscriptionId=%s&msisdn=%s", getBaseUrl(), CHANGE_MSISDN_PATH, subscriptionId, msisdn);
-        performHttpRequestBasedOnChannel(url, null, Method.POST);
+    public void reportChangeMsisdnForSubscriber(SubscriberChangeMsisdnReportRequest reportRequest) {
+        String url = String.format("%s%s", getBaseUrl(), CHANGE_MSISDN_PATH);
+        performHttpRequestBasedOnChannel(url, reportRequest, Method.POST);
+    }
+
+    @Override
+    public List<SubscriberResponse> getSubscribersByMsisdn(String msisdn) {
+        String url = String.format("%s%s?msisdn=%s", getBaseUrl(), GET_SUBSCRIBER_BY_MSISDN_PATH, msisdn);
+        return Arrays.asList(restTemplate.getForEntity(url, SubscriberResponse[].class).getBody());
+    }
+
+    @Override
+    public void reportCampaignScheduleAlertReceived(CampaignScheduleAlertRequest campaignScheduleAlertRequest) {
+        String url = String.format("%s%s", getBaseUrl(), CAMPAIGN_SCHEDULE_ALERT_PATH);
+        performHttpRequestBasedOnChannel(url, campaignScheduleAlertRequest, Method.POST);
     }
 
     private boolean isCallCenterCall() {

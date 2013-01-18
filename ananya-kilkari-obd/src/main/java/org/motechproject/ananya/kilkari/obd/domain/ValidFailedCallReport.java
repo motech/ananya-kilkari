@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 import java.io.Serializable;
 
 public class ValidFailedCallReport implements Serializable {
+    private static final long serialVersionUID = -8340182977417760646L;
     private CampaignMessageStatus statusCode;
     private String subscriptionId;
     private String msisdn;

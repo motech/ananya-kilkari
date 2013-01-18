@@ -6,36 +6,35 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubscriptionWebResponse {
+@XmlRootElement(name = "subscriber")
+public class SubscriptionCCWebResponse extends SubscriptionBaseWebResponse {
 
     @JsonProperty
-    private List<SubscriptionDetails> subscriptionDetails;
+    @XmlElementWrapper(name = "subscriptionDetails")
+    @XmlElement(name = "subscriptionDetail")
+    private List<AllSubscriptionDetails> subscriptionDetails;
 
-    public SubscriptionWebResponse() {
+    public SubscriptionCCWebResponse() {
         this.subscriptionDetails = new ArrayList<>();
     }
 
-    public void addSubscriptionDetail(SubscriptionDetails subscriptionDetail) {
+    public void addSubscriptionDetail(AllSubscriptionDetails subscriptionDetail) {
         subscriptionDetails.add(subscriptionDetail);
     }
 
-    public List<SubscriptionDetails> getSubscriptionDetails() {
+    public List<AllSubscriptionDetails> getSubscriptionDetails() {
         return subscriptionDetails;
     }
 
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SubscriptionWebResponse)) return false;
-
-        SubscriptionWebResponse that = (SubscriptionWebResponse) o;
-
-        return new EqualsBuilder().append(this.subscriptionDetails, that.subscriptionDetails)
-                .isEquals();
+        return EqualsBuilder.reflectionEquals(this,o);
     }
 
     @Override

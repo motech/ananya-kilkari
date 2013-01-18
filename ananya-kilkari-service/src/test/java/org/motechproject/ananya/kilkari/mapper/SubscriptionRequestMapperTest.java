@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.motechproject.ananya.kilkari.builder.ChangeSubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.request.ChangeSubscriptionWebRequest;
+import org.motechproject.ananya.kilkari.request.LocationRequest;
 import org.motechproject.ananya.kilkari.request.SubscriberWebRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
@@ -41,18 +42,19 @@ public class SubscriptionRequestMapperTest {
         String subscriptionId = "subscriptionId";
         String name = "Name";
         String beneficiaryAge = "23";
-        String district = "district";
-        String block = "block";
-        String panchayat = "panchayat";
+        final String district = "district";
+        final String block = "block";
+        final String panchayat = "panchayat";
         String contactCenter = "CONTACT_CENTER";
-        String dob = "01-11-2011";
-        String edd = "01-01-2111";
         DateTime createdAtTime = DateTime.now();
         subscriberWebRequest.setBeneficiaryName(name);
         subscriberWebRequest.setBeneficiaryAge(beneficiaryAge);
-        subscriberWebRequest.setDistrict(district);
-        subscriberWebRequest.setBlock(block);
-        subscriberWebRequest.setPanchayat(panchayat);
+        LocationRequest locationRequest = new LocationRequest(){{
+            setDistrict(district);
+            setBlock(block);
+            setPanchayat(panchayat);
+        }};
+        subscriberWebRequest.setLocation(locationRequest);
         subscriberWebRequest.setChannel(contactCenter);
         subscriberWebRequest.setCreatedAt(createdAtTime);
 
@@ -60,9 +62,7 @@ public class SubscriptionRequestMapperTest {
 
         assertEquals(name, subscriberRequest.getBeneficiaryName());
         assertEquals(Integer.valueOf(beneficiaryAge), subscriberRequest.getBeneficiaryAge());
-        assertEquals(district, subscriberRequest.getDistrict());
-        assertEquals(block, subscriberRequest.getBlock());
-        assertEquals(panchayat, subscriberRequest.getPanchayat());
+        assertEquals(new Location(district, block, panchayat), subscriberRequest.getLocation());
         assertEquals(subscriptionId, subscriberRequest.getSubscriptionId());
     }
 
@@ -75,9 +75,7 @@ public class SubscriptionRequestMapperTest {
 
         assertNull(subscriberRequest.getBeneficiaryName());
         assertNull(subscriberRequest.getBeneficiaryAge());
-        assertNull(subscriberRequest.getDistrict());
-        assertNull(subscriberRequest.getBlock());
-        assertNull(subscriberRequest.getPanchayat());
+        assertEquals(Location.NULL, subscriberRequest.getLocation());
         assertEquals(subscriptionId, subscriberRequest.getSubscriptionId());
     }
 
@@ -100,5 +98,22 @@ public class SubscriptionRequestMapperTest {
         assertEquals(webRequest.getCreatedAt(), changeSubscriptionRequest.getCreatedAt());
         assertEquals(ChangeSubscriptionType.CHANGE_SCHEDULE, changeSubscriptionRequest.getChangeType());
         assertEquals("reason for change subscription", changeSubscriptionRequest.getReason());
+    }
+
+    @Test
+    public void shouldSetLocationToNullIfNotProvidedWhileCreateSubscription(){
+        SubscriptionWebRequest webRequest = new SubscriptionWebRequestBuilder().withDefaults().withLocation(null).build();
+
+        SubscriptionRequest subscriptionRequest = SubscriptionRequestMapper.mapToSubscriptionRequest(webRequest);
+
+        assertEquals(Location.NULL, subscriptionRequest.getLocation());
+
+    }
+
+    @Test
+    public void shouldSetLocationToNullIfNotProvidedWhileUpdatingSubscriberDetails(){
+        SubscriberRequest subscriberRequest = SubscriptionRequestMapper.mapToSubscriberRequest(new SubscriberWebRequest(), "subscriptionId");
+
+        assertEquals(Location.NULL, subscriberRequest.getLocation());
     }
 }

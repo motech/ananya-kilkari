@@ -1,8 +1,8 @@
 package org.motechproject.ananya.kilkari.mapper;
 
 import org.apache.commons.lang.StringUtils;
-import org.motechproject.ananya.kilkari.request.ChangeMsisdnWebRequest;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
+import org.motechproject.ananya.kilkari.request.ChangeMsisdnWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
 
@@ -12,11 +12,12 @@ import java.util.List;
 public class ChangeMsisdnRequestMapper {
 
     public static ChangeMsisdnRequest mapFrom(ChangeMsisdnWebRequest changeMsisdnWebRequest) {
+        String reason = String.format("CHANGE_MSISDN - %s", StringUtils.trimToEmpty(changeMsisdnWebRequest.getReason()));
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(
-                changeMsisdnWebRequest.getOldMsisdn(), changeMsisdnWebRequest.getNewMsisdn(), Channel.from(changeMsisdnWebRequest.getChannel()));
+                changeMsisdnWebRequest.getOldMsisdn(), changeMsisdnWebRequest.getNewMsisdn(), Channel.from(changeMsisdnWebRequest.getChannel()), reason);
 
         if (changeMsisdnWebRequest.getPacks().size() == 1 &&
-            StringUtils.trim(changeMsisdnWebRequest.getPacks().get(0)).equalsIgnoreCase("ALL")) {
+                StringUtils.trim(changeMsisdnWebRequest.getPacks().get(0)).equalsIgnoreCase("ALL")) {
             changeMsisdnRequest.setShouldChangeAllPacks(true);
             return changeMsisdnRequest;
         }

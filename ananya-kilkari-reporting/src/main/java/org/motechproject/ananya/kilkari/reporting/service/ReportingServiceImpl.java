@@ -2,14 +2,13 @@ package org.motechproject.ananya.kilkari.reporting.service;
 
 import org.motechproject.ananya.kilkari.reporting.profile.ProductionProfile;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
-import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @ProductionProfile
@@ -52,7 +51,17 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public void reportChangeMsisdnForSubscriber(String subscriptionId, String msisdn) {
-        reportGateway.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+    public void reportChangeMsisdnForEarlySubscription(SubscriberChangeMsisdnReportRequest reportRequest) {
+        reportGateway.reportChangeMsisdnForSubscriber(reportRequest);
+    }
+
+    @Override
+    public void reportCampaignScheduleAlertReceived(CampaignScheduleAlertRequest campaignScheduleAlertRequest) {
+        reportGateway.reportCampaignScheduleAlertReceived(campaignScheduleAlertRequest);
+    }
+
+    @Override
+    public List<SubscriberResponse> getSubscribersByMsisdn(String msisdn) {
+        return reportGateway.getSubscribersByMsisdn(msisdn);
     }
 }

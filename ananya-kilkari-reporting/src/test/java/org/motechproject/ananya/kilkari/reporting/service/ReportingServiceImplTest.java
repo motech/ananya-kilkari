@@ -1,13 +1,17 @@
 package org.motechproject.ananya.kilkari.reporting.service;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.reporting.repository.ReportingGateway;
 import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
+import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.http.client.service.HttpClientService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static junit.framework.Assert.assertEquals;
@@ -83,12 +87,36 @@ public class ReportingServiceImplTest {
     }
 
     @Test
-    public void shouldReportChangeMsisdn(){
-        String msisdn = "9876543210";
+    public void shouldReportChangeMsisdn() {
+        Long msisdn = 9876543210L;
         String subscriptionId = "subscriptionId";
+        String reason = "reason";
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, reason);
 
-        reportingServiceImpl.reportChangeMsisdnForSubscriber(subscriptionId, msisdn);
+        reportingServiceImpl.reportChangeMsisdnForEarlySubscription(reportRequest);
 
-        verify(reportGateway).reportChangeMsisdnForSubscriber(subscriptionId,msisdn);
+        verify(reportGateway).reportChangeMsisdnForSubscriber(reportRequest);
+    }
+
+    @Test
+    public void shouldGetSubscribersByMsisdn() {
+        final String msisdn = "1234567890";
+        final ArrayList<SubscriberResponse> expectedSubscriber = new ArrayList<SubscriberResponse>() {{
+            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), DateTime.now(), new LocationResponse("d", "b", "p")));
+        }};
+        when(reportGateway.getSubscribersByMsisdn(msisdn)).thenReturn(expectedSubscriber);
+
+        List<SubscriberResponse> actualSubscriber = reportingServiceImpl.getSubscribersByMsisdn(msisdn);
+
+        verify(reportGateway).getSubscribersByMsisdn(msisdn);
+        assertEquals(expectedSubscriber, actualSubscriber);
+    }
+
+    @Test
+    public void shouldReportOnReceivingACampaignScheduleAlert() {
+        CampaignScheduleAlertRequest campaignScheduleAlertRequest = new CampaignScheduleAlertRequest("subscriptionId", "campaignName", DateTime.now());
+        reportingServiceImpl.reportCampaignScheduleAlertReceived(campaignScheduleAlertRequest);
+
+        verify(reportGateway).reportCampaignScheduleAlertReceived(campaignScheduleAlertRequest);
     }
 }

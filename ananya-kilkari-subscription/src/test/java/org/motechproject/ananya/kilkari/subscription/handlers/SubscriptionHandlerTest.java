@@ -108,7 +108,7 @@ public class SubscriptionHandlerTest {
 
         subscriptionHandler.handleEarlySubscription(new MotechEvent(SubscriptionEventKeys.EARLY_SUBSCRIPTION, parameters));
 
-        verify(subscriptionService).initiateActivationRequest(omSubscriptionRequest);
+        verify(subscriptionService).initiateActivationRequestForEarlySubscription(omSubscriptionRequest);
     }
 
     @Test(expected = RuntimeException.class)

@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum CampaignMessageStatus {
-    NEW, DNP, DNC, SUCCESS;
+    NEW, NA, ND, SO, SUCCESS;
 
     public static CampaignMessageStatus getFor(String statusCode) {
         final String standardizedStatusCode = StringUtils.trimToEmpty(statusCode).toUpperCase();
@@ -18,8 +18,7 @@ public enum CampaignMessageStatus {
     }
     
     public static List<CampaignMessageStatus> getFailedStatusCodes(){
-        return Arrays.asList(DNC,DNP);
-
+        return Arrays.asList(ND, NA, SO);
     }
 
     private static boolean contains(String value) {

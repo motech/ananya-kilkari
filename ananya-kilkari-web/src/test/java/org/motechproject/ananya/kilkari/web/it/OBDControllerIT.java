@@ -134,7 +134,7 @@ public class OBDControllerIT extends SpringIntegrationTest {
         verify(reportingService).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
         CallDetailsReportRequest reportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
-        assertEquals(CampaignMessageStatus.DNC.name(), reportRequest.getStatus());
+        assertEquals(CampaignMessageStatus.ND.name(), reportRequest.getStatus());
         assertEquals("0", reportRequest.getRetryCount());
         assertEquals("WEEK13", reportRequest.getCampaignId());
         assertEquals(msisdn, reportRequest.getMsisdn());

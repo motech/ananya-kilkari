@@ -24,12 +24,12 @@ public class ValidCallDeliveryFailureRecordObjectMapperTest {
     public void shouldMapFromCallDeliveryFailureRecordObjectToValidCallDeliveryFailureRecordObject() {
         FailedCallReport failedCallReport = new FailedCallReport("subscriptionId", "msisdn", "WEEK13", "iu_dnp");
 
-        when(campaignMessageService.getCampaignMessageStatusFor("iu_dnp")).thenReturn(CampaignMessageStatus.DNP);
+        when(campaignMessageService.getCampaignMessageStatusFor("iu_dnp")).thenReturn(CampaignMessageStatus.NA);
         ValidFailedCallReport validFailedCallReport = new ValidCallDeliveryFailureRecordObjectMapper(campaignMessageService).mapFrom(failedCallReport);
 
         assertEquals("subscriptionId", validFailedCallReport.getSubscriptionId());
         assertEquals("msisdn", validFailedCallReport.getMsisdn());
-        assertEquals(CampaignMessageStatus.DNP, validFailedCallReport.getStatusCode());
+        assertEquals(CampaignMessageStatus.NA, validFailedCallReport.getStatusCode());
         assertEquals("WEEK13", validFailedCallReport.getCampaignId());
         assertEquals(failedCallReport.getCreatedAt(), validFailedCallReport.getCreatedAt());
     }

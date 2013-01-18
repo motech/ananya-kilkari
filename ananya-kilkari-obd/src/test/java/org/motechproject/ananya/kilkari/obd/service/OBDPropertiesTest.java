@@ -27,45 +27,75 @@ public class OBDPropertiesTest {
     }
 
     @Test
-    public void shouldMapDNPStatusCodeToCampaignMessageStatus() {
-        when(properties.getProperty("campaign.message.dnp.status.codes")).thenReturn(",,  iu_dnp1,iu_dnp2,  iu_dnp3,  ");
-        when(properties.getProperty("campaign.message.dnc.status.codes")).thenReturn("");
+    public void shouldMapNAStatusCodeToCampaignMessageStatus() {
+        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn(",,  iu_na1,iu_na2,  iu_na3,  ");
+        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("iu_nd1, ");
+        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
+
         OBDProperties obdProperties = new OBDProperties(properties);
-        assertEquals(CampaignMessageStatus.DNP, obdProperties.getCampaignMessageStatusFor("iu_dnp1"));
-        assertEquals(CampaignMessageStatus.DNP, obdProperties.getCampaignMessageStatusFor("iu_dnp2"));
-        assertEquals(CampaignMessageStatus.DNP, obdProperties.getCampaignMessageStatusFor("iu_dnp3"));
+
+        assertEquals(CampaignMessageStatus.NA, obdProperties.getCampaignMessageStatusFor("iu_na1"));
+        assertEquals(CampaignMessageStatus.NA, obdProperties.getCampaignMessageStatusFor("iu_na2"));
+        assertEquals(CampaignMessageStatus.NA, obdProperties.getCampaignMessageStatusFor("iu_na3"));
     }
 
     @Test
-    public void shouldMapDNCStatusCodeToCampaignMessageStatus() {
-        when(properties.getProperty("campaign.message.dnp.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.dnc.status.codes")).thenReturn(",,  iu_dnc1,iu_dnc2,  iu_dnc3,  ");
+    public void shouldMapNDStatusCodeToCampaignMessageStatus() {
+        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn(",,  iu_nd1,iu_nd2,  iu_nd3,  ");
+        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("iu_so1,");
+
         OBDProperties obdProperties = new OBDProperties(properties);
-        assertEquals(CampaignMessageStatus.DNC, obdProperties.getCampaignMessageStatusFor("iu_dnc1"));
-        assertEquals(CampaignMessageStatus.DNC, obdProperties.getCampaignMessageStatusFor("iu_dnc2"));
-        assertEquals(CampaignMessageStatus.DNC, obdProperties.getCampaignMessageStatusFor("iu_dnc3"));
+
+        assertEquals(CampaignMessageStatus.ND, obdProperties.getCampaignMessageStatusFor("iu_nd1"));
+        assertEquals(CampaignMessageStatus.ND, obdProperties.getCampaignMessageStatusFor("iu_nd2"));
+        assertEquals(CampaignMessageStatus.ND, obdProperties.getCampaignMessageStatusFor("iu_nd3"));
     }
 
     @Test
-    public void shouldThrowExceptionIfDNPPropertyIsNotDefined() {
+    public void shouldMapSOStatusCodeToCampaignMessageStatus() {
+        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn(",,  iu_nd1,iu_nd2,  iu_nd3,  ");
+        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("iu_so1, iu_so2");
+
+        OBDProperties obdProperties = new OBDProperties(properties);
+
+        assertEquals(CampaignMessageStatus.SO, obdProperties.getCampaignMessageStatusFor("iu_so1"));
+        assertEquals(CampaignMessageStatus.SO, obdProperties.getCampaignMessageStatusFor("iu_so2"));
+    }
+
+    @Test
+    public void shouldThrowExceptionIfNAPropertyIsNotDefined() {
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("campaign.message.dnp.status.codes property should be available");
-        when(properties.getProperty("campaign.message.dnc.status.codes")).thenReturn("");
+        expectedException.expectMessage("campaign.message.na.status.codes property should be available");
+        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
         new OBDProperties(properties);
     }
 
     @Test
-    public void shouldThrowExceptionIfDNCPropertyIsNotDefined() {
+    public void shouldThrowExceptionIfNDPropertyIsNotDefined() {
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("campaign.message.dnc.status.codes property should be available");
-        when(properties.getProperty("campaign.message.dnp.status.codes")).thenReturn("");
+        expectedException.expectMessage("campaign.message.nd.status.codes property should be available");
+        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
+        new OBDProperties(properties);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfSOPropertyIsNotDefined() {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("campaign.message.so.status.codes property should be available");
+        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
         new OBDProperties(properties);
     }
 
     @Test
     public void shouldGetNewMessagesJobCronExpression() {
-        when(properties.getProperty("campaign.message.dnp.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.dnc.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
         when(properties.getProperty("obd.new.messages.job.cron.expression")).thenReturn("****");
 
         OBDProperties obdProperties = new OBDProperties(properties);
@@ -75,8 +105,9 @@ public class OBDPropertiesTest {
 
     @Test
     public void shouldGetRetryMessagesJobCronExpression() {
-        when(properties.getProperty("campaign.message.dnp.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.dnc.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
         when(properties.getProperty("obd.retry.messages.job.cron.expression")).thenReturn("****");
 
         OBDProperties obdProperties = new OBDProperties(properties);
@@ -86,8 +117,9 @@ public class OBDPropertiesTest {
 
     @Test
     public void shouldGetSlotStartAndEndTimes() {
-        when(properties.getProperty("campaign.message.dnp.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.dnc.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
         when(properties.getProperty("obd.new.message.start.time.limit")).thenReturn("13:45");
         when(properties.getProperty("obd.retry.message.start.time.limit")).thenReturn("16:30");
 

@@ -20,7 +20,7 @@ import static org.motechproject.ananya.kilkari.performance.tests.utils.TestUtils
 
 @RunWith(LoadRunner.class)
 public class OBDSchedulerPerformanceTest extends BasePerformanceTest {
-    private CampaignMessageStatus possibleStatus[] = new CampaignMessageStatus[]{CampaignMessageStatus.DNC, CampaignMessageStatus.DNP, CampaignMessageStatus.NEW};
+    private CampaignMessageStatus possibleStatus[] = new CampaignMessageStatus[]{CampaignMessageStatus.ND, CampaignMessageStatus.NA, CampaignMessageStatus.NEW};
     private Operator[] possibleOperators = Operator.values();
     private int numberOfUnsentMessages = 25000;
 

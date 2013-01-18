@@ -69,7 +69,7 @@ public class CampaignMessageVerifier {
     }
 
     public void verifyCampaignMessageFailedDueToDNP(SubscriptionData subscriptionData, String campaignId) {
-        CampaignMessage campaignMessage = findCampaignMessageWithStatus(subscriptionData, campaignId, CampaignMessageStatus.DNP);
+        CampaignMessage campaignMessage = findCampaignMessageWithStatus(subscriptionData, campaignId, CampaignMessageStatus.NA);
         assertTrue(campaignMessage.hasFailed());
         assertFalse(campaignMessage.isSent());
     }
@@ -90,7 +90,7 @@ public class CampaignMessageVerifier {
     }
 
     public void verifyCampaignMessageFailedDueToDNC(SubscriptionData subscriptionData, String campaignId) {
-        CampaignMessage campaignMessage = findCampaignMessageWithStatus(subscriptionData, campaignId, CampaignMessageStatus.DNC);
+        CampaignMessage campaignMessage = findCampaignMessageWithStatus(subscriptionData, campaignId, CampaignMessageStatus.ND);
         assertTrue(campaignMessage.hasFailed());
         assertFalse(campaignMessage.isSent());
     }

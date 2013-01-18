@@ -40,41 +40,41 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
         newCampaignMessage = new CampaignMessage("subscriptionId1", "messageId1", "1234657980", "operator1", weekEndingDate1);
 
         dncCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", "912134567890", "operator2", weekEndingDate2);
-        dncCampaignMessage.setStatusCode(CampaignMessageStatus.DNC);
+        dncCampaignMessage.setStatusCode(CampaignMessageStatus.ND);
         dncCampaignMessage.markSent();
-        dncCampaignMessage.setStatusCode(CampaignMessageStatus.DNC);
+        dncCampaignMessage.setStatusCode(CampaignMessageStatus.ND);
 
         dncCampaignMessageWithoutRetryCount = new CampaignMessage("subscriptionId13", "messageId2", "912134567890", "operator2", weekEndingDate1);
-        dncCampaignMessageWithoutRetryCount.setStatusCode(CampaignMessageStatus.DNC);
+        dncCampaignMessageWithoutRetryCount.setStatusCode(CampaignMessageStatus.ND);
 
         dncCampaignMessageWithGreaterRetry = new CampaignMessage("subscriptionId12", "messageId2", "912134567890", "operator2", weekEndingDate2);
-        dncCampaignMessageWithGreaterRetry.setStatusCode(CampaignMessageStatus.DNC);
+        dncCampaignMessageWithGreaterRetry.setStatusCode(CampaignMessageStatus.ND);
         dncCampaignMessageWithGreaterRetry.markSent();
         dncCampaignMessageWithGreaterRetry.markSent();
-        dncCampaignMessageWithGreaterRetry.setStatusCode(CampaignMessageStatus.DNC);
+        dncCampaignMessageWithGreaterRetry.setStatusCode(CampaignMessageStatus.ND);
 
         newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3", "3124567890", "operator3", weekEndingDate1);
         newCampaignMessageSent.markSent();
 
         dncCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4", "004123567890", "operator4", weekEndingDate1);
         dncCampaignMessageSent.markSent();
-        dncCampaignMessage.setStatusCode(CampaignMessageStatus.DNC);
+        dncCampaignMessage.setStatusCode(CampaignMessageStatus.ND);
 
         dncCampaignMessageSent.markSent();
 
         dnpCampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", "5123467890", "operator5", weekEndingDate1);
         dnpCampaignMessage.markSent();
-        dnpCampaignMessage.setStatusCode(CampaignMessageStatus.DNP);
+        dnpCampaignMessage.setStatusCode(CampaignMessageStatus.NA);
 
         dnpCampaignMessageUnsentWithMoreRetryCount = new CampaignMessage("subscriptionId7", "messageId7", "5128467890", "operator7", weekEndingDate1);
         dnpCampaignMessageUnsentWithMoreRetryCount.markSent();
-        dnpCampaignMessageUnsentWithMoreRetryCount.setStatusCode(CampaignMessageStatus.DNP);
+        dnpCampaignMessageUnsentWithMoreRetryCount.setStatusCode(CampaignMessageStatus.NA);
         dnpCampaignMessageUnsentWithMoreRetryCount.markSent();
-        dnpCampaignMessageUnsentWithMoreRetryCount.setStatusCode(CampaignMessageStatus.DNP);
+        dnpCampaignMessageUnsentWithMoreRetryCount.setStatusCode(CampaignMessageStatus.NA);
 
         dnpCampaignMessageSent = new CampaignMessage("subscriptionId6", "messageId6", "6123457890", "operator6", weekEndingDate1);
         dnpCampaignMessageSent.markSent();
-        dnpCampaignMessageSent.setStatusCode(CampaignMessageStatus.DNP);
+        dnpCampaignMessageSent.setStatusCode(CampaignMessageStatus.NA);
         dnpCampaignMessageSent.markSent();
     }
 
@@ -107,17 +107,17 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
         CampaignMessage actualCampaignMessage4 = allNewMessages.get(3);
 
         assertFalse(actualCampaignMessage1.isSent());
-        assertEquals(CampaignMessageStatus.DNC, actualCampaignMessage1.getStatus());
-        assertEquals(2, actualCampaignMessage1.getDncRetryCount());
+        assertEquals(CampaignMessageStatus.ND, actualCampaignMessage1.getStatus());
+        assertEquals(2, actualCampaignMessage1.getNDRetryCount());
         assertEquals(weekEndingDate2, actualCampaignMessage1.getWeekEndingDate());
 
         assertFalse(actualCampaignMessage2.isSent());
-        assertEquals(CampaignMessageStatus.DNC, actualCampaignMessage2.getStatus());
-        assertEquals(1, actualCampaignMessage2.getDncRetryCount());
+        assertEquals(CampaignMessageStatus.ND, actualCampaignMessage2.getStatus());
+        assertEquals(1, actualCampaignMessage2.getNDRetryCount());
         assertEquals(weekEndingDate2, actualCampaignMessage2.getWeekEndingDate());
 
         assertFalse(actualCampaignMessage3.isSent());
-        assertEquals(CampaignMessageStatus.DNC, actualCampaignMessage2.getStatus());
+        assertEquals(CampaignMessageStatus.ND, actualCampaignMessage2.getStatus());
         assertEquals(weekEndingDate1, actualCampaignMessage3.getWeekEndingDate());
 
         assertFalse(actualCampaignMessage4.isSent());
@@ -150,12 +150,12 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
 
         CampaignMessage actualCampaignMessage1 = allRetryMessages.get(0);
         assertFalse(actualCampaignMessage1.isSent());
-        assertEquals(CampaignMessageStatus.DNP, actualCampaignMessage1.getStatus());
-        assertEquals(1, actualCampaignMessage1.getDnpRetryCount());
+        assertEquals(CampaignMessageStatus.NA, actualCampaignMessage1.getStatus());
+        assertEquals(1, actualCampaignMessage1.getNARetryCount());
 
         CampaignMessage actualCampaignMessage2 = allRetryMessages.get(1);
         assertFalse(actualCampaignMessage2.isSent());
-        assertEquals(CampaignMessageStatus.DNP, actualCampaignMessage2.getStatus());
-        assertEquals(0, actualCampaignMessage2.getDnpRetryCount());
+        assertEquals(CampaignMessageStatus.NA, actualCampaignMessage2.getStatus());
+        assertEquals(0, actualCampaignMessage2.getNARetryCount());
     }
 }

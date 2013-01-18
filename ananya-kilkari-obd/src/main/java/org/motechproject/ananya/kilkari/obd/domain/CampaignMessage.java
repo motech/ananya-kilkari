@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.obd.domain;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
@@ -30,10 +31,13 @@ public class CampaignMessage extends MotechBaseDataObject {
     private CampaignMessageStatus status = CampaignMessageStatus.NEW;
 
     @JsonProperty
-    private int dnpRetryCount;
+    private int NARetryCount;
 
     @JsonProperty
-    private int dncRetryCount;
+    private int NDRetryCount;
+
+    @JsonProperty
+    private int SORetryCount;
 
     public CampaignMessage() {
     }
@@ -74,19 +78,28 @@ public class CampaignMessage extends MotechBaseDataObject {
         return status;
     }
 
-    public int getDnpRetryCount() {
-        return dnpRetryCount;
+    @JsonIgnore
+    public int getNARetryCount() {
+        return NARetryCount;
     }
 
-    public int getDncRetryCount() {
-        return dncRetryCount;
+    @JsonIgnore
+    public int getNDRetryCount() {
+        return NDRetryCount;
+    }
+
+    @JsonIgnore
+    public int getSORetryCount() {
+        return SORetryCount;
     }
 
     public void markSent() {
-        if (this.status == CampaignMessageStatus.DNP)
-            this.dnpRetryCount++;
-        else if (this.status == CampaignMessageStatus.DNC && weekEndingDate.isBeforeNow())
-            this.dncRetryCount++;
+        if (this.status == CampaignMessageStatus.NA)
+            this.NARetryCount++;
+        else if (this.status == CampaignMessageStatus.ND && weekEndingDate.isBeforeNow())
+            this.NDRetryCount++;
+        else if (this.status == CampaignMessageStatus.SO)
+            this.SORetryCount++;
 
         this.sent = true;
     }
@@ -98,6 +111,16 @@ public class CampaignMessage extends MotechBaseDataObject {
 
     public boolean hasFailed() {
         return CampaignMessageStatus.getFailedStatusCodes().contains(status);
+    }
+
+    @JsonIgnore
+    public int getRetryCountForCurrentStatus() {
+        if (status == CampaignMessageStatus.NA)
+            return NARetryCount;
+        else if (status == CampaignMessageStatus.ND)
+            return NDRetryCount;
+        else
+            return SORetryCount;
     }
 }
 

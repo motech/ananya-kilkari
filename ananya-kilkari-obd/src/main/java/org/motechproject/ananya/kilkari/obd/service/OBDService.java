@@ -43,7 +43,7 @@ public class OBDService {
             return false;
         }
 
-        int retryCount = campaignMessage.getDnpRetryCount();
+        int retryCount = campaignMessage.getNARetryCount();
         reportingService.reportCampaignMessageDeliveryStatus(CallDetailsReportRequestMapper.mapFrom(obdSuccessfulCallDetailsRequest, retryCount));
         campaignMessageService.deleteCampaignMessage(campaignMessage);
         return true;

@@ -24,67 +24,126 @@ public class CampaignMessageTest {
     }
 
     @Test
-    public void shouldMarkDidNotPickup() {
+    public void shouldMarkNotAnswered() {
         CampaignMessage campaignMessage = new CampaignMessage();
         campaignMessage.markSent();
-        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
+
+        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
 
         assertFalse(campaignMessage.isSent());
-        assertEquals(CampaignMessageStatus.DNP, campaignMessage.getStatus());
+        assertEquals(CampaignMessageStatus.NA, campaignMessage.getStatus());
     }
 
     @Test
-    public void shouldMarkDidNotCall() {
+    public void shouldMarkNotDelivered() {
         CampaignMessage campaignMessage = new CampaignMessage();
         campaignMessage.markSent();
-        campaignMessage.setStatusCode(CampaignMessageStatus.DNC);
+
+        campaignMessage.setStatusCode(CampaignMessageStatus.ND);
 
         assertFalse(campaignMessage.isSent());
-        assertEquals(CampaignMessageStatus.DNC, campaignMessage.getStatus());
+        assertEquals(CampaignMessageStatus.ND, campaignMessage.getStatus());
     }
 
     @Test
-    public void markSentShouldIncrementRetryCountForDNP() {
+    public void shouldMarkSwitchedOff() {
+        CampaignMessage campaignMessage = new CampaignMessage();
+        campaignMessage.markSent();
+
+        campaignMessage.setStatusCode(CampaignMessageStatus.SO);
+
+        assertFalse(campaignMessage.isSent());
+        assertEquals(CampaignMessageStatus.SO, campaignMessage.getStatus());
+    }
+
+    @Test
+    public void markSentShouldIncrementRetryCountForNA() {
         CampaignMessage campaignMessage = new CampaignMessage("subscriptionId", "WEEEK13", "1234567890", "airtel", DateTime.now().plusDays(2));
         campaignMessage.markSent();
-        assertEquals(0, campaignMessage.getDnpRetryCount());
+        assertEquals(0, campaignMessage.getNARetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
+        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
         campaignMessage.markSent();
-        assertEquals(1, campaignMessage.getDnpRetryCount());
+        assertEquals(1, campaignMessage.getNARetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
+        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
         campaignMessage.markSent();
-        assertEquals(2, campaignMessage.getDnpRetryCount());
+        assertEquals(2, campaignMessage.getNARetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.DNC);
+        campaignMessage.setStatusCode(CampaignMessageStatus.ND);
         campaignMessage.markSent();
-        assertEquals(2, campaignMessage.getDnpRetryCount());
+        assertEquals(2, campaignMessage.getNARetryCount());
     }
 
     @Test
-    public void markSentShouldIncrementRetryCountForDNC() {
+    public void markSentShouldIncrementRetryCountForND() {
         CampaignMessage campaignMessage = new CampaignMessage("subscriptionId", "WEEEK13", "1234567890", "airtel", DateTime.now().minusDays(2));
         campaignMessage.markSent();
-        assertEquals(0, campaignMessage.getDnpRetryCount());
+        assertEquals(0, campaignMessage.getNARetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.DNC);
+        campaignMessage.setStatusCode(CampaignMessageStatus.ND);
         campaignMessage.markSent();
-        assertEquals(0, campaignMessage.getDnpRetryCount());
-        assertEquals(1, campaignMessage.getDncRetryCount());
+        assertEquals(0, campaignMessage.getNARetryCount());
+        assertEquals(1, campaignMessage.getNDRetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
+        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
         campaignMessage.markSent();
-        assertEquals(1, campaignMessage.getDncRetryCount());
-        assertEquals(1, campaignMessage.getDnpRetryCount());
+        assertEquals(1, campaignMessage.getNDRetryCount());
+        assertEquals(1, campaignMessage.getNARetryCount());
     }
 
     @Test
-    public void shouldNotIncrementDNCCountIfTheCurrentDateIsNotGreaterThanWeekEndingDate() {
+    public void shouldNotIncrementNDCountIfTheCurrentDateIsNotGreaterThanWeekEndingDate() {
         CampaignMessage campaignMessage = new CampaignMessage("subscriptionId", "WEEEK13", "1234567890", "airtel", DateTime.now().plusDays(2));
-        campaignMessage.setStatusCode(CampaignMessageStatus.DNC);
+        campaignMessage.setStatusCode(CampaignMessageStatus.ND);
         campaignMessage.markSent();
 
-        assertEquals(0, campaignMessage.getDncRetryCount());
+        assertEquals(0, campaignMessage.getNDRetryCount());
+    }
+
+    @Test
+    public void markSentShouldIncrementRetryCountForSO() {
+        CampaignMessage campaignMessage = new CampaignMessage("subscriptionId", "WEEEK13", "1234567890", "airtel", DateTime.now().plusDays(2));
+        campaignMessage.markSent();
+        assertEquals(0, campaignMessage.getSORetryCount());
+
+        campaignMessage.setStatusCode(CampaignMessageStatus.SO);
+        campaignMessage.markSent();
+        assertEquals(1, campaignMessage.getSORetryCount());
+
+        campaignMessage.setStatusCode(CampaignMessageStatus.SO);
+        campaignMessage.markSent();
+        assertEquals(2, campaignMessage.getSORetryCount());
+
+        campaignMessage.setStatusCode(CampaignMessageStatus.ND);
+        campaignMessage.markSent();
+        assertEquals(2, campaignMessage.getSORetryCount());
+    }
+
+    @Test
+    public void shouldGetRetryCountForNAStatus(){
+        CampaignMessage campaignMessage = new CampaignMessage("subscriptionId", "WEEEK13", "1234567890", "airtel", DateTime.now());
+        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
+        campaignMessage.markSent();
+
+        assertEquals(1, campaignMessage.getRetryCountForCurrentStatus());
+    }
+
+    @Test
+    public void shouldGetRetryCountForNDStatus(){
+        CampaignMessage campaignMessage = new CampaignMessage("subscriptionId", "WEEEK13", "1234567890", "airtel", DateTime.now().minusWeeks(2));
+        campaignMessage.setStatusCode(CampaignMessageStatus.ND);
+        campaignMessage.markSent();
+
+        assertEquals(1, campaignMessage.getRetryCountForCurrentStatus());
+    }
+
+    @Test
+    public void shouldGetRetryCountForSOStatus(){
+        CampaignMessage campaignMessage = new CampaignMessage("subscriptionId", "WEEEK13", "1234567890", "airtel", DateTime.now());
+        campaignMessage.setStatusCode(CampaignMessageStatus.SO);
+        campaignMessage.markSent();
+
+        assertEquals(1, campaignMessage.getRetryCountForCurrentStatus());
     }
 }

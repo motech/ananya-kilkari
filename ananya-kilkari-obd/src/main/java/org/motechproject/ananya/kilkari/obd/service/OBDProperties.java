@@ -22,8 +22,9 @@ public class OBDProperties {
     }
 
     private void populateStatusCodes() {
-        populateMapWithPropertyValue("campaign.message.dnp.status.codes", CampaignMessageStatus.DNP);
-        populateMapWithPropertyValue("campaign.message.dnc.status.codes", CampaignMessageStatus.DNC);
+        populateMapWithPropertyValue("campaign.message.na.status.codes", CampaignMessageStatus.NA);
+        populateMapWithPropertyValue("campaign.message.nd.status.codes", CampaignMessageStatus.ND);
+        populateMapWithPropertyValue("campaign.message.so.status.codes", CampaignMessageStatus.SO);
     }
 
     private void populateMapWithPropertyValue(String propertyName, CampaignMessageStatus campaignMessageStatus) {

@@ -98,7 +98,7 @@ public class CampaignMessageService {
         allCampaignMessages.removeAll(subscriptionId);
     }
 
-    public CampaignMessageStatus getCampaignMessageStatusFor(String statusCode){
+    public CampaignMessageStatus getCampaignMessageStatusFor(String statusCode) {
         return obdProperties.getCampaignMessageStatusFor(statusCode);
     }
 
@@ -112,8 +112,8 @@ public class CampaignMessageService {
     }
 
     private boolean hasReachedMaximumRetries(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
-        return (campaignMessage.getDnpRetryCount() == obdProperties.getMaximumDNPRetryCount() && statusCode == CampaignMessageStatus.DNP) ||
-                (campaignMessage.getDncRetryCount() == obdProperties.getMaximumDNCRetryCount() && statusCode == CampaignMessageStatus.DNC);
+        return (campaignMessage.getNARetryCount() == obdProperties.getMaximumDNPRetryCount() && statusCode == CampaignMessageStatus.NA) ||
+                (campaignMessage.getNDRetryCount() == obdProperties.getMaximumDNCRetryCount() && statusCode == CampaignMessageStatus.ND);
     }
 
     private void sendMessagesToOBD(List<CampaignMessage> messages, GatewayAction gatewayAction) {
@@ -129,16 +129,11 @@ public class CampaignMessageService {
     }
 
     private void reportCampaignMessageStatus(ValidFailedCallReport failedCallReport, CampaignMessage campaignMessage) {
-        String retryCount = getRetryCount(campaignMessage);
+        String retryCount = String.valueOf(campaignMessage.getRetryCountForCurrentStatus());
         CallDetailRecordRequest callDetailRecordRequest = new CallDetailRecordRequest(failedCallReport.getCreatedAt(), failedCallReport.getCreatedAt());
         CallDetailsReportRequest callDetailsReportRequest = new CallDetailsReportRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(),
                 null, retryCount, failedCallReport.getStatusCode().name(), callDetailRecordRequest, CampaignMessageCallSource.OBD.name());
         reportingService.reportCampaignMessageDeliveryStatus(callDetailsReportRequest);
-    }
-
-    private String getRetryCount(CampaignMessage campaignMessage) {
-        return campaignMessage.getStatus() == CampaignMessageStatus.DNP ? String.valueOf(campaignMessage.getDnpRetryCount())
-                : String.valueOf(campaignMessage.getDncRetryCount());
     }
 
     private interface GatewayAction {

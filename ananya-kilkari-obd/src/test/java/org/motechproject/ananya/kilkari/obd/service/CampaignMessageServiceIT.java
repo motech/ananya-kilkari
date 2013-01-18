@@ -100,12 +100,12 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, messageId, "1234567890", null, DateTime.now().plusDays(2));
         allCampaignMessages.add(campaignMessage);
         assertEquals(CampaignMessageStatus.NEW, campaignMessage.getStatus());
-        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
+        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
 
         campaignMessageService.update(campaignMessage);
 
         CampaignMessage updatedCampaignMessage = allCampaignMessages.find("subscriptionId", "messageId");
-        assertEquals(CampaignMessageStatus.DNP, updatedCampaignMessage.getStatus());
+        assertEquals(CampaignMessageStatus.NA, updatedCampaignMessage.getStatus());
     }
 
     @Test
@@ -166,7 +166,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
 
         campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, DateTime.now().plusDays(2));
         CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
-        campaignMessage.setStatusCode(CampaignMessageStatus.DNP);
+        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
         allCampaignMessages.update(campaignMessage);
 
         markForDeletion(campaignMessage);

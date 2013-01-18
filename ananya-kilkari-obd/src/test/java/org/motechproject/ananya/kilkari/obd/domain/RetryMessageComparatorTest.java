@@ -19,29 +19,29 @@ public class RetryMessageComparatorTest {
     public void shouldSortBasedOnDNPRetryCount_AndCampaignMessageWeek() {
         CampaignMessage campaignMessage1 = new CampaignMessage("subscriptionId1", "WEEK2", "1111111111", "IDEA", DateTime.now().plusWeeks(1));
         campaignMessage1.markSent();
-        campaignMessage1.setStatusCode(CampaignMessageStatus.DNP);
+        campaignMessage1.setStatusCode(CampaignMessageStatus.NA);
         campaignMessage1.markSent();
-        campaignMessage1.setStatusCode(CampaignMessageStatus.DNP);
+        campaignMessage1.setStatusCode(CampaignMessageStatus.NA);
         campaignMessage1.markSent();
-        assertEquals(2, campaignMessage1.getDnpRetryCount());
+        assertEquals(2, campaignMessage1.getNARetryCount());
 
         CampaignMessage campaignMessage2 = new CampaignMessage("subscriptionId2", "WEEK1", "1111111112", "IDEA", DateTime.now().plusWeeks(1));
         campaignMessage2.markSent();
-        campaignMessage2.setStatusCode(CampaignMessageStatus.DNP);
+        campaignMessage2.setStatusCode(CampaignMessageStatus.NA);
         campaignMessage2.markSent();
-        assertEquals(1, campaignMessage2.getDnpRetryCount());
+        assertEquals(1, campaignMessage2.getNARetryCount());
 
         CampaignMessage campaignMessage3 = new CampaignMessage("subscriptionId3", "WEEK5", "1111111113", "IDEA", DateTime.now().plusWeeks(1));
         campaignMessage3.markSent();
-        campaignMessage3.setStatusCode(CampaignMessageStatus.DNP);
+        campaignMessage3.setStatusCode(CampaignMessageStatus.NA);
         campaignMessage3.markSent();
-        assertEquals(1, campaignMessage3.getDnpRetryCount());
+        assertEquals(1, campaignMessage3.getNARetryCount());
 
         CampaignMessage campaignMessage4 = new CampaignMessage("subscriptionId4", "WEEK15", "1111111113", "IDEA", DateTime.now().plusWeeks(1));
         campaignMessage4.markSent();
-        campaignMessage4.setStatusCode(CampaignMessageStatus.DNP);
+        campaignMessage4.setStatusCode(CampaignMessageStatus.NA);
         campaignMessage4.markSent();
-        assertEquals(1, campaignMessage4.getDnpRetryCount());
+        assertEquals(1, campaignMessage4.getNARetryCount());
 
         ArrayList<CampaignMessage> campaignMessages = new ArrayList<>();
         campaignMessages.add(campaignMessage4);

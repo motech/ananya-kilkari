@@ -111,8 +111,8 @@ public class OBDCallDetailsServiceTest {
         Errors noError = new Errors();
         when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport1)).thenReturn(noError);
         when(callDeliveryFailureRecordValidator.validate(successfulFailedCallReport2)).thenReturn(noError);
-        ValidFailedCallReport validFailedCallReport1 = new ValidFailedCallReport("sub1", "1234567890", "WEEK13", CampaignMessageStatus.DNP, DateTime.now());
-        ValidFailedCallReport validFailedCallReport2 = new ValidFailedCallReport("sub2", "1234567891", "WEEK13", CampaignMessageStatus.DNC, DateTime.now());
+        ValidFailedCallReport validFailedCallReport1 = new ValidFailedCallReport("sub1", "1234567890", "WEEK13", CampaignMessageStatus.NA, DateTime.now());
+        ValidFailedCallReport validFailedCallReport2 = new ValidFailedCallReport("sub2", "1234567891", "WEEK13", CampaignMessageStatus.ND, DateTime.now());
         when(validCallDeliveryFailureRecordObjectMapper.mapFrom(successfulFailedCallReport1)).thenReturn(validFailedCallReport1);
         when(validCallDeliveryFailureRecordObjectMapper.mapFrom(successfulFailedCallReport2)).thenReturn(validFailedCallReport2);
 

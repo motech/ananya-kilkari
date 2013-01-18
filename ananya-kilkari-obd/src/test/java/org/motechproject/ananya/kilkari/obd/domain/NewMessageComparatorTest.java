@@ -19,7 +19,7 @@ public class NewMessageComparatorTest {
     @Test
     public void shouldReturnObjectWithAFailureOverAnObjectWithoutOnComparison() {
         CampaignMessage erroredCampaignMessage = new CampaignMessage();
-        erroredCampaignMessage.setStatusCode(CampaignMessageStatus.DNC);
+        erroredCampaignMessage.setStatusCode(CampaignMessageStatus.ND);
         CampaignMessage campaignMessageWithoutError = new CampaignMessage();
         List<CampaignMessage> campaignMessageList = new ArrayList<>();
         campaignMessageList.add(erroredCampaignMessage);
@@ -34,12 +34,12 @@ public class NewMessageComparatorTest {
     @Test
     public void shouldReturnObjectWithAHigherDNCRetryOnComparison() {
         CampaignMessage campaignMessageWithHigherDNCRetry = new CampaignMessage("subscriptionId", "WEEEK13", "1234567890", "airtel", DateTime.now().plusDays(2));
-        campaignMessageWithHigherDNCRetry.setStatusCode(CampaignMessageStatus.DNC);
+        campaignMessageWithHigherDNCRetry.setStatusCode(CampaignMessageStatus.ND);
         campaignMessageWithHigherDNCRetry.markSent();
         campaignMessageWithHigherDNCRetry.markSent();
 
         CampaignMessage campaignMessageWithLowerDNCRetry = new CampaignMessage("subscriptionId1", "WEEEK13", "1234567890", "airtel", DateTime.now().plusDays(2));
-        campaignMessageWithHigherDNCRetry.setStatusCode(CampaignMessageStatus.DNC);
+        campaignMessageWithHigherDNCRetry.setStatusCode(CampaignMessageStatus.ND);
         campaignMessageWithHigherDNCRetry.markSent();
 
         List<CampaignMessage> campaignMessageList = new ArrayList<>();
@@ -102,17 +102,17 @@ public class NewMessageComparatorTest {
         campaignMessageWithPriority4.setStatusCode(CampaignMessageStatus.NEW);
 
         final CampaignMessage campaignMessageWithPriority2 = new CampaignMessage("subscriptionId3", "WEEK7", "1234567893", "IDEA", DateTime.now().minusWeeks(1));
-        campaignMessageWithPriority2.setStatusCode(CampaignMessageStatus.DNC);
+        campaignMessageWithPriority2.setStatusCode(CampaignMessageStatus.ND);
         campaignMessageWithPriority2.markSent();
         campaignMessageWithPriority2.markSent();
 
         final CampaignMessage campaignMessageWithPriority3 = new CampaignMessage("subscriptionId4", "WEEK12", "1234567894", "IDEA", DateTime.now().minusWeeks(1));
-        campaignMessageWithPriority3.setStatusCode(CampaignMessageStatus.DNC);
+        campaignMessageWithPriority3.setStatusCode(CampaignMessageStatus.ND);
         campaignMessageWithPriority3.markSent();
         campaignMessageWithPriority3.markSent();
 
         final CampaignMessage campaignMessageWithPriority1 = new CampaignMessage("subscriptionId5", "WEEK6", "1234567895", "IDEA", DateTime.now().minusWeeks(1));
-        campaignMessageWithPriority1.setStatusCode(CampaignMessageStatus.DNC);
+        campaignMessageWithPriority1.setStatusCode(CampaignMessageStatus.ND);
         campaignMessageWithPriority1.markSent();
         campaignMessageWithPriority1.markSent();
         campaignMessageWithPriority1.markSent();

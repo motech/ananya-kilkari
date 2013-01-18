@@ -8,8 +8,8 @@ public class NewMessageComparator implements Comparator<CampaignMessage> {
     public int compare(CampaignMessage thisObject, CampaignMessage otherObject) {
         if (thisObject.hasFailed() && !otherObject.hasFailed()) return -1;
         if (otherObject.hasFailed() && !thisObject.hasFailed()) return 1;
-        if(thisObject.getDncRetryCount() > otherObject.getDncRetryCount()) return -1;
-        if(thisObject.getDncRetryCount() < otherObject.getDncRetryCount()) return 1;
+        if(thisObject.getNDRetryCount() > otherObject.getNDRetryCount()) return -1;
+        if(thisObject.getNDRetryCount() < otherObject.getNDRetryCount()) return 1;
         return CompareMessageIdStrategy.compare(thisObject, otherObject);
     }
 }

@@ -30,7 +30,7 @@ public class KilkariDataTest extends BaseDataSetup {
 
     @Test
     public void shouldCreateDeactivatedSubscription() {
-        DateTime startDate = DateTime.now();
+        DateTime startDate = DateTime.now().minusWeeks(8);
         String operator = getRandomOperator();
         DateTime activationDate = startDate.plusDays(2);
         String pack = SubscriptionPack.BARI_KILKARI.name();
@@ -54,7 +54,7 @@ public class KilkariDataTest extends BaseDataSetup {
         String currentCampaignId = "WEEK1";
         waitForCampaignMessage(subscriptionId, currentCampaignId);
         makeOBDCallBack(msisdn, subscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
-        makeInboxCall(msisdn, currentCampaignId, DateTime.now().plusMinutes(15), pack, subscriptionId );
+        makeInboxCall(msisdn, currentCampaignId, week1.plusDays(1), pack, subscriptionId );
 
         moveToTime(week2);
         renewSubscription(msisdn, subscriptionId, operator);
@@ -70,12 +70,14 @@ public class KilkariDataTest extends BaseDataSetup {
 
         moveToTime(week4);
         suspendSubscription(msisdn, subscriptionId, operator);
+        makeInboxCall(msisdn, currentCampaignId, week4.plusDays(1), pack, subscriptionId);
 
         moveToTime(week4.plusDays(3));
         renewSubscription(msisdn, subscriptionId, operator);
         currentCampaignId = "WEEK4";
         waitForCampaignMessage(subscriptionId, currentCampaignId);
         makeOBDCallBack(msisdn, subscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
+        makeInboxCall(msisdn, currentCampaignId, week4.plusDays(4), pack, subscriptionId);
 
         moveToTime(week5);
         renewSubscription(msisdn, subscriptionId, operator);
@@ -87,12 +89,15 @@ public class KilkariDataTest extends BaseDataSetup {
         suspendSubscription(msisdn, subscriptionId, operator);
         currentCampaignId = "WEEK6";
         waitForCampaignMessageAlert(subscriptionId, currentCampaignId);
+        makeInboxCall(msisdn, currentCampaignId, week6.plusDays(1), pack, subscriptionId);
 
         moveToTime(week6.plusDays(10));
         renewSubscription(msisdn, subscriptionId, operator);
         currentCampaignId = "WEEK7";
         waitForCampaignMessage(subscriptionId, currentCampaignId);
-        makeOBDCallBack(msisdn, subscriptionId, currentCampaignId, "HANGUP", DateTime.now(), DateTime.now().plusMinutes(10));
+        makeOBDCallBack(msisdn, subscriptionId, currentCampaignId, "UNSUBSCRIPTION", DateTime.now(), DateTime.now().plusMinutes(10));
+        deactivateSubscription(msisdn, subscriptionId, operator);
+        makeInboxCall(msisdn, currentCampaignId, week6.plusDays(11), pack, subscriptionId);
 
         moveToTime(DateTime.now());
     }

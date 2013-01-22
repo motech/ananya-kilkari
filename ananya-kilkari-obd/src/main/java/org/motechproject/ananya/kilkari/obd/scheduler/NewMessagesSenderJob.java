@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -31,8 +32,12 @@ public class NewMessagesSenderJob extends MessagesSenderJob {
     private OBDProperties obdProperties;
 
     @Autowired
-    public NewMessagesSenderJob(CampaignMessageService campaignMessageService, RetryService retryService, OBDProperties obdProperties) {
-        super(NewMessagesSenderJob.SLOT_EVENT_SUBJECT, obdProperties.getNewMessageJobCronExpression());
+    public NewMessagesSenderJob(CampaignMessageService campaignMessageService, RetryService retryService, final OBDProperties obdProperties) {
+        super(SLOT_EVENT_SUBJECT,
+                new HashMap<SubSlot, String>() {{
+                    put(SubSlot.ONE, obdProperties.getMainSlotCronJobExpressionFor(SubSlot.ONE.name()));
+                }}
+        );
         this.campaignMessageService = campaignMessageService;
         this.retryService = retryService;
         this.obdProperties = obdProperties;
@@ -42,7 +47,9 @@ public class NewMessagesSenderJob extends MessagesSenderJob {
     public void sendMessages(MotechEvent motechEvent) {
         logger.info("Handling send new messages event");
         RetryRequest retryRequest = new RetryRequest(NewMessagesSenderJob.RETRY_NAME, UUID.randomUUID().toString(), DateTime.now());
-        retryService.schedule(retryRequest);
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put(SUB_SLOT_KEY, motechEvent.getParameters().get(SUB_SLOT_KEY));
+        retryService.schedule(retryRequest, parameters);
     }
 
     @MotechListener(subjects = {NewMessagesSenderJob.RETRY_EVENT_SUBJECT})
@@ -50,14 +57,15 @@ public class NewMessagesSenderJob extends MessagesSenderJob {
         logger.info("Handling send new messages with retry event");
 
         Map<String, Object> parameters = motechEvent.getParameters();
+        SubSlot subSlot = (SubSlot) parameters.get(SUB_SLOT_KEY);
 
-        if (!canSendMessages(obdProperties.getNewMessageStartTimeLimitHours(), obdProperties.getNewMessageStartTimeLimitMinute())){
+        if (!canSendMessages(obdProperties.getMainSlotStartTimeLimitFor(subSlot.name()))) {
             retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), NewMessagesSenderJob.RETRY_GROUP_NAME);
             return;
         }
 
         try {
-            campaignMessageService.sendNewMessages();
+            campaignMessageService.sendNewMessages(subSlot);
             retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), NewMessagesSenderJob.RETRY_GROUP_NAME);
         } catch (Exception ex) {
             logger.error("Error occurred while sending new messages to obd", ex);

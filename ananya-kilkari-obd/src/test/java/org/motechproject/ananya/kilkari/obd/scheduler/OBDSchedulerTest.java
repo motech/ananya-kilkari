@@ -8,6 +8,7 @@ import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.CronSchedulableJob;
 import org.motechproject.event.MotechEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
@@ -30,23 +31,26 @@ public class OBDSchedulerTest {
     }
 
     @Test
-    public void shouldScheduleANewAndRetryMessageJobs() {
-
-        CronSchedulableJob cronSchedulableJobForNewMessages = new CronSchedulableJob(new MotechEvent("subject.new"), "cronexpression.new");
-        CronSchedulableJob cronSchedulableJobForRetryMessages = new CronSchedulableJob(new MotechEvent("subject.retry"), "cronexpression.retry");
-        when(newMessagesSenderJob.getCronJob()).thenReturn(cronSchedulableJobForNewMessages);
-        when(retryMessagesSenderJob.getCronJob()).thenReturn(cronSchedulableJobForRetryMessages);
+    public void shouldScheduleCronJobs() {
+        ArrayList<CronSchedulableJob> newMessagesCronJob = new ArrayList<>();
+        newMessagesCronJob.add(new CronSchedulableJob(new MotechEvent("subject.new"), "cronexpression.new"));
+        ArrayList<CronSchedulableJob> retryMessagesCronJob = new ArrayList<>();
+        retryMessagesCronJob.add(new CronSchedulableJob(new MotechEvent("subject.retry"), "cronexpression.retry.first.expression"));
+        retryMessagesCronJob.add(new CronSchedulableJob(new MotechEvent("subject.retry"), "cronexpression.retry.second.expression"));
+        when(newMessagesSenderJob.getCronJobs()).thenReturn(newMessagesCronJob);
+        when(retryMessagesSenderJob.getCronJobs()).thenReturn(retryMessagesCronJob);
 
         new OBDScheduler(schedulerService, newMessagesSenderJob, retryMessagesSenderJob);
 
         ArgumentCaptor<CronSchedulableJob> captor = ArgumentCaptor.forClass(CronSchedulableJob.class);
-        verify(schedulerService, times(2)).safeScheduleJob(captor.capture());
+        verify(schedulerService, times(3)).safeScheduleJob(captor.capture());
 
         List<CronSchedulableJob> cronSchedulableJobs = captor.getAllValues();
 
-        assertEquals(2, cronSchedulableJobs.size());
-        assertTrue(cronSchedulableJobs.contains(cronSchedulableJobForNewMessages));
-        assertTrue(cronSchedulableJobs.contains(cronSchedulableJobForRetryMessages));
+        assertEquals(3, cronSchedulableJobs.size());
+        assertTrue(cronSchedulableJobs.contains(newMessagesCronJob.get(0)));
+        assertTrue(cronSchedulableJobs.contains(retryMessagesCronJob.get(0)));
+        assertTrue(cronSchedulableJobs.contains(retryMessagesCronJob.get(1)));
     }
 
 }

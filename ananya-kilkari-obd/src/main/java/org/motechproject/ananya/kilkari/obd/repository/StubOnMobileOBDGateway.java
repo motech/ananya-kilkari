@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.repository;
 
 import org.motechproject.ananya.kilkari.obd.profile.TestProfile;
+import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.springframework.stereotype.Component;
 
@@ -12,16 +13,16 @@ public class StubOnMobileOBDGateway implements OnMobileOBDGateway {
     private boolean invalidFailureRecordCalled;
 
     @Override
-    public void sendNewMessages(String content) {
+    public void sendNewMessages(String content, SubSlot subSlot) {
         if(verify()) {
-            behavior.sendNewMessages(content);
+            behavior.sendNewMessages(content, subSlot);
         }
     }
 
     @Override
-    public void sendRetryMessages(String content) {
+    public void sendRetryMessages(String content, SubSlot subSlot) {
         if(verify()) {
-            behavior.sendRetryMessages(content);
+            behavior.sendRetryMessages(content, subSlot);
         }
     }
 

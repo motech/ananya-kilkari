@@ -6,6 +6,7 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
+import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailRecordRequest;
@@ -43,23 +44,23 @@ public class CampaignMessageService {
         allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, msisdn, operator, messageExpiryDate));
     }
 
-    public void sendNewMessages() {
+    public void sendNewMessages(final SubSlot subSlot) {
         List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
         GatewayAction gatewayAction = new GatewayAction() {
             @Override
             public void send(String content) {
-                onMobileOBDGateway.sendNewMessages(content);
+                onMobileOBDGateway.sendNewMessages(content, subSlot);
             }
         };
         sendMessagesToOBD(allNewMessages, gatewayAction);
     }
 
-    public void sendRetryMessages() {
+    public void sendRetryMessages(final SubSlot subSlot) {
         List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentRetryMessages();
         GatewayAction gatewayAction = new GatewayAction() {
             @Override
             public void send(String content) {
-                onMobileOBDGateway.sendRetryMessages(content);
+                onMobileOBDGateway.sendRetryMessages(content, subSlot);
             }
         };
         sendMessagesToOBD(allRetryMessages, gatewayAction);

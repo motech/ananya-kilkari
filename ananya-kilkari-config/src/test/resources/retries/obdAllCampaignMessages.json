@@ -1,0 +1,12 @@
+{
+    "groupName" : "obd-send-all-messages-group",
+    "eventSubject": "obd.send.all.messages.with.retry",
+    "retries" : [
+        {
+            "name" : "obd-send-all-messages",
+            "retryCount" : "5",
+            "retryInterval" : ["3 minutes"],
+            "offset" : "0 minutes"
+        }
+    ]
+}

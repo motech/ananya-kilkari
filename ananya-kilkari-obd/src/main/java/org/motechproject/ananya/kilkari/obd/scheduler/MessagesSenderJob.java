@@ -6,27 +6,38 @@ import org.motechproject.scheduler.domain.CronSchedulableJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class MessagesSenderJob {
 
     private final String subject;
-    private final String cronExpression;
+    private Map<SubSlot, String> cronJobDetails;
+    protected static final String SUB_SLOT_KEY = "sub_slot";
 
     private static final Logger logger = LoggerFactory.getLogger(MessagesSenderJob.class);
 
-    public MessagesSenderJob(String subject, String cronExpression) {
+    public MessagesSenderJob(String subject, Map<SubSlot, String> cronJobDetails) {
         this.subject = subject;
-        this.cronExpression = cronExpression;
+        this.cronJobDetails = cronJobDetails;
     }
 
-    public CronSchedulableJob getCronJob() {
-        MotechEvent motechEvent = new MotechEvent(subject);
-        return new CronSchedulableJob(motechEvent, cronExpression);
+    public ArrayList<CronSchedulableJob> getCronJobs() {
+        ArrayList<CronSchedulableJob> cronJobs = new ArrayList<>();
+        for (SubSlot subSlot : cronJobDetails.keySet()) {
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put(SUB_SLOT_KEY, subSlot);
+            MotechEvent motechEvent = new MotechEvent(subject, parameters);
+            cronJobs.add(new CronSchedulableJob(motechEvent, cronJobDetails.get(subSlot)));
+        }
+        return cronJobs;
     }
 
-    protected boolean canSendMessages(int slotStartTimeHours, int slotStartTimeMinutes) {
+    protected boolean canSendMessages(DateTime slotStartTime) {
         DateTime now = DateTime.now();
-        boolean canSendMessages = !now.isAfter(now.withTime(slotStartTimeHours, slotStartTimeMinutes, 0, 0));
-        if(!canSendMessages) {
+        boolean canSendMessages = !now.isAfter(now.withTime(slotStartTime.getHourOfDay(), slotStartTime.getMinuteOfHour(), 0, 0));
+        if (!canSendMessages) {
             logger.info("Current Time : " + now + " has passed the slot start time.");
         }
         return canSendMessages;

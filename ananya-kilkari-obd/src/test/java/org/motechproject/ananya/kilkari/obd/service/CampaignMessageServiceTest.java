@@ -12,6 +12,7 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
+import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 
@@ -84,33 +85,31 @@ public class CampaignMessageServiceTest {
     }
 
     @Test
-    public void sendNewMessagesShouldFetchNewAndDidNotCallMessages() {
+    public void sendNewMessagesShouldFetchNewMessages() {
         CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
         CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(campaignMessages);
         String csvContent = "csvContent";
         when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
-        campaignMessageService.sendNewMessages();
+
+        campaignMessageService.sendNewMessages(SubSlot.ONE);
 
         verify(allCampaignMessages).getAllUnsentNewMessages();
-        verify(onMobileOBDGateway).sendNewMessages(csvContent);
-
         ArgumentCaptor<CampaignMessage> captor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages, times(2)).update(captor.capture());
-
         List<CampaignMessage> actualCampaignMessages = captor.getAllValues();
         assertEquals(2, actualCampaignMessages.size());
         CampaignMessage actualCampaignMessage1 = actualCampaignMessages.get(0);
         CampaignMessage actualCampaignMessage2 = actualCampaignMessages.get(1);
-
         assertEquals(expectedCampaignMessage1.getSubscriptionId(), actualCampaignMessage1.getSubscriptionId());
         assertEquals(expectedCampaignMessage1.getMessageId(), actualCampaignMessage1.getMessageId());
         assertTrue(actualCampaignMessage1.isSent());
-
         assertEquals(expectedCampaignMessage2.getSubscriptionId(), actualCampaignMessage2.getSubscriptionId());
         assertEquals(expectedCampaignMessage2.getMessageId(), actualCampaignMessage2.getMessageId());
         assertTrue(actualCampaignMessage2.isSent());
+
+        verify(onMobileOBDGateway).sendNewMessages(csvContent, SubSlot.ONE);
     }
 
     @Test
@@ -123,10 +122,10 @@ public class CampaignMessageServiceTest {
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(campaignMessages);
 
-        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendNewMessages(anyString());
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendNewMessages(anyString(), any(SubSlot.class));
 
         try {
-            campaignMessageService.sendNewMessages();
+            campaignMessageService.sendNewMessages(SubSlot.ONE);
         } finally {
             verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         }
@@ -141,14 +140,13 @@ public class CampaignMessageServiceTest {
         String csvContent = "csvContent";
         when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
 
-
-        campaignMessageService.sendRetryMessages();
+        campaignMessageService.sendRetryMessages(SubSlot.ONE);
 
         verify(allCampaignMessages).getAllUnsentRetryMessages();
         ArgumentCaptor<CampaignMessage> captor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages, times(2)).update(captor.capture());
 
-        verify(onMobileOBDGateway).sendRetryMessages(csvContent);
+        verify(onMobileOBDGateway).sendRetryMessages(csvContent, SubSlot.ONE);
 
         List<CampaignMessage> actualCampaignMessages = captor.getAllValues();
         assertEquals(2, actualCampaignMessages.size());
@@ -164,7 +162,6 @@ public class CampaignMessageServiceTest {
         assertTrue(actualCampaignMessage2.isSent());
     }
 
-
     @Test
     public void shouldNotSaveRetryCampaignMessagesAsSentIfSendingFailed() {
         expectedException.expect(RuntimeException.class);
@@ -175,10 +172,10 @@ public class CampaignMessageServiceTest {
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(campaignMessages);
 
-        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendRetryMessages(anyString());
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendRetryMessages(anyString(), any(SubSlot.class));
 
         try {
-            campaignMessageService.sendRetryMessages();
+            campaignMessageService.sendRetryMessages(SubSlot.THREE);
         } finally {
             verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         }
@@ -188,7 +185,7 @@ public class CampaignMessageServiceTest {
     public void shouldNotSendNewMessagesIfNoneExist() {
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(new ArrayList<CampaignMessage>());
 
-        campaignMessageService.sendNewMessages();
+        campaignMessageService.sendNewMessages(SubSlot.ONE);
 
         verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         verifyZeroInteractions(onMobileOBDGateway);
@@ -198,7 +195,7 @@ public class CampaignMessageServiceTest {
     public void shouldNotSendRetryMessagesIfNoneExist() {
         when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(new ArrayList<CampaignMessage>());
 
-        campaignMessageService.sendRetryMessages();
+        campaignMessageService.sendRetryMessages(SubSlot.ONE);
 
         verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         verifyZeroInteractions(onMobileOBDGateway);
@@ -503,7 +500,7 @@ public class CampaignMessageServiceTest {
     }
 
     @Test
-    public void shouldDeleteAllExistingMessagesForASubscription(){
+    public void shouldDeleteAllExistingMessagesForASubscription() {
         String subscriptionId = "subscriptionId";
 
         campaignMessageService.deleteCampaignMessagesFor(subscriptionId);

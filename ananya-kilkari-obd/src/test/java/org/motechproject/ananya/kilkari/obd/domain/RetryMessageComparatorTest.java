@@ -75,6 +75,6 @@ public class RetryMessageComparatorTest {
             add(campaignMessageWithInvalidMessageID);
         }};
 
-        Collections.sort(campaignMessages, new NewMessageComparator());
+        Collections.sort(campaignMessages, new RetryMessageComparator());
     }
 }

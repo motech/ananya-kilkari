@@ -12,6 +12,7 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.StubOnMobileOBDGateway;
+import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
 import org.motechproject.ananya.kilkari.obd.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -152,9 +153,9 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
-        campaignMessageService.sendNewMessages();
+        campaignMessageService.sendNewMessages(SubSlot.ONE);
 
-        verify(mockOnMobileOBDGateway).sendNewMessages("1234567890,messageId,subscriptionId,airtel\n");
+        verify(mockOnMobileOBDGateway).sendNewMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.ONE);
     }
 
     @Test
@@ -174,8 +175,8 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
-        campaignMessageService.sendRetryMessages();
+        campaignMessageService.sendRetryMessages(SubSlot.THREE);
 
-        verify(mockOnMobileOBDGateway).sendRetryMessages("1234567890,messageId,subscriptionId,airtel\n");
+        verify(mockOnMobileOBDGateway).sendRetryMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.THREE);
     }
 }

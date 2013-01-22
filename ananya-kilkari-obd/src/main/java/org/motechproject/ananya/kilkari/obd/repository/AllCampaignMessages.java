@@ -5,7 +5,6 @@ import org.ektorp.CouchDbConnector;
 import org.ektorp.support.GenerateView;
 import org.ektorp.support.View;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
-import org.motechproject.ananya.kilkari.obd.domain.NewMessageComparator;
 import org.motechproject.ananya.kilkari.obd.domain.RetryMessageComparator;
 import org.motechproject.dao.MotechBaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +28,9 @@ public class AllCampaignMessages extends MotechBaseRepository<CampaignMessage> {
         return queryView("by_subscriptionId", subscriptionId);
     }
 
-    @View(name = "all_unsent_new_messages", map = "function(doc) {if(doc.type == 'CampaignMessage' && (doc.status == 'NEW' || doc.status == 'ND') && !doc.sent) {emit([doc.subscriptionId, doc.messageId]);}}")
+    @View(name = "all_unsent_new_messages", map = "function(doc) {if(doc.type == 'CampaignMessage' && doc.status == 'NEW' && !doc.sent) {emit([doc.subscriptionId, doc.messageId]);}}")
     public List<CampaignMessage> getAllUnsentNewMessages() {
-        List<CampaignMessage> campaignMessageList = queryView("all_unsent_new_messages");
-        Collections.sort(campaignMessageList, new NewMessageComparator());
-        return campaignMessageList;
+        return queryView("all_unsent_new_messages");
     }
 
     @View(name = "all_unsent_retry_messages", map = "function(doc) {if(doc.type == 'CampaignMessage' && doc.status == 'NA' && !doc.sent) {emit([doc.subscriptionId, doc.messageId]);}}")

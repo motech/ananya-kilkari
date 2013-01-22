@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.obd.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,14 +59,6 @@ public class OBDProperties {
         return obdProperties.getProperty("obd.message.delivery.file");
     }
 
-    public String getNewMessageSlotStartTime() {
-        return obdProperties.getProperty("obd.new.message.slot.start.time");
-    }
-
-    public String getNewMessageSlotEndTime() {
-        return obdProperties.getProperty("obd.new.message.slot.end.time");
-    }
-
     public Integer getMaximumDNPRetryCount() {
         return Integer.parseInt(obdProperties.getProperty("obd.dnp.message.max.retry.count"));
     }
@@ -73,39 +67,43 @@ public class OBDProperties {
         return Integer.parseInt(obdProperties.getProperty("obd.dnc.message.max.retry.count"));
     }
 
-    public String getRetryMessageSlotStartTime() {
-        return obdProperties.getProperty("obd.retry.message.slot.start.time");
+    public String getMainSlotStartTimeFor(String subSlot) {
+        return obdProperties.getProperty(String.format("obd.main.sub.slot.%s.start.time", subSlot.toLowerCase()));
     }
 
-    public String getRetryMessageSlotEndTime() {
-        return obdProperties.getProperty("obd.retry.message.slot.end.time");
+    public String getMainSlotEndTimeFor(String subSlot) {
+        return obdProperties.getProperty(String.format("obd.main.sub.slot.%s.end.time", subSlot.toLowerCase()));
+    }
+
+    public String getRetrySlotStartTimeFor(String subSlot) {
+        return obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.start.time", subSlot.toLowerCase()));
+    }
+
+    public String getRetrySlotEndTimeFor(String subSlot) {
+        return obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.end.time", subSlot.toLowerCase()));
     }
 
     public CampaignMessageStatus getCampaignMessageStatusFor(String statusCode) {
         return statusCodesMap.get(statusCode);
     }
 
-    public String getNewMessageJobCronExpression() {
-        return obdProperties.getProperty("obd.new.messages.job.cron.expression");
+    public String getMainSlotCronJobExpressionFor(String subSlot) {
+        return obdProperties.getProperty(String.format("obd.main.sub.slot.%s.cron.job.expression", subSlot.toLowerCase()));
     }
 
-    public String getRetryMessageJobCronExpression() {
-        return obdProperties.getProperty("obd.retry.messages.job.cron.expression");
+    public String getRetrySlotCronJobExpressionFor(String subSlot) {
+        return obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.cron.job.expression", subSlot.toLowerCase()));
     }
 
-    public int getNewMessageStartTimeLimitHours() {
-        return Integer.parseInt(obdProperties.getProperty("obd.new.message.start.time.limit").split(":")[0]);
+    public DateTime getMainSlotStartTimeLimitFor(String subSlot) {
+        return parseTime(obdProperties.getProperty(String.format("obd.main.sub.slot.%s.start.time.limit", subSlot.toLowerCase())));
     }
 
-    public int getNewMessageStartTimeLimitMinute() {
-        return Integer.parseInt(obdProperties.getProperty("obd.new.message.start.time.limit").split(":")[1]);
+    public DateTime getRetrySlotStartTimeLimitFor(String subSlot) {
+        return parseTime(obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.start.time.limit", subSlot.toLowerCase())));
     }
 
-    public int getRetryMessageStartTimeLimitHours() {
-        return Integer.parseInt(obdProperties.getProperty("obd.retry.message.start.time.limit").split(":")[0]);
-    }
-
-    public int getRetryMessageStartTimeLimitMinute() {
-        return Integer.parseInt(obdProperties.getProperty("obd.retry.message.start.time.limit").split(":")[1]);
+    private DateTime parseTime(String time) {
+        return DateTimeFormat.forPattern("HH:mm").parseDateTime(time);
     }
 }

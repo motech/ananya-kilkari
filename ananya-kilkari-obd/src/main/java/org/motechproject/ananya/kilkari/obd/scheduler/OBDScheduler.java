@@ -1,9 +1,12 @@
 package org.motechproject.ananya.kilkari.obd.scheduler;
 
 import org.motechproject.scheduler.MotechSchedulerService;
+import org.motechproject.scheduler.domain.CronSchedulableJob;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 
 @Component
 @Lazy(false)
@@ -16,6 +19,9 @@ public class OBDScheduler {
     }
 
     private void scheduleJob(MotechSchedulerService motechSchedulerService, MessagesSenderJob messagesSenderJob) {
-        motechSchedulerService.safeScheduleJob(messagesSenderJob.getCronJob());
+        ArrayList<CronSchedulableJob> cronJobs = messagesSenderJob.getCronJobs();
+        for (CronSchedulableJob cronJob : cronJobs) {
+            motechSchedulerService.safeScheduleJob(cronJob);
+        }
     }
 }

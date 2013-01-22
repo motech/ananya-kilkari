@@ -5,6 +5,7 @@ import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunner;
 import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunnerResponse;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.StubOnMobileOBDGateway;
+import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -62,7 +63,7 @@ public class OnMobileOBDVerifier {
         private ArrayList<OnMobileCampaignMessage> retryCampaignMessages = new ArrayList<>();
 
         @Override
-        public void sendNewMessages(String content) {
+        public void sendNewMessages(String content, SubSlot subSlot) {
             String[] lines = content.split("\n");
             for (String line : lines) {
                 newCampaignMessages.add(new OnMobileCampaignMessage(line));
@@ -71,7 +72,7 @@ public class OnMobileOBDVerifier {
         }
 
         @Override
-        public void sendRetryMessages(String content) {
+        public void sendRetryMessages(String content, SubSlot subSlot) {
             String[] lines = content.split("\n");
             for (String line : lines) {
                 retryCampaignMessages.add(new OnMobileCampaignMessage(line));

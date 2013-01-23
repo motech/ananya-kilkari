@@ -68,7 +68,7 @@ public class NewMessagesSenderJobTest {
         DateTime after = DateTime.now();
         ArgumentCaptor<RetryRequest> captor = ArgumentCaptor.forClass(RetryRequest.class);
 
-        verify(retryService).schedule(captor.capture());
+        verify(retryService).schedule(captor.capture(), eq(expectedParameters));
         RetryRequest retryRequest = captor.getValue();
         assertEquals("obd-send-new-messages", retryRequest.getName());
         assertNotNull(retryRequest.getExternalId());

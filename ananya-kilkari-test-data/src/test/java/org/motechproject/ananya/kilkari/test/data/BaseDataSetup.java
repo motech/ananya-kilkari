@@ -125,10 +125,8 @@ public class BaseDataSetup {
         waitForSubscription(msisdn, subscriptionId, SubscriptionStatus.COMPLETED.getDisplayString());
     }
 
-
-
-
-    protected void makeOBDCallBack(String msisdn, String subscriptionId, String campaignId, String serviceOption, DateTime startTime, DateTime endTime) {
+    protected void makeOBDCallBack(String msisdn, String subscriptionId, String campaignId, String serviceOption, DateTime startTime) {
+        DateTime endTime = startTime.plusMinutes(10);
         CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(startTime.toString("dd-MM-yyyy HH-mm-ss"), endTime.toString("dd-MM-yyyy HH-mm-ss"));
         OBDSuccessfulCallDetailsWebRequest callDetailsWebRequest = new OBDSuccessfulCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, serviceOption);
 

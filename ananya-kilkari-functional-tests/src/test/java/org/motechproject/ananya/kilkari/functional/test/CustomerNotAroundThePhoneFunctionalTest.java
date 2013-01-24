@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.functional.test;
 
 import org.joda.time.DateTime;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.functional.test.builder.SubscriptionDataBuilder;
 import org.motechproject.ananya.kilkari.functional.test.domain.SubscriptionData;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.motechproject.ananya.kilkari.functional.test.Actions.*;
 
+@Ignore
 public class CustomerNotAroundThePhoneFunctionalTest extends BaseFunctionalTest {
 
     @Autowired

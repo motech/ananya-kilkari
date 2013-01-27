@@ -141,7 +141,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
     }
 
     @Test
-    public void shouldSendNewCampaignMessagesToOBD() {
+    public void shouldSendFirstMainSubSlotCampaignMessagesToOBD() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
         String operator = "airtel";
@@ -153,13 +153,49 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
-        campaignMessageService.sendNewMessages(SubSlot.ONE);
+        campaignMessageService.sendFirstMainSubSlotMessages(SubSlot.ONE);
 
-        verify(mockOnMobileOBDGateway).sendNewMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.ONE);
+        verify(mockOnMobileOBDGateway).sendMainSlotMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.ONE);
     }
 
     @Test
-    public void shouldSendRetryCampaignMessagesToOBD() {
+    public void shouldSendSecondMainSubSlotCampaignMessagesToOBD() {
+        String subscriptionId = "subscriptionId";
+        String messageId = "messageId";
+        String operator = "airtel";
+        String msisdn = "1234567890";
+
+        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, DateTime.now().plusDays(2));
+        markForDeletion(allCampaignMessages.find(subscriptionId, messageId));
+
+        OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
+        onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
+
+        campaignMessageService.sendSecondMainSubSlotMessages(SubSlot.TWO);
+
+        verify(mockOnMobileOBDGateway).sendMainSlotMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.TWO);
+    }
+
+    @Test
+    public void shouldSendThirdMainSubSlotCampaignMessagesToOBD() {
+        String subscriptionId = "subscriptionId";
+        String messageId = "messageId";
+        String operator = "airtel";
+        String msisdn = "1234567890";
+
+        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, DateTime.now().plusDays(2));
+        markForDeletion(allCampaignMessages.find(subscriptionId, messageId));
+
+        OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
+        onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
+
+        campaignMessageService.sendThirdMainSubSlotMessages(SubSlot.THREE);
+
+        verify(mockOnMobileOBDGateway).sendMainSlotMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.THREE);
+    }
+
+    @Test
+    public void shouldSendRetrySlotCampaignMessagesToOBD() {
         String subscriptionId = "subscriptionId";
         String messageId = "messageId";
         String operator = "airtel";
@@ -175,8 +211,8 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
-        campaignMessageService.sendRetryMessages(SubSlot.THREE);
+        campaignMessageService.sendRetrySlotMessages(SubSlot.THREE);
 
-        verify(mockOnMobileOBDGateway).sendRetryMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.THREE);
+        verify(mockOnMobileOBDGateway).sendRetrySlotMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.THREE);
     }
 }

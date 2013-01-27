@@ -19,8 +19,8 @@ public class OBDApiService {
     private HttpUtils httpUtils;
 
     public void sendMessagesToOBD() {
-        campaignMessageService.sendNewMessages(SubSlot.ONE);
-        campaignMessageService.sendRetryMessages(SubSlot.ONE);
+        campaignMessageService.sendFirstMainSubSlotMessages(SubSlot.ONE);
+        campaignMessageService.sendRetrySlotMessages(SubSlot.ONE);
     }
 
     public void sendOBDCallbackRequest(OBDSuccessfulCallDetailsWebRequest request){

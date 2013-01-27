@@ -49,17 +49,15 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     }
 
     @Override
-    public void sendNewMessages(String content, SubSlot subSlot) {
-        String url = obdProperties.getMessageDeliveryBaseUrl();
+    public void sendMainSlotMessages(String content, SubSlot subSlot) {
         String date = getCurrentDate();
-        send(content, url, String.format("%s%s", date, obdProperties.getMainSlotStartTimeFor(subSlot.name())), String.format("%s%s", date, obdProperties.getMainSlotEndTimeFor(subSlot.name())));
+        send(content, String.format("%s%s", date, obdProperties.getMainSlotStartTimeFor(subSlot.name())), String.format("%s%s", date, obdProperties.getMainSlotEndTimeFor(subSlot.name())));
     }
 
     @Override
-    public void sendRetryMessages(String content, SubSlot subSlot) {
-        String url = obdProperties.getMessageDeliveryBaseUrl();
+    public void sendRetrySlotMessages(String content, SubSlot subSlot) {
         String date = getCurrentDate();
-        send(content, url, String.format("%s%s", date, obdProperties.getRetrySlotStartTimeFor(subSlot.name())), String.format("%s%s", date, obdProperties.getRetrySlotEndTimeFor(subSlot.name())));
+        send(content, String.format("%s%s", date, obdProperties.getRetrySlotStartTimeFor(subSlot.name())), String.format("%s%s", date, obdProperties.getRetrySlotEndTimeFor(subSlot.name())));
     }
 
     private String getCurrentDate() {
@@ -80,7 +78,8 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
         return JsonUtils.toJson(invalidFailedCallReports.getRecordObjectFaileds());
     }
 
-    private void send(String content, String url, String slotStartDate, String slotEndDate) {
+    private void send(String content, String slotStartDate, String slotEndDate) {
+        String url = obdProperties.getMessageDeliveryBaseUrl();
         logger.info(String.format("Uploading the campaign messages to url: %s", url));
         logger.debug(String.format("Uploading campaign messages content : %s", content));
 

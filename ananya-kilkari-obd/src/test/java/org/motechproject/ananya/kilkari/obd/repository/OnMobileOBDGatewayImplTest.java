@@ -52,10 +52,6 @@ public class OnMobileOBDGatewayImplTest {
         when(obdProperties.getMessageDeliveryBaseUrl()).thenReturn("mybaseurl");
         when(obdProperties.getMessageDeliveryFileName()).thenReturn("myfile.txt");
         when(obdProperties.getMessageDeliveryFile()).thenReturn("myfile");
-        when(obdProperties.getMainSlotStartTimeFor(SubSlot.ONE.name())).thenReturn("130000");
-        when(obdProperties.getMainSlotEndTimeFor(SubSlot.ONE.name())).thenReturn("160000");
-        when(obdProperties.getRetrySlotStartTimeFor(SubSlot.THREE.name())).thenReturn("180000");
-        when(obdProperties.getRetrySlotEndTimeFor(SubSlot.THREE.name())).thenReturn("200000");
         when(obdProperties.getFailureReportUrl()).thenReturn("failureUrl");
 
         onMobileOBDGateway = new OnMobileOBDGatewayImpl(httpClient, obdProperties, restTemplate);
@@ -69,9 +65,11 @@ public class OnMobileOBDGatewayImplTest {
         when(statusLine.getReasonPhrase()).thenReturn("created");
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
+        when(obdProperties.getMainSlotStartTimeFor(SubSlot.ONE.name())).thenReturn("130000");
+        when(obdProperties.getMainSlotEndTimeFor(SubSlot.ONE.name())).thenReturn("160000");
         String expectedContent = "expectedContent";
 
-        onMobileOBDGateway.sendNewMessages(expectedContent, SubSlot.ONE);
+        onMobileOBDGateway.sendMainSlotMessages(expectedContent, SubSlot.ONE);
 
         verify(obdProperties).getMainSlotStartTimeFor(SubSlot.ONE.name());
         verify(obdProperties).getMainSlotEndTimeFor(SubSlot.ONE.name());
@@ -101,9 +99,11 @@ public class OnMobileOBDGatewayImplTest {
         when(statusLine.getReasonPhrase()).thenReturn("created");
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
+        when(obdProperties.getRetrySlotStartTimeFor(SubSlot.THREE.name())).thenReturn("180000");
+        when(obdProperties.getRetrySlotEndTimeFor(SubSlot.THREE.name())).thenReturn("200000");
         String expectedContent = "expectedContent";
 
-        onMobileOBDGateway.sendRetryMessages(expectedContent, SubSlot.THREE);
+        onMobileOBDGateway.sendRetrySlotMessages(expectedContent, SubSlot.THREE);
 
         verify(obdProperties).getRetrySlotStartTimeFor(SubSlot.THREE.name());
         verify(obdProperties).getRetrySlotStartTimeFor(SubSlot.THREE.name());
@@ -138,7 +138,7 @@ public class OnMobileOBDGatewayImplTest {
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
 
-        onMobileOBDGateway.sendNewMessages("content", SubSlot.ONE);
+        onMobileOBDGateway.sendMainSlotMessages("content", SubSlot.ONE);
     }
 
     private String readRequest(MultipartEntity multipartEntity) throws IOException {

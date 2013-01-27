@@ -85,7 +85,7 @@ public class CampaignMessageServiceTest {
     }
 
     @Test
-    public void sendNewMessagesShouldFetchNewMessages() {
+    public void sendFirstMainSubSlotMessagesShouldFetchNewMessages() {
         CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
         CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
@@ -93,23 +93,11 @@ public class CampaignMessageServiceTest {
         String csvContent = "csvContent";
         when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
 
-        campaignMessageService.sendNewMessages(SubSlot.ONE);
+        campaignMessageService.sendFirstMainSubSlotMessages(SubSlot.ONE);
 
         verify(allCampaignMessages).getAllUnsentNewMessages();
-        ArgumentCaptor<CampaignMessage> captor = ArgumentCaptor.forClass(CampaignMessage.class);
-        verify(allCampaignMessages, times(2)).update(captor.capture());
-        List<CampaignMessage> actualCampaignMessages = captor.getAllValues();
-        assertEquals(2, actualCampaignMessages.size());
-        CampaignMessage actualCampaignMessage1 = actualCampaignMessages.get(0);
-        CampaignMessage actualCampaignMessage2 = actualCampaignMessages.get(1);
-        assertEquals(expectedCampaignMessage1.getSubscriptionId(), actualCampaignMessage1.getSubscriptionId());
-        assertEquals(expectedCampaignMessage1.getMessageId(), actualCampaignMessage1.getMessageId());
-        assertTrue(actualCampaignMessage1.isSent());
-        assertEquals(expectedCampaignMessage2.getSubscriptionId(), actualCampaignMessage2.getSubscriptionId());
-        assertEquals(expectedCampaignMessage2.getMessageId(), actualCampaignMessage2.getMessageId());
-        assertTrue(actualCampaignMessage2.isSent());
-
-        verify(onMobileOBDGateway).sendNewMessages(csvContent, SubSlot.ONE);
+        verify(onMobileOBDGateway).sendMainSlotMessages(csvContent, SubSlot.ONE);
+        verifyCampaignMessageUpdate(expectedCampaignMessage1, expectedCampaignMessage2);
     }
 
     @Test
@@ -122,44 +110,29 @@ public class CampaignMessageServiceTest {
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(campaignMessages);
 
-        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendNewMessages(anyString(), any(SubSlot.class));
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendMainSlotMessages(anyString(), any(SubSlot.class));
 
         try {
-            campaignMessageService.sendNewMessages(SubSlot.ONE);
+            campaignMessageService.sendFirstMainSubSlotMessages(SubSlot.ONE);
         } finally {
             verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         }
     }
 
     @Test
-    public void sendRetryMessagesShouldFetchRetryMessages() {
+    public void sendRetrySlotMessagesShouldFetchRetryMessages() {
         CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
         CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
-        when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(campaignMessages);
+        when(allCampaignMessages.getAllUnsentNAMessages()).thenReturn(campaignMessages);
         String csvContent = "csvContent";
         when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
 
-        campaignMessageService.sendRetryMessages(SubSlot.ONE);
+        campaignMessageService.sendRetrySlotMessages(SubSlot.ONE);
 
-        verify(allCampaignMessages).getAllUnsentRetryMessages();
-        ArgumentCaptor<CampaignMessage> captor = ArgumentCaptor.forClass(CampaignMessage.class);
-        verify(allCampaignMessages, times(2)).update(captor.capture());
-
-        verify(onMobileOBDGateway).sendRetryMessages(csvContent, SubSlot.ONE);
-
-        List<CampaignMessage> actualCampaignMessages = captor.getAllValues();
-        assertEquals(2, actualCampaignMessages.size());
-        CampaignMessage actualCampaignMessage1 = actualCampaignMessages.get(0);
-        CampaignMessage actualCampaignMessage2 = actualCampaignMessages.get(1);
-
-        assertEquals(expectedCampaignMessage1.getSubscriptionId(), actualCampaignMessage1.getSubscriptionId());
-        assertEquals(expectedCampaignMessage1.getMessageId(), actualCampaignMessage1.getMessageId());
-        assertTrue(actualCampaignMessage1.isSent());
-
-        assertEquals(expectedCampaignMessage2.getSubscriptionId(), actualCampaignMessage2.getSubscriptionId());
-        assertEquals(expectedCampaignMessage2.getMessageId(), actualCampaignMessage2.getMessageId());
-        assertTrue(actualCampaignMessage2.isSent());
+        verify(allCampaignMessages).getAllUnsentNAMessages();
+        verify(onMobileOBDGateway).sendRetrySlotMessages(csvContent, SubSlot.ONE);
+        verifyCampaignMessageUpdate(expectedCampaignMessage1, expectedCampaignMessage2);
     }
 
     @Test
@@ -170,32 +143,32 @@ public class CampaignMessageServiceTest {
         CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
         CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
-        when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(campaignMessages);
+        when(allCampaignMessages.getAllUnsentNAMessages()).thenReturn(campaignMessages);
 
-        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendRetryMessages(anyString(), any(SubSlot.class));
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendRetrySlotMessages(anyString(), any(SubSlot.class));
 
         try {
-            campaignMessageService.sendRetryMessages(SubSlot.THREE);
+            campaignMessageService.sendRetrySlotMessages(SubSlot.THREE);
         } finally {
             verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         }
     }
 
     @Test
-    public void shouldNotSendNewMessagesIfNoneExist() {
+    public void shouldNotSendFirstMainSubSlotMessagesIfNoneExist() {
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(new ArrayList<CampaignMessage>());
 
-        campaignMessageService.sendNewMessages(SubSlot.ONE);
+        campaignMessageService.sendFirstMainSubSlotMessages(SubSlot.ONE);
 
         verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         verifyZeroInteractions(onMobileOBDGateway);
     }
 
     @Test
-    public void shouldNotSendRetryMessagesIfNoneExist() {
-        when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(new ArrayList<CampaignMessage>());
+    public void shouldNotSendRetrySlotMessagesIfNoneExist() {
+        when(allCampaignMessages.getAllUnsentNAMessages()).thenReturn(new ArrayList<CampaignMessage>());
 
-        campaignMessageService.sendRetryMessages(SubSlot.ONE);
+        campaignMessageService.sendRetrySlotMessages(SubSlot.ONE);
 
         verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         verifyZeroInteractions(onMobileOBDGateway);
@@ -518,4 +491,110 @@ public class CampaignMessageServiceTest {
 
         assertNull(campaignMessageService.getCampaignMessageStatusFor("iu_dnc123"));
     }
+
+    @Test
+    public void shouldFetchNewAndNAMessagesWhenSendingThirdMainSubSlotMessages() {
+        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
+        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
+        List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
+        when(allCampaignMessages.getAllUnsentNewAndNAMessages()).thenReturn(campaignMessages);
+        String csvContent = "csvContent";
+        when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
+
+        campaignMessageService.sendThirdMainSubSlotMessages(SubSlot.THREE);
+
+        verify(allCampaignMessages).getAllUnsentNewAndNAMessages();
+        verify(onMobileOBDGateway).sendMainSlotMessages(csvContent, SubSlot.THREE);
+        verifyCampaignMessageUpdate(expectedCampaignMessage1, expectedCampaignMessage2);
+    }
+
+    @Test
+    public void shouldNotSaveNewAndNACampaignMessagesAsSentIfSendingFailed() {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("myruntimeexception");
+
+        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
+        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
+        List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
+        when(allCampaignMessages.getAllUnsentNewAndNAMessages()).thenReturn(campaignMessages);
+
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendMainSlotMessages(anyString(), any(SubSlot.class));
+
+        try {
+            campaignMessageService.sendThirdMainSubSlotMessages(SubSlot.THREE);
+        } finally {
+            verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
+        }
+    }
+
+    @Test
+    public void shouldNotSendThirdMainSubSlotMessagesIfNoneExist() {
+        when(allCampaignMessages.getAllUnsentNewAndNAMessages()).thenReturn(new ArrayList<CampaignMessage>());
+
+        campaignMessageService.sendThirdMainSubSlotMessages(SubSlot.THREE);
+
+        verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
+        verifyZeroInteractions(onMobileOBDGateway);
+    }
+
+    @Test
+    public void shouldFetchAllMessagesWhenSendingSecondMainSubSlotMessages() {
+        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
+        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
+        List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
+        when(allCampaignMessages.getAllUnsentMessages()).thenReturn(campaignMessages);
+        String csvContent = "csvContent";
+        when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
+
+        campaignMessageService.sendSecondMainSubSlotMessages(SubSlot.TWO);
+
+        verify(allCampaignMessages).getAllUnsentMessages();
+        verify(onMobileOBDGateway).sendMainSlotMessages(csvContent, SubSlot.TWO);
+        verifyCampaignMessageUpdate(expectedCampaignMessage1, expectedCampaignMessage2);
+    }
+
+    @Test
+    public void shouldNotSaveAllCampaignMessagesAsSentIfSendingFailed() {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("myruntimeexception");
+
+        CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
+        CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", "1234567891", "operator2", DateTime.now().plusDays(2));
+        List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
+        when(allCampaignMessages.getAllUnsentMessages()).thenReturn(campaignMessages);
+
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendMainSlotMessages(anyString(), any(SubSlot.class));
+
+        try {
+            campaignMessageService.sendSecondMainSubSlotMessages(SubSlot.TWO);
+        } finally {
+            verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
+        }
+    }
+
+    @Test
+    public void shouldNotSendSecondSubSlotMessagesIfNoneExist() {
+        when(allCampaignMessages.getAllUnsentMessages()).thenReturn(new ArrayList<CampaignMessage>());
+
+        campaignMessageService.sendSecondMainSubSlotMessages(SubSlot.TWO);
+
+        verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
+        verifyZeroInteractions(onMobileOBDGateway);
+    }
+
+    private void verifyCampaignMessageUpdate(CampaignMessage expectedCampaignMessage1, CampaignMessage expectedCampaignMessage2) {
+        ArgumentCaptor<CampaignMessage> captor = ArgumentCaptor.forClass(CampaignMessage.class);
+        verify(allCampaignMessages, times(2)).update(captor.capture());
+        List<CampaignMessage> actualCampaignMessages = captor.getAllValues();
+        assertEquals(2, actualCampaignMessages.size());
+        CampaignMessage actualCampaignMessage1 = actualCampaignMessages.get(0);
+        CampaignMessage actualCampaignMessage2 = actualCampaignMessages.get(1);
+        assertEquals(expectedCampaignMessage1.getSubscriptionId(), actualCampaignMessage1.getSubscriptionId());
+        assertEquals(expectedCampaignMessage1.getMessageId(), actualCampaignMessage1.getMessageId());
+        assertTrue(actualCampaignMessage1.isSent());
+        assertEquals(expectedCampaignMessage2.getSubscriptionId(), actualCampaignMessage2.getSubscriptionId());
+        assertEquals(expectedCampaignMessage2.getMessageId(), actualCampaignMessage2.getMessageId());
+        assertTrue(actualCampaignMessage2.isSent());
+    }
+
 }

@@ -19,21 +19,21 @@ import java.util.UUID;
 
 
 @Component
-public class RetryMessagesSenderJob extends MessagesSenderJob {
+public class RetrySlotMessagesSenderJob extends MessagesSenderJob {
 
-    private static final String SLOT_EVENT_SUBJECT = "obd.send.retry.messages";
-    private static final String RETRY_EVENT_SUBJECT = "obd.send.retry.messages.with.retry";
+    private static final String SLOT_EVENT_SUBJECT = "obd.send.retry.slot.messages";
+    private static final String RETRY_EVENT_SUBJECT = "obd.send.retry.slot.messages.with.retry";
 
-    private static final String RETRY_GROUP_NAME = "obd-send-retry-messages-group";
-    private static final String RETRY_NAME = "obd-send-retry-messages";
+    private static final String RETRY_GROUP_NAME = "obd-send-retry-slot-messages-group";
+    private static final String RETRY_NAME = "obd-send-retry-slot-messages";
 
-    private static final Logger logger = LoggerFactory.getLogger(RetryMessagesSenderJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(RetrySlotMessagesSenderJob.class);
     private CampaignMessageService campaignMessageService;
     private RetryService retryService;
     private OBDProperties obdProperties;
 
     @Autowired
-    public RetryMessagesSenderJob(CampaignMessageService campaignMessageService, RetryService retryService, final OBDProperties obdProperties) {
+    public RetrySlotMessagesSenderJob(CampaignMessageService campaignMessageService, RetryService retryService, final OBDProperties obdProperties) {
         super(SLOT_EVENT_SUBJECT,
                 new HashMap<SubSlot, String>() {{
                     put(SubSlot.ONE, obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.ONE.name()));
@@ -45,31 +45,32 @@ public class RetryMessagesSenderJob extends MessagesSenderJob {
         this.obdProperties = obdProperties;
     }
 
-    @MotechListener(subjects = {RetryMessagesSenderJob.SLOT_EVENT_SUBJECT})
-    public void sendMessages(MotechEvent motechEvent) {
-        logger.info("Handling send retry messages event");
-        RetryRequest retryRequest = new RetryRequest(RetryMessagesSenderJob.RETRY_NAME, UUID.randomUUID().toString(), DateTime.now());
+    @MotechListener(subjects = {RetrySlotMessagesSenderJob.SLOT_EVENT_SUBJECT})
+    public void handleMessages(MotechEvent motechEvent) {
+        SubSlot subSlot = (SubSlot) motechEvent.getParameters().get(SUB_SLOT_KEY);
+        logger.info(String.format("Handling send retry sub slot %s messages event", subSlot.name()));
+        RetryRequest retryRequest = new RetryRequest(RetrySlotMessagesSenderJob.RETRY_NAME, UUID.randomUUID().toString(), DateTime.now());
         HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put(SUB_SLOT_KEY, motechEvent.getParameters().get(SUB_SLOT_KEY));
+        parameters.put(SUB_SLOT_KEY, subSlot);
         retryService.schedule(retryRequest, parameters);
     }
 
-    @MotechListener(subjects = {RetryMessagesSenderJob.RETRY_EVENT_SUBJECT})
+    @MotechListener(subjects = {RetrySlotMessagesSenderJob.RETRY_EVENT_SUBJECT})
     public void sendMessagesWithRetry(MotechEvent motechEvent) {
-        logger.info("Handling send retry messages with retry event");
         Map<String, Object> parameters = motechEvent.getParameters();
         SubSlot subSlot = (SubSlot) parameters.get(SUB_SLOT_KEY);
+        logger.info(String.format("Handling send retry sub slot %s messages with retry event", subSlot.name()));
 
         if (!canSendMessages(obdProperties.getRetrySlotStartTimeLimitFor(subSlot.name()))) {
-            retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), RetryMessagesSenderJob.RETRY_GROUP_NAME);
+            retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), RetrySlotMessagesSenderJob.RETRY_GROUP_NAME);
             return;
         }
 
         try {
-            campaignMessageService.sendRetryMessages(subSlot);
-            retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), RetryMessagesSenderJob.RETRY_GROUP_NAME);
+            campaignMessageService.sendRetrySlotMessages(subSlot);
+            retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), RetrySlotMessagesSenderJob.RETRY_GROUP_NAME);
         } catch (Exception ex) {
-            logger.error("Error occurred while sending retry messages to obd.", ex);
+            logger.error(String.format("Error occurred while sending retry sub slot %s messages to obd.", subSlot.name()), ex);
         }
     }
 }

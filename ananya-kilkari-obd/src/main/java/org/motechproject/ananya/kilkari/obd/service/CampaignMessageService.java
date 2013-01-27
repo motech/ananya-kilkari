@@ -44,23 +44,37 @@ public class CampaignMessageService {
         allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, msisdn, operator, messageExpiryDate));
     }
 
-    public void sendNewMessages(final SubSlot subSlot) {
+    public void sendFirstMainSubSlotMessages(final SubSlot subSlot) {
         List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
-        GatewayAction gatewayAction = new GatewayAction() {
-            @Override
-            public void send(String content) {
-                onMobileOBDGateway.sendNewMessages(content, subSlot);
-            }
-        };
-        sendMessagesToOBD(allNewMessages, gatewayAction);
+        sendMainSlotMessages(subSlot, allNewMessages);
     }
 
-    public void sendRetryMessages(final SubSlot subSlot) {
-        List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentRetryMessages();
+    public void sendSecondMainSubSlotMessages(final SubSlot subSlot) {
+        List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentMessages();
+        sendMainSlotMessages(subSlot, allNewMessages);
+    }
+
+    public void sendThirdMainSubSlotMessages(final SubSlot subSlot) {
+        List<CampaignMessage> allNewAndRetryMessages = allCampaignMessages.getAllUnsentNewAndNAMessages();
+        sendMainSlotMessages(subSlot, allNewAndRetryMessages);
+    }
+
+    private void sendMainSlotMessages(final SubSlot subSlot, List<CampaignMessage> messagesToSend) {
         GatewayAction gatewayAction = new GatewayAction() {
             @Override
             public void send(String content) {
-                onMobileOBDGateway.sendRetryMessages(content, subSlot);
+                onMobileOBDGateway.sendMainSlotMessages(content, subSlot);
+            }
+        };
+        sendMessagesToOBD(messagesToSend, gatewayAction);
+    }
+
+    public void sendRetrySlotMessages(final SubSlot subSlot) {
+        List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentNAMessages();
+        GatewayAction gatewayAction = new GatewayAction() {
+            @Override
+            public void send(String content) {
+                onMobileOBDGateway.sendRetrySlotMessages(content, subSlot);
             }
         };
         sendMessagesToOBD(allRetryMessages, gatewayAction);

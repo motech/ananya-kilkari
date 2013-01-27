@@ -11,15 +11,16 @@ import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 
-public class NewMessagesSenderJobIT extends SpringIntegrationTest {
+public class RetrySlotMessagesSenderJobIT extends SpringIntegrationTest {
 
     @Autowired
-    private NewMessagesSenderJob newMessagesSenderJob;
+    private RetrySlotMessagesSenderJob retrySlotMessagesSenderJob;
     @Autowired
     private AllRetries allRetries;
     @Autowired
@@ -27,10 +28,12 @@ public class NewMessagesSenderJobIT extends SpringIntegrationTest {
 
     @Test
     public void shouldCreateARetrySchedule() {
-        newMessagesSenderJob.sendMessages(new MotechEvent("subject"));
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("sub_slot", SubSlot.THREE);
+        retrySlotMessagesSenderJob.handleMessages(new MotechEvent("subject", parameters));
     }
 
-   @After
+    @After
     public void tearDown() {
         allRetries.removeAll();
         removeQuartzJobs();
@@ -49,5 +52,4 @@ public class NewMessagesSenderJobIT extends SpringIntegrationTest {
             e.printStackTrace();
         }
     }
-
 }

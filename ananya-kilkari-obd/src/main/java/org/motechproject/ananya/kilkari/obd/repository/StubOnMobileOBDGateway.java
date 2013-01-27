@@ -13,16 +13,16 @@ public class StubOnMobileOBDGateway implements OnMobileOBDGateway {
     private boolean invalidFailureRecordCalled;
 
     @Override
-    public void sendNewMessages(String content, SubSlot subSlot) {
+    public void sendMainSlotMessages(String content, SubSlot subSlot) {
         if(verify()) {
-            behavior.sendNewMessages(content, subSlot);
+            behavior.sendMainSlotMessages(content, subSlot);
         }
     }
 
     @Override
-    public void sendRetryMessages(String content, SubSlot subSlot) {
+    public void sendRetrySlotMessages(String content, SubSlot subSlot) {
         if(verify()) {
-            behavior.sendRetryMessages(content, subSlot);
+            behavior.sendRetrySlotMessages(content, subSlot);
         }
     }
 

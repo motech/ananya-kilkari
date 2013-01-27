@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class NewMessagesSenderJobTest {
+public class FirstMainSubSlotMessagesSenderJobTest {
     @Mock
     private OBDProperties obdProperties;
     @Mock
@@ -29,7 +29,7 @@ public class NewMessagesSenderJobTest {
     @Mock
     private CampaignMessageService campaignMessageService;
 
-    private NewMessagesSenderJob newMessagesSenderJob;
+    private FirstMainSubSlotMessagesSenderJob firstMainSubSlotMessagesSenderJob;
     private String cronJobExpression = "mycronjobexpression";
     private static final String SUB_SLOT_KEY = "sub_slot";
 
@@ -37,12 +37,12 @@ public class NewMessagesSenderJobTest {
     public void setUp() {
         initMocks(this);
         when(obdProperties.getMainSlotCronJobExpressionFor(SubSlot.ONE.name())).thenReturn(cronJobExpression);
-        newMessagesSenderJob = new NewMessagesSenderJob(campaignMessageService, retryService, obdProperties);
+        firstMainSubSlotMessagesSenderJob = new FirstMainSubSlotMessagesSenderJob(campaignMessageService, retryService, obdProperties);
     }
 
     @Test
     public void shouldScheduleCronJobsAtConstruction() {
-        List<CronSchedulableJob> cronJobs = newMessagesSenderJob.getCronJobs();
+        List<CronSchedulableJob> cronJobs = firstMainSubSlotMessagesSenderJob.getCronJobs();
 
         assertEquals(1, cronJobs.size());
         CronSchedulableJob cronJob = cronJobs.get(0);
@@ -53,7 +53,7 @@ public class NewMessagesSenderJobTest {
         assertFalse(startDateTime.isAfter(DateTime.now()));
 
         MotechEvent motechEvent = cronJob.getMotechEvent();
-        assertEquals("obd.send.new.messages", motechEvent.getSubject());
+        assertEquals("obd.send.main.sub.slot.one.messages", motechEvent.getSubject());
         assertEquals(SubSlot.ONE, motechEvent.getParameters().get(SUB_SLOT_KEY));
     }
 
@@ -63,14 +63,14 @@ public class NewMessagesSenderJobTest {
         Map<String, Object> expectedParameters = new HashMap<>();
         expectedParameters.put(SUB_SLOT_KEY, SubSlot.ONE);
 
-        newMessagesSenderJob.sendMessages(new MotechEvent("", expectedParameters));
+        firstMainSubSlotMessagesSenderJob.handleMessages(new MotechEvent("", expectedParameters));
 
         DateTime after = DateTime.now();
         ArgumentCaptor<RetryRequest> captor = ArgumentCaptor.forClass(RetryRequest.class);
 
         verify(retryService).schedule(captor.capture(), eq(expectedParameters));
         RetryRequest retryRequest = captor.getValue();
-        assertEquals("obd-send-new-messages", retryRequest.getName());
+        assertEquals("obd-send-main-sub-slot-one-messages", retryRequest.getName());
         assertNotNull(retryRequest.getExternalId());
         DateTime referenceTime = retryRequest.getReferenceTime();
         assertTrue(after.isEqual(referenceTime) || after.isAfter(referenceTime));
@@ -78,21 +78,21 @@ public class NewMessagesSenderJobTest {
     }
 
     @Test
-    public void shouldInvokeCampaignMessageServiceToSendNewMessagesWithRetryAndFulfillTheRetryIfSuccessful() {
+    public void shouldInvokeCampaignMessageServiceToSendFirstMainSubSlotMessagesWithRetryAndFulfillTheRetryIfSuccessful() {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(11).withMinuteOfHour(0).getMillis());
 
         final SubSlot subSlot = SubSlot.ONE;
         when(obdProperties.getMainSlotStartTimeLimitFor(subSlot.name())).thenReturn(DateTime.now().withHourOfDay(11).withMinuteOfHour(45));
 
-        newMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        firstMainSubSlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
 
         verify(obdProperties).getMainSlotStartTimeLimitFor(subSlot.name());
-        verify(campaignMessageService).sendNewMessages(subSlot);
+        verify(campaignMessageService).sendFirstMainSubSlotMessages(subSlot);
 
-        verify(retryService).fulfill("myExternalId", "obd-send-new-messages-group");
+        verify(retryService).fulfill("myExternalId", "obd-send-main-sub-slot-one-messages-group");
 
         DateTimeUtils.setCurrentMillisSystem();
     }
@@ -104,9 +104,9 @@ public class NewMessagesSenderJobTest {
         final SubSlot subSlot = SubSlot.ONE;
         when(obdProperties.getMainSlotStartTimeLimitFor(subSlot.name())).thenReturn(DateTime.now().withHourOfDay(11).withMinuteOfHour(45));
 
-        doThrow(new RuntimeException("some exception")).when(campaignMessageService).sendNewMessages(subSlot);
+        doThrow(new RuntimeException("some exception")).when(campaignMessageService).sendFirstMainSubSlotMessages(subSlot);
 
-        newMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        firstMainSubSlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
@@ -123,13 +123,13 @@ public class NewMessagesSenderJobTest {
         final SubSlot subSlot = SubSlot.ONE;
         when(obdProperties.getMainSlotStartTimeLimitFor(subSlot.name())).thenReturn(DateTime.now().withHourOfDay(11));
 
-        newMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        firstMainSubSlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
 
-        verify(campaignMessageService, never()).sendNewMessages(subSlot);
-        verify(retryService).fulfill("myExternalId", "obd-send-new-messages-group");
+        verify(campaignMessageService, never()).sendFirstMainSubSlotMessages(subSlot);
+        verify(retryService).fulfill("myExternalId", "obd-send-main-sub-slot-one-messages-group");
 
         DateTimeUtils.setCurrentMillisSystem();
     }

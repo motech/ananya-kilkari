@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.domain;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
@@ -7,7 +9,7 @@ import org.joda.time.DateTime;
 import org.motechproject.model.MotechBaseDataObject;
 
 @TypeDiscriminator("doc.type === 'CampaignMessage'")
-public class CampaignMessage extends MotechBaseDataObject {
+public class CampaignMessage extends MotechBaseDataObject implements Comparable<CampaignMessage> {
 
     @JsonProperty
     private String subscriptionId;
@@ -121,6 +123,21 @@ public class CampaignMessage extends MotechBaseDataObject {
             return NDRetryCount;
         else
             return SORetryCount;
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        return EqualsBuilder.reflectionEquals(this, that);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public int compareTo(CampaignMessage that) {
+        return this.status.getPriority().compareTo(that.status.getPriority());
     }
 }
 

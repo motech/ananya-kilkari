@@ -63,7 +63,7 @@ public class OnMobileOBDVerifier {
         private ArrayList<OnMobileCampaignMessage> retryCampaignMessages = new ArrayList<>();
 
         @Override
-        public void sendNewMessages(String content, SubSlot subSlot) {
+        public void sendMainSlotMessages(String content, SubSlot subSlot) {
             String[] lines = content.split("\n");
             for (String line : lines) {
                 newCampaignMessages.add(new OnMobileCampaignMessage(line));
@@ -72,7 +72,7 @@ public class OnMobileOBDVerifier {
         }
 
         @Override
-        public void sendRetryMessages(String content, SubSlot subSlot) {
+        public void sendRetrySlotMessages(String content, SubSlot subSlot) {
             String[] lines = content.split("\n");
             for (String line : lines) {
                 retryCampaignMessages.add(new OnMobileCampaignMessage(line));

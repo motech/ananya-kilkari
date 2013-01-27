@@ -4,9 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.event.MotechEvent;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.CronSchedulableJob;
-import org.motechproject.event.MotechEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +19,15 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class OBDSchedulerTest {
 
     @Mock
-    NewMessagesSenderJob newMessagesSenderJob;
+    FirstMainSubSlotMessagesSenderJob firstMainSubSlotMessagesSenderJob;
     @Mock
-    RetryMessagesSenderJob retryMessagesSenderJob;
+    RetrySlotMessagesSenderJob retrySlotMessagesSenderJob;
     @Mock
     MotechSchedulerService schedulerService;
+    @Mock
+    private ThirdMainSubSlotMessagesSenderJob thirdMainSubSlotMessagesSenderJob;
+    @Mock
+    private SecondMainSubSlotMessagesSenderJob secondMainSubSlotMessagesSenderJob;
 
     @Before
     public void setUp() {
@@ -32,25 +36,32 @@ public class OBDSchedulerTest {
 
     @Test
     public void shouldScheduleCronJobs() {
-        ArrayList<CronSchedulableJob> newMessagesCronJob = new ArrayList<>();
-        newMessagesCronJob.add(new CronSchedulableJob(new MotechEvent("subject.new"), "cronexpression.new"));
-        ArrayList<CronSchedulableJob> retryMessagesCronJob = new ArrayList<>();
-        retryMessagesCronJob.add(new CronSchedulableJob(new MotechEvent("subject.retry"), "cronexpression.retry.first.expression"));
-        retryMessagesCronJob.add(new CronSchedulableJob(new MotechEvent("subject.retry"), "cronexpression.retry.second.expression"));
-        when(newMessagesSenderJob.getCronJobs()).thenReturn(newMessagesCronJob);
-        when(retryMessagesSenderJob.getCronJobs()).thenReturn(retryMessagesCronJob);
+        ArrayList<CronSchedulableJob> firstMainSubSlotCronJob = new ArrayList<>();
+        firstMainSubSlotCronJob.add(new CronSchedulableJob(new MotechEvent("subject.new"), "cronexpression.main.first.expression"));
+        ArrayList<CronSchedulableJob> secondMainSubSlotCronJob = new ArrayList<>();
+        secondMainSubSlotCronJob.add(new CronSchedulableJob(new MotechEvent("subject.new.and.retry"), "cronexpression.main.second.expression"));
+        ArrayList<CronSchedulableJob> thirdMainSubSlotCronJob = new ArrayList<>();
+        thirdMainSubSlotCronJob.add(new CronSchedulableJob(new MotechEvent("subject.new.and.retry"), "cronexpression.main.third.expression"));
+        ArrayList<CronSchedulableJob> retrySlotCronJobs = new ArrayList<>();
+        retrySlotCronJobs.add(new CronSchedulableJob(new MotechEvent("subject.retry"), "cronexpression.retry.first.expression"));
+        retrySlotCronJobs.add(new CronSchedulableJob(new MotechEvent("subject.retry"), "cronexpression.retry.second.expression"));
 
-        new OBDScheduler(schedulerService, newMessagesSenderJob, retryMessagesSenderJob);
+        when(firstMainSubSlotMessagesSenderJob.getCronJobs()).thenReturn(firstMainSubSlotCronJob);
+        when(secondMainSubSlotMessagesSenderJob.getCronJobs()).thenReturn(secondMainSubSlotCronJob);
+        when(thirdMainSubSlotMessagesSenderJob.getCronJobs()).thenReturn(thirdMainSubSlotCronJob);
+        when(retrySlotMessagesSenderJob.getCronJobs()).thenReturn(retrySlotCronJobs);
+
+        new OBDScheduler(schedulerService, firstMainSubSlotMessagesSenderJob, secondMainSubSlotMessagesSenderJob, thirdMainSubSlotMessagesSenderJob, retrySlotMessagesSenderJob);
 
         ArgumentCaptor<CronSchedulableJob> captor = ArgumentCaptor.forClass(CronSchedulableJob.class);
-        verify(schedulerService, times(3)).safeScheduleJob(captor.capture());
-
+        verify(schedulerService, times(5)).safeScheduleJob(captor.capture());
         List<CronSchedulableJob> cronSchedulableJobs = captor.getAllValues();
-
-        assertEquals(3, cronSchedulableJobs.size());
-        assertTrue(cronSchedulableJobs.contains(newMessagesCronJob.get(0)));
-        assertTrue(cronSchedulableJobs.contains(retryMessagesCronJob.get(0)));
-        assertTrue(cronSchedulableJobs.contains(retryMessagesCronJob.get(1)));
+        assertEquals(5, cronSchedulableJobs.size());
+        assertTrue(cronSchedulableJobs.contains(firstMainSubSlotCronJob.get(0)));
+        assertTrue(cronSchedulableJobs.contains(retrySlotCronJobs.get(0)));
+        assertTrue(cronSchedulableJobs.contains(retrySlotCronJobs.get(1)));
+        assertTrue(cronSchedulableJobs.contains(secondMainSubSlotCronJob.get(0)));
+        assertTrue(cronSchedulableJobs.contains(thirdMainSubSlotCronJob.get(0)));
     }
 
 }

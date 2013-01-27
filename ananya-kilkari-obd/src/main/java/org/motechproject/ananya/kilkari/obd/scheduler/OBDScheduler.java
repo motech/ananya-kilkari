@@ -13,9 +13,15 @@ import java.util.ArrayList;
 public class OBDScheduler {
 
     @Autowired
-    public OBDScheduler(MotechSchedulerService schedulerService, NewMessagesSenderJob newMessagesSenderJob, RetryMessagesSenderJob retryMessagesSenderJob) {
-        scheduleJob(schedulerService, newMessagesSenderJob);
-        scheduleJob(schedulerService, retryMessagesSenderJob);
+    public OBDScheduler(MotechSchedulerService schedulerService,
+                        FirstMainSubSlotMessagesSenderJob firstMainSubSlotMessagesSenderJob,
+                        SecondMainSubSlotMessagesSenderJob secondMainSubSlotMessagesSenderJob,
+                        ThirdMainSubSlotMessagesSenderJob thirdMainSubSlotMessagesSenderJob,
+                        RetrySlotMessagesSenderJob retrySlotMessagesSenderJob) {
+        scheduleJob(schedulerService, firstMainSubSlotMessagesSenderJob);
+        scheduleJob(schedulerService, thirdMainSubSlotMessagesSenderJob);
+        scheduleJob(schedulerService, secondMainSubSlotMessagesSenderJob);
+        scheduleJob(schedulerService, retrySlotMessagesSenderJob);
     }
 
     private void scheduleJob(MotechSchedulerService motechSchedulerService, MessagesSenderJob messagesSenderJob) {

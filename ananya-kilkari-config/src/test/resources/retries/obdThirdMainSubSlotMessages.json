@@ -1,0 +1,12 @@
+{
+    "groupName" : "obd-send-main-sub-slot-three-messages-group",
+    "eventSubject": "obd.send.main.sub.slot.three.messages.with.retry",
+    "retries" : [
+        {
+            "name" : "obd-send-main-sub-slot-three-messages",
+            "retryCount" : "5",
+            "retryInterval" : ["3 minutes"],
+            "offset" : "0 minutes"
+        }
+    ]
+}

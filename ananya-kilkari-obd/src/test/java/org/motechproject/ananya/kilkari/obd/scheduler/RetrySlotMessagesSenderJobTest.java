@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class RetryMessagesSenderJobTest {
+public class RetrySlotMessagesSenderJobTest {
     @Mock
     private OBDProperties obdProperties;
     @Mock
@@ -29,7 +29,7 @@ public class RetryMessagesSenderJobTest {
     @Mock
     private RetryService retryService;
 
-    private RetryMessagesSenderJob retryMessagesSenderJob;
+    private RetrySlotMessagesSenderJob retrySlotMessagesSenderJob;
     private String cronJobExpression1 = "myfirstcronjobexpression";
     private String cronJobExpression2 = "mysecondcronjobexpression";
     private static final String SUB_SLOT_KEY = "sub_slot";
@@ -39,12 +39,12 @@ public class RetryMessagesSenderJobTest {
         initMocks(this);
         when(obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.ONE.name())).thenReturn(cronJobExpression1);
         when(obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.THREE.name())).thenReturn(cronJobExpression2);
-        retryMessagesSenderJob = new RetryMessagesSenderJob(campaignMessageService, retryService, obdProperties);
+        retrySlotMessagesSenderJob = new RetrySlotMessagesSenderJob(campaignMessageService, retryService, obdProperties);
     }
 
     @Test
     public void shouldScheduleCronJobsAtConstruction() {
-        List<CronSchedulableJob> cronJobs = retryMessagesSenderJob.getCronJobs();
+        List<CronSchedulableJob> cronJobs = retrySlotMessagesSenderJob.getCronJobs();
         MotechEvent expectedEvent1 = new MotechEvent("obd.send.retry.messages", new HashMap<String, Object>() {{
             put(SUB_SLOT_KEY, SubSlot.ONE);
         }});
@@ -63,14 +63,14 @@ public class RetryMessagesSenderJobTest {
         Map<String, Object> expectedParameters = new HashMap<>();
         expectedParameters.put(SUB_SLOT_KEY, SubSlot.ONE);
 
-        retryMessagesSenderJob.sendMessages(new MotechEvent("", expectedParameters));
+        retrySlotMessagesSenderJob.handleMessages(new MotechEvent("", expectedParameters));
 
         DateTime after = DateTime.now();
 
         ArgumentCaptor<RetryRequest> captor = ArgumentCaptor.forClass(RetryRequest.class);
         verify(retryService).schedule(captor.capture(), eq(expectedParameters));
         RetryRequest retryRequest = captor.getValue();
-        assertEquals("obd-send-retry-messages", retryRequest.getName());
+        assertEquals("obd-send-retry-slot-messages", retryRequest.getName());
         assertNotNull(retryRequest.getExternalId());
         DateTime referenceTime = retryRequest.getReferenceTime();
         assertTrue(after.isEqual(referenceTime) || after.isAfter(referenceTime));
@@ -84,15 +84,15 @@ public class RetryMessagesSenderJobTest {
         final SubSlot subSlot = SubSlot.ONE;
         when(obdProperties.getRetrySlotStartTimeLimitFor(subSlot.name())).thenReturn(DateTime.now().withHourOfDay(16).withMinuteOfHour(45));
 
-        retryMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        retrySlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
 
         verify(obdProperties).getRetrySlotStartTimeLimitFor(subSlot.name());
-        verify(campaignMessageService).sendRetryMessages(subSlot);
+        verify(campaignMessageService).sendRetrySlotMessages(subSlot);
 
-        verify(retryService).fulfill("myExternalId", "obd-send-retry-messages-group");
+        verify(retryService).fulfill("myExternalId", "obd-send-retry-slot-messages-group");
 
         DateTimeUtils.setCurrentMillisSystem();
     }
@@ -103,9 +103,9 @@ public class RetryMessagesSenderJobTest {
         final SubSlot subSlot = SubSlot.THREE;
         when(obdProperties.getRetrySlotStartTimeLimitFor(subSlot.name())).thenReturn(DateTime.now().withHourOfDay(16).withMinuteOfHour(45));
 
-        doThrow(new RuntimeException("some exception")).when(campaignMessageService).sendRetryMessages(subSlot);
+        doThrow(new RuntimeException("some exception")).when(campaignMessageService).sendRetrySlotMessages(subSlot);
 
-        retryMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        retrySlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
@@ -123,13 +123,13 @@ public class RetryMessagesSenderJobTest {
         final SubSlot subSlot = SubSlot.ONE;
         when(obdProperties.getRetrySlotStartTimeLimitFor(subSlot.name())).thenReturn(DateTime.now().withHourOfDay(16).withMinuteOfHour(45));
 
-        retryMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        retrySlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
 
-        verify(campaignMessageService, never()).sendRetryMessages(subSlot);
-        verify(retryService).fulfill("myExternalId", "obd-send-retry-messages-group");
+        verify(campaignMessageService, never()).sendRetrySlotMessages(subSlot);
+        verify(retryService).fulfill("myExternalId", "obd-send-retry-slot-messages-group");
 
         DateTimeUtils.setCurrentMillisSystem();
     }

@@ -6,7 +6,17 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum CampaignMessageStatus {
-    NEW, NA, ND, SO, SUCCESS;
+    NEW(4), NA(1), ND(3), SO(2), SUCCESS(Integer.MAX_VALUE);
+
+    private Integer priority;
+
+    CampaignMessageStatus(Integer priority) {
+        this.priority = priority;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
 
     public static CampaignMessageStatus getFor(String statusCode) {
         final String standardizedStatusCode = StringUtils.trimToEmpty(statusCode).toUpperCase();
@@ -16,8 +26,8 @@ public enum CampaignMessageStatus {
     public static boolean isValid(String statusCode) {
         return (statusCode != null && CampaignMessageStatus.contains(statusCode));
     }
-    
-    public static List<CampaignMessageStatus> getFailedStatusCodes(){
+
+    public static List<CampaignMessageStatus> getFailedStatusCodes() {
         return Arrays.asList(ND, NA, SO);
     }
 

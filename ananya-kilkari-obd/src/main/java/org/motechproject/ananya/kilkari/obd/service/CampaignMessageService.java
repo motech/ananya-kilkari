@@ -46,17 +46,27 @@ public class CampaignMessageService {
 
     public void sendFirstMainSubSlotMessages(final SubSlot subSlot) {
         List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
-        sendMainSlotMessages(subSlot, allNewMessages);
+        int numberOfMessagesToSend = (int) Math.ceil(allNewMessages.size() * obdProperties.getMainSlotMessagePercentageFor(subSlot) / 100.0);
+        List<CampaignMessage> messagesToSend = allNewMessages.subList(0, numberOfMessagesToSend);
+        sendMainSlotMessages(subSlot, messagesToSend);
     }
 
     public void sendSecondMainSubSlotMessages(final SubSlot subSlot) {
-        List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentMessages();
-        sendMainSlotMessages(subSlot, allNewMessages);
+        List<CampaignMessage> messagesToSend = allCampaignMessages.getAllUnsentRetryMessages();
+        List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
+        messagesToSend.addAll(getNewMessagesToSend(subSlot, allNewMessages));
+        sendMainSlotMessages(subSlot, messagesToSend);
+    }
+
+    private List<CampaignMessage> getNewMessagesToSend(SubSlot subSlot, List<CampaignMessage> allNewMessages) {
+        double ratioOfNewMessagesToSend = obdProperties.getMainSlotMessagePercentageFor(subSlot) / (100.0 - obdProperties.getMainSlotMessagePercentageFor(SubSlot.ONE));
+        int numberOfMessagesToSend = (int) Math.ceil(allNewMessages.size() * ratioOfNewMessagesToSend);
+        return allNewMessages.subList(0, numberOfMessagesToSend);
     }
 
     public void sendThirdMainSubSlotMessages(final SubSlot subSlot) {
-        List<CampaignMessage> allNewAndRetryMessages = allCampaignMessages.getAllUnsentNewAndNAMessages();
-        sendMainSlotMessages(subSlot, allNewAndRetryMessages);
+        List<CampaignMessage> allNewAndNAMessages = allCampaignMessages.getAllUnsentNewAndNAMessages();
+        sendMainSlotMessages(subSlot, allNewAndNAMessages);
     }
 
     private void sendMainSlotMessages(final SubSlot subSlot, List<CampaignMessage> messagesToSend) {

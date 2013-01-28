@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.obd.repository;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
@@ -77,6 +78,11 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
         SOCampaignMessageSent.markSent();
     }
 
+    @After
+    public void tearDown() {
+        allCampaignMessages.removeAll();
+    }
+
     @Test
     public void shouldReturnAllTheUnsentNewMessagesInOrderOfViewKeys() {
         obdDbConnector.create(newCampaignMessage);
@@ -88,16 +94,6 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
         obdDbConnector.create(NACampaignMessageSent);
         obdDbConnector.create(SOCampaignMessage);
         obdDbConnector.create(SOCampaignMessageSent);
-
-        markForDeletion(newCampaignMessage);
-        markForDeletion(newCampaignMessageWithEarlierWeekEndingDate);
-        markForDeletion(newCampaignMessageSent);
-        markForDeletion(NDCampaignMessage);
-        markForDeletion(NDCampaignMessageSent);
-        markForDeletion(NACampaignMessage);
-        markForDeletion(NACampaignMessageSent);
-        markForDeletion(SOCampaignMessage);
-        markForDeletion(SOCampaignMessageSent);
 
         List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
 
@@ -115,14 +111,6 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
         obdDbConnector.create(NACampaignMessage);
         obdDbConnector.create(NACampaignMessageSent);
         obdDbConnector.create(NACampaignMessageWithEarlierWeekEndingDate);
-
-        markForDeletion(newCampaignMessage);
-        markForDeletion(newCampaignMessageSent);
-        markForDeletion(NDCampaignMessage);
-        markForDeletion(NDCampaignMessageSent);
-        markForDeletion(NACampaignMessage);
-        markForDeletion(NACampaignMessageSent);
-        markForDeletion(NACampaignMessageWithEarlierWeekEndingDate);
 
         List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentNAMessages();
 
@@ -143,17 +131,6 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
         obdDbConnector.create(NACampaignMessageWithEarlierWeekEndingDate);
         obdDbConnector.create(SOCampaignMessage);
         obdDbConnector.create(SOCampaignMessageSent);
-
-        markForDeletion(newCampaignMessage);
-        markForDeletion(newCampaignMessageSent);
-        markForDeletion(newCampaignMessageWithEarlierWeekEndingDate);
-        markForDeletion(NDCampaignMessage);
-        markForDeletion(NDCampaignMessageSent);
-        markForDeletion(NACampaignMessage);
-        markForDeletion(NACampaignMessageSent);
-        markForDeletion(NACampaignMessageWithEarlierWeekEndingDate);
-        markForDeletion(SOCampaignMessage);
-        markForDeletion(SOCampaignMessageSent);
 
         List<CampaignMessage> allNewAndNAMessages = allCampaignMessages.getAllUnsentNewAndNAMessages();
 
@@ -177,25 +154,12 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
         obdDbConnector.create(SOCampaignMessage);
         obdDbConnector.create(SOCampaignMessageSent);
 
-        markForDeletion(newCampaignMessage);
-        markForDeletion(newCampaignMessageSent);
-        markForDeletion(newCampaignMessageWithEarlierWeekEndingDate);
-        markForDeletion(NDCampaignMessage);
-        markForDeletion(NDCampaignMessageSent);
-        markForDeletion(NACampaignMessage);
-        markForDeletion(NACampaignMessageSent);
-        markForDeletion(NACampaignMessageWithEarlierWeekEndingDate);
-        markForDeletion(SOCampaignMessage);
-        markForDeletion(SOCampaignMessageSent);
+        List<CampaignMessage> allUnsentMessages = allCampaignMessages.getAllUnsentRetryMessages();
 
-        List<CampaignMessage> allUnsentMessages = allCampaignMessages.getAllUnsentMessages();
-
-        assertEquals(6, allUnsentMessages.size());
+        assertEquals(4, allUnsentMessages.size());
         assertEquals(NACampaignMessageWithEarlierWeekEndingDate, allUnsentMessages.get(0));
         assertEquals(NACampaignMessage, allUnsentMessages.get(1));
         assertEquals(SOCampaignMessage, allUnsentMessages.get(2));
         assertEquals(NDCampaignMessage, allUnsentMessages.get(3));
-        assertEquals(newCampaignMessageWithEarlierWeekEndingDate, allUnsentMessages.get(4));
-        assertEquals(newCampaignMessage, allUnsentMessages.get(5));
     }
 }

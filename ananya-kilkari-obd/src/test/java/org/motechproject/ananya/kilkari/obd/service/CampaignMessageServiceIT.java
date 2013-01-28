@@ -142,38 +142,54 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
 
     @Test
     public void shouldSendFirstMainSubSlotCampaignMessagesToOBD() {
-        String subscriptionId = "subscriptionId";
-        String messageId = "messageId";
+        String subscriptionId1 = "subscriptionId1";
+        String messageId1 = "messageId1";
+        String msisdn1 = "1234567890";
+        String subscriptionId2 = "subscriptionId2";
+        String messageId2 = "messageId2";
+        String msisdn2 = "1234567891";
         String operator = "airtel";
-        String msisdn = "1234567890";
 
-        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, DateTime.now().plusDays(2));
-        markForDeletion(allCampaignMessages.find(subscriptionId, messageId));
+        campaignMessageService.scheduleCampaignMessage(subscriptionId1, messageId1, msisdn1, operator, DateTime.now().plusDays(2));
+        campaignMessageService.scheduleCampaignMessage(subscriptionId2, messageId2, msisdn2, operator, DateTime.now());
 
         OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
         campaignMessageService.sendFirstMainSubSlotMessages(SubSlot.ONE);
 
-        verify(mockOnMobileOBDGateway).sendMainSlotMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.ONE);
+        verify(mockOnMobileOBDGateway).sendMainSlotMessages("1234567891,messageId2,subscriptionId2,airtel\n", SubSlot.ONE);
     }
 
     @Test
     public void shouldSendSecondMainSubSlotCampaignMessagesToOBD() {
-        String subscriptionId = "subscriptionId";
-        String messageId = "messageId";
-        String operator = "airtel";
-        String msisdn = "1234567890";
-
-        campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, DateTime.now().plusDays(2));
-        markForDeletion(allCampaignMessages.find(subscriptionId, messageId));
+        CampaignMessage campaignMessage1 = new CampaignMessage("subscriptionId1", "messageId1", "1234567891", "airtel", DateTime.now());
+        CampaignMessage campaignMessage2 = new CampaignMessage("subscriptionId2", "messageId2", "1234567892", "airtel", DateTime.now().minusDays(2));
+        CampaignMessage campaignMessage3 = new CampaignMessage("subscriptionId3", "messageId3", "1234567893", "airtel", DateTime.now().plusDays(3));
+        CampaignMessage campaignMessage4 = new CampaignMessage("subscriptionId4", "messageId4", "1234567894", "airtel", DateTime.now().plusDays(3));
+        CampaignMessage campaignMessage5 = new CampaignMessage("subscriptionId5", "messageId5", "1234567895", "airtel", DateTime.now());
+        CampaignMessage campaignMessage6 = new CampaignMessage("subscriptionId6", "messageId6", "1234567896", "airtel", DateTime.now());
+        CampaignMessage campaignMessage7 = new CampaignMessage("subscriptionId7", "messageId7", "1234567897", "airtel", DateTime.now());
+        CampaignMessage campaignMessage8 = new CampaignMessage("subscriptionId8", "messageId8", "1234567898", "airtel", DateTime.now().plusDays(6));
+        campaignMessage8.setStatusCode(CampaignMessageStatus.ND);
+        allCampaignMessages.add(campaignMessage1);
+        allCampaignMessages.add(campaignMessage2);
+        allCampaignMessages.add(campaignMessage3);
+        allCampaignMessages.add(campaignMessage4);
+        allCampaignMessages.add(campaignMessage5);
+        allCampaignMessages.add(campaignMessage6);
+        allCampaignMessages.add(campaignMessage7);
+        allCampaignMessages.add(campaignMessage8);
 
         OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
         campaignMessageService.sendSecondMainSubSlotMessages(SubSlot.TWO);
 
-        verify(mockOnMobileOBDGateway).sendMainSlotMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.TWO);
+        verify(mockOnMobileOBDGateway).sendMainSlotMessages("1234567898,messageId8,subscriptionId8,airtel\n1234567892,messageId2,subscriptionId2,airtel\n" +
+                "1234567891,messageId1,subscriptionId1,airtel\n1234567895,messageId5,subscriptionId5,airtel\n" +
+                "1234567896,messageId6,subscriptionId6,airtel\n1234567897,messageId7,subscriptionId7,airtel\n" +
+                "1234567893,messageId3,subscriptionId3,airtel\n", SubSlot.TWO);
     }
 
     @Test

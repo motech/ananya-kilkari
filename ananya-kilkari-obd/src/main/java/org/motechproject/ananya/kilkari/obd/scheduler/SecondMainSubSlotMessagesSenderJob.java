@@ -31,7 +31,7 @@ public class SecondMainSubSlotMessagesSenderJob extends MainSlotMessagesSenderJo
     public SecondMainSubSlotMessagesSenderJob(CampaignMessageService campaignMessageService, RetryService retryService, final OBDProperties obdProperties) {
         super(SLOT_EVENT_SUBJECT,
                 new HashMap<SubSlot, String>() {{
-                    put(SubSlot.TWO, obdProperties.getMainSlotCronJobExpressionFor(SubSlot.TWO.name()));
+                    put(SubSlot.TWO, obdProperties.getMainSlotCronJobExpressionFor(SubSlot.TWO));
                 }},
                 obdProperties,
                 retryService

@@ -27,7 +27,7 @@ public abstract class MainSlotMessagesSenderJob extends MessagesSenderJob {
     protected void sendMainSlotMessages(MotechEvent motechEvent, String retryGroupName) throws Exception {
         Map<String, Object> parameters = motechEvent.getParameters();
         SubSlot subSlot = (SubSlot) parameters.get(SUB_SLOT_KEY);
-        if (!canSendMessages(obdProperties.getMainSlotStartTimeLimitFor(subSlot.name()))) {
+        if (!canSendMessages(obdProperties.getMainSlotStartTimeLimitFor(subSlot))) {
             retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), retryGroupName);
             return;
         }

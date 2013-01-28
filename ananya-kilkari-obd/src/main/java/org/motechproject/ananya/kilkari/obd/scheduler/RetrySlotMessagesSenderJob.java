@@ -36,8 +36,8 @@ public class RetrySlotMessagesSenderJob extends MessagesSenderJob {
     public RetrySlotMessagesSenderJob(CampaignMessageService campaignMessageService, RetryService retryService, final OBDProperties obdProperties) {
         super(SLOT_EVENT_SUBJECT,
                 new HashMap<SubSlot, String>() {{
-                    put(SubSlot.ONE, obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.ONE.name()));
-                    put(SubSlot.THREE, obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.THREE.name()));
+                    put(SubSlot.ONE, obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.ONE));
+                    put(SubSlot.THREE, obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.THREE));
                 }}
         );
         this.campaignMessageService = campaignMessageService;
@@ -61,7 +61,7 @@ public class RetrySlotMessagesSenderJob extends MessagesSenderJob {
         SubSlot subSlot = (SubSlot) parameters.get(SUB_SLOT_KEY);
         logger.info(String.format("Handling send retry sub slot %s messages with retry event", subSlot.name()));
 
-        if (!canSendMessages(obdProperties.getRetrySlotStartTimeLimitFor(subSlot.name()))) {
+        if (!canSendMessages(obdProperties.getRetrySlotStartTimeLimitFor(subSlot))) {
             retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), RetrySlotMessagesSenderJob.RETRY_GROUP_NAME);
             return;
         }

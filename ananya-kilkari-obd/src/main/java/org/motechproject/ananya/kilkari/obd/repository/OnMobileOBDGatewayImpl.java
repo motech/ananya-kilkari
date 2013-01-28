@@ -51,13 +51,13 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     @Override
     public void sendMainSlotMessages(String content, SubSlot subSlot) {
         String date = getCurrentDate();
-        send(content, String.format("%s%s", date, obdProperties.getMainSlotStartTimeFor(subSlot.name())), String.format("%s%s", date, obdProperties.getMainSlotEndTimeFor(subSlot.name())));
+        send(content, String.format("%s%s", date, obdProperties.getMainSlotStartTimeFor(subSlot)), String.format("%s%s", date, obdProperties.getMainSlotEndTimeFor(subSlot)));
     }
 
     @Override
     public void sendRetrySlotMessages(String content, SubSlot subSlot) {
         String date = getCurrentDate();
-        send(content, String.format("%s%s", date, obdProperties.getRetrySlotStartTimeFor(subSlot.name())), String.format("%s%s", date, obdProperties.getRetrySlotEndTimeFor(subSlot.name())));
+        send(content, String.format("%s%s", date, obdProperties.getRetrySlotStartTimeFor(subSlot)), String.format("%s%s", date, obdProperties.getRetrySlotEndTimeFor(subSlot)));
     }
 
     private String getCurrentDate() {

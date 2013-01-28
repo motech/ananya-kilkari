@@ -65,14 +65,14 @@ public class OnMobileOBDGatewayImplTest {
         when(statusLine.getReasonPhrase()).thenReturn("created");
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
-        when(obdProperties.getMainSlotStartTimeFor(SubSlot.ONE.name())).thenReturn("130000");
-        when(obdProperties.getMainSlotEndTimeFor(SubSlot.ONE.name())).thenReturn("160000");
+        when(obdProperties.getMainSlotStartTimeFor(SubSlot.ONE)).thenReturn("130000");
+        when(obdProperties.getMainSlotEndTimeFor(SubSlot.ONE)).thenReturn("160000");
         String expectedContent = "expectedContent";
 
         onMobileOBDGateway.sendMainSlotMessages(expectedContent, SubSlot.ONE);
 
-        verify(obdProperties).getMainSlotStartTimeFor(SubSlot.ONE.name());
-        verify(obdProperties).getMainSlotEndTimeFor(SubSlot.ONE.name());
+        verify(obdProperties).getMainSlotStartTimeFor(SubSlot.ONE);
+        verify(obdProperties).getMainSlotEndTimeFor(SubSlot.ONE);
 
         ArgumentCaptor<HttpUriRequest> captor = ArgumentCaptor.forClass(HttpUriRequest.class);
         verify(httpClient).execute(captor.capture());
@@ -99,14 +99,14 @@ public class OnMobileOBDGatewayImplTest {
         when(statusLine.getReasonPhrase()).thenReturn("created");
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
-        when(obdProperties.getRetrySlotStartTimeFor(SubSlot.THREE.name())).thenReturn("180000");
-        when(obdProperties.getRetrySlotEndTimeFor(SubSlot.THREE.name())).thenReturn("200000");
+        when(obdProperties.getRetrySlotStartTimeFor(SubSlot.THREE)).thenReturn("180000");
+        when(obdProperties.getRetrySlotEndTimeFor(SubSlot.THREE)).thenReturn("200000");
         String expectedContent = "expectedContent";
 
         onMobileOBDGateway.sendRetrySlotMessages(expectedContent, SubSlot.THREE);
 
-        verify(obdProperties).getRetrySlotStartTimeFor(SubSlot.THREE.name());
-        verify(obdProperties).getRetrySlotStartTimeFor(SubSlot.THREE.name());
+        verify(obdProperties).getRetrySlotStartTimeFor(SubSlot.THREE);
+        verify(obdProperties).getRetrySlotStartTimeFor(SubSlot.THREE);
 
         ArgumentCaptor<HttpUriRequest> captor = ArgumentCaptor.forClass(HttpUriRequest.class);
         verify(httpClient).execute(captor.capture());

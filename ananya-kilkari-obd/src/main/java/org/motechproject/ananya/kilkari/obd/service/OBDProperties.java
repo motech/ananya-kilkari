@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
+import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -67,43 +68,48 @@ public class OBDProperties {
         return Integer.parseInt(obdProperties.getProperty("obd.dnc.message.max.retry.count"));
     }
 
-    public String getMainSlotStartTimeFor(String subSlot) {
-        return obdProperties.getProperty(String.format("obd.main.sub.slot.%s.start.time", subSlot.toLowerCase()));
+    public String getMainSlotStartTimeFor(SubSlot subSlot) {
+        return obdProperties.getProperty(String.format("obd.main.sub.slot.%s.start.time", subSlot.name().toLowerCase()));
     }
 
-    public String getMainSlotEndTimeFor(String subSlot) {
-        return obdProperties.getProperty(String.format("obd.main.sub.slot.%s.end.time", subSlot.toLowerCase()));
+    public String getMainSlotEndTimeFor(SubSlot subSlot) {
+        return obdProperties.getProperty(String.format("obd.main.sub.slot.%s.end.time", subSlot.name().toLowerCase()));
     }
 
-    public String getRetrySlotStartTimeFor(String subSlot) {
-        return obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.start.time", subSlot.toLowerCase()));
+    public String getRetrySlotStartTimeFor(SubSlot subSlot) {
+        return obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.start.time", subSlot.name().toLowerCase()));
     }
 
-    public String getRetrySlotEndTimeFor(String subSlot) {
-        return obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.end.time", subSlot.toLowerCase()));
+    public String getRetrySlotEndTimeFor(SubSlot subSlot) {
+        return obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.end.time", subSlot.name().toLowerCase()));
     }
 
     public CampaignMessageStatus getCampaignMessageStatusFor(String statusCode) {
         return statusCodesMap.get(statusCode);
     }
 
-    public String getMainSlotCronJobExpressionFor(String subSlot) {
-        return obdProperties.getProperty(String.format("obd.main.sub.slot.%s.cron.job.expression", subSlot.toLowerCase()));
+    public String getMainSlotCronJobExpressionFor(SubSlot subSlot) {
+        return obdProperties.getProperty(String.format("obd.main.sub.slot.%s.cron.job.expression", subSlot.name().toLowerCase()));
     }
 
-    public String getRetrySlotCronJobExpressionFor(String subSlot) {
-        return obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.cron.job.expression", subSlot.toLowerCase()));
+    public String getRetrySlotCronJobExpressionFor(SubSlot subSlot) {
+        return obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.cron.job.expression", subSlot.name().toLowerCase()));
     }
 
-    public DateTime getMainSlotStartTimeLimitFor(String subSlot) {
-        return parseTime(obdProperties.getProperty(String.format("obd.main.sub.slot.%s.start.time.limit", subSlot.toLowerCase())));
+    public DateTime getMainSlotStartTimeLimitFor(SubSlot subSlot) {
+        return parseTime(obdProperties.getProperty(String.format("obd.main.sub.slot.%s.start.time.limit", subSlot.name().toLowerCase())));
     }
 
-    public DateTime getRetrySlotStartTimeLimitFor(String subSlot) {
-        return parseTime(obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.start.time.limit", subSlot.toLowerCase())));
+    public DateTime getRetrySlotStartTimeLimitFor(SubSlot subSlot) {
+        return parseTime(obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.start.time.limit", subSlot.name().toLowerCase())));
     }
 
     private DateTime parseTime(String time) {
         return DateTimeFormat.forPattern("HH:mm").parseDateTime(time);
+    }
+
+    public Integer getMainSlotMessagePercentageFor(SubSlot subSlot) {
+        String percentage = obdProperties.getProperty(String.format("obd.main.sub.slot.%s.message.percentage.to.send", subSlot.name().toLowerCase()));
+        return percentage != null ? Integer.parseInt(percentage) : null;
     }
 }

@@ -34,11 +34,13 @@ public abstract class MessagesSenderJob {
         return cronJobs;
     }
 
-    protected boolean canSendMessages(DateTime slotStartTime) {
+    protected boolean canSendMessages(DateTime slotStartTimeLimit, DateTime slotEndTimeLimit) {
         DateTime now = DateTime.now();
-        boolean canSendMessages = !now.isAfter(now.withTime(slotStartTime.getHourOfDay(), slotStartTime.getMinuteOfHour(), 0, 0));
+        DateTime slotStartTime = now.withTime(slotStartTimeLimit.getHourOfDay(), slotStartTimeLimit.getMinuteOfHour(), 0, 0);
+        DateTime slotEndTime = now.withTime(slotEndTimeLimit.getHourOfDay(), slotEndTimeLimit.getMinuteOfHour(), 0, 0);
+        boolean canSendMessages = !now.isBefore(slotStartTime) && !now.isAfter(slotEndTime);
         if (!canSendMessages) {
-            logger.info("Current Time : " + now + " has passed the slot start time.");
+            logger.info(String.format("Current Time : %s is not within the slot time limits - %s to %s.", now, slotStartTime, slotEndTime));
         }
         return canSendMessages;
     }

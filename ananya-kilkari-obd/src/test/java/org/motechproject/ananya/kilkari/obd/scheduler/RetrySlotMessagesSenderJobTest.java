@@ -82,7 +82,8 @@ public class RetrySlotMessagesSenderJobTest {
     public void shouldInvokeCampaignMessageServiceToSendRetryMessagesWithRetryAndFulfillTheRetryIfSuccessful() {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(16).withMinuteOfHour(0).getMillis());
         final SubSlot subSlot = SubSlot.ONE;
-        when(obdProperties.getRetrySlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(16).withMinuteOfHour(45));
+        when(obdProperties.getRetrySlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(15).withMinuteOfHour(45));
+        when(obdProperties.getRetrySlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(16).withMinuteOfHour(45));
 
         retrySlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
@@ -101,7 +102,8 @@ public class RetrySlotMessagesSenderJobTest {
     public void shouldInvokeCampaignMessageServiceToSendRetryMessagesWithRetryAndNotFulfillTheRetryIfNotSuccessful() {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(16).withMinuteOfHour(0).getMillis());
         final SubSlot subSlot = SubSlot.THREE;
-        when(obdProperties.getRetrySlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(16).withMinuteOfHour(45));
+        when(obdProperties.getRetrySlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(15).withMinuteOfHour(45));
+        when(obdProperties.getRetrySlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(16).withMinuteOfHour(45));
 
         doThrow(new RuntimeException("some exception")).when(campaignMessageService).sendRetrySlotMessages(subSlot);
 
@@ -122,6 +124,7 @@ public class RetrySlotMessagesSenderJobTest {
 
         final SubSlot subSlot = SubSlot.ONE;
         when(obdProperties.getRetrySlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(16).withMinuteOfHour(45));
+        when(obdProperties.getRetrySlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(17).withMinuteOfHour(45));
 
         retrySlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");

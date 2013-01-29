@@ -61,7 +61,7 @@ public class RetrySlotMessagesSenderJob extends MessagesSenderJob {
         SubSlot subSlot = (SubSlot) parameters.get(SUB_SLOT_KEY);
         logger.info(String.format("Handling send retry sub slot %s messages with retry event", subSlot.name()));
 
-        if (!canSendMessages(obdProperties.getRetrySlotStartTimeLimitFor(subSlot))) {
+        if (!canSendMessages(obdProperties.getRetrySlotStartTimeLimitFor(subSlot), obdProperties.getRetrySlotEndTimeLimitFor(subSlot))) {
             retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), RetrySlotMessagesSenderJob.RETRY_GROUP_NAME);
             return;
         }

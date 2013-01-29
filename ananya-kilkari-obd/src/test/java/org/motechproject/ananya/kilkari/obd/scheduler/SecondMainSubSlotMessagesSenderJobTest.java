@@ -83,7 +83,8 @@ public class SecondMainSubSlotMessagesSenderJobTest {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(16).withMinuteOfHour(55).getMillis());
 
         final SubSlot subSlot = SubSlot.TWO;
-        when(obdProperties.getMainSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(17).withMinuteOfHour(00));
+        when(obdProperties.getMainSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(16).withMinuteOfHour(00));
+        when(obdProperties.getMainSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(17).withMinuteOfHour(00));
 
         secondMainSubSlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
@@ -103,7 +104,8 @@ public class SecondMainSubSlotMessagesSenderJobTest {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(18).withMinuteOfHour(0).getMillis());
 
         final SubSlot subSlot = SubSlot.TWO;
-        when(obdProperties.getMainSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(18).withMinuteOfHour(45));
+        when(obdProperties.getMainSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(17).withMinuteOfHour(45));
+        when(obdProperties.getMainSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(18).withMinuteOfHour(45));
 
         doThrow(new RuntimeException("some exception")).when(campaignMessageService).sendSecondMainSubSlotMessages(subSlot);
 
@@ -123,6 +125,7 @@ public class SecondMainSubSlotMessagesSenderJobTest {
 
         final SubSlot subSlot = SubSlot.TWO;
         when(obdProperties.getMainSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(11));
+        when(obdProperties.getMainSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(12));
 
         secondMainSubSlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");

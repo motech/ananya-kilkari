@@ -126,6 +126,24 @@ public class OBDPropertiesTest {
     }
 
     @Test
+    public void shouldGetSlotEndTimeLimits() {
+        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
+        when(properties.getProperty("obd.main.sub.slot.two.end.time.limit")).thenReturn("13:30");
+        when(properties.getProperty("obd.retry.sub.slot.three.end.time.limit")).thenReturn("16:45");
+
+        OBDProperties obdProperties = new OBDProperties(properties);
+
+        DateTime mainSlotStartTimeLimit = obdProperties.getMainSlotEndTimeLimitFor(SubSlot.TWO);
+        assertEquals(13, mainSlotStartTimeLimit.getHourOfDay());
+        assertEquals(30, mainSlotStartTimeLimit.getMinuteOfHour());
+        DateTime retrySlotStartTime = obdProperties.getRetrySlotEndTimeLimitFor(SubSlot.THREE);
+        assertEquals(16, retrySlotStartTime.getHourOfDay());
+        assertEquals(45, retrySlotStartTime.getMinuteOfHour());
+    }
+
+    @Test
     public void shouldGetTimeSlots() {
         when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");

@@ -100,8 +100,16 @@ public class OBDProperties {
         return parseTime(obdProperties.getProperty(String.format("obd.main.sub.slot.%s.start.time.limit", subSlot.name().toLowerCase())));
     }
 
+    public DateTime getMainSlotEndTimeLimitFor(SubSlot subSlot) {
+        return parseTime(obdProperties.getProperty(String.format("obd.main.sub.slot.%s.end.time.limit", subSlot.name().toLowerCase())));
+    }
+
     public DateTime getRetrySlotStartTimeLimitFor(SubSlot subSlot) {
         return parseTime(obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.start.time.limit", subSlot.name().toLowerCase())));
+    }
+
+    public DateTime getRetrySlotEndTimeLimitFor(SubSlot subSlot) {
+        return parseTime(obdProperties.getProperty(String.format("obd.retry.sub.slot.%s.end.time.limit", subSlot.name().toLowerCase())));
     }
 
     private DateTime parseTime(String time) {

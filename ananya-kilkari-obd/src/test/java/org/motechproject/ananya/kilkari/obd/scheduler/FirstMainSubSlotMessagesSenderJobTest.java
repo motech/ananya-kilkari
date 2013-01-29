@@ -11,6 +11,7 @@ import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.retry.domain.RetryRequest;
 import org.motechproject.retry.service.RetryService;
+import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.CronSchedulableJob;
 
 import java.util.HashMap;
@@ -55,6 +56,7 @@ public class FirstMainSubSlotMessagesSenderJobTest {
         MotechEvent motechEvent = cronJob.getMotechEvent();
         assertEquals("obd.send.main.sub.slot.one.messages", motechEvent.getSubject());
         assertEquals(SubSlot.ONE, motechEvent.getParameters().get(SUB_SLOT_KEY));
+        assertEquals(SubSlot.ONE.name(), motechEvent.getParameters().get(MotechSchedulerService.JOB_ID_KEY));
     }
 
     @Test

@@ -11,6 +11,7 @@ import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.retry.domain.RetryRequest;
 import org.motechproject.retry.service.RetryService;
+import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.CronSchedulableJob;
 
 import java.util.HashMap;
@@ -46,10 +47,12 @@ public class RetrySlotMessagesSenderJobTest {
     public void shouldScheduleCronJobsAtConstruction() {
         List<CronSchedulableJob> cronJobs = retrySlotMessagesSenderJob.getCronJobs();
         MotechEvent expectedEvent1 = new MotechEvent("obd.send.retry.messages", new HashMap<String, Object>() {{
+            put(MotechSchedulerService.JOB_ID_KEY, SubSlot.ONE.name());
             put(SUB_SLOT_KEY, SubSlot.ONE);
         }});
         MotechEvent expectedEvent2 = new MotechEvent("obd.send.retry.messages", new HashMap<String, Object>() {{
-            put(SUB_SLOT_KEY, SubSlot.ONE);
+            put(MotechSchedulerService.JOB_ID_KEY, SubSlot.THREE.name());
+            put(SUB_SLOT_KEY, SubSlot.THREE);
         }});
 
         assertEquals(2, cronJobs.size());

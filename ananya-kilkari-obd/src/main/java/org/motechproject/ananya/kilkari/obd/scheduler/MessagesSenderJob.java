@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.obd.scheduler;
 
 import org.joda.time.DateTime;
 import org.motechproject.event.MotechEvent;
+import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.CronSchedulableJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ public abstract class MessagesSenderJob {
         ArrayList<CronSchedulableJob> cronJobs = new ArrayList<>();
         for (SubSlot subSlot : cronJobDetails.keySet()) {
             Map<String, Object> parameters = new HashMap<>();
+            parameters.put(MotechSchedulerService.JOB_ID_KEY, subSlot.name());
             parameters.put(SUB_SLOT_KEY, subSlot);
             MotechEvent motechEvent = new MotechEvent(subject, parameters);
             cronJobs.add(new CronSchedulableJob(motechEvent, cronJobDetails.get(subSlot)));

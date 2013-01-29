@@ -148,8 +148,12 @@ public class CampaignMessageService {
         String campaignMessageCSVContent = campaignMessageCSVBuilder.getCSV(messages);
         gatewayAction.send(campaignMessageCSVContent);
         for (CampaignMessage message : messages) {
-            message.markSent();
-            allCampaignMessages.update(message);
+            try {
+                message.markSent();
+                allCampaignMessages.update(message);
+            } catch (Exception ex) {
+                logger.error(String.format("Error when updating the sent message %s for subscription %s", message.getMessageId(), message.getSubscriptionId()));
+            }
         }
     }
 

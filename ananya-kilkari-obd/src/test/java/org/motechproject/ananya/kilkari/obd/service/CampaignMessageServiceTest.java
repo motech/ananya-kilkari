@@ -597,6 +597,19 @@ public class CampaignMessageServiceTest {
         verifyZeroInteractions(onMobileOBDGateway);
     }
 
+    @Test
+    public void shouldNotThrowTheExceptionWhenThrownDuringUpdateOfSentMessages() {
+        CampaignMessage campaignMessage = new CampaignMessage("subsriptionId1", "messageId1", "1234567890", "operator1", DateTime.now().plusDays(2));
+        List<CampaignMessage> campaignMessages = Arrays.asList(campaignMessage);
+        when(allCampaignMessages.getAllUnsentNAMessages()).thenReturn(campaignMessages);
+        String csvContent = "csvContent";
+        when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
+
+        doThrow(new RuntimeException("myruntimeexception")).when(allCampaignMessages).update(any(CampaignMessage.class));
+
+        campaignMessageService.sendRetrySlotMessages(SubSlot.ONE);
+    }
+
     private void verifyCampaignMessageUpdate(List<CampaignMessage> expectedCampaignMessages) {
         ArgumentCaptor<CampaignMessage> captor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages, times(expectedCampaignMessages.size())).update(captor.capture());

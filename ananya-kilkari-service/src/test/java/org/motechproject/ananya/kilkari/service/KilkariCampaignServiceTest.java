@@ -168,7 +168,7 @@ public class KilkariCampaignServiceTest {
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, creationDate, DateTime.now(), null);
         subscription.activate(operator.name(), scheduleStartDate, activationDate);
         String subscriptionId = subscription.getSubscriptionId();
-        DateTime expiryDate = activationDate.plusWeeks(1);
+        DateTime expiryDate = scheduleStartDate.plusWeeks(1);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getCampaignStartDate(subscriptionId, campaignName)).thenReturn(creationDate);

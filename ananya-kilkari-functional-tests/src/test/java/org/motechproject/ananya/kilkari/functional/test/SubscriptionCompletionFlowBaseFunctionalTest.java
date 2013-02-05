@@ -164,7 +164,7 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
 
         when(time).isMovedToFuture(lastCampaignAlertDate);
         then(user).messageIsNotCreated(subscriptionData, "WEEK64");
-        Thread.sleep(5000);
+        Thread.sleep(15000);
 
         when(time).isMovedToFuture(lastCampaignExpiryDate);
         and(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);

@@ -45,6 +45,9 @@ public class Subscription extends MotechBaseDataObject {
     @JsonProperty
     private Integer startWeekNumber;
 
+    @JsonProperty
+    private boolean campaignCompleted;
+
     Subscription() {
         //for serialization do not make it public
     }
@@ -322,5 +325,13 @@ public class Subscription extends MotechBaseDataObject {
 
     private DateTime floorToExactMinutes(DateTime dateTime) {
         return dateTime != null ? dateTime.withSecondOfMinute(0).withMillisOfSecond(0) : null;
+    }
+
+    public boolean isCampaignCompleted() {
+        return campaignCompleted;
+    }
+
+    public void campaignCompleted() {
+        campaignCompleted = true;
     }
 }

@@ -11,7 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.message.repository.AllInboxMessages;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
@@ -47,7 +46,6 @@ import org.motechproject.ananya.reports.kilkari.contract.response.LocationRespon
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
-import org.motechproject.scheduler.exception.MotechSchedulerException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1390,8 +1388,8 @@ public class SubscriptionServiceTest {
         SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withScheduleStartDate(now.minusWeeks(pack.getTotalWeeks() - 1)).withPack(pack).withStatus(SubscriptionStatus.ACTIVE).build();
         String subscriptionId = subscription.getSubscriptionId();
+        subscription.campaignCompleted();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        doNothing().when(motechSchedulerService).unscheduleRunOnceJob(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, subscriptionId);
 
         subscriptionService.renewSubscription(subscription.getSubscriptionId(), now, 0);
 
@@ -1413,7 +1411,6 @@ public class SubscriptionServiceTest {
         Subscription subscription = new SubscriptionBuilder().withDefaults().withScheduleStartDate(now.minusWeeks(pack.getTotalWeeks() - 1)).withPack(pack).withStatus(SubscriptionStatus.ACTIVE).build();
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        doThrow(new MotechSchedulerException("Schedule does not exist")).when(motechSchedulerService).unscheduleRunOnceJob(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, subscriptionId);
 
         subscriptionService.renewSubscription(subscription.getSubscriptionId(), now, 0);
 
@@ -1438,5 +1435,26 @@ public class SubscriptionServiceTest {
         assertEquals(OMSubscriptionRequest.class, OMSubscriptionRequest.getClass());
         assertEquals(now, new DateTime(runOnceSchedulableJob.getStartDate()).withMillisOfSecond(0));
         assertEquals(Channel.MOTECH, OMSubscriptionRequest.getChannel());
+    }
+
+    @Test
+    public void shouldThrowAnExceptionIfSubscriptionDoesNotExistForUpdate() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.NAVJAAT_KILKARI).withStatus(SubscriptionStatus.ACTIVE).build();
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(String.format("Subscription %s does not exist in db", subscription.getSubscriptionId()));
+
+        doThrow(new IllegalArgumentException("Subscription does not exist")).when(allSubscriptions).update(subscription);
+        subscriptionService.updateSubscription(subscription);
+    }
+
+    @Test
+    public void shouldUpdateASubscriptionIfExists() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.NAVJAAT_KILKARI).withStatus(SubscriptionStatus.ACTIVE).build();
+        subscription.campaignCompleted();
+
+        subscriptionService.updateSubscription(subscription);
+
+        verify(allSubscriptions).update(subscription);
     }
 }

@@ -35,6 +35,7 @@ import org.motechproject.scheduler.MotechSchedulerService;
 import java.util.ArrayList;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -181,6 +182,10 @@ public class KilkariSubscriptionServiceTest {
         kilkariSubscriptionService.processSubscriptionCompletion(subscription, campaignName);
 
         verify(subscriptionService).scheduleCompletion(subscription, expiryDate);
+        ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
+        verify(subscriptionService).updateSubscription(captor.capture());
+        Subscription actualSubscription = captor.getValue();
+        assertTrue(actualSubscription.isCampaignCompleted());
     }
 
     @Test

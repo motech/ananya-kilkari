@@ -29,7 +29,6 @@ import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResp
 import org.motechproject.event.MotechEvent;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
-import org.motechproject.scheduler.exception.MotechSchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -408,11 +407,7 @@ public class SubscriptionService {
     }
 
     private void rescheduleSubscriptionCompletionIfExists(Subscription subscription) {
-        try {
-            motechSchedulerService.unscheduleRunOnceJob(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, subscription.getSubscriptionId());
-        } catch (MotechSchedulerException e) {
-            return;
-        }
+        if (!subscription.isCampaignCompleted()) return;
         scheduleCompletion(subscription, DateTime.now());
         logger.info(String.format("Rescheduled the completion of subscription %s to now", subscription.getSubscriptionId()));
     }
@@ -516,5 +511,13 @@ public class SubscriptionService {
         subscription.setMsisdn(changeMsisdnRequest.getNewMsisdn());
         allSubscriptions.update(subscription);
         reportingService.reportChangeMsisdnForEarlySubscription(new SubscriberChangeMsisdnReportRequest(subscription.getSubscriptionId(), Long.valueOf(changeMsisdnRequest.getNewMsisdn()), changeMsisdnRequest.getReason()));
+    }
+
+    public void updateSubscription(Subscription subscription) {
+        try {
+            allSubscriptions.update(subscription);
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException(String.format("Subscription %s does not exist in db", subscription.getSubscriptionId()));
+        }
     }
 }

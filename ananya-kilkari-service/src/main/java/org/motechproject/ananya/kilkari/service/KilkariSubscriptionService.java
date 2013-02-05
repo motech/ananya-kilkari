@@ -95,6 +95,7 @@ public class KilkariSubscriptionService {
 
     public void processSubscriptionCompletion(Subscription subscription, String campaignName) {
         String subscriptionId = subscription.getSubscriptionId();
+
         CampaignMessageAlert campaignMessageAlert = campaignMessageAlertService.findBy(subscriptionId);
         boolean isRenewed = campaignMessageAlert != null && campaignMessageAlert.isRenewed();
         String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, subscription.getScheduleStartDate(), subscription.getPack());
@@ -103,6 +104,7 @@ public class KilkariSubscriptionService {
             logger.info(String.format("Scheduling completion now for %s, since already renewed for last week", subscriptionId));
             return;
         }
+        markCampaignCompletion(subscription);
         subscriptionService.scheduleCompletion(subscription, subscription.getCurrentWeeksMessageExpiryDate());
     }
 
@@ -141,6 +143,11 @@ public class KilkariSubscriptionService {
 
         ChangeMsisdnRequest changeMsisdnRequest = ChangeMsisdnRequestMapper.mapFrom(changeMsisdnWebRequest);
         subscriptionService.changeMsisdn(changeMsisdnRequest);
+    }
+
+    private void markCampaignCompletion(Subscription subscription) {
+        subscription.campaignCompleted();
+        subscriptionService.updateSubscription(subscription);
     }
 
     private void validateMsisdn(String msisdn) {

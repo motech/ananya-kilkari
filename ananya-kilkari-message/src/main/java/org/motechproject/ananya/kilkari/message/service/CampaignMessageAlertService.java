@@ -103,8 +103,11 @@ public class CampaignMessageAlertService {
         allCampaignMessageAlerts.deleteFor(subscriptionId);
     }
 
+    public CampaignMessageAlert findBy(String subscriptionId) {
+        return allCampaignMessageAlerts.findBySubscriptionId(subscriptionId);
+    }
+
     private interface CampaignMessageAlertUpdater {
         public void update(CampaignMessageAlert campaignMessageAlert);
     }
-
 }

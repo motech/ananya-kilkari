@@ -46,11 +46,13 @@ public class CampaignMessageAlertHandlerTest {
     public void shouldCompleteSubscriptionWhileHandlingCampaignCompletedEvent(){
         Map<String, Object> parameters = new HashMap<>();
         String subscriptionId = "subscriptionId";
+        String campaignName = "mypack";
         parameters.put(EventKeys.EXTERNAL_ID_KEY, subscriptionId);
+        parameters.put(EventKeys.CAMPAIGN_NAME_KEY, campaignName);
         MotechEvent motechEvent = new MotechEvent(EventKeys.CAMPAIGN_COMPLETED, parameters);
 
         campaignMessageAlertHandler.handleCompletionEvent(motechEvent);
 
-        verify(kilkariCampaignService).processCampaignCompletion(subscriptionId);
+        verify(kilkariCampaignService).processCampaignCompletion(subscriptionId, campaignName);
     }
 }

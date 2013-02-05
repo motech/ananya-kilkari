@@ -29,6 +29,7 @@ import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResp
 import org.motechproject.event.MotechEvent;
 import org.motechproject.scheduler.MotechSchedulerService;
 import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
+import org.motechproject.scheduler.exception.MotechSchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -365,6 +366,18 @@ public class SubscriptionService {
         return subscriptionDetailsResponseMapper.map(subscriptionList, subscriberDetailsFromReports);
     }
 
+    public void scheduleCompletion(Subscription subscription, DateTime completionDate) {
+        String subjectKey = SubscriptionEventKeys.SUBSCRIPTION_COMPLETE;
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put(MotechSchedulerService.JOB_ID_KEY, subscription.getSubscriptionId());
+        parameters.put("0", SubscriptionMapper.createOMSubscriptionRequest(subscription, Channel.MOTECH));
+
+        MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
+        RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, completionDate.toDate());
+
+        motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+    }
+
     private void updateToLatestMsisdn(OMSubscriptionRequest omSubscriptionRequest) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
         omSubscriptionRequest.setMsisdn(subscription.getMsisdn());
@@ -391,6 +404,17 @@ public class SubscriptionService {
         String subscriptionId = subscription.getSubscriptionId();
         logger.info(String.format("Processing renewal for subscriptionId: %s", subscriptionId));
         campaignMessageAlertService.scheduleCampaignMessageAlertForRenewal(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
+        rescheduleSubscriptionCompletionIfExists(subscription);
+    }
+
+    private void rescheduleSubscriptionCompletionIfExists(Subscription subscription) {
+        try {
+            motechSchedulerService.unscheduleRunOnceJob(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, subscription.getSubscriptionId());
+        } catch (MotechSchedulerException e) {
+            return;
+        }
+        scheduleCompletion(subscription, DateTime.now());
+        logger.info(String.format("Rescheduled the completion of subscription %s to now", subscription.getSubscriptionId()));
     }
 
     private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest, DateTime nextAlertDateTime) {

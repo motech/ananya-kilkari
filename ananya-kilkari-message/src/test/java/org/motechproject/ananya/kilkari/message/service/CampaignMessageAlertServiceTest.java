@@ -27,7 +27,6 @@ public class CampaignMessageAlertServiceTest {
 
     private CampaignMessageAlertService campaignMessageAlertService;
 
-
     @Before
     public void setUp() {
         initMocks(this);
@@ -95,7 +94,7 @@ public class CampaignMessageAlertServiceTest {
         CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
         assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
     }
-
+//
     @Test
     public void shouldRemoveCampaignMessageAlertIfAlreadyExistsAndScheduleCampaignMessageIfRenewed() {
         String messageId = "mymessageid";
@@ -117,7 +116,7 @@ public class CampaignMessageAlertServiceTest {
         CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
         assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
     }
-
+//
     @Test
     public void shouldUpdateCampaignMessageAlertIfAlreadyExistsButShouldNotScheduleCampaignMessageIfNotRenewed() {
         String messageId = "mymessageid";
@@ -311,5 +310,16 @@ public class CampaignMessageAlertServiceTest {
         campaignMessageAlertService.clearMessageId(subscriptionId);
 
         verify(allCampaignMessageAlerts, never()).update(any(CampaignMessageAlert.class));
+    }
+
+    @Test
+    public void shouldFindCampaignMessageAlertBySubscriptionId() {
+        String subscriptionId = "subscriptionId";
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "WEEK38", false, DateTime.now());
+        when(allCampaignMessageAlerts.findBySubscriptionId(subscriptionId)).thenReturn(campaignMessageAlert);
+
+        CampaignMessageAlert actualCampaignMessageAlert = campaignMessageAlertService.findBy(subscriptionId);
+
+        assertEquals(campaignMessageAlert, actualCampaignMessageAlert);
     }
 }

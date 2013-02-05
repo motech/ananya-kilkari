@@ -11,6 +11,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxEventKeys;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
@@ -132,28 +133,28 @@ public class KilkariCampaignServiceTest {
     @Test
     public void shouldScheduleUnsubscriptionWhenPackIsCompletedAndWhenStatusIsNotDeactivated() {
         String subscriptionId = "abcd1234";
-
+        String campaignName = MessageCampaignService.SIXTEEN_MONTHS_CAMPAIGN_KEY;
         Subscription subscription = new Subscription("9988776655", SubscriptionPack.BARI_KILKARI, DateTime.now().minusWeeks(1), DateTime.now(), null);
         subscription.setStatus(SubscriptionStatus.ACTIVE);
-
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        kilkariCampaignService.processCampaignCompletion(subscriptionId);
+        kilkariCampaignService.processCampaignCompletion(subscriptionId, campaignName);
 
-        verify(kilkariSubscriptionService).processSubscriptionCompletion(subscription);
+        verify(kilkariSubscriptionService).processSubscriptionCompletion(subscription, campaignName);
     }
 
     @Test
     public void shouldNotScheduleUnsubscriptionWhenPackIsCompletedAndStatusIsDeactivated() {
         String subscriptionId = "abcd1234";
+        String campaignName = MessageCampaignService.SIXTEEN_MONTHS_CAMPAIGN_KEY;
         Subscription subscription = new Subscription("9988776655", SubscriptionPack.BARI_KILKARI, DateTime.now().minusWeeks(1), DateTime.now(), null);
         subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
 
         when(kilkariSubscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        kilkariCampaignService.processCampaignCompletion(subscriptionId);
+        kilkariCampaignService.processCampaignCompletion(subscriptionId, campaignName);
 
-        verify(kilkariSubscriptionService, never()).processSubscriptionCompletion(subscription);
+        verify(kilkariSubscriptionService, never()).processSubscriptionCompletion(subscription, campaignName);
     }
 
     @Test

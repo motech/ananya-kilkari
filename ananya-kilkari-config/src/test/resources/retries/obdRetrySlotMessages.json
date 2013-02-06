@@ -4,7 +4,7 @@
     "retries" : [
         {
             "name" : "obd-send-retry-slot-messages",
-            "retryCount" : "5",
+            "retryCount" : "3",
             "retryInterval" : ["3 minutes"],
             "offset" : "0 minutes"
         }

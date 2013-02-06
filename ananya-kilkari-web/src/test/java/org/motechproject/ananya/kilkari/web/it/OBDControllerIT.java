@@ -69,11 +69,11 @@ public class OBDControllerIT extends SpringIntegrationTest {
         markForDeletion(subscription1);
         markForDeletion(subscription2);
 
-        CampaignMessage campaignMessage = new CampaignMessage(subscription1.getSubscriptionId(), "WEEK13", msisdn, Operator.AIRTEL.name(), DateTime.now().plusDays(2));
+        CampaignMessage campaignMessage = new CampaignMessage(subscription1.getSubscriptionId(), "WEEK13", DateTime.now(), msisdn, Operator.AIRTEL.name(), DateTime.now().plusDays(2));
         allCampaignMessages.add(campaignMessage);
         markForDeletion(campaignMessage);
 
-        CampaignMessage campaignMessage1 = new CampaignMessage(subscription2.getSubscriptionId(), "WEEK13", msisdn, Operator.AIRTEL.name(), DateTime.now().plusDays(2));
+        CampaignMessage campaignMessage1 = new CampaignMessage(subscription2.getSubscriptionId(), "WEEK13", DateTime.now(), msisdn, Operator.AIRTEL.name(), DateTime.now().plusDays(2));
         allCampaignMessages.add(campaignMessage1);
         markForDeletion(campaignMessage1);
 

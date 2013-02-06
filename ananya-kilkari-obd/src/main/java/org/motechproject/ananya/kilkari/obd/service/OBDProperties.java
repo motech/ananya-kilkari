@@ -60,12 +60,8 @@ public class OBDProperties {
         return obdProperties.getProperty("obd.message.delivery.file");
     }
 
-    public Integer getMaximumDNPRetryCount() {
-        return Integer.parseInt(obdProperties.getProperty("obd.dnp.message.max.retry.count"));
-    }
-
-    public Integer getMaximumDNCRetryCount() {
-        return Integer.parseInt(obdProperties.getProperty("obd.dnc.message.max.retry.count"));
+    public Integer getMaximumOBDRetryDays() {
+        return Integer.parseInt(obdProperties.getProperty("obd.max.retry.days"));
     }
 
     public String getMainSlotStartTimeFor(SubSlot subSlot) {

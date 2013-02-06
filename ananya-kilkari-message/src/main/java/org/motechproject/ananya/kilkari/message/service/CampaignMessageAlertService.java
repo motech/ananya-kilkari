@@ -94,7 +94,7 @@ public class CampaignMessageAlertService {
         }
 
         logger.info("Campaign message alert can be scheduled. Scheduling and deleting it.");
-        campaignMessageService.scheduleCampaignMessage(campaignMessageAlert.getSubscriptionId(), campaignMessageAlert.getMessageId(), msisdn, operator, campaignMessageAlert.getMessageExpiryDate());
+        campaignMessageService.scheduleCampaignMessage(campaignMessageAlert.getSubscriptionId(), campaignMessageAlert.getMessageId(), msisdn, operator, campaignMessageAlert.getMessageExpiryDate(), DateTime.now());
         allCampaignMessageAlerts.remove(campaignMessageAlert);
         return campaignMessageAlert.getMessageId();
     }

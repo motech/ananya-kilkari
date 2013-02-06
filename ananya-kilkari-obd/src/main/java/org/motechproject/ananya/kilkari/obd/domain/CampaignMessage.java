@@ -18,6 +18,9 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
     private String messageId;
 
     @JsonProperty
+    private DateTime creationDate;
+
+    @JsonProperty
     private DateTime weekEndingDate;
 
     @JsonProperty
@@ -44,9 +47,10 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
     public CampaignMessage() {
     }
 
-    public CampaignMessage(String subscriptionId, String messageId, String msisdn, String operator, DateTime weekEndingDate) {
+    public CampaignMessage(String subscriptionId, String messageId, DateTime creationDate, String msisdn, String operator, DateTime weekEndingDate) {
         this.subscriptionId = subscriptionId;
         this.messageId = messageId;
+        this.creationDate = creationDate;
         this.weekEndingDate = weekEndingDate;
         this.msisdn = msisdn;
         this.operator = operator;
@@ -98,7 +102,7 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
     public void markSent() {
         if (this.status == CampaignMessageStatus.NA)
             this.NARetryCount++;
-        else if (this.status == CampaignMessageStatus.ND && weekEndingDate.isBeforeNow())
+        else if (this.status == CampaignMessageStatus.ND)
             this.NDRetryCount++;
         else if (this.status == CampaignMessageStatus.SO)
             this.SORetryCount++;
@@ -138,6 +142,10 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
     @Override
     public int compareTo(CampaignMessage that) {
         return this.status.getPriority().compareTo(that.status.getPriority());
+    }
+
+    public DateTime getCreationDate() {
+        return creationDate;
     }
 }
 

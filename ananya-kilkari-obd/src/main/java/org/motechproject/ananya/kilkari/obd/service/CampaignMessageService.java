@@ -40,8 +40,8 @@ public class CampaignMessageService {
         this.obdProperties = obdProperties;
     }
 
-    public void scheduleCampaignMessage(String subscriptionId, String messageId, String msisdn, String operator, DateTime messageExpiryDate) {
-        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, msisdn, operator, messageExpiryDate));
+    public void scheduleCampaignMessage(String subscriptionId, String messageId, String msisdn, String operator, DateTime messageExpiryDate, DateTime creationDate) {
+        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, creationDate, msisdn, operator, messageExpiryDate));
     }
 
     public void sendFirstMainSubSlotMessages(final SubSlot subSlot) {
@@ -128,7 +128,7 @@ public class CampaignMessageService {
     }
 
     private void updateCampaignMessageStatus(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
-        if (hasReachedMaximumRetries(campaignMessage, statusCode))
+        if (hasReachedMaximumRetryDays(campaignMessage))
             allCampaignMessages.delete(campaignMessage);
         else {
             campaignMessage.setStatusCode(statusCode);
@@ -136,9 +136,13 @@ public class CampaignMessageService {
         }
     }
 
-    private boolean hasReachedMaximumRetries(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
-        return (campaignMessage.getNARetryCount() == obdProperties.getMaximumDNPRetryCount() && statusCode == CampaignMessageStatus.NA) ||
-                (campaignMessage.getNDRetryCount() == obdProperties.getMaximumDNCRetryCount() && statusCode == CampaignMessageStatus.ND);
+    private boolean hasReachedMaximumRetryDays(CampaignMessage campaignMessage) {
+        DateTime now = DateTime.now();
+        return now.isAfter(minimum(campaignMessage.getCreationDate().plusDays(obdProperties.getMaximumOBDRetryDays()), campaignMessage.getWeekEndingDate()));
+    }
+
+    private DateTime minimum(DateTime obdRetryEndDate, DateTime weekEndingDate) {
+        return obdRetryEndDate.isBefore(weekEndingDate) ? obdRetryEndDate : weekEndingDate;
     }
 
     private void sendMessagesToOBD(List<CampaignMessage> messages, GatewayAction gatewayAction) {

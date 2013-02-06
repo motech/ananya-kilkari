@@ -59,7 +59,7 @@ public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
             subscriptionDbService.addSubscription(subscription);
 
             CampaignMessage campaignMessage = new CampaignMessage(
-                    subscription.getSubscriptionId(), week, msisdn, operator.name(), now.plusWeeks(1));
+                    subscription.getSubscriptionId(), week, DateTime.now().minusDays(1), msisdn, operator.name(), now.plusWeeks(1));
             campaignMessage.setStatusCode(CampaignMessageStatus.NEW);
             campaignMessage.markSent();
             obdDbService.add(campaignMessage);

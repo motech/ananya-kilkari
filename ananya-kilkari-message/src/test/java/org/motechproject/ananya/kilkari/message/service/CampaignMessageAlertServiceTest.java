@@ -88,13 +88,16 @@ public class CampaignMessageAlertServiceTest {
 
         assertEquals(messageId, actualMessageId);
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, messageExpiryDate);
+        ArgumentCaptor<DateTime> creationDateCaptor = ArgumentCaptor.forClass(DateTime.class);
+        verify(campaignMessageService).scheduleCampaignMessage(eq(subscriptionId), eq(messageId), eq(msisdn), eq(operator), eq(messageExpiryDate), creationDateCaptor.capture());
         ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
         verify(allCampaignMessageAlerts).remove(captor.capture());
         CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
         assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
+        DateTime creationDateValue = creationDateCaptor.getValue();
+        assertEquals(DateTime.now().withMillisOfSecond(0), creationDateValue.withMillisOfSecond(0));
     }
-//
+
     @Test
     public void shouldRemoveCampaignMessageAlertIfAlreadyExistsAndScheduleCampaignMessageIfRenewed() {
         String messageId = "mymessageid";
@@ -110,13 +113,16 @@ public class CampaignMessageAlertServiceTest {
         campaignMessageAlertService.scheduleCampaignMessageAlert(subscriptionId, messageId, messageExpiryDate, msisdn, operator);
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, messageExpiryDate);
+        ArgumentCaptor<DateTime> DateTimeCaptor = ArgumentCaptor.forClass(DateTime.class);
+        verify(campaignMessageService).scheduleCampaignMessage(eq(subscriptionId), eq(messageId), eq(msisdn), eq(operator), eq(messageExpiryDate), DateTimeCaptor.capture());
         ArgumentCaptor<CampaignMessageAlert> captor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
         verify(allCampaignMessageAlerts).remove(captor.capture());
         CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
         assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
+        DateTime DateTimeCaptorValue = DateTimeCaptor.getValue();
+        assertEquals(DateTime.now().withMillisOfSecond(0), DateTimeCaptorValue.withMillisOfSecond(0));
     }
-//
+
     @Test
     public void shouldUpdateCampaignMessageAlertIfAlreadyExistsButShouldNotScheduleCampaignMessageIfNotRenewed() {
         String messageId = "mymessageid";
@@ -131,14 +137,12 @@ public class CampaignMessageAlertServiceTest {
         campaignMessageAlertService.scheduleCampaignMessageAlert(subscriptionId, messageId, messageExpiryDate, msisdn, operator);
 
         verify(allCampaignMessageAlerts).findBySubscriptionId(subscriptionId);
-
         ArgumentCaptor<CampaignMessageAlert> campaignMessageAlertArgumentCaptor = ArgumentCaptor.forClass(CampaignMessageAlert.class);
         verify(allCampaignMessageAlerts).update(campaignMessageAlertArgumentCaptor.capture());
         CampaignMessageAlert actualCampaignMessageAlert = campaignMessageAlertArgumentCaptor.getValue();
         assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
         assertEquals(messageId, actualCampaignMessageAlert.getMessageId());
         assertFalse(actualCampaignMessageAlert.isRenewed());
-
         verifyZeroInteractions(campaignMessageService);
         verify(allCampaignMessageAlerts, never()).remove(any(CampaignMessageAlert.class));
     }
@@ -254,8 +258,10 @@ public class CampaignMessageAlertServiceTest {
         verify(allCampaignMessageAlerts).remove(campaignMessageAlertArgumentCaptor.capture());
         CampaignMessageAlert campaignMessageAlert = campaignMessageAlertArgumentCaptor.getValue();
         assertEquals(subscriptionId, campaignMessageAlert.getSubscriptionId());
-
-        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, messageExpiryDate);
+        ArgumentCaptor<DateTime> dateTimeArgumentCaptor = ArgumentCaptor.forClass(DateTime.class);
+        verify(campaignMessageService).scheduleCampaignMessage(eq(subscriptionId), eq(messageId), eq(msisdn), eq(operator), eq(messageExpiryDate), dateTimeArgumentCaptor.capture());
+        DateTime actualDateTime = dateTimeArgumentCaptor.getValue();
+        assertEquals(DateTime.now().withMillisOfSecond(0), actualDateTime.withMillisOfSecond(0));
     }
 
     @Test
@@ -274,8 +280,10 @@ public class CampaignMessageAlertServiceTest {
         verify(allCampaignMessageAlerts).remove(campaignMessageAlertArgumentCaptor.capture());
         CampaignMessageAlert campaignMessageAlert = campaignMessageAlertArgumentCaptor.getValue();
         assertEquals(subscriptionId, campaignMessageAlert.getSubscriptionId());
-
-        verify(campaignMessageService).scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, messageExpiryDate);
+        ArgumentCaptor<DateTime> dateTimeArgumentCaptor = ArgumentCaptor.forClass(DateTime.class);
+        verify(campaignMessageService).scheduleCampaignMessage(eq(subscriptionId), eq(messageId), eq(msisdn), eq(operator), eq(messageExpiryDate), dateTimeArgumentCaptor.capture());
+        DateTime actualDateTime = dateTimeArgumentCaptor.getValue();
+        assertEquals(DateTime.now().withMillisOfSecond(0), actualDateTime.withMillisOfSecond(0));
     }
 
     @Test

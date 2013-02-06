@@ -81,7 +81,7 @@ public class ConsoleIT {
         String messageId = "WEEK3";
         subscriptionId = subscription.getSubscriptionId();
         allSubscriptions.add(subscription);
-        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, msisdn, messageId, DateTime.now()));
+        allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, DateTime.now(), msisdn, messageId, DateTime.now()));
         allInboxMessages.add(new InboxMessage(subscriptionId, messageId));
         allCampaignMessageAlerts.add(new CampaignMessageAlert(subscriptionId, messageId,false,DateTime.now().plusDays(2)));
         allInvalidCallRecords.add(new InvalidCallRecord(msisdn,subscriptionId,"","",""));

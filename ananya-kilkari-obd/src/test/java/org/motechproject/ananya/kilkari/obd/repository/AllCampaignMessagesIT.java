@@ -37,43 +37,44 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
     public void setUp() {
         allCampaignMessages.removeAll();
 
-        weekEndingDate1 = DateTime.now().withZone(DateTimeZone.UTC).plusDays(2);
-        weekEndingDate2 = DateTime.now().withZone(DateTimeZone.UTC).minusDays(2);
-        weekEndingDate3 = DateTime.now().withZone(DateTimeZone.UTC).minusDays(5);
-        weekEndingDate4 = DateTime.now().withZone(DateTimeZone.UTC).minusDays(7);
+        DateTime now = DateTime.now().withZone(DateTimeZone.UTC);
+        weekEndingDate1 = now.plusDays(2);
+        weekEndingDate2 = now.minusDays(2);
+        weekEndingDate3 = now.minusDays(5);
+        weekEndingDate4 = now.minusDays(7);
 
-        newCampaignMessage = new CampaignMessage("subscriptionId1", "messageId1", "1234657980", "operator1", weekEndingDate1);
-        newCampaignMessageWithEarlierWeekEndingDate = new CampaignMessage("subscriptionId1", "messageId1", "1234657980", "operator1", weekEndingDate4);
+        newCampaignMessage = new CampaignMessage("subscriptionId1", "messageId1", now, "1234657980", "operator1", weekEndingDate1);
+        newCampaignMessageWithEarlierWeekEndingDate = new CampaignMessage("subscriptionId1", "messageId1", now, "1234657980", "operator1", weekEndingDate4);
 
-        NDCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", "912134567890", "operator2", weekEndingDate2);
+        NDCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", now, "912134567890", "operator2", weekEndingDate2);
         NDCampaignMessage.setStatusCode(CampaignMessageStatus.ND);
         NDCampaignMessage.markSent();
 
-        newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3", "3124567890", "operator3", weekEndingDate1);
+        newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3", now, "3124567890", "operator3", weekEndingDate1);
         newCampaignMessageSent.markSent();
 
-        NDCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4", "004123567890", "operator4", weekEndingDate1);
+        NDCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4", now, "004123567890", "operator4", weekEndingDate1);
         NDCampaignMessageSent.markSent();
         NDCampaignMessage.setStatusCode(CampaignMessageStatus.ND);
 
         NDCampaignMessageSent.markSent();
 
-        NACampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", "5123467890", "operator5", weekEndingDate2);
+        NACampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", now, "5123467890", "operator5", weekEndingDate2);
         NACampaignMessage.markSent();
         NACampaignMessage.setStatusCode(CampaignMessageStatus.NA);
 
-        NACampaignMessageWithEarlierWeekEndingDate = new CampaignMessage("subscriptionId7", "messageId7", "5128467890", "operator7", weekEndingDate3);
+        NACampaignMessageWithEarlierWeekEndingDate = new CampaignMessage("subscriptionId7", "messageId7", now, "5128467890", "operator7", weekEndingDate3);
         NACampaignMessageWithEarlierWeekEndingDate.setStatusCode(CampaignMessageStatus.NA);
 
-        NACampaignMessageSent = new CampaignMessage("subscriptionId6", "messageId6", "6123457890", "operator6", weekEndingDate1);
+        NACampaignMessageSent = new CampaignMessage("subscriptionId6", "messageId6", now, "6123457890", "operator6", weekEndingDate1);
         NACampaignMessageSent.markSent();
         NACampaignMessageSent.setStatusCode(CampaignMessageStatus.NA);
         NACampaignMessageSent.markSent();
 
-        SOCampaignMessage = new CampaignMessage("subscriptionId7", "messageId7", "6123457890", "operator6", weekEndingDate1);
+        SOCampaignMessage = new CampaignMessage("subscriptionId7", "messageId7", now, "6123457890", "operator6", weekEndingDate1);
         SOCampaignMessage.setStatusCode(CampaignMessageStatus.SO);
 
-        SOCampaignMessageSent = new CampaignMessage("subscriptionId7", "messageId7", "6123457890", "operator6", weekEndingDate1);
+        SOCampaignMessageSent = new CampaignMessage("subscriptionId7", "messageId7", now, "6123457890", "operator6", weekEndingDate1);
         SOCampaignMessage.setStatusCode(CampaignMessageStatus.SO);
         SOCampaignMessageSent.markSent();
     }

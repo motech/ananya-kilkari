@@ -3,7 +3,6 @@ package org.motechproject.ananya.kilkari.obd.service;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
-import org.motechproject.ananya.kilkari.obd.service.CampaignMessageCSVBuilder;
 
 import java.util.ArrayList;
 
@@ -14,9 +13,9 @@ public class CampaignMessageCSVBuilderTest {
     public void shouldReturnCsvContentForAList() {
         CampaignMessageCSVBuilder campaignMessageCSVBuilder = new CampaignMessageCSVBuilder();
         ArrayList<CampaignMessage> campaignMessages = new ArrayList<>();
-        campaignMessages.add(new CampaignMessage("subscriptionId1","message1", "1234567891", "operator1", DateTime.now().plusDays(2)));
-        campaignMessages.add(new CampaignMessage("subscriptionId2","message2", "1234567892", "operator2", DateTime.now().plusDays(2)));
-        campaignMessages.add(new CampaignMessage("subscriptionId3","message3", "1234567893", "operator3", DateTime.now().plusDays(2)));
+        campaignMessages.add(new CampaignMessage("subscriptionId1","message1", DateTime.now(), "1234567891", "operator1", DateTime.now().plusDays(2)));
+        campaignMessages.add(new CampaignMessage("subscriptionId2","message2", DateTime.now(), "1234567892", "operator2", DateTime.now().plusDays(2)));
+        campaignMessages.add(new CampaignMessage("subscriptionId3","message3", DateTime.now(), "1234567893", "operator3", DateTime.now().plusDays(2)));
 
         String csvContent = campaignMessageCSVBuilder.getCSV(campaignMessages);
 

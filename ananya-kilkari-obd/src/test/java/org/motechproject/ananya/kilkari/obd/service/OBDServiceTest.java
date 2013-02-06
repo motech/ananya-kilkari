@@ -75,7 +75,6 @@ public class OBDServiceTest {
         assertEquals(obdSuccessfulCallDetailsRequest.getSubscriptionId(), campaignMessageDeliveryReportRequest.getSubscriptionId());
         assertEquals(obdSuccessfulCallDetailsRequest.getMsisdn(), campaignMessageDeliveryReportRequest.getMsisdn());
         assertEquals(obdSuccessfulCallDetailsRequest.getCampaignId(), campaignMessageDeliveryReportRequest.getCampaignId());
-        assertEquals(retryCount.toString(), campaignMessageDeliveryReportRequest.getRetryCount());
         assertEquals(obdSuccessfulCallDetailsRequest.getServiceOption().name(), campaignMessageDeliveryReportRequest.getServiceOption());
     }
 

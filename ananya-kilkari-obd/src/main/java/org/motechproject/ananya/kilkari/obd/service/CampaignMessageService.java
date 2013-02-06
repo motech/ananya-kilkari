@@ -116,7 +116,7 @@ public class CampaignMessageService {
             return;
         }
         updateCampaignMessageStatus(campaignMessage, failedCallReport.getStatusCode());
-        reportCampaignMessageStatus(failedCallReport, campaignMessage);
+        reportCampaignMessageStatus(failedCallReport);
     }
 
     public void deleteCampaignMessagesFor(String subscriptionId) {
@@ -161,11 +161,10 @@ public class CampaignMessageService {
         }
     }
 
-    private void reportCampaignMessageStatus(ValidFailedCallReport failedCallReport, CampaignMessage campaignMessage) {
-        String retryCount = String.valueOf(campaignMessage.getRetryCountForCurrentStatus());
+    private void reportCampaignMessageStatus(ValidFailedCallReport failedCallReport) {
         CallDetailRecordRequest callDetailRecordRequest = new CallDetailRecordRequest(failedCallReport.getCreatedAt(), failedCallReport.getCreatedAt());
         CallDetailsReportRequest callDetailsReportRequest = new CallDetailsReportRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(),
-                null, retryCount, failedCallReport.getStatusCode().name(), callDetailRecordRequest, CampaignMessageCallSource.OBD.name());
+                null, failedCallReport.getStatusCode().name(), callDetailRecordRequest, CampaignMessageCallSource.OBD.name());
         reportingService.reportCampaignMessageDeliveryStatus(callDetailsReportRequest);
     }
 

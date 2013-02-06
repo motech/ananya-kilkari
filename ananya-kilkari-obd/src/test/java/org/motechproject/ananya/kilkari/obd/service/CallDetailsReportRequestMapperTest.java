@@ -32,7 +32,6 @@ public class CallDetailsReportRequestMapperTest {
         assertEquals(obdSuccessfulCallDetailsRequest.getCampaignId(), actualDeliveryReportRequest.getCampaignId());
         assertEquals(obdSuccessfulCallDetailsRequest.getServiceOption().name(), actualDeliveryReportRequest.getServiceOption());
         assertEquals(CampaignMessageStatus.SUCCESS.name(), actualDeliveryReportRequest.getStatus());
-        assertEquals(retryCount.toString(), actualDeliveryReportRequest.getRetryCount());
         assertEquals(startTime, obdSuccessfulCallDetailsRequest.getCallDurationRequest().getStartTime());
         assertEquals(endTime, obdSuccessfulCallDetailsRequest.getCallDurationRequest().getEndTime());
         assertEquals("OBD", actualDeliveryReportRequest.getCallSource());
@@ -56,7 +55,6 @@ public class CallDetailsReportRequestMapperTest {
         assertEquals(obdSuccessfulCallDetailsRequest.getCampaignId(), actualDeliveryReportRequest.getCampaignId());
         assertNull(actualDeliveryReportRequest.getServiceOption());
         assertEquals(CampaignMessageStatus.SUCCESS.name(), actualDeliveryReportRequest.getStatus());
-        assertEquals(retryCount.toString(), actualDeliveryReportRequest.getRetryCount());
         assertEquals(startTime, obdSuccessfulCallDetailsRequest.getCallDurationRequest().getStartTime());
         assertEquals(endTime, obdSuccessfulCallDetailsRequest.getCallDurationRequest().getEndTime());
         assertEquals("OBD", actualDeliveryReportRequest.getCallSource());

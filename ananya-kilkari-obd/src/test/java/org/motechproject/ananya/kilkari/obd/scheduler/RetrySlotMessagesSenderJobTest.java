@@ -33,13 +33,15 @@ public class RetrySlotMessagesSenderJobTest {
     private RetrySlotMessagesSenderJob retrySlotMessagesSenderJob;
     private String cronJobExpression1 = "myfirstcronjobexpression";
     private String cronJobExpression2 = "mysecondcronjobexpression";
+    private String cronJobExpression3 = "mythirdcronjobexpression";
     private static final String SUB_SLOT_KEY = "sub_slot";
 
     @Before
     public void setUp() {
         initMocks(this);
         when(obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.ONE)).thenReturn(cronJobExpression1);
-        when(obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.THREE)).thenReturn(cronJobExpression2);
+        when(obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.TWO)).thenReturn(cronJobExpression2);
+        when(obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.THREE)).thenReturn(cronJobExpression3);
         retrySlotMessagesSenderJob = new RetrySlotMessagesSenderJob(campaignMessageService, retryService, obdProperties);
     }
 
@@ -51,13 +53,18 @@ public class RetrySlotMessagesSenderJobTest {
             put(SUB_SLOT_KEY, SubSlot.ONE);
         }});
         MotechEvent expectedEvent2 = new MotechEvent("obd.send.retry.messages", new HashMap<String, Object>() {{
+            put(MotechSchedulerService.JOB_ID_KEY, SubSlot.TWO.name());
+            put(SUB_SLOT_KEY, SubSlot.TWO);
+        }});
+        MotechEvent expectedEvent3 = new MotechEvent("obd.send.retry.messages", new HashMap<String, Object>() {{
             put(MotechSchedulerService.JOB_ID_KEY, SubSlot.THREE.name());
             put(SUB_SLOT_KEY, SubSlot.THREE);
         }});
 
-        assertEquals(2, cronJobs.size());
+        assertEquals(3, cronJobs.size());
         cronJobs.contains(new CronSchedulableJob(expectedEvent1, cronJobExpression1));
         cronJobs.contains(new CronSchedulableJob(expectedEvent2, cronJobExpression2));
+        cronJobs.contains(new CronSchedulableJob(expectedEvent3, cronJobExpression3));
     }
 
     @Test

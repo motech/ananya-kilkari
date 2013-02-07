@@ -37,6 +37,7 @@ public class RetrySlotMessagesSenderJob extends MessagesSenderJob {
         super(SLOT_EVENT_SUBJECT,
                 new HashMap<SubSlot, String>() {{
                     put(SubSlot.ONE, obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.ONE));
+                    put(SubSlot.TWO, obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.TWO));
                     put(SubSlot.THREE, obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.THREE));
                 }}
         );

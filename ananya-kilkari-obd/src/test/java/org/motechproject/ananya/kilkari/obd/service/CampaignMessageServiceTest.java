@@ -13,6 +13,8 @@ import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
+import org.motechproject.ananya.kilkari.obd.service.utils.RetryTask;
+import org.motechproject.ananya.kilkari.obd.service.utils.RetryTaskExecutor;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 
@@ -46,13 +48,16 @@ public class CampaignMessageServiceTest {
     @Mock
     private ReportingService reportingService;
 
+    @Mock
+    private RetryTaskExecutor retryTaskExecutor;
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() {
         initMocks(this);
-        campaignMessageService = new CampaignMessageService(allCampaignMessages, onMobileOBDGateway, campaignMessageCSVBuilder, reportingService, obdProperties);
+        campaignMessageService = new CampaignMessageService(allCampaignMessages, onMobileOBDGateway, campaignMessageCSVBuilder, reportingService, obdProperties, retryTaskExecutor);
     }
 
     @Test
@@ -381,7 +386,7 @@ public class CampaignMessageServiceTest {
     }
 
     @Test
-    public void shouldNotThrowTheExceptionWhenThrownDuringUpdateOfSentMessages() {
+    public void shouldNotThrowTheExceptionAndRetryUpdatingWhenThrownDuringUpdateOfSentMessages() {
         CampaignMessage campaignMessage = new CampaignMessage("subsriptionId1", "messageId1", DateTime.now(), "1234567890", "operator1", DateTime.now().plusDays(2));
         List<CampaignMessage> campaignMessages = Arrays.asList(campaignMessage);
         when(allCampaignMessages.getAllUnsentNAMessages()).thenReturn(campaignMessages);
@@ -389,8 +394,16 @@ public class CampaignMessageServiceTest {
         when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
 
         doThrow(new RuntimeException("myruntimeexception")).when(allCampaignMessages).update(any(CampaignMessage.class));
-
         campaignMessageService.sendRetrySlotMessages(SubSlot.ONE);
+        ArgumentCaptor<RetryTask> retryTaskArgumentCaptor = ArgumentCaptor.forClass(RetryTask.class);
+        verify(retryTaskExecutor).run(eq(5), eq(5), eq(3), retryTaskArgumentCaptor.capture());
+        RetryTask retryTask = retryTaskArgumentCaptor.getValue();
+        try {
+            retryTask.execute();
+        } catch (Exception e) {
+
+        }
+        verify(allCampaignMessages, times(2)).update(campaignMessage);
     }
 
     @Test
@@ -408,7 +421,7 @@ public class CampaignMessageServiceTest {
         verify(allCampaignMessages).find(subscriptionId, campaignId);
         verify(reportingService).reportCampaignMessageDeliveryStatus(any(CallDetailsReportRequest.class));
         verify(allCampaignMessages).delete(campaignMessage);
-        verify(allCampaignMessages,never()).update(campaignMessage);
+        verify(allCampaignMessages, never()).update(campaignMessage);
     }
 
     @Test
@@ -426,7 +439,7 @@ public class CampaignMessageServiceTest {
         verify(allCampaignMessages).find(subscriptionId, campaignId);
         verify(reportingService).reportCampaignMessageDeliveryStatus(any(CallDetailsReportRequest.class));
         verify(allCampaignMessages).delete(campaignMessage);
-        verify(allCampaignMessages,never()).update(campaignMessage);
+        verify(allCampaignMessages, never()).update(campaignMessage);
     }
 
     private void verifyCampaignMessageUpdate(List<CampaignMessage> expectedCampaignMessages) {

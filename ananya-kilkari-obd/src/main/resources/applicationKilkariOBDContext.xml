@@ -34,4 +34,9 @@
         <constructor-arg value="${http.read.timeout}"/>
         <constructor-arg value="${http.connect.timeout}"/>
     </bean>
+
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="maxPoolSize" value="10"/>
+        <property name="queueCapacity" value="25"/>
+    </bean>
 </beans>

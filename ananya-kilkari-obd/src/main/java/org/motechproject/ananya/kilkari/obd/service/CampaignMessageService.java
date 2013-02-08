@@ -7,6 +7,8 @@ import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
+import org.motechproject.ananya.kilkari.obd.service.utils.RetryTask;
+import org.motechproject.ananya.kilkari.obd.service.utils.RetryTaskExecutor;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailRecordRequest;
@@ -26,18 +28,20 @@ public class CampaignMessageService {
     private CampaignMessageCSVBuilder campaignMessageCSVBuilder;
     private final ReportingService reportingService;
     private final OBDProperties obdProperties;
+    private RetryTaskExecutor retryTaskExecutor;
 
     private static final Logger logger = LoggerFactory.getLogger(CampaignMessageService.class);
 
     @Autowired
     public CampaignMessageService(AllCampaignMessages allCampaignMessages, OnMobileOBDGateway onMobileOBDGateway,
                                   CampaignMessageCSVBuilder campaignMessageCSVBuilder, ReportingService reportingService,
-                                  OBDProperties obdProperties) {
+                                  OBDProperties obdProperties, RetryTaskExecutor retryTaskExecutor) {
         this.allCampaignMessages = allCampaignMessages;
         this.onMobileOBDGateway = onMobileOBDGateway;
         this.campaignMessageCSVBuilder = campaignMessageCSVBuilder;
         this.reportingService = reportingService;
         this.obdProperties = obdProperties;
+        this.retryTaskExecutor = retryTaskExecutor;
     }
 
     public void scheduleCampaignMessage(String subscriptionId, String messageId, String msisdn, String operator, DateTime messageExpiryDate, DateTime creationDate) {
@@ -151,12 +155,20 @@ public class CampaignMessageService {
             return;
         String campaignMessageCSVContent = campaignMessageCSVBuilder.getCSV(messages);
         gatewayAction.send(campaignMessageCSVContent);
-        for (CampaignMessage message : messages) {
+
+        for (final CampaignMessage message : messages) {
             try {
                 message.markSent();
                 allCampaignMessages.update(message);
             } catch (Exception ex) {
                 logger.error(String.format("Error when updating the sent message %s for subscription %s", message.getMessageId(), message.getSubscriptionId()));
+                retryTaskExecutor.run(5, 5, 3, new RetryTask() {
+                    @Override
+                    public boolean execute() {
+                        allCampaignMessages.update(message);
+                        return true;
+                    }
+                });
             }
         }
     }

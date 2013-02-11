@@ -682,7 +682,7 @@ public class SubscriptionServiceTest {
         CampaignChangeReason campaignChangeReason = CampaignChangeReason.MISCARRIAGE;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.BARI_KILKARI).withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_COMPLETION).build();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        doThrow(new ValidationException(message)).when(subscriptionValidator).validateActiveSubscriptionExists(subscriptionId);
+        doThrow(new ValidationException(message)).when(subscriptionValidator).validateChangeCampaign(subscriptionId, CampaignChangeReason.MISCARRIAGE);
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(message);
 
@@ -929,20 +929,6 @@ public class SubscriptionServiceTest {
         assertEquals(MessageCampaignPack.NAVJAAT_KILKARI.getCampaignName(), messageCampaignRequest.getCampaignName());
         assertEquals(scheduleStartDate.withSecondOfMinute(0).withMillisOfSecond(0), messageCampaignRequest.getScheduleStartDate());
         verify(campaignMessageAlertService).deleteFor(subscriptionId);
-    }
-
-    @Test
-    public void shouldGivePriorityToWeekNumberOverDOBForALateSubscription() {
-        Integer weekNumber = 40;
-        DateTime dob = DateTime.now().minusMonths(6);
-        SubscriptionPack subscriptionPack = mock(SubscriptionPack.class);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(subscriptionPack).withDateOfBirth(dob).withWeek(weekNumber).build();
-        when(subscriptionPack.getStartDateForWeek(subscriptionRequest.getCreationDate(), weekNumber)).thenReturn(dob);
-
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CONTACT_CENTER);
-
-        verify(subscriptionPack).getStartDateForWeek(Matchers.<DateTime>any(), Matchers.<Integer>any());
-        verify(subscriptionPack, never()).getStartDate(Matchers.<DateTime>any());
     }
 
     @Test

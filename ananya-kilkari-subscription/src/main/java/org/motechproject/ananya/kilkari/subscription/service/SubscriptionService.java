@@ -325,7 +325,7 @@ public class SubscriptionService {
 
     public void rescheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
         String subscriptionId = campaignRescheduleRequest.getSubscriptionId();
-        subscriptionValidator.validateActiveSubscriptionExists(subscriptionId);
+        subscriptionValidator.validateChangeCampaign(subscriptionId, campaignRescheduleRequest.getReason());
 
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         DateTime nextAlertDateTime = messageCampaignService.getMessageTimings(subscriptionId, campaignRescheduleRequest.getCreatedAt(), campaignRescheduleRequest.getCreatedAt().plusMonths(1)).get(0);

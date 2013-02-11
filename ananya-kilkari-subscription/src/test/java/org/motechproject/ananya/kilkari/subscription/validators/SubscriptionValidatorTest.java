@@ -7,9 +7,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
+import org.motechproject.ananya.kilkari.subscription.domain.CampaignChangeReason;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
@@ -113,11 +115,12 @@ public class SubscriptionValidatorTest {
 
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(subscription.isActiveOrSuspended()).thenReturn(false);
+        when(subscription.getMessageCampaignPack()).thenReturn(MessageCampaignPack.BARI_KILKARI);
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Subscription is not active for subscriptionId subscriptionId");
 
-        subscriptionValidator.validateActiveSubscriptionExists(subscriptionId);
+        subscriptionValidator.validateChangeCampaign(subscriptionId, CampaignChangeReason.INFANT_DEATH);
     }
 
     @Test
@@ -129,6 +132,30 @@ public class SubscriptionValidatorTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Subscription does not exist for subscriptionId subscriptionId");
 
-        subscriptionValidator.validateActiveSubscriptionExists(subscriptionId);
+        subscriptionValidator.validateChangeCampaign(subscriptionId, CampaignChangeReason.MISCARRIAGE);
+    }
+
+    @Test
+    public void shouldValidateIfSubscriptionIsAlreadyInTheSameCampaignPack(){
+        String subscriptionId = "subscriptionId";
+        Subscription subscription = mock(Subscription.class);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(subscription.isActiveOrSuspended()).thenReturn(true);
+        when(subscription.getMessageCampaignPack()).thenReturn(MessageCampaignPack.MISCARRIAGE);
+
+        subscriptionValidator.validateChangeCampaign(subscriptionId, CampaignChangeReason.INFANT_DEATH);
+    }
+
+    @Test
+    public void shouldValidateAndThrowExceptionIfSubscriptionIsAlreadyInTheSameCampaignPack(){
+        String subscriptionId = "subscriptionId";
+        Subscription subscription = mock(Subscription.class);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(subscription.getMessageCampaignPack()).thenReturn(MessageCampaignPack.INFANT_DEATH);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Subscription with subscriptionId subscriptionId is already in INFANT_DEATH");
+
+        subscriptionValidator.validateChangeCampaign(subscriptionId, CampaignChangeReason.INFANT_DEATH);
     }
 }

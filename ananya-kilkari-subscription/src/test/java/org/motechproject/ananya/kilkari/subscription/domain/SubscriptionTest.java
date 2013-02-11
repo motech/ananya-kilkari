@@ -1,29 +1,14 @@
 package org.motechproject.ananya.kilkari.subscription.domain;
 
 import org.joda.time.DateTime;
-import org.joda.time.Weeks;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class SubscriptionTest {
-
-    @Test
-    public void foo() {
-        DateTime now = DateTime.now();
-        DateTime twoDaysLater = now.plusDays(2);
-        DateTime twoDaysEarlier = now.minusDays(2);
-        DateTime nineDaysLater = now.plusDays(9);
-        DateTime nineDaysEarlier = now.minusDays(9);
-
-        int count1 = Weeks.weeksBetween(now, twoDaysEarlier).getWeeks();
-        int count2 = Weeks.weeksBetween(now, twoDaysLater).getWeeks();
-        int count3 = Weeks.weeksBetween(now, nineDaysEarlier).getWeeks();
-        int count4 = Weeks.weeksBetween(now, nineDaysLater).getWeeks();
-    }
-
     @Test
     public void shouldInitializeSubscription() {
         DateTime beforeCreation = DateTime.now().withSecondOfMinute(0).withMillisOfSecond(0);
@@ -36,6 +21,7 @@ public class SubscriptionTest {
         assertEquals(SubscriptionStatus.NEW, subscription.getStatus());
         assertEquals(msisdn, subscription.getMsisdn());
         assertEquals(SubscriptionPack.BARI_KILKARI, subscription.getPack());
+        assertEquals(MessageCampaignPack.BARI_KILKARI, subscription.getMessageCampaignPack());
         assertNotNull(subscription.getSubscriptionId());
 
         DateTime creationDate = subscription.getCreationDate();

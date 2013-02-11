@@ -113,7 +113,6 @@ public class OBDControllerIT extends SpringIntegrationTest {
         }.executeWithTimeout();
         stubReportingService.setReportCampaignMessageDeliveryCalled(false);
 
-
         verifyOMGatewayRequest();
         verifyReportingRequest();
     }

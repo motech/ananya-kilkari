@@ -9,6 +9,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
 import org.joda.time.Weeks;
+import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
 import org.motechproject.model.MotechBaseDataObject;
 
 import java.util.UUID;
@@ -48,6 +49,9 @@ public class Subscription extends MotechBaseDataObject {
     @JsonProperty
     private boolean campaignCompleted;
 
+    @JsonProperty
+    private MessageCampaignPack messageCampaignPack;
+
     Subscription() {
         //for serialization do not make it public
     }
@@ -60,6 +64,7 @@ public class Subscription extends MotechBaseDataObject {
         this.startDate = floorToExactMinutes(startDate);
         this.subscriptionId = UUID.randomUUID().toString();
         this.status = isEarlySubscription() ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW;
+        this.messageCampaignPack = MessageCampaignPack.from(pack.name());
     }
 
     public String getMsisdn() {
@@ -111,6 +116,10 @@ public class Subscription extends MotechBaseDataObject {
         return startWeekNumber;
     }
 
+    public MessageCampaignPack getMessageCampaignPack() {
+        return messageCampaignPack;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -137,14 +146,15 @@ public class Subscription extends MotechBaseDataObject {
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-                .append(this.msisdn)
-                .append(this.subscriptionId)
-                .append(this.pack)
-                .append(this.status)
-                .append(this.creationDate)
-                .append(this.startDate)
-                .append(this.activationDate)
-                .append(this.scheduleStartDate)
+                .append(msisdn)
+                .append(subscriptionId)
+                .append(pack)
+                .append(status)
+                .append(creationDate)
+                .append(startDate)
+                .append(activationDate)
+                .append(scheduleStartDate)
+                .append(messageCampaignPack)
                 .toString();
     }
 

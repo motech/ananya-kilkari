@@ -147,7 +147,7 @@ public class CampaignMessageService {
                 allCampaignMessages.update(message);
             } catch (Exception ex) {
                 logger.error(String.format("Error when updating the sent message %s for subscription %s", message.getMessageId(), message.getSubscriptionId()));
-                retryTaskExecutor.run(5, 5, 3, new RetryTask() {
+                retryTaskExecutor.run(obdProperties.getInitialWaitForMessageUpdate(), obdProperties.getRetryIntervalForMessageUpdate(), obdProperties.getRetryCountForMessageUpdate(), new RetryTask() {
                     @Override
                     public boolean execute() {
                         allCampaignMessages.update(message);

@@ -24,6 +24,7 @@ public class OBDPropertiesTest {
 
     @Mock
     private Properties properties;
+    private OBDProperties obdProperties;
 
     @Before
     public void setup() {
@@ -36,7 +37,7 @@ public class OBDPropertiesTest {
         when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("iu_nd1, ");
         when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
 
-        OBDProperties obdProperties = new OBDProperties(properties);
+        obdProperties = new OBDProperties(properties);
 
         assertEquals(CampaignMessageStatus.NA, obdProperties.getCampaignMessageStatusFor("iu_na1"));
         assertEquals(CampaignMessageStatus.NA, obdProperties.getCampaignMessageStatusFor("iu_na2"));
@@ -49,7 +50,7 @@ public class OBDPropertiesTest {
         when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn(",,  iu_nd1,iu_nd2,  iu_nd3,  ");
         when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("iu_so1,");
 
-        OBDProperties obdProperties = new OBDProperties(properties);
+        obdProperties = new OBDProperties(properties);
 
         assertEquals(CampaignMessageStatus.ND, obdProperties.getCampaignMessageStatusFor("iu_nd1"));
         assertEquals(CampaignMessageStatus.ND, obdProperties.getCampaignMessageStatusFor("iu_nd2"));
@@ -62,7 +63,7 @@ public class OBDPropertiesTest {
         when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn(",,  iu_nd1,iu_nd2,  iu_nd3,  ");
         when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("iu_so1, iu_so2");
 
-        OBDProperties obdProperties = new OBDProperties(properties);
+        obdProperties = new OBDProperties(properties);
 
         assertEquals(CampaignMessageStatus.SO, obdProperties.getCampaignMessageStatusFor("iu_so1"));
         assertEquals(CampaignMessageStatus.SO, obdProperties.getCampaignMessageStatusFor("iu_so2"));
@@ -97,13 +98,9 @@ public class OBDPropertiesTest {
 
     @Test
     public void shouldGetCronJobExpression() {
-        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
+        defaultSetup();
         when(properties.getProperty("obd.main.one.sub.slot.cron.job.expression")).thenReturn("0 0 12 * * ?");
         when(properties.getProperty("obd.retry.three.sub.slot.cron.job.expression")).thenReturn("0 30 14 * * ?");
-
-        OBDProperties obdProperties = new OBDProperties(properties);
 
         assertEquals("0 0 12 * * ?", obdProperties.getCronJobExpressionFor(MainSubSlot.ONE));
         assertEquals("0 30 14 * * ?", obdProperties.getCronJobExpressionFor(RetrySubSlot.THREE));
@@ -111,12 +108,9 @@ public class OBDPropertiesTest {
 
     @Test
     public void shouldGetSlotStartTimeLimits() {
-        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
+        defaultSetup();
         when(properties.getProperty("obd.main.two.sub.slot.start.time.limit")).thenReturn("13:30");
         when(properties.getProperty("obd.retry.three.sub.slot.start.time.limit")).thenReturn("16:45");
-        OBDProperties obdProperties = new OBDProperties(properties);
 
         DateTime mainSlotStartTimeLimit = obdProperties.getSlotStartTimeLimitFor(MainSubSlot.TWO);
         assertEquals(13, mainSlotStartTimeLimit.getHourOfDay());
@@ -128,13 +122,9 @@ public class OBDPropertiesTest {
 
     @Test
     public void shouldGetSlotEndTimeLimits() {
-        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
+        defaultSetup();
         when(properties.getProperty("obd.main.two.sub.slot.end.time.limit")).thenReturn("13:30");
         when(properties.getProperty("obd.retry.three.sub.slot.end.time.limit")).thenReturn("16:45");
-
-        OBDProperties obdProperties = new OBDProperties(properties);
 
         DateTime mainSlotStartTimeLimit = obdProperties.getSlotEndTimeLimitFor(MainSubSlot.TWO);
         assertEquals(13, mainSlotStartTimeLimit.getHourOfDay());
@@ -146,14 +136,11 @@ public class OBDPropertiesTest {
 
     @Test
     public void shouldGetTimeSlots() {
-        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
+        defaultSetup();
         when(properties.getProperty("obd.main.one.sub.slot.start.time")).thenReturn("String1");
         when(properties.getProperty("obd.main.three.sub.slot.end.time")).thenReturn("String2");
         when(properties.getProperty("obd.retry.one.sub.slot.start.time")).thenReturn("String3");
         when(properties.getProperty("obd.retry.three.sub.slot.end.time")).thenReturn("String4");
-        OBDProperties obdProperties = new OBDProperties(properties);
 
         String mainSlotStartTime = obdProperties.getSlotStartTimeFor(MainSubSlot.ONE);
         String mainSlotEndTime = obdProperties.getSlotEndTimeFor(MainSubSlot.THREE);
@@ -168,12 +155,9 @@ public class OBDPropertiesTest {
 
     @Test
     public void shouldGetMainSubSlotsMessagePercentageToSend() {
-        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
-        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
+        defaultSetup();
         when(properties.getProperty("obd.main.one.sub.slot.message.percentage.to.send")).thenReturn("30");
         when(properties.getProperty("obd.main.two.sub.slot.message.percentage.to.send")).thenReturn("60");
-        OBDProperties obdProperties = new OBDProperties(properties);
 
         assertEquals(30, (int) obdProperties.getSlotMessagePercentageFor(MainSubSlot.ONE));
         assertEquals(60, (int) obdProperties.getSlotMessagePercentageFor(MainSubSlot.TWO));
@@ -181,5 +165,25 @@ public class OBDPropertiesTest {
         assertNull(obdProperties.getSlotMessagePercentageFor(RetrySubSlot.ONE));
         assertNull(obdProperties.getSlotMessagePercentageFor(RetrySubSlot.TWO));
         assertNull(obdProperties.getSlotMessagePercentageFor(RetrySubSlot.THREE));
+    }
+
+    @Test
+    public void shouldGetRetryPropertiesUpdatingMessages(){
+        defaultSetup();
+        when(properties.getProperty("obd.retry.sent.messages.update.initial.wait")).thenReturn("2");
+        when(properties.getProperty("obd.retry.sent.messages.update.max.retry.count")).thenReturn("2");
+        when(properties.getProperty("obd.retry.sent.messages.update.retry.interval")).thenReturn("2");
+
+        assertEquals(2, (int) obdProperties.getRetryIntervalForMessageUpdate());
+        assertEquals(2, (int) obdProperties.getRetryCountForMessageUpdate());
+        assertEquals(2, (int) obdProperties.getInitialWaitForMessageUpdate());
+    }
+
+    private void defaultSetup() {
+        when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
+        when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
+
+        obdProperties = new OBDProperties(properties);
     }
 }

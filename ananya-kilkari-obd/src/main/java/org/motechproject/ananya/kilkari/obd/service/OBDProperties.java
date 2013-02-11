@@ -96,4 +96,16 @@ public class OBDProperties {
         String percentage = obdProperties.getProperty(String.format("obd.%s.sub.slot.message.percentage.to.send", subSlot.getSlotName().toLowerCase()));
         return percentage != null ? Integer.parseInt(percentage) : null;
     }
+
+    public Integer getRetryIntervalForMessageUpdate() {
+        return Integer.parseInt(obdProperties.getProperty("obd.retry.sent.messages.update.retry.interval"));
+    }
+
+    public Integer getRetryCountForMessageUpdate() {
+        return Integer.parseInt(obdProperties.getProperty("obd.retry.sent.messages.update.max.retry.count"));
+    }
+
+    public Integer getInitialWaitForMessageUpdate() {
+        return Integer.parseInt(obdProperties.getProperty("obd.retry.sent.messages.update.initial.wait"));
+    }
 }

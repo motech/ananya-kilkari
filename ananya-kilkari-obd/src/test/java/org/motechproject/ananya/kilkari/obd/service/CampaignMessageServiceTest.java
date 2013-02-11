@@ -393,6 +393,9 @@ public class CampaignMessageServiceTest {
         when(allCampaignMessages.getAllUnsentNAMessages()).thenReturn(campaignMessages);
         String csvContent = "csvContent";
         when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
+        when(obdProperties.getRetryIntervalForMessageUpdate()).thenReturn(5);
+        when(obdProperties.getInitialWaitForMessageUpdate()).thenReturn(5);
+        when(obdProperties.getRetryCountForMessageUpdate()).thenReturn(3);
 
         doThrow(new RuntimeException("myruntimeexception")).when(allCampaignMessages).update(any(CampaignMessage.class));
         campaignMessageService.sendRetrySlotMessages(RetrySubSlot.ONE);

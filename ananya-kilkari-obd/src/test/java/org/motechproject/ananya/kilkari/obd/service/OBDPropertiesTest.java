@@ -7,7 +7,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
-import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.MainSubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.RetrySubSlot;
 
 import java.util.Properties;
 
@@ -99,13 +100,13 @@ public class OBDPropertiesTest {
         when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
-        when(properties.getProperty("obd.main.sub.slot.one.cron.job.expression")).thenReturn("0 0 12 * * ?");
-        when(properties.getProperty("obd.retry.sub.slot.three.cron.job.expression")).thenReturn("0 30 14 * * ?");
+        when(properties.getProperty("obd.main.one.sub.slot.cron.job.expression")).thenReturn("0 0 12 * * ?");
+        when(properties.getProperty("obd.retry.three.sub.slot.cron.job.expression")).thenReturn("0 30 14 * * ?");
 
         OBDProperties obdProperties = new OBDProperties(properties);
 
-        assertEquals("0 0 12 * * ?", obdProperties.getMainSlotCronJobExpressionFor(SubSlot.ONE));
-        assertEquals("0 30 14 * * ?", obdProperties.getRetrySlotCronJobExpressionFor(SubSlot.THREE));
+        assertEquals("0 0 12 * * ?", obdProperties.getCronJobExpressionFor(MainSubSlot.ONE));
+        assertEquals("0 30 14 * * ?", obdProperties.getCronJobExpressionFor(RetrySubSlot.THREE));
     }
 
     @Test
@@ -113,14 +114,14 @@ public class OBDPropertiesTest {
         when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
-        when(properties.getProperty("obd.main.sub.slot.two.start.time.limit")).thenReturn("13:30");
-        when(properties.getProperty("obd.retry.sub.slot.three.start.time.limit")).thenReturn("16:45");
+        when(properties.getProperty("obd.main.two.sub.slot.start.time.limit")).thenReturn("13:30");
+        when(properties.getProperty("obd.retry.three.sub.slot.start.time.limit")).thenReturn("16:45");
         OBDProperties obdProperties = new OBDProperties(properties);
 
-        DateTime mainSlotStartTimeLimit = obdProperties.getMainSlotStartTimeLimitFor(SubSlot.TWO);
+        DateTime mainSlotStartTimeLimit = obdProperties.getSlotStartTimeLimitFor(MainSubSlot.TWO);
         assertEquals(13, mainSlotStartTimeLimit.getHourOfDay());
         assertEquals(30, mainSlotStartTimeLimit.getMinuteOfHour());
-        DateTime retrySlotStartTime = obdProperties.getRetrySlotStartTimeLimitFor(SubSlot.THREE);
+        DateTime retrySlotStartTime = obdProperties.getSlotStartTimeLimitFor(RetrySubSlot.THREE);
         assertEquals(16, retrySlotStartTime.getHourOfDay());
         assertEquals(45, retrySlotStartTime.getMinuteOfHour());
     }
@@ -130,15 +131,15 @@ public class OBDPropertiesTest {
         when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
-        when(properties.getProperty("obd.main.sub.slot.two.end.time.limit")).thenReturn("13:30");
-        when(properties.getProperty("obd.retry.sub.slot.three.end.time.limit")).thenReturn("16:45");
+        when(properties.getProperty("obd.main.two.sub.slot.end.time.limit")).thenReturn("13:30");
+        when(properties.getProperty("obd.retry.three.sub.slot.end.time.limit")).thenReturn("16:45");
 
         OBDProperties obdProperties = new OBDProperties(properties);
 
-        DateTime mainSlotStartTimeLimit = obdProperties.getMainSlotEndTimeLimitFor(SubSlot.TWO);
+        DateTime mainSlotStartTimeLimit = obdProperties.getSlotEndTimeLimitFor(MainSubSlot.TWO);
         assertEquals(13, mainSlotStartTimeLimit.getHourOfDay());
         assertEquals(30, mainSlotStartTimeLimit.getMinuteOfHour());
-        DateTime retrySlotStartTime = obdProperties.getRetrySlotEndTimeLimitFor(SubSlot.THREE);
+        DateTime retrySlotStartTime = obdProperties.getSlotEndTimeLimitFor(RetrySubSlot.THREE);
         assertEquals(16, retrySlotStartTime.getHourOfDay());
         assertEquals(45, retrySlotStartTime.getMinuteOfHour());
     }
@@ -148,16 +149,16 @@ public class OBDPropertiesTest {
         when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
-        when(properties.getProperty("obd.main.sub.slot.one.start.time")).thenReturn("String1");
-        when(properties.getProperty("obd.main.sub.slot.three.end.time")).thenReturn("String2");
-        when(properties.getProperty("obd.retry.sub.slot.one.start.time")).thenReturn("String3");
-        when(properties.getProperty("obd.retry.sub.slot.three.end.time")).thenReturn("String4");
+        when(properties.getProperty("obd.main.one.sub.slot.start.time")).thenReturn("String1");
+        when(properties.getProperty("obd.main.three.sub.slot.end.time")).thenReturn("String2");
+        when(properties.getProperty("obd.retry.one.sub.slot.start.time")).thenReturn("String3");
+        when(properties.getProperty("obd.retry.three.sub.slot.end.time")).thenReturn("String4");
         OBDProperties obdProperties = new OBDProperties(properties);
 
-        String mainSlotStartTime = obdProperties.getMainSlotStartTimeFor(SubSlot.ONE);
-        String mainSlotEndTime = obdProperties.getMainSlotEndTimeFor(SubSlot.THREE);
-        String retrySlotStartTime = obdProperties.getRetrySlotStartTimeFor(SubSlot.ONE);
-        String retrySlotEndTime = obdProperties.getRetrySlotEndTimeFor(SubSlot.THREE);
+        String mainSlotStartTime = obdProperties.getSlotStartTimeFor(MainSubSlot.ONE);
+        String mainSlotEndTime = obdProperties.getSlotEndTimeFor(MainSubSlot.THREE);
+        String retrySlotStartTime = obdProperties.getSlotStartTimeFor(RetrySubSlot.ONE);
+        String retrySlotEndTime = obdProperties.getSlotEndTimeFor(RetrySubSlot.THREE);
 
         assertEquals("String1", mainSlotStartTime);
         assertEquals("String2", mainSlotEndTime);
@@ -170,12 +171,15 @@ public class OBDPropertiesTest {
         when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.so.status.codes")).thenReturn("");
-        when(properties.getProperty("obd.main.sub.slot.one.message.percentage.to.send")).thenReturn("30");
-        when(properties.getProperty("obd.main.sub.slot.two.message.percentage.to.send")).thenReturn("60");
+        when(properties.getProperty("obd.main.one.sub.slot.message.percentage.to.send")).thenReturn("30");
+        when(properties.getProperty("obd.main.two.sub.slot.message.percentage.to.send")).thenReturn("60");
         OBDProperties obdProperties = new OBDProperties(properties);
 
-        assertEquals(30, (int) obdProperties.getMainSlotMessagePercentageFor(SubSlot.ONE));
-        assertEquals(60, (int) obdProperties.getMainSlotMessagePercentageFor(SubSlot.TWO));
-        assertNull(obdProperties.getMainSlotMessagePercentageFor(SubSlot.THREE));
+        assertEquals(30, (int) obdProperties.getSlotMessagePercentageFor(MainSubSlot.ONE));
+        assertEquals(60, (int) obdProperties.getSlotMessagePercentageFor(MainSubSlot.TWO));
+        assertNull(obdProperties.getSlotMessagePercentageFor(MainSubSlot.THREE));
+        assertNull(obdProperties.getSlotMessagePercentageFor(RetrySubSlot.ONE));
+        assertNull(obdProperties.getSlotMessagePercentageFor(RetrySubSlot.TWO));
+        assertNull(obdProperties.getSlotMessagePercentageFor(RetrySubSlot.THREE));
     }
 }

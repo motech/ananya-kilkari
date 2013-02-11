@@ -38,8 +38,8 @@ public class SecondMainSubSlotMessagesSenderJobTest {
     @Before
     public void setUp() {
         initMocks(this);
-        when(obdProperties.getMainSlotCronJobExpressionFor(SubSlot.TWO)).thenReturn(cronJobExpression);
-        secondMainSubSlotMessagesSenderJob = new SecondMainSubSlotMessagesSenderJob(campaignMessageService, retryService, obdProperties);
+        when(obdProperties.getCronJobExpressionFor(MainSubSlot.TWO)).thenReturn(cronJobExpression);
+        secondMainSubSlotMessagesSenderJob = new SecondMainSubSlotMessagesSenderJobStub(campaignMessageService, retryService, obdProperties);
     }
 
     @Test
@@ -56,15 +56,15 @@ public class SecondMainSubSlotMessagesSenderJobTest {
 
         MotechEvent motechEvent = cronJob.getMotechEvent();
         assertEquals("obd.send.main.sub.slot.two.messages", motechEvent.getSubject());
-        assertEquals(SubSlot.TWO, motechEvent.getParameters().get(SUB_SLOT_KEY));
-        assertEquals(SubSlot.TWO.name(), motechEvent.getParameters().get(MotechSchedulerService.JOB_ID_KEY));
+        assertEquals(MainSubSlot.TWO, motechEvent.getParameters().get(SUB_SLOT_KEY));
+        assertEquals(MainSubSlot.TWO.getSlotName(), motechEvent.getParameters().get(MotechSchedulerService.JOB_ID_KEY));
     }
 
     @Test
     public void shouldScheduleRetryJobToSendNewMessagesToOBD() {
         DateTime before = DateTime.now();
         Map<String, Object> expectedParameters = new HashMap<>();
-        expectedParameters.put(SUB_SLOT_KEY, SubSlot.TWO);
+        expectedParameters.put(SUB_SLOT_KEY, MainSubSlot.TWO);
 
         secondMainSubSlotMessagesSenderJob.handleMessages(new MotechEvent("", expectedParameters));
 
@@ -84,16 +84,16 @@ public class SecondMainSubSlotMessagesSenderJobTest {
     public void shouldInvokeCampaignMessageServiceToSendSecondMainSubSlotMessagesWithRetryAndFulfillTheRetryIfSuccessful() {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(16).withMinuteOfHour(55).getMillis());
 
-        final SubSlot subSlot = SubSlot.TWO;
-        when(obdProperties.getMainSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(16).withMinuteOfHour(00));
-        when(obdProperties.getMainSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(17).withMinuteOfHour(00));
+        final MainSubSlot subSlot = MainSubSlot.TWO;
+        when(obdProperties.getSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(16).withMinuteOfHour(00));
+        when(obdProperties.getSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(17).withMinuteOfHour(00));
 
-        secondMainSubSlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        secondMainSubSlotMessagesSenderJob.handleMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
 
-        verify(obdProperties).getMainSlotStartTimeLimitFor(subSlot);
+        verify(obdProperties).getSlotStartTimeLimitFor(subSlot);
         verify(campaignMessageService).sendSecondMainSubSlotMessages(subSlot);
 
         verify(retryService).fulfill("myExternalId", "obd-send-main-sub-slot-two-messages-group");
@@ -105,13 +105,13 @@ public class SecondMainSubSlotMessagesSenderJobTest {
     public void shouldInvokeCampaignMessageServiceToSendNewMessagesWithRetryAndNotFulfillTheRetryIfNotSuccessful() {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(18).withMinuteOfHour(0).getMillis());
 
-        final SubSlot subSlot = SubSlot.TWO;
-        when(obdProperties.getMainSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(17).withMinuteOfHour(45));
-        when(obdProperties.getMainSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(18).withMinuteOfHour(45));
+        final MainSubSlot subSlot = MainSubSlot.TWO;
+        when(obdProperties.getSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(17).withMinuteOfHour(45));
+        when(obdProperties.getSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(18).withMinuteOfHour(45));
 
         doThrow(new RuntimeException("some exception")).when(campaignMessageService).sendSecondMainSubSlotMessages(subSlot);
 
-        secondMainSubSlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        secondMainSubSlotMessagesSenderJob.handleMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
@@ -125,11 +125,11 @@ public class SecondMainSubSlotMessagesSenderJobTest {
     public void shouldNotSendNewMessagesIfTimeIsAfterTheNewMessagesSlot() {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(13).withMinuteOfHour(0).getMillis());
 
-        final SubSlot subSlot = SubSlot.TWO;
-        when(obdProperties.getMainSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(11));
-        when(obdProperties.getMainSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(12));
+        final MainSubSlot subSlot = MainSubSlot.TWO;
+        when(obdProperties.getSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(11));
+        when(obdProperties.getSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(12));
 
-        secondMainSubSlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        secondMainSubSlotMessagesSenderJob.handleMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
@@ -138,5 +138,14 @@ public class SecondMainSubSlotMessagesSenderJobTest {
         verify(retryService).fulfill("myExternalId", "obd-send-main-sub-slot-two-messages-group");
 
         DateTimeUtils.setCurrentMillisSystem();
+    }
+
+    class SecondMainSubSlotMessagesSenderJobStub extends SecondMainSubSlotMessagesSenderJob {
+        public SecondMainSubSlotMessagesSenderJobStub(CampaignMessageService campaignMessageService, RetryService retryService, OBDProperties obdProperties) {
+            super();
+            this.campaignMessageService = campaignMessageService;
+            this.retryService = retryService;
+            this.obdProperties = obdProperties;
+        }
     }
 }

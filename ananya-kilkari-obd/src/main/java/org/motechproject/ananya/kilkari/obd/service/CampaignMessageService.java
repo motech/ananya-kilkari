@@ -6,7 +6,8 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.MainSubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.OBDSubSlot;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTask;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTaskExecutor;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
@@ -48,50 +49,34 @@ public class CampaignMessageService {
         allCampaignMessages.add(new CampaignMessage(subscriptionId, messageId, creationDate, msisdn, operator, messageExpiryDate));
     }
 
-    public void sendFirstMainSubSlotMessages(final SubSlot subSlot) {
+    public void sendFirstMainSubSlotMessages(final OBDSubSlot subSlot) {
         List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
-        int numberOfMessagesToSend = (int) Math.ceil(allNewMessages.size() * obdProperties.getMainSlotMessagePercentageFor(subSlot) / 100.0);
+        int numberOfMessagesToSend = (int) Math.ceil(allNewMessages.size() * obdProperties.getSlotMessagePercentageFor(subSlot) / 100.0);
         List<CampaignMessage> messagesToSend = allNewMessages.subList(0, numberOfMessagesToSend);
-        sendMainSlotMessages(subSlot, messagesToSend);
+        sendMessagesToOBD(messagesToSend, subSlot);
     }
 
-    public void sendSecondMainSubSlotMessages(final SubSlot subSlot) {
+    public void sendSecondMainSubSlotMessages(final OBDSubSlot subSlot) {
         List<CampaignMessage> messagesToSend = allCampaignMessages.getAllUnsentRetryMessages();
         List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
         messagesToSend.addAll(getNewMessagesToSend(subSlot, allNewMessages));
-        sendMainSlotMessages(subSlot, messagesToSend);
+        sendMessagesToOBD(messagesToSend, subSlot);
     }
 
-    private List<CampaignMessage> getNewMessagesToSend(SubSlot subSlot, List<CampaignMessage> allNewMessages) {
-        double ratioOfNewMessagesToSend = obdProperties.getMainSlotMessagePercentageFor(subSlot) / (100.0 - obdProperties.getMainSlotMessagePercentageFor(SubSlot.ONE));
+    private List<CampaignMessage> getNewMessagesToSend(OBDSubSlot subSlot, List<CampaignMessage> allNewMessages) {
+        double ratioOfNewMessagesToSend = obdProperties.getSlotMessagePercentageFor(subSlot) / (100.0 - obdProperties.getSlotMessagePercentageFor(MainSubSlot.ONE));
         int numberOfMessagesToSend = (int) Math.ceil(allNewMessages.size() * ratioOfNewMessagesToSend);
         return allNewMessages.subList(0, numberOfMessagesToSend);
     }
 
-    public void sendThirdMainSubSlotMessages(final SubSlot subSlot) {
+    public void sendThirdMainSubSlotMessages(final OBDSubSlot subSlot) {
         List<CampaignMessage> allNewAndNAMessages = allCampaignMessages.getAllUnsentNewAndNAMessages();
-        sendMainSlotMessages(subSlot, allNewAndNAMessages);
+        sendMessagesToOBD(allNewAndNAMessages, subSlot);
     }
 
-    private void sendMainSlotMessages(final SubSlot subSlot, List<CampaignMessage> messagesToSend) {
-        GatewayAction gatewayAction = new GatewayAction() {
-            @Override
-            public void send(String content) {
-                onMobileOBDGateway.sendMainSlotMessages(content, subSlot);
-            }
-        };
-        sendMessagesToOBD(messagesToSend, gatewayAction);
-    }
-
-    public void sendRetrySlotMessages(final SubSlot subSlot) {
+    public void sendRetrySlotMessages(final OBDSubSlot subSlot) {
         List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentNAMessages();
-        GatewayAction gatewayAction = new GatewayAction() {
-            @Override
-            public void send(String content) {
-                onMobileOBDGateway.sendRetrySlotMessages(content, subSlot);
-            }
-        };
-        sendMessagesToOBD(allRetryMessages, gatewayAction);
+        sendMessagesToOBD(allRetryMessages, subSlot);
     }
 
     public void deleteCampaignMessageIfExists(String subscriptionId, String messageId) {
@@ -149,12 +134,12 @@ public class CampaignMessageService {
         return obdRetryEndDate.isBefore(weekEndingDate) ? obdRetryEndDate : weekEndingDate;
     }
 
-    private void sendMessagesToOBD(List<CampaignMessage> messages, GatewayAction gatewayAction) {
+    private void sendMessagesToOBD(List<CampaignMessage> messages, OBDSubSlot subSlot) {
         logger.info(String.format("Sending %s campaign messages to obd", messages.size()));
         if (messages.isEmpty())
             return;
         String campaignMessageCSVContent = campaignMessageCSVBuilder.getCSV(messages);
-        gatewayAction.send(campaignMessageCSVContent);
+        onMobileOBDGateway.sendMessages(campaignMessageCSVContent, subSlot);
 
         for (final CampaignMessage message : messages) {
             try {

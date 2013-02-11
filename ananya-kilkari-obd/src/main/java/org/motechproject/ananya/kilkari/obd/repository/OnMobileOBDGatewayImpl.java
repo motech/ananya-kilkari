@@ -13,7 +13,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.profile.ProductionProfile;
-import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.OBDSubSlot;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.service.utils.JsonUtils;
@@ -49,15 +49,9 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     }
 
     @Override
-    public void sendMainSlotMessages(String content, SubSlot subSlot) {
+    public void sendMessages(String content, OBDSubSlot subSlot) {
         String date = getCurrentDate();
-        send(content, String.format("%s%s", date, obdProperties.getMainSlotStartTimeFor(subSlot)), String.format("%s%s", date, obdProperties.getMainSlotEndTimeFor(subSlot)));
-    }
-
-    @Override
-    public void sendRetrySlotMessages(String content, SubSlot subSlot) {
-        String date = getCurrentDate();
-        send(content, String.format("%s%s", date, obdProperties.getRetrySlotStartTimeFor(subSlot)), String.format("%s%s", date, obdProperties.getRetrySlotEndTimeFor(subSlot)));
+        send(content, String.format("%s%s", date, obdProperties.getSlotStartTimeFor(subSlot)), String.format("%s%s", date, obdProperties.getSlotEndTimeFor(subSlot)));
     }
 
     private String getCurrentDate() {

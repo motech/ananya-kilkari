@@ -29,7 +29,7 @@ public class FirstMainSubSlotMessagesSenderJobIT extends SpringIntegrationTest {
     @Test
     public void shouldCreateARetrySchedule() {
         HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put("sub_slot", SubSlot.THREE);
+        parameters.put("sub_slot", MainSubSlot.THREE);
         firstMainSubSlotMessagesSenderJob.handleMessages(new MotechEvent("subject", parameters));
     }
 

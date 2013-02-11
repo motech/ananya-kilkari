@@ -16,7 +16,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.MainSubSlot;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
@@ -65,14 +65,14 @@ public class OnMobileOBDGatewayImplTest {
         when(statusLine.getReasonPhrase()).thenReturn("created");
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
-        when(obdProperties.getMainSlotStartTimeFor(SubSlot.ONE)).thenReturn("130000");
-        when(obdProperties.getMainSlotEndTimeFor(SubSlot.ONE)).thenReturn("160000");
+        when(obdProperties.getSlotStartTimeFor(MainSubSlot.ONE)).thenReturn("130000");
+        when(obdProperties.getSlotEndTimeFor(MainSubSlot.ONE)).thenReturn("160000");
         String expectedContent = "expectedContent";
 
-        onMobileOBDGateway.sendMainSlotMessages(expectedContent, SubSlot.ONE);
+        onMobileOBDGateway.sendMessages(expectedContent, MainSubSlot.ONE);
 
-        verify(obdProperties).getMainSlotStartTimeFor(SubSlot.ONE);
-        verify(obdProperties).getMainSlotEndTimeFor(SubSlot.ONE);
+        verify(obdProperties).getSlotStartTimeFor(MainSubSlot.ONE);
+        verify(obdProperties).getSlotEndTimeFor(MainSubSlot.ONE);
 
         ArgumentCaptor<HttpUriRequest> captor = ArgumentCaptor.forClass(HttpUriRequest.class);
         verify(httpClient).execute(captor.capture());
@@ -92,40 +92,6 @@ public class OnMobileOBDGatewayImplTest {
     }
 
     @Test
-    public void shouldPostTheMessagesFileToOnMobileInRetrySlot() throws IOException {
-        HttpResponse httpResponse = Mockito.mock(HttpResponse.class);
-        StatusLine statusLine = Mockito.mock(StatusLine.class);
-        when(statusLine.getStatusCode()).thenReturn(200);
-        when(statusLine.getReasonPhrase()).thenReturn("created");
-        when(httpResponse.getStatusLine()).thenReturn(statusLine);
-        when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
-        when(obdProperties.getRetrySlotStartTimeFor(SubSlot.THREE)).thenReturn("180000");
-        when(obdProperties.getRetrySlotEndTimeFor(SubSlot.THREE)).thenReturn("200000");
-        String expectedContent = "expectedContent";
-
-        onMobileOBDGateway.sendRetrySlotMessages(expectedContent, SubSlot.THREE);
-
-        verify(obdProperties).getRetrySlotStartTimeFor(SubSlot.THREE);
-        verify(obdProperties).getRetrySlotStartTimeFor(SubSlot.THREE);
-
-        ArgumentCaptor<HttpUriRequest> captor = ArgumentCaptor.forClass(HttpUriRequest.class);
-        verify(httpClient).execute(captor.capture());
-        HttpPost httpPost = (HttpPost) captor.getValue();
-        MultipartEntity multipartEntity = (MultipartEntity) httpPost.getEntity();
-
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd");
-        String date = dateTimeFormatter.print(DateTime.now());
-
-        assertEquals("mybaseurl", httpPost.getURI().toString());
-
-        String actualContent = readRequest(multipartEntity);
-        assertTrue(actualContent.contains(expectedContent));
-        assertTrue(actualContent.contains("form-data; name=\"myfile\"; filename=\"myfile.txt\""));
-        assertTrue(actualContent.contains(String.format("form-data; name=\"%s\"%s%s", "startDate", date, "180000")));
-        assertTrue(actualContent.contains(String.format("form-data; name=\"%s\"%s%s", "endDate", date, "200000")));
-    }
-
-    @Test
     public void shouldThrowExceptionForAFailureResponse() throws IOException {
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("Sending messages to OBD failed with code: 500, reason: failed");
@@ -138,7 +104,7 @@ public class OnMobileOBDGatewayImplTest {
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
 
-        onMobileOBDGateway.sendMainSlotMessages("content", SubSlot.ONE);
+        onMobileOBDGateway.sendMessages("content", MainSubSlot.ONE);
     }
 
     private String readRequest(MultipartEntity multipartEntity) throws IOException {

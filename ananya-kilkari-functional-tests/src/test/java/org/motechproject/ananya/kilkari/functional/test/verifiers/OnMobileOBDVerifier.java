@@ -5,12 +5,13 @@ import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunner;
 import org.motechproject.ananya.kilkari.functional.test.utils.TimedRunnerResponse;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.StubOnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.OBDSubSlot;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -57,35 +58,28 @@ public class OnMobileOBDVerifier {
 
     private class OnMobileOBDGatewayBehavior implements OnMobileOBDGateway {
 
-        private boolean newMessagesSent;
-        private boolean retryMessagesSent;
+        private Boolean newMessagesSent;
+        private Boolean retryMessagesSent;
         private ArrayList<OnMobileCampaignMessage> newCampaignMessages = new ArrayList<>();
         private ArrayList<OnMobileCampaignMessage> retryCampaignMessages = new ArrayList<>();
-
-        @Override
-        public void sendMainSlotMessages(String content, SubSlot subSlot) {
-            String[] lines = content.split("\n");
-            for (String line : lines) {
-                newCampaignMessages.add(new OnMobileCampaignMessage(line));
-            }
-            newMessagesSent = true;
-        }
-
-        @Override
-        public void sendRetrySlotMessages(String content, SubSlot subSlot) {
-            String[] lines = content.split("\n");
-            for (String line : lines) {
-                retryCampaignMessages.add(new OnMobileCampaignMessage(line));
-            }
-            retryMessagesSent = true;
-        }
-
 
         public void reset() {
             newMessagesSent = false;
             retryMessagesSent = false;
             newCampaignMessages = new ArrayList<>();
             retryCampaignMessages = new ArrayList<>();
+        }
+
+        @Override
+        public void sendMessages(String content, OBDSubSlot subSlot) {
+            String[] lines = content.split("\n");
+            boolean isRetrySlot = subSlot.getSlotName().contains("RETRY");
+            List<OnMobileCampaignMessage> campaignMessages = isRetrySlot ? retryCampaignMessages : newCampaignMessages;
+            Boolean messageSent = isRetrySlot ? retryMessagesSent : newMessagesSent;
+            for (String line : lines) {
+                campaignMessages.add(new OnMobileCampaignMessage(line));
+            }
+            messageSent = true;
         }
 
         @Override

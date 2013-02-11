@@ -12,7 +12,8 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.MainSubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.RetrySubSlot;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTask;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTaskExecutor;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
@@ -96,15 +97,15 @@ public class CampaignMessageServiceTest {
         List<CampaignMessage> campaignMessages = Arrays.asList(campaignMessage1, campaignMessage2, campaignMessage3, campaignMessage4);
         List<CampaignMessage> expectedCampaignMessagesToBeSent = Arrays.asList(campaignMessage1, campaignMessage2);
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(campaignMessages);
-        when(obdProperties.getMainSlotMessagePercentageFor(SubSlot.ONE)).thenReturn(30);
+        when(obdProperties.getSlotMessagePercentageFor(MainSubSlot.ONE)).thenReturn(30);
         String csvContent = "csvContent";
         when(campaignMessageCSVBuilder.getCSV(expectedCampaignMessagesToBeSent)).thenReturn(csvContent);
 
-        campaignMessageService.sendFirstMainSubSlotMessages(SubSlot.ONE);
+        campaignMessageService.sendFirstMainSubSlotMessages(MainSubSlot.ONE);
 
         verify(campaignMessageCSVBuilder).getCSV(expectedCampaignMessagesToBeSent);
         verify(allCampaignMessages).getAllUnsentNewMessages();
-        verify(onMobileOBDGateway).sendMainSlotMessages(csvContent, SubSlot.ONE);
+        verify(onMobileOBDGateway).sendMessages(csvContent, MainSubSlot.ONE);
         verifyCampaignMessageUpdate(expectedCampaignMessagesToBeSent);
     }
 
@@ -116,13 +117,13 @@ public class CampaignMessageServiceTest {
         CampaignMessage expectedCampaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", DateTime.now(), "1234567890", "operator1", DateTime.now().plusDays(2));
         CampaignMessage expectedCampaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", DateTime.now(), "1234567891", "operator2", DateTime.now().plusDays(2));
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
-        when(obdProperties.getMainSlotMessagePercentageFor(SubSlot.ONE)).thenReturn(100);
+        when(obdProperties.getSlotMessagePercentageFor(MainSubSlot.ONE)).thenReturn(100);
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(campaignMessages);
 
-        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendMainSlotMessages(anyString(), any(SubSlot.class));
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendMessages(anyString(), any(MainSubSlot.class));
 
         try {
-            campaignMessageService.sendFirstMainSubSlotMessages(SubSlot.ONE);
+            campaignMessageService.sendFirstMainSubSlotMessages(MainSubSlot.ONE);
         } finally {
             verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         }
@@ -137,10 +138,10 @@ public class CampaignMessageServiceTest {
         String csvContent = "csvContent";
         when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
 
-        campaignMessageService.sendRetrySlotMessages(SubSlot.ONE);
+        campaignMessageService.sendRetrySlotMessages(RetrySubSlot.ONE);
 
         verify(allCampaignMessages).getAllUnsentNAMessages();
-        verify(onMobileOBDGateway).sendRetrySlotMessages(csvContent, SubSlot.ONE);
+        verify(onMobileOBDGateway).sendMessages(csvContent, RetrySubSlot.ONE);
         verifyCampaignMessageUpdate(campaignMessages);
     }
 
@@ -154,10 +155,10 @@ public class CampaignMessageServiceTest {
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentNAMessages()).thenReturn(campaignMessages);
 
-        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendRetrySlotMessages(anyString(), any(SubSlot.class));
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendMessages(anyString(), any(RetrySubSlot.class));
 
         try {
-            campaignMessageService.sendRetrySlotMessages(SubSlot.THREE);
+            campaignMessageService.sendRetrySlotMessages(RetrySubSlot.THREE);
         } finally {
             verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         }
@@ -167,7 +168,7 @@ public class CampaignMessageServiceTest {
     public void shouldNotSendFirstMainSubSlotMessagesIfNoneExist() {
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(new ArrayList<CampaignMessage>());
 
-        campaignMessageService.sendFirstMainSubSlotMessages(SubSlot.ONE);
+        campaignMessageService.sendFirstMainSubSlotMessages(MainSubSlot.ONE);
 
         verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         verifyZeroInteractions(onMobileOBDGateway);
@@ -177,7 +178,7 @@ public class CampaignMessageServiceTest {
     public void shouldNotSendRetrySlotMessagesIfNoneExist() {
         when(allCampaignMessages.getAllUnsentNAMessages()).thenReturn(new ArrayList<CampaignMessage>());
 
-        campaignMessageService.sendRetrySlotMessages(SubSlot.ONE);
+        campaignMessageService.sendRetrySlotMessages(RetrySubSlot.ONE);
 
         verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         verifyZeroInteractions(onMobileOBDGateway);
@@ -294,10 +295,10 @@ public class CampaignMessageServiceTest {
         String csvContent = "csvContent";
         when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
 
-        campaignMessageService.sendThirdMainSubSlotMessages(SubSlot.THREE);
+        campaignMessageService.sendThirdMainSubSlotMessages(MainSubSlot.THREE);
 
         verify(allCampaignMessages).getAllUnsentNewAndNAMessages();
-        verify(onMobileOBDGateway).sendMainSlotMessages(csvContent, SubSlot.THREE);
+        verify(onMobileOBDGateway).sendMessages(csvContent, MainSubSlot.THREE);
         verifyCampaignMessageUpdate(campaignMessages);
     }
 
@@ -311,10 +312,10 @@ public class CampaignMessageServiceTest {
         List<CampaignMessage> campaignMessages = Arrays.asList(expectedCampaignMessage1, expectedCampaignMessage2);
         when(allCampaignMessages.getAllUnsentNewAndNAMessages()).thenReturn(campaignMessages);
 
-        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendMainSlotMessages(anyString(), any(SubSlot.class));
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendMessages(anyString(), any(MainSubSlot.class));
 
         try {
-            campaignMessageService.sendThirdMainSubSlotMessages(SubSlot.THREE);
+            campaignMessageService.sendThirdMainSubSlotMessages(MainSubSlot.THREE);
         } finally {
             verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         }
@@ -324,7 +325,7 @@ public class CampaignMessageServiceTest {
     public void shouldNotSendThirdMainSubSlotMessagesIfNoneExist() {
         when(allCampaignMessages.getAllUnsentNewAndNAMessages()).thenReturn(new ArrayList<CampaignMessage>());
 
-        campaignMessageService.sendThirdMainSubSlotMessages(SubSlot.THREE);
+        campaignMessageService.sendThirdMainSubSlotMessages(MainSubSlot.THREE);
 
         verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         verifyZeroInteractions(onMobileOBDGateway);
@@ -343,14 +344,14 @@ public class CampaignMessageServiceTest {
         when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(retryCampaignMessages);
         String csvContent = "csvContent";
         when(campaignMessageCSVBuilder.getCSV(expectedCampaignMessagesToBeSent)).thenReturn(csvContent);
-        when(obdProperties.getMainSlotMessagePercentageFor(SubSlot.TWO)).thenReturn(40);
-        when(obdProperties.getMainSlotMessagePercentageFor(SubSlot.ONE)).thenReturn(30);
+        when(obdProperties.getSlotMessagePercentageFor(MainSubSlot.TWO)).thenReturn(40);
+        when(obdProperties.getSlotMessagePercentageFor(MainSubSlot.ONE)).thenReturn(30);
 
-        campaignMessageService.sendSecondMainSubSlotMessages(SubSlot.TWO);
+        campaignMessageService.sendSecondMainSubSlotMessages(MainSubSlot.TWO);
 
         verify(campaignMessageCSVBuilder).getCSV(expectedCampaignMessagesToBeSent);
         verify(allCampaignMessages).getAllUnsentRetryMessages();
-        verify(onMobileOBDGateway).sendMainSlotMessages(csvContent, SubSlot.TWO);
+        verify(onMobileOBDGateway).sendMessages(csvContent, MainSubSlot.TWO);
         verifyCampaignMessageUpdate(expectedCampaignMessagesToBeSent);
     }
 
@@ -365,10 +366,10 @@ public class CampaignMessageServiceTest {
         when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(campaignMessages);
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(campaignMessages);
 
-        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendMainSlotMessages(anyString(), any(SubSlot.class));
+        doThrow(new RuntimeException("myruntimeexception")).when(onMobileOBDGateway).sendMessages(anyString(), any(MainSubSlot.class));
 
         try {
-            campaignMessageService.sendSecondMainSubSlotMessages(SubSlot.TWO);
+            campaignMessageService.sendSecondMainSubSlotMessages(MainSubSlot.TWO);
         } finally {
             verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         }
@@ -379,7 +380,7 @@ public class CampaignMessageServiceTest {
         when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(new ArrayList<CampaignMessage>());
         when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(new ArrayList<CampaignMessage>());
 
-        campaignMessageService.sendSecondMainSubSlotMessages(SubSlot.TWO);
+        campaignMessageService.sendSecondMainSubSlotMessages(MainSubSlot.TWO);
 
         verify(allCampaignMessages, never()).update(any(CampaignMessage.class));
         verifyZeroInteractions(onMobileOBDGateway);
@@ -394,7 +395,7 @@ public class CampaignMessageServiceTest {
         when(campaignMessageCSVBuilder.getCSV(campaignMessages)).thenReturn(csvContent);
 
         doThrow(new RuntimeException("myruntimeexception")).when(allCampaignMessages).update(any(CampaignMessage.class));
-        campaignMessageService.sendRetrySlotMessages(SubSlot.ONE);
+        campaignMessageService.sendRetrySlotMessages(RetrySubSlot.ONE);
         ArgumentCaptor<RetryTask> retryTaskArgumentCaptor = ArgumentCaptor.forClass(RetryTask.class);
         verify(retryTaskExecutor).run(eq(5), eq(5), eq(3), retryTaskArgumentCaptor.capture());
         RetryTask retryTask = retryTaskArgumentCaptor.getValue();

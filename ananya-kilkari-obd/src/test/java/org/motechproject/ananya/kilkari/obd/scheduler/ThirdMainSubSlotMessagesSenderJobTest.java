@@ -38,8 +38,8 @@ public class ThirdMainSubSlotMessagesSenderJobTest {
     @Before
     public void setUp() {
         initMocks(this);
-        when(obdProperties.getMainSlotCronJobExpressionFor(SubSlot.THREE)).thenReturn(cronJobExpression);
-        thirdMainSubSlotMessagesSenderJob = new ThirdMainSubSlotMessagesSenderJob(campaignMessageService, retryService, obdProperties);
+        when(obdProperties.getCronJobExpressionFor(MainSubSlot.THREE)).thenReturn(cronJobExpression);
+        thirdMainSubSlotMessagesSenderJob = new ThirdMainSubSlotMessagesSenderJobStub(campaignMessageService, retryService, obdProperties);
     }
 
     @Test
@@ -56,15 +56,15 @@ public class ThirdMainSubSlotMessagesSenderJobTest {
 
         MotechEvent motechEvent = cronJob.getMotechEvent();
         assertEquals("obd.send.main.sub.slot.three.messages", motechEvent.getSubject());
-        assertEquals(SubSlot.THREE, motechEvent.getParameters().get(SUB_SLOT_KEY));
-        assertEquals(SubSlot.THREE.name(), motechEvent.getParameters().get(MotechSchedulerService.JOB_ID_KEY));
+        assertEquals(MainSubSlot.THREE, motechEvent.getParameters().get(SUB_SLOT_KEY));
+        assertEquals(MainSubSlot.THREE.getSlotName(), motechEvent.getParameters().get(MotechSchedulerService.JOB_ID_KEY));
     }
 
     @Test
     public void shouldScheduleRetryJobToSendNewMessagesToOBD() {
         DateTime before = DateTime.now();
         Map<String, Object> expectedParameters = new HashMap<>();
-        expectedParameters.put(SUB_SLOT_KEY, SubSlot.THREE);
+        expectedParameters.put(SUB_SLOT_KEY, MainSubSlot.THREE);
 
         thirdMainSubSlotMessagesSenderJob.handleMessages(new MotechEvent("", expectedParameters));
 
@@ -84,16 +84,16 @@ public class ThirdMainSubSlotMessagesSenderJobTest {
     public void shouldInvokeCampaignMessageServiceToSendThirdMainSubSlotMessagesWithRetryAndFulfillTheRetryIfSuccessful() {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(11).withMinuteOfHour(0).getMillis());
 
-        final SubSlot subSlot = SubSlot.THREE;
-        when(obdProperties.getMainSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(10).withMinuteOfHour(45));
-        when(obdProperties.getMainSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(11).withMinuteOfHour(45));
+        final MainSubSlot subSlot = MainSubSlot.THREE;
+        when(obdProperties.getSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(10).withMinuteOfHour(45));
+        when(obdProperties.getSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(11).withMinuteOfHour(45));
 
-        thirdMainSubSlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        thirdMainSubSlotMessagesSenderJob.handleMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
 
-        verify(obdProperties).getMainSlotStartTimeLimitFor(subSlot);
+        verify(obdProperties).getSlotStartTimeLimitFor(subSlot);
         verify(campaignMessageService).sendThirdMainSubSlotMessages(subSlot);
 
         verify(retryService).fulfill("myExternalId", "obd-send-main-sub-slot-three-messages-group");
@@ -105,13 +105,13 @@ public class ThirdMainSubSlotMessagesSenderJobTest {
     public void shouldInvokeCampaignMessageServiceToSendNewMessagesWithRetryAndNotFulfillTheRetryIfNotSuccessful() {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(18).withMinuteOfHour(0).getMillis());
 
-        final SubSlot subSlot = SubSlot.THREE;
-        when(obdProperties.getMainSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(17).withMinuteOfHour(45));
-        when(obdProperties.getMainSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(18).withMinuteOfHour(45));
+        final MainSubSlot subSlot = MainSubSlot.THREE;
+        when(obdProperties.getSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(17).withMinuteOfHour(45));
+        when(obdProperties.getSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(18).withMinuteOfHour(45));
 
         doThrow(new RuntimeException("some exception")).when(campaignMessageService).sendThirdMainSubSlotMessages(subSlot);
 
-        thirdMainSubSlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        thirdMainSubSlotMessagesSenderJob.handleMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
@@ -125,11 +125,11 @@ public class ThirdMainSubSlotMessagesSenderJobTest {
     public void shouldNotSendNewMessagesIfTimeIsAfterTheNewMessagesSlot() {
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().withHourOfDay(13).withMinuteOfHour(0).getMillis());
 
-        final SubSlot subSlot = SubSlot.THREE;
-        when(obdProperties.getMainSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(11));
-        when(obdProperties.getMainSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(12));
+        final MainSubSlot subSlot = MainSubSlot.THREE;
+        when(obdProperties.getSlotStartTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(11));
+        when(obdProperties.getSlotEndTimeLimitFor(subSlot)).thenReturn(DateTime.now().withHourOfDay(12));
 
-        thirdMainSubSlotMessagesSenderJob.sendMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
+        thirdMainSubSlotMessagesSenderJob.handleMessagesWithRetry(new MotechEvent("some subject", new HashMap<String, Object>() {{
             put("EXTERNAL_ID", "myExternalId");
             put(SUB_SLOT_KEY, subSlot);
         }}));
@@ -139,4 +139,14 @@ public class ThirdMainSubSlotMessagesSenderJobTest {
 
         DateTimeUtils.setCurrentMillisSystem();
     }
+
+    class ThirdMainSubSlotMessagesSenderJobStub extends ThirdMainSubSlotMessagesSenderJob {
+        public ThirdMainSubSlotMessagesSenderJobStub(CampaignMessageService campaignMessageService, RetryService retryService, OBDProperties obdProperties) {
+            super();
+            this.campaignMessageService = campaignMessageService;
+            this.retryService = retryService;
+            this.obdProperties = obdProperties;
+        }
+    }
+
 }

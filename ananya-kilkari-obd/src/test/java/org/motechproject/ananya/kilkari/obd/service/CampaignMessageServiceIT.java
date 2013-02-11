@@ -12,7 +12,8 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.StubOnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.obd.scheduler.SubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.MainSubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.RetrySubSlot;
 import org.motechproject.ananya.kilkari.obd.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -156,9 +157,9 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
-        campaignMessageService.sendFirstMainSubSlotMessages(SubSlot.ONE);
+        campaignMessageService.sendFirstMainSubSlotMessages(MainSubSlot.ONE);
 
-        verify(mockOnMobileOBDGateway).sendMainSlotMessages("1234567891,messageId2,subscriptionId2,airtel\n", SubSlot.ONE);
+        verify(mockOnMobileOBDGateway).sendMessages("1234567891,messageId2,subscriptionId2,airtel\n", MainSubSlot.ONE);
     }
 
     @Test
@@ -184,12 +185,12 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
-        campaignMessageService.sendSecondMainSubSlotMessages(SubSlot.TWO);
+        campaignMessageService.sendSecondMainSubSlotMessages(MainSubSlot.TWO);
 
-        verify(mockOnMobileOBDGateway).sendMainSlotMessages("1234567898,messageId8,subscriptionId8,airtel\n1234567892,messageId2,subscriptionId2,airtel\n" +
+        verify(mockOnMobileOBDGateway).sendMessages("1234567898,messageId8,subscriptionId8,airtel\n1234567892,messageId2,subscriptionId2,airtel\n" +
                 "1234567891,messageId1,subscriptionId1,airtel\n1234567895,messageId5,subscriptionId5,airtel\n" +
                 "1234567896,messageId6,subscriptionId6,airtel\n1234567897,messageId7,subscriptionId7,airtel\n" +
-                "1234567893,messageId3,subscriptionId3,airtel\n", SubSlot.TWO);
+                "1234567893,messageId3,subscriptionId3,airtel\n", MainSubSlot.TWO);
     }
 
     @Test
@@ -205,9 +206,9 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
-        campaignMessageService.sendThirdMainSubSlotMessages(SubSlot.THREE);
+        campaignMessageService.sendThirdMainSubSlotMessages(MainSubSlot.THREE);
 
-        verify(mockOnMobileOBDGateway).sendMainSlotMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.THREE);
+        verify(mockOnMobileOBDGateway).sendMessages("1234567890,messageId,subscriptionId,airtel\n", MainSubSlot.THREE);
     }
 
     @Test
@@ -227,8 +228,8 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         OnMobileOBDGateway mockOnMobileOBDGateway = Mockito.mock(OnMobileOBDGateway.class);
         onMobileOBDGateway.setBehavior(mockOnMobileOBDGateway);
 
-        campaignMessageService.sendRetrySlotMessages(SubSlot.THREE);
+        campaignMessageService.sendRetrySlotMessages(RetrySubSlot.THREE);
 
-        verify(mockOnMobileOBDGateway).sendRetrySlotMessages("1234567890,messageId,subscriptionId,airtel\n", SubSlot.THREE);
+        verify(mockOnMobileOBDGateway).sendMessages("1234567890,messageId,subscriptionId,airtel\n", RetrySubSlot.THREE);
     }
 }

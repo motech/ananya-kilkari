@@ -8,6 +8,8 @@ import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.message.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
@@ -15,6 +17,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
+import org.motechproject.ananya.kilkari.test.data.contract.InboxCallDetailsWebRequestsList;
 import org.motechproject.ananya.kilkari.test.data.contract.SubscriberSubscriptions;
 import org.motechproject.ananya.kilkari.test.data.contract.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.test.data.contract.builders.SubscriptionRequestBuilder;
@@ -32,9 +35,9 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.motechproject.ananya.kilkari.test.data.utils.TestUtils.constructUrl;
 import static org.motechproject.ananya.kilkari.test.data.utils.TestUtils.fromJson;
-import org.motechproject.ananya.kilkari.test.data.contract.InboxCallDetailsWebRequestsList;
 
 @ContextConfiguration("classpath:applicationKilkariTestDataContext.xml")
 @ActiveProfiles("production")
@@ -125,7 +128,7 @@ public class BaseDataSetup {
         waitForSubscription(msisdn, subscriptionId, SubscriptionStatus.COMPLETED.getDisplayString());
     }
 
-    protected void makeOBDCallBack(String msisdn, String subscriptionId, String campaignId, String serviceOption, DateTime startTime) {
+    protected void makeOBDCallBackSuccess(String msisdn, String subscriptionId, String campaignId, String serviceOption, DateTime startTime) {
         DateTime endTime = startTime.plusMinutes(10);
         CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(startTime.toString("dd-MM-yyyy HH-mm-ss"), endTime.toString("dd-MM-yyyy HH-mm-ss"));
         OBDSuccessfulCallDetailsWebRequest callDetailsWebRequest = new OBDSuccessfulCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, serviceOption);
@@ -133,6 +136,17 @@ public class BaseDataSetup {
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(constructUrl(baseUrlMaster(), "/obd/calldetails/" + subscriptionId, new HashMap<String, String>()), callDetailsWebRequest, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         System.out.println(responseEntity.getBody());
+    }
+
+    protected void makeOBDCallBackFailure(final String msisdn, final String subscriptionId, final String campaignId, final String failureCode){
+        FailedCallReports failedCallReports = new FailedCallReports();
+        ArrayList<FailedCallReport> calls = new ArrayList<FailedCallReport>() {{
+            add(new FailedCallReport(subscriptionId, msisdn, campaignId, failureCode));
+        }};
+        failedCallReports.setFailedCallReports(calls);
+        ResponseEntity<String> response = restTemplate.postForEntity(constructUrl(baseUrlMaster(), "/obd/calldetails"), failedCallReports, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        System.out.println(response.getBody());
     }
 
     protected void moveToTime(final DateTime dateTime){

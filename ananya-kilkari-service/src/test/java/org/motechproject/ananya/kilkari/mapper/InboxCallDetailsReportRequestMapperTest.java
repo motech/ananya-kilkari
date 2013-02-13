@@ -32,7 +32,6 @@ public class InboxCallDetailsReportRequestMapperTest {
         assertEquals(campaignId, actualDeliveryReportRequest.getCampaignId());
         assertNull(actualDeliveryReportRequest.getServiceOption());
         assertEquals(CampaignMessageStatus.SUCCESS.name(), actualDeliveryReportRequest.getStatus());
-        assertNull(actualDeliveryReportRequest.getRetryCount());
         assertEquals(DateUtils.parseDateTime(startTime), actualDeliveryReportRequest.getStartTime());
         assertEquals(DateUtils.parseDateTime(endTime), actualDeliveryReportRequest.getEndTime());
         assertEquals("INBOX", actualDeliveryReportRequest.getCallSource());

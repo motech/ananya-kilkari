@@ -15,7 +15,11 @@ public class TestDataConfig {
         this.testDataProperties = testDataProperties;
     }
 
-    public String baseUrl() {
-        return testDataProperties.getProperty("baseurl");
+    public String baseUrlMaster() {
+        return testDataProperties.getProperty("baseurlmaster");
+    }
+
+    public String baseUrlSlave() {
+        return testDataProperties.getProperty("baseurlslave");
     }
 }

@@ -69,11 +69,11 @@ public class OBDControllerIT extends SpringIntegrationTest {
         markForDeletion(subscription1);
         markForDeletion(subscription2);
 
-        CampaignMessage campaignMessage = new CampaignMessage(subscription1.getSubscriptionId(), "WEEK13", msisdn, Operator.AIRTEL.name(), DateTime.now().plusDays(2));
+        CampaignMessage campaignMessage = new CampaignMessage(subscription1.getSubscriptionId(), "WEEK13", DateTime.now(), msisdn, Operator.AIRTEL.name(), DateTime.now().plusDays(2));
         allCampaignMessages.add(campaignMessage);
         markForDeletion(campaignMessage);
 
-        CampaignMessage campaignMessage1 = new CampaignMessage(subscription2.getSubscriptionId(), "WEEK13", msisdn, Operator.AIRTEL.name(), DateTime.now().plusDays(2));
+        CampaignMessage campaignMessage1 = new CampaignMessage(subscription2.getSubscriptionId(), "WEEK13", DateTime.now(), msisdn, Operator.AIRTEL.name(), DateTime.now().plusDays(2));
         allCampaignMessages.add(campaignMessage1);
         markForDeletion(campaignMessage1);
 
@@ -113,7 +113,6 @@ public class OBDControllerIT extends SpringIntegrationTest {
         }.executeWithTimeout();
         stubReportingService.setReportCampaignMessageDeliveryCalled(false);
 
-
         verifyOMGatewayRequest();
         verifyReportingRequest();
     }
@@ -134,8 +133,7 @@ public class OBDControllerIT extends SpringIntegrationTest {
         verify(reportingService).reportCampaignMessageDeliveryStatus(campaignMessageDeliveryReportRequestArgumentCaptor.capture());
         CallDetailsReportRequest reportRequest = campaignMessageDeliveryReportRequestArgumentCaptor.getValue();
 
-        assertEquals(CampaignMessageStatus.DNC.name(), reportRequest.getStatus());
-        assertEquals("0", reportRequest.getRetryCount());
+        assertEquals(CampaignMessageStatus.ND.name(), reportRequest.getStatus());
         assertEquals("WEEK13", reportRequest.getCampaignId());
         assertEquals(msisdn, reportRequest.getMsisdn());
         assertEquals(subscription1.getSubscriptionId(), reportRequest.getSubscriptionId());

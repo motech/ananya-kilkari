@@ -3,32 +3,34 @@ package org.motechproject.ananya.kilkari.service;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.mapper.ChangeMsisdnRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
+import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.domain.PhoneNumber;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.*;
-import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.domain.CampaignChangeReason;
+import org.motechproject.ananya.kilkari.subscription.domain.CampaignRescheduleRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.service.ChangeSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
-import org.motechproject.ananya.kilkari.subscription.service.mapper.SubscriptionMapper;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
-import org.motechproject.event.MotechEvent;
+import org.motechproject.ananya.kilkari.utils.CampaignMessageIdStrategy;
 import org.motechproject.scheduler.MotechSchedulerService;
-import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -38,6 +40,8 @@ public class KilkariSubscriptionService {
     private MotechSchedulerService motechSchedulerService;
     private KilkariPropertiesData kilkariProperties;
     private ChangeSubscriptionService changeSubscriptionService;
+    private CampaignMessageAlertService campaignMessageAlertService;
+    private CampaignMessageService campaignMessageService;
 
     private final Logger logger = LoggerFactory.getLogger(KilkariSubscriptionService.class);
 
@@ -45,12 +49,16 @@ public class KilkariSubscriptionService {
     public KilkariSubscriptionService(SubscriptionPublisher subscriptionPublisher,
                                       SubscriptionService subscriptionService,
                                       MotechSchedulerService motechSchedulerService,
-                                      ChangeSubscriptionService changeSubscriptionService, KilkariPropertiesData kilkariProperties) {
+                                      ChangeSubscriptionService changeSubscriptionService,
+                                      KilkariPropertiesData kilkariProperties,
+                                      CampaignMessageAlertService campaignMessageAlertService, CampaignMessageService campaignMessageService) {
         this.subscriptionPublisher = subscriptionPublisher;
         this.subscriptionService = subscriptionService;
         this.motechSchedulerService = motechSchedulerService;
         this.changeSubscriptionService = changeSubscriptionService;
         this.kilkariProperties = kilkariProperties;
+        this.campaignMessageAlertService = campaignMessageAlertService;
+        this.campaignMessageService = campaignMessageService;
     }
 
     public void createSubscriptionAsync(SubscriptionWebRequest subscriptionWebRequest) {
@@ -85,17 +93,19 @@ public class KilkariSubscriptionService {
         return subscriptionService.findBySubscriptionId(subscriptionId);
     }
 
-    public void processSubscriptionCompletion(Subscription subscription) {
-        String subjectKey = SubscriptionEventKeys.SUBSCRIPTION_COMPLETE;
-        Date startDate = DateTime.now().plusDays(kilkariProperties.getBufferDaysToAllowRenewalForPackCompletion()).toDate();
-        HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put(MotechSchedulerService.JOB_ID_KEY, subscription.getSubscriptionId());
-        parameters.put("0", new SubscriptionMapper().createOMSubscriptionRequest(subscription, Channel.MOTECH));
+    public void processSubscriptionCompletion(Subscription subscription, String campaignName) {
+        String subscriptionId = subscription.getSubscriptionId();
 
-        MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
-        RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, startDate);
-
-        motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+        CampaignMessageAlert campaignMessageAlert = campaignMessageAlertService.findBy(subscriptionId);
+        boolean isRenewed = campaignMessageAlert != null && campaignMessageAlert.isRenewed();
+        String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, subscription.getScheduleStartDate(), subscription.getPack());
+        if (isRenewed || campaignMessageService.find(subscriptionId, messageId) != null) {
+            subscriptionService.scheduleCompletion(subscription, DateTime.now());
+            logger.info(String.format("Scheduling completion now for %s, since already renewed for last week", subscriptionId));
+            return;
+        }
+        markCampaignCompletion(subscription);
+        subscriptionService.scheduleCompletion(subscription, subscription.getCurrentWeeksMessageExpiryDate());
     }
 
     public void requestUnsubscription(String subscriptionId, UnSubscriptionWebRequest unSubscriptionWebRequest) {
@@ -133,6 +143,11 @@ public class KilkariSubscriptionService {
 
         ChangeMsisdnRequest changeMsisdnRequest = ChangeMsisdnRequestMapper.mapFrom(changeMsisdnWebRequest);
         subscriptionService.changeMsisdn(changeMsisdnRequest);
+    }
+
+    private void markCampaignCompletion(Subscription subscription) {
+        subscription.campaignCompleted();
+        subscriptionService.updateSubscription(subscription);
     }
 
     private void validateMsisdn(String msisdn) {

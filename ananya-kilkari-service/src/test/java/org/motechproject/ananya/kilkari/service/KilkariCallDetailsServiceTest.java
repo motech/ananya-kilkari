@@ -162,7 +162,6 @@ public class KilkariCallDetailsServiceTest {
         Assert.assertEquals(msisdn, callDetailsReportRequest.getMsisdn());
         Assert.assertEquals("INBOX", callDetailsReportRequest.getCallSource());
         Assert.assertEquals(campaignId, callDetailsReportRequest.getCampaignId());
-        Assert.assertNull(callDetailsReportRequest.getRetryCount());
         Assert.assertNull(callDetailsReportRequest.getServiceOption());
         Assert.assertEquals(DateUtils.parseDateTime(startTime), callDetailsReportRequest.getStartTime());
         Assert.assertEquals(DateUtils.parseDateTime(endTime), callDetailsReportRequest.getEndTime());

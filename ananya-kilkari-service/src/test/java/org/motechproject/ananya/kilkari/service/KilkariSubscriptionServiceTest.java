@@ -9,15 +9,21 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.builder.ChangeSubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.builder.SubscriptionWebRequestBuilder;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
+import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
+import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
+import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
+import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
-import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.domain.CampaignRescheduleRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
-import org.motechproject.ananya.kilkari.subscription.request.OMSubscriptionRequest;
 import org.motechproject.ananya.kilkari.subscription.service.ChangeSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisdnRequest;
@@ -25,11 +31,11 @@ import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubsc
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.scheduler.MotechSchedulerService;
-import org.motechproject.scheduler.domain.RunOnceSchedulableJob;
 
 import java.util.ArrayList;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -56,12 +62,16 @@ public class KilkariSubscriptionServiceTest {
     private KilkariPropertiesData kilkariPropertiesData;
     @Mock
     private ChangeSubscriptionService changeSubscriptionService;
+    @Mock
+    private CampaignMessageAlertService campaignMessageAlertService;
+    @Mock
+    private CampaignMessageService campaignMessageService;
 
     @Before
     public void setup() {
         initMocks(this);
         kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService,
-                changeSubscriptionService, kilkariPropertiesData);
+                changeSubscriptionService, kilkariPropertiesData, campaignMessageAlertService, campaignMessageService);
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
     }
 
@@ -160,24 +170,61 @@ public class KilkariSubscriptionServiceTest {
     }
 
     @Test
-    public void shouldScheduleASubscriptionCompletionEvent() {
-        String subscriptionId = "subscriptionId";
+    public void shouldScheduleASubscriptionCompletionEventAtExpiryDate_IfMessageIsNotReadyToBeSent() {
         DateTime now = DateTime.now();
-        org.motechproject.ananya.kilkari.subscription.domain.Subscription mockedSubscription = mock(org.motechproject.ananya.kilkari.subscription.domain.Subscription.class);
-        when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
-        when(kilkariPropertiesData.getBufferDaysToAllowRenewalForPackCompletion()).thenReturn(3);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withScheduleStartDate(now).build();
+        String subscriptionId = subscription.getSubscriptionId();
+        String campaignName = MessageCampaignService.SIXTEEN_MONTHS_CAMPAIGN_KEY;
+        DateTime expiryDate = subscription.getCurrentWeeksMessageExpiryDate();
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, "WEEK64", false, expiryDate);
+        when(campaignMessageAlertService.findBy(subscriptionId)).thenReturn(campaignMessageAlert);
 
-        kilkariSubscriptionService.processSubscriptionCompletion(mockedSubscription);
+        kilkariSubscriptionService.processSubscriptionCompletion(subscription, campaignName);
 
-        ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
-        verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
-        RunOnceSchedulableJob runOnceSchedulableJob = runOnceSchedulableJobArgumentCaptor.getValue();
-        assertEquals(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, runOnceSchedulableJob.getMotechEvent().getSubject());
-        assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
-        OMSubscriptionRequest OMSubscriptionRequest = (OMSubscriptionRequest) runOnceSchedulableJob.getMotechEvent().getParameters().get("0");
-        assertEquals(OMSubscriptionRequest.class, OMSubscriptionRequest.getClass());
-        assertEquals(now.plusDays(3).toDate(), runOnceSchedulableJob.getStartDate());
-        assertEquals(Channel.MOTECH, OMSubscriptionRequest.getChannel());
+        verify(subscriptionService).scheduleCompletion(subscription, expiryDate);
+        ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
+        verify(subscriptionService).updateSubscription(captor.capture());
+        Subscription actualSubscription = captor.getValue();
+        assertTrue(actualSubscription.isCampaignCompleted());
+    }
+
+    @Test
+    public void shouldScheduleASubscriptionCompletionEventNow_IfSubscriptionIsAlreadyRenewed() {
+        DateTime expectedCompletionDate = DateTime.now().withMillisOfSecond(0);
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.BARI_KILKARI).withScheduleStartDate(expectedCompletionDate).build();
+        String subscriptionId = subscription.getSubscriptionId();
+        String campaignName = MessageCampaignService.SIXTEEN_MONTHS_CAMPAIGN_KEY;
+        String messageId = "WEEK64";
+        CampaignMessageAlert campaignMessageAlert = new CampaignMessageAlert(subscriptionId, messageId, true, expectedCompletionDate.plusWeeks(1));
+        when(campaignMessageAlertService.findBy(subscriptionId)).thenReturn(campaignMessageAlert);
+
+        kilkariSubscriptionService.processSubscriptionCompletion(subscription, campaignName);
+
+        verify(campaignMessageService, never()).find(subscriptionId, messageId);
+        ArgumentCaptor<DateTime> dateTimeArgumentCaptor = ArgumentCaptor.forClass(DateTime.class);
+        verify(subscriptionService).scheduleCompletion(eq(subscription), dateTimeArgumentCaptor.capture());
+        DateTime actualCompletionDate = dateTimeArgumentCaptor.getValue();
+        assertEquals(expectedCompletionDate, actualCompletionDate.withMillisOfSecond(0));
+    }
+
+    @Test
+    public void shouldScheduleASubscriptionCompletionEventNow_IfSubscriptionHasLastMessageInOBD() {
+        DateTime expectedCompletionDate = DateTime.now().withMillisOfSecond(0);
+        SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(pack)
+                .withScheduleStartDate(expectedCompletionDate.minusWeeks(pack.getTotalWeeks() - 1)).build();
+        String subscriptionId = subscription.getSubscriptionId();
+        String messageId = "WEEK64";
+        String campaignName = MessageCampaignService.SIXTEEN_MONTHS_CAMPAIGN_KEY;
+        when(campaignMessageAlertService.findBy(subscriptionId)).thenReturn(null);
+        when(campaignMessageService.find(subscriptionId, messageId)).thenReturn(new CampaignMessage());
+
+        kilkariSubscriptionService.processSubscriptionCompletion(subscription, campaignName);
+
+        ArgumentCaptor<DateTime> dateTimeArgumentCaptor = ArgumentCaptor.forClass(DateTime.class);
+        verify(subscriptionService).scheduleCompletion(eq(subscription), dateTimeArgumentCaptor.capture());
+        DateTime actualCompletionDate = dateTimeArgumentCaptor.getValue();
+        assertEquals(expectedCompletionDate, actualCompletionDate.withMillisOfSecond(0));
     }
 
     @Test
@@ -266,7 +313,7 @@ public class KilkariSubscriptionServiceTest {
         request.setBeneficiaryAge("23");
         request.setChannel(Channel.IVR.name());
         request.setCreatedAt(DateTime.now());
-        LocationRequest location = new LocationRequest(){{
+        LocationRequest location = new LocationRequest() {{
             setDistrict("district");
             setBlock("block");
             setPanchayat("panchayat");

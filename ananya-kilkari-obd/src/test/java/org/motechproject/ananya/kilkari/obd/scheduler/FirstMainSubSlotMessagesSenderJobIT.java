@@ -3,23 +3,24 @@ package org.motechproject.ananya.kilkari.obd.scheduler;
 import org.junit.After;
 import org.junit.Test;
 import org.motechproject.ananya.kilkari.obd.utils.SpringIntegrationTest;
-import org.motechproject.retry.dao.AllRetries;
 import org.motechproject.event.MotechEvent;
+import org.motechproject.retry.dao.AllRetries;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 
-public class NewMessagesSenderJobIT extends SpringIntegrationTest {
+public class FirstMainSubSlotMessagesSenderJobIT extends SpringIntegrationTest {
 
     @Autowired
-    private NewMessagesSenderJob newMessagesSenderJob;
+    private FirstMainSubSlotMessagesSenderJob firstMainSubSlotMessagesSenderJob;
     @Autowired
     private AllRetries allRetries;
     @Autowired
@@ -27,10 +28,12 @@ public class NewMessagesSenderJobIT extends SpringIntegrationTest {
 
     @Test
     public void shouldCreateARetrySchedule() {
-        newMessagesSenderJob.sendMessages(new MotechEvent("subject"));
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("sub_slot", MainSubSlot.THREE);
+        firstMainSubSlotMessagesSenderJob.handleMessages(new MotechEvent("subject", parameters));
     }
 
-   @After
+    @After
     public void tearDown() {
         allRetries.removeAll();
         removeQuartzJobs();

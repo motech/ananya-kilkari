@@ -60,7 +60,7 @@ public class OBDServiceTest {
     public void shouldProcessSuccessfulCallDelivery() {
 
         Integer retryCount = 1;
-        when(campaignMessage.getDnpRetryCount()).thenReturn(retryCount);
+        when(campaignMessage.getNARetryCount()).thenReturn(retryCount);
         when(campaignMessageService.find(obdSuccessfulCallDetailsRequest.getSubscriptionId(), obdSuccessfulCallDetailsRequest.getCampaignId()))
                 .thenReturn(campaignMessage);
 
@@ -75,7 +75,6 @@ public class OBDServiceTest {
         assertEquals(obdSuccessfulCallDetailsRequest.getSubscriptionId(), campaignMessageDeliveryReportRequest.getSubscriptionId());
         assertEquals(obdSuccessfulCallDetailsRequest.getMsisdn(), campaignMessageDeliveryReportRequest.getMsisdn());
         assertEquals(obdSuccessfulCallDetailsRequest.getCampaignId(), campaignMessageDeliveryReportRequest.getCampaignId());
-        assertEquals(retryCount.toString(), campaignMessageDeliveryReportRequest.getRetryCount());
         assertEquals(obdSuccessfulCallDetailsRequest.getServiceOption().name(), campaignMessageDeliveryReportRequest.getServiceOption());
     }
 

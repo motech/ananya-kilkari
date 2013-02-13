@@ -1,18 +1,24 @@
 package org.motechproject.ananya.kilkari.obd.domain;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ektorp.support.TypeDiscriminator;
 import org.joda.time.DateTime;
 import org.motechproject.model.MotechBaseDataObject;
 
 @TypeDiscriminator("doc.type === 'CampaignMessage'")
-public class CampaignMessage extends MotechBaseDataObject {
+public class CampaignMessage extends MotechBaseDataObject implements Comparable<CampaignMessage> {
 
     @JsonProperty
     private String subscriptionId;
 
     @JsonProperty
     private String messageId;
+
+    @JsonProperty
+    private DateTime creationDate;
 
     @JsonProperty
     private DateTime weekEndingDate;
@@ -30,17 +36,21 @@ public class CampaignMessage extends MotechBaseDataObject {
     private CampaignMessageStatus status = CampaignMessageStatus.NEW;
 
     @JsonProperty
-    private int dnpRetryCount;
+    private int NARetryCount;
 
     @JsonProperty
-    private int dncRetryCount;
+    private int NDRetryCount;
+
+    @JsonProperty
+    private int SORetryCount;
 
     public CampaignMessage() {
     }
 
-    public CampaignMessage(String subscriptionId, String messageId, String msisdn, String operator, DateTime weekEndingDate) {
+    public CampaignMessage(String subscriptionId, String messageId, DateTime creationDate, String msisdn, String operator, DateTime weekEndingDate) {
         this.subscriptionId = subscriptionId;
         this.messageId = messageId;
+        this.creationDate = creationDate;
         this.weekEndingDate = weekEndingDate;
         this.msisdn = msisdn;
         this.operator = operator;
@@ -74,19 +84,28 @@ public class CampaignMessage extends MotechBaseDataObject {
         return status;
     }
 
-    public int getDnpRetryCount() {
-        return dnpRetryCount;
+    @JsonIgnore
+    public int getNARetryCount() {
+        return NARetryCount;
     }
 
-    public int getDncRetryCount() {
-        return dncRetryCount;
+    @JsonIgnore
+    public int getNDRetryCount() {
+        return NDRetryCount;
+    }
+
+    @JsonIgnore
+    public int getSORetryCount() {
+        return SORetryCount;
     }
 
     public void markSent() {
-        if (this.status == CampaignMessageStatus.DNP)
-            this.dnpRetryCount++;
-        else if (this.status == CampaignMessageStatus.DNC && weekEndingDate.isBeforeNow())
-            this.dncRetryCount++;
+        if (this.status == CampaignMessageStatus.NA)
+            this.NARetryCount++;
+        else if (this.status == CampaignMessageStatus.ND)
+            this.NDRetryCount++;
+        else if (this.status == CampaignMessageStatus.SO)
+            this.SORetryCount++;
 
         this.sent = true;
     }
@@ -98,6 +117,35 @@ public class CampaignMessage extends MotechBaseDataObject {
 
     public boolean hasFailed() {
         return CampaignMessageStatus.getFailedStatusCodes().contains(status);
+    }
+
+    @JsonIgnore
+    public int getRetryCountForCurrentStatus() {
+        if (status == CampaignMessageStatus.NA)
+            return NARetryCount;
+        else if (status == CampaignMessageStatus.ND)
+            return NDRetryCount;
+        else
+            return SORetryCount;
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        return EqualsBuilder.reflectionEquals(this, that);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public int compareTo(CampaignMessage that) {
+        return this.status.getPriority().compareTo(that.status.getPriority());
+    }
+
+    public DateTime getCreationDate() {
+        return creationDate;
     }
 }
 

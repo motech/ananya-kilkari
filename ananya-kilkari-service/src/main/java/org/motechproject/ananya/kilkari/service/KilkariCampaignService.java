@@ -110,9 +110,9 @@ public class KilkariCampaignService {
             inboxService.newMessage(subscriptionId, messageId);
     }
 
-    public void processCampaignCompletion(String subscriptionId) {
+    public void processCampaignCompletion(String subscriptionId, String campaignName) {
         Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
         if (!subscription.isInDeactivatedState())
-            kilkariSubscriptionService.processSubscriptionCompletion(subscription);
+            kilkariSubscriptionService.processSubscriptionCompletion(subscription, campaignName);
     }
 }

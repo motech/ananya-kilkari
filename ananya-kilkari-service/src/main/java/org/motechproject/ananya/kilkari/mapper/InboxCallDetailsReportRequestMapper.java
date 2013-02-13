@@ -17,7 +17,6 @@ public class InboxCallDetailsReportRequestMapper {
                 inboxCallDetailsWebRequest.getMsisdn(),
                 inboxCallDetailsWebRequest.getCampaignId(),
                 null,
-                null,
                 CampaignMessageStatus.SUCCESS.name(),
                 new CallDetailRecordRequest(DateUtils.parseDateTime(callDurationWebRequest.getStartTime()), DateUtils.parseDateTime(callDurationWebRequest.getEndTime())),
                 CampaignMessageCallSource.INBOX.name());

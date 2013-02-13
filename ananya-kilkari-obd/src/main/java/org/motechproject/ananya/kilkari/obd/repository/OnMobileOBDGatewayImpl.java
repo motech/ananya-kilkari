@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.profile.ProductionProfile;
+import org.motechproject.ananya.kilkari.obd.scheduler.OBDSubSlot;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.service.utils.JsonUtils;
@@ -48,17 +49,9 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
     }
 
     @Override
-    public void sendNewMessages(String content) {
-        String url = obdProperties.getMessageDeliveryBaseUrl();
+    public void sendMessages(String content, OBDSubSlot subSlot) {
         String date = getCurrentDate();
-        send(content, url, String.format("%s%s", date, obdProperties.getNewMessageSlotStartTime()), String.format("%s%s", date, obdProperties.getNewMessageSlotEndTime()));
-    }
-
-    @Override
-    public void sendRetryMessages(String content) {
-        String url = obdProperties.getMessageDeliveryBaseUrl();
-        String date = getCurrentDate();
-        send(content, url, String.format("%s%s", date, obdProperties.getRetryMessageSlotStartTime()), String.format("%s%s", date, obdProperties.getRetryMessageSlotEndTime()));
+        send(content, String.format("%s%s", date, obdProperties.getSlotStartTimeFor(subSlot)), String.format("%s%s", date, obdProperties.getSlotEndTimeFor(subSlot)));
     }
 
     private String getCurrentDate() {
@@ -79,7 +72,8 @@ public class OnMobileOBDGatewayImpl implements OnMobileOBDGateway {
         return JsonUtils.toJson(invalidFailedCallReports.getRecordObjectFaileds());
     }
 
-    private void send(String content, String url, String slotStartDate, String slotEndDate) {
+    private void send(String content, String slotStartDate, String slotEndDate) {
+        String url = obdProperties.getMessageDeliveryBaseUrl();
         logger.info(String.format("Uploading the campaign messages to url: %s", url));
         logger.debug(String.format("Uploading campaign messages content : %s", content));
 

@@ -20,7 +20,7 @@ import static org.motechproject.ananya.kilkari.performance.tests.utils.TestUtils
 
 @RunWith(LoadRunner.class)
 public class OBDSchedulerPerformanceTest extends BasePerformanceTest {
-    private CampaignMessageStatus possibleStatus[] = new CampaignMessageStatus[]{CampaignMessageStatus.DNC, CampaignMessageStatus.DNP, CampaignMessageStatus.NEW};
+    private CampaignMessageStatus possibleStatus[] = new CampaignMessageStatus[]{CampaignMessageStatus.ND, CampaignMessageStatus.NA, CampaignMessageStatus.NEW};
     private Operator[] possibleOperators = Operator.values();
     private int numberOfUnsentMessages = 25000;
 
@@ -43,7 +43,7 @@ public class OBDSchedulerPerformanceTest extends BasePerformanceTest {
             Operator operator = getRandomElementFromList(possibleOperators);
             CampaignMessageStatus status = getRandomElementFromList(possibleStatus);
 
-            CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, week, msisdn, operator.name(), now.plusWeeks(1));
+            CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, week, DateTime.now(), msisdn, operator.name(), now.plusWeeks(1));
             campaignMessage.setStatusCode(status);
 
             obdDbService.add(campaignMessage);

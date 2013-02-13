@@ -145,6 +145,7 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
         DateTime secondCampaignAlertDate = firstCampaignAlertDate.plusWeeks(1);
         DateTime thirdCampaignAlertDate = secondCampaignAlertDate.plusWeeks(1);
         DateTime lastCampaignAlertDate = firstCampaignAlertDate.plusWeeks(63);
+        DateTime lastCampaignExpiryDate = lastCampaignAlertDate.plusWeeks(1);
 
         SubscriptionData subscriptionData = new SubscriptionDataBuilder().withDefaults().build();
 
@@ -162,6 +163,10 @@ public class SubscriptionCompletionFlowBaseFunctionalTest extends BaseFunctional
         then(user).messageIsNotCreated(subscriptionData, "WEEK3");
 
         when(time).isMovedToFuture(lastCampaignAlertDate);
+        then(user).messageIsNotCreated(subscriptionData, "WEEK64");
+        Thread.sleep(15000);
+
+        when(time).isMovedToFuture(lastCampaignExpiryDate);
         and(subscriptionVerifier).verifySubscriptionState(subscriptionData, SubscriptionStatus.PENDING_COMPLETION);
         and(subscriptionManager).confirmsDeactivation(subscriptionData, SubscriptionStatus.COMPLETED);
     }

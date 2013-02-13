@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.performance.tests.service.api;
 
+import org.motechproject.ananya.kilkari.obd.scheduler.MainSubSlot;
+import org.motechproject.ananya.kilkari.obd.scheduler.RetrySubSlot;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.performance.tests.utils.HttpUtils;
@@ -18,8 +20,8 @@ public class OBDApiService {
     private HttpUtils httpUtils;
 
     public void sendMessagesToOBD() {
-        campaignMessageService.sendNewMessages();
-        campaignMessageService.sendRetryMessages();
+        campaignMessageService.sendFirstMainSubSlotMessages(MainSubSlot.ONE);
+        campaignMessageService.sendRetrySlotMessages(RetrySubSlot.ONE);
     }
 
     public void sendOBDCallbackRequest(OBDSuccessfulCallDetailsWebRequest request){

@@ -325,7 +325,7 @@ public class SubscriptionService {
 
     public void rescheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest) {
         String subscriptionId = campaignRescheduleRequest.getSubscriptionId();
-        subscriptionValidator.validateActiveSubscriptionExists(subscriptionId);
+        subscriptionValidator.validateChangeCampaign(subscriptionId, campaignRescheduleRequest.getReason());
 
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         DateTime nextAlertDateTime = messageCampaignService.getMessageTimings(subscriptionId, campaignRescheduleRequest.getCreatedAt(), campaignRescheduleRequest.getCreatedAt().plusMonths(1)).get(0);
@@ -365,6 +365,18 @@ public class SubscriptionService {
         return subscriptionDetailsResponseMapper.map(subscriptionList, subscriberDetailsFromReports);
     }
 
+    public void scheduleCompletion(Subscription subscription, DateTime completionDate) {
+        String subjectKey = SubscriptionEventKeys.SUBSCRIPTION_COMPLETE;
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put(MotechSchedulerService.JOB_ID_KEY, subscription.getSubscriptionId());
+        parameters.put("0", SubscriptionMapper.createOMSubscriptionRequest(subscription, Channel.MOTECH));
+
+        MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
+        RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, completionDate.toDate());
+
+        motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+    }
+
     private void updateToLatestMsisdn(OMSubscriptionRequest omSubscriptionRequest) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
         omSubscriptionRequest.setMsisdn(subscription.getMsisdn());
@@ -391,6 +403,13 @@ public class SubscriptionService {
         String subscriptionId = subscription.getSubscriptionId();
         logger.info(String.format("Processing renewal for subscriptionId: %s", subscriptionId));
         campaignMessageAlertService.scheduleCampaignMessageAlertForRenewal(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
+        rescheduleSubscriptionCompletionIfExists(subscription);
+    }
+
+    private void rescheduleSubscriptionCompletionIfExists(Subscription subscription) {
+        if (!subscription.isCampaignCompleted()) return;
+        scheduleCompletion(subscription, DateTime.now());
+        logger.info(String.format("Rescheduled the completion of subscription %s to now", subscription.getSubscriptionId()));
     }
 
     private void scheduleCampaign(CampaignRescheduleRequest campaignRescheduleRequest, DateTime nextAlertDateTime) {
@@ -492,5 +511,13 @@ public class SubscriptionService {
         subscription.setMsisdn(changeMsisdnRequest.getNewMsisdn());
         allSubscriptions.update(subscription);
         reportingService.reportChangeMsisdnForEarlySubscription(new SubscriberChangeMsisdnReportRequest(subscription.getSubscriptionId(), Long.valueOf(changeMsisdnRequest.getNewMsisdn()), changeMsisdnRequest.getReason()));
+    }
+
+    public void updateSubscription(Subscription subscription) {
+        try {
+            allSubscriptions.update(subscription);
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException(String.format("Subscription %s does not exist in db", subscription.getSubscriptionId()));
+        }
     }
 }

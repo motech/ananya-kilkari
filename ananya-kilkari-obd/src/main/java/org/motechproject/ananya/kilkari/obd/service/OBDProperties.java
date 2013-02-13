@@ -1,7 +1,10 @@
 package org.motechproject.ananya.kilkari.obd.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
+import org.motechproject.ananya.kilkari.obd.scheduler.OBDSubSlot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -22,8 +25,9 @@ public class OBDProperties {
     }
 
     private void populateStatusCodes() {
-        populateMapWithPropertyValue("campaign.message.dnp.status.codes", CampaignMessageStatus.DNP);
-        populateMapWithPropertyValue("campaign.message.dnc.status.codes", CampaignMessageStatus.DNC);
+        populateMapWithPropertyValue("campaign.message.na.status.codes", CampaignMessageStatus.NA);
+        populateMapWithPropertyValue("campaign.message.nd.status.codes", CampaignMessageStatus.ND);
+        populateMapWithPropertyValue("campaign.message.so.status.codes", CampaignMessageStatus.SO);
     }
 
     private void populateMapWithPropertyValue(String propertyName, CampaignMessageStatus campaignMessageStatus) {
@@ -56,55 +60,52 @@ public class OBDProperties {
         return obdProperties.getProperty("obd.message.delivery.file");
     }
 
-    public String getNewMessageSlotStartTime() {
-        return obdProperties.getProperty("obd.new.message.slot.start.time");
+    public Integer getMaximumOBDRetryDays() {
+        return Integer.parseInt(obdProperties.getProperty("obd.max.retry.days"));
     }
 
-    public String getNewMessageSlotEndTime() {
-        return obdProperties.getProperty("obd.new.message.slot.end.time");
+    public String getSlotStartTimeFor(OBDSubSlot subSlot) {
+        return obdProperties.getProperty(String.format("obd.%s.sub.slot.start.time", subSlot.getSlotName().toLowerCase()));
     }
 
-    public Integer getMaximumDNPRetryCount() {
-        return Integer.parseInt(obdProperties.getProperty("obd.dnp.message.max.retry.count"));
-    }
-
-    public Integer getMaximumDNCRetryCount() {
-        return Integer.parseInt(obdProperties.getProperty("obd.dnc.message.max.retry.count"));
-    }
-
-    public String getRetryMessageSlotStartTime() {
-        return obdProperties.getProperty("obd.retry.message.slot.start.time");
-    }
-
-    public String getRetryMessageSlotEndTime() {
-        return obdProperties.getProperty("obd.retry.message.slot.end.time");
+    public String getSlotEndTimeFor(OBDSubSlot subSlot) {
+        return obdProperties.getProperty(String.format("obd.%s.sub.slot.end.time", subSlot.getSlotName().toLowerCase()));
     }
 
     public CampaignMessageStatus getCampaignMessageStatusFor(String statusCode) {
         return statusCodesMap.get(statusCode);
     }
 
-    public String getNewMessageJobCronExpression() {
-        return obdProperties.getProperty("obd.new.messages.job.cron.expression");
+    public String getCronJobExpressionFor(OBDSubSlot subSlot) {
+        return obdProperties.getProperty(String.format("obd.%s.sub.slot.cron.job.expression", subSlot.getSlotName().toLowerCase()));
     }
 
-    public String getRetryMessageJobCronExpression() {
-        return obdProperties.getProperty("obd.retry.messages.job.cron.expression");
+    public DateTime getSlotStartTimeLimitFor(OBDSubSlot subSlot) {
+        return parseTime(obdProperties.getProperty(String.format("obd.%s.sub.slot.start.time.limit", subSlot.getSlotName().toLowerCase())));
     }
 
-    public int getNewMessageStartTimeLimitHours() {
-        return Integer.parseInt(obdProperties.getProperty("obd.new.message.start.time.limit").split(":")[0]);
+    public DateTime getSlotEndTimeLimitFor(OBDSubSlot subSlot) {
+        return parseTime(obdProperties.getProperty(String.format("obd.%s.sub.slot.end.time.limit", subSlot.getSlotName().toLowerCase())));
     }
 
-    public int getNewMessageStartTimeLimitMinute() {
-        return Integer.parseInt(obdProperties.getProperty("obd.new.message.start.time.limit").split(":")[1]);
+    private DateTime parseTime(String time) {
+        return DateTimeFormat.forPattern("HH:mm").parseDateTime(time);
     }
 
-    public int getRetryMessageStartTimeLimitHours() {
-        return Integer.parseInt(obdProperties.getProperty("obd.retry.message.start.time.limit").split(":")[0]);
+    public Integer getSlotMessagePercentageFor(OBDSubSlot subSlot) {
+        String percentage = obdProperties.getProperty(String.format("obd.%s.sub.slot.message.percentage.to.send", subSlot.getSlotName().toLowerCase()));
+        return percentage != null ? Integer.parseInt(percentage) : null;
     }
 
-    public int getRetryMessageStartTimeLimitMinute() {
-        return Integer.parseInt(obdProperties.getProperty("obd.retry.message.start.time.limit").split(":")[1]);
+    public Integer getRetryIntervalForMessageUpdate() {
+        return Integer.parseInt(obdProperties.getProperty("obd.retry.sent.messages.update.retry.interval"));
+    }
+
+    public Integer getRetryCountForMessageUpdate() {
+        return Integer.parseInt(obdProperties.getProperty("obd.retry.sent.messages.update.max.retry.count"));
+    }
+
+    public Integer getInitialWaitForMessageUpdate() {
+        return Integer.parseInt(obdProperties.getProperty("obd.retry.sent.messages.update.initial.wait"));
     }
 }

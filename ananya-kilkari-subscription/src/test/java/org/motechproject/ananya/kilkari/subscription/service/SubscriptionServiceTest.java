@@ -682,7 +682,7 @@ public class SubscriptionServiceTest {
         CampaignChangeReason campaignChangeReason = CampaignChangeReason.MISCARRIAGE;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("1234567890").withPack(SubscriptionPack.BARI_KILKARI).withCreationDate(DateTime.now()).withStatus(SubscriptionStatus.PENDING_COMPLETION).build();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
-        doThrow(new ValidationException(message)).when(subscriptionValidator).validateActiveSubscriptionExists(subscriptionId);
+        doThrow(new ValidationException(message)).when(subscriptionValidator).validateChangeCampaign(subscriptionId, CampaignChangeReason.MISCARRIAGE);
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(message);
 
@@ -929,20 +929,6 @@ public class SubscriptionServiceTest {
         assertEquals(MessageCampaignPack.NAVJAAT_KILKARI.getCampaignName(), messageCampaignRequest.getCampaignName());
         assertEquals(scheduleStartDate.withSecondOfMinute(0).withMillisOfSecond(0), messageCampaignRequest.getScheduleStartDate());
         verify(campaignMessageAlertService).deleteFor(subscriptionId);
-    }
-
-    @Test
-    public void shouldGivePriorityToWeekNumberOverDOBForALateSubscription() {
-        Integer weekNumber = 40;
-        DateTime dob = DateTime.now().minusMonths(6);
-        SubscriptionPack subscriptionPack = mock(SubscriptionPack.class);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withPack(subscriptionPack).withDateOfBirth(dob).withWeek(weekNumber).build();
-        when(subscriptionPack.getStartDateForWeek(subscriptionRequest.getCreationDate(), weekNumber)).thenReturn(dob);
-
-        subscriptionService.createSubscription(subscriptionRequest, Channel.CONTACT_CENTER);
-
-        verify(subscriptionPack).getStartDateForWeek(Matchers.<DateTime>any(), Matchers.<Integer>any());
-        verify(subscriptionPack, never()).getStartDate(Matchers.<DateTime>any());
     }
 
     @Test
@@ -1367,7 +1353,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldReturnNullWeekNumberIfScheduleStartDateIsNull_WhenSubscriptionHasNotBeenActivated(){
+    public void shouldReturnNullWeekNumberIfScheduleStartDateIsNull_WhenSubscriptionHasNotBeenActivated() {
         DateTime now = DateTime.now();
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.NANHI_KILKARI, now, now.plusWeeks(4), null);
         subscription.setStatus(SubscriptionStatus.NEW_EARLY);
@@ -1380,5 +1366,81 @@ public class SubscriptionServiceTest {
         verify(reportingServiceImpl).reportSubscriptionStateChange(reportRequestCaptor.capture());
         SubscriptionStateChangeRequest request = reportRequestCaptor.getValue();
         assertNull(request.getWeekNumber());
+    }
+
+    @Test
+    public void shouldRescheduleACompletionEventForNowIfExists() {
+        DateTime now = DateTime.now().withMillisOfSecond(0);
+        SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withScheduleStartDate(now.minusWeeks(pack.getTotalWeeks() - 1)).withPack(pack).withStatus(SubscriptionStatus.ACTIVE).build();
+        String subscriptionId = subscription.getSubscriptionId();
+        subscription.campaignCompleted();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.renewSubscription(subscription.getSubscriptionId(), now, 0);
+
+        ArgumentCaptor<RunOnceSchedulableJob> captor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
+        verify(motechSchedulerService).safeScheduleRunOnceJob(captor.capture());
+        RunOnceSchedulableJob runOnceSchedulableJob = captor.getValue();
+        assertEquals(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, runOnceSchedulableJob.getMotechEvent().getSubject());
+        assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
+        OMSubscriptionRequest OMSubscriptionRequest = (OMSubscriptionRequest) runOnceSchedulableJob.getMotechEvent().getParameters().get("0");
+        assertEquals(OMSubscriptionRequest.class, OMSubscriptionRequest.getClass());
+        assertEquals(now, new DateTime(runOnceSchedulableJob.getStartDate()).withMillisOfSecond(0));
+        assertEquals(Channel.MOTECH, OMSubscriptionRequest.getChannel());
+    }
+
+    @Test
+    public void shouldNotRescheduleACompletionEventIfRenewalIsNotForLastMessage() {
+        DateTime now = DateTime.now().withMillisOfSecond(0);
+        SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withScheduleStartDate(now.minusWeeks(pack.getTotalWeeks() - 1)).withPack(pack).withStatus(SubscriptionStatus.ACTIVE).build();
+        String subscriptionId = subscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+
+        subscriptionService.renewSubscription(subscription.getSubscriptionId(), now, 0);
+
+        verify(motechSchedulerService, never()).safeScheduleRunOnceJob(any(RunOnceSchedulableJob.class));
+    }
+
+    @Test
+    public void shouldScheduleCompletionEventForASubscription() {
+        DateTime now = DateTime.now().withMillisOfSecond(0);
+        SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withScheduleStartDate(now.minusWeeks(pack.getTotalWeeks() - 1)).withPack(pack).withStatus(SubscriptionStatus.ACTIVE).build();
+        String subscriptionId = subscription.getSubscriptionId();
+
+        subscriptionService.scheduleCompletion(subscription, now);
+
+        ArgumentCaptor<RunOnceSchedulableJob> captor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
+        verify(motechSchedulerService).safeScheduleRunOnceJob(captor.capture());
+        RunOnceSchedulableJob runOnceSchedulableJob = captor.getValue();
+        assertEquals(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, runOnceSchedulableJob.getMotechEvent().getSubject());
+        assertEquals(subscriptionId, runOnceSchedulableJob.getMotechEvent().getParameters().get(MotechSchedulerService.JOB_ID_KEY));
+        OMSubscriptionRequest OMSubscriptionRequest = (OMSubscriptionRequest) runOnceSchedulableJob.getMotechEvent().getParameters().get("0");
+        assertEquals(OMSubscriptionRequest.class, OMSubscriptionRequest.getClass());
+        assertEquals(now, new DateTime(runOnceSchedulableJob.getStartDate()).withMillisOfSecond(0));
+        assertEquals(Channel.MOTECH, OMSubscriptionRequest.getChannel());
+    }
+
+    @Test
+    public void shouldThrowAnExceptionIfSubscriptionDoesNotExistForUpdate() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.NAVJAAT_KILKARI).withStatus(SubscriptionStatus.ACTIVE).build();
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(String.format("Subscription %s does not exist in db", subscription.getSubscriptionId()));
+
+        doThrow(new IllegalArgumentException("Subscription does not exist")).when(allSubscriptions).update(subscription);
+        subscriptionService.updateSubscription(subscription);
+    }
+
+    @Test
+    public void shouldUpdateASubscriptionIfExists() {
+        Subscription subscription = new SubscriptionBuilder().withDefaults().withPack(SubscriptionPack.NAVJAAT_KILKARI).withStatus(SubscriptionStatus.ACTIVE).build();
+        subscription.campaignCompleted();
+
+        subscriptionService.updateSubscription(subscription);
+
+        verify(allSubscriptions).update(subscription);
     }
 }

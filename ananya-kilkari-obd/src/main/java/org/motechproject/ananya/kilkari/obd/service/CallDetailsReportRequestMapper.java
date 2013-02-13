@@ -15,7 +15,6 @@ public class CallDetailsReportRequestMapper {
                 obdSuccessfulCallDetailsRequest.getMsisdn(),
                 obdSuccessfulCallDetailsRequest.getCampaignId(),
                 getServiceOption(obdSuccessfulCallDetailsRequest),
-                retryCount.toString(),
                 CampaignMessageStatus.SUCCESS.name(),
                 callDurationReportRequest,
                 obdSuccessfulCallDetailsRequest.getCallSource().name());

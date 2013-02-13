@@ -8,6 +8,8 @@ import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.message.repository.AllCampaignMessageAlerts;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
@@ -15,6 +17,7 @@ import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.validators.DateUtils;
+import org.motechproject.ananya.kilkari.test.data.contract.InboxCallDetailsWebRequestsList;
 import org.motechproject.ananya.kilkari.test.data.contract.SubscriberSubscriptions;
 import org.motechproject.ananya.kilkari.test.data.contract.SubscriptionRequest;
 import org.motechproject.ananya.kilkari.test.data.contract.builders.SubscriptionRequestBuilder;
@@ -32,9 +35,9 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.motechproject.ananya.kilkari.test.data.utils.TestUtils.constructUrl;
 import static org.motechproject.ananya.kilkari.test.data.utils.TestUtils.fromJson;
-import org.motechproject.ananya.kilkari.test.data.contract.InboxCallDetailsWebRequestsList;
 
 @ContextConfiguration("classpath:applicationKilkariTestDataContext.xml")
 @ActiveProfiles("production")
@@ -67,7 +70,7 @@ public class BaseDataSetup {
         Map<String, String> parametersMap = new HashMap<>();
         String channel = "CONTACT_CENTER";
         parametersMap.put("channel", channel);
-        restTemplate.postForEntity(constructUrl(baseUrl(), "subscription", parametersMap), subscriptionRequest, String.class);
+        restTemplate.postForEntity(constructUrl(baseUrlMaster(), "subscription", parametersMap), subscriptionRequest, String.class);
         waitForSubscriptionToBeCreated(msisdn);
         return msisdn;
     }
@@ -79,7 +82,7 @@ public class BaseDataSetup {
             put("msisdn",subscriptionRequest.getMsisdn());
             put("pack",subscriptionRequest.getPack());
         }};
-        restTemplate.getForEntity(constructUrl(baseUrl(), "subscription", parametersMap), String.class);
+        restTemplate.getForEntity(constructUrl(baseUrlMaster(), "subscription", parametersMap), String.class);
         waitForSubscriptionToBeCreated(subscriptionRequest.getMsisdn());
         return subscriptionRequest.getMsisdn();
     }
@@ -95,7 +98,7 @@ public class BaseDataSetup {
             add(MediaType.APPLICATION_JSON);
         }});
 
-        ResponseEntity<String> subscriber = restTemplate.exchange(constructUrl(baseUrl(), "subscriber", parametersMap), HttpMethod.GET, new HttpEntity<byte[]>(headers), String.class);
+        ResponseEntity<String> subscriber = restTemplate.exchange(constructUrl(baseUrlMaster(), "subscriber", parametersMap), HttpMethod.GET, new HttpEntity<byte[]>(headers), String.class);
         SubscriberSubscriptions subscriptionDetails = fromJson(subscriber.getBody(), SubscriberSubscriptions.class);
         return subscriptionDetails;
     }
@@ -125,16 +128,25 @@ public class BaseDataSetup {
         waitForSubscription(msisdn, subscriptionId, SubscriptionStatus.COMPLETED.getDisplayString());
     }
 
-
-
-
-    protected void makeOBDCallBack(String msisdn, String subscriptionId, String campaignId, String serviceOption, DateTime startTime, DateTime endTime) {
+    protected void makeOBDCallBackSuccess(String msisdn, String subscriptionId, String campaignId, String serviceOption, DateTime startTime) {
+        DateTime endTime = startTime.plusMinutes(10);
         CallDurationWebRequest callDurationWebRequest = new CallDurationWebRequest(startTime.toString("dd-MM-yyyy HH-mm-ss"), endTime.toString("dd-MM-yyyy HH-mm-ss"));
         OBDSuccessfulCallDetailsWebRequest callDetailsWebRequest = new OBDSuccessfulCallDetailsWebRequest(msisdn, campaignId, callDurationWebRequest, serviceOption);
 
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(constructUrl(baseUrl(), "/obd/calldetails/" + subscriptionId, new HashMap<String, String>()), callDetailsWebRequest, String.class);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(constructUrl(baseUrlMaster(), "/obd/calldetails/" + subscriptionId, new HashMap<String, String>()), callDetailsWebRequest, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         System.out.println(responseEntity.getBody());
+    }
+
+    protected void makeOBDCallBackFailure(final String msisdn, final String subscriptionId, final String campaignId, final String failureCode){
+        FailedCallReports failedCallReports = new FailedCallReports();
+        ArrayList<FailedCallReport> calls = new ArrayList<FailedCallReport>() {{
+            add(new FailedCallReport(subscriptionId, msisdn, campaignId, failureCode));
+        }};
+        failedCallReports.setFailedCallReports(calls);
+        ResponseEntity<String> response = restTemplate.postForEntity(constructUrl(baseUrlMaster(), "/obd/calldetails"), failedCallReports, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        System.out.println(response.getBody());
     }
 
     protected void moveToTime(final DateTime dateTime){
@@ -142,10 +154,14 @@ public class BaseDataSetup {
         final LinkedMultiValueMap<String, String> parameters = new LinkedMultiValueMap<String, String>() {{
             put("newDateTime", Arrays.asList(dateTime.toString("dd/MM/yyyy HH:mm")));
         }};
-        String response = restTemplate.postForObject(constructUrl(baseUrl(), "utils/fake_time.jsp"), parameters, String.class);
+        String responseMaster = restTemplate.postForObject(constructUrl(baseUrlMaster(), "utils/fake_time.jsp"), parameters, String.class);
+        String responseSlave = restTemplate.postForObject(constructUrl(baseUrlSlave(), "utils/fake_time.jsp"), parameters, String.class);
 
-        int beginIndex = response.indexOf("newDateTime\" value=\"");
-        System.out.println(response.substring(beginIndex+20, beginIndex + 36));
+        int beginIndex = responseMaster.indexOf("newDateTime\" value=\"");
+        System.out.println(responseMaster.substring(beginIndex+20, beginIndex + 36));
+
+        beginIndex = responseSlave.indexOf("newDateTime\" value=\"");
+        System.out.println(responseSlave.substring(beginIndex+20, beginIndex + 36));
 
     }
 
@@ -177,7 +193,7 @@ public class BaseDataSetup {
             add(pack);
         }};
         ChangeMsisdnWebRequest changeMsisdnWebRequest = new ChangeMsisdnWebRequest(msisdn, modifiedMsisdn, packs, "contact_center", "Changing MSISDN by script");
-        String response = restTemplate.postForObject(constructUrl(baseUrl(), "/subscriber/changemsisdn", parametersMap), changeMsisdnWebRequest, String.class);
+        String response = restTemplate.postForObject(constructUrl(baseUrlMaster(), "/subscriber/changemsisdn", parametersMap), changeMsisdnWebRequest, String.class);
         System.out.println(response);
 
         SubscriberSubscriptions subscriptionDetails = getSubscriptionDetails(modifiedMsisdn);
@@ -201,7 +217,7 @@ public class BaseDataSetup {
         callbackRequest.setReason("By script with action "+action);
         callbackRequest.setOperator(operator);
         callbackRequest.setStatus(status);
-        restTemplate.put(constructUrl(baseUrl(), "subscription/" + subscriptionId, parametersMap), callbackRequest);
+        restTemplate.put(constructUrl(baseUrlMaster(), "subscription/" + subscriptionId, parametersMap), callbackRequest);
     }
 
     private CampaignMessage findOBDCampaignMessage(String subscriptionId, String weekMessageId) {
@@ -213,8 +229,12 @@ public class BaseDataSetup {
         return campaignMessageAlert !=null && campaignMessageAlert.getMessageId().equals(weekMessageId) ? campaignMessageAlert : null;
     }
 
-    protected String baseUrl() {
-        return testDataConfig.baseUrl();
+    protected String baseUrlMaster() {
+        return testDataConfig.baseUrlMaster();
+    }
+
+    protected String baseUrlSlave() {
+        return testDataConfig.baseUrlSlave();
     }
 
     protected void waitForCampaignMessage(final String subscriptionId, final String weekMessageId) {
@@ -268,7 +288,7 @@ public class BaseDataSetup {
             put("channel", "ivr");
 
         }};
-        String response = restTemplate.postForObject(constructUrl(baseUrl(), "inbox/calldetails", parametersMap), inboxCallDetailsWebRequestsList, String.class);
+        String response = restTemplate.postForObject(constructUrl(baseUrlMaster(), "inbox/calldetails", parametersMap), inboxCallDetailsWebRequestsList, String.class);
         System.out.println(response);
     }
 
@@ -308,7 +328,7 @@ public class BaseDataSetup {
         if(modifiedEDD !=null) request.setExpectedDateOfDelivery(modifiedEDD.toString("dd-MM-yyyy"));
         request.setReason("Change by script");
 
-        restTemplate.put(constructUrl(baseUrl(),"/subscription/"+subscriptionId+"/changesubscription",parametersMap), request,String.class);
+        restTemplate.put(constructUrl(baseUrlMaster(),"/subscription/"+subscriptionId+"/changesubscription",parametersMap), request,String.class);
         waitForSubscription(msisdn, subscriptionId, SubscriptionStatus.PENDING_DEACTIVATION.getDisplayString());
         SubscriberSubscriptions subscriptionDetails = getSubscriptionDetails(msisdn);
         List<AllSubscriptionDetails> subscriptions = subscriptionDetails.getSubscriptionDetails();

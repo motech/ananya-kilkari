@@ -1,13 +1,9 @@
 package org.motechproject.ananya.kilkari.obd.service;
 
 import org.joda.time.DateTime;
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
-import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
+import org.motechproject.ananya.kilkari.obd.domain.*;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.obd.domain.MainSubSlot;
-import org.motechproject.ananya.kilkari.obd.domain.OBDSubSlot;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTask;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTaskExecutor;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
@@ -117,9 +113,10 @@ public class CampaignMessageService {
     }
 
     private void updateCampaignMessageStatus(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
-        if (hasReachedMaximumRetryDays(campaignMessage))
+        if (hasReachedMaximumRetryDays(campaignMessage)) {
             allCampaignMessages.delete(campaignMessage);
-        else {
+            logger.info(String.format("Deleting campaign message for subscriptionId : %s and Week ending date : %s as it has reached maximum retry days", campaignMessage.getSubscriptionId(), campaignMessage.getWeekEndingDate()));
+        } else {
             campaignMessage.setStatusCode(statusCode);
             allCampaignMessages.update(campaignMessage);
         }

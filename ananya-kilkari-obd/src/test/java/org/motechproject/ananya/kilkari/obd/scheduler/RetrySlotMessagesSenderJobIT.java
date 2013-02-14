@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.obd.scheduler;
 
 import org.junit.After;
 import org.junit.Test;
+import org.motechproject.ananya.kilkari.obd.domain.RetrySubSlot;
 import org.motechproject.ananya.kilkari.obd.utils.SpringIntegrationTest;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.retry.dao.AllRetries;

@@ -16,7 +16,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.motechproject.ananya.kilkari.obd.scheduler.MainSubSlot;
+import org.motechproject.ananya.kilkari.obd.domain.MainSubSlot;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;

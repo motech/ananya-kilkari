@@ -13,7 +13,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.motechproject.ananya.kilkari.obd.profile.ProductionProfile;
-import org.motechproject.ananya.kilkari.obd.scheduler.OBDSubSlot;
+import org.motechproject.ananya.kilkari.obd.domain.OBDSubSlot;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.ananya.kilkari.obd.service.request.InvalidFailedCallReports;
 import org.motechproject.ananya.kilkari.obd.service.utils.JsonUtils;

@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.scheduler;
+package org.motechproject.ananya.kilkari.obd.domain;
 
 import java.io.Serializable;
 
@@ -15,6 +15,13 @@ public abstract class OBDSubSlot implements Serializable {
 
     public String getSlotName() {
         return name + "." + slotNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "OBDSubSlot{" +
+                "slotName='" + getSlotName() +
+                "'}";
     }
 }
 

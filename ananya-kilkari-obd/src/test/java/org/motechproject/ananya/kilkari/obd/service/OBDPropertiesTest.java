@@ -7,8 +7,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
-import org.motechproject.ananya.kilkari.obd.scheduler.MainSubSlot;
-import org.motechproject.ananya.kilkari.obd.scheduler.RetrySubSlot;
+import org.motechproject.ananya.kilkari.obd.domain.MainSubSlot;
+import org.motechproject.ananya.kilkari.obd.domain.RetrySubSlot;
 
 import java.util.Properties;
 

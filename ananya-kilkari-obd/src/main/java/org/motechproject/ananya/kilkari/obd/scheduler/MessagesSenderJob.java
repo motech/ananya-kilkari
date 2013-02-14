@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.scheduler;
 
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.obd.domain.OBDSubSlot;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.obd.service.OBDProperties;
 import org.motechproject.event.MotechEvent;

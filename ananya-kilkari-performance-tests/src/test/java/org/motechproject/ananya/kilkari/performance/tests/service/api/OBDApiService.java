@@ -1,7 +1,7 @@
 package org.motechproject.ananya.kilkari.performance.tests.service.api;
 
-import org.motechproject.ananya.kilkari.obd.scheduler.MainSubSlot;
-import org.motechproject.ananya.kilkari.obd.scheduler.RetrySubSlot;
+import org.motechproject.ananya.kilkari.obd.domain.MainSubSlot;
+import org.motechproject.ananya.kilkari.obd.domain.RetrySubSlot;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReports;
 import org.motechproject.ananya.kilkari.performance.tests.utils.HttpUtils;

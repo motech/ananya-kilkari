@@ -12,8 +12,8 @@ import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
 import org.motechproject.ananya.kilkari.obd.repository.StubOnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.obd.scheduler.MainSubSlot;
-import org.motechproject.ananya.kilkari.obd.scheduler.RetrySubSlot;
+import org.motechproject.ananya.kilkari.obd.domain.MainSubSlot;
+import org.motechproject.ananya.kilkari.obd.domain.RetrySubSlot;
 import org.motechproject.ananya.kilkari.obd.utils.SpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 

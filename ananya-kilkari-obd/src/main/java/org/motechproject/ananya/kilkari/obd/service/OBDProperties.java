@@ -4,7 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
-import org.motechproject.ananya.kilkari.obd.scheduler.OBDSubSlot;
+import org.motechproject.ananya.kilkari.obd.domain.OBDSubSlot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;

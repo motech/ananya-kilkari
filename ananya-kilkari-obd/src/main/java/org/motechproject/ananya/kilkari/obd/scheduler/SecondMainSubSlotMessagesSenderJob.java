@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.scheduler;
 
+import org.motechproject.ananya.kilkari.obd.domain.MainSubSlot;
+import org.motechproject.ananya.kilkari.obd.domain.OBDSubSlot;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.event.annotations.MotechListener;
 import org.springframework.stereotype.Component;

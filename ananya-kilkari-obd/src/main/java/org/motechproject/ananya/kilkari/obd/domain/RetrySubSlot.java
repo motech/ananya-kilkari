@@ -1,4 +1,4 @@
-package org.motechproject.ananya.kilkari.obd.scheduler;
+package org.motechproject.ananya.kilkari.obd.domain;
 
 public class RetrySubSlot extends OBDSubSlot {
 

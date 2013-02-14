@@ -136,6 +136,8 @@ public class BaseDataSetup {
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(constructUrl(baseUrlMaster(), "/obd/calldetails/" + subscriptionId, new HashMap<String, String>()), callDetailsWebRequest, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         System.out.println(responseEntity.getBody());
+        if(serviceOption.equals("UNSUBSCRIPTION"))
+            waitForSubscription(msisdn,subscriptionId,SubscriptionStatus.PENDING_DEACTIVATION.getDisplayString());
     }
 
     protected void makeOBDCallBackFailure(final String msisdn, final String subscriptionId, final String campaignId, final String failureCode){

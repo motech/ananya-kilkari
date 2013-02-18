@@ -1084,7 +1084,6 @@ public class SubscriptionServiceTest {
         assertEquals(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, actualSchedulableJob.getMotechEvent().getSubject());
         ScheduleDeactivationRequest scheduleDeactivationRequest = (ScheduleDeactivationRequest) actualSchedulableJob.getMotechEvent().getParameters().get("0");
         verify(kilkariPropertiesData).getBufferDaysToAllowRenewalForDeactivation();
-        verify(kilkariPropertiesData, times(0)).getBufferDaysToAllowRenewalForPackCompletion();
         assertEquals(new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount), scheduleDeactivationRequest);
     }
 

@@ -24,10 +24,6 @@ public class KilkariPropertiesData {
 
     }
 
-    public int getBufferDaysToAllowRenewalForPackCompletion() {
-        return Integer.parseInt(kilkariProperties.getProperty("buffer.days.to.allow.renewal.for.pack.completion"));
-    }
-
     public int getBufferDaysToAllowRenewalForDeactivation() {
         return Integer.parseInt(kilkariProperties.getProperty("buffer.days.to.allow.renewal.for.pack.deactivation"));
     }

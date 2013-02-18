@@ -264,8 +264,14 @@ public class SubscriptionService {
         Subscription subscription = findBySubscriptionId(subscriptionId);
         if (subscription.isSubscriptionCompletionRequestSent())
             deactivateSubscription(subscriptionId, deactivationDate, reason, graceCount);
-        else
+        else {
+            SubscriptionStatus status = subscription.getStatus();
+            if (status.isSuspended()) {
+                reason = reason.isEmpty() ? "Deactivation due to renewal max" : reason;
+                logger.info(String.format("Subscription %s is being deactivated due to low balance. Current status: %s", subscriptionId, status.getDisplayString()));
+            }
             scheduleDeactivation(subscriptionId, deactivationDate, reason, graceCount);
+        }
     }
 
     public void deactivateSubscription(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {

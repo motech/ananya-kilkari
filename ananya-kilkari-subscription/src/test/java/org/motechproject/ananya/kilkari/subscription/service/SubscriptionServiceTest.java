@@ -1088,6 +1088,20 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    public void shouldPopulateReasonWhenDeactivatingALowBalanceCase() {
+        Integer graceCount = 2;
+        DateTime deactivationDate = DateTime.now();
+        Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
+        String subscriptionId = subscription.getSubscriptionId();
+        subscription.setStatus(SubscriptionStatus.SUSPENDED);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        int bufferForDeactivationInDays = 2;
+        when(kilkariPropertiesData.getBufferDaysToAllowRenewalForDeactivation()).thenReturn(bufferForDeactivationInDays);
+
+        subscriptionService.processDeactivation(subscriptionId, deactivationDate, "Deactivation due to renewal max", graceCount);
+    }
+
+    @Test
     public void processDeactivationForSubscriptionCompletionShouldNotScheduleDeactivation() {
         DateTime date = DateTime.now();
         String reason = "balance is low";

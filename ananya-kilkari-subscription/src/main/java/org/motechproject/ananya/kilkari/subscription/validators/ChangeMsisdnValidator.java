@@ -80,10 +80,10 @@ public class ChangeMsisdnValidator {
 
     private void validatePack(SubscriptionPack requestedPack, List<SubscriptionPack> updatablePacksForOldMsisdn, List<SubscriptionPack> updatablePacksForNewMsisdn) {
         if (!updatablePacksForOldMsisdn.contains(requestedPack)) {
-            throw new ValidationException(String.format("Old msisdn doesn't actively subscribe to the requested pack %s", requestedPack));
+            throw new ValidationException(String.format("Old msisdn doesn't have an updatable subscription for the requested pack %s", requestedPack));
         }
         if (updatablePacksForNewMsisdn.contains(requestedPack)) {
-            throw new ValidationException(String.format("New msisdn already has a subscription in progress for the requested pack %s.", requestedPack));
+            throw new ValidationException(String.format("New msisdn already has a in-progress subscription for the requested pack %s.", requestedPack));
         }
     }
 }

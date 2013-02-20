@@ -14,7 +14,6 @@ import org.quartz.SchedulerException;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,14 +34,11 @@ public class SchedulerDiagnosticsTest {
     @Test
     public void shouldGetAllOBDSchedulers() throws SchedulerException {
         DiagnosticsResult expectedDiagnosticsResult = new DiagnosticsResult(DiagnosticsStatus.PASS, "some message");
-        when(schedulerDiagnosticService.diagnose(anyList())).thenReturn(expectedDiagnosticsResult);
+        when(schedulerDiagnosticService.diagnoseAllOBDSchedules()).thenReturn(expectedDiagnosticsResult);
 
         DiagnosticsResult actualDiagnosticsResult = schedulerDiagnostics.performDiagnosis();
 
-        verify(schedulerDiagnosticService).diagnose(jobsArgumentCaptor.capture());
-        List<String> actualJobs = jobsArgumentCaptor.getValue();
-        assertEquals("obd.send.new.messages", actualJobs.get(0));
-        assertEquals("obd.send.retry.messages", actualJobs.get(1));
+        verify(schedulerDiagnosticService).diagnoseAllOBDSchedules();
         assertEquals(expectedDiagnosticsResult, actualDiagnosticsResult);
     }
 }

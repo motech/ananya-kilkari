@@ -30,10 +30,10 @@ public class ChangeMsisdnValidator {
         List<SubscriptionPack> requestedPacks = getRequestedPacks(changeMsisdnRequest);
 
         List<SubscriptionPack> updatablePacksForOldMsisdn = getUpadatablePacks(oldMsisdn);
-        List<SubscriptionPack> updatablePacksForNewMsisdn = getUpadatablePacks(newMsisdn);
+        List<SubscriptionPack> inProgressPacksForNewMsisdn = getPacksInProgress(newMsisdn);
 
         for (SubscriptionPack requestedPack : requestedPacks) {
-            validatePack(requestedPack, updatablePacksForOldMsisdn, updatablePacksForNewMsisdn);
+            validatePack(requestedPack, updatablePacksForOldMsisdn, inProgressPacksForNewMsisdn);
         }
     }
 
@@ -64,6 +64,11 @@ public class ChangeMsisdnValidator {
         return toPacks(updatableSubscriptions);
     }
 
+    private List<SubscriptionPack> getPacksInProgress(String msisdn) {
+        List<Subscription> subscriptionsInProgress = allSubscriptions.findSubscriptionsInProgress(msisdn);
+        return toPacks(subscriptionsInProgress);
+    }
+
     private List<SubscriptionPack> toPacks(List<Subscription> subscriptions) {
         return new ArrayList<SubscriptionPack>(CollectionUtils.collect(subscriptions, new Transformer() {
             @Override
@@ -75,10 +80,10 @@ public class ChangeMsisdnValidator {
 
     private void validatePack(SubscriptionPack requestedPack, List<SubscriptionPack> updatablePacksForOldMsisdn, List<SubscriptionPack> updatablePacksForNewMsisdn) {
         if (!updatablePacksForOldMsisdn.contains(requestedPack)) {
-            throw new ValidationException(String.format("Old msisdn doesn't actively subscribe to the requested pack. Pack: %s", requestedPack));
+            throw new ValidationException(String.format("Old msisdn doesn't actively subscribe to the requested pack %s", requestedPack));
         }
         if (updatablePacksForNewMsisdn.contains(requestedPack)) {
-            throw new ValidationException(String.format("New msisdn actively subscribes to the requested pack. Pack: %s", requestedPack));
+            throw new ValidationException(String.format("New msisdn already has a subscription in progress for the requested pack %s.", requestedPack));
         }
     }
 }

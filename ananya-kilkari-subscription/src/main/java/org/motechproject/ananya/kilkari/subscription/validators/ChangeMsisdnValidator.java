@@ -32,23 +32,13 @@ public class ChangeMsisdnValidator {
         List<SubscriptionPack> updatablePacksForOldMsisdn = getUpadatablePacks(oldMsisdn);
         List<SubscriptionPack> updatablePacksForNewMsisdn = getUpadatablePacks(newMsisdn);
 
-        for(SubscriptionPack requestedPack: requestedPacks) {
+        for (SubscriptionPack requestedPack : requestedPacks) {
             validatePack(requestedPack, updatablePacksForOldMsisdn, updatablePacksForNewMsisdn);
         }
     }
 
-    private void validatePack(SubscriptionPack requestedPack, List<SubscriptionPack> updatablePacksForOldMsisdn, List<SubscriptionPack> updatablePacksForNewMsisdn) {
-        if(!updatablePacksForOldMsisdn.contains(requestedPack)) {
-            throw new ValidationException(String.format("Old msisdn doesn't actively subscribe to the requested pack. Pack: %s", requestedPack));
-        }
-
-        if(updatablePacksForNewMsisdn.contains(requestedPack)) {
-            throw new ValidationException(String.format("New msisdn actively subscribes to the requested pack. Pack: %s", requestedPack));
-        }
-    }
-
     private List<SubscriptionPack> getRequestedPacks(ChangeMsisdnRequest changeMsisdnRequest) {
-        if(!changeMsisdnRequest.getShouldChangeAllPacks()) {
+        if (!changeMsisdnRequest.getShouldChangeAllPacks()) {
             return changeMsisdnRequest.getPacks();
         }
         return getRequestPacksForAll(changeMsisdnRequest);
@@ -64,11 +54,9 @@ public class ChangeMsisdnValidator {
     }
 
     private void validateIfAllUpdatable(List<Subscription> subscriptions) {
-        for(Subscription subscription: subscriptions) {
-            if(!subscription.isInUpdatableState()) {
+        for (Subscription subscription : subscriptions)
+            if (!subscription.isInUpdatableState())
                 throw new ValidationException(String.format("All the subscription for old msisdn are not updatable. SubscriptionId: %s; Pack: %s, Status: %s", subscription.getSubscriptionId(), subscription.getPack(), subscription.getStatus()));
-            }
-        }
     }
 
     private List<SubscriptionPack> getUpadatablePacks(String msisdn) {
@@ -85,10 +73,12 @@ public class ChangeMsisdnValidator {
         }));
     }
 
-    private void validateIfAtleastOneUpdatableSubscriptionExists(List<SubscriptionPack> packs) {
-        if (packs.isEmpty()) {
-            throw new ValidationException("Old msisdn has no subscriptions in the updatable state");
+    private void validatePack(SubscriptionPack requestedPack, List<SubscriptionPack> updatablePacksForOldMsisdn, List<SubscriptionPack> updatablePacksForNewMsisdn) {
+        if (!updatablePacksForOldMsisdn.contains(requestedPack)) {
+            throw new ValidationException(String.format("Old msisdn doesn't actively subscribe to the requested pack. Pack: %s", requestedPack));
+        }
+        if (updatablePacksForNewMsisdn.contains(requestedPack)) {
+            throw new ValidationException(String.format("New msisdn actively subscribes to the requested pack. Pack: %s", requestedPack));
         }
     }
-
 }

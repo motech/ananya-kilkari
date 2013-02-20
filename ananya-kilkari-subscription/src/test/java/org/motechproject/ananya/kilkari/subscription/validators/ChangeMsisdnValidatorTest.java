@@ -70,7 +70,7 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack. Pack: NANHI_KILKARI");
+        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack NANHI_KILKARI");
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
@@ -84,7 +84,7 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(new ArrayList<Subscription>());
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack. Pack: BARI_KILKARI");
+        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack BARI_KILKARI");
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
@@ -104,7 +104,7 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack. Pack: NAVJAAT_KILKARI");
+        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack NAVJAAT_KILKARI");
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
@@ -182,10 +182,10 @@ public class ChangeMsisdnValidatorTest {
         newMsisdnSubscription2.setStatus(SubscriptionStatus.ACTIVE);
 
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(oldMsisdnSubscription));
-        when(allSubscriptions.findUpdatableSubscriptions(newMsisdn)).thenReturn(Arrays.asList(newMsisdnSubscription2, newMsisdnSubscription1));
+        when(allSubscriptions.findSubscriptionsInProgress(newMsisdn)).thenReturn(Arrays.asList(newMsisdnSubscription2, newMsisdnSubscription1));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("New msisdn actively subscribes to the requested pack. Pack: NAVJAAT_KILKARI");
+        expectedException.expectMessage(String.format("New msisdn already has a subscription in progress for the requested pack %s.", SubscriptionPack.NAVJAAT_KILKARI));
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
@@ -204,14 +204,14 @@ public class ChangeMsisdnValidatorTest {
         subscription2.setStatus(SubscriptionStatus.SUSPENDED);
 
         Subscription subscription3 = new Subscription(newMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
-        subscription2.setStatus(SubscriptionStatus.ACTIVE);
+        subscription3.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
 
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
         when(allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
-        when(allSubscriptions.findUpdatableSubscriptions(newMsisdn)).thenReturn(Arrays.asList(subscription3));
+        when(allSubscriptions.findSubscriptionsInProgress(newMsisdn)).thenReturn(Arrays.asList(subscription3));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("New msisdn actively subscribes to the requested pack. Pack: NAVJAAT_KILKARI");
+        expectedException.expectMessage(String.format("New msisdn already has a subscription in progress for the requested pack %s.", SubscriptionPack.NAVJAAT_KILKARI));
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }

@@ -16,7 +16,6 @@ import org.motechproject.ananya.kilkari.subscription.service.request.ChangeMsisd
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -71,35 +70,13 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Requested Msisdn doesn't actively subscribe to all the packs which have been requested");
+        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack. Pack: NANHI_KILKARI");
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
 
     @Test
-    public void shouldValidateChangeMsisdnRequestWhenAllPacksSpecified() {
-        String oldMsisdn = "9876543210";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CONTACT_CENTER, null);
-        changeMsisdnRequest.setShouldChangeAllPacks(true);
-
-        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
-        subscription1.setStatus(SubscriptionStatus.ACTIVE);
-
-        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
-        subscription2.setStatus(SubscriptionStatus.SUSPENDED);
-
-        Subscription subscription3 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
-        subscription3.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
-
-        when(allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2, subscription3));
-
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Requested Msisdn doesn't have all subscriptions in updatable state. " + subscription3.getSubscriptionId() + " in " + subscription3.getStatus());
-        changeMsisdnValidator.validate(changeMsisdnRequest);
-    }
-
-    @Test
-    public void shouldValidateChangeMsisdnRequestWhenNoSubscriptionIsPresent() {
+    public void shouldValidateChangeMsisdnRequestWhenAllPacksAreMissing() {
         String oldMsisdn = "9876543210";
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CONTACT_CENTER, null);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.BARI_KILKARI, SubscriptionPack.NAVJAAT_KILKARI, SubscriptionPack.NANHI_KILKARI));
@@ -107,7 +84,7 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(new ArrayList<Subscription>());
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Requested Msisdn has no subscriptions in the updatable state");
+        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack. Pack: BARI_KILKARI");
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
@@ -127,21 +104,64 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Requested Msisdn doesn't actively subscribe to all the packs which have been requested");
+        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack. Pack: NAVJAAT_KILKARI");
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
 
     @Test
-    public void shouldValidateWhenAllPacksSpecifiedAndSubscriptionDoesNotExist() {
+    public void shouldValidateChangeMsisdnWhenAllPacksSpecified() {
         String oldMsisdn = "9876543210";
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CONTACT_CENTER, null);
         changeMsisdnRequest.setShouldChangeAllPacks(true);
 
-        when(allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn())).thenReturn(Collections.EMPTY_LIST);
+        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
+        subscription1.setStatus(SubscriptionStatus.ACTIVE);
+
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
+        subscription2.setStatus(SubscriptionStatus.SUSPENDED);
+
+        when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
+        when(allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
+
+        changeMsisdnValidator.validate(changeMsisdnRequest);
+    }
+
+    @Test
+    public void shouldValidateChangeMsisdnForAllSubscriptionToBeUpdatableWhenAllPacksSpecified() {
+        String oldMsisdn = "9876543210";
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CONTACT_CENTER, null);
+        changeMsisdnRequest.setShouldChangeAllPacks(true);
+
+        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
+        subscription1.setStatus(SubscriptionStatus.ACTIVE);
+
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now(), null);
+        subscription2.setStatus(SubscriptionStatus.SUSPENDED);
+
+        Subscription subscription3 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
+        subscription3.setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+
+        when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
+        when(allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2, subscription3));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Requested Msisdn has no subscriptions in the updatable state");
+        expectedException.expectMessage(String.format("All the subscription for old msisdn are not updatable. SubscriptionId: %s; Pack: %s, Status: %s", subscription3.getSubscriptionId(), subscription3.getPack(), subscription3.getStatus()));
+        changeMsisdnValidator.validate(changeMsisdnRequest);
+    }
+
+    @Test
+    public void shouldValidateForAlteastOneSubscriptionWhenAllPacksIsSpecified() {
+        String oldMsisdn = "9876543210";
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, "9876543211", Channel.CONTACT_CENTER, null);
+        changeMsisdnRequest.setShouldChangeAllPacks(true);
+
+        when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(new ArrayList<Subscription>());
+        when(allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn())).thenReturn(new ArrayList<Subscription>());
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Old msisdn has no subscriptions.");
+
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
 
@@ -165,7 +185,33 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findUpdatableSubscriptions(newMsisdn)).thenReturn(Arrays.asList(newMsisdnSubscription2, newMsisdnSubscription1));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("Subscription already exists for msisdn[%s] and and pack[%s]", changeMsisdnRequest.getNewMsisdn(), pack.name()));
+        expectedException.expectMessage("New msisdn actively subscribes to the requested pack. Pack: NAVJAAT_KILKARI");
+
+        changeMsisdnValidator.validate(changeMsisdnRequest);
+    }
+
+    @Test
+    public void shouldValidateIfTheNewMsisdnIsAlreadySubscribedToAnyOfTheGivenPacksWhenAllSpecified() {
+        String oldMsisdn = "9876543210";
+        String newMsisdn = "9876543211";
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER, null);
+        changeMsisdnRequest.setShouldChangeAllPacks(true);
+
+        Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
+        subscription1.setStatus(SubscriptionStatus.ACTIVE);
+
+        Subscription subscription2 = new Subscription(oldMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
+        subscription2.setStatus(SubscriptionStatus.SUSPENDED);
+
+        Subscription subscription3 = new Subscription(newMsisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null);
+        subscription2.setStatus(SubscriptionStatus.ACTIVE);
+
+        when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
+        when(allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
+        when(allSubscriptions.findUpdatableSubscriptions(newMsisdn)).thenReturn(Arrays.asList(subscription3));
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("New msisdn actively subscribes to the requested pack. Pack: NAVJAAT_KILKARI");
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }

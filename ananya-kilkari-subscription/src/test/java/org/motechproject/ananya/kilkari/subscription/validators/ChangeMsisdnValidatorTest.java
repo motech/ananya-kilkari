@@ -51,7 +51,7 @@ public class ChangeMsisdnValidatorTest {
         subscription2.setStatus(SubscriptionStatus.SUSPENDED);
 
 
-        when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1,subscription2));
+        when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
@@ -142,6 +142,31 @@ public class ChangeMsisdnValidatorTest {
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Requested Msisdn has no subscriptions in the updatable state");
+        changeMsisdnValidator.validate(changeMsisdnRequest);
+    }
+
+    @Test
+    public void shouldValidateIfTheNewMsisdnIsAlreadySubscribedToAnyOfTheGivenPacks() {
+        String oldMsisdn = "1111111111";
+        String newMsisdn = "1111111112";
+        final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER, "random reason");
+        changeMsisdnRequest.setPacks(new ArrayList<SubscriptionPack>(){{
+            add(pack);
+        }});
+        Subscription oldMsisdnSubscription = new Subscription(oldMsisdn, pack, DateTime.now(), DateTime.now(), null);
+        oldMsisdnSubscription.setStatus(SubscriptionStatus.ACTIVE);
+        Subscription newMsisdnSubscription1 = new Subscription(newMsisdn, pack, DateTime.now(), DateTime.now(), null);
+        newMsisdnSubscription1.setStatus(SubscriptionStatus.SUSPENDED);
+        Subscription newMsisdnSubscription2 = new Subscription(newMsisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);
+        newMsisdnSubscription2.setStatus(SubscriptionStatus.ACTIVE);
+
+        when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(oldMsisdnSubscription));
+        when(allSubscriptions.findUpdatableSubscriptions(newMsisdn)).thenReturn(Arrays.asList(newMsisdnSubscription2, newMsisdnSubscription1));
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage(String.format("Subscription already exists for msisdn[%s] and and pack[%s]", changeMsisdnRequest.getNewMsisdn(), pack.name()));
+
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
 }

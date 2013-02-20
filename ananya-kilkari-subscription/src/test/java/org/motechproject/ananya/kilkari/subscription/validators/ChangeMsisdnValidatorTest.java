@@ -70,7 +70,7 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1, subscription2));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack NANHI_KILKARI");
+        expectedException.expectMessage(String.format("Old msisdn doesn't have an updatable subscription for the requested pack %s", SubscriptionPack.NANHI_KILKARI));
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
@@ -84,7 +84,7 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(new ArrayList<Subscription>());
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack BARI_KILKARI");
+        expectedException.expectMessage(String.format("Old msisdn doesn't have an updatable subscription for the requested pack %s", SubscriptionPack.BARI_KILKARI));
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
@@ -104,7 +104,7 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findUpdatableSubscriptions(changeMsisdnRequest.getOldMsisdn())).thenReturn(Arrays.asList(subscription1));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Old msisdn doesn't actively subscribe to the requested pack NAVJAAT_KILKARI");
+        expectedException.expectMessage(String.format("Old msisdn doesn't have an updatable subscription for the requested pack %s", SubscriptionPack.NAVJAAT_KILKARI));
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
@@ -185,7 +185,7 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findSubscriptionsInProgress(newMsisdn)).thenReturn(Arrays.asList(newMsisdnSubscription2, newMsisdnSubscription1));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("New msisdn already has a subscription in progress for the requested pack %s.", SubscriptionPack.NAVJAAT_KILKARI));
+        expectedException.expectMessage(String.format("New msisdn already has a in-progress subscription for the requested pack %s.", SubscriptionPack.NAVJAAT_KILKARI));
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }
@@ -211,7 +211,7 @@ public class ChangeMsisdnValidatorTest {
         when(allSubscriptions.findSubscriptionsInProgress(newMsisdn)).thenReturn(Arrays.asList(subscription3));
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage(String.format("New msisdn already has a subscription in progress for the requested pack %s.", SubscriptionPack.NAVJAAT_KILKARI));
+        expectedException.expectMessage(String.format("New msisdn already has a in-progress subscription for the requested pack %s.", SubscriptionPack.NAVJAAT_KILKARI));
 
         changeMsisdnValidator.validate(changeMsisdnRequest);
     }

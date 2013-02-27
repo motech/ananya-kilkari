@@ -1,6 +1,5 @@
 package org.motechproject.ananya.kilkari.subscription.validators;
 
-import org.motechproject.ananya.kilkari.messagecampaign.domain.MessageCampaignPack;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.subscription.domain.CampaignChangeReason;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
@@ -37,8 +36,8 @@ public class SubscriptionValidator {
         else if (!subscription.isActiveOrSuspended())
             errors.add(String.format("Subscription is not active for subscriptionId %s", subscriptionId));
 
-        if (subscription != null && subscription.getMessageCampaignPack().equals(MessageCampaignPack.from(reason.name())))
-            errors.add(String.format("Subscription with subscriptionId %s is already in %s", subscriptionId, reason.name()));
+        if (subscription != null && subscription.getMessageCampaignPack().isMCOrID())
+            errors.add(String.format("Subscription with subscriptionId %s is already in %s", subscriptionId, subscription.getMessageCampaignPack().name()));
 
         raiseExceptionIfThereAreErrors(errors);
     }

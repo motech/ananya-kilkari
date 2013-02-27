@@ -1456,4 +1456,21 @@ public class SubscriptionServiceTest {
 
         verify(allSubscriptions).update(subscription);
     }
+
+    @Test
+    public void shouldUpdateMessageCampaignPackWhenReschedulingToMCOrID() {
+        String subscriptionId = "subscriptionId";
+        DateTime now = DateTime.now();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription("2134567890", SubscriptionPack.NANHI_KILKARI, now, now, 2));
+        when(messageCampaignService.getActiveCampaignName(subscriptionId)).thenReturn(null);
+        when(messageCampaignService.getMessageTimings(anyString(), any(DateTime.class), any(DateTime.class))).thenReturn(Arrays.asList(new DateTime()));
+        when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(30);
+
+        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId, CampaignChangeReason.MISCARRIAGE, now.plusWeeks(4)));
+
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
+        verify(allSubscriptions).update(subscriptionArgumentCaptor.capture());
+        Subscription actualSubscription = subscriptionArgumentCaptor.getValue();
+        assertEquals(MessageCampaignPack.MISCARRIAGE, actualSubscription.getMessageCampaignPack());
+    }
 }

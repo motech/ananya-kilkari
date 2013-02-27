@@ -334,10 +334,16 @@ public class SubscriptionService {
         subscriptionValidator.validateChangeCampaign(subscriptionId, campaignRescheduleRequest.getReason());
 
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+        updateMessageCampaignPack(campaignRescheduleRequest.getReason(), subscription);
         DateTime nextAlertDateTime = messageCampaignService.getMessageTimings(subscriptionId, campaignRescheduleRequest.getCreatedAt(), campaignRescheduleRequest.getCreatedAt().plusMonths(1)).get(0);
         unScheduleCampaign(subscription);
         removeScheduledMessagesFromOBD(subscriptionId);
         scheduleCampaign(campaignRescheduleRequest, nextAlertDateTime);
+    }
+
+    private void updateMessageCampaignPack(CampaignChangeReason campaignChangeReason, Subscription subscription) {
+        subscription.setMessageCampaignPack(MessageCampaignPack.from(campaignChangeReason.name()));
+        allSubscriptions.update(subscription);
     }
 
     public void updateSubscriberDetails(SubscriberRequest request) {

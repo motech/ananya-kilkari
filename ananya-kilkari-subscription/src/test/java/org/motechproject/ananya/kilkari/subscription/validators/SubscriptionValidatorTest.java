@@ -136,18 +136,31 @@ public class SubscriptionValidatorTest {
     }
 
     @Test
-    public void shouldValidateIfSubscriptionIsAlreadyInTheSameCampaignPack(){
+    public void shouldValidateIfSubscriptionIsAlreadyInMiscarriage() {
         String subscriptionId = "subscriptionId";
         Subscription subscription = mock(Subscription.class);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(subscription.isActiveOrSuspended()).thenReturn(true);
-        when(subscription.getMessageCampaignPack()).thenReturn(MessageCampaignPack.MISCARRIAGE);
+        when(subscription.getMessageCampaignPack()).thenReturn(MessageCampaignPack.BARI_KILKARI);
 
         subscriptionValidator.validateChangeCampaign(subscriptionId, CampaignChangeReason.INFANT_DEATH);
     }
 
     @Test
-    public void shouldValidateAndThrowExceptionIfSubscriptionIsAlreadyInTheSameCampaignPack(){
+    public void shouldValidateAndThrowExceptionIfSubscriptionIsAlreadyInMiscarriage() {
+        String subscriptionId = "subscriptionId";
+        Subscription subscription = mock(Subscription.class);
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
+        when(subscription.getMessageCampaignPack()).thenReturn(MessageCampaignPack.MISCARRIAGE);
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Subscription with subscriptionId subscriptionId is already in MISCARRIAGE");
+
+        subscriptionValidator.validateChangeCampaign(subscriptionId, CampaignChangeReason.INFANT_DEATH);
+    }
+
+    @Test
+    public void shouldValidateAndThrowExceptionIfSubscriptionIsAlreadyInInfantDeath() {
         String subscriptionId = "subscriptionId";
         Subscription subscription = mock(Subscription.class);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);

@@ -17,6 +17,7 @@ import java.util.List;
 public class ChangeMsisdnValidator {
 
     private AllSubscriptions allSubscriptions;
+    private final static String INVALID_REQUEST_MESSAGE = "Request cannot be processed successfully.";
 
     @Autowired
     public ChangeMsisdnValidator(AllSubscriptions allSubscriptions) {
@@ -47,7 +48,7 @@ public class ChangeMsisdnValidator {
     private List<SubscriptionPack> getRequestPacksForAll(ChangeMsisdnRequest changeMsisdnRequest) {
         List<Subscription> subscriptions = allSubscriptions.findByMsisdn(changeMsisdnRequest.getOldMsisdn());
         if (subscriptions.isEmpty()) {
-            throw new ValidationException("Old msisdn has no subscriptions.");
+            throw new ValidationException(formatErrorMessage("Old msisdn has no subscriptions."));
         }
         validateIfAllUpdatable(subscriptions);
         return toPacks(subscriptions);
@@ -56,7 +57,7 @@ public class ChangeMsisdnValidator {
     private void validateIfAllUpdatable(List<Subscription> subscriptions) {
         for (Subscription subscription : subscriptions)
             if (!subscription.isInUpdatableState())
-                throw new ValidationException(String.format("All the subscription for old msisdn are not updatable. SubscriptionId: %s; Pack: %s, Status: %s", subscription.getSubscriptionId(), subscription.getPack(), subscription.getStatus()));
+                throw new ValidationException(formatErrorMessage(String.format("All the subscription for old msisdn are not updatable. SubscriptionId: %s; Pack: %s, Status: %s", subscription.getSubscriptionId(), subscription.getPack(), subscription.getStatus())));
     }
 
     private List<SubscriptionPack> getUpadatablePacks(String msisdn) {
@@ -80,10 +81,14 @@ public class ChangeMsisdnValidator {
 
     private void validatePack(SubscriptionPack requestedPack, List<SubscriptionPack> updatablePacksForOldMsisdn, List<SubscriptionPack> updatablePacksForNewMsisdn) {
         if (!updatablePacksForOldMsisdn.contains(requestedPack)) {
-            throw new ValidationException(String.format("Old msisdn doesn't have an updatable subscription for the requested pack %s", requestedPack));
+            throw new ValidationException(formatErrorMessage(String.format("Old msisdn doesn't have an updatable subscription for the requested pack %s", requestedPack)));
         }
         if (updatablePacksForNewMsisdn.contains(requestedPack)) {
-            throw new ValidationException(String.format("New msisdn already has a in-progress subscription for the requested pack %s.", requestedPack));
+            throw new ValidationException(formatErrorMessage(String.format("New msisdn already has a in-progress subscription for the requested pack %s.", requestedPack)));
         }
+    }
+
+    private String formatErrorMessage(String errorMessage) {
+        return String.format("%s %s", INVALID_REQUEST_MESSAGE, errorMessage);
     }
 }

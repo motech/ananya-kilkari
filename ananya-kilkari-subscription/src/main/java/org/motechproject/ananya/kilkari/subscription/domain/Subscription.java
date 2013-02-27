@@ -120,6 +120,10 @@ public class Subscription extends MotechBaseDataObject {
         return messageCampaignPack;
     }
 
+    public void setMessageCampaignPack(MessageCampaignPack messageCampaignPack) {
+        this.messageCampaignPack = messageCampaignPack;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

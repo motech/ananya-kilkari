@@ -24,12 +24,16 @@ public enum MessageCampaignPack {
         return MessageCampaignPack.valueOf(StringUtils.trimToEmpty(pack).toUpperCase());
     }
 
+    public boolean isMCOrID() {
+        return this.equals(MISCARRIAGE) || this.equals(INFANT_DEATH);
+    }
+
     public static boolean isValid(String subscriptionPack) {
         try {
             from(subscriptionPack);
         } catch (Exception e) {
             return false;
         }
-        return  true;
+        return true;
     }
 }

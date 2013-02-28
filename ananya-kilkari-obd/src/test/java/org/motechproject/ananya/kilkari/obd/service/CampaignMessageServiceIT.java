@@ -102,7 +102,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, messageId, DateTime.now(), "1234567890", null, DateTime.now().plusDays(2));
         allCampaignMessages.add(campaignMessage);
         assertEquals(CampaignMessageStatus.NEW, campaignMessage.getStatus());
-        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.NA);
 
         campaignMessageService.update(campaignMessage);
 
@@ -172,7 +172,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
         CampaignMessage campaignMessage6 = new CampaignMessage("subscriptionId6", "messageId6", DateTime.now(), "1234567896", "airtel", DateTime.now());
         CampaignMessage campaignMessage7 = new CampaignMessage("subscriptionId7", "messageId7", DateTime.now(), "1234567897", "airtel", DateTime.now());
         CampaignMessage campaignMessage8 = new CampaignMessage("subscriptionId8", "messageId8", DateTime.now(), "1234567898", "airtel", DateTime.now().plusDays(6));
-        campaignMessage8.setStatusCode(CampaignMessageStatus.ND);
+        campaignMessage8.setFailureStatusCode(CampaignMessageStatus.ND);
         allCampaignMessages.add(campaignMessage1);
         allCampaignMessages.add(campaignMessage2);
         allCampaignMessages.add(campaignMessage3);
@@ -220,7 +220,7 @@ public class CampaignMessageServiceIT extends SpringIntegrationTest {
 
         campaignMessageService.scheduleCampaignMessage(subscriptionId, messageId, msisdn, operator, DateTime.now().plusDays(2), DateTime.now());
         CampaignMessage campaignMessage = allCampaignMessages.find(subscriptionId, messageId);
-        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.NA);
         allCampaignMessages.update(campaignMessage);
 
         markForDeletion(campaignMessage);

@@ -28,7 +28,7 @@ public class CampaignMessageTest {
         CampaignMessage campaignMessage = new CampaignMessage();
         campaignMessage.markSent();
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.NA);
 
         assertFalse(campaignMessage.isSent());
         assertEquals(CampaignMessageStatus.NA, campaignMessage.getStatus());
@@ -39,7 +39,7 @@ public class CampaignMessageTest {
         CampaignMessage campaignMessage = new CampaignMessage();
         campaignMessage.markSent();
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.ND);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.ND);
 
         assertFalse(campaignMessage.isSent());
         assertEquals(CampaignMessageStatus.ND, campaignMessage.getStatus());
@@ -50,7 +50,7 @@ public class CampaignMessageTest {
         CampaignMessage campaignMessage = new CampaignMessage();
         campaignMessage.markSent();
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.SO);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.SO);
 
         assertFalse(campaignMessage.isSent());
         assertEquals(CampaignMessageStatus.SO, campaignMessage.getStatus());
@@ -62,15 +62,15 @@ public class CampaignMessageTest {
         campaignMessage.markSent();
         assertEquals(0, campaignMessage.getNARetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.NA);
         campaignMessage.markSent();
         assertEquals(1, campaignMessage.getNARetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.NA);
         campaignMessage.markSent();
         assertEquals(2, campaignMessage.getNARetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.ND);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.ND);
         campaignMessage.markSent();
         assertEquals(2, campaignMessage.getNARetryCount());
     }
@@ -81,12 +81,12 @@ public class CampaignMessageTest {
         campaignMessage.markSent();
         assertEquals(0, campaignMessage.getNARetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.ND);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.ND);
         campaignMessage.markSent();
         assertEquals(0, campaignMessage.getNARetryCount());
         assertEquals(1, campaignMessage.getNDRetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.NA);
         campaignMessage.markSent();
         assertEquals(1, campaignMessage.getNDRetryCount());
         assertEquals(1, campaignMessage.getNARetryCount());
@@ -98,15 +98,15 @@ public class CampaignMessageTest {
         campaignMessage.markSent();
         assertEquals(0, campaignMessage.getSORetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.SO);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.SO);
         campaignMessage.markSent();
         assertEquals(1, campaignMessage.getSORetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.SO);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.SO);
         campaignMessage.markSent();
         assertEquals(2, campaignMessage.getSORetryCount());
 
-        campaignMessage.setStatusCode(CampaignMessageStatus.ND);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.ND);
         campaignMessage.markSent();
         assertEquals(2, campaignMessage.getSORetryCount());
     }
@@ -114,7 +114,7 @@ public class CampaignMessageTest {
     @Test
     public void shouldGetRetryCountForNAStatus(){
         CampaignMessage campaignMessage = new CampaignMessage("subscriptionId", "WEEEK13", DateTime.now(), "1234567890", "airtel", DateTime.now());
-        campaignMessage.setStatusCode(CampaignMessageStatus.NA);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.NA);
         campaignMessage.markSent();
 
         assertEquals(1, campaignMessage.getRetryCountForCurrentStatus());
@@ -123,7 +123,7 @@ public class CampaignMessageTest {
     @Test
     public void shouldGetRetryCountForNDStatus(){
         CampaignMessage campaignMessage = new CampaignMessage("subscriptionId", "WEEEK13", DateTime.now(), "1234567890", "airtel", DateTime.now().minusWeeks(2));
-        campaignMessage.setStatusCode(CampaignMessageStatus.ND);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.ND);
         campaignMessage.markSent();
 
         assertEquals(1, campaignMessage.getRetryCountForCurrentStatus());
@@ -132,7 +132,7 @@ public class CampaignMessageTest {
     @Test
     public void shouldGetRetryCountForSOStatus(){
         CampaignMessage campaignMessage = new CampaignMessage("subscriptionId", "WEEEK13", DateTime.now(), "1234567890", "airtel", DateTime.now());
-        campaignMessage.setStatusCode(CampaignMessageStatus.SO);
+        campaignMessage.setFailureStatusCode(CampaignMessageStatus.SO);
         campaignMessage.markSent();
 
         assertEquals(1, campaignMessage.getRetryCountForCurrentStatus());

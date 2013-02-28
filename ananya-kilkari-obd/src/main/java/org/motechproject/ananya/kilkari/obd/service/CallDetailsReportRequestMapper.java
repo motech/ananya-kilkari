@@ -7,7 +7,7 @@ import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailRecor
 import org.motechproject.ananya.reports.kilkari.contract.request.CallDetailsReportRequest;
 
 public class CallDetailsReportRequestMapper {
-    public static CallDetailsReportRequest mapFrom(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest, Integer retryCount) {
+    public static CallDetailsReportRequest mapFrom(OBDSuccessfulCallDetailsRequest obdSuccessfulCallDetailsRequest) {
         CallDurationRequest callDurationRequest = obdSuccessfulCallDetailsRequest.getCallDurationRequest();
         CallDetailRecordRequest callDurationReportRequest = new CallDetailRecordRequest(callDurationRequest.getStartTime(), callDurationRequest.getEndTime());
         return new CallDetailsReportRequest(

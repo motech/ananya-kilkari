@@ -110,7 +110,7 @@ public class CampaignMessage extends MotechBaseDataObject implements Comparable<
         this.sent = true;
     }
 
-    public void setStatusCode(CampaignMessageStatus statusCode) {
+    public void setFailureStatusCode(CampaignMessageStatus statusCode) {
         this.status = statusCode;
         this.sent = false;
     }

@@ -89,16 +89,4 @@ public class CallDeliveryFailureRecordValidatorTest {
         assertEquals(1, errors.getCount());
         assertTrue(errors.hasMessage("Invalid subscription id subscriptionId"));
     }
-
-    @Test
-    public void shouldValidateCallDeliveryFailureRecordForStatusCode() {
-        String subscriptionId = "subscriptionId";
-        FailedCallReport failedCallReport = new FailedCallReport(subscriptionId, "1234567890", "WEEK13", "iu_dnp");
-        when(allCampaignMessages.findBySubscriptionId(subscriptionId)).thenReturn(Arrays.asList(new CampaignMessage()));
-
-        Errors errors = callDeliveryFailureRecordValidator.validate(failedCallReport);
-
-        assertEquals(1, errors.getCount());
-        assertTrue(errors.hasMessage("Invalid status code iu_dnp"));
-    }
 }

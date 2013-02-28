@@ -44,7 +44,7 @@ public class OBDSchedulerPerformanceTest extends BasePerformanceTest {
             CampaignMessageStatus status = getRandomElementFromList(possibleStatus);
 
             CampaignMessage campaignMessage = new CampaignMessage(subscriptionId, week, DateTime.now(), msisdn, operator.name(), now.plusWeeks(1));
-            campaignMessage.setStatusCode(status);
+            campaignMessage.setFailureStatusCode(status);
 
             obdDbService.add(campaignMessage);
         }

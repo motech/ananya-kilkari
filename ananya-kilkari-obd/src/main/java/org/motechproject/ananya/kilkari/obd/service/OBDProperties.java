@@ -108,4 +108,8 @@ public class OBDProperties {
     public Integer getInitialWaitForMessageUpdate() {
         return Integer.parseInt(obdProperties.getProperty("obd.retry.sent.messages.update.initial.wait"));
     }
+
+    public CampaignMessageStatus getDefaultCampaignMessageStatus() {
+        return CampaignMessageStatus.getFor(obdProperties.getProperty("obd.default.campaign.message.status"));
+    }
 }

@@ -7,13 +7,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
-import org.motechproject.ananya.kilkari.obd.domain.CampaignMessageStatus;
-import org.motechproject.ananya.kilkari.obd.domain.ValidFailedCallReport;
+import org.motechproject.ananya.kilkari.obd.domain.*;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
-import org.motechproject.ananya.kilkari.obd.domain.MainSubSlot;
-import org.motechproject.ananya.kilkari.obd.domain.RetrySubSlot;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTask;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTaskExecutor;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
@@ -24,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static junit.framework.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -283,6 +279,11 @@ public class CampaignMessageServiceTest {
         when(obdProperties.getCampaignMessageStatusFor("iu_dnp")).thenReturn(CampaignMessageStatus.NA);
         assertEquals(CampaignMessageStatus.NA, campaignMessageService.getCampaignMessageStatusFor("iu_dnp"));
 
+        CampaignMessageStatus defaultStatus = CampaignMessageStatus.NA;
+        when(obdProperties.getDefaultCampaignMessageStatus()).thenReturn(defaultStatus);
+        assertEquals(defaultStatus, campaignMessageService.getCampaignMessageStatusFor("iu_dnc123"));
+
+        when(obdProperties.getDefaultCampaignMessageStatus()).thenReturn(null);
         assertNull(campaignMessageService.getCampaignMessageStatusFor("iu_dnc123"));
     }
 

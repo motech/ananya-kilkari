@@ -47,7 +47,7 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
         newCampaignMessageWithEarlierWeekEndingDate = new CampaignMessage("subscriptionId1", "messageId1", now, "1234657980", "operator1", weekEndingDate4);
 
         NDCampaignMessage = new CampaignMessage("subscriptionId2", "messageId2", now, "912134567890", "operator2", weekEndingDate2);
-        NDCampaignMessage.setStatusCode(CampaignMessageStatus.ND);
+        NDCampaignMessage.setFailureStatusCode(CampaignMessageStatus.ND);
         NDCampaignMessage.markSent();
 
         newCampaignMessageSent = new CampaignMessage("subscriptionId3", "messageId3", now, "3124567890", "operator3", weekEndingDate1);
@@ -55,27 +55,27 @@ public class AllCampaignMessagesIT extends SpringIntegrationTest {
 
         NDCampaignMessageSent = new CampaignMessage("subscriptionId4", "messageId4", now, "004123567890", "operator4", weekEndingDate1);
         NDCampaignMessageSent.markSent();
-        NDCampaignMessage.setStatusCode(CampaignMessageStatus.ND);
+        NDCampaignMessage.setFailureStatusCode(CampaignMessageStatus.ND);
 
         NDCampaignMessageSent.markSent();
 
         NACampaignMessage = new CampaignMessage("subscriptionId5", "messageId5", now, "5123467890", "operator5", weekEndingDate2);
         NACampaignMessage.markSent();
-        NACampaignMessage.setStatusCode(CampaignMessageStatus.NA);
+        NACampaignMessage.setFailureStatusCode(CampaignMessageStatus.NA);
 
         NACampaignMessageWithEarlierWeekEndingDate = new CampaignMessage("subscriptionId7", "messageId7", now, "5128467890", "operator7", weekEndingDate3);
-        NACampaignMessageWithEarlierWeekEndingDate.setStatusCode(CampaignMessageStatus.NA);
+        NACampaignMessageWithEarlierWeekEndingDate.setFailureStatusCode(CampaignMessageStatus.NA);
 
         NACampaignMessageSent = new CampaignMessage("subscriptionId6", "messageId6", now, "6123457890", "operator6", weekEndingDate1);
         NACampaignMessageSent.markSent();
-        NACampaignMessageSent.setStatusCode(CampaignMessageStatus.NA);
+        NACampaignMessageSent.setFailureStatusCode(CampaignMessageStatus.NA);
         NACampaignMessageSent.markSent();
 
         SOCampaignMessage = new CampaignMessage("subscriptionId7", "messageId7", now, "6123457890", "operator6", weekEndingDate1);
-        SOCampaignMessage.setStatusCode(CampaignMessageStatus.SO);
+        SOCampaignMessage.setFailureStatusCode(CampaignMessageStatus.SO);
 
         SOCampaignMessageSent = new CampaignMessage("subscriptionId7", "messageId7", now, "6123457890", "operator6", weekEndingDate1);
-        SOCampaignMessage.setStatusCode(CampaignMessageStatus.SO);
+        SOCampaignMessage.setFailureStatusCode(CampaignMessageStatus.SO);
         SOCampaignMessageSent.markSent();
     }
 

@@ -25,7 +25,7 @@ public class CallDetailsReportRequestMapperTest {
 
         Integer retryCount = 3;
 
-        CallDetailsReportRequest actualDeliveryReportRequest = CallDetailsReportRequestMapper.mapFrom(obdSuccessfulCallDetailsRequest, retryCount);
+        CallDetailsReportRequest actualDeliveryReportRequest = CallDetailsReportRequestMapper.mapFrom(obdSuccessfulCallDetailsRequest);
 
         assertEquals(subscriptionId, actualDeliveryReportRequest.getSubscriptionId());
         assertEquals(obdSuccessfulCallDetailsRequest.getMsisdn(), actualDeliveryReportRequest.getMsisdn());
@@ -48,7 +48,7 @@ public class CallDetailsReportRequestMapperTest {
 
         Integer retryCount = 3;
 
-        CallDetailsReportRequest actualDeliveryReportRequest = CallDetailsReportRequestMapper.mapFrom(obdSuccessfulCallDetailsRequest, retryCount);
+        CallDetailsReportRequest actualDeliveryReportRequest = CallDetailsReportRequestMapper.mapFrom(obdSuccessfulCallDetailsRequest);
 
         assertEquals(subscriptionId, actualDeliveryReportRequest.getSubscriptionId());
         assertEquals(obdSuccessfulCallDetailsRequest.getMsisdn(), actualDeliveryReportRequest.getMsisdn());

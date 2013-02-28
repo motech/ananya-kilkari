@@ -45,6 +45,25 @@ public class OBDPropertiesTest {
     }
 
     @Test
+    public void shouldGetTheDefaultOBDCampaignMessageStatusCode() {
+        defaultSetup();
+        when(properties.getProperty("obd.default.campaign.message.status")).thenReturn("NA");
+
+        obdProperties = new OBDProperties(properties);
+
+        assertEquals(CampaignMessageStatus.NA, obdProperties.getDefaultCampaignMessageStatus());
+    }
+
+    @Test
+    public void shouldReturnNullIfTheDefaultOBDCampaignMessageStatusCodePropertyIsNotPresent() {
+        defaultSetup();
+
+        obdProperties = new OBDProperties(properties);
+
+        assertNull(obdProperties.getDefaultCampaignMessageStatus());
+    }
+
+    @Test
     public void shouldMapNDStatusCodeToCampaignMessageStatus() {
         when(properties.getProperty("campaign.message.na.status.codes")).thenReturn("");
         when(properties.getProperty("campaign.message.nd.status.codes")).thenReturn(",,  iu_nd1,iu_nd2,  iu_nd3,  ");

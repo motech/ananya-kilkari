@@ -28,6 +28,7 @@ public class CampaignMessageService {
     private RetryTaskExecutor retryTaskExecutor;
 
     private static final Logger logger = LoggerFactory.getLogger(CampaignMessageService.class);
+    private static final Logger invalidStatusCodeLogger = LoggerFactory.getLogger("org.motechproject.ananya.kilkari.obd.InvalidStatusCodes");
 
     @Autowired
     public CampaignMessageService(AllCampaignMessages allCampaignMessages, OnMobileOBDGateway onMobileOBDGateway,
@@ -109,7 +110,12 @@ public class CampaignMessageService {
     }
 
     public CampaignMessageStatus getCampaignMessageStatusFor(String statusCode) {
-        return obdProperties.getCampaignMessageStatusFor(statusCode);
+        CampaignMessageStatus campaignMessageStatus = obdProperties.getCampaignMessageStatusFor(statusCode);
+        if (campaignMessageStatus == null) {
+            invalidStatusCodeLogger.error(String.format("Invalid failure status code : %s", statusCode));
+            return obdProperties.getDefaultCampaignMessageStatus();
+        }
+        return campaignMessageStatus;
     }
 
     private void updateCampaignMessageStatus(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
@@ -117,7 +123,7 @@ public class CampaignMessageService {
             allCampaignMessages.delete(campaignMessage);
             logger.info(String.format("Deleting campaign message for subscriptionId : %s and Week ending date : %s as it has reached maximum retry days", campaignMessage.getSubscriptionId(), campaignMessage.getWeekEndingDate()));
         } else {
-            campaignMessage.setStatusCode(statusCode);
+            campaignMessage.setFailureStatusCode(statusCode);
             allCampaignMessages.update(campaignMessage);
         }
     }
@@ -157,12 +163,9 @@ public class CampaignMessageService {
 
     private void reportCampaignMessageStatus(ValidFailedCallReport failedCallReport) {
         CallDetailRecordRequest callDetailRecordRequest = new CallDetailRecordRequest(failedCallReport.getCreatedAt(), failedCallReport.getCreatedAt());
+        String statusCode = failedCallReport.getStatusCode() != null ? failedCallReport.getStatusCode().name() : null;
         CallDetailsReportRequest callDetailsReportRequest = new CallDetailsReportRequest(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(),
-                null, failedCallReport.getStatusCode().name(), callDetailRecordRequest, CampaignMessageCallSource.OBD.name());
+                null, statusCode, callDetailRecordRequest, CampaignMessageCallSource.OBD.name());
         reportingService.reportCampaignMessageDeliveryStatus(callDetailsReportRequest);
-    }
-
-    private interface GatewayAction {
-        public void send(String content);
     }
 }

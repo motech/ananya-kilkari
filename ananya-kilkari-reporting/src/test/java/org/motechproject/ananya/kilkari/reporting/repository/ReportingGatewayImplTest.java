@@ -222,7 +222,7 @@ public class ReportingGatewayImplTest {
         long msisdn = 9988776655L;
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason", DateTime.now());
 
         reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 
@@ -235,7 +235,7 @@ public class ReportingGatewayImplTest {
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         HttpThreadContext.set("CONTACT_CENTER");
-        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason", DateTime.now());
 
         reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 
@@ -248,7 +248,7 @@ public class ReportingGatewayImplTest {
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         HttpThreadContext.set("CONTACT_CENTER");
-        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason", DateTime.now());
         doThrow(new RuntimeException()).when(httpClientService).executeSync(anyString(), anyObject(), any(Method.class));
 
         reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
@@ -275,7 +275,7 @@ public class ReportingGatewayImplTest {
         String subscriptionId = "subscriptionId";
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         HttpThreadContext.set("CONTACT_CENTER");
-        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason");
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason", DateTime.now());
 
         reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 

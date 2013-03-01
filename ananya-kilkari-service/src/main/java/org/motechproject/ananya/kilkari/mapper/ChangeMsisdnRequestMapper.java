@@ -14,7 +14,7 @@ public class ChangeMsisdnRequestMapper {
     public static ChangeMsisdnRequest mapFrom(ChangeMsisdnWebRequest changeMsisdnWebRequest) {
         String reason = String.format("CHANGE_MSISDN - %s", StringUtils.trimToEmpty(changeMsisdnWebRequest.getReason()));
         ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(
-                changeMsisdnWebRequest.getOldMsisdn(), changeMsisdnWebRequest.getNewMsisdn(), Channel.from(changeMsisdnWebRequest.getChannel()), reason);
+                changeMsisdnWebRequest.getOldMsisdn(), changeMsisdnWebRequest.getNewMsisdn(), Channel.from(changeMsisdnWebRequest.getChannel()), reason, changeMsisdnWebRequest.getCreatedAt());
 
         if (changeMsisdnWebRequest.getPacks().size() == 1 &&
                 StringUtils.trim(changeMsisdnWebRequest.getPacks().get(0)).equalsIgnoreCase("ALL")) {

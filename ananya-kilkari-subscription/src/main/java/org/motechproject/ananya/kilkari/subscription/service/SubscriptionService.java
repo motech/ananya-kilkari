@@ -502,7 +502,7 @@ public class SubscriptionService {
     private void migrateMsisdnToNewSubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
         SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
 
-        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), DateTime.now(), changeMsisdnRequest.getReason()));
+        requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), changeMsisdnRequest.getCreatedAt(), changeMsisdnRequest.getReason()));
 
         Location location = null;
         if (subscriberResponse.getLocationResponse() != null) {
@@ -513,7 +513,7 @@ public class SubscriptionService {
                 subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getNextWeekNumber());
 
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeMsisdnRequest.getNewMsisdn(),
-                DateTime.now(), subscription.getPack(), location, subscriber, changeMsisdnRequest.getReason());
+                changeMsisdnRequest.getCreatedAt(), subscription.getPack(), location, subscriber, changeMsisdnRequest.getReason());
         subscriptionRequest.setOldSubscriptionId(subscription.getSubscriptionId());
 
         createSubscription(subscriptionRequest, changeMsisdnRequest.getChannel());
@@ -522,7 +522,7 @@ public class SubscriptionService {
     private void changeMsisdnForEarlySubscription(Subscription subscription, ChangeMsisdnRequest changeMsisdnRequest) {
         subscription.setMsisdn(changeMsisdnRequest.getNewMsisdn());
         allSubscriptions.update(subscription);
-        reportingService.reportChangeMsisdnForEarlySubscription(new SubscriberChangeMsisdnReportRequest(subscription.getSubscriptionId(), Long.valueOf(changeMsisdnRequest.getNewMsisdn()), changeMsisdnRequest.getReason()));
+        reportingService.reportChangeMsisdnForEarlySubscription(new SubscriberChangeMsisdnReportRequest(subscription.getSubscriptionId(), Long.valueOf(changeMsisdnRequest.getNewMsisdn()), changeMsisdnRequest.getReason(), changeMsisdnRequest.getCreatedAt()));
     }
 
     public void updateSubscription(Subscription subscription) {

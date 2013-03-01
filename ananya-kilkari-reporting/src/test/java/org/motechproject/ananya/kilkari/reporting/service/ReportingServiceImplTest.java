@@ -91,7 +91,7 @@ public class ReportingServiceImplTest {
         Long msisdn = 9876543210L;
         String subscriptionId = "subscriptionId";
         String reason = "reason";
-        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, reason);
+        SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, reason, DateTime.now());
 
         reportingServiceImpl.reportChangeMsisdnForEarlySubscription(reportRequest);
 

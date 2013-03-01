@@ -960,7 +960,7 @@ public class SubscriptionServiceTest {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
         DateTime now = DateTime.now();
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER, null);
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER, null, now);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.NANHI_KILKARI));
 
         Subscription subscription1 = new SubscriptionBuilder().withDefaults().withMsisdn(oldMsisdn).withPack(SubscriptionPack.NANHI_KILKARI)
@@ -994,6 +994,7 @@ public class SubscriptionServiceTest {
 
         assertEquals(subscriptionId, subscriptionStateChangeRequest.getSubscriptionId());
         assertEquals(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED.toString(), subscriptionStateChangeRequest.getSubscriptionStatus());
+        assertEquals(now, subscriptionStateChangeRequest.getCreatedAt());
 
         ArgumentCaptor<OMSubscriptionRequest> deactivationRequest = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         order.verify(onMobileSubscriptionManagerPublisher).processDeactivation(deactivationRequest.capture());
@@ -1009,6 +1010,7 @@ public class SubscriptionServiceTest {
 
         assertEquals(newMsisdn, actualSubscription.getMsisdn());
         assertEquals(SubscriptionPack.NANHI_KILKARI, actualSubscription.getPack());
+        assertEquals(now.withSecondOfMinute(0).withMillisOfSecond(0), actualSubscription.getCreationDate());
 
         ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
         order.verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
@@ -1017,6 +1019,7 @@ public class SubscriptionServiceTest {
         assertEquals(beneficiaryName, subscriptionReportRequest.getName());
         assertEquals(beneficiaryAge, subscriptionReportRequest.getAgeOfBeneficiary());
         assertEquals(subscriptionId, subscriptionReportRequest.getOldSubscriptionId());
+        assertEquals(now.withSecondOfMinute(0).withMillisOfSecond(0), subscriptionReportRequest.getCreatedAt());
 
         ArgumentCaptor<OMSubscriptionRequest> activationRequest = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(activationRequest.capture());
@@ -1030,7 +1033,8 @@ public class SubscriptionServiceTest {
     public void shouldChangeMsisdnForEarlySubscription() {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
-        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER, null);
+        DateTime createdAt = DateTime.now();
+        ChangeMsisdnRequest changeMsisdnRequest = new ChangeMsisdnRequest(oldMsisdn, newMsisdn, Channel.CONTACT_CENTER, null, createdAt);
         changeMsisdnRequest.setPacks(Arrays.asList(SubscriptionPack.NANHI_KILKARI));
 
         Subscription subscription1 = new Subscription(oldMsisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now(), null);
@@ -1058,6 +1062,7 @@ public class SubscriptionServiceTest {
         verify(reportingServiceImpl).reportChangeMsisdnForEarlySubscription(requestArgumentCaptor.capture());
         SubscriberChangeMsisdnReportRequest reportRequest = requestArgumentCaptor.getValue();
         assertEquals(newMsisdn, reportRequest.getMsisdn().toString());
+        assertEquals(createdAt, reportRequest.getCreatedAt());
     }
 
     @Test

@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.request;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 
@@ -36,8 +37,14 @@ public class ChangeMsisdnWebRequest {
     @XmlElement(name = "pack")
     private List<String> packs;
 
+    @JsonIgnore
+    @XmlTransient
+    private DateTime createdAt;
 
-    public ChangeMsisdnWebRequest() { }
+
+    public ChangeMsisdnWebRequest() {
+        this.createdAt = DateTime.now();
+    }
 
     public ChangeMsisdnWebRequest(String oldMsisdn, String newMsisdn, List<String> packs, String channel, String reason) {
         this.oldMsisdn = oldMsisdn;
@@ -45,6 +52,7 @@ public class ChangeMsisdnWebRequest {
         this.packs = packs;
         this.channel = channel;
         this.reason = reason;
+        this.createdAt = DateTime.now();
     }
 
     public Errors validate() {
@@ -104,6 +112,12 @@ public class ChangeMsisdnWebRequest {
         this.reason = reason;
     }
 
+    @JsonIgnore
+    @XmlTransient
+    public DateTime getCreatedAt() {
+        return createdAt;
+    }
+
     private void validateSubscriptionPacksForChangeMsisdn(Errors errors) {
         if (packs.size() <= 0) errors.add("At least one pack should be specified");
 
@@ -120,12 +134,12 @@ public class ChangeMsisdnWebRequest {
             requestValidator.validatePack(pack);
         }
 
-        if(requestValidator.getErrors().hasErrors())
+        if (requestValidator.getErrors().hasErrors())
             errors.add(requestValidator.getErrors().allMessages());
     }
 
     private void validateOldAndNewMsisdnsAreDifferent(Errors errors) {
-        if(oldMsisdn.equals(newMsisdn))
+        if (oldMsisdn.equals(newMsisdn))
             errors.add("Old and new msisdn cannot be same");
     }
 }

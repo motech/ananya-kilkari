@@ -19,14 +19,16 @@ public class ChangeMsisdnRequestMapperTest {
         String newMsisdn = "9876543211";
         Channel channel = Channel.CONTACT_CENTER;
         String reason = "reason";
+        ChangeMsisdnWebRequest webRequest = new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList("alL"), channel.toString(), reason);
 
-        ChangeMsisdnRequest mappedRequest = ChangeMsisdnRequestMapper.mapFrom(new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList("alL"), channel.toString(), reason));
+        ChangeMsisdnRequest mappedRequest = ChangeMsisdnRequestMapper.mapFrom(webRequest);
 
         assertEquals(oldMsisdn, mappedRequest.getOldMsisdn());
         assertEquals(newMsisdn, mappedRequest.getNewMsisdn());
         assertEquals(channel, mappedRequest.getChannel());
         assertEquals(true, mappedRequest.getShouldChangeAllPacks());
         assertEquals("CHANGE_MSISDN - " + reason, mappedRequest.getReason());
+        assertEquals(webRequest.getCreatedAt(), mappedRequest.getCreatedAt());
     }
 
     @Test
@@ -34,8 +36,9 @@ public class ChangeMsisdnRequestMapperTest {
         String oldMsisdn = "9876543210";
         String newMsisdn = "9876543211";
         Channel channel = Channel.CONTACT_CENTER;
+        ChangeMsisdnWebRequest webRequest = new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList("NANHI_KILKARI", "navjaat_kilkari"), channel.toString(), null);
 
-        ChangeMsisdnRequest mappedRequest = ChangeMsisdnRequestMapper.mapFrom(new ChangeMsisdnWebRequest(oldMsisdn, newMsisdn, Arrays.asList("NANHI_KILKARI", "navjaat_kilkari"), channel.toString(), null));
+        ChangeMsisdnRequest mappedRequest = ChangeMsisdnRequestMapper.mapFrom(webRequest);
 
         assertEquals(oldMsisdn, mappedRequest.getOldMsisdn());
         assertEquals(newMsisdn, mappedRequest.getNewMsisdn());
@@ -44,6 +47,7 @@ public class ChangeMsisdnRequestMapperTest {
         assertTrue(mappedRequest.getPacks().contains(SubscriptionPack.NANHI_KILKARI));
         assertTrue(mappedRequest.getPacks().contains(SubscriptionPack.NAVJAAT_KILKARI));
         assertEquals("CHANGE_MSISDN - ", mappedRequest.getReason());
+        assertEquals(webRequest.getCreatedAt(), mappedRequest.getCreatedAt());
     }
 
 }

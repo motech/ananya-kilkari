@@ -16,7 +16,7 @@ import java.util.List;
 public class AllAdminUsers extends MotechBaseRepository<AdminUser> {
 
     @Autowired
-    protected AllAdminUsers(@Qualifier("adminDbConnector") CouchDbConnector db) {
+    public AllAdminUsers(@Qualifier("adminDbConnector") CouchDbConnector db) {
         super(AdminUser.class, db);
         initStandardDesignDocument();
     }

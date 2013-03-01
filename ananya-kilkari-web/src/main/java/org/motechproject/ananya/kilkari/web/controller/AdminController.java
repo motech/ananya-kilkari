@@ -31,11 +31,4 @@ public class AdminController {
         final String error = request.getParameter("login_error");
         return loginPage.display(error);
     }
-
-    private boolean validLogin(UserDetails userDetails) {
-        return userDetails.isAccountNonExpired() &&
-                userDetails.isAccountNonLocked() &&
-                userDetails.isCredentialsNonExpired() &&
-                userDetails.isEnabled();
-    }
 }

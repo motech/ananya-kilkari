@@ -1,0 +1,66 @@
+<div>
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="page-header">
+                <h2>Manage Location Master</h2>
+            </div>
+        </div>
+    </div>
+
+    #if(${successMessage})
+    <div class="alert alert-success">
+        ${successMessage}
+        <a class="close" data-dismiss="alert">x</a>
+    </div>
+    #end
+    #if(${errorMessage})
+    <div class="alert alert-error">
+        ${errorMessage}
+        <a class="close" data-dismiss="alert">x</a>
+    </div>
+    #end
+
+    <div class="row-fluid">
+        <div class="well well-small">
+            <strong>Download Locations</strong>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <span>$label.page.location.download</span>
+            <div>
+                <br />
+                <a class="btn btn-primary" data-dismiss="" href="admin/locationsToBeVerified/download">Download</a>
+            </div>
+        </div>
+    </div>
+
+    <hr/>
+    <div class="row-fluid">
+        <div class="well well-small">
+            <strong>Upload Locations</strong>
+        </div>
+    </div>
+
+    <div class="row-fluid">
+        <div class="span12">
+            <form method="post" action="admin/location/upload"
+                  enctype="multipart/form-data" modelattribute="csvUpload" id="csvUploadForm">
+                <fieldset>
+                    <div class="control-group">
+                        <div class="controls">
+                            <label for="fileData">$label.page.location.master.upload</label>
+                            <input name="fileData" id="fileData" type="file" class="required"/>
+
+                        </div>
+                    </div>
+
+                    <input name="upload" id="uploadAction" type="submit" class="input-medium btn-primary"
+                           value="Upload"/>
+
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+</div>

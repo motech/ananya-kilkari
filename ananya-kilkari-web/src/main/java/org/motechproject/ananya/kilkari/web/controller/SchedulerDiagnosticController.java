@@ -33,7 +33,7 @@ public class SchedulerDiagnosticController {
 
     @RequestMapping(value = "/diagnostics/scheduler/{subscriptionId}", method = RequestMethod.GET)
     @ResponseBody
-    public void getSchedule(@PathVariable final String subscriptionId, final HttpServletResponse response) throws SchedulerException, IOException {
+    public void getSchedule(@PathVariable final String subscriptionId, final HttpServletResponse response) throws Exception {
         final DiagnosticsResult diagnosticsResult = schedulerDiagnosticService.diagnose(new ArrayList<String>() {{
             add(subscriptionId);
         }});
@@ -47,7 +47,7 @@ public class SchedulerDiagnosticController {
         return schedulerDiagnosticService.AreSchedulerJobsRunning() ? "SUCCESS" : "FAILURE";
     }
 
-    private String createResponseMessage(DiagnosticsResponse diagnosticsResponse) {
+    private String createResponseMessage(DiagnosticsResponse diagnosticsResponse) throws Exception {
         Template template = velocityEngine.getTemplate("/schedulerResponse.vm");
         VelocityContext context = new VelocityContext();
         context.put("diagnosticsResponse", diagnosticsResponse);

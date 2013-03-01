@@ -13,8 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static junit.framework.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class KilkariChannelInterceptorTest {
@@ -45,6 +44,28 @@ public class KilkariChannelInterceptorTest {
         kilkariChannelInterceptor.preHandle(request, response, null);
 
         verify(outputStream).print("");
+    }
+
+    @Test
+    public void shouldNotPreProcessTheRequestIfItItAdminPageAccess() throws Exception {
+        KilkariChannelInterceptor kilkariChannelInterceptor = new KilkariChannelInterceptor();
+        when(request.getRequestURI()).thenReturn("/ananya-kilkari/admin/login");
+        when(request.getContextPath()).thenReturn("/ananya-kilkari");
+
+        kilkariChannelInterceptor.preHandle(request, response, null);
+
+        verifyZeroInteractions(response);
+    }
+
+    @Test
+    public void shouldNotPostProcessTheRequestIfItItAdminPageAccess() throws Exception {
+        KilkariChannelInterceptor kilkariChannelInterceptor = new KilkariChannelInterceptor();
+        when(request.getRequestURI()).thenReturn("/ananya-kilkari/admin/login");
+        when(request.getContextPath()).thenReturn("/ananya-kilkari");
+
+        kilkariChannelInterceptor.postHandle(request, response, null, null);
+
+        verifyZeroInteractions(response);
     }
 
     @Test

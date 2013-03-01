@@ -14,16 +14,26 @@ public class KilkariChannelInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws java.lang.Exception {
-        String responsePrefix = HttpConstants.forRequest(request).getResponsePrefix();
-        response.getOutputStream().print(responsePrefix);
-        HttpThreadContext.set(getChannel(request));
+        if (shouldProcessRequest(request)) {
+            String responsePrefix = HttpConstants.forRequest(request).getResponsePrefix();
+            response.getOutputStream().print(responsePrefix);
+            HttpThreadContext.set(getChannel(request));
+        }
         return true;
+    }
+
+    private boolean shouldProcessRequest(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        requestURI = StringUtils.remove(requestURI, request.getContextPath());
+        return !StringUtils.startsWith(requestURI, "/admin");
     }
 
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
             throws Exception {
-        String contentType = HttpConstants.forRequest(request).getResponseContentType(request.getHeader("accept"));
-        response.setContentType(contentType);
+        if (shouldProcessRequest(request)) {
+            String contentType = HttpConstants.forRequest(request).getResponseContentType(request.getHeader("accept"));
+            response.setContentType(contentType);
+        }
     }
 
     private String getChannel(HttpServletRequest request) {

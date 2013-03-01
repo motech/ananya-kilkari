@@ -11,6 +11,7 @@
     <import resource="classpath*:applicationKilkariCommonContext.xml"/>
     <import resource="classpath*:applicationPlatformServerAPI.xml"/>
     <import resource="classpath:applicationKilkariServiceContext.xml"/>
+    <import resource="classpath:applicationKilkariSecurityContext.xml"/>
 
     <import resource="classpath:applicationContext-Diagnostics-Couch.xml"/>
     <import resource="classpath:applicationContext-Diagnostics-Queues.xml"/>

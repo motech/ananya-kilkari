@@ -103,7 +103,7 @@ public class SubscriptionControllerTest {
         int startWeekNumber = 4;
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE,
-                "WEEK13", "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"), DateTime.now());
+                "WEEK13", "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"), DateTime.now(), DateTime.now());
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -128,7 +128,7 @@ public class SubscriptionControllerTest {
         int startWeekNumber = 4;
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13",
-                "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"), DateTime.now());
+                "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"), DateTime.now(), DateTime.now());
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -609,6 +609,7 @@ public class SubscriptionControllerTest {
         assertEquals(subscriptionDetails.getDateOfBirth(), actualDetailsResponse.getDateOfBirth());
         assertEquals(subscriptionDetails.getExpectedDateOfDelivery(), actualDetailsResponse.getExpectedDateOfDelivery());
         assertEquals(expectedLocation, actualDetailsResponse.getLocation());
+        assertEquals(subscriptionDetails.getLastUpdatedTime(), actualDetailsResponse.getLastUpdatedTime());
     }
 
     private void assertCreatedAt(DateTime beforeCreate, SubscriptionWebRequest subscriptionWebRequest) {

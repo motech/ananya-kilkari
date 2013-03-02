@@ -37,11 +37,15 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
     @XmlElement
     private String lastWeeklyMessageScheduledDate;
 
+    @JsonProperty
+    @XmlElement
+    private String lastUpdatedTime;
+
     public AllSubscriptionDetails() {
     }
 
     public AllSubscriptionDetails(String subscriptionId, String pack, String status, String lastCampaignId,
-                                  String beneficiaryName, Integer beneficiaryAge, Integer weekNumber, String expectedDateOfDelivery, String dateOfBirth, LocationResponse location, String lastWeeklyMessageScheduledDate) {
+                                  String beneficiaryName, Integer beneficiaryAge, Integer weekNumber, String expectedDateOfDelivery, String dateOfBirth, LocationResponse location, String lastWeeklyMessageScheduledDate, String lastUpdatedTime) {
         super(subscriptionId, pack, status, lastCampaignId);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
@@ -50,6 +54,7 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
         this.dateOfBirth = dateOfBirth;
         this.location = location;
         this.lastWeeklyMessageScheduledDate = lastWeeklyMessageScheduledDate;
+        this.lastUpdatedTime = lastUpdatedTime;
     }
 
     public String getBeneficiaryName() {
@@ -74,6 +79,10 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
 
     public LocationResponse getLocation() {
         return location;
+    }
+
+    public String getLastUpdatedTime() {
+        return lastUpdatedTime;
     }
 
     @Override

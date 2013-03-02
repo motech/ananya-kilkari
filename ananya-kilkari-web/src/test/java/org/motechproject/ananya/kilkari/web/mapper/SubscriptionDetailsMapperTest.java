@@ -68,9 +68,8 @@ public class SubscriptionDetailsMapperTest {
     }
 
     private SubscriptionDetailsResponse setupData(Location actualLocation) {
-        SubscriptionDetailsResponse detailsResponse = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK33",
-                "name", 10, DateTime.now(), DateTime.now(), 4, actualLocation, DateTime.now());
-        return detailsResponse;
+        return new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK33",
+                "name", 10, DateTime.now(), DateTime.now(), 4, actualLocation, DateTime.now(), DateTime.now());
     }
 
     private void assertDetails(SubscriptionDetailsResponse detailsResponse, AllSubscriptionDetails subscriptionDetails) {
@@ -84,5 +83,6 @@ public class SubscriptionDetailsMapperTest {
         assertEquals(detailsResponse.getDateOfBirth(), subscriptionDetails.getDateOfBirth());
         assertEquals(detailsResponse.getExpectedDateOfDelivery(), subscriptionDetails.getExpectedDateOfDelivery());
         assertEquals(detailsResponse.getLastWeeklyMessageScheduledDate(), subscriptionDetails.getLastWeeklyMessageScheduledDate());
+        assertEquals(detailsResponse.getLastUpdatedTime(), subscriptionDetails.getLastUpdatedTime());
     }
 }

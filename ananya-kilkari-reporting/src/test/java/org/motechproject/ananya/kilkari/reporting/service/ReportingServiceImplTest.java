@@ -102,7 +102,7 @@ public class ReportingServiceImplTest {
     public void shouldGetSubscribersByMsisdn() {
         final String msisdn = "1234567890";
         final ArrayList<SubscriberResponse> expectedSubscriber = new ArrayList<SubscriberResponse>() {{
-            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), DateTime.now(), new LocationResponse("d", "b", "p")));
+            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), DateTime.now(), new LocationResponse("d", "b", "p"), DateTime.now()));
         }};
         when(reportGateway.getSubscribersByMsisdn(msisdn)).thenReturn(expectedSubscriber);
 

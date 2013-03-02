@@ -221,12 +221,13 @@ public class ReportingGatewayImplTest {
     public void shouldReportMsisdnChange() {
         long msisdn = 9988776655L;
         String subscriptionId = "subscriptionId";
+        HttpThreadContext.set("CONTACT_CENTER");
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         SubscriberChangeMsisdnReportRequest reportRequest = new SubscriberChangeMsisdnReportRequest(subscriptionId, msisdn, "reason", DateTime.now());
 
         reportingGateway.reportChangeMsisdnForSubscriber(reportRequest);
 
-        verify(httpClientService).execute("url/subscription/changemsisdn", reportRequest, Method.POST);
+        verify(httpClientService).executeSync("url/subscription/changemsisdn", reportRequest, Method.POST);
     }
 
     @Test

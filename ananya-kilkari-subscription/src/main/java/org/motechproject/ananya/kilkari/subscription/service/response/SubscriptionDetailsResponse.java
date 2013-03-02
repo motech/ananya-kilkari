@@ -20,6 +20,7 @@ public class SubscriptionDetailsResponse {
     private String expectedDateOfDelivery;
     private String dateOfBirth;
     private Location location;
+    private String lastUpdatedTime;
 
     public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId) {
         this.subscriptionId = subscriptionId;
@@ -28,7 +29,7 @@ public class SubscriptionDetailsResponse {
         this.campaignId = campaignId;
     }
 
-    public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId, String beneficiaryName, Integer beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer startWeekNumber, Location location, DateTime lastWeeklyMessageScheduledDate) {
+    public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId, String beneficiaryName, Integer beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer startWeekNumber, Location location, DateTime lastWeeklyMessageScheduledDate, DateTime lastUpdatedTime) {
         this(subscriptionId, pack, status, campaignId);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
@@ -37,6 +38,7 @@ public class SubscriptionDetailsResponse {
         this.startWeekNumber = startWeekNumber;
         this.location = location;
         this.lastWeeklyMessageScheduledDate = DateUtils.formatDate(lastWeeklyMessageScheduledDate, DateTimeZone.UTC);
+        this.lastUpdatedTime = DateUtils.formatDateTimeForCC(lastUpdatedTime, DateUtils.ISTTimeZone);
     }
 
     public String getSubscriptionId() {
@@ -81,5 +83,9 @@ public class SubscriptionDetailsResponse {
 
     public String getLastWeeklyMessageScheduledDate() {
         return lastWeeklyMessageScheduledDate;
+    }
+
+    public String getLastUpdatedTime() {
+        return lastUpdatedTime;
     }
 }

@@ -38,7 +38,8 @@ public class SubscriptionDetailsMapper {
                     detailsResponse.getExpectedDateOfDelivery(),
                     detailsResponse.getDateOfBirth(),
                     location,
-                    detailsResponse.getLastWeeklyMessageScheduledDate()));
+                    detailsResponse.getLastWeeklyMessageScheduledDate(),
+                    detailsResponse.getLastUpdatedTime()));
         }
         return ccWebResponse;
     }

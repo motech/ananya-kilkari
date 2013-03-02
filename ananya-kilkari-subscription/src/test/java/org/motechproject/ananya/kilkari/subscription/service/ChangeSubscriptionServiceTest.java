@@ -83,7 +83,7 @@ public class ChangeSubscriptionServiceTest {
         String subscriptionId = subscription.getSubscriptionId();
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CONTACT_CENTER))).thenReturn(subscription);
-        SubscriberResponse subscriberResponse = new SubscriberResponse(null, null, beneficiaryAge, dateOfBirth, null, null, null);
+        SubscriberResponse subscriberResponse = new SubscriberResponse(null, null, beneficiaryAge, dateOfBirth, null, null, null, null);
         when(reportingService.getSubscriber(subscriptionId)).thenReturn(subscriberResponse);
 
         changeSubscriptionService.process(new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1234567890", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CONTACT_CENTER, null, null, null, "reason"));

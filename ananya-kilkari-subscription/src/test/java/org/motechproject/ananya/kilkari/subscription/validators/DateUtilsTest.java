@@ -89,14 +89,14 @@ public class DateUtilsTest {
     public void shouldFormatDateTimeToStringInCCFormat() {
         DateTime dateTime = new DateTime(2012, 12, 13, 23, 3, 56);
 
-        String formattedDateForCC = DateUtils.formatDateTimeForCC(dateTime);
+        String formattedDateForCC = DateUtils.formatDateTimeForCC(dateTime, DateUtils.ISTTimeZone);
 
         assertEquals("13-12-2012 23:03:56", formattedDateForCC);
     }
 
     @Test
     public void shouldFormatNulDateTimeToNullStringInCCFormat() {
-        String formattedDateForCC = DateUtils.formatDateTimeForCC(null);
+        String formattedDateForCC = DateUtils.formatDateTimeForCC(null, DateUtils.ISTTimeZone);
 
         assertNull(formattedDateForCC);
     }

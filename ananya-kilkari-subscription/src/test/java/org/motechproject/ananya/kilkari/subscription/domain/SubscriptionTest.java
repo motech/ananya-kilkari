@@ -29,7 +29,6 @@ public class SubscriptionTest {
         assertTrue(creationDate.isEqual(afterCreation) || creationDate.isBefore(afterCreation));
     }
 
-
     @Test
     public void shouldChangeStatusOfSubscriptionToPendingDuringActivationRequest() {
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null);

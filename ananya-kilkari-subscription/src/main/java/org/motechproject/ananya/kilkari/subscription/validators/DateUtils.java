@@ -40,8 +40,8 @@ public class DateUtils {
         return StringUtils.isNotEmpty(dateTime) ? DateTimeFormat.forPattern(DATE_TIME_FORMAT_FOR_CC).parseDateTime(dateTime) : null;
     }
 
-    public static String formatDateTimeForCC(DateTime dateTime) {
-        return dateTime == null ? null : dateTime.toString(DATE_TIME_FORMAT_FOR_CC);
+    public static String formatDateTimeForCC(DateTime dateTime, DateTimeZone dateTimeZone) {
+        return dateTime == null ? null : dateTime.withZone(dateTimeZone).toString(DATE_TIME_FORMAT_FOR_CC);
     }
 
     public static boolean isValidForCC(String dateTime) {

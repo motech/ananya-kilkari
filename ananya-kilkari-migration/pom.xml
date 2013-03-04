@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ananya-kilkari-migration</artifactId>
+    <name>Ananya Kilkari Migration</name>
 
     <dependencies>
         <dependency>

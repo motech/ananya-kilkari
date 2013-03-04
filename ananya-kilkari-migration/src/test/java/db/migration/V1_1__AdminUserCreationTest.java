@@ -14,15 +14,15 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
-public class V1_1_AdminUserCreationTest {
+public class V1_1__AdminUserCreationTest {
 
-    private V1_1_AdminUserCreation adminMigration;
+    private V1_1__AdminUserCreation adminMigration;
     private AllAdminUsers adminUserRepository;
 
     @Before
     @After
     public void setUp() throws Exception {
-        adminMigration = new V1_1_AdminUserCreation();
+        adminMigration = new V1_1__AdminUserCreation();
         adminUserRepository = adminMigration.getAdminUserRepository();
         adminUserRepository.removeAll();
     }

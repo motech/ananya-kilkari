@@ -160,9 +160,9 @@ public class SubscriptionServiceTest {
         SubscriptionPack subscriptionPack = SubscriptionPack.NAVJAAT_KILKARI;
         ArgumentCaptor<SubscriptionReportRequest> subscriptionReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionReportRequest.class);
         ArgumentCaptor<OMSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
-        SubscriptionRequest subscription = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequestBuilder().withDefaults().withMsisdn(msisdn).withPack(subscriptionPack).build();
 
-        subscriptionService.createSubscription(subscription, channel);
+        subscriptionService.createSubscription(subscriptionRequest, channel);
 
         InOrder order = inOrder(reportingServiceImpl, onMobileSubscriptionManagerPublisher);
         order.verify(reportingServiceImpl).reportSubscriptionCreation(subscriptionReportRequestArgumentCaptor.capture());
@@ -170,6 +170,7 @@ public class SubscriptionServiceTest {
         assertEquals(msisdn, actualSubscriptionCreationReportRequest.getMsisdn().toString());
         assertEquals(subscriptionPack.name(), actualSubscriptionCreationReportRequest.getPack());
         assertEquals(channel.name(), actualSubscriptionCreationReportRequest.getChannel());
+        assertEquals(subscriptionRequest.getCreationDate(), actualSubscriptionCreationReportRequest.getCreatedAt());
 
         order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(subscriptionActivationRequestArgumentCaptor.capture());
         OMSubscriptionRequest actualOMSubscriptionRequest = subscriptionActivationRequestArgumentCaptor.getValue();
@@ -1019,7 +1020,7 @@ public class SubscriptionServiceTest {
         assertEquals(beneficiaryName, subscriptionReportRequest.getName());
         assertEquals(beneficiaryAge, subscriptionReportRequest.getAgeOfBeneficiary());
         assertEquals(subscriptionId, subscriptionReportRequest.getOldSubscriptionId());
-        assertEquals(now.withSecondOfMinute(0).withMillisOfSecond(0), subscriptionReportRequest.getCreatedAt());
+        assertEquals(now, subscriptionReportRequest.getCreatedAt());
 
         ArgumentCaptor<OMSubscriptionRequest> activationRequest = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(activationRequest.capture());

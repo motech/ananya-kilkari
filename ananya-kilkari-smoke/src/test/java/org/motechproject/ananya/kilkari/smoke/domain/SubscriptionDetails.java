@@ -24,24 +24,10 @@ public class SubscriptionDetails {
     private String dateOfBirth;
     @JsonProperty
     private Location location;
-
+    @JsonProperty
+    private String lastUpdatedTime;
 
     public SubscriptionDetails() {
-    }
-
-    public SubscriptionDetails(String subscriptionId, String pack, String status,
-                               String lastCampaignId, String beneficiaryName, String beneficiaryAge,
-                               String weekNumber, String expectedDateOfDelivery, String dateOfBirth, Location location) {
-        this.subscriptionId = subscriptionId;
-        this.pack = pack;
-        this.status = status;
-        this.lastCampaignId = lastCampaignId;
-        this.beneficiaryName = beneficiaryName;
-        this.beneficiaryAge = beneficiaryAge;
-        this.weekNumber = weekNumber;
-        this.expectedDateOfDelivery = expectedDateOfDelivery;
-        this.dateOfBirth = dateOfBirth;
-        this.location = location;
     }
 
     @JsonIgnore

@@ -25,7 +25,9 @@ public class SubscriptionDetails {
     @JsonProperty
     private Location location;
     @JsonProperty
-    private String lastUpdatedTime;
+    private String lastUpdatedTimeForSubscription;
+    @JsonProperty
+    private String lastUpdatedTimeForBeneficiary;
 
     public SubscriptionDetails() {
     }

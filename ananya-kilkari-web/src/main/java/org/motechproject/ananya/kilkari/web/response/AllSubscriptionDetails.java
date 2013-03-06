@@ -39,13 +39,17 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
 
     @JsonProperty
     @XmlElement
-    private String lastUpdatedTime;
+    private String lastUpdatedTimeForSubscription;
+
+    @JsonProperty
+    @XmlElement
+    private String lastUpdatedTimeForBeneficiary;
 
     public AllSubscriptionDetails() {
     }
 
     public AllSubscriptionDetails(String subscriptionId, String pack, String status, String lastCampaignId,
-                                  String beneficiaryName, Integer beneficiaryAge, Integer weekNumber, String expectedDateOfDelivery, String dateOfBirth, LocationResponse location, String lastWeeklyMessageScheduledDate, String lastUpdatedTime) {
+                                  String beneficiaryName, Integer beneficiaryAge, Integer weekNumber, String expectedDateOfDelivery, String dateOfBirth, LocationResponse location, String lastWeeklyMessageScheduledDate, String lastUpdatedTimeForSubscription, String lastUpdatedTimeForBeneficiary) {
         super(subscriptionId, pack, status, lastCampaignId);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
@@ -54,7 +58,8 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
         this.dateOfBirth = dateOfBirth;
         this.location = location;
         this.lastWeeklyMessageScheduledDate = lastWeeklyMessageScheduledDate;
-        this.lastUpdatedTime = lastUpdatedTime;
+        this.lastUpdatedTimeForSubscription = lastUpdatedTimeForSubscription;
+        this.lastUpdatedTimeForBeneficiary = lastUpdatedTimeForBeneficiary;
     }
 
     public String getBeneficiaryName() {
@@ -81,8 +86,12 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
         return location;
     }
 
-    public String getLastUpdatedTime() {
-        return lastUpdatedTime;
+    public String getLastUpdatedTimeForSubscription() {
+        return lastUpdatedTimeForSubscription;
+    }
+
+    public String getLastUpdatedTimeForBeneficiary() {
+        return lastUpdatedTimeForBeneficiary;
     }
 
     @Override

@@ -20,7 +20,8 @@ public class SubscriptionDetailsResponse {
     private String expectedDateOfDelivery;
     private String dateOfBirth;
     private Location location;
-    private String lastUpdatedTime;
+    private String lastUpdatedTimeForSubscription;
+    private String lastUpdatedTimeForBeneficiary;
 
     public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId) {
         this.subscriptionId = subscriptionId;
@@ -29,7 +30,9 @@ public class SubscriptionDetailsResponse {
         this.campaignId = campaignId;
     }
 
-    public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId, String beneficiaryName, Integer beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer startWeekNumber, Location location, DateTime lastWeeklyMessageScheduledDate, DateTime lastUpdatedTime) {
+    public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId,
+                                       String beneficiaryName, Integer beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer startWeekNumber,
+                                       Location location, DateTime lastWeeklyMessageScheduledDate, DateTime lastUpdatedTimeForSubscription, DateTime lastUpdatedTimeForBeneficiary) {
         this(subscriptionId, pack, status, campaignId);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
@@ -38,7 +41,8 @@ public class SubscriptionDetailsResponse {
         this.startWeekNumber = startWeekNumber;
         this.location = location;
         this.lastWeeklyMessageScheduledDate = DateUtils.formatDate(lastWeeklyMessageScheduledDate, DateTimeZone.UTC);
-        this.lastUpdatedTime = DateUtils.formatDateTimeForCC(lastUpdatedTime, DateUtils.ISTTimeZone);
+        this.lastUpdatedTimeForSubscription = DateUtils.formatDateTimeForCC(lastUpdatedTimeForSubscription, DateUtils.ISTTimeZone);
+        this.lastUpdatedTimeForBeneficiary = DateUtils.formatDateTimeForCC(lastUpdatedTimeForBeneficiary, DateUtils.ISTTimeZone);
     }
 
     public String getSubscriptionId() {
@@ -85,7 +89,11 @@ public class SubscriptionDetailsResponse {
         return lastWeeklyMessageScheduledDate;
     }
 
-    public String getLastUpdatedTime() {
-        return lastUpdatedTime;
+    public String getLastUpdatedTimeForSubscription() {
+        return lastUpdatedTimeForSubscription;
+    }
+
+    public String getLastUpdatedTimeForBeneficiary() {
+        return lastUpdatedTimeForBeneficiary;
     }
 }

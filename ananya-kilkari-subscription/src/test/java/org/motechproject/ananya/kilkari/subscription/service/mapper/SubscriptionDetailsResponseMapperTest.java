@@ -63,6 +63,7 @@ public class SubscriptionDetailsResponseMapperTest {
 
     @Test
     public void shouldMapToAppropriateResponseWhenBothTransactionalAndReportsResponseIsPresent() {
+        DateTime now = DateTime.now();
         final String msisdn = "1234567890";
         String messageId1 = "messageId 1";
         String messageId2 = "messageId 2";
@@ -73,8 +74,8 @@ public class SubscriptionDetailsResponseMapperTest {
             add(subscription1);
             add(subscription2);
         }};
-        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, DateTime.now(), DateTime.now().minusYears(1), DateTime.now(), location, DateTime.now());
-        final SubscriberResponse subscriberResponse2 = new SubscriberResponse(subscription2.getSubscriptionId(), "name1", 24, DateTime.now(), DateTime.now().minusYears(1), DateTime.now(), location, DateTime.now());
+        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, now, now.minusYears(1), now, location, now, now.minusDays(3));
+        final SubscriberResponse subscriberResponse2 = new SubscriberResponse(subscription2.getSubscriptionId(), "name1", 24, now, now.minusYears(1), now, location, now, now.minusDays(3));
         List<SubscriberResponse> subscriberDetailsList = new ArrayList<SubscriberResponse>() {{
             add(subscriberResponse2);
             add(subscriberResponse1);
@@ -97,7 +98,7 @@ public class SubscriptionDetailsResponseMapperTest {
         List<Subscription> subscriptionList = new ArrayList<Subscription>() {{
             add(subscription1);
         }};
-        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, DateTime.now(), DateTime.now(), DateTime.now(), null, DateTime.now());
+        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, DateTime.now(), DateTime.now(), DateTime.now(), null, DateTime.now(), DateTime.now());
         List<SubscriberResponse> subscriberDetailsList = new ArrayList<SubscriberResponse>() {{
             add(subscriberResponse1);
         }};
@@ -123,7 +124,8 @@ public class SubscriptionDetailsResponseMapperTest {
         assertEquals(subscriberResponse.getExpectedDateOfDelivery().toString("dd-MM-yyyy"), response.getExpectedDateOfDelivery());
         assertEquals(expectedLocation, response.getLocation());
         assertEquals(DateUtils.formatDate(subscriberResponse.getLastScheduledMessageDate(), DateTimeZone.UTC), response.getLastWeeklyMessageScheduledDate());
-        assertEquals(DateUtils.formatDateTimeForCC(subscriberResponse.getLastUpdatedTime(), DateUtils.ISTTimeZone), response.getLastUpdatedTime());
+        assertEquals(DateUtils.formatDateTimeForCC(subscriberResponse.getLastUpdatedTimeForSubscription(), DateUtils.ISTTimeZone), response.getLastUpdatedTimeForSubscription());
+        assertEquals(DateUtils.formatDateTimeForCC(subscriberResponse.getLastUpdatedTimeForBeneficiary(), DateUtils.ISTTimeZone), response.getLastUpdatedTimeForBeneficiary());
     }
 
     @Test

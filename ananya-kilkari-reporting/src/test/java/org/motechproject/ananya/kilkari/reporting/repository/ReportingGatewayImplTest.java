@@ -312,4 +312,16 @@ public class ReportingGatewayImplTest {
 
         verify(httpClientService).execute("url/subscription/campaignScheduleAlert", campaignScheduleAlertRequest, Method.POST);
     }
+
+    @Test
+    public void shouldReportACampaignChange() {
+        String subscriptionId = "subscriptionId";
+        CampaignChangeReportRequest campaignChangeReportRequest = new CampaignChangeReportRequest("INFANT_DEATH", DateTime.now());
+        HttpThreadContext.set("CONTACT_CENTER");
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+
+        reportingGateway.reportCampaignChange(campaignChangeReportRequest, subscriptionId);
+
+        verify(httpClientService).executeSync("url/subscription/" + subscriptionId + "/changecampaign", campaignChangeReportRequest, Method.PUT);
+    }
 }

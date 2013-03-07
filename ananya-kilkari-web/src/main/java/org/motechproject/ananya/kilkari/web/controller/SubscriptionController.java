@@ -110,7 +110,6 @@ public class SubscriptionController {
         return BaseResponse.success("Subscriber Update request submitted successfully");
     }
 
-
     private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
         if (validationErrors.hasErrors()) {
             throw new ValidationException(validationErrors.allMessages());

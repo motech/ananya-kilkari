@@ -119,4 +119,14 @@ public class ReportingServiceImplTest {
 
         verify(reportGateway).reportCampaignScheduleAlertReceived(campaignScheduleAlertRequest);
     }
+
+    @Test
+    public void shouldReportCampaignMessagePackChange() {
+        CampaignChangeReportRequest campaignChangeReportRequest = new CampaignChangeReportRequest("INFANT_DEATH", DateTime.now());
+        String subscriptionId = "subscriptionId";
+
+        reportingServiceImpl.reportCampaignChange(campaignChangeReportRequest, subscriptionId);
+
+        verify(reportGateway).reportCampaignChange(campaignChangeReportRequest, subscriptionId);
+    }
 }

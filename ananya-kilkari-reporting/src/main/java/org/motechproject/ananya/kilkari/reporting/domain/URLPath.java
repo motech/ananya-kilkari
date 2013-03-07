@@ -11,4 +11,5 @@ public class URLPath {
     public static final String PURGE_SUBSCRIPTION_PATH = "subscription";
     public static final String GET_SUBSCRIBER_BY_MSISDN_PATH = "subscriber";
     public static final String CAMPAIGN_SCHEDULE_ALERT_PATH = "subscription/campaignScheduleAlert";
+    public static final String CHANGE_CAMPAIGN_PATH = "subscription/%s/changecampaign";
 }

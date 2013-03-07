@@ -65,6 +65,12 @@ public class StubReportingGateway implements ReportingGateway {
     }
 
     @Override
+    public void reportCampaignChange(CampaignChangeReportRequest campaignChangeReportRequest, String subscriptionId) {
+        if (verify())
+            behavior.reportCampaignChange(campaignChangeReportRequest, subscriptionId);
+    }
+
+    @Override
     public List<SubscriberResponse> getSubscribersByMsisdn(String msisdn) {
         if (verify())
             return behavior.getSubscribersByMsisdn(msisdn);

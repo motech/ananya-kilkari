@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -39,7 +40,7 @@ public class CallDeliveryFailureRecordValidatorTest {
         FailedCallReport failedCallReport3 = new FailedCallReport(subscriptionId, null, "WEEK13", statusCode);
 
         when(allCampaignMessages.findBySubscriptionId(subscriptionId)).thenReturn(Arrays.asList(new CampaignMessage()));
-        when(campaignMessageService.getCampaignMessageStatusFor(statusCode)).thenReturn(CampaignMessageStatus.ND);
+        when(campaignMessageService.getCampaignMessageStatusFor(any(FailedCallReport.class))).thenReturn(CampaignMessageStatus.ND);
 
 
         Errors errors1 = callDeliveryFailureRecordValidator.validate(failedCallReport1);
@@ -62,7 +63,7 @@ public class CallDeliveryFailureRecordValidatorTest {
         FailedCallReport failedCallReport2 = new FailedCallReport(subscriptionId, "1234567890", "WEEKS13", statusCode);
         FailedCallReport failedCallReport3 = new FailedCallReport(subscriptionId, "1234567890", "WEEK132", statusCode);
         when(allCampaignMessages.findBySubscriptionId(subscriptionId)).thenReturn(Arrays.asList(new CampaignMessage()));
-        when(campaignMessageService.getCampaignMessageStatusFor(statusCode)).thenReturn(CampaignMessageStatus.ND);
+        when(campaignMessageService.getCampaignMessageStatusFor(any(FailedCallReport.class))).thenReturn(CampaignMessageStatus.ND);
 
         Errors errors1 = callDeliveryFailureRecordValidator.validate(failedCallReport1);
         Errors errors2 = callDeliveryFailureRecordValidator.validate(failedCallReport2);
@@ -82,7 +83,7 @@ public class CallDeliveryFailureRecordValidatorTest {
         String statusCode = "iu_dnp";
         FailedCallReport failedCallReport = new FailedCallReport(subscriptionId, "1234567890", "WEEK13", statusCode);
         when(allCampaignMessages.findBySubscriptionId(subscriptionId)).thenReturn(null);
-        when(campaignMessageService.getCampaignMessageStatusFor(statusCode)).thenReturn(CampaignMessageStatus.ND);
+        when(campaignMessageService.getCampaignMessageStatusFor(failedCallReport)).thenReturn(CampaignMessageStatus.ND);
 
         Errors errors = callDeliveryFailureRecordValidator.validate(failedCallReport);
 

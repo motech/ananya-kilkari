@@ -51,4 +51,8 @@ public class FailedCallReport implements Serializable {
     public DateTime getCreatedAt() {
         return createdAt;
     }
+
+    public void setStatusCode(String statusCode) {
+        this.statusCode = statusCode;
+    }
 }

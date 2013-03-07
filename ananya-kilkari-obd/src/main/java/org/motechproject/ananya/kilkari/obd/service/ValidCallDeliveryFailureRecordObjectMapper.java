@@ -17,7 +17,7 @@ class ValidCallDeliveryFailureRecordObjectMapper {
     }
 
     public ValidFailedCallReport mapFrom(FailedCallReport failedCallReport) {
-        CampaignMessageStatus statusCode = campaignMessageService.getCampaignMessageStatusFor(failedCallReport.getStatusCode());
+        CampaignMessageStatus statusCode = campaignMessageService.getCampaignMessageStatusFor(failedCallReport);
         return new ValidFailedCallReport(failedCallReport.getSubscriptionId(), failedCallReport.getMsisdn(), failedCallReport.getCampaignId(), statusCode, failedCallReport.getCreatedAt());
     }
 }

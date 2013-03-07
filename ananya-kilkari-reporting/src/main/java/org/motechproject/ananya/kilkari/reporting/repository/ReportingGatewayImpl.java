@@ -103,6 +103,12 @@ public class ReportingGatewayImpl implements ReportingGateway {
         performHttpRequestBasedOnChannel(url, campaignScheduleAlertRequest, Method.POST);
     }
 
+    @Override
+    public void reportCampaignChange(CampaignChangeReportRequest campaignChangeReportRequest, String subscriptionId) {
+        String url = String.format("%s%s", getBaseUrl(), String.format(CHANGE_CAMPAIGN_PATH, subscriptionId));
+        performHttpRequestBasedOnChannel(url, campaignChangeReportRequest, Method.PUT);
+    }
+
     private boolean isCallCenterCall() {
         String channel = HttpThreadContext.get();
         return "CONTACT_CENTER".equalsIgnoreCase(channel);

@@ -25,4 +25,6 @@ public interface ReportingService {
     void reportCampaignScheduleAlertReceived(CampaignScheduleAlertRequest campaignScheduleAlertRequest);
 
     List<SubscriberResponse> getSubscribersByMsisdn(String msisdn);
+
+    void reportCampaignChange(CampaignChangeReportRequest expectedReportRequest, String subscriptionId);
 }

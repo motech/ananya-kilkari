@@ -82,6 +82,13 @@ public class StubReportingService implements ReportingService {
         return Collections.EMPTY_LIST;
     }
 
+    @Override
+    public void reportCampaignChange(CampaignChangeReportRequest campaignChangeReportRequest, String subscriptionId) {
+        if (verify()) {
+            behavior.reportCampaignChange(campaignChangeReportRequest, subscriptionId);
+        }
+    }
+
     public void setBehavior(ReportingService behavior) {
         this.behavior = behavior;
     }

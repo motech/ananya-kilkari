@@ -64,4 +64,9 @@ public class ReportingServiceImpl implements ReportingService {
     public List<SubscriberResponse> getSubscribersByMsisdn(String msisdn) {
         return reportGateway.getSubscribersByMsisdn(msisdn);
     }
+
+    @Override
+    public void reportCampaignChange(CampaignChangeReportRequest campaignChangeReportRequest, String subscriptionId) {
+        reportGateway.reportCampaignChange(campaignChangeReportRequest, subscriptionId);
+    }
 }

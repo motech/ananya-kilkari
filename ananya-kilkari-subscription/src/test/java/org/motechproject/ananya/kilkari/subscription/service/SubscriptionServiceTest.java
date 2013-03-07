@@ -38,10 +38,7 @@ import org.motechproject.ananya.kilkari.subscription.validators.ChangeMsisdnVali
 import org.motechproject.ananya.kilkari.subscription.validators.SubscriptionValidator;
 import org.motechproject.ananya.kilkari.subscription.validators.UnsubscriptionValidator;
 import org.motechproject.ananya.kilkari.sync.service.RefdataSyncService;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberChangeMsisdnReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
-import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionStateChangeRequest;
+import org.motechproject.ananya.reports.kilkari.contract.request.*;
 import org.motechproject.ananya.reports.kilkari.contract.response.LocationResponse;
 import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResponse;
 import org.motechproject.scheduler.MotechSchedulerService;
@@ -1464,19 +1461,24 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldUpdateMessageCampaignPackWhenReschedulingToMCOrID() {
-        String subscriptionId = "subscriptionId";
+    public void shouldUpdateMessageCampaignPackAndReportWhenReschedulingToMCOrID() {
         DateTime now = DateTime.now();
-        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(new Subscription("2134567890", SubscriptionPack.NANHI_KILKARI, now, now, 2));
+        DateTime createdAt = now.plusWeeks(4);
+        Subscription subscription = new Subscription("2134567890", SubscriptionPack.NANHI_KILKARI, now, now, 2);
+        String subscriptionId = subscription.getSubscriptionId();
+        when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getActiveCampaignName(subscriptionId)).thenReturn(null);
         when(messageCampaignService.getMessageTimings(anyString(), any(DateTime.class), any(DateTime.class))).thenReturn(Arrays.asList(new DateTime()));
         when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(30);
 
-        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId, CampaignChangeReason.MISCARRIAGE, now.plusWeeks(4)));
+        subscriptionService.rescheduleCampaign(new CampaignRescheduleRequest(subscriptionId, CampaignChangeReason.MISCARRIAGE, createdAt));
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).update(subscriptionArgumentCaptor.capture());
         Subscription actualSubscription = subscriptionArgumentCaptor.getValue();
         assertEquals(MessageCampaignPack.MISCARRIAGE, actualSubscription.getMessageCampaignPack());
+
+        CampaignChangeReportRequest expectedReportRequest = new CampaignChangeReportRequest(MessageCampaignPack.MISCARRIAGE.name(), createdAt);
+        verify(reportingServiceImpl).reportCampaignChange(expectedReportRequest, subscription.getSubscriptionId());
     }
 }

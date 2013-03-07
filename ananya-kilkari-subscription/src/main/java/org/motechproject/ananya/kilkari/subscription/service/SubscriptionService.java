@@ -334,16 +334,20 @@ public class SubscriptionService {
         subscriptionValidator.validateChangeCampaign(subscriptionId, campaignRescheduleRequest.getReason());
 
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
-        updateMessageCampaignPack(campaignRescheduleRequest.getReason(), subscription);
+        updateMessageCampaignPackAndReport(campaignRescheduleRequest, subscription);
         DateTime nextAlertDateTime = messageCampaignService.getMessageTimings(subscriptionId, campaignRescheduleRequest.getCreatedAt(), campaignRescheduleRequest.getCreatedAt().plusMonths(1)).get(0);
         unScheduleCampaign(subscription);
         removeScheduledMessagesFromOBD(subscriptionId);
         scheduleCampaign(campaignRescheduleRequest, nextAlertDateTime);
     }
 
-    private void updateMessageCampaignPack(CampaignChangeReason campaignChangeReason, Subscription subscription) {
-        subscription.setMessageCampaignPack(MessageCampaignPack.from(campaignChangeReason.name()));
+    private void updateMessageCampaignPackAndReport(CampaignRescheduleRequest campaignRescheduleRequest, Subscription subscription) {
+        MessageCampaignPack messageCampaignPack = MessageCampaignPack.from(campaignRescheduleRequest.getReason().name());
+        subscription.setMessageCampaignPack(messageCampaignPack);
         allSubscriptions.update(subscription);
+
+        logger.info("Reporting change campaign for " + subscription);
+        reportingService.reportCampaignChange(new CampaignChangeReportRequest(messageCampaignPack.name(), campaignRescheduleRequest.getCreatedAt()), subscription.getSubscriptionId());
     }
 
     public void updateSubscriberDetails(SubscriberRequest request) {

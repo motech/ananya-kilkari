@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.obd.domain.*;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTask;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTaskExecutor;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
@@ -273,18 +274,25 @@ public class CampaignMessageServiceTest {
 
     @Test
     public void shouldGetStatusCode() {
+        FailedCallReport failedCallReport = new FailedCallReport("subscriptionId", "msisdn", "WEEK13", "iu_dnp");
+
+        failedCallReport.setStatusCode("iu_dnc");
         when(obdProperties.getCampaignMessageStatusFor("iu_dnc")).thenReturn(CampaignMessageStatus.ND);
-        assertEquals(CampaignMessageStatus.ND, campaignMessageService.getCampaignMessageStatusFor("iu_dnc"));
+        assertEquals(CampaignMessageStatus.ND, campaignMessageService.getCampaignMessageStatusFor(failedCallReport));
 
+        failedCallReport.setStatusCode("iu_dnp");
         when(obdProperties.getCampaignMessageStatusFor("iu_dnp")).thenReturn(CampaignMessageStatus.NA);
-        assertEquals(CampaignMessageStatus.NA, campaignMessageService.getCampaignMessageStatusFor("iu_dnp"));
+        assertEquals(CampaignMessageStatus.NA, campaignMessageService.getCampaignMessageStatusFor(failedCallReport));
 
+        failedCallReport.setStatusCode("iu_dnc123");
         CampaignMessageStatus defaultStatus = CampaignMessageStatus.NA;
         when(obdProperties.getDefaultCampaignMessageStatus()).thenReturn(defaultStatus);
-        assertEquals(defaultStatus, campaignMessageService.getCampaignMessageStatusFor("iu_dnc123"));
+        assertEquals(defaultStatus, campaignMessageService.getCampaignMessageStatusFor(failedCallReport));
 
+
+        failedCallReport.setStatusCode("iu_dnc123");
         when(obdProperties.getDefaultCampaignMessageStatus()).thenReturn(null);
-        assertNull(campaignMessageService.getCampaignMessageStatusFor("iu_dnc123"));
+        assertNull(campaignMessageService.getCampaignMessageStatusFor(failedCallReport));
     }
 
     @Test

@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.domain.*;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
 import org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGateway;
+import org.motechproject.ananya.kilkari.obd.service.request.FailedCallReport;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTask;
 import org.motechproject.ananya.kilkari.obd.service.utils.RetryTaskExecutor;
 import org.motechproject.ananya.kilkari.reporting.domain.CampaignMessageCallSource;
@@ -109,10 +110,10 @@ public class CampaignMessageService {
         allCampaignMessages.removeAll(subscriptionId);
     }
 
-    public CampaignMessageStatus getCampaignMessageStatusFor(String statusCode) {
-        CampaignMessageStatus campaignMessageStatus = obdProperties.getCampaignMessageStatusFor(statusCode);
+    public CampaignMessageStatus getCampaignMessageStatusFor(FailedCallReport failedCallReport) {
+        CampaignMessageStatus campaignMessageStatus = obdProperties.getCampaignMessageStatusFor(failedCallReport.getStatusCode());
         if (campaignMessageStatus == null) {
-            invalidStatusCodeLogger.error(String.format("Invalid failure status code : %s", statusCode));
+            invalidStatusCodeLogger.error(String.format("Invalid failure status code : %s, msisdn : %s, subscriptionId : %s", failedCallReport.getStatusCode(), failedCallReport.getMsisdn(), failedCallReport.getSubscriptionId()));
             return obdProperties.getDefaultCampaignMessageStatus();
         }
         return campaignMessageStatus;

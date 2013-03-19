@@ -178,7 +178,8 @@ DataGrid = function(params){
         var contentKeys = this.contentKeys;
         var newRow = $('<tr></tr>');
         for(var i in contentKeys){
-            newRow.append('<td>'+content[contentKeys[i]]+'</td>');
+            var dataToAppend = content[contentKeys[i]] == undefined ? "" : content[contentKeys[i]]
+            newRow.append('<td>'+dataToAppend+'</td>');
         }
 
         return newRow;

@@ -17,6 +17,6 @@ public class SchedulerDiagnostics {
 
     @Diagnostic(name = "SCHEDULER DIAGNOSTICS")
     public DiagnosticsResult performDiagnosis() throws SchedulerException {
-        return schedulerDiagnosticService.diagnose(ObdSchedulers.getAll());
+        return schedulerDiagnosticService.diagnoseAllOBDSchedules();
     }
 }

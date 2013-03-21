@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SchedulerDiagnosticServiceTest {
@@ -35,18 +35,23 @@ public class SchedulerDiagnosticServiceTest {
     @Before
     public void setUp() {
         when(schedulerFactoryBean.getScheduler()).thenReturn(motechScheduler);
-        schedulerDiagnosticService = new SchedulerDiagnosticService(schedulerFactoryBean);
+        ArrayList<String> obdSchedules = new ArrayList<>();
+        obdSchedules.add("obd.schedule");
+        schedulerDiagnosticService = new SchedulerDiagnosticService(schedulerFactoryBean, obdSchedules);
     }
 
     @Test
     public void shouldPrintJobHasNotRunWhenJobHasNotPreviouslyRun() throws SchedulerException {
         Set<TriggerKey> triggerKeys = new HashSet<>();
-        TriggerKey triggerKey = new TriggerKey("name1", "default");
-        triggerKeys.add(triggerKey);
+        TriggerKey triggerKey1 = new TriggerKey("name1", "default");
+        TriggerKey triggerKey2 = new TriggerKey("name2", "default");
+        triggerKeys.add(triggerKey1);
+        triggerKeys.add(triggerKey2);
         when(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains(anyString()))).thenReturn(triggerKeys);
 
         Trigger mockTrigger = mock(Trigger.class);
-        when(motechScheduler.getTrigger(triggerKey)).thenReturn(mockTrigger);
+        when(motechScheduler.getTrigger(triggerKey1)).thenReturn(mockTrigger);
+        when(motechScheduler.getTrigger(triggerKey2)).thenReturn(mockTrigger);
         final String jobName1 = "Job Name1";
         final String jobName2 = "Job Name2";
         when(mockTrigger.getJobKey()).thenReturn(new JobKey(jobName1));
@@ -71,12 +76,15 @@ public class SchedulerDiagnosticServiceTest {
     @Test
     public void shouldPrintMotechSchedulerIsNotRunning() throws SchedulerException {
         Set<TriggerKey> triggerKeys = new HashSet<>();
-        TriggerKey triggerKey = new TriggerKey("name1", "default");
-        triggerKeys.add(triggerKey);
+        TriggerKey triggerKey1 = new TriggerKey("name1", "default");
+        TriggerKey triggerKey2 = new TriggerKey("name2", "default");
+        triggerKeys.add(triggerKey1);
+        triggerKeys.add(triggerKey2);
         when(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains(anyString()))).thenReturn(triggerKeys);
 
         Trigger mockTrigger = mock(Trigger.class);
-        when(motechScheduler.getTrigger(triggerKey)).thenReturn(mockTrigger);
+        when(motechScheduler.getTrigger(triggerKey1)).thenReturn(mockTrigger);
+        when(motechScheduler.getTrigger(triggerKey2)).thenReturn(mockTrigger);
         final String jobName1 = "Job Name1";
         final String jobName2 = "Job Name2";
         when(mockTrigger.getJobKey()).thenReturn(new JobKey(jobName1));
@@ -147,7 +155,7 @@ public class SchedulerDiagnosticServiceTest {
     @Test
     public void shouldFailDiagnosticsIfJobHasNotRunForGivenInterval() throws SchedulerException {
         Set<TriggerKey> triggerKeys = new HashSet<>();
-        final String jobName1 = ObdSchedulers.getAll().get(0);
+        final String jobName1 = ObdSchedules.getAll().get(0);
         TriggerKey triggerKey = new TriggerKey(jobName1, "default");
         triggerKeys.add(triggerKey);
         when(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains(anyString()))).thenReturn(triggerKeys);
@@ -173,7 +181,7 @@ public class SchedulerDiagnosticServiceTest {
     }
 
     @Test
-    public void shouldReturnTrueIfTheJobHasRunThePreviousDay() throws SchedulerException {
+    public void shouldPassIfTheJobHasRunThePreviousDay() throws SchedulerException {
         Set<TriggerKey> triggerKeys = new HashSet<>();
         TriggerKey triggerKey = new TriggerKey("name1", "default");
         triggerKeys.add(triggerKey);
@@ -181,7 +189,7 @@ public class SchedulerDiagnosticServiceTest {
 
         Trigger mockTrigger = mock(Trigger.class);
         when(motechScheduler.getTrigger(triggerKey)).thenReturn(mockTrigger);
-        final String jobName1 = ObdSchedulers.getAll().get(0);
+        final String jobName1 = "obd.schedule";
         when(mockTrigger.getJobKey()).thenReturn(new JobKey(jobName1));
 
         ArrayList jobKeyList = mock(ArrayList.class);
@@ -193,13 +201,13 @@ public class SchedulerDiagnosticServiceTest {
 
         when(motechScheduler.isStarted()).thenReturn(true);
 
-        boolean schedulerRunStatus = schedulerDiagnosticService.AreSchedulerJobsRunning();
+        DiagnosticsResult diagnosticsResult = schedulerDiagnosticService.diagnoseAllOBDSchedules();
 
-        assertTrue(schedulerRunStatus);
+        assertEquals(DiagnosticsStatus.PASS, diagnosticsResult.getStatus());
     }
 
     @Test
-    public void shouldReturnFalseIfMotechSchedulerIsStopped() throws SchedulerException {
+    public void shouldFailIfMotechSchedulerIsStopped() throws SchedulerException {
         Set<TriggerKey> triggerKeys = new HashSet<>();
         TriggerKey triggerKey = new TriggerKey("name1", "default");
         triggerKeys.add(triggerKey);
@@ -207,7 +215,7 @@ public class SchedulerDiagnosticServiceTest {
 
         Trigger mockTrigger = mock(Trigger.class);
         when(motechScheduler.getTrigger(triggerKey)).thenReturn(mockTrigger);
-        final String jobName1 = ObdSchedulers.getAll().get(0);
+        final String jobName1 = ObdSchedules.getAll().get(0);
         when(mockTrigger.getJobKey()).thenReturn(new JobKey(jobName1));
 
         ArrayList jobKeyList = mock(ArrayList.class);
@@ -219,9 +227,9 @@ public class SchedulerDiagnosticServiceTest {
 
         when(motechScheduler.isStarted()).thenReturn(false);
 
-        boolean schedulerRunStatus = schedulerDiagnosticService.AreSchedulerJobsRunning();
+        DiagnosticsResult diagnosticsResult = schedulerDiagnosticService.diagnoseAllOBDSchedules();
 
-        assertFalse(schedulerRunStatus);
+        assertEquals(DiagnosticsStatus.FAIL, diagnosticsResult.getStatus());
     }
 
     @Test
@@ -233,7 +241,7 @@ public class SchedulerDiagnosticServiceTest {
 
         Trigger mockTrigger = mock(Trigger.class);
         when(motechScheduler.getTrigger(triggerKey)).thenReturn(mockTrigger);
-        final String jobName1 = ObdSchedulers.getAll().get(0);
+        final String jobName1 = ObdSchedules.getAll().get(0);
         when(mockTrigger.getJobKey()).thenReturn(new JobKey(jobName1));
 
         ArrayList jobKeyList = mock(ArrayList.class);
@@ -245,9 +253,9 @@ public class SchedulerDiagnosticServiceTest {
 
         when(motechScheduler.isStarted()).thenReturn(true);
 
-        boolean schedulerRunStatus = schedulerDiagnosticService.AreSchedulerJobsRunning();
+        DiagnosticsResult diagnosticsResult = schedulerDiagnosticService.diagnoseAllOBDSchedules();
 
-        assertFalse(schedulerRunStatus);
+        assertEquals(DiagnosticsStatus.FAIL, diagnosticsResult.getStatus());
     }
 
     @Test
@@ -259,7 +267,7 @@ public class SchedulerDiagnosticServiceTest {
 
         Trigger mockTrigger = mock(Trigger.class);
         when(motechScheduler.getTrigger(triggerKey)).thenReturn(mockTrigger);
-        final String jobName1 = ObdSchedulers.getAll().get(0);
+        final String jobName1 = "obd.schedule";
         when(mockTrigger.getJobKey()).thenReturn(new JobKey(jobName1));
 
         ArrayList jobKeyList = mock(ArrayList.class);
@@ -271,8 +279,34 @@ public class SchedulerDiagnosticServiceTest {
 
         when(motechScheduler.isStarted()).thenReturn(true);
 
-        boolean schedulerRunStatus = schedulerDiagnosticService.AreSchedulerJobsRunning();
+        DiagnosticsResult diagnosticsResult = schedulerDiagnosticService.diagnoseAllOBDSchedules();
 
-        assertTrue(schedulerRunStatus);
+        assertEquals(DiagnosticsStatus.PASS, diagnosticsResult.getStatus());
+    }
+
+    @Test
+    public void shouldFailIfAllTheJobsAreNotScheduled() throws SchedulerException {
+        Set<TriggerKey> triggerKeys = new HashSet<>();
+        TriggerKey triggerKey1 = new TriggerKey("name1", "default");
+        triggerKeys.add(triggerKey1);
+        when(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains(anyString()))).thenReturn(triggerKeys);
+
+        Trigger mockTrigger = mock(Trigger.class);
+        when(motechScheduler.getTrigger(triggerKey1)).thenReturn(mockTrigger);
+        final String jobName1 = "Job Name1";
+        when(mockTrigger.getJobKey()).thenReturn(new JobKey(jobName1));
+        when(mockTrigger.getPreviousFireTime()).thenReturn(DateTime.now().minusHours(21).toDate());
+        when(mockTrigger.getNextFireTime()).thenReturn(DateTime.now().plusMonths(4).toDate());
+
+        ArrayList jobKeyList = mock(ArrayList.class);
+        when(motechScheduler.getTriggersOfJob(any(JobKey.class))).thenReturn(jobKeyList);
+        when(jobKeyList.size()).thenReturn(2);
+
+        DiagnosticsResult diagnosticsResult = schedulerDiagnosticService.diagnoseAllOBDSchedules();
+
+        System.out.println(diagnosticsResult.getMessage());
+        assertTrue(diagnosticsResult.getMessage().contains(String.format("Unscheduled Job: obd.schedule")));
+        assertEquals(DiagnosticsStatus.FAIL, diagnosticsResult.getStatus());
+        verify(motechScheduler, never()).isStarted();
     }
 }

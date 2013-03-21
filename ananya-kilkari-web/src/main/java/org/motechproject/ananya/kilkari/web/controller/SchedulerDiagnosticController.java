@@ -6,6 +6,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.motechproject.ananya.kilkari.web.diagnostics.SchedulerDiagnosticService;
 import org.motechproject.diagnostics.response.DiagnosticsResponse;
 import org.motechproject.diagnostics.response.DiagnosticsResult;
+import org.motechproject.diagnostics.response.DiagnosticsStatus;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
@@ -44,7 +44,10 @@ public class SchedulerDiagnosticController {
     @RequestMapping(value = "/diagnostics/scheduler/obd", method = RequestMethod.GET)
     @ResponseBody
     public String obdSchedulerStatus() throws SchedulerException {
-        return schedulerDiagnosticService.AreSchedulerJobsRunning() ? "SUCCESS" : "FAILURE";
+        DiagnosticsResult diagnosticsResult = schedulerDiagnosticService.diagnoseAllOBDSchedules();
+        return diagnosticsResult.getStatus().equals(DiagnosticsStatus.PASS)
+                ? "SUCCESS"
+                : String.format("FAILURE\n%s", diagnosticsResult.getMessage());
     }
 
     private String createResponseMessage(DiagnosticsResponse diagnosticsResponse) throws Exception {

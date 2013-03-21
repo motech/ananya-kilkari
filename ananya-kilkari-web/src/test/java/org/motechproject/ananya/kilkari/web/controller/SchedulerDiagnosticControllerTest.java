@@ -57,7 +57,7 @@ public class SchedulerDiagnosticControllerTest extends SpringIntegrationTest {
     @Test
     public void shouldReturnSuccessWhenObdSchedulesRunAsExpected() throws Exception {
         schedulerDiagnosticController = new SchedulerDiagnosticController(schedulerDiagnosticService, velocityEngine);
-        when(schedulerDiagnosticService.AreSchedulerJobsRunning()).thenReturn(true);
+        when(schedulerDiagnosticService.diagnoseAllOBDSchedules()).thenReturn(new DiagnosticsResult(DiagnosticsStatus.PASS, "message"));
 
         String status = schedulerDiagnosticController.obdSchedulerStatus();
 
@@ -67,10 +67,10 @@ public class SchedulerDiagnosticControllerTest extends SpringIntegrationTest {
     @Test
     public void shouldReturnFailureWhenObdSchedulesDoNotRunAsExpected() throws Exception {
         schedulerDiagnosticController = new SchedulerDiagnosticController(schedulerDiagnosticService, velocityEngine);
-        when(schedulerDiagnosticService.AreSchedulerJobsRunning()).thenReturn(false);
+        when(schedulerDiagnosticService.diagnoseAllOBDSchedules()).thenReturn(new DiagnosticsResult(DiagnosticsStatus.FAIL, "OBD Schedulers not running"));
 
         String status = schedulerDiagnosticController.obdSchedulerStatus();
 
-        assertEquals("FAILURE", status);
+        assertEquals("FAILURE\nOBD Schedulers not running", status);
     }
 }

@@ -89,6 +89,13 @@ public class StubReportingService implements ReportingService {
         }
     }
 
+    @Override
+    public void reportCareRequest(SubscriberCareReportRequest subscriberCareReportRequest) {
+        if (verify()) {
+            behavior.reportCareRequest(subscriberCareReportRequest);
+        }
+    }
+
     public void setBehavior(ReportingService behavior) {
         this.behavior = behavior;
     }

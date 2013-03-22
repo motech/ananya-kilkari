@@ -27,4 +27,6 @@ public interface ReportingGateway {
     void reportCampaignScheduleAlertReceived(CampaignScheduleAlertRequest campaignScheduleAlertRequest);
 
     void reportCampaignChange(CampaignChangeReportRequest campaignChangeReportRequest, String subscriptionId);
+
+    void reportCareRequest(SubscriberCareReportRequest subscriberCareReportRequest);
 }

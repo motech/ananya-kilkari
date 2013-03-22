@@ -27,4 +27,6 @@ public interface ReportingService {
     List<SubscriberResponse> getSubscribersByMsisdn(String msisdn);
 
     void reportCampaignChange(CampaignChangeReportRequest expectedReportRequest, String subscriptionId);
+
+    void reportCareRequest(SubscriberCareReportRequest subscriberCareReportRequest);
 }

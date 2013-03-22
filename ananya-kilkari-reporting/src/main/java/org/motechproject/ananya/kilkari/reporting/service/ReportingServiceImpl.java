@@ -69,4 +69,9 @@ public class ReportingServiceImpl implements ReportingService {
     public void reportCampaignChange(CampaignChangeReportRequest campaignChangeReportRequest, String subscriptionId) {
         reportGateway.reportCampaignChange(campaignChangeReportRequest, subscriptionId);
     }
+
+    @Override
+    public void reportCareRequest(SubscriberCareReportRequest subscriberCareReportRequest) {
+        reportGateway.reportCareRequest(subscriberCareReportRequest);
+    }
 }

@@ -26,7 +26,6 @@ public class ReportingServiceImplTest {
     private HttpClientService httpClientService;
     @Mock
     private Properties kilkariProperties;
-
     private ReportingServiceImpl reportingServiceImpl;
 
     @Before
@@ -128,5 +127,16 @@ public class ReportingServiceImplTest {
         reportingServiceImpl.reportCampaignChange(campaignChangeReportRequest, subscriptionId);
 
         verify(reportGateway).reportCampaignChange(campaignChangeReportRequest, subscriptionId);
+    }
+
+    @Test
+    public void shouldReportSubscriberCareReportRequest() {
+
+        SubscriberCareReportRequest subscriberCareReportRequest = new SubscriberCareReportRequest("msisdn", "HELP", "ivr", DateTime.now());
+
+        reportingServiceImpl.reportCareRequest(subscriberCareReportRequest);
+
+        verify(reportGateway).reportCareRequest(subscriberCareReportRequest);
+
     }
 }

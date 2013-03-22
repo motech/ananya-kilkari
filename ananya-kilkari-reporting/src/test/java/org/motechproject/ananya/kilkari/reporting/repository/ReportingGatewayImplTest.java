@@ -30,6 +30,8 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ReportingGatewayImplTest {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
     private ReportingGateway reportingGateway;
     @Mock
     private RestTemplate restTemplate;
@@ -41,9 +43,6 @@ public class ReportingGatewayImplTest {
     private ArgumentCaptor<Class<String>> responseTypeArgumentCaptor;
     @Captor
     private ArgumentCaptor<HashMap<String, String>> urlVariablesArgumentCaptor;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() {
@@ -323,5 +322,17 @@ public class ReportingGatewayImplTest {
         reportingGateway.reportCampaignChange(campaignChangeReportRequest, subscriptionId);
 
         verify(httpClientService).executeSync("url/subscription/" + subscriptionId + "/changecampaign", campaignChangeReportRequest, Method.PUT);
+    }
+
+    @Test
+    public void shouldReportSubscriberCareRequest() {
+
+        SubscriberCareReportRequest subscriberCareReportRequest = new SubscriberCareReportRequest("msisdn", "HELP", "ivr", DateTime.now());
+        HttpThreadContext.set("IVR");
+        when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
+
+        reportingGateway.reportCareRequest(subscriberCareReportRequest);
+
+        verify(httpClientService).execute("url/help", subscriberCareReportRequest, Method.POST);
     }
 }

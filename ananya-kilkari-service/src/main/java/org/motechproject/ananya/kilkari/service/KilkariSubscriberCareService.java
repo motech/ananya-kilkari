@@ -14,11 +14,10 @@ import java.util.List;
 
 @Service
 public class KilkariSubscriberCareService {
+    private static final Logger logger = LoggerFactory.getLogger(KilkariSubscriberCareService.class);
     private SubscriberCareRequestValidator careRequestValidator;
     private SubscriptionPublisher subscriptionPublisher;
     private SubscriberCareService subscriberCareService;
-
-    private static final Logger logger = LoggerFactory.getLogger(KilkariSubscriberCareService.class);
 
     public KilkariSubscriberCareService(SubscriberCareService subscriberCareService, SubscriberCareRequestValidator careRequestValidator,
                                         SubscriptionPublisher subscriptionPublisher) {

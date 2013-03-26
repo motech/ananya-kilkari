@@ -29,4 +29,14 @@ public class AllAdminUsers extends MotechBaseRepository<AdminUser> {
         if (adminUsers == null || adminUsers.isEmpty()) return null;
         return adminUsers.get(0);
     }
+
+    public void addOrUpdate(AdminUser adminUser) {
+        AdminUser adminUserFromDb = findByName(adminUser.getName());
+        if (adminUserFromDb == null) {
+            add(adminUser);
+            return;
+        }
+        adminUserFromDb.setPassword(adminUser.getPassword());
+        update(adminUserFromDb);
+    }
 }

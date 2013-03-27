@@ -27,7 +27,7 @@ public class UserCredentialsMigration {
 
     protected AllAdminUsers getAdminUserRepository() throws Exception {
         Properties couchDBProperties = new Properties();
-        couchDBProperties.load(V1_1__AdminUserCreation.class.getClassLoader().getResourceAsStream("couchdb.properties"));
+        couchDBProperties.load(UserCredentialsMigration.class.getClassLoader().getResourceAsStream("couchdb.properties"));
         HttpClientFactoryBean httpClientFactoryBean = new HttpClientFactoryBean();
         httpClientFactoryBean.setProperties(couchDBProperties);
         httpClientFactoryBean.afterPropertiesSet();
@@ -37,7 +37,7 @@ public class UserCredentialsMigration {
 
     private AdminUserList getAllCredentials() throws IOException {
         Properties adminUserProperties = new Properties();
-        adminUserProperties.load(V1_1__AdminUserCreation.class.getClassLoader().getResourceAsStream("admin.properties"));
+        adminUserProperties.load(UserCredentialsMigration.class.getClassLoader().getResourceAsStream("admin.properties"));
         String credentials = adminUserProperties.getProperty("credentials");
         return new ObjectMapper().readValue(credentials, AdminUserList.class);
     }

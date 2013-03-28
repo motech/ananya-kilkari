@@ -6,7 +6,6 @@ import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.HashMap;
@@ -29,7 +28,7 @@ public class InquiryPage {
             List<SubscriptionDetailsResponse> subscriptionDetails = kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.CONTACT_CENTER);
             model.put("subscriptionDetails", mapToSubscriptionGrid(subscriptionDetails));
         } catch (Exception e) {
-            model.put("subscriberError", ExceptionUtils.getFullStackTrace(e));
+            model.put("subscriberError", ExceptionUtils.getMessage(e));
         }
         return model;
     }

@@ -2,7 +2,7 @@
 <body>
     #default_navbar()
 <div class=container-fluid>
-    <div class="row-fluid mainbox">
+    <div class="row-fluid">
         <div class="span10">
             $screen_content
         </div>

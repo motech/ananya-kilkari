@@ -1,16 +1,17 @@
 var subscriptionDataGrid = new DataGrid({
     "tableId": "subscription-details-table",
-    "root" : "subscriptionDetails",
-    "rows": 10
+    "root": "subscriptionDetails",
+    "rows": 10,
+    "whenNull": ""
 });
 
-$(document).ready(function() {
+$(document).ready(function () {
     resetForm();
     fetchAndDisplay();
 });
 
-var fetchAndDisplay = function() {
-    $("#msisdn_form").submit(function(event) {
+var fetchAndDisplay = function () {
+    $("#msisdn_form").submit(function (event) {
         event.preventDefault();
         var msisdn = $("#msisdn").val();
         if (validateMsisdn(msisdn)) {
@@ -19,7 +20,7 @@ var fetchAndDisplay = function() {
     });
 }
 
-var showSubscriptionDetails = function(data) {
+var showSubscriptionDetails = function (data) {
     $("#subscriber-details").show();
     subscriptionDataGrid.initWithData(data);
     $("#subscription-details-table").show();
@@ -27,7 +28,7 @@ var showSubscriptionDetails = function(data) {
 }
 
 
-var showAllDetails = function(data) {
+var showAllDetails = function (data) {
     if (data.subscriberError) {
         $("#subscriber-details").hide();
         $("#subscriber-error").html(data.subscriberError);
@@ -37,7 +38,7 @@ var showAllDetails = function(data) {
     }
 }
 
-var initDataGrids = function(msisdn) {
+var initDataGrids = function (msisdn) {
     resetForm();
 
     $.ajax({
@@ -48,7 +49,7 @@ var initDataGrids = function(msisdn) {
     }).done(showAllDetails);
 }
 
-var resetForm = function() {
+var resetForm = function () {
     $("#subscriber-error").hide();
     $("#subscriber-details").show();
 }

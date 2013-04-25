@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.obd.service;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.joda.time.DateTime;
 import org.motechproject.ananya.kilkari.obd.domain.*;
 import org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages;
@@ -56,6 +58,7 @@ public class CampaignMessageService {
 
     public void sendSecondMainSubSlotMessages(final OBDSubSlot subSlot) {
         List<CampaignMessage> messagesToSend = allCampaignMessages.getAllUnsentRetryMessages();
+        checkForMaximumRetries(messagesToSend);
         List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
         messagesToSend.addAll(getNewMessagesToSend(subSlot, allNewMessages));
         sendMessagesToOBD(messagesToSend, subSlot);
@@ -69,12 +72,24 @@ public class CampaignMessageService {
 
     public void sendThirdMainSubSlotMessages(final OBDSubSlot subSlot) {
         List<CampaignMessage> allNewAndNAMessages = allCampaignMessages.getAllUnsentNewAndNAMessages();
+        checkForMaximumRetries(allNewAndNAMessages);
         sendMessagesToOBD(allNewAndNAMessages, subSlot);
     }
 
     public void sendRetrySlotMessages(final OBDSubSlot subSlot) {
         List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentNAMessages();
+        checkForMaximumRetries(allRetryMessages);
         sendMessagesToOBD(allRetryMessages, subSlot);
+    }
+
+    private void checkForMaximumRetries(List<CampaignMessage> campaignMessages) {
+        CollectionUtils.filter(campaignMessages, new Predicate() {
+            @Override
+            public boolean evaluate(Object object) {
+                CampaignMessage campaignMessage = (CampaignMessage) object;
+                return !(campaignMessage.hasFailed() && hasReachedMaximumRetryDays(campaignMessage));
+            }
+        });
     }
 
     public void deleteCampaignMessageIfExists(String subscriptionId, String messageId) {
@@ -120,18 +135,21 @@ public class CampaignMessageService {
     }
 
     private void updateCampaignMessageStatus(CampaignMessage campaignMessage, CampaignMessageStatus statusCode) {
-        if (hasReachedMaximumRetryDays(campaignMessage)) {
-            allCampaignMessages.delete(campaignMessage);
-            logger.info(String.format("Deleting campaign message for subscriptionId : %s and Week ending date : %s as it has reached maximum retry days", campaignMessage.getSubscriptionId(), campaignMessage.getWeekEndingDate()));
-        } else {
-            campaignMessage.setFailureStatusCode(statusCode);
-            allCampaignMessages.update(campaignMessage);
-        }
+        if (hasReachedMaximumRetryDays(campaignMessage))
+            return;
+        campaignMessage.setFailureStatusCode(statusCode);
+        allCampaignMessages.update(campaignMessage);
+
     }
 
     private boolean hasReachedMaximumRetryDays(CampaignMessage campaignMessage) {
         DateTime now = DateTime.now();
-        return now.isAfter(minimum(campaignMessage.getCreationDate().plusDays(obdProperties.getMaximumOBDRetryDays()), campaignMessage.getWeekEndingDate()));
+        boolean reachedMaximumRetries = now.isAfter(minimum(campaignMessage.getCreationDate().plusDays(obdProperties.getMaximumOBDRetryDays()), campaignMessage.getWeekEndingDate()));
+        if (reachedMaximumRetries) {
+            allCampaignMessages.delete(campaignMessage);
+            logger.info(String.format("Deleting campaign message for subscriptionId : %s and Week ending date : %s as it has reached maximum retry days", campaignMessage.getSubscriptionId(), campaignMessage.getWeekEndingDate()));
+        }
+        return reachedMaximumRetries;
     }
 
     private DateTime minimum(DateTime obdRetryEndDate, DateTime weekEndingDate) {

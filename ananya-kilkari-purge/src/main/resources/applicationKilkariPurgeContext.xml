@@ -7,6 +7,7 @@
     <import resource="classpath:applicationKilkariSubscriptionContext.xml"/>
     <import resource="classpath:applicationKilkariOBDContext.xml"/>
     <import resource="classpath:applicationKilkariReportingContext.xml"/>
+    <import resource="classpath:applicationKilkariAdminContext.xml"/>
 
     <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
     <property name="configLocation" value="classpath:quartz.properties"/>

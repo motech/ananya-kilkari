@@ -455,6 +455,103 @@ public class CampaignMessageServiceTest {
         verify(allCampaignMessages, never()).update(campaignMessage);
     }
 
+    @Test
+    public void shouldNotCheckForMaximumRetriesForFirstMainSlotSinceThereAreNoRetryMessages() {
+        CampaignMessage campaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", DateTime.now().minusMinutes(4), "1234567890", "operator1", DateTime.now().plusDays(2));
+        CampaignMessage campaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", DateTime.now().minusMinutes(3), "1234567891", "operator2", DateTime.now().plusDays(2));
+        List<CampaignMessage> campaignMessages = Arrays.asList(campaignMessage1, campaignMessage2);
+        List<CampaignMessage> expectedCampaignMessagesToBeSent = Arrays.asList(campaignMessage1, campaignMessage2);
+        when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(campaignMessages);
+        when(obdProperties.getSlotMessagePercentageFor(MainSubSlot.ONE)).thenReturn(100);
+        String csvContent = "csvContent";
+        when(campaignMessageCSVBuilder.getCSV(expectedCampaignMessagesToBeSent)).thenReturn(csvContent);
+
+        campaignMessageService.sendFirstMainSubSlotMessages(MainSubSlot.ONE);
+
+        verify(obdProperties, never()).getMaximumOBDRetryDays();
+        verify(allCampaignMessages, never()).delete(any(CampaignMessage.class));
+        verify(campaignMessageCSVBuilder).getCSV(expectedCampaignMessagesToBeSent);
+        verifyCampaignMessageUpdate(expectedCampaignMessagesToBeSent);
+    }
+
+    @Test
+    public void shouldCheckForMaximumRetriesOnlyForFailureMessagesInSecondMainSlot() {
+        CampaignMessage campaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", DateTime.now(), "1234567890", "operator1", DateTime.now().minusDays(3));
+        campaignMessage1.setFailureStatusCode(CampaignMessageStatus.NA);
+        CampaignMessage campaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", DateTime.now(), "1234567891", "operator2", DateTime.now().minusDays(2));
+        campaignMessage2.setFailureStatusCode(CampaignMessageStatus.SO);
+        CampaignMessage campaignMessage3 = new CampaignMessage("subsriptionId3", "messageId3", DateTime.now(), "1234567892", "operator3", DateTime.now().plusDays(2));
+        campaignMessage3.setFailureStatusCode(CampaignMessageStatus.ND);
+        CampaignMessage campaignMessage4 = new CampaignMessage("subsriptionId4", "messageId4", DateTime.now(), "1234567893", "operator4", DateTime.now().plusDays(2));
+        List<CampaignMessage> retryCampaignMessages = new ArrayList<>(Arrays.asList(campaignMessage1, campaignMessage2, campaignMessage3));
+        List<CampaignMessage> newCampaignMessages = Arrays.asList(campaignMessage4);
+        List<CampaignMessage> expectedCampaignMessagesToBeSent = Arrays.asList(campaignMessage3, campaignMessage4);
+        when(allCampaignMessages.getAllUnsentNewMessages()).thenReturn(newCampaignMessages);
+        when(allCampaignMessages.getAllUnsentRetryMessages()).thenReturn(retryCampaignMessages);
+        when(obdProperties.getMaximumOBDRetryDays()).thenReturn(7);
+        String csvContent = "csvContent";
+        when(campaignMessageCSVBuilder.getCSV(expectedCampaignMessagesToBeSent)).thenReturn(csvContent);
+        when(obdProperties.getSlotMessagePercentageFor(MainSubSlot.TWO)).thenReturn(40);
+        when(obdProperties.getSlotMessagePercentageFor(MainSubSlot.ONE)).thenReturn(30);
+
+        campaignMessageService.sendSecondMainSubSlotMessages(MainSubSlot.TWO);
+
+        verify(obdProperties, times(3)).getMaximumOBDRetryDays();
+        verify(allCampaignMessages).delete(campaignMessage1);
+        verify(allCampaignMessages).delete(campaignMessage2);
+        verify(allCampaignMessages, times(2)).delete(any(CampaignMessage.class));
+
+        verify(campaignMessageCSVBuilder).getCSV(expectedCampaignMessagesToBeSent);
+        verifyCampaignMessageUpdate(expectedCampaignMessagesToBeSent);
+    }
+
+    @Test
+    public void shouldCheckForMaximumRetriesOnlyForFailureMessagesInThirdMainSlot() {
+        CampaignMessage campaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", DateTime.now(), "1234567890", "operator1", DateTime.now().minusDays(2));
+        campaignMessage1.setFailureStatusCode(CampaignMessageStatus.ND);
+        CampaignMessage campaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", DateTime.now(), "1234567891", "operator2", DateTime.now().plusDays(2));
+        campaignMessage2.setFailureStatusCode(CampaignMessageStatus.SO);
+        CampaignMessage campaignMessage3 = new CampaignMessage("subsriptionId2", "messageId3", DateTime.now(), "1234567891", "operator2", DateTime.now().plusDays(2));
+        List<CampaignMessage> campaignMessages = new ArrayList<>(Arrays.asList(campaignMessage2, campaignMessage1, campaignMessage3));
+        List<CampaignMessage> expectedCampaignMessagesToBeSent = new ArrayList<>(Arrays.asList(campaignMessage2, campaignMessage3));
+        when(allCampaignMessages.getAllUnsentNewAndNAMessages()).thenReturn(campaignMessages);
+        String csvContent = "csvContent";
+        when(campaignMessageCSVBuilder.getCSV(expectedCampaignMessagesToBeSent)).thenReturn(csvContent);
+        when(obdProperties.getMaximumOBDRetryDays()).thenReturn(7);
+
+        campaignMessageService.sendThirdMainSubSlotMessages(MainSubSlot.THREE);
+
+        verify(obdProperties, times(2)).getMaximumOBDRetryDays();
+        verify(allCampaignMessages).delete(campaignMessage1);
+        verify(allCampaignMessages, times(1)).delete(any(CampaignMessage.class));
+
+        verify(campaignMessageCSVBuilder).getCSV(expectedCampaignMessagesToBeSent);
+        verifyCampaignMessageUpdate(expectedCampaignMessagesToBeSent);
+    }
+
+    @Test
+    public void shouldCheckForMaximumRetriesForFailureMessagesInRetrySlot() {
+        CampaignMessage campaignMessage1 = new CampaignMessage("subsriptionId1", "messageId1", DateTime.now(), "1234567890", "operator1", DateTime.now().minusDays(2));
+        campaignMessage1.setFailureStatusCode(CampaignMessageStatus.ND);
+        CampaignMessage campaignMessage2 = new CampaignMessage("subsriptionId2", "messageId2", DateTime.now(), "1234567891", "operator2", DateTime.now().plusDays(2));
+        campaignMessage2.setFailureStatusCode(CampaignMessageStatus.SO);
+        List<CampaignMessage> campaignMessages = new ArrayList<>(Arrays.asList(campaignMessage1, campaignMessage2));
+        List<CampaignMessage> expectedCampaignMessagesToBeSent = new ArrayList<>(Arrays.asList(campaignMessage2));
+        when(allCampaignMessages.getAllUnsentNAMessages()).thenReturn(campaignMessages);
+        String csvContent = "csvContent";
+        when(campaignMessageCSVBuilder.getCSV(expectedCampaignMessagesToBeSent)).thenReturn(csvContent);
+        when(obdProperties.getMaximumOBDRetryDays()).thenReturn(7);
+
+        campaignMessageService.sendRetrySlotMessages(RetrySubSlot.TWO);
+
+        verify(obdProperties, times(2)).getMaximumOBDRetryDays();
+        verify(allCampaignMessages).delete(campaignMessage1);
+        verify(allCampaignMessages, times(1)).delete(any(CampaignMessage.class));
+
+        verify(campaignMessageCSVBuilder).getCSV(expectedCampaignMessagesToBeSent);
+        verifyCampaignMessageUpdate(expectedCampaignMessagesToBeSent);
+    }
+
     private void verifyCampaignMessageUpdate(List<CampaignMessage> expectedCampaignMessages) {
         ArgumentCaptor<CampaignMessage> captor = ArgumentCaptor.forClass(CampaignMessage.class);
         verify(allCampaignMessages, times(expectedCampaignMessages.size())).update(captor.capture());

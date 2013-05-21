@@ -412,7 +412,7 @@ public class SubscriptionService {
         if (location == Location.NULL)
             return null;
 
-        return reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
+        return reportingService.getLocation(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat());
     }
 
     private void renewSchedule(Subscription subscription) {

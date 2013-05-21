@@ -21,8 +21,8 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public LocationResponse getLocation(String district, String block, String panchayat) {
-        return reportGateway.getLocation(district, block, panchayat);
+    public LocationResponse getLocation(String state, String district, String block, String panchayat) {
+        return reportGateway.getLocation(state, district, block, panchayat);
     }
 
     @Override

@@ -14,6 +14,9 @@ public class LocationRequest implements Serializable {
     private static final long serialVersionUID = -4180457398904997956L;
     @JsonProperty
     @XmlElement
+    private String state;
+    @JsonProperty
+    @XmlElement
     private String district;
     @JsonProperty
     @XmlElement
@@ -30,6 +33,7 @@ public class LocationRequest implements Serializable {
         LocationRequest that = (LocationRequest) o;
 
         return new EqualsBuilder()
+                .append(this.state, that.state)
                 .append(this.district, that.district)
                 .append(this.block, that.block)
                 .append(this.panchayat, that.panchayat)
@@ -39,10 +43,20 @@ public class LocationRequest implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
+                .append(this.state)
                 .append(this.district)
                 .append(this.block)
                 .append(this.panchayat)
                 .hashCode();
+    }
+
+    @XmlTransient
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     @XmlTransient

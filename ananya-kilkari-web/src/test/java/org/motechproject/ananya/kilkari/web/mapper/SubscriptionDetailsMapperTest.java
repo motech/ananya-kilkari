@@ -36,7 +36,7 @@ public class SubscriptionDetailsMapperTest {
 
     @Test
     public void shouldMapToCCWebResponseWithLocation() {
-        Location actualLocation = new Location("d", "b", "p");
+        Location actualLocation = new Location("s", "d", "b", "p");
         SubscriptionDetailsResponse detailsResponse = setupData(actualLocation);
         ArrayList<SubscriptionDetailsResponse> responseList = new ArrayList<>();
         responseList.add(detailsResponse);

@@ -64,7 +64,7 @@ public class SubscriberWebRequest implements Serializable {
     @JsonIgnore
     @XmlTransient
     public Location getLocation() {
-        return location == null ? null : new Location(location.getDistrict(), location.getBlock(), location.getPanchayat());
+        return location == null ? null : new Location(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat());
     }
 
     public void setBeneficiaryName(String beneficiaryName) {

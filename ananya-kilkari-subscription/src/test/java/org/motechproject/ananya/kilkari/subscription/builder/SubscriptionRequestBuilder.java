@@ -21,7 +21,7 @@ public class SubscriptionRequestBuilder {
     public SubscriptionRequestBuilder withDefaults() {
         return withMsisdn("9876543210")
                 .withPack(SubscriptionPack.BARI_KILKARI)
-                .withLocation("district", "block", "panchayat")
+                .withLocation("state", "district", "block", "panchayat")
                 .withReason(null)
                 .withCreationDate(DateTime.now());
     }
@@ -41,8 +41,8 @@ public class SubscriptionRequestBuilder {
         return this;
     }
 
-    public SubscriptionRequestBuilder withLocation(String district, String block, String panchayat) {
-        this.location =  new Location(district, block, panchayat);
+    public SubscriptionRequestBuilder withLocation(String state, String district, String block, String panchayat) {
+        this.location =  new Location(state, district, block, panchayat);
         return this;
     }
 

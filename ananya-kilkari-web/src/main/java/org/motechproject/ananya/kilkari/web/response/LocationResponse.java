@@ -16,6 +16,10 @@ public class LocationResponse {
 
     @JsonProperty
     @XmlElement
+    private String state;
+
+    @JsonProperty
+    @XmlElement
     private String panchayat;
 
     @JsonProperty
@@ -25,7 +29,8 @@ public class LocationResponse {
     public LocationResponse() {
     }
 
-    public LocationResponse(String district, String block, String panchayat) {
+    public LocationResponse(String state, String district, String block, String panchayat) {
+        this.state = state;
         this.district = district;
         this.block = block;
         this.panchayat = panchayat;
@@ -41,6 +46,10 @@ public class LocationResponse {
 
     public String getDistrict() {
         return district;
+    }
+
+    public String getState() {
+        return state;
     }
 
     @Override

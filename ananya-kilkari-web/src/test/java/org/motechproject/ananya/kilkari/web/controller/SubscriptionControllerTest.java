@@ -103,7 +103,7 @@ public class SubscriptionControllerTest {
         int startWeekNumber = 4;
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE,
-                "WEEK13", "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"), DateTime.now(), DateTime.now(), DateTime.now().minusDays(3));
+                "WEEK13", "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("s", "d", "b", "p"), DateTime.now(), DateTime.now(), DateTime.now().minusDays(3));
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -128,7 +128,7 @@ public class SubscriptionControllerTest {
         int startWeekNumber = 4;
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13",
-                "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("d", "b", "p"), DateTime.now(), DateTime.now(), DateTime.now().minusDays(8));
+                "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("s", "d", "b", "p"), DateTime.now(), DateTime.now(), DateTime.now().minusDays(8));
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -602,7 +602,8 @@ public class SubscriptionControllerTest {
     }
 
     private void assertAdditionalSubscriberDetails(SubscriptionDetailsResponse subscriptionDetails, AllSubscriptionDetails actualDetailsResponse) {
-        LocationResponse expectedLocation = new LocationResponse(subscriptionDetails.getLocation().getDistrict(), subscriptionDetails.getLocation().getBlock(), subscriptionDetails.getLocation().getPanchayat());
+        Location location = subscriptionDetails.getLocation();
+        LocationResponse expectedLocation = new LocationResponse(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat());
         assertEquals(subscriptionDetails.getBeneficiaryName(), actualDetailsResponse.getBeneficiaryName());
         assertEquals(subscriptionDetails.getBeneficiaryAge(), actualDetailsResponse.getBeneficiaryAge());
         assertEquals(subscriptionDetails.getStartWeekNumber(), actualDetailsResponse.getWeekNumber());

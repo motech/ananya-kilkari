@@ -157,7 +157,8 @@ public class WebRequestValidatorTest {
 
         webRequestValidator.validateLocation(new LocationRequest());
 
-        assertEquals(3, webRequestValidator.getErrors().getCount());
+        assertEquals(4, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("Missing state"));
         assertTrue(webRequestValidator.getErrors().hasMessage("Missing district"));
         assertTrue(webRequestValidator.getErrors().hasMessage("Missing block"));
         assertTrue(webRequestValidator.getErrors().hasMessage("Missing panchayat"));
@@ -173,7 +174,8 @@ public class WebRequestValidatorTest {
             setPanchayat("");
         }});
 
-        assertEquals(3, webRequestValidator.getErrors().getCount());
+        assertEquals(4, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("Missing state"));
         assertTrue(webRequestValidator.getErrors().hasMessage("Missing district"));
         assertTrue(webRequestValidator.getErrors().hasMessage("Missing block"));
         assertTrue(webRequestValidator.getErrors().hasMessage("Missing panchayat"));
@@ -194,6 +196,7 @@ public class WebRequestValidatorTest {
         WebRequestValidator webRequestValidator = new WebRequestValidator();
 
         webRequestValidator.validateLocation(new LocationRequest() {{
+            setState("s");
             setDistrict("d");
             setBlock("b");
             setPanchayat("   ");

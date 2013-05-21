@@ -314,6 +314,7 @@ public class KilkariSubscriptionServiceTest {
         request.setChannel(Channel.IVR.name());
         request.setCreatedAt(DateTime.now());
         LocationRequest location = new LocationRequest() {{
+            setState("state");
             setDistrict("district");
             setBlock("block");
             setPanchayat("panchayat");

@@ -246,7 +246,7 @@ public class SubscriptionWebRequestTest {
     @Test
     public void shouldValidateLocationIfProvided() {
         SubscriptionWebRequest webRequest = new SubscriptionWebRequestBuilder().withDefaults().withChannel("contact_center").withLocation(new LocationRequest()).build();
-        validateErrors(3, webRequest.validate(), "Missing district", "Missing block", "Missing panchayat");
+        validateErrors(4, webRequest.validate(), "Missing state", "Missing district", "Missing block", "Missing panchayat");
     }
 
     @Test

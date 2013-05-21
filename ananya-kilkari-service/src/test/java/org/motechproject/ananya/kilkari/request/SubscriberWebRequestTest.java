@@ -34,7 +34,8 @@ public class SubscriberWebRequestTest {
 
         Errors errors = subscriberWebRequest.validate();
 
-        assertEquals(2, errors.getCount());
+        assertEquals(3, errors.getCount());
+        assertTrue(errors.hasMessage("Missing state"));
         assertTrue(errors.hasMessage("Missing block"));
         assertTrue(errors.hasMessage("Missing panchayat"));
     }

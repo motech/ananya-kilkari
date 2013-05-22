@@ -49,4 +49,5 @@ public class SubscriberRequest {
     public boolean hasLocation() {
         return location != Location.NULL;
     }
+
 }

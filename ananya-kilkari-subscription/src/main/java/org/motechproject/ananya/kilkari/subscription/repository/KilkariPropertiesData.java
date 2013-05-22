@@ -27,4 +27,8 @@ public class KilkariPropertiesData {
     public int getBufferDaysToAllowRenewalForDeactivation() {
         return Integer.parseInt(kilkariProperties.getProperty("buffer.days.to.allow.renewal.for.pack.deactivation"));
     }
+
+    public String getDefaultState() {
+        return kilkariProperties.getProperty("location.default.state");
+    }
 }

@@ -30,7 +30,6 @@ public class RefdataSyncServiceTest {
 
     @Test
     public void shouldSendSyncRequestToAppropriateURLWithAPIKeyHeaders() {
-        String state = "state";
         String district = "district";
         String block = "block";
         String panchayat = "panchayat";
@@ -42,7 +41,7 @@ public class RefdataSyncServiceTest {
         when(refdataProperties.getProperty("api.key.value")).thenReturn(expectedAPIKeyValue);
 
         RefdataSyncService refdataSyncService = new RefdataSyncService(httpClientService, refdataProperties);
-        refdataSyncService.syncNewLocation(state, district, block, panchayat);
+        refdataSyncService.syncNewLocation(district, block, panchayat);
 
         ArgumentCaptor<NewLocationSyncRequest> requestArgumentCaptor = ArgumentCaptor.forClass(NewLocationSyncRequest.class);
         ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
@@ -51,7 +50,6 @@ public class RefdataSyncServiceTest {
         assertEquals(expectedUrl, urlCaptor.getValue());
 
         NewLocationSyncRequest request = requestArgumentCaptor.getValue();
-        assertEquals(state, request.getState());
         assertEquals(district, request.getDistrict());
         assertEquals(block, request.getBlock());
         assertEquals(panchayat, request.getPanchayat());
@@ -63,7 +61,6 @@ public class RefdataSyncServiceTest {
 
     @Test
     public void shouldSendSyncRequestToAppropriateURLWithoutAPIKeyHeaders() {
-        String state = "state";
         String district = "district";
         String block = "block";
         String panchayat = "panchayat";
@@ -73,7 +70,7 @@ public class RefdataSyncServiceTest {
         when(refdataProperties.getProperty("api.key.value")).thenReturn(expectedAPIKeyValue);
 
         RefdataSyncService refdataSyncService = new RefdataSyncService(httpClientService, refdataProperties);
-        refdataSyncService.syncNewLocation(state, district, block, panchayat);
+        refdataSyncService.syncNewLocation(district, block, panchayat);
 
         verify(httpClientService).post(anyString(), any(NewLocationSyncRequest.class), headerCaptor.capture());
 

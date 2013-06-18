@@ -104,7 +104,7 @@ public class SubscriptionService {
             initiateActivationRequest(omSubscriptionRequest);
 
         if (existingLocation == null && subscriptionRequest.hasLocation()) {
-            refdataSyncService.syncNewLocation(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat());
+            refdataSyncService.syncNewLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
         }
 
         return subscription;
@@ -361,7 +361,7 @@ public class SubscriptionService {
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
 
         if (existingLocation == null && request.hasLocation()) {
-            refdataSyncService.syncNewLocation(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat());
+            refdataSyncService.syncNewLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
         }
     }
 

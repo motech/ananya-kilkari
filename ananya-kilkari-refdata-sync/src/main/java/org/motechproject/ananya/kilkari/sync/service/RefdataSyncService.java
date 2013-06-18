@@ -38,10 +38,10 @@ public class RefdataSyncService {
         this.newLocationSyncUrl = refDataProperties.getProperty(NEW_LOCATION_SYNC_URL);
     }
 
-    public void syncNewLocation(String state, String district, String block, String panchayat) {
+    public void syncNewLocation(String district, String block, String panchayat) {
         logger.info(String.format("Synchronizing new location to reference database for district: %s, block: %s, panchayat: %s", district, block, panchayat));
 
-        httpClientService.post(newLocationSyncUrl, new NewLocationSyncRequest(state, district, block, panchayat), constructHeaders());
+        httpClientService.post(newLocationSyncUrl, new NewLocationSyncRequest(district, block, panchayat), constructHeaders());
     }
 
     private Map<String, String> constructHeaders() {

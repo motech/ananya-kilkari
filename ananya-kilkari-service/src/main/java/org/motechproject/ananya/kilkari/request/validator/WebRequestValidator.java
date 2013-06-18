@@ -133,7 +133,6 @@ public class WebRequestValidator {
             errors.add("Missing location");
             return;
         }
-        addErrorMessageIfEmpty(location.getState(), "Missing state");
         addErrorMessageIfEmpty(location.getDistrict(), "Missing district");
         addErrorMessageIfEmpty(location.getBlock(), "Missing block");
         addErrorMessageIfEmpty(location.getPanchayat(), "Missing panchayat");

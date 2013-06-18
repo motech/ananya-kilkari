@@ -50,7 +50,7 @@ public class SubscriptionDetailsResponseMapper {
         LocationResponse subscriberLocationResponse = subscriberDetails.getLocationResponse();
         return subscriberLocationResponse == null
                 ? null
-                : new Location(subscriberLocationResponse.getState(), subscriberLocationResponse.getDistrict(), subscriberLocationResponse.getBlock(), subscriberLocationResponse.getPanchayat());
+                : new Location(subscriberLocationResponse.getDistrict(), subscriberLocationResponse.getBlock(), subscriberLocationResponse.getPanchayat());
     }
 
     private SubscriberResponse findSubscriberDetailsFor(String subscriptionId, List<SubscriberResponse> subscriberDetailsFromReports) {

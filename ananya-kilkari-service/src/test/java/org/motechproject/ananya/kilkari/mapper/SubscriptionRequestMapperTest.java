@@ -43,7 +43,6 @@ public class SubscriptionRequestMapperTest {
         String name = "Name";
         String beneficiaryAge = "23";
         final String district = "district";
-        final String state = "state";
         final String block = "block";
         final String panchayat = "panchayat";
         String contactCenter = "CONTACT_CENTER";
@@ -51,7 +50,6 @@ public class SubscriptionRequestMapperTest {
         subscriberWebRequest.setBeneficiaryName(name);
         subscriberWebRequest.setBeneficiaryAge(beneficiaryAge);
         LocationRequest locationRequest = new LocationRequest(){{
-            setState(state);
             setDistrict(district);
             setBlock(block);
             setPanchayat(panchayat);
@@ -64,7 +62,7 @@ public class SubscriptionRequestMapperTest {
 
         assertEquals(name, subscriberRequest.getBeneficiaryName());
         assertEquals(Integer.valueOf(beneficiaryAge), subscriberRequest.getBeneficiaryAge());
-        assertEquals(new Location(state, district, block, panchayat), subscriberRequest.getLocation());
+        assertEquals(new Location(district, block, panchayat), subscriberRequest.getLocation());
         assertEquals(subscriptionId, subscriberRequest.getSubscriptionId());
     }
 

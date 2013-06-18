@@ -708,14 +708,13 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldPublishASubscriberUpdateEventWithLocation() {
         String subscriptionId = "subscriptionId";
-        String state = "state";
         String district = "district";
         String block = "block";
         String panchayat = "panchayat";
         when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
 
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CONTACT_CENTER.name(), DateTime.now(), "name", 23,
-                new Location(state, district, block, panchayat)));
+                new Location(district, block, panchayat)));
 
         verify(reportingServiceImpl).getLocation(district, block, panchayat);
 
@@ -1201,7 +1200,7 @@ public class SubscriptionServiceTest {
         String district = "d";
         String block = "b";
         String panchayat = "p";
-        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withLocation("state", district, block, panchayat).build();
+        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withLocation(district, block, panchayat).build();
         when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
 
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
@@ -1227,7 +1226,7 @@ public class SubscriptionServiceTest {
         String district = "d";
         String block = "b";
         String panchayat = "p";
-        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withLocation("state", district, block, panchayat).build();
+        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withLocation(district, block, panchayat).build();
         when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(new LocationResponse());
 
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
@@ -1251,10 +1250,9 @@ public class SubscriptionServiceTest {
         String district = "d";
         String block = "b";
         String panchayat = "p";
-        String state = "s";
         when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
 
-        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(state, district, block, panchayat)));
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(district, block, panchayat)));
 
         InOrder order = inOrder(reportingServiceImpl, refdataSyncService);
         order.verify(reportingServiceImpl).getLocation(district, block, panchayat);
@@ -1271,13 +1269,12 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldNotSyncIfLocationAlreadyExistsWhenUpdatingSubscriberDetails() {
-        String state = "s";
         String district = "d";
         String block = "b";
         String panchayat = "p";
         when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(new LocationResponse());
 
-        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(state, district, block, panchayat)));
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(district, block, panchayat)));
 
         verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
     }
@@ -1295,7 +1292,7 @@ public class SubscriptionServiceTest {
         String msisdn = "1234567890";
         SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).build();
-        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), null, new LocationResponse("s","d", "b", "p"), DateTime.now(), DateTime.now());
+        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), null, new LocationResponse("d", "b", "p"), DateTime.now(), DateTime.now());
         ArrayList<Subscription> subscriptionList = new ArrayList<>();
         subscriptionList.add(subscription);
         ArrayList<SubscriberResponse> subscriberResponseList = new ArrayList<>();

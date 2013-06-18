@@ -5,27 +5,17 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class Location {
     private String panchayat;
-    private String state;
     private String block;
     private String district;
     public static final Location NULL = new Location();
 
-    public Location(String state, String district, String block, String panchayat) {
-        this.state = state;
+    public Location(String district, String block, String panchayat) {
         this.district = district;
         this.block = block;
         this.panchayat = panchayat;
     }
 
     private Location() {
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
     }
 
     public String getPanchayat() {
@@ -54,7 +44,6 @@ public class Location {
         return new EqualsBuilder().append(this.panchayat, that.panchayat)
                 .append(this.block, that.block)
                 .append(this.district, that.district)
-                .append(this.state, that.state)
                 .isEquals();
     }
 
@@ -64,7 +53,6 @@ public class Location {
                 .append(this.panchayat)
                 .append(this.block)
                 .append(this.district)
-                .append(this.state)
                 .hashCode();
     }
 

@@ -67,7 +67,7 @@ public class SubscriptionDetailsResponseMapperTest {
         final String msisdn = "1234567890";
         String messageId1 = "messageId 1";
         String messageId2 = "messageId 2";
-        LocationResponse location = new LocationResponse("s","d", "b", "p");
+        LocationResponse location = new LocationResponse("d", "b", "p");
         final Subscription subscription1 = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(SubscriptionPack.BARI_KILKARI).build();
         final Subscription subscription2 = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(SubscriptionPack.NANHI_KILKARI).build();
         List<Subscription> subscriptionList = new ArrayList<Subscription>() {{
@@ -111,7 +111,7 @@ public class SubscriptionDetailsResponseMapperTest {
 
     private void assertResponse(String messageId, Subscription subscription, SubscriberResponse subscriberResponse, SubscriptionDetailsResponse response) {
         LocationResponse actualLocation = subscriberResponse.getLocationResponse();
-        Location expectedLocation = new Location(actualLocation.getState(), actualLocation.getDistrict(), actualLocation.getBlock(), actualLocation.getPanchayat());
+        Location expectedLocation = new Location(actualLocation.getDistrict(), actualLocation.getBlock(), actualLocation.getPanchayat());
 
         assertEquals(subscription.getSubscriptionId(), response.getSubscriptionId());
         assertEquals(subscription.getPack(), response.getPack());

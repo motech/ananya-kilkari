@@ -43,18 +43,18 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
 
     private void setupLocations() {
         locationList = new ArrayList<Location>();
-        locationList.add(new Location("Bihar", "Begusarai", "Bachhwara", "Kadarabad"));
-        locationList.add(new Location("Bihar", "Begusarai", "Bachhwara", "Godhana"));
-        locationList.add(new Location("Bihar", "Begusarai", "Bakhri", "Aakha"));
-        locationList.add(new Location("Bihar", "Begusarai", "Bakhri", "Bagban"));
-        locationList.add(new Location("Bihar", "Begusarai", "Bakhri", "Bahuwara"));
-        locationList.add(new Location("Bihar", "Begusarai", "Bakhri", "Bakhari East"));
-        locationList.add(new Location("Bihar", "Begusarai", "Begusarai", "Suja"));
-        locationList.add(new Location("Bihar", "Begusarai", "Begusarai", "Ulao"));
-        locationList.add(new Location("Bihar", "Begusarai", "Bhagwanpur", "Banwaripur"));
-        locationList.add(new Location("Bihar", "Begusarai", "Bhagwanpur", "Bhitsari"));
-        locationList.add(new Location("Bihar", "Begusarai", "Bhagwanpur", "Chandaur"));
-        locationList.add(new Location("Bihar", "Begusarai", "Bhagwanpur", "Damodarpur"));
+        locationList.add(new Location("Begusarai", "Bachhwara", "Kadarabad"));
+        locationList.add(new Location("Begusarai", "Bachhwara", "Godhana"));
+        locationList.add(new Location("Begusarai", "Bakhri", "Aakha"));
+        locationList.add(new Location("Begusarai", "Bakhri", "Bagban"));
+        locationList.add(new Location("Begusarai", "Bakhri", "Bahuwara"));
+        locationList.add(new Location("Begusarai", "Bakhri", "Bakhari East"));
+        locationList.add(new Location("Begusarai", "Begusarai", "Suja"));
+        locationList.add(new Location("Begusarai", "Begusarai", "Ulao"));
+        locationList.add(new Location("Begusarai", "Bhagwanpur", "Banwaripur"));
+        locationList.add(new Location("Begusarai", "Bhagwanpur", "Bhitsari"));
+        locationList.add(new Location("Begusarai", "Bhagwanpur", "Chandaur"));
+        locationList.add(new Location("Begusarai", "Bhagwanpur", "Damodarpur"));
     }
 
     @LoadPerf(concurrentUsers = 100)
@@ -101,7 +101,7 @@ public class SubscriptionPerformanceTest extends BasePerformanceTest {
         Location location = locationList.get(random.nextInt(locationList.size()));
         return new SubscriptionWebRequestBuilder()
                 .withDefaults()
-                .withLocation(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat())
+                .withLocation(location.getDistrict(), location.getBlock(), location.getPanchayat())
                 .withMsisdn(getRandomMsisdn())
                 .build();
     }

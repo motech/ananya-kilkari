@@ -356,7 +356,7 @@ public class SubscriptionService {
         Location location = request.getLocation();
         LocationResponse existingLocation = getExistingLocation(location);
 
-        SubscriberLocation subscriberLocation = request.hasLocation() ? new SubscriberLocation(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat()) : null;
+        SubscriberLocation subscriberLocation = request.hasLocation() ? new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat()) : null;
         reportingService.reportSubscriberDetailsChange(request.getSubscriptionId(), new SubscriberReportRequest(request.getCreatedAt(),
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
 
@@ -509,11 +509,9 @@ public class SubscriptionService {
         requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), changeMsisdnRequest.getCreatedAt(), changeMsisdnRequest.getReason()));
 
         Location location = null;
-        LocationResponse locationResponse = subscriberResponse.getLocationResponse();
-        if (locationResponse != null) {
-            location = new Location(locationResponse.getState(),
-                    locationResponse.getDistrict(),
-                    locationResponse.getBlock(), locationResponse.getPanchayat());
+        if (subscriberResponse.getLocationResponse() != null) {
+            location = new Location(subscriberResponse.getLocationResponse().getDistrict(),
+                    subscriberResponse.getLocationResponse().getBlock(), subscriberResponse.getLocationResponse().getPanchayat());
         }
         Subscriber subscriber = new Subscriber(subscriberResponse.getBeneficiaryName(), subscriberResponse.getBeneficiaryAge(),
                 subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getNextWeekNumber());

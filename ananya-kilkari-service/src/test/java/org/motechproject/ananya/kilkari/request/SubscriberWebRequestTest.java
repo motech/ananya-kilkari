@@ -46,27 +46,4 @@ public class SubscriberWebRequestTest {
         assertNull(webRequest.getLocation());
     }
 
-
-    @Test
-    public void shouldUpdateStateWithDefaultValue_whenStateIsNull() {
-        SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
-        LocationRequest locationWithNoState = new LocationRequest();
-        subscriberWebRequest.setLocation(locationWithNoState);
-
-        subscriberWebRequest.defaultState("BIHAR");
-        assertEquals("BIHAR", subscriberWebRequest.getLocation().getState());
-    }
-
-    @Test
-    public void shouldNotUpdateStateWithDefaultValue_whenStateIsNotNull() {
-        String validState = "ORISSA";
-        SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
-        LocationRequest locationWithState = new LocationRequest();
-        locationWithState.setState(validState);
-        subscriberWebRequest.setLocation(locationWithState);
-
-        subscriberWebRequest.defaultState("BIHAR");
-        assertEquals(validState, subscriberWebRequest.getLocation().getState());
-    }
-
 }

@@ -22,7 +22,6 @@ import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
-import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.service.request.Location;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
@@ -66,17 +65,13 @@ public class SubscriptionControllerTest {
     private CallbackRequestValidator callbackRequestValidator;
     @Mock
     private SubscriptionDetailsMapper mockedSubscriptionDetailsMapper;
-    @Mock
-    private KilkariPropertiesData kilkariPropertiesData;
 
     private static final String IVR_RESPONSE_PREFIX = "var response = ";
-    private final String DEFAULT_STATE = "DEFAULT";
 
     @Before
     public void setUp() {
         initMocks(this);
-        when(kilkariPropertiesData.getDefaultState()).thenReturn(DEFAULT_STATE);
-        subscriptionController = new SubscriptionController(kilkariSubscriptionService, callbackRequestValidator, kilkariPropertiesData);
+        subscriptionController = new SubscriptionController(kilkariSubscriptionService, callbackRequestValidator);
     }
 
     @Test
@@ -407,7 +402,6 @@ public class SubscriptionControllerTest {
         subscriptionController.createSubscription(subscriptionWebRequest, "CONTACT_CENTER");
 
         verify(subscriptionWebRequest).validateChannel();
-        verify(subscriptionWebRequest).defaultState(DEFAULT_STATE);
     }
 
     @Test
@@ -530,7 +524,6 @@ public class SubscriptionControllerTest {
     @Test
     public void shouldUpdateSubscriberDetails() throws Exception {
         SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
-        subscriberWebRequest.setLocation(new LocationRequest());
         byte[] requestBody = TestUtils.toJson(subscriberWebRequest).getBytes();
 
         assertUpdateSubscriberRequest(subscriberWebRequest, requestBody, MediaType.APPLICATION_JSON, HttpHeaders.APPLICATION_JSON);
@@ -556,7 +549,6 @@ public class SubscriptionControllerTest {
                 .andExpect(content().string(baseResponseMatcher("SUCCESS", "Subscriber Update request submitted successfully", contentType)));
 
         subscriberWebRequest.setChannel(Channel.CONTACT_CENTER.name());
-        subscriberWebRequest.defaultState(DEFAULT_STATE);
         verify(kilkariSubscriptionService).updateSubscriberDetails(subscriberWebRequest, subscriptionId);
     }
 

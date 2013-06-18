@@ -12,11 +12,9 @@ import java.io.Serializable;
 @XmlRootElement
 public class LocationRequest implements Serializable {
     private static final long serialVersionUID = -4180457398904997956L;
-
     @JsonProperty
-    @XmlElement(required = false)
+    @XmlElement
     private String state;
-
     @JsonProperty
     @XmlElement
     private String district;

@@ -18,8 +18,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
-
 @XmlRootElement(name = "subscription")
 public class SubscriptionWebRequest implements Serializable {
     private static final long serialVersionUID = -6320440975475940990L;
@@ -219,10 +217,5 @@ public class SubscriptionWebRequest implements Serializable {
                 .append(this.expectedDateOfDelivery)
                 .append(this.location)
                 .hashCode();
-    }
-
-    public void defaultState(String defaultState) {
-        if(location != null && isEmpty(location.getState()))
-            location.setState(defaultState);
     }
 }

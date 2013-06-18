@@ -8,7 +8,7 @@ import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResp
 import java.util.List;
 
 public interface ReportingService {
-    LocationResponse getLocation(String state, String district, String block, String panchayat);
+    LocationResponse getLocation(String district, String block, String panchayat);
 
     SubscriberResponse getSubscriber(String subscriptionId);
 

@@ -56,7 +56,7 @@ public class ReportingGatewayImplTest {
         LocationResponse expectedLocation = new LocationResponse("mystate", "mydistrict", "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        LocationResponse actualLocation = reportingGateway.getLocation("mystate", "mydistrict", "myblock", "my panchayat");
+        LocationResponse actualLocation = reportingGateway.getLocation("mydistrict", "myblock", "my panchayat");
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -70,7 +70,6 @@ public class ReportingGatewayImplTest {
         String url = urlArgumentCaptor.getValue();
         assertTrue(url.startsWith("url/location?"));
         assertTrue(url.contains("district=mydistrict"));
-        assertTrue(url.contains("state=mystate"));
         assertTrue(url.contains("block=myblock"));
         assertTrue(url.contains("panchayat=my panchayat"));
     }
@@ -80,7 +79,7 @@ public class ReportingGatewayImplTest {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        LocationResponse actualLocation = reportingGateway.getLocation("mystate", "mydistrict", "myblock", "mypanchayat");
+        LocationResponse actualLocation = reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat");
 
         assertNull(actualLocation);
 
@@ -93,7 +92,6 @@ public class ReportingGatewayImplTest {
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
         assertTrue(url.startsWith("url/location?"));
-        assertTrue(url.contains("state=mystate"));
         assertTrue(url.contains("district=mydistrict"));
         assertTrue(url.contains("block=myblock"));
         assertTrue(url.contains("panchayat=mypanchayat"));
@@ -106,7 +104,7 @@ public class ReportingGatewayImplTest {
         expectedException.expect(HttpClientErrorException.class);
         expectedException.expectMessage("400 BAD_REQUEST");
 
-        reportingGateway.getLocation("mystate", "mydistrict", "myblock", "mypanchayat");
+        reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat");
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
@@ -117,7 +115,6 @@ public class ReportingGatewayImplTest {
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
         assertTrue(url.startsWith("url/location?"));
-        assertTrue(url.contains("state=mystate"));
         assertTrue(url.contains("district=mydistrict"));
         assertTrue(url.contains("block=myblock"));
         assertTrue(url.contains("panchayat=mypanchayat"));
@@ -129,7 +126,7 @@ public class ReportingGatewayImplTest {
         LocationResponse expectedLocation = new LocationResponse("mystate", null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        LocationResponse actualLocation = reportingGateway.getLocation("mystate", null, "myblock", "mypanchayat");
+        LocationResponse actualLocation = reportingGateway.getLocation(null, "myblock", "mypanchayat");
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -142,7 +139,6 @@ public class ReportingGatewayImplTest {
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
         assertTrue(url.startsWith("url/location?"));
-        assertTrue(url.contains("state=mystate"));
         assertTrue(url.contains("block=myblock"));
         assertTrue(url.contains("panchayat=mypanchayat"));
     }
@@ -153,7 +149,7 @@ public class ReportingGatewayImplTest {
         LocationResponse expectedLocation = new LocationResponse("mystate", null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        LocationResponse actualLocation = reportingGateway.getLocation(null, null, null, null);
+        LocationResponse actualLocation = reportingGateway.getLocation(null, null, null);
 
         assertEquals(expectedLocation, actualLocation);
 

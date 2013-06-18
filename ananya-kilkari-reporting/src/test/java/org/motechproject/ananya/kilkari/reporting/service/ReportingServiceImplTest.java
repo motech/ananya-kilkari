@@ -40,9 +40,9 @@ public class ReportingServiceImplTest {
         String block = "block";
         String panchayat = "panchayat";
         String state = "state";
-        when(reportGateway.getLocation(state, district, block, panchayat)).thenReturn(new LocationResponse(state, district, block, panchayat));
+        when(reportGateway.getLocation(district, block, panchayat)).thenReturn(new LocationResponse(state, district, block, panchayat));
 
-        LocationResponse location = reportingServiceImpl.getLocation(state, district, block, panchayat);
+        LocationResponse location = reportingServiceImpl.getLocation(district, block, panchayat);
 
         assertEquals(district, location.getDistrict());
         assertEquals(block, location.getBlock());

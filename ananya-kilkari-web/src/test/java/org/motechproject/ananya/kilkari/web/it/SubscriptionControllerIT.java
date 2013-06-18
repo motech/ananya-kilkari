@@ -228,7 +228,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
-        when(mockedReportingService.getLocation("state", "district", "block", "panchayat")).thenReturn(new LocationResponse("state","district", "block", "panchayat"));
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("state","district", "block", "panchayat"));
         reportingService.setBehavior(mockedReportingService);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 
@@ -275,7 +275,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
-        when(mockedReportingService.getLocation("state", "district", "block", "panchayat")).thenReturn(new LocationResponse("state", "district", "block", "panchayat"));
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("state", "district", "block", "panchayat"));
         reportingService.setBehavior(mockedReportingService);
 
         SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withMsisdn(msisdn).withEDD(edd.toString("dd-MM-yyyy")).withCreatedAt(now).build();
@@ -320,7 +320,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         DateTime expectedStartDate = SubscriptionPack.BARI_KILKARI.getStartDate(edd);
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
-        when(mockedReportingService.getLocation("state", "district", "block", "panchayat")).thenReturn(new LocationResponse("state", "district", "block", "panchayat"));
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("state", "district", "block", "panchayat"));
         reportingService.setBehavior(mockedReportingService);
 
         SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withMsisdn(msisdn).withEDD(edd.toString("dd-MM-yyyy")).withCreatedAt(now).build();

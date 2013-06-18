@@ -42,8 +42,8 @@ public class ReportingGatewayImpl implements ReportingGateway {
     }
 
     @Override
-    public LocationResponse getLocation(String state, String district, String block, String panchayat) {
-        List<NameValuePair> locationParameters = constructParameterMap(state, district, block, panchayat);
+    public LocationResponse getLocation(String district, String block, String panchayat) {
+        List<NameValuePair> locationParameters = constructParameterMap(district, block, panchayat);
         String url = constructGetLocationUrl(locationParameters);
         try {
             return restTemplate.getForEntity(url, LocationResponse.class).getBody();
@@ -146,9 +146,8 @@ public class ReportingGatewayImpl implements ReportingGateway {
         return uriComponentsBuilder.build().toString();
     }
 
-    private List<NameValuePair> constructParameterMap(String state, String district, String block, String panchayat) {
+    private List<NameValuePair> constructParameterMap(String district, String block, String panchayat) {
         List<NameValuePair> locationParameters = new ArrayList<>();
-        if (StringUtils.isNotBlank(state)) locationParameters.add(new BasicNameValuePair("state", state));
         if (StringUtils.isNotBlank(district)) locationParameters.add(new BasicNameValuePair("district", district));
         if (StringUtils.isNotBlank(block)) locationParameters.add(new BasicNameValuePair("block", block));
         if (StringUtils.isNotBlank(panchayat)) locationParameters.add(new BasicNameValuePair("panchayat", panchayat));

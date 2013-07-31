@@ -1,0 +1,12 @@
+{
+    "groupName" : "obd-send-new-messages-group",
+    "eventSubject": "obd.send.new.messages.with.retry",
+    "retries" : [
+        {
+            "name" : "obd-send-new-messages",
+            "retryCount" : "5",
+            "retryInterval" : ["3 minutes"],
+            "offset" : "1 minutes"
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="classpath:applicationKilkariMessageCampaignContext.xml"/>
+    <import resource="classpath:applicationKilkariSubscriptionContext.xml"/>
+    <import resource="classpath:applicationKilkariOBDContext.xml"/>
+    <import resource="classpath:applicationKilkariReportingContext.xml"/>
+    <import resource="classpath:applicationKilkariAdminContext.xml"/>
+
+    <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <property name="configLocation" value="classpath:quartz.properties"/>
+    <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+    <property name="autoStartup" value="false"/>
+    </bean>
+
+    <bean id="motechSchedulerService" class="org.motechproject.scheduler.impl.MotechSchedulerServiceImpl">
+    <constructor-arg ref="schedulerFactoryBean"/>
+    </bean>
+</beans>
+

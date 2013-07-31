@@ -1,0 +1,12 @@
+#head()
+<body>
+    #default_navbar()
+<div class=container-fluid>
+    <div class="row-fluid">
+        <div class="span10">
+            $screen_content
+        </div>
+    </div>
+    #footer()
+</div>
+</body>

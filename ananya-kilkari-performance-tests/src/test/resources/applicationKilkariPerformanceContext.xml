@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <import resource="classpath:applicationContextHttpClient.xml"/>
+
+    <util:properties id="performanceProperties" location="classpath:performance.properties"/>
+
+    <util:properties id="couchdbProperties" location="classpath:couchdb.properties"/>
+    <util:properties id="obdPropertiesFile" location="classpath:obd.properties"/>
+    <util:properties id="kilkariProperties" location="classpath:kilkari.properties"/>
+    <util:properties id="activemqProperties" location="classpath:activemq.properties"/>
+
+    <context:component-scan base-package="org.motechproject.ananya.kilkari.performance.tests"/>
+
+    <bean id="httpClient" class="org.ektorp.spring.HttpClientFactoryBean">
+        <property name="properties" ref="couchdbProperties"/>
+    </bean>
+
+    <bean id="dbInstance" class="org.ektorp.impl.StdCouchDbInstance">
+        <constructor-arg ref="httpClient"/>
+    </bean>
+
+    <bean id="kilkariSubscriptionDbConnector" class="org.ektorp.impl.StdCouchDbConnector">
+        <constructor-arg value="motech-subscription"/>
+        <constructor-arg ref="dbInstance"/>
+    </bean>
+
+    <bean id="allSubscriptions" class="org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions" >
+        <constructor-arg ref="kilkariSubscriptionDbConnector"/>
+    </bean>
+
+
+    <bean id="obdDbConnector" class="org.ektorp.impl.StdCouchDbConnector">
+        <constructor-arg value="motech-obd"/>
+        <constructor-arg ref="dbInstance"/>
+    </bean>
+
+    <bean id="allCampaignMessages" class="org.motechproject.ananya.kilkari.obd.repository.AllCampaignMessages" >
+        <constructor-arg ref="obdDbConnector"/>
+    </bean>
+
+    <bean id="campaignMessageService" class="org.motechproject.ananya.kilkari.obd.service.CampaignMessageService">
+        <constructor-arg ref="allCampaignMessages"/>
+        <constructor-arg ref="onMobileOBDGateway" />
+        <constructor-arg ref="campaignMessageCSVBuilder" />
+        <constructor-arg ref="reportingService" />
+        <constructor-arg ref="obdProperties"/>
+    </bean>
+
+    <bean id="onMobileOBDGateway" class="org.motechproject.ananya.kilkari.obd.repository.OnMobileOBDGatewayImpl">
+        <constructor-arg ref="obdHttpClient" />
+        <constructor-arg ref="obdProperties" />
+        <constructor-arg ref="restTemplateReporting" />
+    </bean>
+
+    <bean id="obdProperties" class="org.motechproject.ananya.kilkari.obd.service.OBDProperties">
+        <constructor-arg ref="obdPropertiesFile" />
+    </bean>
+
+    <bean id="campaignMessageCSVBuilder" class="org.motechproject.ananya.kilkari.obd.service.CampaignMessageCSVBuilder" />
+
+    <bean id="restTemplateReporting" class="org.springframework.web.client.RestTemplate"/>
+
+    <bean id="httpClientService" class="org.motechproject.http.client.service.HttpClientServiceImpl" />
+
+    <bean id="reportGateway" class="org.motechproject.ananya.kilkari.reporting.repository.ReportingGatewayImpl">
+        <constructor-arg ref="restTemplateReporting" />
+        <constructor-arg ref="httpClientService" />
+        <constructor-arg ref="kilkariProperties" />
+    </bean>
+
+    <bean id="reportingService" class="org.motechproject.ananya.kilkari.reporting.service.ReportingServiceImpl">
+        <constructor-arg ref="reportGateway" />
+    </bean>
+
+    <bean id="obdHttpClientConnectionManager" class="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager"/>
+
+    <bean id="obdHttpClient" class="org.motechproject.ananya.kilkari.obd.repository.OBDHttpClient">
+        <constructor-arg ref="obdHttpClientConnectionManager"/>
+        <constructor-arg value="${http.read.timeout}"/>
+        <constructor-arg value="${http.connect.timeout}"/>
+    </bean>
+</beans>

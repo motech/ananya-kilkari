@@ -1,0 +1,77 @@
+[
+    {
+        "name" : "kilkari-mother-child-campaign-sixteen-months",
+        "type" : "REPEAT_INTERVAL",
+        "maxDuration" : "64 Weeks",
+        "messages" : [
+            {
+                "name" : "Mother Child Health Care",
+                "formats" : ["IVR"],
+                "languages" : ["en"],
+                "messageKey": "PREGNANCY",
+                "startTime" : "13:00",
+                "repeatEvery" : "1 week"
+            }
+        ]
+    },
+    {
+        "name" : "kilkari-mother-child-campaign-twelve-months",
+        "type" : "REPEAT_INTERVAL",
+        "maxDuration" : "48 Weeks",
+        "messages" : [
+            {
+                "name" : "Mother Child Health Care",
+                "formats" : ["IVR"],
+                "languages" : ["en"],
+                "messageKey": "PREGNANCY",
+                "startTime" : "13:00",
+                "repeatEvery" : "1 week"
+            }
+        ]
+    },
+    {
+        "name" : "kilkari-mother-child-campaign-seven-months",
+        "type" : "REPEAT_INTERVAL",
+        "maxDuration" : "28 Weeks",
+        "messages" : [
+            {
+                "name" : "Mother Child Health Care",
+                "formats" : ["IVR"],
+                "languages" : ["en"],
+                "messageKey": "PREGNANCY",
+                "startTime" : "13:00",
+                "repeatEvery" : "1 week"
+            }
+        ]
+    },
+    {
+        "name" : "kilkari-mother-child-campaign-infant-death",
+        "type" : "REPEAT_INTERVAL",
+        "maxDuration" : "2 Weeks",
+        "messages" : [
+            {
+                "name" : "Mother Child Health Care",
+                "formats" : ["IVR"],
+                "languages" : ["en"],
+                "messageKey": "PREGNANCY",
+                "startTime" : "13:00",
+                "repeatEvery" : "1 week"
+            }
+        ]
+    },
+    {
+        "name" : "kilkari-mother-child-campaign-miscarriage",
+        "type" : "REPEAT_INTERVAL",
+        "maxDuration" : "1 Week",
+        "messages" : [
+            {
+                "name" : "Mother Child Health Care",
+                "formats" : ["IVR"],
+                "languages" : ["en"],
+                "messageKey": "PREGNANCY",
+                "startTime" : "13:00",
+                "repeatEvery" : "1 week"
+            }
+        ]
+    }
+]

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <import resource="classpath*:applicationKilkariCommonContext.xml"/>
+    <import resource="classpath*:applicationKilkariOBDContext.xml"/>
+
+    <util:properties id="couchdbProperties" location="classpath:couchdb.properties"/>
+    <bean id="httpClient" class="org.ektorp.spring.HttpClientFactoryBean">
+        <property name="properties" ref="couchdbProperties"/>
+    </bean>
+
+    <bean id="messageDbInstance" class="org.ektorp.impl.StdCouchDbInstance">
+        <constructor-arg ref="httpClient"/>
+    </bean>
+
+    <bean id="messageDbConnector" class="org.ektorp.impl.StdCouchDbConnector">
+        <constructor-arg value="motech-message"/>
+        <constructor-arg ref="messageDbInstance"/>
+    </bean>
+</beans>

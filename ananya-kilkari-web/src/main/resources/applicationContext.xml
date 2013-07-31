@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                             http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <import resource="classpath*:applicationKilkariCommonContext.xml"/>
+    <import resource="classpath*:applicationPlatformServerAPI.xml"/>
+    <import resource="classpath:applicationKilkariServiceContext.xml"/>
+    <import resource="classpath:applicationKilkariSecurityContext.xml"/>
+
+    <import resource="classpath:applicationContext-Diagnostics-Couch.xml"/>
+    <import resource="classpath:applicationContext-Diagnostics-Queues.xml"/>
+    <import resource="classpath:applicationContext-Diagnostics-Configuration.xml"/>
+
+    <bean id="handlerMapping"
+          class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
+
+    <util:map id="configurationFilesMap">
+        <entry key="activemqProperties"><util:properties location="classpath:activemq.properties"/></entry>
+        <entry key="couchProperties"><util:properties location="classpath:couchdb.properties"/></entry>
+        <entry key="httpClient"><util:properties location="classpath:httpclient.properties"/></entry>
+        <entry key="kilkariProperties"><util:properties location="classpath:kilkari.properties"/></entry>
+        <entry key="log4jProperties"><util:properties location="classpath:log4j.properties"/></entry>
+        <entry key="messageCampaignProperties"><util:properties location="classpath:messageCampaign.properties"/></entry>
+        <entry key="obdProperties"><util:properties location="classpath:obd.properties"/></entry>
+        <entry key="quartzProperties"><util:properties location="classpath:quartz.properties"/></entry>
+    </util:map>
+
+    <util:list id="couchDatabasesList">
+        <value>motech-subscription</value>
+        <value>motech-message</value>
+        <value>motech-message-campaign</value>
+        <value>motech-obd</value>
+        <value>motech-retries</value>
+    </util:list>
+</beans>
+

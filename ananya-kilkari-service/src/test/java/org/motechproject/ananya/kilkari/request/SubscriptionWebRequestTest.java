@@ -274,4 +274,26 @@ public class SubscriptionWebRequestTest {
 
         return subscriptionWebRequest;
     }
+
+    @Test
+    public void shouldUpdateStateWithDefaultValue_whenStateIsNull() {
+        SubscriptionWebRequest subscriptionWebRequestWithNoState = new SubscriptionWebRequestBuilder()
+                .withDefaults()
+                .withLocation(null, "district", "block", "panchayat")
+                .build();
+        subscriptionWebRequestWithNoState.defaultState("BIHAR");
+        assertEquals("BIHAR", subscriptionWebRequestWithNoState.getLocation().getState());
+    }
+
+    @Test
+    public void shouldNotUpdateStateWithDefaultValue_whenStateIsNotNull() {
+        String validState = "ORISSA";
+        SubscriptionWebRequest subscriptionWebRequest = new SubscriptionWebRequestBuilder()
+                .withDefaults()
+                .withLocation(validState, "district", "block", "panchayat")
+                .build();
+
+        subscriptionWebRequest.defaultState("BIHAR");
+        assertEquals(validState, subscriptionWebRequest.getLocation().getState());
+    }
 }

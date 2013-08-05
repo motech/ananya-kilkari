@@ -54,7 +54,7 @@ public class ReportVerifier {
     public void setUpReportingExpectations(SubscriptionData subscriptionData) {
         LocationRequest location = subscriptionData.getLocation();
         if (location == null) return;
-        when(reportingService.getLocation(anyString(), anyString(), anyString())).thenReturn(new LocationResponse(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat()));
+        when(reportingService.getLocation(anyString(), anyString(), anyString(), anyString())).thenReturn(new LocationResponse(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat()));
     }
 
     public void reset() {

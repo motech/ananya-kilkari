@@ -147,7 +147,7 @@ public class SubscriptionServiceTest {
         verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class), any(Integer.class), any(Integer.class));
         verify(reportingServiceImpl, never()).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
         verify(onMobileSubscriptionManagerPublisher, never()).sendActivationRequest(any(OMSubscriptionRequest.class));
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1211,7 +1211,7 @@ public class SubscriptionServiceTest {
         order.verify(reportingServiceImpl).getLocation(state, district, block, panchayat);
         order.verify(reportingServiceImpl).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
         order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(any(OMSubscriptionRequest.class));
-        order.verify(refdataSyncService).syncNewLocation(district, block, panchayat);
+        order.verify(refdataSyncService).syncNewLocation(state, district, block, panchayat);
     }
 
     @Test
@@ -1220,7 +1220,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
 
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1234,7 +1234,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
 
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1245,7 +1245,7 @@ public class SubscriptionServiceTest {
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
 
         verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString(), anyString());
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1261,14 +1261,14 @@ public class SubscriptionServiceTest {
         InOrder order = inOrder(reportingServiceImpl, refdataSyncService);
         order.verify(reportingServiceImpl).getLocation(state, district, block, panchayat);
         order.verify(reportingServiceImpl).reportSubscriberDetailsChange(anyString(), any(SubscriberReportRequest.class));
-        order.verify(refdataSyncService).syncNewLocation(district, block, panchayat);
+        order.verify(refdataSyncService).syncNewLocation(state, district, block, panchayat);
     }
 
     @Test
     public void shouldNotSyncLocationIfNotProvidedWhileUpdatingSubscriberDetails() {
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, null));
 
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1281,7 +1281,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(state, district, block, panchayat)));
 
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1289,7 +1289,7 @@ public class SubscriptionServiceTest {
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, Location.NULL));
 
         verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString(), anyString());
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test

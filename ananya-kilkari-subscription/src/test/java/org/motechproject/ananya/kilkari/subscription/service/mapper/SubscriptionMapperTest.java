@@ -64,12 +64,14 @@ public class SubscriptionMapperTest {
         String panchayat = "panchayat";
         String block = "block";
         String district = "district";
-        Location location = new Location(district, block, panchayat);
+        String state = "state";
+        Location location = new Location(state, district, block, panchayat);
 
         SubscriptionReportRequest request = SubscriptionMapper.createSubscriptionCreationReportRequest(
                 subscription, channel, new SubscriptionRequest("msisdn", null, null, location, Subscriber.NULL, null));
 
         SubscriberLocation actualLocation = request.getLocation();
+        assertEquals(state, actualLocation.getState());
         assertEquals(panchayat, actualLocation.getPanchayat());
         assertEquals(block, actualLocation.getBlock());
         assertEquals(district, actualLocation.getDistrict());

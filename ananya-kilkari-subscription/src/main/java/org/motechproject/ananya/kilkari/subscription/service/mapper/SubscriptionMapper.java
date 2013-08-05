@@ -19,7 +19,7 @@ public class SubscriptionMapper {
     public static SubscriptionReportRequest createSubscriptionCreationReportRequest(
             Subscription subscription, Channel channel, SubscriptionRequest subscriptionRequest) {
         Location location = subscriptionRequest.getLocation();
-        SubscriberLocation subscriberLocation = subscriptionRequest.hasLocation() ? new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat()) : null;
+        SubscriberLocation subscriberLocation = subscriptionRequest.hasLocation() ? new SubscriberLocation(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat()) : null;
         Subscriber subscriber = subscriptionRequest.getSubscriber();
 
         Long msisdn = NumberUtils.createLong(subscription.getMsisdn());

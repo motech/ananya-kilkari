@@ -145,8 +145,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         markForDeletion(inboxMessage1);
         markForDeletion(inboxMessage2);
         ReportingService mockedReportingService = mock(ReportingService.class);
-        final SubscriberResponse reportResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "beneficiaryName", 25, now, now, now, new LocationResponse("d", "b", "p"), now, now.minusDays(3));
-        final SubscriberResponse reportResponse2 = new SubscriberResponse(subscription2.getSubscriptionId(), "beneficiaryName1", 26, now, now, now, new LocationResponse("d1", "b1", "p1"), now, now.minusDays(8));
+        final SubscriberResponse reportResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "beneficiaryName", 25, now, now, now, new LocationResponse("s", "d", "b", "p"), now, now.minusDays(3));
+        final SubscriberResponse reportResponse2 = new SubscriberResponse(subscription2.getSubscriptionId(), "beneficiaryName1", 26, now, now, now, new LocationResponse("s1", "d1", "b1", "p1"), now, now.minusDays(8));
         ArrayList<SubscriberResponse> reportResponseList = new ArrayList<SubscriberResponse>() {{
             add(reportResponse2);
             add(reportResponse1);
@@ -159,11 +159,11 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
             LocationResponse locationResponse2 = reportResponse2.getLocationResponse();
             SubscriptionDetailsResponse detailsResponse1 = new SubscriptionDetailsResponse(subscription1.getSubscriptionId(), subscription1.getPack(),
                     subscription1.getStatus(), inboxMessage1.getMessageId(), reportResponse1.getBeneficiaryName(), reportResponse1.getBeneficiaryAge(), reportResponse1.getDateOfBirth(),
-                    reportResponse1.getExpectedDateOfDelivery(), startWeekNumber, new Location(locationResponse1.getDistrict(),
+                    reportResponse1.getExpectedDateOfDelivery(), startWeekNumber, new Location(locationResponse1.getState(), locationResponse1.getDistrict(),
                     locationResponse1.getBlock(), locationResponse1.getPanchayat()), now, now, now.minusDays(3));
             SubscriptionDetailsResponse detailsResponse2 = new SubscriptionDetailsResponse(subscription2.getSubscriptionId(),
                     subscription2.getPack(), subscription2.getStatus(), inboxMessage2.getMessageId(), reportResponse2.getBeneficiaryName(), reportResponse2.getBeneficiaryAge(), reportResponse2.getDateOfBirth(),
-                    reportResponse2.getExpectedDateOfDelivery(), startWeekNumber, new Location(locationResponse2.getDistrict(),
+                    reportResponse2.getExpectedDateOfDelivery(), startWeekNumber, new Location(locationResponse2.getState(), locationResponse2.getDistrict(),
                     locationResponse2.getBlock(), locationResponse2.getPanchayat()), now, now, now.minusDays(8));
             add(detailsResponse1);
             add(detailsResponse2);
@@ -228,7 +228,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
-        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("district", "block", "panchayat"));
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("state","district", "block", "panchayat"));
         reportingService.setBehavior(mockedReportingService);
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
 
@@ -275,7 +275,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         BaseResponse expectedResponse = BaseResponse.success("Subscription request submitted successfully");
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
-        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("district", "block", "panchayat"));
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("state", "district", "block", "panchayat"));
         reportingService.setBehavior(mockedReportingService);
 
         SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withMsisdn(msisdn).withEDD(edd.toString("dd-MM-yyyy")).withCreatedAt(now).build();
@@ -320,7 +320,7 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         DateTime expectedStartDate = SubscriptionPack.BARI_KILKARI.getStartDate(edd);
 
         ReportingService mockedReportingService = Mockito.mock(ReportingService.class);
-        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("district", "block", "panchayat"));
+        when(mockedReportingService.getLocation("district", "block", "panchayat")).thenReturn(new LocationResponse("state", "district", "block", "panchayat"));
         reportingService.setBehavior(mockedReportingService);
 
         SubscriptionWebRequest expectedWebRequest = new SubscriptionWebRequestBuilder().withDefaults().withMsisdn(msisdn).withEDD(edd.toString("dd-MM-yyyy")).withCreatedAt(now).build();

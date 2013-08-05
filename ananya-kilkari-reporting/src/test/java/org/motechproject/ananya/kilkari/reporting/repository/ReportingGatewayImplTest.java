@@ -53,7 +53,7 @@ public class ReportingGatewayImplTest {
     @Test
     public void shouldInvokeReportingServiceWithGetLocations() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        LocationResponse expectedLocation = new LocationResponse("mydistrict", "myblock", "mypanchayat");
+        LocationResponse expectedLocation = new LocationResponse("mystate", "mydistrict", "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
         LocationResponse actualLocation = reportingGateway.getLocation("mydistrict", "myblock", "my panchayat");
@@ -123,7 +123,7 @@ public class ReportingGatewayImplTest {
     @Test
     public void shouldInvokeReportingServiceWithGetLocationsIfDistrctNotPresent() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        LocationResponse expectedLocation = new LocationResponse(null, "myblock", "mypanchayat");
+        LocationResponse expectedLocation = new LocationResponse("mystate", null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
         LocationResponse actualLocation = reportingGateway.getLocation(null, "myblock", "mypanchayat");
@@ -146,7 +146,7 @@ public class ReportingGatewayImplTest {
     @Test
     public void shouldInvokeReportingServiceToGetLocationIfDistrictBlockAndPanchayatAreNotPresent() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        LocationResponse expectedLocation = new LocationResponse(null, "myblock", "mypanchayat");
+        LocationResponse expectedLocation = new LocationResponse("mystate", null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
         LocationResponse actualLocation = reportingGateway.getLocation(null, null, null);
@@ -287,7 +287,7 @@ public class ReportingGatewayImplTest {
         final String msisdn = "1234567890";
         String expectedUrl = "url/subscriber?msisdn=" + msisdn;
         ArrayList<SubscriberResponse> expectedResponse = new ArrayList<SubscriberResponse>() {{
-            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), DateTime.now(), new LocationResponse("d", "b", "p"), DateTime.now(), DateTime.now()));
+            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), DateTime.now(), new LocationResponse("s","d", "b", "p"), DateTime.now(), DateTime.now()));
         }};
         ResponseEntity<SubscriberResponse[]> responseEntity = new ResponseEntity(expectedResponse.toArray(), HttpStatus.OK);
 

@@ -27,7 +27,7 @@ public class SubscriptionDetailsMapper {
         SubscriptionCCWebResponse ccWebResponse = new SubscriptionCCWebResponse();
         for (SubscriptionDetailsResponse detailsResponse : subscriptionDetailsResponses) {
             Location locationDetails = detailsResponse.getLocation();
-            LocationResponse location = locationDetails != null ? new LocationResponse(locationDetails.getDistrict(), locationDetails.getBlock(), locationDetails.getPanchayat()) : null;
+            LocationResponse location = locationDetails != null ? new LocationResponse(locationDetails.getState(), locationDetails.getDistrict(), locationDetails.getBlock(), locationDetails.getPanchayat()) : null;
             ccWebResponse.addSubscriptionDetail(new AllSubscriptionDetails(detailsResponse.getSubscriptionId(),
                     detailsResponse.getPack().name(),
                     detailsResponse.getStatus().getDisplayString(),

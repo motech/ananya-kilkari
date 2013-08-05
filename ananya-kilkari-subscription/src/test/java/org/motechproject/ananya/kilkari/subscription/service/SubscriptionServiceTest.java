@@ -147,7 +147,7 @@ public class SubscriptionServiceTest {
         verify(messageCampaignService, never()).start(any(MessageCampaignRequest.class), any(Integer.class), any(Integer.class));
         verify(reportingServiceImpl, never()).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
         verify(onMobileSubscriptionManagerPublisher, never()).sendActivationRequest(any(OMSubscriptionRequest.class));
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -701,22 +701,23 @@ public class SubscriptionServiceTest {
 
         subscriptionService.updateSubscriberDetails(request);
 
-        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
+        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString(), anyString());
         verify(reportingServiceImpl, never()).reportSubscriberDetailsChange(request.getSubscriptionId(), any(SubscriberReportRequest.class));
     }
 
     @Test
     public void shouldPublishASubscriberUpdateEventWithLocation() {
         String subscriptionId = "subscriptionId";
+        String state = "state";
         String district = "district";
         String block = "block";
         String panchayat = "panchayat";
-        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
+        when(reportingServiceImpl.getLocation(state, district, block, panchayat)).thenReturn(null);
 
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CONTACT_CENTER.name(), DateTime.now(), "name", 23,
-                new Location(district, block, panchayat)));
+                new Location(state, district, block, panchayat)));
 
-        verify(reportingServiceImpl).getLocation(district, block, panchayat);
+        verify(reportingServiceImpl).getLocation(state, district, block, panchayat);
 
         ArgumentCaptor<SubscriberReportRequest> requestCaptor = ArgumentCaptor.forClass(SubscriberReportRequest.class);
         ArgumentCaptor<String> subscriptionIdCaptor = ArgumentCaptor.forClass(String.class);
@@ -735,7 +736,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldPublishASubscriberUpdateEventWithoutALocation() {
         String subscriptionId = "subscriptionId";
-        when(reportingServiceImpl.getLocation(anyString(), anyString(), anyString())).thenReturn(null);
+        when(reportingServiceImpl.getLocation(anyString(), anyString(), anyString(), anyString())).thenReturn(null);
 
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(subscriptionId, Channel.CONTACT_CENTER.name(), DateTime.now(), "name", 23,
                 Location.NULL));
@@ -1200,16 +1201,17 @@ public class SubscriptionServiceTest {
         String district = "d";
         String block = "b";
         String panchayat = "p";
-        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withLocation(district, block, panchayat).build();
-        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
+        String state = "s";
+        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withLocation(state, district, block, panchayat).build();
+        when(reportingServiceImpl.getLocation(state, district, block, panchayat)).thenReturn(null);
 
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
 
         InOrder order = inOrder(reportingServiceImpl, onMobileSubscriptionManagerPublisher, refdataSyncService);
-        order.verify(reportingServiceImpl).getLocation(district, block, panchayat);
+        order.verify(reportingServiceImpl).getLocation(state, district, block, panchayat);
         order.verify(reportingServiceImpl).reportSubscriptionCreation(any(SubscriptionReportRequest.class));
         order.verify(onMobileSubscriptionManagerPublisher).sendActivationRequest(any(OMSubscriptionRequest.class));
-        order.verify(refdataSyncService).syncNewLocation(district, block, panchayat);
+        order.verify(refdataSyncService).syncNewLocation(state, district, block, panchayat);
     }
 
     @Test
@@ -1218,7 +1220,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
 
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1226,12 +1228,13 @@ public class SubscriptionServiceTest {
         String district = "d";
         String block = "b";
         String panchayat = "p";
-        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withLocation(district, block, panchayat).build();
-        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(new LocationResponse());
+        String state = "s";
+        SubscriptionRequest request = new SubscriptionRequestBuilder().withDefaults().withLocation(state, district, block, panchayat).build();
+        when(reportingServiceImpl.getLocation(state, district, block, panchayat)).thenReturn(new LocationResponse());
 
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
 
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1241,8 +1244,8 @@ public class SubscriptionServiceTest {
 
         subscriptionService.createSubscription(request, Channel.CONTACT_CENTER);
 
-        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1250,41 +1253,43 @@ public class SubscriptionServiceTest {
         String district = "d";
         String block = "b";
         String panchayat = "p";
-        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(null);
+        String state = "s";
+        when(reportingServiceImpl.getLocation(state, district, block, panchayat)).thenReturn(null);
 
-        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(district, block, panchayat)));
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(state, district, block, panchayat)));
 
         InOrder order = inOrder(reportingServiceImpl, refdataSyncService);
-        order.verify(reportingServiceImpl).getLocation(district, block, panchayat);
+        order.verify(reportingServiceImpl).getLocation(state, district, block, panchayat);
         order.verify(reportingServiceImpl).reportSubscriberDetailsChange(anyString(), any(SubscriberReportRequest.class));
-        order.verify(refdataSyncService).syncNewLocation(district, block, panchayat);
+        order.verify(refdataSyncService).syncNewLocation(state, district, block, panchayat);
     }
 
     @Test
     public void shouldNotSyncLocationIfNotProvidedWhileUpdatingSubscriberDetails() {
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, null));
 
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
     public void shouldNotSyncIfLocationAlreadyExistsWhenUpdatingSubscriberDetails() {
+        String state = "s";
         String district = "d";
         String block = "b";
         String panchayat = "p";
-        when(reportingServiceImpl.getLocation(district, block, panchayat)).thenReturn(new LocationResponse());
+        when(reportingServiceImpl.getLocation(state, district, block, panchayat)).thenReturn(new LocationResponse());
 
-        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(district, block, panchayat)));
+        subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, new Location(state, district, block, panchayat)));
 
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
     public void shouldNotFetchLocationIfTheRequestDoesNotHaveLocation_WhenUpdatingSubscriberDetails() {
         subscriptionService.updateSubscriberDetails(new SubscriberRequest(null, null, null, null, null, Location.NULL));
 
-        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString());
-        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString());
+        verify(reportingServiceImpl, never()).getLocation(anyString(), anyString(), anyString(), anyString());
+        verify(refdataSyncService, never()).syncNewLocation(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1292,7 +1297,7 @@ public class SubscriptionServiceTest {
         String msisdn = "1234567890";
         SubscriptionPack pack = SubscriptionPack.BARI_KILKARI;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(pack).build();
-        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), null, new LocationResponse("d", "b", "p"), DateTime.now(), DateTime.now());
+        SubscriberResponse subscriberResponse = new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), null, new LocationResponse("s","d", "b", "p"), DateTime.now(), DateTime.now());
         ArrayList<Subscription> subscriptionList = new ArrayList<>();
         subscriptionList.add(subscription);
         ArrayList<SubscriberResponse> subscriberResponseList = new ArrayList<>();

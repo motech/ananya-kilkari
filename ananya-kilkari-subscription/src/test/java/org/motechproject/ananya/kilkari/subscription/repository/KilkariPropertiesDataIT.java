@@ -22,5 +22,6 @@ public class KilkariPropertiesDataIT {
         assertEquals(0, kilkariProperties.getCampaignScheduleDeltaDays());
         assertEquals(1, kilkariProperties.getCampaignScheduleDeltaMinutes());
         assertEquals(0, kilkariProperties.getBufferDaysToAllowRenewalForDeactivation());
+        assertEquals("Bihar", kilkariProperties.getDefaultState());
     }
 }

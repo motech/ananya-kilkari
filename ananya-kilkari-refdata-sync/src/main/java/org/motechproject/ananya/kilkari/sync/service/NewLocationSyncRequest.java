@@ -7,13 +7,16 @@ import java.io.Serializable;
 public class NewLocationSyncRequest implements Serializable {
     private static final long serialVersionUID = 5630093949090637856L;
     @JsonProperty
+    private String state;
+    @JsonProperty
     private String district;
     @JsonProperty
     private String block;
     @JsonProperty
     private String panchayat;
 
-    public NewLocationSyncRequest(String district, String block, String panchayat) {
+    public NewLocationSyncRequest(String state, String district, String block, String panchayat) {
+        this.state = state;
         this.district = district;
         this.block = block;
         this.panchayat = panchayat;
@@ -29,5 +32,9 @@ public class NewLocationSyncRequest implements Serializable {
 
     public String getPanchayat() {
         return panchayat;
+    }
+
+    public String getState() {
+        return state;
     }
 }

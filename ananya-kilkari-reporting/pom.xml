@@ -45,8 +45,8 @@
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.motechproject.ananya.reports</groupId>
+        <dependency> 
+            <groupId>org.motechproject.ananya.reports-location-changes</groupId>
             <artifactId>ananya-reports-contract</artifactId>
         </dependency>
         <dependency>

@@ -14,6 +14,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+
 @XmlRootElement(name = "subscriber")
 public class SubscriberWebRequest implements Serializable {
     private static final long serialVersionUID = 3755618556691805936L;
@@ -64,7 +66,7 @@ public class SubscriberWebRequest implements Serializable {
     @JsonIgnore
     @XmlTransient
     public Location getLocation() {
-        return location == null ? null : new Location(location.getDistrict(), location.getBlock(), location.getPanchayat());
+        return location == null ? null : new Location(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat());
     }
 
     public void setBeneficiaryName(String beneficiaryName) {
@@ -85,6 +87,11 @@ public class SubscriberWebRequest implements Serializable {
 
     public void setLocation(LocationRequest location) {
         this.location = location;
+    }
+
+    public void defaultState(String defaultState) {
+        if(this.location != null && isEmpty(this.location.getState()))
+            this.location.setState(defaultState);
     }
 
     public Errors validate() {

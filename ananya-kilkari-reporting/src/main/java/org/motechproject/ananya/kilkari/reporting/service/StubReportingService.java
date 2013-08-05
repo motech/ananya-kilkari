@@ -16,9 +16,9 @@ public class StubReportingService implements ReportingService {
     private boolean reportCampaignMessageDeliveryCalled;
 
     @Override
-    public LocationResponse getLocation(String district, String block, String panchayat) {
+    public LocationResponse getLocation(String state, String district, String block, String panchayat) {
         if (verify()) {
-            return behavior.getLocation(district, block, panchayat);
+            return behavior.getLocation(state, district, block, panchayat);
         }
         return null;
     }

@@ -53,10 +53,10 @@ public class ReportingGatewayImplTest {
     @Test
     public void shouldInvokeReportingServiceWithGetLocations() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        LocationResponse expectedLocation = new LocationResponse("mydistrict", "myblock", "mypanchayat");
+        LocationResponse expectedLocation = new LocationResponse("mystate", "mydistrict", "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        LocationResponse actualLocation = reportingGateway.getLocation("mydistrict", "myblock", "my panchayat");
+        LocationResponse actualLocation = reportingGateway.getLocation("mystate", "mydistrict", "myblock", "my panchayat");
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -70,6 +70,7 @@ public class ReportingGatewayImplTest {
         String url = urlArgumentCaptor.getValue();
         assertTrue(url.startsWith("url/location?"));
         assertTrue(url.contains("district=mydistrict"));
+        assertTrue(url.contains("state=mystate"));
         assertTrue(url.contains("block=myblock"));
         assertTrue(url.contains("panchayat=my panchayat"));
     }
@@ -79,7 +80,7 @@ public class ReportingGatewayImplTest {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        LocationResponse actualLocation = reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat");
+        LocationResponse actualLocation = reportingGateway.getLocation("mystate", "mydistrict", "myblock", "mypanchayat");
 
         assertNull(actualLocation);
 
@@ -92,6 +93,7 @@ public class ReportingGatewayImplTest {
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
         assertTrue(url.startsWith("url/location?"));
+        assertTrue(url.contains("state=mystate"));
         assertTrue(url.contains("district=mydistrict"));
         assertTrue(url.contains("block=myblock"));
         assertTrue(url.contains("panchayat=mypanchayat"));
@@ -104,7 +106,7 @@ public class ReportingGatewayImplTest {
         expectedException.expect(HttpClientErrorException.class);
         expectedException.expectMessage("400 BAD_REQUEST");
 
-        reportingGateway.getLocation("mydistrict", "myblock", "mypanchayat");
+        reportingGateway.getLocation("mystate", "mydistrict", "myblock", "mypanchayat");
 
         ArgumentCaptor<String> urlArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Class> subscriberLocationCaptor = ArgumentCaptor.forClass(Class.class);
@@ -115,6 +117,7 @@ public class ReportingGatewayImplTest {
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
         assertTrue(url.startsWith("url/location?"));
+        assertTrue(url.contains("state=mystate"));
         assertTrue(url.contains("district=mydistrict"));
         assertTrue(url.contains("block=myblock"));
         assertTrue(url.contains("panchayat=mypanchayat"));
@@ -123,10 +126,10 @@ public class ReportingGatewayImplTest {
     @Test
     public void shouldInvokeReportingServiceWithGetLocationsIfDistrctNotPresent() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        LocationResponse expectedLocation = new LocationResponse(null, "myblock", "mypanchayat");
+        LocationResponse expectedLocation = new LocationResponse("mystate", null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        LocationResponse actualLocation = reportingGateway.getLocation(null, "myblock", "mypanchayat");
+        LocationResponse actualLocation = reportingGateway.getLocation("mystate", null, "myblock", "mypanchayat");
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -139,6 +142,7 @@ public class ReportingGatewayImplTest {
         verify(kilkariProperties).getProperty("reporting.service.base.url");
         String url = urlArgumentCaptor.getValue();
         assertTrue(url.startsWith("url/location?"));
+        assertTrue(url.contains("state=mystate"));
         assertTrue(url.contains("block=myblock"));
         assertTrue(url.contains("panchayat=mypanchayat"));
     }
@@ -146,10 +150,10 @@ public class ReportingGatewayImplTest {
     @Test
     public void shouldInvokeReportingServiceToGetLocationIfDistrictBlockAndPanchayatAreNotPresent() {
         when(kilkariProperties.getProperty("reporting.service.base.url")).thenReturn("url");
-        LocationResponse expectedLocation = new LocationResponse(null, "myblock", "mypanchayat");
+        LocationResponse expectedLocation = new LocationResponse("mystate", null, "myblock", "mypanchayat");
         when(restTemplate.getForEntity(any(String.class), any(Class.class))).thenReturn(new ResponseEntity(expectedLocation, HttpStatus.OK));
 
-        LocationResponse actualLocation = reportingGateway.getLocation(null, null, null);
+        LocationResponse actualLocation = reportingGateway.getLocation(null, null, null, null);
 
         assertEquals(expectedLocation, actualLocation);
 
@@ -287,7 +291,7 @@ public class ReportingGatewayImplTest {
         final String msisdn = "1234567890";
         String expectedUrl = "url/subscriber?msisdn=" + msisdn;
         ArrayList<SubscriberResponse> expectedResponse = new ArrayList<SubscriberResponse>() {{
-            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), DateTime.now(), new LocationResponse("d", "b", "p"), DateTime.now(), DateTime.now()));
+            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), DateTime.now(), new LocationResponse("s","d", "b", "p"), DateTime.now(), DateTime.now()));
         }};
         ResponseEntity<SubscriberResponse[]> responseEntity = new ResponseEntity(expectedResponse.toArray(), HttpStatus.OK);
 

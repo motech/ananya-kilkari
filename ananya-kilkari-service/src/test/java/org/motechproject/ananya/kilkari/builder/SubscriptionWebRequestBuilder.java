@@ -21,7 +21,7 @@ public class SubscriptionWebRequestBuilder {
         subscriptionWebRequest.setMsisdn("9876543210");
         subscriptionWebRequest.setBeneficiaryAge("25");
 
-        withLocation("district", "block", "panchayat");
+        withLocation("state", "district", "block", "panchayat");
 
         subscriptionWebRequest.setBeneficiaryName("name");
         subscriptionWebRequest.setDateOfBirth(null);
@@ -79,8 +79,9 @@ public class SubscriptionWebRequestBuilder {
         return this;
     }
 
-    public SubscriptionWebRequestBuilder withLocation(final String district, final String block, final String panchayat) {
+    public SubscriptionWebRequestBuilder withLocation(final String state, final String district, final String block, final String panchayat) {
         return withLocation(new LocationRequest() {{
+            setState(state);
             setDistrict(district);
             setBlock(block);
             setPanchayat(panchayat);

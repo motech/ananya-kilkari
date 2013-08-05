@@ -7,6 +7,7 @@ import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
+import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
@@ -23,12 +24,15 @@ public class SubscriptionController {
 
     private KilkariSubscriptionService kilkariSubscriptionService;
     private CallbackRequestValidator callbackRequestValidator;
+    private KilkariPropertiesData kilkariPropertiesData;
 
     @Autowired
     public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService,
-                                  CallbackRequestValidator callbackRequestValidator) {
+                                  CallbackRequestValidator callbackRequestValidator,
+                                  KilkariPropertiesData kilkariPropertiesData) {
         this.kilkariSubscriptionService = kilkariSubscriptionService;
         this.callbackRequestValidator = callbackRequestValidator;
+        this.kilkariPropertiesData = kilkariPropertiesData;
     }
 
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
@@ -44,6 +48,7 @@ public class SubscriptionController {
     public BaseResponse createSubscription(@RequestBody SubscriptionWebRequest subscriptionWebRequest, @RequestParam String channel) {
         subscriptionWebRequest.setChannel(channel);
         subscriptionWebRequest.validateChannel();
+        subscriptionWebRequest.defaultState(kilkariPropertiesData.getDefaultState());
         kilkariSubscriptionService.createSubscription(subscriptionWebRequest);
         return BaseResponse.success("Subscription request submitted successfully");
     }
@@ -106,6 +111,7 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse updateSubscriberDetails(@RequestBody SubscriberWebRequest subscriberWebRequest, @PathVariable String subscriptionId, @RequestParam String channel) {
         subscriberWebRequest.setChannel(channel);
+        subscriberWebRequest.defaultState(kilkariPropertiesData.getDefaultState());
         kilkariSubscriptionService.updateSubscriberDetails(subscriberWebRequest, subscriptionId);
         return BaseResponse.success("Subscriber Update request submitted successfully");
     }

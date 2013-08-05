@@ -104,7 +104,7 @@ public class SubscriptionService {
             initiateActivationRequest(omSubscriptionRequest);
 
         if (existingLocation == null && subscriptionRequest.hasLocation()) {
-            refdataSyncService.syncNewLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
+            refdataSyncService.syncNewLocation(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat());
         }
 
         return subscription;
@@ -356,12 +356,12 @@ public class SubscriptionService {
         Location location = request.getLocation();
         LocationResponse existingLocation = getExistingLocation(location);
 
-        SubscriberLocation subscriberLocation = request.hasLocation() ? new SubscriberLocation(location.getDistrict(), location.getBlock(), location.getPanchayat()) : null;
+        SubscriberLocation subscriberLocation = request.hasLocation() ? new SubscriberLocation(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat()) : null;
         reportingService.reportSubscriberDetailsChange(request.getSubscriptionId(), new SubscriberReportRequest(request.getCreatedAt(),
                 request.getBeneficiaryName(), request.getBeneficiaryAge(), subscriberLocation));
 
         if (existingLocation == null && request.hasLocation()) {
-            refdataSyncService.syncNewLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
+            refdataSyncService.syncNewLocation(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat());
         }
     }
 
@@ -412,7 +412,7 @@ public class SubscriptionService {
         if (location == Location.NULL)
             return null;
 
-        return reportingService.getLocation(location.getDistrict(), location.getBlock(), location.getPanchayat());
+        return reportingService.getLocation(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat());
     }
 
     private void renewSchedule(Subscription subscription) {
@@ -509,9 +509,11 @@ public class SubscriptionService {
         requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeMsisdnRequest.getChannel(), changeMsisdnRequest.getCreatedAt(), changeMsisdnRequest.getReason()));
 
         Location location = null;
-        if (subscriberResponse.getLocationResponse() != null) {
-            location = new Location(subscriberResponse.getLocationResponse().getDistrict(),
-                    subscriberResponse.getLocationResponse().getBlock(), subscriberResponse.getLocationResponse().getPanchayat());
+        LocationResponse locationResponse = subscriberResponse.getLocationResponse();
+        if (locationResponse != null) {
+            location = new Location(locationResponse.getState(),
+                    locationResponse.getDistrict(),
+                    locationResponse.getBlock(), locationResponse.getPanchayat());
         }
         Subscriber subscriber = new Subscriber(subscriberResponse.getBeneficiaryName(), subscriberResponse.getBeneficiaryAge(),
                 subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getNextWeekNumber());

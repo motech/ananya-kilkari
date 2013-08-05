@@ -97,7 +97,7 @@ public class SubscriptionValidatorTest {
 
     @Test
     public void shouldValidateInvalidSubscriptionIdInSubscriberDetails() {
-        Location location = new Location("district", "block", "panchayat");
+        Location location = new Location("state", "district", "block", "panchayat");
         String subscriptionId = "subscriptionId";
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(null);
 

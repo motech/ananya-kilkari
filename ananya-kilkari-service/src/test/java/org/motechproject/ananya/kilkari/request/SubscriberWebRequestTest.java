@@ -34,7 +34,8 @@ public class SubscriberWebRequestTest {
 
         Errors errors = subscriberWebRequest.validate();
 
-        assertEquals(2, errors.getCount());
+        assertEquals(3, errors.getCount());
+        assertTrue(errors.hasMessage("Missing state"));
         assertTrue(errors.hasMessage("Missing block"));
         assertTrue(errors.hasMessage("Missing panchayat"));
     }
@@ -43,6 +44,29 @@ public class SubscriberWebRequestTest {
     public void shouldReturnNullLocationIfLocationIsNotProvided(){
         SubscriberWebRequest webRequest = new SubscriberWebRequest();
         assertNull(webRequest.getLocation());
+    }
+
+
+    @Test
+    public void shouldUpdateStateWithDefaultValue_whenStateIsNull() {
+        SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
+        LocationRequest locationWithNoState = new LocationRequest();
+        subscriberWebRequest.setLocation(locationWithNoState);
+
+        subscriberWebRequest.defaultState("BIHAR");
+        assertEquals("BIHAR", subscriberWebRequest.getLocation().getState());
+    }
+
+    @Test
+    public void shouldNotUpdateStateWithDefaultValue_whenStateIsNotNull() {
+        String validState = "ORISSA";
+        SubscriberWebRequest subscriberWebRequest = new SubscriberWebRequest();
+        LocationRequest locationWithState = new LocationRequest();
+        locationWithState.setState(validState);
+        subscriberWebRequest.setLocation(locationWithState);
+
+        subscriberWebRequest.defaultState("BIHAR");
+        assertEquals(validState, subscriberWebRequest.getLocation().getState());
     }
 
 }

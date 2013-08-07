@@ -1,7 +1,9 @@
 package org.motechproject.ananya.kilkari.message.service;
 
 
+import junit.framework.Assert;
 import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -12,6 +14,7 @@ import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
+import static org.joda.time.Minutes.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -120,7 +123,7 @@ public class CampaignMessageAlertServiceTest {
         CampaignMessageAlert actualCampaignMessageAlert = captor.getValue();
         assertEquals(subscriptionId, actualCampaignMessageAlert.getSubscriptionId());
         DateTime DateTimeCaptorValue = DateTimeCaptor.getValue();
-        assertEquals(DateTime.now().withMillisOfSecond(0), DateTimeCaptorValue.withMillisOfSecond(0));
+        assertTrue(minutesBetween(DateTime.now(), DateTimeCaptorValue).isLessThan(ONE));
     }
 
     @Test

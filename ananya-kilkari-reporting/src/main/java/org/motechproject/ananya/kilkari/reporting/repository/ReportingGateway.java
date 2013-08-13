@@ -20,6 +20,8 @@ public interface ReportingGateway {
 
     void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest);
 
+    void reportChangeReferredByFlwMsisdnForSubscriber(SubscriptionChangeReferredFLWMsisdnReportRequest reportRequest);
+
     void reportChangeMsisdnForSubscriber(SubscriberChangeMsisdnReportRequest reportRequest);
 
     List<SubscriberResponse> getSubscribersByMsisdn(String msisdn);

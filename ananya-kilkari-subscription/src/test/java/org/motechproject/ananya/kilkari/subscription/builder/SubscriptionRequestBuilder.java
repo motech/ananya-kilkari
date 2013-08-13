@@ -17,17 +17,24 @@ public class SubscriptionRequestBuilder {
     private Integer week;
     private String reason;
     private Location location;
+    private String referredBy;
 
     public SubscriptionRequestBuilder withDefaults() {
         return withMsisdn("9876543210")
                 .withPack(SubscriptionPack.BARI_KILKARI)
                 .withLocation("state", "district", "block", "panchayat")
                 .withReason(null)
-                .withCreationDate(DateTime.now());
+                .withCreationDate(DateTime.now())
+        		.withReferredBy("1234567890");   		
     }
 
     public SubscriptionRequestBuilder withMsisdn(String msisdn) {
         this.msisdn = msisdn;
+        return this;
+    }
+
+    public SubscriptionRequestBuilder withReferredBy(String referredBy) {
+        this.referredBy = referredBy;
         return this;
     }
 
@@ -83,6 +90,6 @@ public class SubscriptionRequestBuilder {
 
     public SubscriptionRequest build() {
         Subscriber subscriber = new Subscriber(beneficiaryName, beneficiaryAge, dob, edd, week);
-        return new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber, reason);
+        return new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber, reason, referredBy);
     }
 }

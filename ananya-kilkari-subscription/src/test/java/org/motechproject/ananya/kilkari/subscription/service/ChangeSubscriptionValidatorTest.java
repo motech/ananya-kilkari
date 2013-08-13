@@ -10,9 +10,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionBuilder;
+import org.motechproject.ananya.kilkari.subscription.builder.SubscriptionRequestBuilder;
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
+import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 
 import java.util.Arrays;
 
@@ -39,7 +41,7 @@ public class ChangeSubscriptionValidatorTest {
     @Test
     public void shouldThrowExceptionIfSubscriptionForChangePackDoesNotExist(){
         String subscriptionId = "subscriptionId";
-        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason");
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason", "1234567890");
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(null);
 
@@ -53,7 +55,7 @@ public class ChangeSubscriptionValidatorTest {
     public void shouldThrowExceptionIfSubscriptionOfPackChangeIsNotInActiveOrSuspendedState(){
         Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.ACTIVATION_FAILED).build();
         String subscriptionId = subscription.getSubscriptionId();
-        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason");
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1111111111", subscriptionId, SubscriptionPack.BARI_KILKARI, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason", "1234567890");
         when(subscriptionService.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
 
         expectedException.expect(ValidationException.class);
@@ -72,7 +74,7 @@ public class ChangeSubscriptionValidatorTest {
         when(subscriptionService.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
         when(subscriptionService.findByMsisdnAndPack(msisdn, pack)).thenReturn(Arrays.asList(subscription));
 
-        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, msisdn, subscriptionId, pack, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason");
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, msisdn, subscriptionId, pack, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason", "1234567890");
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Active subscription already exists for %s and %s",msisdn,pack));
@@ -92,7 +94,7 @@ public class ChangeSubscriptionValidatorTest {
         when(subscriptionService.findBySubscriptionId(subscription1.getSubscriptionId())).thenReturn(subscription1);
         when(subscriptionService.findByMsisdnAndPack(msisdn, requestedPack)).thenReturn(Arrays.asList(subscription2,subscription3));
 
-        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, msisdn, subscriptionId, requestedPack, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason");
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, msisdn, subscriptionId, requestedPack, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason", "1234567890");
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Active subscription already exists for %s and %s",msisdn,requestedPack));
@@ -106,7 +108,7 @@ public class ChangeSubscriptionValidatorTest {
         String subscriptionId = subscription.getSubscriptionId();
         when(subscriptionService.findBySubscriptionId(subscription.getSubscriptionId())).thenReturn(subscription);
 
-        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_SCHEDULE, "1111111111", subscriptionId, SubscriptionPack.NAVJAAT_KILKARI, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason");
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_SCHEDULE, "1111111111", subscriptionId, SubscriptionPack.NAVJAAT_KILKARI, Channel.CONTACT_CENTER, DateTime.now(), null, null, "reason", "1234567890");
 
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage(String.format("Subscription %s is not subscribed to requested pack",subscriptionId));

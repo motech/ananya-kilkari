@@ -83,7 +83,7 @@ public class SubscriptionControllerTest {
     public void shouldGetSubscriptionsForGivenMsisdnForChannelIvr() throws Exception {
         String msisdn = "1234567890";
         String channel = "ivr";
-        SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
+        SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13",null);
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -108,7 +108,7 @@ public class SubscriptionControllerTest {
         int startWeekNumber = 4;
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE,
-                "WEEK13", "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("s", "d", "b", "p"), DateTime.now(), DateTime.now(), DateTime.now().minusDays(3));
+                "WEEK13", "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("s", "d", "b", "p"), DateTime.now(), DateTime.now(), DateTime.now().minusDays(3),null);
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -133,7 +133,7 @@ public class SubscriptionControllerTest {
         int startWeekNumber = 4;
 
         SubscriptionDetailsResponse subscriptionDetails = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13",
-                "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("s", "d", "b", "p"), DateTime.now(), DateTime.now(), DateTime.now().minusDays(8));
+                "name", 23, DateTime.now(), DateTime.now().plusDays(2), startWeekNumber, new Location("s", "d", "b", "p"), DateTime.now(), DateTime.now(), DateTime.now().minusDays(8),null);
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
         subscriptionDetailsResponses.add(subscriptionDetails);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.from(channel))).thenReturn(subscriptionDetailsResponses);
@@ -356,11 +356,11 @@ public class SubscriptionControllerTest {
 
         Errors errors = new Errors();
         errors.addAll(errorsMessages);
-        when(callbackRequestValidator.validate(any(CallbackRequestWrapper.class))).thenReturn(errors);
+        when(callbackRequestValidator.validate(any(CallbackRequestWrapper.class), eq(false))).thenReturn(errors);
 
         mockMvc(subscriptionController)
                 .perform(put("/subscription/abcd1234")
-                        .body(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .body(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().type(HttpHeaders.APPLICATION_JSON))
                 .andExpect(content().string(baseResponseMatcher("FAILED", "Invalid msisdn invalidMsisdn,Invalid operator invalidOperator")));
@@ -380,7 +380,7 @@ public class SubscriptionControllerTest {
         callbackRequest.setOperator(Operator.AIRTEL.name());
         callbackRequest.setGraceCount("2");
         byte[] requestBody = TestUtils.toJson(callbackRequest).getBytes();
-        when(callbackRequestValidator.validate(any(CallbackRequestWrapper.class))).thenReturn(new Errors());
+        when(callbackRequestValidator.validate(any(CallbackRequestWrapper.class), eq(false))).thenReturn(new Errors());
 
         mockMvc(subscriptionController)
                 .perform(put("/subscription/" + subscriptionId)

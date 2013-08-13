@@ -33,7 +33,7 @@ public class RenewalSuspensionHandlerTest {
         callbackRequest.setGraceCount(graceCount);
         callbackRequest.setReason(reason);
 
-        renewalSuspensionHandler.perform(new CallbackRequestWrapper(callbackRequest, subId, renewalDate));
+        renewalSuspensionHandler.perform(new CallbackRequestWrapper(callbackRequest, subId, renewalDate, true));
 
         verify(subscriptionService).suspendSubscription(subId, renewalDate, reason, Integer.valueOf(graceCount));
     }

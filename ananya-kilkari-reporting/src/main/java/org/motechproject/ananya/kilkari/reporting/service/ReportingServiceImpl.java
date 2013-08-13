@@ -74,4 +74,9 @@ public class ReportingServiceImpl implements ReportingService {
     public void reportCareRequest(SubscriberCareReportRequest subscriberCareReportRequest) {
         reportGateway.reportCareRequest(subscriberCareReportRequest);
     }
+
+	@Override
+	public void reportChangeReferredByFlwMsisdn(SubscriptionChangeReferredFLWMsisdnReportRequest reportRequest) {
+		 reportGateway.reportChangeReferredByFlwMsisdnForSubscriber(reportRequest);
+	}
 }

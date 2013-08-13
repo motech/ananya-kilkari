@@ -7,6 +7,7 @@ import org.ektorp.support.GenerateView;
 import org.ektorp.support.View;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscriptions;
 import org.motechproject.dao.MotechBaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,12 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
         ViewQuery viewQuery = createQuery("by_msisdn").key(msisdn).includeDocs(true);
         List<Subscription> subscriptions = db.queryView(viewQuery, Subscription.class);
         return subscriptions == null ? Collections.EMPTY_LIST : subscriptions;
+    }
+
+    @View(name = "find_by_msisdn_pack_and_status", map = "function(doc) {if(doc.type === 'Subscription') emit([doc.msisdn, doc.pack, doc.status]);}")
+     public List<Subscription> findByMsisdnPackAndStatus(String msisdn, SubscriptionPack pack, SubscriptionStatus status) {
+        List<Subscription> subscriptionsByPackStatusAndMsisdn = queryView("find_by_msisdn_pack_and_status", ComplexKey.of(msisdn, pack, status));
+        return subscriptionsByPackStatusAndMsisdn == null ? Collections.EMPTY_LIST : subscriptionsByPackStatusAndMsisdn;
     }
 
     @GenerateView

@@ -17,15 +17,16 @@ public class SubscriptionMapper {
     }
 
     public static SubscriptionReportRequest createSubscriptionCreationReportRequest(
-            Subscription subscription, Channel channel, SubscriptionRequest subscriptionRequest) {
+        Subscription subscription, Channel channel, SubscriptionRequest subscriptionRequest, Integer weekNumber, String operator, boolean requestedFromSM) {
         Location location = subscriptionRequest.getLocation();
-        SubscriberLocation subscriberLocation = subscriptionRequest.hasLocation() ? new SubscriberLocation(location.getState(), location.getDistrict(), location.getBlock(), location.getPanchayat()) : null;
+        SubscriberLocation subscriberLocation = subscriptionRequest.hasLocation() ? new SubscriberLocation(location.getState(),location.getDistrict(), location.getBlock(), location.getPanchayat()) : null;
         Subscriber subscriber = subscriptionRequest.getSubscriber();
-
+        Integer startWeekNumber = requestedFromSM?weekNumber:subscriber.getWeek();
         Long msisdn = NumberUtils.createLong(subscription.getMsisdn());
+        Long referredBy = NumberUtils.createLong(subscription.getReferredBy());
 
         return new SubscriptionReportRequest(subscription.getSubscriptionId(), channel.name(), msisdn, subscription.getPack().name(),
                 subscriber.getBeneficiaryName(), subscriber.getBeneficiaryAge(), subscriptionRequest.getCreationDate(), subscription.getStatus().name(), subscriber.getExpectedDateOfDelivery(),
-                subscriber.getDateOfBirth(), subscriberLocation, null, subscription.getStartDate(), subscriptionRequest.getOldSubscriptionId(), subscriptionRequest.getReason(), subscriber.getWeek());
+                subscriber.getDateOfBirth(), subscriberLocation, operator, subscription.getStartDate(), subscriptionRequest.getOldSubscriptionId(), subscriptionRequest.getReason(), startWeekNumber, referredBy, requestedFromSM);
     }
 }

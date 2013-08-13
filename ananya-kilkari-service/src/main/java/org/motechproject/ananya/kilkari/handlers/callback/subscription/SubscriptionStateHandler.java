@@ -4,4 +4,5 @@ import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 
 public interface SubscriptionStateHandler {
     public void perform(CallbackRequestWrapper callbackRequestWrapper);
+    public void performForSMReq(CallbackRequestWrapper callbackRequestWrapper);
 }

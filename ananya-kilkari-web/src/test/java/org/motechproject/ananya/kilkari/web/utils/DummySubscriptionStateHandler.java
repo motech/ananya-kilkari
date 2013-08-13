@@ -7,4 +7,8 @@ public class DummySubscriptionStateHandler implements SubscriptionStateHandler {
     @Override
     public void perform(CallbackRequestWrapper callbackRequestWrapper) {
     }
+
+	@Override
+	public void performForSMReq(CallbackRequestWrapper callbackRequestWrapper) {
+	}
 }

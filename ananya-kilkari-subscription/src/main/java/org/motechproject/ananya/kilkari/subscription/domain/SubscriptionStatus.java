@@ -27,6 +27,16 @@ public enum SubscriptionStatus {
             return validStates.contains(toStatus);
         }
     },
+    REFERRED_MSISDN_RECEIVED("New Subscription") {
+        @Override
+        public boolean canTransitionTo(SubscriptionStatus toStatus) {
+            List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
+                add(SubscriptionStatus.ACTIVE);
+                add(SubscriptionStatus.ACTIVATION_FAILED);
+            }};
+            return validStates.contains(toStatus);
+        }
+    },
     PENDING_ACTIVATION("Pending Subscription") {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
@@ -147,7 +157,11 @@ public enum SubscriptionStatus {
     }
 
     public boolean canActivate() {
-        return equals(PENDING_ACTIVATION);
+        return this == PENDING_ACTIVATION || this == REFERRED_MSISDN_RECEIVED;
+    }
+
+    public boolean canNotActivateForSM() {
+        return this == SUSPENDED || this == ACTIVE || this == NEW || this == NEW_EARLY || this == PENDING_ACTIVATION;
     }
 
     public boolean canChangeSubscription() {

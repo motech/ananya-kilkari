@@ -50,6 +50,12 @@ public class WebRequestValidator {
         }
     }
 
+	public void validatePack(SubscriptionPack pack) {
+		if (!SubscriptionPack.isValid(pack.name())) {
+			errors.add("Invalid subscription pack %s", pack.name());
+		}
+	}
+	
     public void validatePack(String pack) {
         if (!SubscriptionPack.isValid(pack)) {
             errors.add("Invalid subscription pack %s", pack);
@@ -61,6 +67,14 @@ public class WebRequestValidator {
             errors.add("Invalid msisdn %s", msisdn);
         }
     }
+
+	public void validateReferredByMsisdn(String referredMsisdn) {
+		if(StringUtils.isNotEmpty(referredMsisdn)){
+			if (PhoneNumber.isNotValid(referredMsisdn)) {
+				errors.add("Invalid msisdn for flw %s", referredMsisdn);
+			}
+		}
+	}
 
     public void validateChannel(String channel) {
         if (!Channel.isValid(channel)) {

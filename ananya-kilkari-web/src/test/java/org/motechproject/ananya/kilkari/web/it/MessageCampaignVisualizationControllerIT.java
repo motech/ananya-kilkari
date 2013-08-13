@@ -32,7 +32,7 @@ public class MessageCampaignVisualizationControllerIT extends SpringIntegrationT
         String msisdn = "9876543210";
         SubscriptionPack subscriptionPack = SubscriptionPack.BARI_KILKARI;
         DateTime now = DateTime.now();
-        Subscription subscription = new Subscription(msisdn, subscriptionPack, now, now, null);
+        Subscription subscription = new Subscription(msisdn, subscriptionPack, now, now, null, null);
         subscription.activate("airtel", now, now);
 
         allSubscriptions.add(subscription);

@@ -13,6 +13,9 @@ import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionBaseWebResponse;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
+import org.motechproject.web.context.HttpThreadContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,7 @@ public class SubscriptionController {
     private KilkariSubscriptionService kilkariSubscriptionService;
     private CallbackRequestValidator callbackRequestValidator;
     private KilkariPropertiesData kilkariPropertiesData;
+    private final static Logger logger = LoggerFactory.getLogger(SubscriptionController.class);
 
     @Autowired
     public SubscriptionController(KilkariSubscriptionService kilkariSubscriptionService,
@@ -35,11 +39,20 @@ public class SubscriptionController {
         this.kilkariPropertiesData = kilkariPropertiesData;
     }
 
+
     @RequestMapping(value = "/subscription", method = RequestMethod.GET)
     @ResponseBody
     public BaseResponse createSubscriptionForIVR(SubscriptionWebRequest subscriptionWebRequest) {
         subscriptionWebRequest.validateChannel();
         kilkariSubscriptionService.createSubscriptionAsync(subscriptionWebRequest);
+        return BaseResponse.success("Subscription request submitted successfully");
+    }
+
+    @RequestMapping(value = "/setReferredByFLWMsisdn", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResponse setReferredByFLWMsisdnForIVR(ReferredByFlwMsisdnRequest referredByFlwMsisdnRequest) {
+        referredByFlwMsisdnRequest.validateChannel();   
+        kilkariSubscriptionService.subscriptionAsyncForReferredBy(referredByFlwMsisdnRequest);
         return BaseResponse.success("Subscription request submitted successfully");
     }
 
@@ -56,12 +69,24 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.PUT)
     @ResponseBody
     public BaseResponse subscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
-        final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
-        Errors validationErrors = callbackRequestValidator.validate(callbackRequestWrapper);
+        final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now(),true);
+        Errors validationErrors = callbackRequestValidator.validate(callbackRequestWrapper, false);
         raiseExceptionIfThereAreErrors(validationErrors);
 
         kilkariSubscriptionService.processCallbackRequest(callbackRequestWrapper);
 
+        return BaseResponse.success("Callback request processed successfully");
+    }
+
+	@RequestMapping(value = "/subscription/handleCallBack", method = RequestMethod.PUT)
+    @ResponseBody
+    public BaseResponse subscriptionCallbackWithoutId(@RequestBody CallbackRequest callbackRequest) {
+        final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, null, DateTime.now(),false);
+        Errors validationErrors = callbackRequestValidator.validate(callbackRequestWrapper, true);
+        raiseExceptionIfThereAreErrors(validationErrors);
+        HttpThreadContext.set("NOT_INITIATED_BY_MOTECH");
+        logger.info("set HttpThreadContext to:"+HttpThreadContext.get());
+        kilkariSubscriptionService.processCallbackRequest(callbackRequestWrapper);
         return BaseResponse.success("Callback request processed successfully");
     }
 

@@ -1,6 +1,8 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
+
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
@@ -26,17 +28,18 @@ public class ChangeSubscriptionService {
 
     public void process(ChangeSubscriptionRequest changeSubscriptionRequest) {
         changeSubscriptionValidator.validate(changeSubscriptionRequest);
-
         String subscriptionId = changeSubscriptionRequest.getSubscriptionId();
         Subscription existingSubscription = subscriptionService.findBySubscriptionId(subscriptionId);
         changeSubscriptionRequest.setMsisdn(existingSubscription.getMsisdn());
         changeSubscriptionRequest.prefixReasonWithChangeType();
-
+		if(ChangeSubscriptionType.isChangeReferredBy(changeSubscriptionRequest.getChangeType()))
+			subscriptionService.updateReferredByMsisdn(existingSubscription, changeSubscriptionRequest);   
+		else{
         subscriptionService.requestDeactivation(new DeactivationRequest(changeSubscriptionRequest.getSubscriptionId(), changeSubscriptionRequest.getChannel(),
                 changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getReason()));
         updateEddOrDob(changeSubscriptionRequest);
         createSubscriptionWithNewPack(changeSubscriptionRequest);
-
+		}
     }
 
     private void updateEddOrDob(ChangeSubscriptionRequest changeSubscriptionRequest) {
@@ -49,7 +52,7 @@ public class ChangeSubscriptionService {
 
     private Subscription createSubscriptionWithNewPack(ChangeSubscriptionRequest changeSubscriptionRequest) {
         Subscriber subscriber = new Subscriber(null, null, changeSubscriptionRequest.getDateOfBirth(), changeSubscriptionRequest.getExpectedDateOfDelivery(), null);
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeSubscriptionRequest.getMsisdn(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getPack(), null, subscriber, changeSubscriptionRequest.getReason());
+		SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeSubscriptionRequest.getMsisdn(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getPack(), null, subscriber, changeSubscriptionRequest.getReason(), changeSubscriptionRequest.getReferredBy());
         subscriptionRequest.setOldSubscriptionId(changeSubscriptionRequest.getSubscriptionId());
         return subscriptionService.createSubscription(subscriptionRequest, changeSubscriptionRequest.getChannel());
     }

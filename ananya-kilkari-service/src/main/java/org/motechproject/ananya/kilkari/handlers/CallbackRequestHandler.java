@@ -21,6 +21,9 @@ public class CallbackRequestHandler {
     @MotechListener(subjects = {SubscriptionEventKeys.PROCESS_CALLBACK_REQUEST})
     public void handleCallbackRequest(MotechEvent motechEvent) {
         CallbackRequestWrapper callbackRequestWrapper = (CallbackRequestWrapper) motechEvent.getParameters().get("0");
-        subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper).perform(callbackRequestWrapper);
+        if(callbackRequestWrapper.isRequestedByMotech())
+        	subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper).perform(callbackRequestWrapper);
+        else
+        	subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper).performForSMReq(callbackRequestWrapper);
     }
 }

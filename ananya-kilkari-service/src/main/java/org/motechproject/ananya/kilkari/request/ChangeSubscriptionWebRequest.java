@@ -33,6 +33,9 @@ public class ChangeSubscriptionWebRequest {
     @JsonProperty
     @XmlElement
     private String reason;
+    @JsonProperty
+    @XmlElement
+    private String referredBy;
 
     public ChangeSubscriptionWebRequest() {
         this.createdAt = DateTime.now();
@@ -73,6 +76,15 @@ public class ChangeSubscriptionWebRequest {
         return reason;
     }
 
+    @XmlTransient
+    public String getReferredBy() {
+		return referredBy;
+	}
+
+	public void setReferredBy(String referredBy) {
+		this.referredBy = referredBy;
+	}
+	
     public void setPack(String pack) {
         this.pack = pack;
     }
@@ -105,6 +117,7 @@ public class ChangeSubscriptionWebRequest {
         webRequestValidator.validateEDD(expectedDateOfDelivery, createdAt);
         webRequestValidator.validateOnlyOneOfEDDOrDOBIsPresent(expectedDateOfDelivery, dateOfBirth);
         webRequestValidator.validateChangeType(changeType, expectedDateOfDelivery, dateOfBirth);
+        webRequestValidator.validateReferredByMsisdn(referredBy);
         return webRequestValidator.getErrors();
     }
 }

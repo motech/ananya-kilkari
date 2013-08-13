@@ -115,4 +115,11 @@ public class StubReportingService implements ReportingService {
         }
         return true;
     }
+
+	@Override
+	public void reportChangeReferredByFlwMsisdn(SubscriptionChangeReferredFLWMsisdnReportRequest reportRequest) {
+		if (verify()) {
+            behavior.reportChangeReferredByFlwMsisdn(reportRequest);
+        }
+	}
 }

@@ -47,7 +47,7 @@ public class InquiryPageTest {
         header.put("dateOfBirth", "Date of Birth");
         String msisdn = "1234567890";
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
-        SubscriptionDetailsResponse subscriptionDetailsResponse = new SubscriptionDetailsResponse("subscriptionId", SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "campaignId");
+        SubscriptionDetailsResponse subscriptionDetailsResponse = new SubscriptionDetailsResponse("subscriptionId", SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "campaignId", null);
         subscriptionDetailsResponses.add(subscriptionDetailsResponse);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.CONTACT_CENTER)).thenReturn(subscriptionDetailsResponses);
 

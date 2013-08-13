@@ -15,7 +15,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-
 @XmlRootElement(name = "subscriber")
 public class SubscriberWebRequest implements Serializable {
     private static final long serialVersionUID = 3755618556691805936L;

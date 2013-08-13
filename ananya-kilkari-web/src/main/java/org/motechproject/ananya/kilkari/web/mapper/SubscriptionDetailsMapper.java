@@ -35,6 +35,7 @@ public class SubscriptionDetailsMapper {
                     detailsResponse.getBeneficiaryName(),
                     detailsResponse.getBeneficiaryAge(),
                     detailsResponse.getStartWeekNumber(),
+                    detailsResponse.getReferredBy(),
                     detailsResponse.getExpectedDateOfDelivery(),
                     detailsResponse.getDateOfBirth(),
                     location,

@@ -12,8 +12,11 @@ import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.subscription.domain.CampaignChangeReason;
 import org.motechproject.ananya.kilkari.subscription.domain.CampaignRescheduleRequest;
+import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.DeactivationRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.exceptions.DuplicateSubscriptionException;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
@@ -65,6 +68,41 @@ public class KilkariSubscriptionService {
         subscriptionPublisher.createSubscription(subscriptionWebRequest);
     }
 
+	public void subscriptionAsyncForReferredBy(ReferredByFlwMsisdnRequest referredByFlwMsisdnRequest) {
+		subscriptionPublisher.processReferredByFLWRequest(referredByFlwMsisdnRequest);
+	}
+
+	
+	public void subscriptionForReferredByFLWRequest(ReferredByFlwMsisdnRequest referredByFlwMsisdnRequest) {
+		validateSetReferredByFlwMsisdnRequest(referredByFlwMsisdnRequest);
+		SubscriptionStatus status = SubscriptionStatus.ACTIVE;
+		SubscriptionStatus status1 = SubscriptionStatus.ACTIVATION_FAILED;
+		String msisdn = referredByFlwMsisdnRequest.getMsisdn();
+		SubscriptionPack pack = referredByFlwMsisdnRequest.getPack();
+		Channel channel = Channel.valueOf(referredByFlwMsisdnRequest.getChannel().toUpperCase());
+		String referredBy = referredByFlwMsisdnRequest.getReferredBy();
+		List<Subscription> subcriptionList = findByMsisdnPackAndStatus(msisdn, pack, status);
+		List<Subscription> subcriptionList1 = findByMsisdnPackAndStatus(msisdn, pack, status1);
+		if(!subcriptionList.isEmpty() || !subcriptionList1.isEmpty()){//updateSubscription
+			Subscription subscription=null;
+			if(!subcriptionList.isEmpty())
+				subscription = subcriptionList.get(0);
+			else
+				subscription = subcriptionList1.get(0);
+			if(subscription == null){
+				logger.error("Something went wrong. Could not initialise subscription from activate or deactivate");
+			}
+			ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_REFERRED_BY, msisdn, subscription.getSubscriptionId(), pack, channel, referredByFlwMsisdnRequest.getCreatedAt(), null, null, null, referredBy);
+			subscriptionService.updateReferredByMsisdn(subscription, changeSubscriptionRequest);
+		}else{//createNewSubscription 
+			Subscription subscription = new Subscription(msisdn, referredByFlwMsisdnRequest.getPack(),
+					referredByFlwMsisdnRequest.getCreatedAt(), DateTime.now(), null, referredBy);	
+			subscription.setStatus(SubscriptionStatus.REFERRED_MSISDN_RECEIVED);
+			subscriptionService.createEntryInCouchForReferredBy(subscription);
+		}
+
+	}
+
     public void createSubscription(SubscriptionWebRequest subscriptionWebRequest) {
         validateSubscriptionRequest(subscriptionWebRequest);
         SubscriptionRequest subscriptionRequest = SubscriptionRequestMapper.mapToSubscriptionRequest(subscriptionWebRequest);
@@ -75,6 +113,17 @@ public class KilkariSubscriptionService {
                     subscriptionWebRequest.getMsisdn(), subscriptionWebRequest.getPack()));
         }
     }
+
+	public void updateSubscriptionForFlw(SubscriptionWebRequest subscriptionWebRequest) {
+		validateSubscriptionRequest(subscriptionWebRequest);
+		SubscriptionRequest subscriptionRequest = SubscriptionRequestMapper.mapToSubscriptionRequest(subscriptionWebRequest);
+		try {
+			subscriptionService.updateSubscriptionForFlw(subscriptionRequest, Channel.from(subscriptionWebRequest.getChannel()));
+		} catch (DuplicateSubscriptionException e) {
+			logger.warn(String.format("Subscription for msisdn[%s] and pack[%s] already exists.",
+					subscriptionWebRequest.getMsisdn(), subscriptionWebRequest.getPack()));
+		}
+	}	
 
     public void processCallbackRequest(CallbackRequestWrapper callbackRequestWrapper) {
         subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
@@ -88,6 +137,10 @@ public class KilkariSubscriptionService {
     public List<Subscription> findByMsisdn(String msisdn) {
         return subscriptionService.findByMsisdn(msisdn);
     }
+
+	public List<Subscription> findByMsisdnPackAndStatus(String msisdn, SubscriptionPack pack, SubscriptionStatus status) {
+		return subscriptionService.findByMsisdnPackAndStatus(msisdn, pack, status);
+	}
 
     public Subscription findBySubscriptionId(String subscriptionId) {
         return subscriptionService.findBySubscriptionId(subscriptionId);
@@ -167,4 +220,17 @@ public class KilkariSubscriptionService {
             throw new ValidationException(errors.allMessages());
         }
     }
+
+	private void validateSetReferredByFlwMsisdnRequest(ReferredByFlwMsisdnRequest setReferredByFlwMsisdnRequest) {
+		Errors errors = setReferredByFlwMsisdnRequest.validate();
+		if (errors.hasErrors()) {
+			throw new ValidationException(errors.allMessages());
+		}
+	}
+
+	public void updateReferredByMsisdn(Subscription subscription,
+			ChangeSubscriptionRequest changeSubscriptionRequest) {
+		subscriptionService.updateReferredByMsisdn(subscription, changeSubscriptionRequest);  
+	}
+
 }

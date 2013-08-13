@@ -46,7 +46,7 @@ public class ChangeSubscriptionServiceIT extends SpringIntegrationTest {
     public void shouldChangePackForAnExistingSubscription() {
         Subscription existingSubscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(SubscriptionPack.BARI_KILKARI).build();
         allSubscriptions.add(existingSubscription);
-        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, msisdn, existingSubscription.getSubscriptionId(), SubscriptionPack.NAVJAAT_KILKARI, Channel.CONTACT_CENTER, DateTime.now(), DateTime.now().plusMonths(1), null, "reason");
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, msisdn, existingSubscription.getSubscriptionId(), SubscriptionPack.NAVJAAT_KILKARI, Channel.CONTACT_CENTER, DateTime.now(), DateTime.now().plusMonths(1), null, "reason", null);
 
         changeSubscriptionService.process(changeSubscriptionRequest);
 

@@ -56,7 +56,7 @@ public class ChangeSubscriptionServiceTest {
 
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(existingSubscription);
 //        when(subscriptionService.findByMsisdnAndPack(msisdn, newPack)).thenReturn(new ArrayList<Subscription>());
-        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, null, subscriptionId, newPack, Channel.CONTACT_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth, reason);
+        ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, null, subscriptionId, newPack, Channel.CONTACT_CENTER, DateTime.now().plusWeeks(20), null, dateOfBirth, reason, null);
 
         Subscription newSubscription = new SubscriptionBuilder().withDefaults().withPack(changeSubscriptionRequest.getPack()).build();
         when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CONTACT_CENTER))).thenReturn(newSubscription);
@@ -83,10 +83,10 @@ public class ChangeSubscriptionServiceTest {
         String subscriptionId = subscription.getSubscriptionId();
         when(subscriptionService.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(subscriptionService.createSubscription(any(SubscriptionRequest.class), eq(Channel.CONTACT_CENTER))).thenReturn(subscription);
-        SubscriberResponse subscriberResponse = new SubscriberResponse(null, null, beneficiaryAge, dateOfBirth, null, null, null, null, null);
+        SubscriberResponse subscriberResponse = new SubscriberResponse(null, null, beneficiaryAge, dateOfBirth, null, null, null, null, null, null);
         when(reportingService.getSubscriber(subscriptionId)).thenReturn(subscriberResponse);
 
-        changeSubscriptionService.process(new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1234567890", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CONTACT_CENTER, null, null, null, "reason"));
+        changeSubscriptionService.process(new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_PACK, "1234567890", subscriptionId, SubscriptionPack.NANHI_KILKARI, Channel.CONTACT_CENTER, null, null, null, "reason", null));
 
         verify(reportingService).getSubscriber(subscriptionId);
         ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);

@@ -12,11 +12,12 @@ public class SubscriptionRequest {
     private String dateOfBirth;
     private Location location;
     private String status;
+    private String referredBy;
 
     public SubscriptionRequest() {
     }
 
-    public SubscriptionRequest(String msisdn, String pack, DateTime createdAt, String beneficiaryName, String beneficiaryAge, String expectedDateOfDelivery, String dateOfBirth, Location location) {
+    public SubscriptionRequest(String msisdn, String pack, DateTime createdAt, String beneficiaryName, String beneficiaryAge, String expectedDateOfDelivery, String dateOfBirth, Location location, String referredBy) {
         this.msisdn = msisdn;
         this.pack = pack;
         this.createdAt = createdAt;
@@ -25,6 +26,7 @@ public class SubscriptionRequest {
         this.expectedDateOfDelivery = expectedDateOfDelivery;
         this.dateOfBirth = dateOfBirth;
         this.location = location;
+        this.setReferredBy(referredBy);
     }
 
     public String getMsisdn() {
@@ -107,4 +109,12 @@ public class SubscriptionRequest {
     public void setStatus(String status) {
         this.status = status;
     }
+
+	public String getReferredBy() {
+		return referredBy;
+	}
+
+	public void setReferredBy(String referredBy) {
+		this.referredBy = referredBy;
+	}
 }

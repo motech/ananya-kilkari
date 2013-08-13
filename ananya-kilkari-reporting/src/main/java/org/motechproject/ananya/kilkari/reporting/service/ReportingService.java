@@ -22,6 +22,8 @@ public interface ReportingService {
 
     void reportChangeMsisdnForEarlySubscription(SubscriberChangeMsisdnReportRequest reportRequest);
 
+    void reportChangeReferredByFlwMsisdn(SubscriptionChangeReferredFLWMsisdnReportRequest reportRequest);
+
     void reportCampaignScheduleAlertReceived(CampaignScheduleAlertRequest campaignScheduleAlertRequest);
 
     List<SubscriberResponse> getSubscribersByMsisdn(String msisdn);

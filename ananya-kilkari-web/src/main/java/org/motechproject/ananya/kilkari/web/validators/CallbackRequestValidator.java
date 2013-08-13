@@ -1,5 +1,7 @@
 package org.motechproject.ananya.kilkari.web.validators;
 
+
+import org.apache.commons.lang.StringUtils;
 import org.motechproject.ananya.kilkari.domain.CallbackAction;
 import org.motechproject.ananya.kilkari.domain.CallbackStatus;
 import org.motechproject.ananya.kilkari.factory.SubscriptionStateHandlerFactory;
@@ -8,10 +10,12 @@ import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 
 @Component
 public class CallbackRequestValidator {
@@ -25,19 +29,102 @@ public class CallbackRequestValidator {
         this.subscriptionService = subscriptionService;
     }
 
-    public Errors validate(CallbackRequestWrapper callbackRequestWrapper) {
-        Errors errors = new Errors();
-        final boolean isValidCallbackAction = validateCallbackAction(callbackRequestWrapper, errors);
-        final boolean isValidCallbackStatus = validateCallbackStatus(callbackRequestWrapper, errors);
-        if (isValidCallbackAction && isValidCallbackStatus) {
-            errors.addAll(validateSubscriptionRequest(callbackRequestWrapper));
-        }
-
+	public Errors validate(CallbackRequestWrapper callbackRequestWrapper, boolean isReqFromSM) {
+		Errors errors = new Errors();
+		final boolean isValidCallbackAction = validateCallbackAction(callbackRequestWrapper, errors);
+		final boolean isValidCallbackStatus = validateCallbackStatus(callbackRequestWrapper, errors);
+		if(isReqFromSM){
+			final boolean isPackValid = validatePack(callbackRequestWrapper, errors);
+			if (isValidCallbackAction && isValidCallbackStatus && isPackValid) {
+				errors.addAll(validateSubscriptionRequestForSM(callbackRequestWrapper));
+			}
+		}else{
+			if (isValidCallbackAction && isValidCallbackStatus) {
+				errors.addAll(validateSubscriptionRequest(callbackRequestWrapper));
+			}
+		}
         validateMsisdn(callbackRequestWrapper, errors);
         validateOperator(callbackRequestWrapper, errors);
 
         return errors;
     }
+
+	private boolean validatePack(CallbackRequestWrapper callbackRequestWrapper,
+			Errors errors) {
+		if(StringUtils.isEmpty(callbackRequestWrapper.getPack().toString())){
+			errors.add(String.format("subscription pack cannot be empty or null"));
+			return false;
+		}
+		String pack = callbackRequestWrapper.getPack().toString();
+		if (!SubscriptionPack.isValid(pack)) {
+			errors.add(String.format("Invalid subscription pack %s", pack));
+			return false;
+		}
+		return true;
+	}
+
+	private Errors validateSubscriptionRequestForSM(CallbackRequestWrapper callbackRequestWrapper) {
+		Errors errors = new Errors();
+		final String requestStatus = callbackRequestWrapper.getStatus();
+		final String requestAction = callbackRequestWrapper.getAction();
+
+		if (subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper) == null) {
+			errors.add(String.format("Invalid status %s for action %s for subscription %s", requestStatus, requestAction, callbackRequestWrapper.getSubscriptionId()));
+		}
+
+		if (CallbackAction.ACT.name().equals(requestAction) && (CallbackStatus.SUCCESS.getStatus().equals(requestStatus) || CallbackStatus.BAL_LOW.getStatus().equals(requestStatus))) {
+			boolean canNotBeActivated = false;
+			java.util.List<Subscription> subscriptions = subscriptionService.findByMsisdnAndPack(callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack());
+			if(subscriptions == null || subscriptions.isEmpty())	//checking if subscription is new or not
+				return errors;
+			else{
+				for (Subscription subscription : subscriptions) {
+					if(subscription.getStatus().canNotActivateForSM())
+						canNotBeActivated = true;	
+				}
+				if(canNotBeActivated)
+					errors.add(String.format("Cannot activate. The subscription state cannot be transitioned to ACTIVE state"));
+			}
+
+		}
+
+		if (CallbackAction.DCT.name().equals(requestAction) && CallbackStatus.BAL_LOW.getStatus().equals(requestStatus)) {
+			boolean canBeDeactivated = false;
+			java.util.List<Subscription> subscriptionsByPack = subscriptionService.findByMsisdnAndPack(callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack());
+			if(subscriptionsByPack == null || subscriptionsByPack.isEmpty()){
+				errors.add(String.format("No subscription for msisdn: %s and pack: %s", callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack()));
+				return errors;
+			}else{
+				for (Subscription subscription : subscriptionsByPack) {
+					if(subscription.getStatus().canDeactivateOnRenewal())
+						canBeDeactivated = true;	
+				}
+				if(!canBeDeactivated)
+					errors.add(String.format("Cannot deactivate on renewal. Subscription not in status: %s", SubscriptionStatus.SUSPENDED));
+			}
+			return errors;		
+		}
+
+		if (CallbackAction.REN.name().equals(requestAction)) {
+			boolean canBeRenewed = false;
+			java.util.List<Subscription> subscriptionsByPack = subscriptionService.findByMsisdnAndPack(callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack());
+			if(subscriptionsByPack == null || subscriptionsByPack.isEmpty()){
+				errors.add(String.format("No subscription for msisdn: %s and pack: %s", callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack()));
+				return errors;
+			}
+			else{
+				for (Subscription subscription : subscriptionsByPack) {
+					if(subscription.getStatus().canRenew())
+						canBeRenewed = true;	
+				}
+				if(!canBeRenewed)
+					errors.add(String.format("Cannot renew. Subscription status is not ACTIVE or SUSPENDED"));
+			}
+		}
+
+		return errors;
+	}
+
 
     private Errors validateSubscriptionRequest(CallbackRequestWrapper callbackRequestWrapper) {
         Errors errors = new Errors();

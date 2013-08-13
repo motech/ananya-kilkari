@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 import java.util.Date;
@@ -87,14 +88,14 @@ public class SubscriptionService {
         subscriptionValidator.validate(subscriptionRequest);
 
         Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
-                subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate(), subscriptionRequest.getSubscriber().getWeek());
+				subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate(), subscriptionRequest.getSubscriber().getWeek(), subscriptionRequest.getReferredBy());
         allSubscriptions.add(subscription);
 
         Location location = subscriptionRequest.getLocation();
         LocationResponse existingLocation = getExistingLocation(location);
 
         SubscriptionReportRequest reportRequest = SubscriptionMapper.createSubscriptionCreationReportRequest(
-                subscription, channel, subscriptionRequest);
+				subscription, channel, subscriptionRequest, null, null, false);
         reportingService.reportSubscriptionCreation(reportRequest);
 
         OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, channel);
@@ -159,6 +160,56 @@ public class SubscriptionService {
         activateSchedule(subscription);
     }
 
+	public void activateForReqFromSM(String msisdn, SubscriptionPack pack, SubscriptionStatus status, final DateTime activatedOn, final String operator) {
+		List<Subscription> subscriptions = allSubscriptions.findByMsisdnPackAndStatus(msisdn, pack, status);
+		logger.info("got request for msisdn:"+msisdn+" pack:"+pack+" and status:"+status+" . Activated on:"+activatedOn.toString()+" operator="+operator);
+		if(!subscriptions.isEmpty()){
+			//an entry already exists with msisdn pack and status
+			Subscription subscription = subscriptions.get(0);
+			logger.info("an entry already exists with msisdn pack and status. Subscription="+subscription.toString());
+			if (!subscription.canActivate()) {
+	            logger.warn("Cannot ACTIVATE from state : " + subscription.getStatus());
+	            return;
+	        }
+			final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(activatedOn);
+			logger.info("scheduleStartDateTime="+scheduleStartDateTime.toString());
+			updateStatusAndReportForSM(subscription, activatedOn, null, operator, null, new Action<Subscription>() {
+				@Override
+				public void perform(Subscription subscription) {
+					subscription.activate(operator, getBufferedDateTime(scheduleStartDateTime), activatedOn);
+				}
+			});
+			logger.info("going to schedule campaign");
+			scheduleCampaign(subscription, scheduleStartDateTime);
+			logger.info("activateSchedule");
+			activateSchedule(subscription);
+		}else{
+			//create new subscription
+			logger.info("create new subscription");
+			Subscription subscription = new Subscription(msisdn, pack, activatedOn , DateTime.now() , null, null);
+			logger.info("Created Subscription="+subscription.toString());
+			final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(activatedOn);
+			logger.info("scheduleStartDateTime="+scheduleStartDateTime.toString());
+			createSubscriptionAndReport(subscription, activatedOn, null, operator, null, new Action<Subscription>() {
+				@Override
+				public void perform(Subscription subscription) {
+					subscription.activate(operator, getBufferedDateTime(scheduleStartDateTime), activatedOn);
+				}
+			});
+			List<Subscription> newSubscription = allSubscriptions.findByMsisdnPackAndStatus(msisdn, pack, SubscriptionStatus.ACTIVE);
+			if(newSubscription.isEmpty()){
+				logger.warn("Cannot schedule campaign as entry is missing in couchDB");
+				return;
+			}
+			subscription = newSubscription.get(0);
+			logger.info(" Subscription="+subscription.toString());
+			logger.info("going to schedule campaign");
+			scheduleCampaign(subscription, scheduleStartDateTime);
+			logger.info("activateSchedule");
+			activateSchedule(subscription);
+		}
+	}
+
     public void activationFailed(String subscriptionId, DateTime updatedOn, String reason, final String operator) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         if (!subscription.canFailActivation()) {
@@ -172,6 +223,36 @@ public class SubscriptionService {
             }
         });
     }
+
+	public void activationFailedForSM(String msisdn, SubscriptionPack pack,
+			SubscriptionStatus status, DateTime updatedOn, String reason,
+			final String operator) {
+		List<Subscription> subscriptions = allSubscriptions.findByMsisdnPackAndStatus(msisdn, pack, status);
+		if(!subscriptions.isEmpty()){
+			Subscription subscription = subscriptions.get(0);
+			logger.info(" subscription"+subscription.toString());
+			if (!subscription.canFailActivation()) {
+				logger.warn("Cannot move to ACTIVATION_FAILED state from state : " + subscription.getStatus());
+				return;
+			}
+			updateStatusAndReportForSM(subscription, updatedOn, reason, operator, null, new Action<Subscription>() {
+				@Override
+				public void perform(Subscription subscription) {
+					subscription.activationFailed(operator);
+				}
+			});
+		}else{
+			Subscription subscription = new Subscription(msisdn, pack, updatedOn , DateTime.now(), null, null);
+			logger.info("created subscription"+subscription.toString());
+			createSubscriptionAndReport(subscription, updatedOn, null, operator, null, new Action<Subscription>() {
+				@Override
+				public void perform(Subscription subscription) {
+					subscription.activationFailed(operator);
+				}
+			});
+		}
+		
+	}
 
     public void activationRequested(OMSubscriptionRequest omSubscriptionRequest) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
@@ -235,7 +316,20 @@ public class SubscriptionService {
             logger.warn("Cannot renew from state : " + subscription.getStatus());
             return;
         }
+		updateStatusAndReport(subscription, renewedDate, null, null, graceCount, new Action<Subscription>() {
+			@Override
+			public void perform(Subscription subscription) {
+				subscription.activateOnRenewal();
+			}
+		});
+		renewSchedule(subscription);
+	}
 
+	public void renewSubscriptionForSM(String msisdn, SubscriptionPack pack,
+			final DateTime renewedDate, Integer graceCount) {
+		List<Subscription> subscriptions = findByMsisdnAndPack(msisdn, pack);
+		for(Subscription subscription: subscriptions){
+			if(subscription.canActivate()){
         updateStatusAndReport(subscription, renewedDate, null, null, graceCount, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
@@ -243,22 +337,43 @@ public class SubscriptionService {
             }
         });
         renewSchedule(subscription);
-    }
+			}else{
+				logger.warn("Cannot renew from state : " + subscription.getStatus());
+			}
+		}
+	}
 
+	
     public void suspendSubscription(String subscriptionId, final DateTime renewalDate, String reason, Integer graceCount) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
         if (!subscription.canSuspend()) {
             logger.warn("Cannot suspend from state : " + subscription.getStatus());
             return;
         }
-
+		updateStatusAndReport(subscription, renewalDate, reason, null, graceCount, new Action<Subscription>() {
+			@Override
+			public void perform(Subscription subscription) {
+				subscription.suspendOnRenewal();
+			}
+		});
+	}
+	
+	public void suspendSubscriptionForSM(String msisdn, SubscriptionPack pack, final DateTime renewalDate, String reason, Integer graceCount) {
+		List<Subscription> subscriptions = findByMsisdnAndPack(msisdn, pack);
+		for(Subscription subscription: subscriptions){
+			if (subscription.canSuspend()) {
         updateStatusAndReport(subscription, renewalDate, reason, null, graceCount, new Action<Subscription>() {
             @Override
             public void perform(Subscription subscription) {
                 subscription.suspendOnRenewal();
             }
         });
-    }
+			}else
+				logger.warn("Cannot suspend from state : " + subscription.getStatus());
+			
+		}
+	}
+
 
     public void processDeactivation(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
         Subscription subscription = findBySubscriptionId(subscriptionId);
@@ -267,12 +382,34 @@ public class SubscriptionService {
         else {
             SubscriptionStatus status = subscription.getStatus();
             if (status.isSuspended()) {
-                reason = reason.isEmpty() ? "Deactivation due to renewal max" : reason;
+				reason = (StringUtils.isEmpty(reason)) ? "Deactivation due to renewal max" : reason;
                 logger.info(String.format("Subscription %s is being deactivated due to low balance. Current status: %s", subscriptionId, status.getDisplayString()));
             }
             scheduleDeactivation(subscriptionId, deactivationDate, reason, graceCount);
         }
     }
+
+	public void processDeactivationForReqSM(String msisdn,
+			SubscriptionPack pack, final DateTime deactivationDate , String reason,
+			Integer graceCount) {
+		List<Subscription> subscriptions = findByMsisdnAndPack(msisdn, pack);
+		logger.info("total no. of subscriptions for msisdn and pack="+subscriptions.size());
+		for(Subscription subscription: subscriptions){
+			if(subscription.canDeactivate()){
+				if (subscription.isSubscriptionCompletionRequestSent())
+					deactivateSubscription(subscription.getSubscriptionId(), deactivationDate, reason, graceCount);
+				else {
+					SubscriptionStatus status = subscription.getStatus();
+					if (status.isSuspended()) {
+						reason = (StringUtils.isEmpty(reason)) ? "Deactivation due to renewal max" : reason;
+						logger.info(String.format("Subscription %s is being deactivated due to low balance. Current status: %s", subscription.getSubscriptionId(), status.getDisplayString()));
+					}
+					scheduleDeactivation(subscription.getSubscriptionId(), deactivationDate, reason, graceCount);
+				}
+			}
+		}
+		
+	}
 
     public void deactivateSubscription(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount) {
         Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
@@ -376,7 +513,6 @@ public class SubscriptionService {
         if (Channel.IVR.equals(channel)) {
             return subscriptionDetailsResponseMapper.map(subscriptionList, Collections.EMPTY_LIST);
         }
-
         List<SubscriberResponse> subscriberDetailsFromReports = reportingService.getSubscribersByMsisdn(msisdn);
         return subscriptionDetailsResponseMapper.map(subscriptionList, subscriberDetailsFromReports);
     }
@@ -478,11 +614,35 @@ public class SubscriptionService {
     private void updateStatusAndReport(Subscription subscription, DateTime updatedOn, String reason, String operator,
                                        Integer graceCount, Action<Subscription> action) {
         action.perform(subscription);
-        logger.info("Updating Subscription and reporting change " + subscription);
+		    logger.info("Updating Subscription and reporting change " + subscription.toString());
         allSubscriptions.update(subscription);
         reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(),
                 subscription.getStatus().name(), reason, updatedOn, operator, graceCount, getSubscriptionWeekNumber(subscription, updatedOn)));
     }
+
+	private void createSubscriptionAndReport(Subscription subscription, DateTime updatedOn, String reason, String operator,
+			Integer graceCount, Action<Subscription> action) {
+		action.perform(subscription);
+		logger.info("adding Subscription and reporting it " + subscription.toString());
+		allSubscriptions.add(subscription);
+		SubscriptionRequest subscriptionRequest = new SubscriptionRequest(subscription.getMsisdn(), subscription.getCreationDate(), subscription.getPack(), null, null, reason, subscription.getReferredBy());
+		SubscriptionReportRequest reportRequest = SubscriptionMapper.createSubscriptionCreationReportRequest(
+				subscription, Channel.IVR, subscriptionRequest, getSubscriptionWeekNumber(subscription, updatedOn), operator, true);
+		reportingService.reportSubscriptionCreation(reportRequest);
+		logger.info("done");
+	}
+	
+	private void updateStatusAndReportForSM(Subscription subscription, DateTime updatedOn, String reason, String operator,
+			Integer graceCount, Action<Subscription> action) {
+		action.perform(subscription);
+		logger.info("Updating Subscription and reporting change " + subscription.toString());
+		allSubscriptions.update(subscription);
+		SubscriptionRequest subscriptionRequest = new SubscriptionRequest(subscription.getMsisdn(), subscription.getCreationDate(), subscription.getPack(), null, null, reason, subscription.getReferredBy());
+		SubscriptionReportRequest reportRequest = SubscriptionMapper.createSubscriptionCreationReportRequest(
+				subscription, Channel.IVR, subscriptionRequest, getSubscriptionWeekNumber(subscription, updatedOn), operator, true);
+		reportingService.reportSubscriptionCreation(reportRequest);
+		logger.info("done.");
+	}
 
     private Integer getSubscriptionWeekNumber(Subscription subscription, DateTime endDate) {
         if (subscription.getScheduleStartDate() == null)
@@ -519,7 +679,7 @@ public class SubscriptionService {
                 subscriberResponse.getDateOfBirth(), subscriberResponse.getExpectedDateOfDelivery(), subscription.getNextWeekNumber());
 
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeMsisdnRequest.getNewMsisdn(),
-                changeMsisdnRequest.getCreatedAt(), subscription.getPack(), location, subscriber, changeMsisdnRequest.getReason());
+				changeMsisdnRequest.getCreatedAt(), subscription.getPack(), location, subscriber, changeMsisdnRequest.getReason(), null);
         subscriptionRequest.setOldSubscriptionId(subscription.getSubscriptionId());
 
         createSubscription(subscriptionRequest, changeMsisdnRequest.getChannel());
@@ -531,6 +691,12 @@ public class SubscriptionService {
         reportingService.reportChangeMsisdnForEarlySubscription(new SubscriberChangeMsisdnReportRequest(subscription.getSubscriptionId(), Long.valueOf(changeMsisdnRequest.getNewMsisdn()), changeMsisdnRequest.getReason(), changeMsisdnRequest.getCreatedAt()));
     }
 
+	public void updateReferredByMsisdn(Subscription subscription, ChangeSubscriptionRequest changeSubscriptionRequest) {  	
+		subscription.setReferredBy(changeSubscriptionRequest.getReferredBy());
+		allSubscriptions.update(subscription);
+		reportingService.reportChangeReferredByFlwMsisdn(new SubscriptionChangeReferredFLWMsisdnReportRequest(subscription.getSubscriptionId(), changeSubscriptionRequest.getReferredBy(), changeSubscriptionRequest.getReason(), changeSubscriptionRequest.getCreatedAt()));		
+	}
+
     public void updateSubscription(Subscription subscription) {
         try {
             allSubscriptions.update(subscription);
@@ -538,4 +704,22 @@ public class SubscriptionService {
             throw new IllegalArgumentException(String.format("Subscription %s does not exist in db", subscription.getSubscriptionId()));
         }
     }
+
+	public List<Subscription>findByMsisdnPackAndStatus(String msisdn, SubscriptionPack pack, SubscriptionStatus status){
+		return allSubscriptions.findByMsisdnPackAndStatus(msisdn, pack, status);
+	}
+
+	public Subscription updateSubscriptionForFlw(SubscriptionRequest subscriptionRequest, Channel channel) {
+		subscriptionValidator.validate(subscriptionRequest);
+
+		Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
+				subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate(), subscriptionRequest.getSubscriber().getWeek(), subscriptionRequest.getReferredBy());
+		allSubscriptions.update(subscription);
+		return subscription;
+	}
+
+	public void createEntryInCouchForReferredBy(Subscription subscription) {
+		allSubscriptions.add(subscription);
+	}
+
 }

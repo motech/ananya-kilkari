@@ -39,7 +39,7 @@ public class SubscriptionStateHandlerFactoryTest {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("ACT");
         callbackRequest.setStatus("SUCCESS");
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now(), true);
 
         SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
 
@@ -51,7 +51,7 @@ public class SubscriptionStateHandlerFactoryTest {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("ACT");
         callbackRequest.setStatus("BAL-LOW");
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now(), true);
 
         SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
 
@@ -63,7 +63,7 @@ public class SubscriptionStateHandlerFactoryTest {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("REN");
         callbackRequest.setStatus("SUCCESS");
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now(), true);
 
         SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
 
@@ -75,7 +75,7 @@ public class SubscriptionStateHandlerFactoryTest {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("REN");
         callbackRequest.setStatus("BAL-LOW");
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now(), true);
 
         SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
 
@@ -87,7 +87,7 @@ public class SubscriptionStateHandlerFactoryTest {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("DCT");
         callbackRequest.setStatus("BAL-LOW");
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now(), true);
 
         SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
 
@@ -99,7 +99,7 @@ public class SubscriptionStateHandlerFactoryTest {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("DCT");
         callbackRequest.setStatus("SUCCESS");
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "abcd1234", DateTime.now(), true);
 
         SubscriptionStateHandler subscriptionStateHandler = subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper);
 

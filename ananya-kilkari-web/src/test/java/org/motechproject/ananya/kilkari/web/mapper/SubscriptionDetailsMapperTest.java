@@ -19,7 +19,7 @@ public class SubscriptionDetailsMapperTest {
 
     @Test
     public void shouldMapToIVRWebResponse() {
-        SubscriptionDetailsResponse detailsResponse = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13");
+        SubscriptionDetailsResponse detailsResponse = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13", null);
         ArrayList<SubscriptionDetailsResponse> responseList = new ArrayList<>();
         responseList.add(detailsResponse);
 
@@ -69,7 +69,7 @@ public class SubscriptionDetailsMapperTest {
 
     private SubscriptionDetailsResponse setupData(Location actualLocation) {
         return new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK33",
-                "name", 10, DateTime.now(), DateTime.now(), 4, actualLocation, DateTime.now(), DateTime.now(), DateTime.now().minusDays(8));
+                "name", 10, DateTime.now(), DateTime.now(), 4, actualLocation, DateTime.now(), DateTime.now(), DateTime.now().minusDays(8), null);
     }
 
     private void assertDetails(SubscriptionDetailsResponse detailsResponse, AllSubscriptionDetails subscriptionDetails) {

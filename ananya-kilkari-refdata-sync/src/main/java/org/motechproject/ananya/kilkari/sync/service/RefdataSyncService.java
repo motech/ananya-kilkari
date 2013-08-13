@@ -47,6 +47,7 @@ public class RefdataSyncService {
     private Map<String, String> constructHeaders() {
         Map<String, String> headers = new HashMap<>();
         if(!StringUtils.isBlank(apiKeyName)) {
+
             headers.put(apiKeyName, apiKeyValue);
         }
         return headers;

@@ -33,7 +33,7 @@ public class DeactivateHandlerTest {
         callbackRequest.setGraceCount(graceCount);
         callbackRequest.setReason(reason);
 
-        deactivateHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, deactivationDate));
+        deactivateHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, deactivationDate, true));
 
         verify(subscriptionService).processDeactivation(subscriptionId, deactivationDate, reason, Integer.valueOf(graceCount));
     }

@@ -22,18 +22,20 @@ public class SubscriptionDetailsResponse {
     private Location location;
     private String lastUpdatedTimeForSubscription;
     private String lastUpdatedTimeForBeneficiary;
+    private String referredBy;
 
-    public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId) {
+    public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId, String referredBy) {
         this.subscriptionId = subscriptionId;
         this.pack = pack;
         this.status = status;
         this.campaignId = campaignId;
+        this.referredBy = referredBy;
     }
 
     public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId,
                                        String beneficiaryName, Integer beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer startWeekNumber,
-                                       Location location, DateTime lastWeeklyMessageScheduledDate, DateTime lastUpdatedTimeForSubscription, DateTime lastUpdatedTimeForBeneficiary) {
-        this(subscriptionId, pack, status, campaignId);
+                                       Location location, DateTime lastWeeklyMessageScheduledDate, DateTime lastUpdatedTimeForSubscription, DateTime lastUpdatedTimeForBeneficiary, String referredBy) {
+        this(subscriptionId, pack, status, campaignId, referredBy);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
         this.dateOfBirth = DateUtils.formatDate(dateOfBirth, DateUtils.ISTTimeZone);
@@ -44,6 +46,14 @@ public class SubscriptionDetailsResponse {
         this.lastUpdatedTimeForSubscription = DateUtils.formatDateTimeForCC(lastUpdatedTimeForSubscription, DateUtils.ISTTimeZone);
         this.lastUpdatedTimeForBeneficiary = DateUtils.formatDateTimeForCC(lastUpdatedTimeForBeneficiary, DateUtils.ISTTimeZone);
     }
+
+    public String getReferredBy() {
+		return referredBy;
+	}
+
+	public void setReferredBy(String referredBy) {
+		this.referredBy = referredBy;
+	}
 
     public String getSubscriptionId() {
         return subscriptionId;

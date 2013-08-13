@@ -47,7 +47,7 @@ public class KilkariPurgeServiceTest {
     public void setUp(){
         couchdbPurgeService = new KilkariPurgeService(allCampaignMessageAlerts, allSubscriptions, allInboxMessages, allCampaignMessages, allSubscriberCareDocs, allInvalidCallRecords, allKilkariCampaignEnrollments);
         msisdn = "234566";
-        subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now(), null);
+        subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now(), null, null);
 
     }
 

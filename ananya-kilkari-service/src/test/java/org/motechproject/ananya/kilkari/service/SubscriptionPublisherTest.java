@@ -41,7 +41,16 @@ public class SubscriptionPublisherTest {
 
     @Test
     public void shouldPublishCallbackRequestIntoQueue() {
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(new CallbackRequest(), "abcd1234", DateTime.now());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(new CallbackRequest(), "abcd1234", DateTime.now(),true);
+
+        subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
+
+        verify(eventContext).send(SubscriptionEventKeys.PROCESS_CALLBACK_REQUEST, callbackRequestWrapper);
+    }
+
+    @Test
+    public void shouldPublishCallbackRequestIntoQueueForMotech() {
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(new CallbackRequest(), null, DateTime.now(),false);
 
         subscriptionPublisher.processCallbackRequest(callbackRequestWrapper);
 

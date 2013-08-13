@@ -35,7 +35,7 @@ public class CallbackRequestHandlerTest {
         callbackRequest.setMsisdn(msisdn);
         callbackRequest.setAction("ACT");
         callbackRequest.setStatus("SUCCESS");
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now(),true);
         parameters.put("0", callbackRequestWrapper);
 
         SubscriptionStateHandler subscriptionStateHandler = mock(SubscriptionStateHandler.class);
@@ -45,5 +45,25 @@ public class CallbackRequestHandlerTest {
 
         verify(subscriptionStateHandlerFactory).getHandler(callbackRequestWrapper);
         verify(subscriptionStateHandler).perform(callbackRequestWrapper);
+    }
+
+    @Test
+    public void shouldHandleProcessCallbackRequestEventFromMotech() {
+        HashMap<String, Object> parameters = new HashMap<>();
+        String msisdn = "1234567890";
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setMsisdn(msisdn);
+        callbackRequest.setAction("ACT");
+        callbackRequest.setStatus("SUCCESS");
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, null, DateTime.now(),false);
+        parameters.put("0", callbackRequestWrapper);
+
+        SubscriptionStateHandler subscriptionStateHandler = mock(SubscriptionStateHandler.class);
+        when(subscriptionStateHandlerFactory.getHandler(any(CallbackRequestWrapper.class))).thenReturn(subscriptionStateHandler);
+
+        new CallbackRequestHandler(subscriptionStateHandlerFactory).handleCallbackRequest(new MotechEvent(SubscriptionEventKeys.PROCESS_CALLBACK_REQUEST, parameters));
+
+        verify(subscriptionStateHandlerFactory).getHandler(callbackRequestWrapper);
+        verify(subscriptionStateHandler).performForSMReq(callbackRequestWrapper);
     }
 }

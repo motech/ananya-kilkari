@@ -47,7 +47,9 @@ public class SubscriptionWebRequest implements Serializable {
     @JsonProperty
     @XmlElement
     private LocationRequest location;
-
+    @JsonProperty
+    @XmlElement
+    private String referredBy;
     @JsonIgnore
     @XmlTransient
     private String channel;
@@ -119,6 +121,16 @@ public class SubscriptionWebRequest implements Serializable {
         return week;
     }
 
+    @JsonIgnore
+    @XmlTransient
+    public String getReferredBy() {
+		return referredBy;
+	}
+
+	public void setReferredBy(String referredBy) {
+		this.referredBy = referredBy;
+	}
+
     public void setBeneficiaryName(String beneficiaryName) {
         this.beneficiaryName = beneficiaryName;
     }
@@ -164,6 +176,7 @@ public class SubscriptionWebRequest implements Serializable {
         webRequestValidator.validateMsisdn(msisdn);
         webRequestValidator.validatePack(pack);
         webRequestValidator.validateChannel(channel);
+        webRequestValidator.validateReferredByMsisdn(referredBy);
         if (!Channel.isIVR(channel)) {
             webRequestValidator.validateLocation(location);
             webRequestValidator.validateName(beneficiaryName);

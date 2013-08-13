@@ -17,13 +17,15 @@ public class SubscriptionRequestMapper {
         Subscriber subscriber = new Subscriber(subscriptionWebRequest.getBeneficiaryName(), subscriptionWebRequest.getBeneficiaryAge(),
                 subscriptionWebRequest.getDateOfBirth(), subscriptionWebRequest.getExpectedDateOfDelivery(), week);
 
+
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest(
                 subscriptionWebRequest.getMsisdn(),
                 subscriptionWebRequest.getCreatedAt(),
                 SubscriptionPack.from(subscriptionWebRequest.getPack()),
                 location,
                 subscriber,
-                null);
+                null,
+                subscriptionWebRequest.getReferredBy());
         return subscriptionRequest;
     }
 
@@ -35,7 +37,7 @@ public class SubscriptionRequestMapper {
 
     public static ChangeSubscriptionRequest mapToChangeSubscriptionRequest(ChangeSubscriptionWebRequest webRequest, String subscriptionId) {
         return new ChangeSubscriptionRequest(ChangeSubscriptionType.from(webRequest.getChangeType()), null, subscriptionId, SubscriptionPack.from(webRequest.getPack()), Channel.from(webRequest.getChannel()),
-                webRequest.getCreatedAt(), DateUtils.parseDate(webRequest.getExpectedDateOfDelivery()), DateUtils.parseDate(webRequest.getDateOfBirth()), webRequest.getReason());
+                webRequest.getCreatedAt(), DateUtils.parseDate(webRequest.getExpectedDateOfDelivery()), DateUtils.parseDate(webRequest.getDateOfBirth()), webRequest.getReason(), webRequest.getReferredBy());
     }
 
     private static Integer convertToInteger(String age) {

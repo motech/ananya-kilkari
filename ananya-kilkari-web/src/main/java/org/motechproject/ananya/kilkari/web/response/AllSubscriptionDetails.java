@@ -23,6 +23,10 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
 
     @JsonProperty
     @XmlElement
+    private String referredBy;
+
+    @JsonProperty
+    @XmlElement
     private String expectedDateOfDelivery;
 
     @JsonProperty
@@ -49,11 +53,12 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
     }
 
     public AllSubscriptionDetails(String subscriptionId, String pack, String status, String lastCampaignId,
-                                  String beneficiaryName, Integer beneficiaryAge, Integer weekNumber, String expectedDateOfDelivery, String dateOfBirth, LocationResponse location, String lastWeeklyMessageScheduledDate, String lastUpdatedTimeForSubscription, String lastUpdatedTimeForBeneficiary) {
+                                  String beneficiaryName, Integer beneficiaryAge, Integer weekNumber, String referredBy, String expectedDateOfDelivery, String dateOfBirth, LocationResponse location, String lastWeeklyMessageScheduledDate, String lastUpdatedTimeForSubscription, String lastUpdatedTimeForBeneficiary) {
         super(subscriptionId, pack, status, lastCampaignId);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
         this.weekNumber = weekNumber;
+        this.referredBy = referredBy;
         this.expectedDateOfDelivery = expectedDateOfDelivery;
         this.dateOfBirth = dateOfBirth;
         this.location = location;
@@ -107,4 +112,9 @@ public class AllSubscriptionDetails extends SubscriptionDetails {
     public String getLastWeeklyMessageScheduledDate() {
         return lastWeeklyMessageScheduledDate;
     }
+
+	public String getReferredBy() {
+		return referredBy;
+	}
+
 }

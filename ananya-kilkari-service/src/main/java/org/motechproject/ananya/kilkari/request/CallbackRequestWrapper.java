@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.request;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 import java.io.Serializable;
 
@@ -11,16 +12,29 @@ public class CallbackRequestWrapper implements Serializable {
     private CallbackRequest callbackRequest;
     private String subscriptionId;
     private DateTime createdAt;
+    private boolean isRequestedByMotech;
 
-    public CallbackRequestWrapper(CallbackRequest callbackRequest, String subscriptionId, DateTime createdAt) {
-        this.callbackRequest = callbackRequest;
-        this.subscriptionId = subscriptionId;
-        this.createdAt = createdAt;
+    public CallbackRequestWrapper(CallbackRequest callbackRequest,
+			String subscriptionId, DateTime createdAt,
+			boolean isRequestedByMotech) {
+		super();
+		this.callbackRequest = callbackRequest;
+		this.subscriptionId = subscriptionId;
+		this.createdAt = createdAt;
+		this.isRequestedByMotech = isRequestedByMotech;
     }
 
     public String getMsisdn() {
         return callbackRequest.getMsisdn();
     }
+
+    public boolean isRequestedByMotech() {
+		return isRequestedByMotech;
+	}
+
+	public void setRequestedByMotech(boolean isRequestedByMotech) {
+		this.isRequestedByMotech = isRequestedByMotech;
+	}
 
     public String getAction() {
         return callbackRequest.getAction();
@@ -28,6 +42,10 @@ public class CallbackRequestWrapper implements Serializable {
 
     public String getStatus() {
         return callbackRequest.getStatus();
+    }
+
+    public SubscriptionPack getPack() {
+        return callbackRequest.getPack();
     }
 
     public String getReason() {

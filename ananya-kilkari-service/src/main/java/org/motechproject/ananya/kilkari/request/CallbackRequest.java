@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.request;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 import java.io.Serializable;
 
@@ -17,6 +18,8 @@ public class CallbackRequest implements Serializable {
     private String reason;
     @JsonProperty
     private String operator;
+    @JsonProperty
+    private SubscriptionPack pack;
     @JsonProperty
     private String graceCount;
 
@@ -49,6 +52,15 @@ public class CallbackRequest implements Serializable {
     public String getGraceCount() {
         return graceCount;
     }
+
+    @JsonIgnore
+    public SubscriptionPack getPack() {
+		return pack;
+	}
+
+	public void setPack(SubscriptionPack pack) {
+		this.pack = pack;
+	}
 
     public void setMsisdn(String msisdn) {
         this.msisdn = msisdn;

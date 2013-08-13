@@ -52,11 +52,14 @@ public class Subscription extends MotechBaseDataObject {
     @JsonProperty
     private MessageCampaignPack messageCampaignPack;
 
+	@JsonProperty
+    private String referredBy;
+
     Subscription() {
         //for serialization do not make it public
     }
 
-    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, DateTime startDate, Integer startWeekNumber) {
+    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, DateTime startDate, Integer startWeekNumber, String referredBy) {
         this.pack = pack;
         this.msisdn = msisdn;
         this.startWeekNumber = startWeekNumber;
@@ -65,6 +68,7 @@ public class Subscription extends MotechBaseDataObject {
         this.subscriptionId = UUID.randomUUID().toString();
         this.status = isEarlySubscription() ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW;
         this.messageCampaignPack = MessageCampaignPack.from(pack.name());
+        this.referredBy = referredBy;
     }
 
     public String getMsisdn() {
@@ -123,6 +127,13 @@ public class Subscription extends MotechBaseDataObject {
     public void setMessageCampaignPack(MessageCampaignPack messageCampaignPack) {
         this.messageCampaignPack = messageCampaignPack;
     }
+    public String getReferredBy() {
+		return referredBy;
+	}
+
+	public void setReferredBy(String referredBy) {
+		this.referredBy = referredBy;
+	}
 
     @Override
     public boolean equals(Object o) {
@@ -281,7 +292,6 @@ public class Subscription extends MotechBaseDataObject {
     @JsonIgnore
     public DateTime getStartDateForSubscription(DateTime activatedOn) {
         activatedOn = floorToExactMinutes(activatedOn);
-
         if (isLateSubscription())
             return startDate.plus(activatedOn.getMillis() - creationDate.getMillis());
 

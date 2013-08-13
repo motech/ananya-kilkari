@@ -291,7 +291,7 @@ public class ReportingGatewayImplTest {
         final String msisdn = "1234567890";
         String expectedUrl = "url/subscriber?msisdn=" + msisdn;
         ArrayList<SubscriberResponse> expectedResponse = new ArrayList<SubscriberResponse>() {{
-            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), DateTime.now(), new LocationResponse("s","d", "b", "p"), DateTime.now(), DateTime.now()));
+            add(new SubscriberResponse("subscriptionId", "bName", 25, DateTime.now(), DateTime.now(), DateTime.now(), new LocationResponse("s","d", "b", "p"), DateTime.now(), DateTime.now(), null));
         }};
         ResponseEntity<SubscriberResponse[]> responseEntity = new ResponseEntity(expectedResponse.toArray(), HttpStatus.OK);
 

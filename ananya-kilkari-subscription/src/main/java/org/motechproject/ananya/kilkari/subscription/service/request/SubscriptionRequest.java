@@ -11,15 +11,18 @@ public class SubscriptionRequest {
     private Subscriber subscriber;
     private String oldSubscriptionId;
     private String reason;
+    private String referredBy;
 
     public SubscriptionRequest(String msisdn, DateTime creationDate,
-                               SubscriptionPack pack, Location location, Subscriber subscriber, String reason) {
+			SubscriptionPack pack, Location location, Subscriber subscriber,
+		     String reason, String referredBy) {
         this.msisdn = msisdn;
         this.creationDate = creationDate;
         this.pack = pack;
         this.location = location == null ? Location.NULL : location;
         this.subscriber = subscriber;
         this.reason = reason;
+		    this.referredBy = referredBy;
     }
 
     public String getMsisdn() {
@@ -57,6 +60,14 @@ public class SubscriptionRequest {
     public void setOldSubscriptionId(String oldSubscriptionId) {
         this.oldSubscriptionId = oldSubscriptionId;
     }
+
+    public String getReferredBy() {
+		return referredBy;
+	}
+
+	public void setReferredByFlwMsisdn(String referredByFlwMsisdn) {
+		this.referredBy = referredByFlwMsisdn;
+	}
 
     public DateTime getSubscriptionStartDate() {
         Integer weekNumber = subscriber.getWeek();

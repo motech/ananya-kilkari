@@ -16,7 +16,7 @@ public class CallbackRequestWrapperTest {
         String graceCountString = "3";
         CallbackRequest callbackRequest = mock(CallbackRequest.class);
         when(callbackRequest.getGraceCount()).thenReturn(graceCountString);
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now(), true);
 
         Integer graceCount = callbackRequestWrapper.getGraceCount();
         assertEquals(Integer.valueOf(graceCountString), graceCount);
@@ -27,7 +27,7 @@ public class CallbackRequestWrapperTest {
         String graceCountString = "a";
         CallbackRequest callbackRequest = mock(CallbackRequest.class);
         when(callbackRequest.getGraceCount()).thenReturn(graceCountString);
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now(), true);
 
         Integer graceCount = callbackRequestWrapper.getGraceCount();
         assertNull(graceCount);
@@ -38,7 +38,7 @@ public class CallbackRequestWrapperTest {
         String graceCountString = "";
         CallbackRequest callbackRequest = mock(CallbackRequest.class);
         when(callbackRequest.getGraceCount()).thenReturn(graceCountString);
-        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now());
+        CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, "subId", DateTime.now(), true);
 
         Integer graceCount = callbackRequestWrapper.getGraceCount();
         assertNull(graceCount);

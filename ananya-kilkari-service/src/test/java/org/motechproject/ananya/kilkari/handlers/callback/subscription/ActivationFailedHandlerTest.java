@@ -31,7 +31,7 @@ public class ActivationFailedHandlerTest {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setReason("my own reason");
         callbackRequest.setOperator(operator);
-        activationFailedHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now));
+        activationFailedHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now, true));
 
         verify(subscriptionService).activationFailed(subscriptionId, now, "my own reason", operator);
     }

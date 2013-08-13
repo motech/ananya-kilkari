@@ -213,4 +213,23 @@ public class WebRequestValidatorTest {
 
         assertFalse(webRequestValidator.getErrors().hasErrors());
     }
+
+    @Test
+    public void shouldReturnErrorForInvalidReferredByMsisdn() {
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateReferredByMsisdn("8878564");
+
+        assertEquals(1, webRequestValidator.getErrors().getCount());
+        assertTrue(webRequestValidator.getErrors().hasMessage("Invalid msisdn for flw 8878564"));
+    }
+
+    @Test
+    public void shouldValidateForEmptyReferredByMsisdn() {
+        WebRequestValidator webRequestValidator = new WebRequestValidator();
+        webRequestValidator.validateReferredByMsisdn(null);
+
+        assertFalse(webRequestValidator.getErrors().hasErrors());
+    }
+
+
 }

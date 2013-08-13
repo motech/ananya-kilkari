@@ -1,5 +1,5 @@
 package org.motechproject.ananya.kilkari.subscription.service;
-
+import org.motechproject.ananya.kilkari.obd.domain.PhoneNumber;
 import org.motechproject.ananya.kilkari.subscription.domain.ChangeSubscriptionType;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
@@ -7,6 +7,8 @@ import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationExcept
 import org.motechproject.ananya.kilkari.subscription.service.request.ChangeSubscriptionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
 
 import java.util.List;
 
@@ -23,7 +25,6 @@ public class ChangeSubscriptionValidator {
     public void validate(ChangeSubscriptionRequest changeSubscriptionRequest) {
         Subscription subscription = validateAndReturnIfSubscriptionExists(changeSubscriptionRequest.getSubscriptionId());
         validateSubscriptionStatus(subscription);
-
         if (ChangeSubscriptionType.isChangePack(changeSubscriptionRequest.getChangeType()))
             validateIfSubscriptionAlreadyExistsFor(subscription.getMsisdn(), changeSubscriptionRequest.getPack());
         else

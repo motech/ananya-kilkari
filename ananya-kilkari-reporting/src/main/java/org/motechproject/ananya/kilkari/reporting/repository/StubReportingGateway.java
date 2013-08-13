@@ -94,4 +94,10 @@ public class StubReportingGateway implements ReportingGateway {
         }
         return true;
     }
+
+	@Override
+	public void reportChangeReferredByFlwMsisdnForSubscriber(SubscriptionChangeReferredFLWMsisdnReportRequest reportRequest) {
+		// TODO Auto-generated method stub
+		
+	}
 }

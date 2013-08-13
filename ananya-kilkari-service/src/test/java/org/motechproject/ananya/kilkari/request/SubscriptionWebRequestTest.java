@@ -73,7 +73,7 @@ public class SubscriptionWebRequestTest {
         validateErrors(0, subscriptionWebRequest.validate());
 
         subscriptionWebRequest = createSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI.name(), Channel.IVR.name(), "", "Name", "", "", "state", "mydistrict", "myblock", "mypanchayat", DateTime.now());
-         
+
         validateErrors(0, subscriptionWebRequest.validate());
     }
 

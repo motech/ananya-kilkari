@@ -16,9 +16,11 @@ public class ChangeSubscriptionRequest {
     private DateTime expectedDateOfDelivery;
     private DateTime dateOfBirth;
     private String reason;
+    private String referredBy;
+
 
     public ChangeSubscriptionRequest(ChangeSubscriptionType changeType, String msisdn, String subscriptionId, SubscriptionPack pack, Channel channel, DateTime createdAt,
-                                     DateTime expectedDateOfDelivery, DateTime dateOfBirth, String reason) {
+                                     DateTime expectedDateOfDelivery, DateTime dateOfBirth, String reason, String referredBy) {
         this.changeType = changeType;
         this.msisdn = msisdn;
         this.subscriptionId = subscriptionId;
@@ -28,6 +30,15 @@ public class ChangeSubscriptionRequest {
         this.expectedDateOfDelivery = expectedDateOfDelivery;
         this.dateOfBirth = dateOfBirth;
         this.reason = reason;
+        this.referredBy=referredBy;
+    }
+
+    public String getReferredBy() {
+		return referredBy;
+	}
+
+	public void setReferredBy(String referredBy) {
+		this.referredBy = referredBy;
     }
 
     public ChangeSubscriptionType getChangeType() {

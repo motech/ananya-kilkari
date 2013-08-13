@@ -74,8 +74,8 @@ public class SubscriptionDetailsResponseMapperTest {
             add(subscription1);
             add(subscription2);
         }};
-        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, now, now.minusYears(1), now, location, now, now.minusDays(3));
-        final SubscriberResponse subscriberResponse2 = new SubscriberResponse(subscription2.getSubscriptionId(), "name1", 24, now, now.minusYears(1), now, location, now, now.minusDays(3));
+        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, now, now.minusYears(1), now, location, now, now.minusDays(3), null);
+        final SubscriberResponse subscriberResponse2 = new SubscriberResponse(subscription2.getSubscriptionId(), "name1", 24, now, now.minusYears(1), now, location, now, now.minusDays(3), null);
         List<SubscriberResponse> subscriberDetailsList = new ArrayList<SubscriberResponse>() {{
             add(subscriberResponse2);
             add(subscriberResponse1);
@@ -98,7 +98,7 @@ public class SubscriptionDetailsResponseMapperTest {
         List<Subscription> subscriptionList = new ArrayList<Subscription>() {{
             add(subscription1);
         }};
-        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, DateTime.now(), DateTime.now(), DateTime.now(), null, DateTime.now(), DateTime.now());
+        final SubscriberResponse subscriberResponse1 = new SubscriberResponse(subscription1.getSubscriptionId(), "name", 23, DateTime.now(), DateTime.now(), DateTime.now(), null, DateTime.now(), DateTime.now(), null);
         List<SubscriberResponse> subscriberDetailsList = new ArrayList<SubscriberResponse>() {{
             add(subscriberResponse1);
         }};

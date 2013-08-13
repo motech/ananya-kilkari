@@ -32,8 +32,7 @@ public class RenewalSuccessHandlerTest {
         String graceCount = "0";
         final CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setGraceCount(graceCount);
-        
-        renewalSuccessHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now));
+        renewalSuccessHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now, true));
 
         verify(subscriptionService).renewSubscription(subscriptionId, now, Integer.valueOf(graceCount));
     }

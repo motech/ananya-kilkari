@@ -16,7 +16,6 @@ public class LocationRequest implements Serializable {
     @JsonProperty
     @XmlElement(required = false)
     private String state;
-
     @JsonProperty
     @XmlElement
     private String district;

@@ -10,6 +10,8 @@ import org.motechproject.ananya.reports.kilkari.contract.response.SubscriberResp
 import org.motechproject.http.client.domain.Method;
 import org.motechproject.http.client.service.HttpClientService;
 import org.motechproject.web.context.HttpThreadContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,7 @@ public class ReportingGatewayImpl implements ReportingGateway {
     private HttpClientService httpClientService;
     private Properties kilkariProperties;
 
+    private final Logger logger = LoggerFactory.getLogger(ReportingGatewayImpl.class);
     @Autowired
     public ReportingGatewayImpl(RestTemplate kilkariRestTemplate, HttpClientService httpClientService, @Qualifier("kilkariProperties") Properties kilkariProperties) {
         this.restTemplate = kilkariRestTemplate;
@@ -120,9 +123,16 @@ public class ReportingGatewayImpl implements ReportingGateway {
         return "CONTACT_CENTER".equalsIgnoreCase(channel);
     }
 
+    private boolean isSMCall(){
+    	String notInitiatedByMotech = HttpThreadContext.get();
+    	logger.debug("The httpReq is "+notInitiatedByMotech+". Retuening "+"NOT_INITIATED_BY_MOTECH".equalsIgnoreCase(notInitiatedByMotech));
+    	return "NOT_INITIATED_BY_MOTECH".equalsIgnoreCase(notInitiatedByMotech);
+    }
+
     private <T> void performHttpRequestBasedOnChannel(String url, T postObject, Method method) {
-        if (isCallCenterCall()) {
+        if (isCallCenterCall() || isSMCall()) {
             try {
+            	logger.debug("executeSync");
                 httpClientService.executeSync(url, postObject, method);
             } catch (Exception e) {
                 httpClientService.execute(url, postObject, method);
@@ -159,4 +169,10 @@ public class ReportingGatewayImpl implements ReportingGateway {
         String baseUrl = kilkariProperties.getProperty("reporting.service.base.url");
         return baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
     }
+
+	@Override
+	public void reportChangeReferredByFlwMsisdnForSubscriber(SubscriptionChangeReferredFLWMsisdnReportRequest reportRequest) {
+		 String url = String.format("%s%s", getBaseUrl(), CHANGE_REFERRED_BY_PATH);
+	     performHttpRequestBasedOnChannel(url, reportRequest, Method.POST);
+	}
 }

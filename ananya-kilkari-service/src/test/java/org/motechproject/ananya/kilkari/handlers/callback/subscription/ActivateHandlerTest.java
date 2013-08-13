@@ -33,7 +33,7 @@ public class ActivateHandlerTest {
 
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setOperator(operator);
-        activateHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now));
+        activateHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now, true));
 
         verify(subscriptionService).activate(subscriptionId, now, operator);
     }

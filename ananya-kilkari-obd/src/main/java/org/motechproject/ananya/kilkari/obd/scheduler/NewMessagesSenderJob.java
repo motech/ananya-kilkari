@@ -49,7 +49,7 @@ public class NewMessagesSenderJob extends MessagesSenderJob {
         RetryRequest retryRequest = new RetryRequest(NewMessagesSenderJob.RETRY_NAME, UUID.randomUUID().toString(), DateTime.now());
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put(SUB_SLOT_KEY, motechEvent.getParameters().get(SUB_SLOT_KEY));
-        retryService.schedule(retryRequest, parameters);
+        retryService.schedule(retryRequest);
     }
 
     @MotechListener(subjects = {NewMessagesSenderJob.RETRY_EVENT_SUBJECT})

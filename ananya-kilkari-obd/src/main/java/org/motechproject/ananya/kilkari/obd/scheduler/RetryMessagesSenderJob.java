@@ -51,7 +51,7 @@ public class RetryMessagesSenderJob extends MessagesSenderJob {
         RetryRequest retryRequest = new RetryRequest(RetryMessagesSenderJob.RETRY_NAME, UUID.randomUUID().toString(), DateTime.now());
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put(SUB_SLOT_KEY, motechEvent.getParameters().get(SUB_SLOT_KEY));
-        retryService.schedule(retryRequest, parameters);
+        retryService.schedule(retryRequest);
     }
 
     @MotechListener(subjects = {RetryMessagesSenderJob.RETRY_EVENT_SUBJECT})

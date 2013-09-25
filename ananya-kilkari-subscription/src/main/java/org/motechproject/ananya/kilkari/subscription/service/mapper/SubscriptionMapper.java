@@ -9,6 +9,7 @@ import org.motechproject.ananya.kilkari.subscription.service.request.Subscriber;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriptionRequest;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriberLocation;
 import org.motechproject.ananya.reports.kilkari.contract.request.SubscriptionReportRequest;
+import org.springframework.util.StringUtils;
 
 public class SubscriptionMapper {
 
@@ -23,7 +24,7 @@ public class SubscriptionMapper {
         Subscriber subscriber = subscriptionRequest.getSubscriber();
         Integer startWeekNumber = requestedFromSM?weekNumber:subscriber.getWeek();
         Long msisdn = NumberUtils.createLong(subscription.getMsisdn());
-        Long referredBy = NumberUtils.createLong(subscription.getReferredBy());
+        Long referredBy = StringUtils.hasText(subscription.getReferredBy())?NumberUtils.createLong(subscription.getReferredBy()) : null;
 
         return new SubscriptionReportRequest(subscription.getSubscriptionId(), channel.name(), msisdn, subscription.getPack().name(),
                 subscriber.getBeneficiaryName(), subscriber.getBeneficiaryAge(), subscriptionRequest.getCreationDate(), subscription.getStatus().name(), subscriber.getExpectedDateOfDelivery(),

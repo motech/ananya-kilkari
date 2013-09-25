@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.service;
 
 import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 import org.motechproject.ananya.kilkari.mapper.ChangeMsisdnRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
 import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
@@ -83,7 +84,7 @@ public class KilkariSubscriptionService {
 		String referredBy = referredByFlwMsisdnRequest.getReferredBy();
 		List<Subscription> subcriptionList = findByMsisdnPackAndStatus(msisdn, pack, status);
 		List<Subscription> subcriptionList1 = findByMsisdnPackAndStatus(msisdn, pack, status1);
-		if(!subcriptionList.isEmpty() || !subcriptionList1.isEmpty()){//updateSubscription
+		if(!subcriptionList.isEmpty() || hasCallbackComeForActivationFailed(subcriptionList1)){//updateSubscription
 			Subscription subscription=null;
 			if(!subcriptionList.isEmpty())
 				subscription = subcriptionList.get(0);
@@ -102,8 +103,16 @@ public class KilkariSubscriptionService {
 		}
 
 	}
+	
 
-    public void createSubscription(SubscriptionWebRequest subscriptionWebRequest) {
+    private boolean hasCallbackComeForActivationFailed(List<Subscription> subcriptionList) {
+		if(subcriptionList.isEmpty())
+			return false;
+		Subscription subscription = subcriptionList.get(0);
+		return !subscription.getActivationDate().isBefore(DateTime.now().minusMinutes(10));
+	}
+
+	public void createSubscription(SubscriptionWebRequest subscriptionWebRequest) {
         validateSubscriptionRequest(subscriptionWebRequest);
         SubscriptionRequest subscriptionRequest = SubscriptionRequestMapper.mapToSubscriptionRequest(subscriptionWebRequest);
         try {

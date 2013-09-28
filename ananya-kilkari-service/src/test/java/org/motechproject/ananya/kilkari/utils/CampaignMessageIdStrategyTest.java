@@ -10,7 +10,7 @@ public class CampaignMessageIdStrategyTest {
 
     @Test
     public void shouldCreateMessageIdIfPackWasSubscribed2DaysBack() {
-        String campaignName = "kilkari-mother-child-campaign-fifteen-months";
+        String campaignName = "kilkari-mother-child-campaign-sixteen-months";
 
         String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now().minusDays(2), SubscriptionPack.BARI_KILKARI);
 
@@ -23,7 +23,7 @@ public class CampaignMessageIdStrategyTest {
 
         String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, DateTime.now(), SubscriptionPack.CHOTI_KILKARI);
 
-        assertEquals("WEEK13", messageId);
+        assertEquals("WEEK17", messageId);
     }
 
     @Test

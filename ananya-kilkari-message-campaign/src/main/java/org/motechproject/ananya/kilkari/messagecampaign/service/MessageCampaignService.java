@@ -26,7 +26,7 @@ import static ch.lambdaj.Lambda.on;
 @Service("kilkariMessageCampaignService")
 public class MessageCampaignService {
 
-    public static final String FIFTEEN_MONTHS_CAMPAIGN_KEY = "kilkari-mother-child-campaign-fifteen-months";
+    public static final String SIXTEEN_MONTHS_CAMPAIGN_KEY = "kilkari-mother-child-campaign-sixteen-months";
     public static final String TWELVE_MONTHS_CAMPAIGN_KEY = "kilkari-mother-child-campaign-twelve-months";
     public static final String SEVEN_MONTHS_CAMPAIGN_KEY = "kilkari-mother-child-campaign-seven-months";
     public static final String INFANT_DEATH_CAMPAIGN_KEY = "kilkari-mother-child-campaign-infant-death";

@@ -137,7 +137,7 @@ public class KilkariCampaignServiceTest {
         DateTime activationDate = creationDate.plusDays(1);
         DateTime scheduleStartDate = creationDate.plusDays(2);
         String messageId = "WEEK1";
-        String campaignName = MessageCampaignService.FIFTEEN_MONTHS_CAMPAIGN_KEY;
+        String campaignName = MessageCampaignService.SIXTEEN_MONTHS_CAMPAIGN_KEY;
         Operator operator = Operator.AIRTEL;
         String msisdn = "9988776655";
         Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, creationDate, DateTime.now());

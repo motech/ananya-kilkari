@@ -1,6 +1,6 @@
 package org.motechproject.ananya.kilkari.handlers;
 
-import org.motechproject.ananya.kilkari.request.ReferredByFlwMsisdnRequest;
+import org.motechproject.ananya.kilkari.request.ReferredByFlwRequest;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.event.MotechEvent;
@@ -26,9 +26,9 @@ public class SubscriptionForFlwHandler {
 
     @MotechListener(subjects = {SubscriptionEventKeys.PROCESS_REFFERED_BY_SUBSCRIPTION})
     public void handleSubscriptionForFLW(MotechEvent event) {
-        ReferredByFlwMsisdnRequest referredByFlwMsisdnRequest = (ReferredByFlwMsisdnRequest) event.getParameters().get("0");
-        logger.info(String.format("Create subscription event for msisdn: %s, pack: %s, channel: %s, referredBy: %s",
-                referredByFlwMsisdnRequest.getMsisdn(), referredByFlwMsisdnRequest.getPack(), referredByFlwMsisdnRequest.getChannel(), referredByFlwMsisdnRequest.getReferredBy()));
+        ReferredByFlwRequest referredByFlwMsisdnRequest = (ReferredByFlwRequest) event.getParameters().get("0");
+        logger.info(String.format("Create subscription event for msisdn: %s, pack: %s, channel: %s, isreferredByFLW: %s",
+                referredByFlwMsisdnRequest.getMsisdn(), referredByFlwMsisdnRequest.getPack(), referredByFlwMsisdnRequest.getChannel(), referredByFlwMsisdnRequest.isReferredBy()));
 
         kilkariSubscriptionService.subscriptionForReferredByFLWRequest(referredByFlwMsisdnRequest);
     }

@@ -54,12 +54,15 @@ public class Subscription extends MotechBaseDataObject {
 
 	@JsonProperty
     private String referredBy;
+	
+	@JsonProperty
+    private boolean referredByFLW;
 
     Subscription() {
         //for serialization do not make it public
     }
 
-    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, DateTime startDate, Integer startWeekNumber, String referredBy) {
+    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, DateTime startDate, Integer startWeekNumber, String referredBy, boolean referredByFLW) {
         this.pack = pack;
         this.msisdn = msisdn;
         this.startWeekNumber = startWeekNumber;
@@ -69,9 +72,18 @@ public class Subscription extends MotechBaseDataObject {
         this.status = isEarlySubscription() ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW;
         this.messageCampaignPack = MessageCampaignPack.from(pack.name());
         this.referredBy = referredBy;
+        this.referredByFLW = referredByFLW;
     }
 
-    public String getMsisdn() {
+    public boolean isReferredByFLW() {
+		return referredByFLW;
+	}
+
+	public void setReferredByFLW(boolean referredByFLW) {
+		this.referredByFLW = referredByFLW;
+	}
+
+	public String getMsisdn() {
         return msisdn;
     }
 
@@ -358,4 +370,14 @@ public class Subscription extends MotechBaseDataObject {
     public void campaignCompleted() {
         campaignCompleted = true;
     }
+
+	public void setCreationDate(DateTime creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public void setStartDate(DateTime startDate) {
+		this.startDate = startDate;
+	}
+    
+    
 }

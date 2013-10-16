@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.service;
 
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberCareRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
-import org.motechproject.ananya.kilkari.request.ReferredByFlwMsisdnRequest;
+import org.motechproject.ananya.kilkari.request.ReferredByFlwRequest;
 import org.motechproject.ananya.kilkari.request.SubscriptionWebRequest;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionEventKeys;
 import org.motechproject.scheduler.context.EventContext;
@@ -23,7 +23,7 @@ public class SubscriptionPublisher {
         eventContext.send(SubscriptionEventKeys.CREATE_SUBSCRIPTION, subscriptionWebRequest);
     }
 
-    public void processReferredByFLWRequest(ReferredByFlwMsisdnRequest referredByFlwMsisdnRequest) {
+    public void processReferredByFLWRequest(ReferredByFlwRequest referredByFlwMsisdnRequest) {
         eventContext.send(SubscriptionEventKeys.PROCESS_REFFERED_BY_SUBSCRIPTION, referredByFlwMsisdnRequest);
     }
     public void processReferredByRequest(SubscriptionWebRequest subscriptionWebRequest) {

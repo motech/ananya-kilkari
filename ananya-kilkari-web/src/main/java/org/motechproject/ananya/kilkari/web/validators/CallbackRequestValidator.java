@@ -51,7 +51,7 @@ public class CallbackRequestValidator {
 
 	private boolean validatePack(CallbackRequestWrapper callbackRequestWrapper,
 			Errors errors) {
-		if(StringUtils.isEmpty(callbackRequestWrapper.getPack().toString())){
+		if(callbackRequestWrapper.getPack()==null || StringUtils.isEmpty(callbackRequestWrapper.getPack().toString())){
 			errors.add(String.format("subscription pack cannot be empty or null"));
 			return false;
 		}

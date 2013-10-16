@@ -50,7 +50,11 @@ public class SubscriptionWebRequest implements Serializable {
     @JsonProperty
     @XmlElement
     private String referredBy;
-    @JsonIgnore
+    @JsonProperty
+    @XmlElement
+    private boolean referredByFLW;
+
+	@JsonIgnore
     @XmlTransient
     private String channel;
     @JsonIgnore
@@ -90,6 +94,16 @@ public class SubscriptionWebRequest implements Serializable {
     public String getBeneficiaryName() {
         return beneficiaryName;
     }
+    
+    @JsonIgnore
+    @XmlTransient
+    public boolean isReferredByFLW() {
+		return referredByFLW;
+	}
+
+	public void setReferredByFLW(boolean referredByFLW) {
+		this.referredByFLW = referredByFLW;
+	}
 
     @JsonIgnore
     @XmlTransient

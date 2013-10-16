@@ -36,8 +36,13 @@ public class ChangeSubscriptionWebRequest {
     @JsonProperty
     @XmlElement
     private String referredBy;
+    
+    @JsonIgnore
+    @XmlTransient
+    private boolean referredByFLW;
 
-    public ChangeSubscriptionWebRequest() {
+
+	public ChangeSubscriptionWebRequest() {
         this.createdAt = DateTime.now();
     }
 
@@ -79,6 +84,11 @@ public class ChangeSubscriptionWebRequest {
     @XmlTransient
     public String getReferredBy() {
 		return referredBy;
+	}
+    
+    @XmlTransient
+	public boolean isReferredByFLW() {
+		return referredByFLW;
 	}
 
 	public void setReferredBy(String referredBy) {

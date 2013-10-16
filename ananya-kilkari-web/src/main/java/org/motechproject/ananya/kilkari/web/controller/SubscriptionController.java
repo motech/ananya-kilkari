@@ -6,12 +6,14 @@ import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
+import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
 import org.motechproject.ananya.kilkari.web.mapper.SubscriptionDetailsMapper;
 import org.motechproject.ananya.kilkari.web.response.BaseResponse;
 import org.motechproject.ananya.kilkari.web.response.SubscriptionBaseWebResponse;
+import org.motechproject.ananya.kilkari.web.response.SubscriptionResponseList;
 import org.motechproject.ananya.kilkari.web.validators.CallbackRequestValidator;
 import org.motechproject.web.context.HttpThreadContext;
 import org.slf4j.Logger;
@@ -48,13 +50,29 @@ public class SubscriptionController {
         return BaseResponse.success("Subscription request submitted successfully");
     }
 
-    @RequestMapping(value = "/setReferredByFLWMsisdn", method = RequestMethod.GET)
+ 
+    
+    @RequestMapping(value = "/referredByFLW", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResponse setReferredByFLWMsisdnForIVR(ReferredByFlwMsisdnRequest referredByFlwMsisdnRequest) {
-        referredByFlwMsisdnRequest.validateChannel();   
-        kilkariSubscriptionService.subscriptionAsyncForReferredBy(referredByFlwMsisdnRequest);
+    public BaseResponse referredByFLWForIVR(ReferredByFlwRequest referredByFlwRequest) {
+        referredByFlwRequest.validateChannel();   
+        kilkariSubscriptionService.subscriptionAsyncForReferredBy(referredByFlwRequest);
         return BaseResponse.success("Subscription request submitted successfully");
     }
+    
+    @RequestMapping(value = "/subscriptionreferredbyflw", method = RequestMethod.GET)
+    @ResponseBody
+    public SubscriptionResponseList subscriptionReferredByFlw(@RequestParam String channel,@RequestParam String startTime,@RequestParam String endTime){
+    
+           SubscriptionReferredByFlwRequest subscriptionReferredByFlwRequest = new SubscriptionReferredByFlwRequest(startTime, endTime, channel);
+
+           Errors validationErrors = subscriptionReferredByFlwRequest.validate();
+           raiseExceptionIfThereAreErrors(validationErrors);
+
+           List<Subscription> subscriptionList = kilkariSubscriptionService.getSubscriptionsReferredByFlw(subscriptionReferredByFlwRequest);
+           return SubscriptionDetailsMapper.mapToSubscriptionResponseList(subscriptionList);
+    }    
+
 
     @RequestMapping(value = "/subscription", method = RequestMethod.POST)
     @ResponseBody

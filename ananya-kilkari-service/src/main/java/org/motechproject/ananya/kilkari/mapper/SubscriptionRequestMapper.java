@@ -25,7 +25,8 @@ public class SubscriptionRequestMapper {
                 location,
                 subscriber,
                 null,
-                subscriptionWebRequest.getReferredBy());
+                subscriptionWebRequest.getReferredBy(),
+                subscriptionWebRequest.isReferredByFLW());
         return subscriptionRequest;
     }
 
@@ -37,7 +38,7 @@ public class SubscriptionRequestMapper {
 
     public static ChangeSubscriptionRequest mapToChangeSubscriptionRequest(ChangeSubscriptionWebRequest webRequest, String subscriptionId) {
         return new ChangeSubscriptionRequest(ChangeSubscriptionType.from(webRequest.getChangeType()), null, subscriptionId, SubscriptionPack.from(webRequest.getPack()), Channel.from(webRequest.getChannel()),
-                webRequest.getCreatedAt(), DateUtils.parseDate(webRequest.getExpectedDateOfDelivery()), DateUtils.parseDate(webRequest.getDateOfBirth()), webRequest.getReason(), webRequest.getReferredBy());
+                webRequest.getCreatedAt(), DateUtils.parseDate(webRequest.getExpectedDateOfDelivery()), DateUtils.parseDate(webRequest.getDateOfBirth()), webRequest.getReason(), webRequest.getReferredBy(), webRequest.isReferredByFLW());
     }
 
     private static Integer convertToInteger(String age) {

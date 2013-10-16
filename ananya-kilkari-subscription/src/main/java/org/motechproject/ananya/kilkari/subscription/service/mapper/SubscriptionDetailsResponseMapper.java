@@ -43,7 +43,7 @@ public class SubscriptionDetailsResponseMapper {
                 : new SubscriptionDetailsResponse(subscriptionId, subscription.getPack(), subscription.getStatus(), messageId,
                 subscriberDetails.getBeneficiaryName(), subscriberDetails.getBeneficiaryAge(), subscriberDetails.getDateOfBirth(),
                 subscriberDetails.getExpectedDateOfDelivery(), subscription.getStartWeekNumber(), getLocation(subscriberDetails),
-                subscriberDetails.getLastScheduledMessageDate(), subscriberDetails.getLastUpdatedTimeForSubscription(), subscriberDetails.getLastUpdatedTimeForBeneficiary(), subscription.getReferredBy());
+                subscriberDetails.getLastScheduledMessageDate(), subscriberDetails.getLastUpdatedTimeForSubscription(), subscriberDetails.getLastUpdatedTimeForBeneficiary(), subscription.getReferredBy(), subscription.getCreationDate());
     }
 
     private Location getLocation(SubscriberResponse subscriberDetails) {

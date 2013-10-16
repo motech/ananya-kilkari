@@ -77,7 +77,7 @@ public class SubscriptionBuilder {
     }
 
     public Subscription build() {
-        Subscription subscription = new Subscription(msisdn, pack, creationDate, startDate, startWeekNumber, null);
+        Subscription subscription = new Subscription(msisdn, pack, creationDate, startDate, startWeekNumber, null, false);
         subscription.activate(operator.name(), scheduleStartDate, activationDate);
         subscription.setStatus(status);
         subscription.setOperator(operator);

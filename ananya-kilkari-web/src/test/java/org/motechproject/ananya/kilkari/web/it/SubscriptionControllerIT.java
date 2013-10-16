@@ -91,8 +91,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         Channel channel = Channel.IVR;
         final Integer startWeekNumber = 4;
         String channelString = channel.toString();
-        final Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null, null);
-        final Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null, null);
+        final Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, DateTime.now(), DateTime.now(), null, null, false);
+        final Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null, null, false);
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
         final InboxMessage inboxMessage1 = new InboxMessage(subscription1.getSubscriptionId(), "WEEK23");
@@ -132,8 +132,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         Channel channel = Channel.CONTACT_CENTER;
         String channelString = channel.toString();
         final DateTime now = DateTime.now();
-        final Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, now, now, startWeekNumber, null);
-        final Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, now, now, startWeekNumber, null);
+        final Subscription subscription1 = new Subscription(msisdn, SubscriptionPack.NAVJAAT_KILKARI, now, now, startWeekNumber, null, false);
+        final Subscription subscription2 = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, now, now, startWeekNumber, null, false);
         allSubscriptions.add(subscription1);
         allSubscriptions.add(subscription2);
         final InboxMessage inboxMessage1 = new InboxMessage(subscription1.getSubscriptionId(), "WEEK23");
@@ -160,11 +160,11 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
             SubscriptionDetailsResponse detailsResponse1 = new SubscriptionDetailsResponse(subscription1.getSubscriptionId(), subscription1.getPack(),
                     subscription1.getStatus(), inboxMessage1.getMessageId(), reportResponse1.getBeneficiaryName(), reportResponse1.getBeneficiaryAge(), reportResponse1.getDateOfBirth(),
                     reportResponse1.getExpectedDateOfDelivery(), startWeekNumber, new Location(locationResponse1.getState(),locationResponse1.getDistrict(),
-                    locationResponse1.getBlock(), locationResponse1.getPanchayat()), now, now, now.minusDays(3), null);
+                    locationResponse1.getBlock(), locationResponse1.getPanchayat()), now, now, now.minusDays(3), null, DateTime.now());
             SubscriptionDetailsResponse detailsResponse2 = new SubscriptionDetailsResponse(subscription2.getSubscriptionId(),
                     subscription2.getPack(), subscription2.getStatus(), inboxMessage2.getMessageId(), reportResponse2.getBeneficiaryName(), reportResponse2.getBeneficiaryAge(), reportResponse2.getDateOfBirth(),
                     reportResponse2.getExpectedDateOfDelivery(), startWeekNumber, new Location(locationResponse2.getState(),locationResponse2.getDistrict(),
-                    locationResponse2.getBlock(), locationResponse2.getPanchayat()), now, now, now.minusDays(8), null);
+                    locationResponse2.getBlock(), locationResponse2.getPanchayat()), now, now, now.minusDays(8), null, DateTime.now());
             add(detailsResponse1);
             add(detailsResponse2);
         }};

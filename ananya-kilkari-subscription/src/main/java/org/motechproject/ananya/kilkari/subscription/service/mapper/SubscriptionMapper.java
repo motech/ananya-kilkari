@@ -25,9 +25,9 @@ public class SubscriptionMapper {
         Integer startWeekNumber = requestedFromSM?weekNumber:subscriber.getWeek();
         Long msisdn = NumberUtils.createLong(subscription.getMsisdn());
         Long referredBy = StringUtils.hasText(subscription.getReferredBy())?NumberUtils.createLong(subscription.getReferredBy()) : null;
-
+        boolean referredByFlag = subscription.isReferredByFLW();
         return new SubscriptionReportRequest(subscription.getSubscriptionId(), channel.name(), msisdn, subscription.getPack().name(),
                 subscriber.getBeneficiaryName(), subscriber.getBeneficiaryAge(), subscriptionRequest.getCreationDate(), subscription.getStatus().name(), subscriber.getExpectedDateOfDelivery(),
-                subscriber.getDateOfBirth(), subscriberLocation, operator, subscription.getStartDate(), subscriptionRequest.getOldSubscriptionId(), subscriptionRequest.getReason(), startWeekNumber, referredBy, requestedFromSM);
+                subscriber.getDateOfBirth(), subscriberLocation, operator, subscription.getStartDate(), subscriptionRequest.getOldSubscriptionId(), subscriptionRequest.getReason(), startWeekNumber, referredBy, referredByFlag , requestedFromSM);
     }
 }

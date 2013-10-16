@@ -23,6 +23,7 @@ public class SubscriptionDetailsResponse {
     private String lastUpdatedTimeForSubscription;
     private String lastUpdatedTimeForBeneficiary;
     private String referredBy;
+    private String reqDateForActivation;
 
     public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId, String referredBy) {
         this.subscriptionId = subscriptionId;
@@ -34,7 +35,7 @@ public class SubscriptionDetailsResponse {
 
     public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId,
                                        String beneficiaryName, Integer beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer startWeekNumber,
-                                       Location location, DateTime lastWeeklyMessageScheduledDate, DateTime lastUpdatedTimeForSubscription, DateTime lastUpdatedTimeForBeneficiary, String referredBy) {
+                                       Location location, DateTime lastWeeklyMessageScheduledDate, DateTime lastUpdatedTimeForSubscription, DateTime lastUpdatedTimeForBeneficiary, String referredBy, DateTime reqDateForActivation) {
         this(subscriptionId, pack, status, campaignId, referredBy);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
@@ -45,14 +46,11 @@ public class SubscriptionDetailsResponse {
         this.lastWeeklyMessageScheduledDate = DateUtils.formatDate(lastWeeklyMessageScheduledDate, DateTimeZone.UTC);
         this.lastUpdatedTimeForSubscription = DateUtils.formatDateTimeForCC(lastUpdatedTimeForSubscription, DateUtils.ISTTimeZone);
         this.lastUpdatedTimeForBeneficiary = DateUtils.formatDateTimeForCC(lastUpdatedTimeForBeneficiary, DateUtils.ISTTimeZone);
+        this.reqDateForActivation = DateUtils.formatDate(reqDateForActivation, DateUtils.ISTTimeZone);
     }
 
     public String getReferredBy() {
 		return referredBy;
-	}
-
-	public void setReferredBy(String referredBy) {
-		this.referredBy = referredBy;
 	}
 
     public String getSubscriptionId() {
@@ -106,4 +104,10 @@ public class SubscriptionDetailsResponse {
     public String getLastUpdatedTimeForBeneficiary() {
         return lastUpdatedTimeForBeneficiary;
     }
+
+	public String getReqDateForActivation() {
+		return reqDateForActivation;
+	}
+    
+    
 }

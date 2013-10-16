@@ -48,7 +48,7 @@ public class QuartzSchedulerPurgeServiceTest {
         when(schedulerFactoryBean.getScheduler()).thenReturn(motechScheduler);
         quartzSchedulerPurgeService = new QuartzSchedulerPurgeService(motechSchedulerService, messageCampaignService, allSubscriptions);
         msisdn = "123456";
-        subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now(), null, null);
+        subscription = new Subscription(msisdn, SubscriptionPack.NANHI_KILKARI, DateTime.now(), DateTime.now(), null, null, false);
         when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(new ArrayList<Subscription>() {{
             add(subscription);
         }});

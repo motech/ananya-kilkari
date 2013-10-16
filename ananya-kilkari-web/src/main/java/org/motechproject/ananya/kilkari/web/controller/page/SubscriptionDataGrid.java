@@ -26,6 +26,8 @@ public class SubscriptionDataGrid {
        header.put("startWeekNumber", "Start Week Number");
        header.put("expectedDateOfDelivery", "Expected Date of Delivery");
        header.put("dateOfBirth", "Date of Birth");
+       header.put("dateOfBirth", "Date of Birth");
+       header.put("reqDateForActivation", "Request Date for Activation");
     }
 
     public Map<String, String> getHeader() {

@@ -12,20 +12,30 @@ public class SubscriptionRequest {
     private String oldSubscriptionId;
     private String reason;
     private String referredBy;
+    private boolean referredByFLW;
 
     public SubscriptionRequest(String msisdn, DateTime creationDate,
 			SubscriptionPack pack, Location location, Subscriber subscriber,
-		     String reason, String referredBy) {
+		     String reason, String referredBy, boolean referredByFLW) {
         this.msisdn = msisdn;
         this.creationDate = creationDate;
         this.pack = pack;
         this.location = location == null ? Location.NULL : location;
         this.subscriber = subscriber;
         this.reason = reason;
-		    this.referredBy = referredBy;
+		this.referredBy = referredBy;
+		this.referredByFLW = referredByFLW;
     }
 
-    public String getMsisdn() {
+    public boolean isReferredByFLW() {
+		return referredByFLW;
+	}
+
+	public void setReferredByFLW(boolean referredByFLW) {
+		this.referredByFLW = referredByFLW;
+	}
+
+	public String getMsisdn() {
         return msisdn;
     }
 

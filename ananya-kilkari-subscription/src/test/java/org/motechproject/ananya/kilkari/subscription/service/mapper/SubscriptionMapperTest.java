@@ -46,7 +46,7 @@ public class SubscriptionMapperTest {
         Integer week = 33;
         Subscriber subscriber = new Subscriber("name", null, null, null, week);
         SubscriptionReportRequest request = SubscriptionMapper.createSubscriptionCreationReportRequest(
-                subscription, channel, new SubscriptionRequest("msisdn", null, null, Location.NULL, subscriber, reason, null), null
+                subscription, channel, new SubscriptionRequest("msisdn", null, null, Location.NULL, subscriber, reason, null, false), null
                 , null, false);
 
         assertEquals(subscription.getMsisdn(), request.getMsisdn().toString());
@@ -70,7 +70,7 @@ public class SubscriptionMapperTest {
 
 
         SubscriptionReportRequest request = SubscriptionMapper.createSubscriptionCreationReportRequest(
-                subscription, channel, new SubscriptionRequest("msisdn", null, null, location, Subscriber.NULL, null, null), null, null, false);
+                subscription, channel, new SubscriptionRequest("msisdn", null, null, location, Subscriber.NULL, null, null, false), null, null, false);
 
         SubscriberLocation actualLocation = request.getLocation();
         assertEquals(state, actualLocation.getState());

@@ -81,6 +81,8 @@ public class WebRequestValidator {
             errors.add("Invalid channel %s", channel);
         }
     }
+    
+   
 
     public void validateChannel(String channelFromRequest, Channel channel) {
         if (!(Channel.isValid(channelFromRequest) && channel.name().equals(channelFromRequest))) {

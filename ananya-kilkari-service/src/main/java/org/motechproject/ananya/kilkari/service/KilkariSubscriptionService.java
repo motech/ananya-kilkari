@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -69,47 +70,51 @@ public class KilkariSubscriptionService {
         subscriptionPublisher.createSubscription(subscriptionWebRequest);
     }
 
-	public void subscriptionAsyncForReferredBy(ReferredByFlwMsisdnRequest referredByFlwMsisdnRequest) {
+	public void subscriptionAsyncForReferredBy(ReferredByFlwRequest referredByFlwMsisdnRequest) {
 		subscriptionPublisher.processReferredByFLWRequest(referredByFlwMsisdnRequest);
 	}
 
 	
-	public void subscriptionForReferredByFLWRequest(ReferredByFlwMsisdnRequest referredByFlwMsisdnRequest) {
+	public void subscriptionForReferredByFLWRequest(ReferredByFlwRequest referredByFlwMsisdnRequest) {
 		validateSetReferredByFlwMsisdnRequest(referredByFlwMsisdnRequest);
-		SubscriptionStatus status = SubscriptionStatus.ACTIVE;
-		SubscriptionStatus status1 = SubscriptionStatus.ACTIVATION_FAILED;
 		String msisdn = referredByFlwMsisdnRequest.getMsisdn();
 		SubscriptionPack pack = referredByFlwMsisdnRequest.getPack();
 		Channel channel = Channel.valueOf(referredByFlwMsisdnRequest.getChannel().toUpperCase());
-		String referredBy = referredByFlwMsisdnRequest.getReferredBy();
-		List<Subscription> subcriptionList = findByMsisdnPackAndStatus(msisdn, pack, status);
-		List<Subscription> subcriptionList1 = findByMsisdnPackAndStatus(msisdn, pack, status1);
+		//String referredBy = referredByFlwMsisdnRequest.getReferredBy();
+		boolean referredBy = false;
+		referredBy = referredByFlwMsisdnRequest.isReferredBy();
+		List<Subscription> subcriptionList = findByMsisdnPackAndStatus(msisdn, pack, SubscriptionStatus.ACTIVE);
+		List<Subscription> subcriptionList1 = findByMsisdnPackAndStatus(msisdn, pack, SubscriptionStatus.ACTIVATION_FAILED);
+		List<Subscription> subscriptionListForRefByStatus = findByMsisdnPackAndStatus(msisdn, pack, SubscriptionStatus.REFERRED_MSISDN_RECEIVED);
 		if(!subcriptionList.isEmpty() || hasCallbackComeForActivationFailed(subcriptionList1)){//updateSubscription
 			Subscription subscription=null;
 			if(!subcriptionList.isEmpty())
 				subscription = subcriptionList.get(0);
 			else
 				subscription = subcriptionList1.get(0);
-			if(subscription == null){
-				logger.error("Something went wrong. Could not initialise subscription from activate or deactivate");
-			}
-			ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_REFERRED_BY, msisdn, subscription.getSubscriptionId(), pack, channel, referredByFlwMsisdnRequest.getCreatedAt(), null, null, null, referredBy);
+			if(subscription == null)
+				logger.error("Something went wrong. Could not initialise subscription");
+			ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_REFERRED_BY, msisdn, subscription.getSubscriptionId(), pack, channel, referredByFlwMsisdnRequest.getCreatedAt(), null, null, null,null, referredBy);
 			subscriptionService.updateReferredByMsisdn(subscription, changeSubscriptionRequest);
+		}else if(!subscriptionListForRefByStatus.isEmpty()){//check for already existing entries with status REFERRED_MSISDN_FLAG_RECEIVED
+			Subscription subscription= subscriptionListForRefByStatus.get(0);
+			subscription.setCreationDate(referredByFlwMsisdnRequest.getCreatedAt());
+			subscription.setStartDate(DateTime.now());
+			subscriptionService.updateSubscription(subscription);
 		}else{//createNewSubscription 
 			Subscription subscription = new Subscription(msisdn, referredByFlwMsisdnRequest.getPack(),
-					referredByFlwMsisdnRequest.getCreatedAt(), DateTime.now(), null, referredBy);	
+					referredByFlwMsisdnRequest.getCreatedAt(), DateTime.now(), null, null, referredBy);	
 			subscription.setStatus(SubscriptionStatus.REFERRED_MSISDN_RECEIVED);
 			subscriptionService.createEntryInCouchForReferredBy(subscription);
 		}
 
 	}
-	
 
-    private boolean hasCallbackComeForActivationFailed(List<Subscription> subcriptionList) {
+    private static boolean hasCallbackComeForActivationFailed(List<Subscription> subcriptionList) {
 		if(subcriptionList.isEmpty())
 			return false;
 		Subscription subscription = subcriptionList.get(0);
-		return !subscription.getActivationDate().isBefore(DateTime.now().minusMinutes(10));
+		return !subscription.getCreationDate().isBefore(DateTime.now().minusMinutes(10));
 	}
 
 	public void createSubscription(SubscriptionWebRequest subscriptionWebRequest) {
@@ -230,7 +235,7 @@ public class KilkariSubscriptionService {
         }
     }
 
-	private void validateSetReferredByFlwMsisdnRequest(ReferredByFlwMsisdnRequest setReferredByFlwMsisdnRequest) {
+	private void validateSetReferredByFlwMsisdnRequest(ReferredByFlwRequest setReferredByFlwMsisdnRequest) {
 		Errors errors = setReferredByFlwMsisdnRequest.validate();
 		if (errors.hasErrors()) {
 			throw new ValidationException(errors.allMessages());
@@ -241,5 +246,24 @@ public class KilkariSubscriptionService {
 			ChangeSubscriptionRequest changeSubscriptionRequest) {
 		subscriptionService.updateReferredByMsisdn(subscription, changeSubscriptionRequest);  
 	}
+	
+	public List<Subscription> getSubscriptionsReferredByFlw(SubscriptionReferredByFlwRequest subscriptionReferredByFlwRequest) {
+	       
+        List<Subscription> subscriptionList=fetchSubscribers(subscriptionReferredByFlwRequest);
+        
+        List<Subscription> activeRefbyFlwSubscriptionList=new ArrayList<Subscription>();
+        for (Subscription subscription : subscriptionList) {
+               if(subscription.getStatus().equals(SubscriptionStatus.ACTIVE)&&subscription.isReferredByFLW()){
+                     activeRefbyFlwSubscriptionList.add(subscription);
+               }
+        }             
+        
+        return activeRefbyFlwSubscriptionList;
+ } 
+ 
+ public List<Subscription> fetchSubscribers(SubscriptionReferredByFlwRequest subscriptionReferredByFlwRequest) {
+        return subscriptionService.getAllSortedByDate(subscriptionReferredByFlwRequest.getStartTime(), subscriptionReferredByFlwRequest.getEndTime());
+ }
+
 
 }

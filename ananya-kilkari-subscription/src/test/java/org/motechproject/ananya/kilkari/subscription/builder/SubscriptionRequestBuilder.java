@@ -18,6 +18,7 @@ public class SubscriptionRequestBuilder {
     private String reason;
     private Location location;
     private String referredBy;
+    private boolean referredByFLW;
 
     public SubscriptionRequestBuilder withDefaults() {
         return withMsisdn("9876543210")
@@ -25,14 +26,18 @@ public class SubscriptionRequestBuilder {
                 .withLocation("state", "district", "block", "panchayat")
                 .withReason(null)
                 .withCreationDate(DateTime.now())
-        		.withReferredBy("1234567890");   		
+        		.withReferredBy(null)
+        		.withReferredByFLW(true);
     }
 
     public SubscriptionRequestBuilder withMsisdn(String msisdn) {
         this.msisdn = msisdn;
         return this;
     }
-
+    public SubscriptionRequestBuilder withReferredByFLW(boolean referredByFLW) {
+        this.referredByFLW = referredByFLW;
+        return this;
+    }
     public SubscriptionRequestBuilder withReferredBy(String referredBy) {
         this.referredBy = referredBy;
         return this;
@@ -90,6 +95,6 @@ public class SubscriptionRequestBuilder {
 
     public SubscriptionRequest build() {
         Subscriber subscriber = new Subscriber(beneficiaryName, beneficiaryAge, dob, edd, week);
-        return new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber, reason, referredBy);
+        return new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber, reason, referredBy, referredByFLW);
     }
 }

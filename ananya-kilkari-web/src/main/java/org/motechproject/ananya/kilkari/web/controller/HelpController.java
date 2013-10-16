@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 @Controller
 public class HelpController {
@@ -36,7 +38,7 @@ public class HelpController {
         return BaseResponse.success("Subscriber care request processed successfully");
     }
 
-    @RequestMapping(value = "/help/list", method = RequestMethod.GET, produces = "text/csv")
+/*    @RequestMapping(value = "/help/list", method = RequestMethod.GET, produces = "text/csv")
     @ResponseBody
     public SubscriberCareDocResponseList getSubscriberCareDocs(@RequestParam String startTime, @RequestParam String endTime, @RequestParam String channel) {
         HelpWebRequest helpWebRequest = new HelpWebRequest(startTime, endTime, channel);
@@ -47,10 +49,30 @@ public class HelpController {
         List<SubscriberCareDoc> subscriberCareDocList = kilkariSubscriberCareService.fetchSubscriberCareDocs(helpWebRequest);
         return SubscriberCareDocsResponseMapper.mapToSubscriberDocsResponseList(subscriberCareDocList);
     }
+    */
+    
+    @RequestMapping(value = "/help/list", method = RequestMethod.GET, produces = "text/csv")
+    @ResponseBody
+    public SubscriberCareDocResponseList getSubscriberCareDocs(@RequestParam String startTime, @RequestParam String endTime, @RequestParam String channel) {
+        HelpWebRequest helpWebRequest = new HelpWebRequest(startTime, endTime, channel);
+
+        Errors validationErrors = helpWebRequest.validate();
+        raiseExceptionIfThereAreErrors(validationErrors);
+
+        List<SubscriberCareDoc> subscriberCareDocList = kilkariSubscriberCareService.fetchSubscriberCareDocs(helpWebRequest);
+        TreeSet<SubscriberCareDoc> subscriberCareTreeSet=new TreeSet<SubscriberCareDoc>(new SubscriberCareDocComparator());
+        subscriberCareTreeSet.addAll(subscriberCareDocList);
+        List<SubscriberCareDoc> uniqueSubscriberCareDocList=new ArrayList<>(subscriberCareTreeSet);
+        return SubscriberCareDocsResponseMapper.mapToSubscriberDocsResponseList(uniqueSubscriberCareDocList);
+    }
+
+
 
     private void raiseExceptionIfThereAreErrors(Errors validationErrors) {
         if (validationErrors.hasErrors()) {
             throw new ValidationException(validationErrors.allMessages());
         }
     }
+    
+    
 }

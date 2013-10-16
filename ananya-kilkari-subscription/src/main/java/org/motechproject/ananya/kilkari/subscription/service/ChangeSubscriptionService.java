@@ -32,9 +32,10 @@ public class ChangeSubscriptionService {
         Subscription existingSubscription = subscriptionService.findBySubscriptionId(subscriptionId);
         changeSubscriptionRequest.setMsisdn(existingSubscription.getMsisdn());
         changeSubscriptionRequest.prefixReasonWithChangeType();
-		if(ChangeSubscriptionType.isChangeReferredBy(changeSubscriptionRequest.getChangeType()))
-			subscriptionService.updateReferredByMsisdn(existingSubscription, changeSubscriptionRequest);   
-		else{
+		if(ChangeSubscriptionType.isChangeReferredBy(changeSubscriptionRequest.getChangeType())){
+			changeSubscriptionRequest.setReferredByFLW(existingSubscription.isReferredByFLW());
+			subscriptionService.updateReferredByMsisdn(existingSubscription, changeSubscriptionRequest);  
+		}else{
         subscriptionService.requestDeactivation(new DeactivationRequest(changeSubscriptionRequest.getSubscriptionId(), changeSubscriptionRequest.getChannel(),
                 changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getReason()));
         updateEddOrDob(changeSubscriptionRequest);
@@ -52,7 +53,7 @@ public class ChangeSubscriptionService {
 
     private Subscription createSubscriptionWithNewPack(ChangeSubscriptionRequest changeSubscriptionRequest) {
         Subscriber subscriber = new Subscriber(null, null, changeSubscriptionRequest.getDateOfBirth(), changeSubscriptionRequest.getExpectedDateOfDelivery(), null);
-		SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeSubscriptionRequest.getMsisdn(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getPack(), null, subscriber, changeSubscriptionRequest.getReason(), changeSubscriptionRequest.getReferredBy());
+		SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeSubscriptionRequest.getMsisdn(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getPack(), null, subscriber, changeSubscriptionRequest.getReason(), changeSubscriptionRequest.getReferredBy(), changeSubscriptionRequest.isReferredBy());
         subscriptionRequest.setOldSubscriptionId(changeSubscriptionRequest.getSubscriptionId());
         return subscriptionService.createSubscription(subscriptionRequest, changeSubscriptionRequest.getChannel());
     }

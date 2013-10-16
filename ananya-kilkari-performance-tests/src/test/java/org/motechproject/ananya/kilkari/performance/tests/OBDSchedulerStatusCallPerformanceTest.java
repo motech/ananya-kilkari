@@ -54,7 +54,7 @@ public class OBDSchedulerStatusCallPerformanceTest extends BasePerformanceTest {
             String week = getRandomCampaignId();
             Operator operator = getRandomElementFromList(possibleOperators);
 
-            Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, now, now, null, null);
+            Subscription subscription = new Subscription(msisdn, SubscriptionPack.BARI_KILKARI, now, now, null, null, false);
             subscription.activate(operator.toString(), now, now);
             subscriptionDbService.addSubscription(subscription);
 

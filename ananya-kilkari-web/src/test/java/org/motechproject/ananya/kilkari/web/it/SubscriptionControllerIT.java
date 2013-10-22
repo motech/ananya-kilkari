@@ -108,8 +108,8 @@ public class SubscriptionControllerIT extends SpringIntegrationTest {
         onMobileSubscriptionService.setBehavior(mock(OnMobileSubscriptionGateway.class));
         reportingService.setBehavior(mockedReportingService);
         SubscriptionIVRWebResponse expectedIVRResponse = (SubscriptionIVRWebResponse) SubscriptionDetailsMapper.mapFrom(new ArrayList<SubscriptionDetailsResponse>() {{
-            add(new SubscriptionDetailsResponse(subscription1.getSubscriptionId(), subscription1.getPack(), subscription1.getStatus(), inboxMessage1.getMessageId(), null));
-            add(new SubscriptionDetailsResponse(subscription2.getSubscriptionId(), subscription2.getPack(), subscription2.getStatus(), inboxMessage2.getMessageId(), null));
+            add(new SubscriptionDetailsResponse(subscription1.getSubscriptionId(), subscription1.getPack(), subscription1.getStatus(), inboxMessage1.getMessageId(), subscription1.getReferredBy(), subscription1.getCreationDate()));
+            add(new SubscriptionDetailsResponse(subscription2.getSubscriptionId(), subscription2.getPack(), subscription2.getStatus(), inboxMessage2.getMessageId(), subscription2.getReferredBy(), subscription2.getCreationDate()));
         }}, channel);
 
         MvcResult result = mockMvc(subscriptionController)

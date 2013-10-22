@@ -50,7 +50,7 @@ public class SubscriptionController {
         return BaseResponse.success("Subscription request submitted successfully");
     }
 
- 
+
     
     @RequestMapping(value = "/referredByFLW", method = RequestMethod.GET)
     @ResponseBody

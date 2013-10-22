@@ -25,18 +25,19 @@ public class SubscriptionDetailsResponse {
     private String referredBy;
     private String reqDateForActivation;
 
-    public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId, String referredBy) {
+    public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId, String referredBy, DateTime reqDateForActivation) {
         this.subscriptionId = subscriptionId;
         this.pack = pack;
         this.status = status;
         this.campaignId = campaignId;
         this.referredBy = referredBy;
+        this.reqDateForActivation = DateUtils.formatDate(reqDateForActivation, DateUtils.ISTTimeZone);
     }
 
     public SubscriptionDetailsResponse(String subscriptionId, SubscriptionPack pack, SubscriptionStatus status, String campaignId,
                                        String beneficiaryName, Integer beneficiaryAge, DateTime dateOfBirth, DateTime expectedDateOfDelivery, Integer startWeekNumber,
                                        Location location, DateTime lastWeeklyMessageScheduledDate, DateTime lastUpdatedTimeForSubscription, DateTime lastUpdatedTimeForBeneficiary, String referredBy, DateTime reqDateForActivation) {
-        this(subscriptionId, pack, status, campaignId, referredBy);
+        this(subscriptionId, pack, status, campaignId, referredBy, reqDateForActivation);
         this.beneficiaryName = beneficiaryName;
         this.beneficiaryAge = beneficiaryAge;
         this.dateOfBirth = DateUtils.formatDate(dateOfBirth, DateUtils.ISTTimeZone);
@@ -46,7 +47,6 @@ public class SubscriptionDetailsResponse {
         this.lastWeeklyMessageScheduledDate = DateUtils.formatDate(lastWeeklyMessageScheduledDate, DateTimeZone.UTC);
         this.lastUpdatedTimeForSubscription = DateUtils.formatDateTimeForCC(lastUpdatedTimeForSubscription, DateUtils.ISTTimeZone);
         this.lastUpdatedTimeForBeneficiary = DateUtils.formatDateTimeForCC(lastUpdatedTimeForBeneficiary, DateUtils.ISTTimeZone);
-        this.reqDateForActivation = DateUtils.formatDate(reqDateForActivation, DateUtils.ISTTimeZone);
     }
 
     public String getReferredBy() {

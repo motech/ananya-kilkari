@@ -19,7 +19,7 @@ public class SubscriptionDetailsMapperTest {
 
     @Test
     public void shouldMapToIVRWebResponse() {
-        SubscriptionDetailsResponse detailsResponse = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13", null);
+        SubscriptionDetailsResponse detailsResponse = new SubscriptionDetailsResponse(UUID.randomUUID().toString(), SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "WEEK13", null, DateTime.now());
         ArrayList<SubscriptionDetailsResponse> responseList = new ArrayList<>();
         responseList.add(detailsResponse);
 

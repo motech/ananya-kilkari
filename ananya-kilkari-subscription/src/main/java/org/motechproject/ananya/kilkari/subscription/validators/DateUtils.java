@@ -51,4 +51,8 @@ public class DateUtils {
             return false;
         }
     }
+    
+    public static void main(String[] args) {
+		System.out.println(isValidForCC("24-01-2012 11:13:00"));
+	}
 }

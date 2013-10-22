@@ -1,5 +1,6 @@
 package org.motechproject.ananya.kilkari.web.controller.page;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,9 +46,10 @@ public class InquiryPageTest {
         header.put("startWeekNumber", "Start Week Number");
         header.put("expectedDateOfDelivery", "Expected Date of Delivery");
         header.put("dateOfBirth", "Date of Birth");
+        header.put("reqDateForActivation", "Request Date for Activation");
         String msisdn = "1234567890";
         ArrayList<SubscriptionDetailsResponse> subscriptionDetailsResponses = new ArrayList<>();
-        SubscriptionDetailsResponse subscriptionDetailsResponse = new SubscriptionDetailsResponse("subscriptionId", SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "campaignId", null);
+        SubscriptionDetailsResponse subscriptionDetailsResponse = new SubscriptionDetailsResponse("subscriptionId", SubscriptionPack.BARI_KILKARI, SubscriptionStatus.ACTIVE, "campaignId", null, DateTime.now());
         subscriptionDetailsResponses.add(subscriptionDetailsResponse);
         when(kilkariSubscriptionService.getSubscriptionDetails(msisdn, Channel.CONTACT_CENTER)).thenReturn(subscriptionDetailsResponses);
 

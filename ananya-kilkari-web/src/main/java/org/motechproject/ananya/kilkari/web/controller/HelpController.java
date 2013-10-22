@@ -38,18 +38,6 @@ public class HelpController {
         return BaseResponse.success("Subscriber care request processed successfully");
     }
 
-/*    @RequestMapping(value = "/help/list", method = RequestMethod.GET, produces = "text/csv")
-    @ResponseBody
-    public SubscriberCareDocResponseList getSubscriberCareDocs(@RequestParam String startTime, @RequestParam String endTime, @RequestParam String channel) {
-        HelpWebRequest helpWebRequest = new HelpWebRequest(startTime, endTime, channel);
-
-        Errors validationErrors = helpWebRequest.validate();
-        raiseExceptionIfThereAreErrors(validationErrors);
-
-        List<SubscriberCareDoc> subscriberCareDocList = kilkariSubscriberCareService.fetchSubscriberCareDocs(helpWebRequest);
-        return SubscriberCareDocsResponseMapper.mapToSubscriberDocsResponseList(subscriberCareDocList);
-    }
-    */
     
     @RequestMapping(value = "/help/list", method = RequestMethod.GET, produces = "text/csv")
     @ResponseBody

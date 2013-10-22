@@ -39,7 +39,7 @@ public class SubscriptionDetailsResponseMapper {
 
     private SubscriptionDetailsResponse getSubscriptionDetailsResponse(Subscription subscription, String subscriptionId, String messageId, SubscriberResponse subscriberDetails) {
         return subscriberDetails == null
-                ? new SubscriptionDetailsResponse(subscriptionId, subscription.getPack(), subscription.getStatus(), messageId, subscription.getReferredBy())
+                ? new SubscriptionDetailsResponse(subscriptionId, subscription.getPack(), subscription.getStatus(), messageId, subscription.getReferredBy(), subscription.getCreationDate())
                 : new SubscriptionDetailsResponse(subscriptionId, subscription.getPack(), subscription.getStatus(), messageId,
                 subscriberDetails.getBeneficiaryName(), subscriberDetails.getBeneficiaryAge(), subscriberDetails.getDateOfBirth(),
                 subscriberDetails.getExpectedDateOfDelivery(), subscription.getStartWeekNumber(), getLocation(subscriberDetails),

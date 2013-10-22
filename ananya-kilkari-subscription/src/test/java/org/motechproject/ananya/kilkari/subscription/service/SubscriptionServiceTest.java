@@ -1303,7 +1303,7 @@ public class SubscriptionServiceTest {
         ArrayList<SubscriberResponse> subscriberResponseList = new ArrayList<>();
         subscriberResponseList.add(subscriberResponse);
         ArrayList<SubscriptionDetailsResponse> expectedResponse = new ArrayList<>();
-        expectedResponse.add(new SubscriptionDetailsResponse(null, pack, null, null, null));
+        expectedResponse.add(new SubscriptionDetailsResponse(null, pack, null, null, null, null));
         when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionList);
         when(reportingServiceImpl.getSubscribersByMsisdn(msisdn)).thenReturn(subscriberResponseList);
         when(subscriptionDetailsResponseMapper.map(subscriptionList, subscriberResponseList)).thenReturn(expectedResponse);
@@ -1324,7 +1324,7 @@ public class SubscriptionServiceTest {
         ArrayList<Subscription> subscriptionList = new ArrayList<>();
         subscriptionList.add(subscription);
         ArrayList<SubscriptionDetailsResponse> expectedResponse = new ArrayList<>();
-        expectedResponse.add(new SubscriptionDetailsResponse(null, pack, null, null, null));
+        expectedResponse.add(new SubscriptionDetailsResponse(null, pack, null, null, null, null));
         when(allSubscriptions.findByMsisdn(msisdn)).thenReturn(subscriptionList);
         when(subscriptionDetailsResponseMapper.map(subscriptionList, Collections.EMPTY_LIST)).thenReturn(expectedResponse);
 

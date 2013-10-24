@@ -65,14 +65,12 @@ public class SubscriptionDetailsMapper {
 	}
 
 	private static String getDateAsString(Date date){
-
 		SimpleDateFormat ft = new SimpleDateFormat ("yyyy/MM/dd");
 		return ft.format(date);
 	}
 
 	private static String getTimeAsString(Date date) {
-
-		SimpleDateFormat ft = new SimpleDateFormat ("hh:mm:ss");
+		SimpleDateFormat ft = new SimpleDateFormat ("HH:mm:ss");
 		return ft.format(date);
 	}
 }

@@ -27,6 +27,10 @@ public class ValidationUtils {
     public static boolean assertDateBefore(DateTime before, DateTime now) {
         return before.isBefore(now);
     }
+    
+    public static boolean assertDateEquals(DateTime before, DateTime now) {
+        return before.equals(now);
+    }
 
     public static boolean assertDateFormat(String value) {
         if (StringUtils.isEmpty(value) || !Pattern.matches("^\\d{2}-\\d{2}-\\d{4}$", value)) {

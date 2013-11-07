@@ -36,6 +36,11 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
+    public void reportChangeSubscription(ChangeSubscriptionReportRequest changeSubscriptionReportRequest) {
+        reportGateway.reportChangeSubscription(changeSubscriptionReportRequest);
+    }
+    
+    @Override
     public void reportSubscriptionStateChange(SubscriptionStateChangeRequest subscriptionStateChangeRequest) {
         reportGateway.reportSubscriptionStateChange(subscriptionStateChangeRequest);
     }
@@ -49,7 +54,13 @@ public class ReportingServiceImpl implements ReportingService {
     public void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest request) {
         reportGateway.reportSubscriberDetailsChange(subscriptionId, request);
     }
-
+    
+    
+    @Override
+    public void reportSubscriberDetailsChangeForChangeSubscription(String subscriptionId, SubscriberChangeSubscriptionReportRequest request) {
+        reportGateway.reportSubscriberDetailsForChangeSubscription(subscriptionId, request);
+    }
+    
     @Override
     public void reportChangeMsisdnForEarlySubscription(SubscriberChangeMsisdnReportRequest reportRequest) {
         reportGateway.reportChangeMsisdnForSubscriber(reportRequest);

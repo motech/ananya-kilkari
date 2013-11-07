@@ -16,7 +16,9 @@ import java.util.UUID;
 
 @TypeDiscriminator("doc.type === 'Subscription'")
 public class Subscription extends MotechBaseDataObject {
-    @JsonProperty
+   
+
+	@JsonProperty
     private String msisdn;
 
     @JsonProperty
@@ -147,7 +149,14 @@ public class Subscription extends MotechBaseDataObject {
 		this.referredBy = referredBy;
 	}
 
-    @Override
+	
+	
+	
+    public void setStartWeekNumber(Integer startWeekNumber) {
+		this.startWeekNumber = startWeekNumber;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Subscription)) return false;
@@ -379,5 +388,7 @@ public class Subscription extends MotechBaseDataObject {
 		this.startDate = startDate;
 	}
     
-    
+	 public void setPack(SubscriptionPack pack) {
+			this.pack = pack;
+		}
 }

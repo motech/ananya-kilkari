@@ -42,4 +42,18 @@ public class Subscriber {
     public Integer getWeek() {
         return week;
     }
+
+	public void setDateOfBirth(DateTime dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
+
+	public void setExpectedDateOfDelivery(DateTime expectedDateOfDelivery) {
+		this.expectedDateOfDelivery = expectedDateOfDelivery;
+	}
+
+	public void setWeek(Integer week) {
+		this.week = week;
+	}
+    
+    
 }

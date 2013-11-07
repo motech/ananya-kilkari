@@ -109,4 +109,11 @@ public class ChangeSubscriptionRequest {
         this.reason = String.format("%s - %s", changeType.name(), reason);
     }
 
+
+	public void setPack(SubscriptionPack pack) {
+		this.pack = pack;
+	}
+    
+	
+
 }

@@ -63,6 +63,17 @@ public class CallbackRequestValidator {
 		return true;
 	}
 
+	public static boolean validatePack (String pack, Errors errors){
+	if (!SubscriptionPack.isValid(pack)) {
+		errors.add(String.format("Invalid subscription pack %s", pack));
+		return false;
+	}
+	return true;
+}
+	public static void main(String[] args) {
+		System.out.println("print"+validatePack("BARI_KILKARI01",new Errors()));
+	}
+	
 	private Errors validateSubscriptionRequestForSM(CallbackRequestWrapper callbackRequestWrapper) {
 		Errors errors = new Errors();
 		final String requestStatus = callbackRequestWrapper.getStatus();

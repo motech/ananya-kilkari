@@ -26,6 +26,10 @@ public enum ChangeSubscriptionType {
     public static boolean isChangeReferredBy(ChangeSubscriptionType type) {
         return ChangeSubscriptionType.CHANGE_REFERRED_BY.equals(type);
     }
+    
+    public static boolean isChangeSchedule(ChangeSubscriptionType type) {
+        return ChangeSubscriptionType.CHANGE_SCHEDULE.equals(type);
+    }
 }
 
 

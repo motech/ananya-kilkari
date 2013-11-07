@@ -13,12 +13,16 @@ public interface ReportingService {
     SubscriberResponse getSubscriber(String subscriptionId);
 
     void reportSubscriptionCreation(SubscriptionReportRequest subscriptionReportRequest);
+    
+    void reportChangeSubscription(ChangeSubscriptionReportRequest changeSubscriptionReportRequest);
 
     void reportSubscriptionStateChange(SubscriptionStateChangeRequest subscriptionStateChangeRequest);
 
     void reportCampaignMessageDeliveryStatus(CallDetailsReportRequest callDetailsReportRequest);
 
     void reportSubscriberDetailsChange(String subscriptionId, SubscriberReportRequest subscriberReportRequest);
+    
+    void reportSubscriberDetailsChangeForChangeSubscription(String subscriptionId, SubscriberChangeSubscriptionReportRequest subscriberReportRequest);
 
     void reportChangeMsisdnForEarlySubscription(SubscriberChangeMsisdnReportRequest reportRequest);
 

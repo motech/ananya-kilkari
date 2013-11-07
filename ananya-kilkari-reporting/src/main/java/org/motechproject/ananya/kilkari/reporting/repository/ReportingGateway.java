@@ -13,6 +13,8 @@ public interface ReportingGateway {
     SubscriberResponse getSubscriber(String subscriptionId);
 
     void reportSubscriptionCreation(SubscriptionReportRequest subscriptionReportRequest);
+    
+    void reportChangeSubscription(ChangeSubscriptionReportRequest changeSubscriptionReportRequest);
 
     void reportSubscriptionStateChange(SubscriptionStateChangeRequest subscriptionStateChangeRequest);
 
@@ -31,4 +33,6 @@ public interface ReportingGateway {
     void reportCampaignChange(CampaignChangeReportRequest campaignChangeReportRequest, String subscriptionId);
 
     void reportCareRequest(SubscriberCareReportRequest subscriberCareReportRequest);
+
+	void reportSubscriberDetailsForChangeSubscription(String subscriptionId, SubscriberChangeSubscriptionReportRequest request);
 }

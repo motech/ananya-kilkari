@@ -10,7 +10,9 @@ import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignS
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
+
 import org.motechproject.ananya.kilkari.subscription.domain.*;
+import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
@@ -544,6 +546,46 @@ public class SubscriptionService {
 		});
 	}
 
+	private void unschedule(Subscription subscription) {
+		motechSchedulerService.safeUnscheduleRunOnceJob(SubscriptionEventKeys.EARLY_SUBSCRIPTION, subscription.getSubscriptionId());
+	}
+
+	public void rescheduleCampaignForChangeRequest(Subscription subscription, final ChangeSubscriptionRequest changeRequest) {		
+		if (subscription.isNewEarly()) 
+			unschedule(subscription);
+		else{
+			unScheduleCampaign(subscription);	
+			removeScheduledMessagesFromOBD(subscription.getSubscriptionId());
+		}
+		Subscriber subscriber = updateSubscriberDetailsAndReturnSubscriber(subscription, changeRequest);
+		SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeRequest.getMsisdn(), changeRequest.getCreatedAt(), changeRequest.getPack(), null, subscriber, changeRequest.getReason(), subscription.getReferredBy(), subscription.isReferredByFLW());
+		subscription.setStartDate(subscriptionRequest.getSubscriptionStartDate());
+		//create request to set messagecampaign
+		OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, changeRequest.getChannel());
+		if(subscriptionRequest.getSubscriptionStartDate().isAfter(subscriptionRequest.getCreationDate()))
+			scheduleEarlySubscription(subscriptionRequest.getSubscriptionStartDate(), omSubscriptionRequest);
+		else
+			scheduleCampaign(subscription, subscriptionRequest.getCreationDate());
+		updateSubscriptionAndReport(subscription, changeRequest.getChannel());
+	}
+
+	private Subscriber updateSubscriberDetailsAndReturnSubscriber(Subscription subscription, ChangeSubscriptionRequest changeRequest){
+		SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
+		Subscriber subscriber = new Subscriber(subscriberResponse.getBeneficiaryName(), subscriberResponse.getBeneficiaryAge(), changeRequest.getDateOfBirth(), changeRequest.getExpectedDateOfDelivery(), null);
+		SubscriberChangeSubscriptionReportRequest subscriberReportRequest = new SubscriberChangeSubscriptionReportRequest(changeRequest.getCreatedAt(), subscriber.getExpectedDateOfDelivery(), subscriber.getDateOfBirth(), subscriber.getWeek());
+		reportingService.reportSubscriberDetailsChangeForChangeSubscription(subscription.getSubscriptionId(), subscriberReportRequest);
+		return subscriber;
+	}
+
+	private void updateSubscriptionAndReport(Subscription subscription, Channel channel){
+		allSubscriptions.update(subscription);
+		ChangeSubscriptionReportRequest reportRequest = new ChangeSubscriptionReportRequest(subscription.getSubscriptionId(),
+				 subscription.getStartDate(), DateTime.now());
+		reportingService.reportChangeSubscription(reportRequest);
+	}
+
+	
+
 	private LocationResponse getExistingLocation(Location location) {
 		if (location == Location.NULL)
 			return null;
@@ -618,6 +660,14 @@ public class SubscriptionService {
 		allSubscriptions.update(subscription);
 		reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(),
 				subscription.getStatus().name(), reason, updatedOn, operator, graceCount, getSubscriptionWeekNumber(subscription, updatedOn)));
+	}
+
+	private void updateSubscriptionForChangeSubscriptionRequestAndReport(Subscription subscription, Action<Subscription> action) {
+		action.perform(subscription);
+		logger.info("Updating Subscription and reporting change " + subscription.toString());
+		allSubscriptions.update(subscription);
+		//reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(),
+		//		subscription.getStatus().name(), reason, updatedOn, operator, graceCount, getSubscriptionWeekNumber(subscription, updatedOn)));
 	}
 
 	private void createSubscriptionAndReport(Subscription subscription, DateTime updatedOn, String reason, String operator,
@@ -727,6 +777,15 @@ public class SubscriptionService {
 		List<Subscription> subscriptionList = allSubscriptions.findByCreationDate(startDate, endDate);
 		Collections.sort(subscriptionList,new SubscriptionComparator());
 		return subscriptionList;
+	}
+
+	public boolean isTransitionFromActiveOrSuspendedToNewEarly(Subscription subscription,ChangeSubscriptionRequest changeSubscriptionRequest) {
+		Subscriber subscriber = new Subscriber(null, null, changeSubscriptionRequest.getDateOfBirth(), changeSubscriptionRequest.getExpectedDateOfDelivery(), null);
+		SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeSubscriptionRequest.getMsisdn(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getPack(), null, subscriber, changeSubscriptionRequest.getReason(), subscription.getReferredBy(), subscription.isReferredByFLW());
+		if(subscriptionRequest.getSubscriptionStartDate().isAfter(subscriptionRequest.getCreationDate()) && !subscription.getStatus().equals(SubscriptionStatus.NEW_EARLY)){
+			return true;
+		}		
+		return false;
 	}
 
 

@@ -15,32 +15,32 @@ import java.util.Properties;
 @Component
 public class KilkariExceptionResolver extends SimpleMappingExceptionResolver {
 
-    private final static Logger log = LoggerFactory.getLogger(KilkariExceptionResolver.class);
+	private final static Logger log = LoggerFactory.getLogger(KilkariExceptionResolver.class);
 
-    public KilkariExceptionResolver() {
-        Properties properties = new Properties();
-        properties.put(".Exception", "exceptionView");
-        properties.put(ValidationException.class.getCanonicalName(), "validationExceptionView");
+	public KilkariExceptionResolver() {
+		Properties properties = new Properties();
+		properties.put(".Exception", "exceptionView");
+		properties.put(ValidationException.class.getCanonicalName(), "validationExceptionView");
 
-        setExceptionMappings(properties);
-    }
+		setExceptionMappings(properties);
+	}
 
-    @Override
-    protected ModelAndView doResolveException(HttpServletRequest request,
-                                              HttpServletResponse response,
-                                              Object handler,
-                                              Exception ex) {
-        log.error(getExceptionString(ex), ex);
+	@Override
+	protected ModelAndView doResolveException(HttpServletRequest request,
+			HttpServletResponse response,
+			Object handler,
+			Exception ex) {
+		log.error(getExceptionString(ex), ex);
 
-        return super.doResolveException(request, response, handler, ex);
-    }
+		return super.doResolveException(request, response, handler, ex);
+	}
 
-    private String getExceptionString(Exception ex) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(ExceptionUtils.getMessage(ex));
-        sb.append(ExceptionUtils.getStackTrace(ex));
-        sb.append(ExceptionUtils.getRootCauseMessage(ex));
-        sb.append(ExceptionUtils.getRootCauseStackTrace(ex));
-        return sb.toString();
-    }
+	private String getExceptionString(Exception ex) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(ExceptionUtils.getMessage(ex));
+		sb.append(ExceptionUtils.getStackTrace(ex));
+		sb.append(ExceptionUtils.getRootCauseMessage(ex));
+		sb.append(ExceptionUtils.getRootCauseStackTrace(ex));
+		return sb.toString();
+	}
 }

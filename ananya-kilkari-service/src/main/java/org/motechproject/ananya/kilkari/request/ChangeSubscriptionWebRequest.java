@@ -128,6 +128,7 @@ public class ChangeSubscriptionWebRequest {
         webRequestValidator.validateOnlyOneOfEDDOrDOBIsPresent(expectedDateOfDelivery, dateOfBirth);
         webRequestValidator.validateChangeType(changeType, expectedDateOfDelivery, dateOfBirth);
         webRequestValidator.validateReferredByMsisdn(referredBy);
+        
         return webRequestValidator.getErrors();
     }
 }

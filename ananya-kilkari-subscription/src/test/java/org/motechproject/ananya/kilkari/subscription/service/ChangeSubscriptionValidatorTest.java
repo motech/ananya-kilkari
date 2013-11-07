@@ -35,7 +35,7 @@ public class ChangeSubscriptionValidatorTest {
     @Before
     public void setUp(){
         initMocks(this);
-        changeSubscriptionValidator = new ChangeSubscriptionValidator(subscriptionService);
+        changeSubscriptionValidator = new ChangeSubscriptionValidator(subscriptionService, null);
     }
 
     @Test

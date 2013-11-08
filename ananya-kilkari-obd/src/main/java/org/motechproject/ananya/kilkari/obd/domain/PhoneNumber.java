@@ -13,6 +13,6 @@ public class PhoneNumber {
     }
 
     private static boolean validate(String phoneNumber) {
-        return StringUtils.isNotBlank(phoneNumber) && StringUtils.isNumeric(phoneNumber) && (phoneNumber.length() == 10);
+        return StringUtils.isNotBlank(phoneNumber) && StringUtils.isNumeric(phoneNumber) && ((phoneNumber.length() == 10)||(phoneNumber.length()==11 && phoneNumber.startsWith("0")));
     }
 }

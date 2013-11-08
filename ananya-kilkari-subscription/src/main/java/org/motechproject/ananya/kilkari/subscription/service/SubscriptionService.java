@@ -12,7 +12,6 @@ import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
 
 import org.motechproject.ananya.kilkari.subscription.domain.*;
-import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.repository.OnMobileSubscriptionGateway;
@@ -565,7 +564,7 @@ public class SubscriptionService {
 		if(subscriptionRequest.getSubscriptionStartDate().isAfter(subscriptionRequest.getCreationDate()))
 			scheduleEarlySubscription(subscriptionRequest.getSubscriptionStartDate(), omSubscriptionRequest);
 		else
-			scheduleCampaign(subscription, subscriptionRequest.getCreationDate());
+			scheduleCampaign(subscription, subscriptionRequest.getSubscriptionStartDate());
 		updateSubscriptionAndReport(subscription, changeRequest.getChannel());
 	}
 
@@ -660,14 +659,6 @@ public class SubscriptionService {
 		allSubscriptions.update(subscription);
 		reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(),
 				subscription.getStatus().name(), reason, updatedOn, operator, graceCount, getSubscriptionWeekNumber(subscription, updatedOn)));
-	}
-
-	private void updateSubscriptionForChangeSubscriptionRequestAndReport(Subscription subscription, Action<Subscription> action) {
-		action.perform(subscription);
-		logger.info("Updating Subscription and reporting change " + subscription.toString());
-		allSubscriptions.update(subscription);
-		//reportingService.reportSubscriptionStateChange(new SubscriptionStateChangeRequest(subscription.getSubscriptionId(),
-		//		subscription.getStatus().name(), reason, updatedOn, operator, graceCount, getSubscriptionWeekNumber(subscription, updatedOn)));
 	}
 
 	private void createSubscriptionAndReport(Subscription subscription, DateTime updatedOn, String reason, String operator,

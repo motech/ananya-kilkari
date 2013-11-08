@@ -51,7 +51,7 @@ public class ChangeSubscriptionValidator {
 
 
 	private void validateIfEarlySubscriptonIsBlockedForOperator(Subscription subscription,ChangeSubscriptionRequest changeSubscriptionRequest) {
-		String blockedOperators = kilkariProperties.getProperty("blocked.operators.for.early.suscriptions");
+		String blockedOperators = kilkariProperties.getProperty("blocked.operators.for.early.subcriptions");
 		if(subscriptionService.isTransitionFromActiveOrSuspendedToNewEarly(subscription, changeSubscriptionRequest) && isOperatorBlocked(subscription.getOperator(), blockedOperators))		
 			throw new ValidationException(String.format("Transition to Early Subscription from %s state Is Blocked for Operator %s", subscription.getStatus().toString(), subscription.getOperator().toString()));
 

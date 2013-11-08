@@ -27,20 +27,6 @@ public class ChangeSubscriptionService {
 	}
 
 
-	/* public void process(ChangeSubscriptionRequest changeSubscriptionRequest) {
-        changeSubscriptionValidator.validate(changeSubscriptionRequest);
-        String subscriptionId = changeSubscriptionRequest.getSubscriptionId();
-        Subscription existingSubscription = subscriptionService.findBySubscriptionId(subscriptionId);
-        changeSubscriptionRequest.setMsisdn(existingSubscription.getMsisdn());
-        changeSubscriptionRequest.prefixReasonWithChangeType();
-		if(ChangeSubscriptionType.isChangeReferredBy(changeSubscriptionRequest.getChangeType())){
-			changeSubscriptionRequest.setReferredByFLW(existingSubscription.isReferredByFLW());
-			subscriptionService.updateReferredByMsisdn(existingSubscription, changeSubscriptionRequest);  
-		}else{
-        updateEddOrDob(changeSubscriptionRequest);
-        subscriptionService.rescheduleCampaignForChangeRequest(existingSubscription, changeSubscriptionRequest);
-		}
-    }*/
 
 	public void process(ChangeSubscriptionRequest changeSubscriptionRequest) {
 		changeSubscriptionValidator.validate(changeSubscriptionRequest);

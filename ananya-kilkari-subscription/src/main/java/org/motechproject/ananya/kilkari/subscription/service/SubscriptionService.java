@@ -563,10 +563,14 @@ public class SubscriptionService {
 		OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, changeRequest.getChannel());
 		if(subscriptionRequest.getSubscriptionStartDate().isAfter(subscriptionRequest.getCreationDate()))
 			scheduleEarlySubscription(subscriptionRequest.getSubscriptionStartDate(), omSubscriptionRequest);
-		else
-			scheduleCampaign(subscription, subscriptionRequest.getSubscriptionStartDate());
+		else{
+			final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(subscriptionRequest.getCreationDate());
+			scheduleCampaign(subscription, scheduleStartDateTime);
+			activateSchedule(subscription);
+		}
 		updateSubscriptionAndReport(subscription, changeRequest.getChannel());
 	}
+	
 
 	private Subscriber updateSubscriberDetailsAndReturnSubscriber(Subscription subscription, ChangeSubscriptionRequest changeRequest){
 		SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());

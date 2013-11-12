@@ -79,42 +79,6 @@ public class KilkariSubscriptionService {
 	}
 
 
-	/*public void subscriptionForReferredByFLWRequest(ReferredByFlwRequest referredByFlwMsisdnRequest) {
-		validateSetReferredByFlwMsisdnRequest(referredByFlwMsisdnRequest);
-		String msisdn = referredByFlwMsisdnRequest.getMsisdn();
-		SubscriptionPack pack = referredByFlwMsisdnRequest.getPack();
-		Channel channel = Channel.valueOf(referredByFlwMsisdnRequest.getChannel().toUpperCase());
-		//String referredBy = referredByFlwMsisdnRequest.getReferredBy();
-		boolean referredBy = false;
-		referredBy = referredByFlwMsisdnRequest.isReferredBy();
-		List<Subscription> subcriptionList = findByMsisdnPackAndStatus(msisdn, pack, SubscriptionStatus.ACTIVE);
-		List<Subscription> subcriptionList1 = findByMsisdnPackAndStatus(msisdn, pack, SubscriptionStatus.ACTIVATION_FAILED);
-		List<Subscription> subcriptionList2 = findByMsisdnPackAndStatus(msisdn, pack, SubscriptionStatus.PENDING_ACTIVATION);
-		List<Subscription> subscriptionListForRefByStatus = findByMsisdnPackAndStatus(msisdn, pack, SubscriptionStatus.REFERRED_MSISDN_RECEIVED);
-		if(!subcriptionList.isEmpty() || hasCallbackComeForActivationFailed(subcriptionList1) || hasCallbackComeForAirtelPendingActivation(subcriptionList2)){//updateSubscription
-			Subscription subscription=null;
-			if(!subcriptionList.isEmpty())
-				subscription = subcriptionList.get(0);
-			else
-				subscription = subcriptionList1.get(0);
-			if(subscription == null)
-				logger.error("Something went wrong. Could not initialise subscription");
-			ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_REFERRED_BY, msisdn, subscription.getSubscriptionId(), pack, channel, referredByFlwMsisdnRequest.getCreatedAt(), null, null, null,null, referredBy);
-			subscriptionService.updateReferredByMsisdn(subscription, changeSubscriptionRequest);
-		}else if(!subscriptionListForRefByStatus.isEmpty()){//check for already existing entries with status REFERRED_MSISDN_FLAG_RECEIVED
-			Subscription subscription= subscriptionListForRefByStatus.get(0);
-			subscription.setCreationDate(referredByFlwMsisdnRequest.getCreatedAt());
-			subscription.setStartDate(DateTime.now());
-			subscriptionService.updateSubscription(subscription);
-		}else{//createNewSubscription 
-			Subscription subscription = new Subscription(msisdn, referredByFlwMsisdnRequest.getPack(),
-					referredByFlwMsisdnRequest.getCreatedAt(), DateTime.now(), null, null, referredBy);	
-			subscription.setStatus(SubscriptionStatus.REFERRED_MSISDN_RECEIVED);
-			subscriptionService.createEntryInCouchForReferredBy(subscription);
-		}
-
-	}*/
-
 
 	public void subscriptionForReferredByFLWRequest(ReferredByFlwRequest referredByFlwMsisdnRequest) {
 		validateSetReferredByFlwMsisdnRequest(referredByFlwMsisdnRequest);
@@ -150,35 +114,19 @@ public class KilkariSubscriptionService {
 		TreeSet<Subscription> subscriptionTreeSet =new TreeSet<Subscription>(new SubscriptionListComparator());
 		subscriptionTreeSet.addAll(subscriptionList);
 		Subscription subscription= subscriptionTreeSet.first();
-		System.out.println(subscriptionTreeSet.toString());
 			if(subscription.getStatus().equals(SubscriptionStatus.ACTIVE))
 				return subscription; 
 			if((subscription.getStatus().equals(SubscriptionStatus.ACTIVATION_FAILED)||subscription.getStatus().equals(SubscriptionStatus.PENDING_ACTIVATION )) && shouldUpdateSubscription(subscription))
 				return subscription;
 		return null;
 	}
-
-	public static void main(String[] args) {
-		Subscription subscription =  new Subscription("9999999999", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), 1, null, false);
-		subscription.setStatus(SubscriptionStatus.ACTIVE);
-		Subscription subscription2 =  new Subscription("9999999999", SubscriptionPack.BARI_KILKARI, DateTime.now().minusMinutes(5), DateTime.now().minusDays(1), 1, null, false);
-		subscription2.setStatus(SubscriptionStatus.ACTIVATION_FAILED);
-		List<Subscription> list = new ArrayList<Subscription>();
-		list.add(subscription2);
-		list.add(subscription);
-		System.out.println(subscriptionExists(list).toString());
-	}
 	
 	private static boolean shouldUpdateSubscription(Subscription subscription) {
+		if(subscription.getCreationDate()==null)
+			return false;
 		return !subscription.getCreationDate().isBefore(DateTime.now().minusMinutes(10));
 	}
 
-	/* private  boolean hasCallbackComeForActivationFailed(List<Subscription> subcriptionList) {
-		if(subcriptionList.isEmpty())
-			return false;
-		Subscription subscription = subcriptionList.get(0);
-		return !subscription.getCreationDate().isBefore(DateTime.now().minusMinutes(10));
-	}*/
 
 	public void createSubscription(SubscriptionWebRequest subscriptionWebRequest) {
 		validateSubscriptionRequest(subscriptionWebRequest);

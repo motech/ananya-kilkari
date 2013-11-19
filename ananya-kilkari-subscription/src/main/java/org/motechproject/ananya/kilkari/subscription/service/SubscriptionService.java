@@ -553,7 +553,9 @@ public class SubscriptionService {
 		if (subscription.isNewEarly()) 
 			unschedule(subscription);
 		else{
-			unScheduleCampaign(subscription);	
+			inboxService.scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
+			unScheduleCampaign(subscription);
+			campaignMessageAlertService.deleteFor(subscription.getSubscriptionId());
 			removeScheduledMessagesFromOBD(subscription.getSubscriptionId());
 		}
 		Subscriber subscriber = updateSubscriberDetailsAndReturnSubscriber(subscription, changeRequest);
@@ -561,10 +563,12 @@ public class SubscriptionService {
 		subscription.setStartDate(subscriptionRequest.getSubscriptionStartDate());
 		//create request to set messagecampaign
 		OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, changeRequest.getChannel());
+		subscription.setCreationDate(changeRequest.getCreatedAt());
+		final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(subscriptionRequest.getCreationDate());
 		if(subscriptionRequest.getSubscriptionStartDate().isAfter(subscriptionRequest.getCreationDate()))
 			scheduleEarlySubscription(subscriptionRequest.getSubscriptionStartDate(), omSubscriptionRequest);
 		else{
-			final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(subscriptionRequest.getCreationDate());
+			logger.info("going to reschedule subscription for subscription id"+subscription.getSubscriptionId()+" start date="+scheduleStartDateTime);
 			scheduleCampaign(subscription, scheduleStartDateTime);
 			activateSchedule(subscription);
 		}

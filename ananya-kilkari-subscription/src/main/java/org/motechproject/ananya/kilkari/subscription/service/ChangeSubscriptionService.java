@@ -28,6 +28,7 @@ public class ChangeSubscriptionService {
 
 
 
+
 	public void process(ChangeSubscriptionRequest changeSubscriptionRequest) {
 		changeSubscriptionValidator.validate(changeSubscriptionRequest);
 		String subscriptionId = changeSubscriptionRequest.getSubscriptionId();

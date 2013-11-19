@@ -8,7 +8,7 @@ import org.motechproject.web.message.converters.annotations.CSVFileName;
 import java.util.ArrayList;
 import java.util.Collection;
 
-@SuppressWarnings("serial")
+
 @CSVEntity
 public class SubscriptionResponseList extends ArrayList<SubscriptionCCReferredByFlwResponse> {
     public SubscriptionResponseList(Collection<? extends SubscriptionCCReferredByFlwResponse> responses) {

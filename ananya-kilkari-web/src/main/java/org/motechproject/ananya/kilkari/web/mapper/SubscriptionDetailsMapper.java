@@ -66,7 +66,7 @@ public class SubscriptionDetailsMapper {
 	}
 
 	private static String getDateAsString(Date date){
-		SimpleDateFormat ft = new SimpleDateFormat ("yyyy/MM/dd");
+		SimpleDateFormat ft = new SimpleDateFormat ("dd-MM-yyyy");
 		return ft.format(date);
 	}
 

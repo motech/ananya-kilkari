@@ -268,7 +268,7 @@ public class KilkariSubscriptionService {
 
 		List<Subscription> activeRefbyFlwSubscriptionList=new ArrayList<Subscription>();
 		for (Subscription subscription : subscriptionList) {
-			if(subscription.getStatus().equals(SubscriptionStatus.ACTIVE)&&subscription.isReferredByFLW()){
+			if(subscription.getStatus().equals(SubscriptionStatus.ACTIVE)&&subscription.isReferredByFLW()&& subscription.getReferredBy()==null){
 				activeRefbyFlwSubscriptionList.add(subscription);
 			}
 		}             

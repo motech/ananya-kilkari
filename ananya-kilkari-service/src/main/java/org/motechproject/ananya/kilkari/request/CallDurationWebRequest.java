@@ -65,7 +65,7 @@ public class CallDurationWebRequest implements Serializable {
             errors.add(String.format("Invalid end time format %s", endTime));
             formatInvalid = true;
         }
-        if (!formatInvalid && (!ValidationUtils.assertDateBefore(parseDateTime(startTime), parseDateTime(endTime)) || !ValidationUtils.assertDateEquals(parseDateTime(startTime), parseDateTime(endTime))))
+        if (!formatInvalid && (!ValidationUtils.assertDateBefore(parseDateTime(startTime), parseDateTime(endTime)) && !ValidationUtils.assertDateEquals(parseDateTime(startTime), parseDateTime(endTime))))
             errors.add(String.format("Start DateTime[%s] should not be greater than End DateTime[%s]", startTime, endTime));
         return errors;
     }

@@ -34,8 +34,6 @@ public enum Channel {
             return false;
         }
     }
-    public static void main(String[] args) {
-		System.out.println(Channel.CONTACT_CENTER.name());
-	}
+   
 }
 

@@ -25,9 +25,7 @@ public class ChangeSubscriptionService {
 		this.changeSubscriptionValidator = changeSubscriptionValidator;
 		this.reportingService = reportingService;
 	}
-
-
-
+	
 
 	public void process(ChangeSubscriptionRequest changeSubscriptionRequest) {
 		changeSubscriptionValidator.validate(changeSubscriptionRequest);

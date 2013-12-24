@@ -702,7 +702,7 @@ public class SubscriptionService {
 
 	private void updateStatusWithoutReporting(Subscription subscription, Action<Subscription> action) {
 		action.perform(subscription);
-		logger.info("Updating Subscription and reporting change " + subscription);
+		logger.info("Updating Subscription without reporting change " + subscription);
 		allSubscriptions.update(subscription);
 	}
 

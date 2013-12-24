@@ -257,6 +257,12 @@ public class Subscription extends MotechBaseDataObject {
     public boolean isSubscriptionCompletionRequestSent() {
         return SubscriptionStatus.PENDING_COMPLETION.equals(getStatus());
     }
+	
+	@JsonIgnore
+    public boolean isStatusUpdatableForReferredBy() {
+        return SubscriptionStatus.NEW.equals(getStatus())||SubscriptionStatus.ACTIVATION_FAILED.equals(getStatus())||SubscriptionStatus.PENDING_ACTIVATION.equals(getStatus());
+    }
+
 
     public void complete() {
         setStatus(SubscriptionStatus.PENDING_COMPLETION);

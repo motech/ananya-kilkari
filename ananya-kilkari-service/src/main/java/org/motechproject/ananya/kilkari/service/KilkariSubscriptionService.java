@@ -116,7 +116,7 @@ public class KilkariSubscriptionService {
 		Subscription subscription= subscriptionTreeSet.first();
 			if(subscription.getStatus().equals(SubscriptionStatus.ACTIVE))
 				return subscription; 
-			if((subscription.getStatus().equals(SubscriptionStatus.ACTIVATION_FAILED)||subscription.getStatus().equals(SubscriptionStatus.PENDING_ACTIVATION )) && shouldUpdateSubscription(subscription))
+			if(subscription.isStatusUpdatableForReferredBy() && shouldUpdateSubscription(subscription))
 				return subscription;
 		return null;
 	}

@@ -3,6 +3,7 @@ package org.motechproject.ananya.kilkari.subscription.validators;
 import org.motechproject.ananya.kilkari.obd.service.validator.Errors;
 import org.motechproject.ananya.kilkari.subscription.domain.CampaignChangeReason;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.service.request.SubscriberRequest;
@@ -71,7 +72,7 @@ public class SubscriptionValidator {
 
     private void validateActiveSubscriptionDoesNotExist(SubscriptionRequest subscription, Errors errors) {
         Subscription existingActiveSubscription = allSubscriptions.findSubscriptionInProgress(subscription.getMsisdn(), subscription.getPack());
-        if (existingActiveSubscription != null) {
+        if (existingActiveSubscription != null && !existingActiveSubscription.getStatus().equals(SubscriptionStatus.REFERRED_MSISDN_RECEIVED)) {
             errors.add(String.format("Active subscription already exists for msisdn[%s] and pack[%s]", subscription.getMsisdn(), subscription.getPack()));
         }
     }

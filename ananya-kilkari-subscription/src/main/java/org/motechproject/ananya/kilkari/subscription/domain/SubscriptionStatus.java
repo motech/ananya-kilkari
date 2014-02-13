@@ -106,7 +106,7 @@ public enum SubscriptionStatus {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
             List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
-                add(SubscriptionStatus.DEACTIVATED);
+                //add(SubscriptionStatus.DEACTIVATED);
             }};
             return validStates.contains(toStatus);
         }

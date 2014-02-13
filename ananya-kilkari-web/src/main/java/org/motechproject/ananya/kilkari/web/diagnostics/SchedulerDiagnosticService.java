@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.web.diagnostics;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.motechproject.diagnostics.diagnostics.DiagnosticLog;
 import org.motechproject.diagnostics.response.DiagnosticsResult;
@@ -19,6 +20,8 @@ import java.util.List;
 
 @Service
 public class SchedulerDiagnosticService {
+	
+	Logger logger = Logger.getLogger(SchedulerDiagnosticService.class);
 
     private Scheduler motechScheduler;
     private List<String> obdSchedules;
@@ -36,8 +39,9 @@ public class SchedulerDiagnosticService {
 
     public DiagnosticsResult diagnoseAllOBDSchedules() throws SchedulerException {
         List<JobDetails> jobDetailsList = getJobDetailsFor(obdSchedules);
-
+        logger.info("/scheduler/obd/ jobDetailsList="+jobDetailsList!=null?jobDetailsList.toString():null);
         DiagnosticsResult diagnosticsResult = checkIfAllJobsAreScheduled(obdSchedules, jobDetailsList);
+        logger.info("/scheduler/obd/ diagnosticsResult="+diagnosticsResult!=null?diagnosticsResult.toString():null);
         return diagnosticsResult.getStatus().equals(DiagnosticsStatus.FAIL) ?
                 diagnosticsResult :
                 checkIfJobsAreScheduledAtTheRightTime(jobDetailsList);

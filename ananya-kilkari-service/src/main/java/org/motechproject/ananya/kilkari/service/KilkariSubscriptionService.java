@@ -97,6 +97,7 @@ public class KilkariSubscriptionService {
 			subscription= subscriptionListForRefByStatus.get(0);
 			subscription.setCreationDate(referredByFlwMsisdnRequest.getCreatedAt());
 			subscription.setStartDate(DateTime.now());
+			subscription.setReferredByFLW(referredByFlwMsisdnRequest.isReferredBy());
 			subscriptionService.updateSubscription(subscription);
 		}else{//createNewSubscription 
 			subscription = new Subscription(msisdn, referredByFlwMsisdnRequest.getPack(),
@@ -262,8 +263,8 @@ public class KilkariSubscriptionService {
 		subscriptionService.updateReferredByMsisdn(subscription, changeSubscriptionRequest);  
 	}
 
-	public List<Subscription> getSubscriptionsReferredByFlw(SubscriptionReferredByFlwRequest subscriptionReferredByFlwRequest) {
 
+	public List<Subscription> getSubscriptionsReferredByFlw(SubscriptionReferredByFlwRequest subscriptionReferredByFlwRequest) {
 		List<Subscription> subscriptionList=fetchSubscribers(subscriptionReferredByFlwRequest);
 
 		List<Subscription> activeRefbyFlwSubscriptionList=new ArrayList<Subscription>();

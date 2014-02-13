@@ -88,6 +88,15 @@ public class SubscriptionService {
 	public Subscription createSubscription(SubscriptionRequest subscriptionRequest, Channel channel) {
 		subscriptionValidator.validate(subscriptionRequest);
 
+		Subscription existingActiveSubscription = allSubscriptions.findSubscriptionInProgress(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack());
+		
+		if(existingActiveSubscription!=null && existingActiveSubscription.getStatus().equals(SubscriptionStatus.REFERRED_MSISDN_RECEIVED)){
+			//user has received referred msisdn received request first. hence getting referred by and deleting this entry
+			subscriptionRequest.setReferredByFLW(existingActiveSubscription.isReferredByFLW());
+			logger.info("setting referred by to in subscription request and removing existing entry for referred msisdn received "+existingActiveSubscription.getMsisdn());
+			allSubscriptions.remove(existingActiveSubscription);
+		}
+		
 		Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
 				subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate(), subscriptionRequest.getSubscriber().getWeek(), subscriptionRequest.getReferredBy(), subscriptionRequest.isReferredByFLW());
 		allSubscriptions.add(subscription);

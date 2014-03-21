@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 import org.motechproject.diagnostics.diagnostics.DiagnosticLog;
 import org.motechproject.diagnostics.response.DiagnosticsResult;
 import org.motechproject.diagnostics.response.DiagnosticsStatus;
+import org.motechproject.scheduler.exception.MotechSchedulerException;
 import org.motechproject.util.DateUtil;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -20,103 +21,104 @@ import java.util.List;
 
 @Service
 public class SchedulerDiagnosticService {
-	
+
 	Logger logger = Logger.getLogger(SchedulerDiagnosticService.class);
 
-    private Scheduler motechScheduler;
-    private List<String> obdSchedules;
+	private Scheduler motechScheduler;
+	private List<String> obdSchedules;
 
-    @Autowired
-    public SchedulerDiagnosticService(SchedulerFactoryBean schedulerFactoryBean) {
-        motechScheduler = schedulerFactoryBean.getScheduler();
-        obdSchedules = ObdSchedules.getAll();
-    }
+	@Autowired
+	public SchedulerDiagnosticService(SchedulerFactoryBean schedulerFactoryBean) {
+		motechScheduler = schedulerFactoryBean.getScheduler();
+		obdSchedules = ObdSchedules.getAll();
+	}
 
-    public SchedulerDiagnosticService(SchedulerFactoryBean schedulerFactoryBean, List<String> obdSchedules) {
-        this.motechScheduler = schedulerFactoryBean.getScheduler();
-        this.obdSchedules = obdSchedules;
-    }
+	public SchedulerDiagnosticService(SchedulerFactoryBean schedulerFactoryBean, List<String> obdSchedules) {
+		this.motechScheduler = schedulerFactoryBean.getScheduler();
+		this.obdSchedules = obdSchedules;
+	}
 
-    public DiagnosticsResult diagnoseAllOBDSchedules() throws SchedulerException {
-        List<JobDetails> jobDetailsList = getJobDetailsFor(obdSchedules);
-        logger.info("/scheduler/obd/ jobDetailsList="+jobDetailsList!=null?jobDetailsList.toString():null);
-        DiagnosticsResult diagnosticsResult = checkIfAllJobsAreScheduled(obdSchedules, jobDetailsList);
-        logger.info("/scheduler/obd/ diagnosticsResult="+diagnosticsResult!=null?diagnosticsResult.toString():null);
-        return diagnosticsResult.getStatus().equals(DiagnosticsStatus.FAIL) ?
-                diagnosticsResult :
-                checkIfJobsAreScheduledAtTheRightTime(jobDetailsList);
-    }
+	public DiagnosticsResult diagnoseAllOBDSchedules() throws SchedulerException {
+		List<JobDetails> jobDetailsList = getJobDetailsFor(obdSchedules);
+		logger.info("/scheduler/obd/ jobDetailsList="+jobDetailsList!=null?jobDetailsList.toString():null);
+		DiagnosticsResult diagnosticsResult = checkIfAllJobsAreScheduled(obdSchedules, jobDetailsList);
+		logger.info("/scheduler/obd/ diagnosticsResult="+diagnosticsResult!=null?diagnosticsResult.toString():null);
+		return diagnosticsResult.getStatus().equals(DiagnosticsStatus.FAIL) ?
+				diagnosticsResult :
+					checkIfJobsAreScheduledAtTheRightTime(jobDetailsList);
+	}
 
-    private DiagnosticsResult checkIfAllJobsAreScheduled(List<String> jobs, List<JobDetails> jobDetailsList) {
-        DiagnosticLog diagnosticLog = new DiagnosticLog();
+	private DiagnosticsResult checkIfAllJobsAreScheduled(List<String> jobs, List<JobDetails> jobDetailsList) {
+		DiagnosticLog diagnosticLog = new DiagnosticLog();
 
-        if (jobDetailsList.size() != jobs.size()) {
-            ArrayList<String> unScheduledJobs = getUnscheduledJobs(jobs, jobDetailsList);
-            for (String unScheduledJob : unScheduledJobs)
-                diagnosticLog.add("Unscheduled Job: " + unScheduledJob);
-            return new DiagnosticsResult(DiagnosticsStatus.FAIL, diagnosticLog.toString());
-        }
-        return new DiagnosticsResult(DiagnosticsStatus.PASS, diagnosticLog.toString());
-    }
+		if (jobDetailsList.size() != jobs.size()) {
+			ArrayList<String> unScheduledJobs = getUnscheduledJobs(jobs, jobDetailsList);
+			for (String unScheduledJob : unScheduledJobs)
+				diagnosticLog.add("Unscheduled Job: " + unScheduledJob);
+			return new DiagnosticsResult(DiagnosticsStatus.FAIL, diagnosticLog.toString());
+		}
+		return new DiagnosticsResult(DiagnosticsStatus.PASS, diagnosticLog.toString());
+	}
 
-    public DiagnosticsResult diagnose(List<String> jobs) throws SchedulerException {
-        List<JobDetails> jobDetailsList = getJobDetailsFor(jobs);
-        return checkIfJobsAreScheduledAtTheRightTime(jobDetailsList);
-    }
+	public DiagnosticsResult diagnose(List<String> jobs) throws SchedulerException {
+		List<JobDetails> jobDetailsList = getJobDetailsFor(jobs);
+		return checkIfJobsAreScheduledAtTheRightTime(jobDetailsList);
+	}
 
-    private DiagnosticsResult checkIfJobsAreScheduledAtTheRightTime(List<JobDetails> jobDetailsList) throws SchedulerException {
-        DiagnosticLog diagnosticLog = new DiagnosticLog();
-        DiagnosticsStatus status = DiagnosticsStatus.PASS;
-        for (JobDetails jobDetails : jobDetailsList) {
-            diagnosticLog.add("Job : " + jobDetails.getName());
-            Date previousFireTime = jobDetails.getPreviousFireTime();
-            diagnosticLog.add("Previous Fire Time : " + (previousFireTime == null ? "This job has not yet run" : previousFireTime.toString()));
-            diagnosticLog.add("Next Fire Time : " + jobDetails.getNextFireTime());
+	private DiagnosticsResult checkIfJobsAreScheduledAtTheRightTime(List<JobDetails> jobDetailsList) throws SchedulerException {
+		DiagnosticLog diagnosticLog = new DiagnosticLog();
+		DiagnosticsStatus status = DiagnosticsStatus.PASS;
+		for (JobDetails jobDetails : jobDetailsList) {
+			diagnosticLog.add("Job : " + jobDetails.getName());
+			Date previousFireTime = jobDetails.getPreviousFireTime();
+			diagnosticLog.add("Previous Fire Time : " + (previousFireTime == null ? "This job has not yet run" : previousFireTime.toString()));
+			diagnosticLog.add("Next Fire Time : " + jobDetails.getNextFireTime());
 
-            if (!hasJobRunInPreviousDay(jobDetails, diagnosticLog)) {
-                status = DiagnosticsStatus.FAIL;
-            }
-            diagnosticLog.add("");
-        }
+			if (!hasJobRunInPreviousDay(jobDetails, diagnosticLog)) {
+				status = DiagnosticsStatus.FAIL;
+			}
+			diagnosticLog.add("");
+		}
 
-        if (!checkMotechScheduler(diagnosticLog)) {
-            status = DiagnosticsStatus.FAIL;
-        }
+		if (!checkMotechScheduler(diagnosticLog)) {
+			status = DiagnosticsStatus.FAIL;
+		}
 
-        return new DiagnosticsResult(status, diagnosticLog.toString());
-    }
+		return new DiagnosticsResult(status, diagnosticLog.toString());
+	}
 
-    private ArrayList<String> getUnscheduledJobs(List<String> jobs, List<JobDetails> jobDetailsList) {
-        ArrayList<String> jobDetailNamesList = (ArrayList<String>) CollectionUtils.collect(jobDetailsList, new Transformer() {
-            @Override
-            public Object transform(Object input) {
-                JobDetails jobDetails = (JobDetails) input;
-                return jobDetails.getName();
-            }
-        });
-        return (ArrayList<String>) CollectionUtils.disjunction(jobs, jobDetailNamesList);
-    }
+	@SuppressWarnings("unchecked")
+	private ArrayList<String> getUnscheduledJobs(List<String> jobs, List<JobDetails> jobDetailsList) {
+		ArrayList<String> jobDetailNamesList = (ArrayList<String>) CollectionUtils.collect(jobDetailsList, new Transformer() {
+			@Override
+			public Object transform(Object input) {
+				JobDetails jobDetails = (JobDetails) input;
+				return jobDetails.getName();
+			}
+		});
+		return (ArrayList<String>) CollectionUtils.disjunction(jobs, jobDetailNamesList);
+	}
 
-    private boolean checkMotechScheduler(DiagnosticLog diagnosticLog) throws SchedulerException {
-        boolean schedulerRunning = motechScheduler.isStarted();
-        diagnosticLog.add(String.format("Motech Scheduler: %s", schedulerRunning ? "Running" : "Not Running"));
-        return schedulerRunning;
-    }
+	private boolean checkMotechScheduler(DiagnosticLog diagnosticLog) throws SchedulerException {
+		boolean schedulerRunning = motechScheduler.isStarted();
+		diagnosticLog.add(String.format("Motech Scheduler: %s", schedulerRunning ? "Running" : "Not Running"));
+		return schedulerRunning;
+	}
 
-    private boolean hasJobRunInPreviousDay(JobDetails jobDetails, DiagnosticLog diagnosticLog) {
-        String log = "Has job run in previous day : %s";
-        Date previousFireTime = jobDetails.getPreviousFireTime();
-        if (previousFireTime == null) {
-            diagnosticLog.add(String.format(log, "N/A"));
-            return true;
-        }
+	private boolean hasJobRunInPreviousDay(JobDetails jobDetails, DiagnosticLog diagnosticLog) {
+		String log = "Has job run in previous day : %s";
+		Date previousFireTime = jobDetails.getPreviousFireTime();
+		if (previousFireTime == null) {
+			diagnosticLog.add(String.format(log, "N/A"));
+			return true;
+		}
 
-        boolean hasRunInPreviousDay = !DateUtil.newDateTime(previousFireTime).isBefore(DateTime.now().minusHours(25));
-        diagnosticLog.add(String.format(log, hasRunInPreviousDay ? "Yes" : "No"));
-        return hasRunInPreviousDay;
-    }
+		boolean hasRunInPreviousDay = !DateUtil.newDateTime(previousFireTime).isBefore(DateTime.now().minusHours(25));
+		diagnosticLog.add(String.format(log, hasRunInPreviousDay ? "Yes" : "No"));
+		return hasRunInPreviousDay;
+	}
 
-    private List<JobDetails> getJobDetailsFor(List<String> jobs) throws SchedulerException {
+	/* private List<JobDetails> getJobDetailsFor(List<String> jobs) throws SchedulerException {
         List<TriggerKey> triggerKeys = new ArrayList<>(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains("default")));
         List<JobDetails> jobDetailsList = new ArrayList<>();
         for (TriggerKey triggerKey : triggerKeys) {
@@ -128,13 +130,42 @@ public class SchedulerDiagnosticService {
             }
         }
         return jobDetailsList;
-    }
+    }*/
 
-    private boolean isForJob(String name, List<String> jobs) {
-        for (String job : jobs) {
-            if (name.contains(job))
-                return true;
-        }
-        return false;
-    }
+	private List<JobDetails> getJobDetailsFor(List<String> jobs){
+		String _method = "getJobDetailsFor";
+		DiagnosticLog diagnosticLog = new DiagnosticLog();
+		List<JobDetails> jobDetailsList = new ArrayList<>();
+		try{
+
+			List<TriggerKey> triggerKeys = new ArrayList<>(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains("default")));
+			for (TriggerKey triggerKey : triggerKeys) {
+				Trigger trigger = motechScheduler.getTrigger(triggerKey);
+				if(trigger !=null){
+					JobKey jobKey = trigger.getJobKey();
+					if (motechScheduler.getTriggersOfJob(jobKey).size() > 0 && isForJob(jobKey.getName(), jobs)) {
+						Date previousFireTime = trigger.getPreviousFireTime();
+						jobDetailsList.add(new JobDetails(previousFireTime, jobKey.getName(), trigger.getNextFireTime()));
+					}
+				}else{
+					String errorMessage = "Exception in method:"+_method+": Cannot get the job details as trigger does not exist";
+					diagnosticLog.add(errorMessage);
+					throw new MotechSchedulerException(errorMessage);
+				}
+			}
+		}catch (SchedulerException e) {          
+			diagnosticLog.add("Exception in _method : "+_method+" : " + e.getMessage());
+			throw new MotechSchedulerException("Exception in _method" + e.getMessage());
+		}
+		return jobDetailsList;
+	}
+
+
+	private boolean isForJob(String name, List<String> jobs) {
+		for (String job : jobs) {
+			if (name.contains(job))
+				return true;
+		}
+		return false;
+	}
 }

@@ -23,7 +23,7 @@ public class CallbackRequestHandler {
 
     @MotechListener(subjects = {SubscriptionEventKeys.PROCESS_CALLBACK_REQUEST})
     public void handleCallbackRequest(MotechEvent motechEvent) {
-    	logger.info("@@1 PROCESS_CALLBACK_REQUEST: processing call back request.. in CallbackRequestHandler class");
+    	logger.info("PROCESS_CALLBACK_REQUEST: processing call back request.. in CallbackRequestHandler class");
         CallbackRequestWrapper callbackRequestWrapper = (CallbackRequestWrapper) motechEvent.getParameters().get("0");
         if(callbackRequestWrapper.isRequestedByMotech())
         	subscriptionStateHandlerFactory.getHandler(callbackRequestWrapper).perform(callbackRequestWrapper);

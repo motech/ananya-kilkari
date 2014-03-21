@@ -24,21 +24,17 @@ public class SubscriptionPublisher {
     }
 
     public void createSubscription(SubscriptionWebRequest subscriptionWebRequest) {
-    	logger.info("#1 SubscriptionPublisher: CREATE_SUBSCRIPTION");
-        eventContext.send(SubscriptionEventKeys.CREATE_SUBSCRIPTION, subscriptionWebRequest);
+    	 eventContext.send(SubscriptionEventKeys.CREATE_SUBSCRIPTION, subscriptionWebRequest);
     }
 
     public void processReferredByFLWRequest(ReferredByFlwRequest referredByFlwMsisdnRequest) {
-    	logger.info("#2 ubscriptionPublisher: PROCESS_REFFERED_BY_SUBSCRIPTION");
-        eventContext.send(SubscriptionEventKeys.PROCESS_REFFERED_BY_SUBSCRIPTION, referredByFlwMsisdnRequest);
+    	 eventContext.send(SubscriptionEventKeys.PROCESS_REFFERED_BY_SUBSCRIPTION, referredByFlwMsisdnRequest);
     }
     public void processReferredByRequest(SubscriptionWebRequest subscriptionWebRequest) {
-    	logger.info("#3 SubscriptionPublisher: CREATE_SUBSCRIPTION");
-        eventContext.send(SubscriptionEventKeys.CREATE_SUBSCRIPTION, subscriptionWebRequest);
+    	  eventContext.send(SubscriptionEventKeys.CREATE_SUBSCRIPTION, subscriptionWebRequest);
     }
 
     public void processCallbackRequest(CallbackRequestWrapper callbackRequestWrapper) {
-    	logger.info("#4 SubscriptionPublisher: PROCESS_CALLBACK_REQUEST");
     	try{
     		eventContext.send(SubscriptionEventKeys.PROCESS_CALLBACK_REQUEST, callbackRequestWrapper);
     	}
@@ -49,7 +45,6 @@ public class SubscriptionPublisher {
     }
 
     public void processSubscriberCareRequest(SubscriberCareRequest subscriberCareRequest) {
-    	logger.info("#5 SubscriptionPublisher: PROCESS_SUBSCRIBER_CARE_REQUEST");
-        eventContext.send(SubscriptionEventKeys.PROCESS_SUBSCRIBER_CARE_REQUEST, subscriberCareRequest);
+    	 eventContext.send(SubscriptionEventKeys.PROCESS_SUBSCRIBER_CARE_REQUEST, subscriberCareRequest);
     }
 }

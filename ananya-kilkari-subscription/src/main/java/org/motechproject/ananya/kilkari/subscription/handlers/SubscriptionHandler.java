@@ -54,6 +54,6 @@ public class SubscriptionHandler {
     public void handleDeactivateSubscription(MotechEvent event) {
         ScheduleDeactivationRequest scheduleDeactivationRequest = (ScheduleDeactivationRequest) event.getParameters().get("0");
         logger.info(String.format("Handling deactivation for subscriptionid: %s", scheduleDeactivationRequest.getSubscriptionId()));
-        subscriptionService.deactivateSubscription(scheduleDeactivationRequest.getSubscriptionId(), scheduleDeactivationRequest.getDeactivationDate(), scheduleDeactivationRequest.getReason(), scheduleDeactivationRequest.getGraceCount());
+        subscriptionService.deactivateSubscription(scheduleDeactivationRequest.getSubscriptionId(), scheduleDeactivationRequest.getDeactivationDate(), scheduleDeactivationRequest.getReason(), scheduleDeactivationRequest.getGraceCount(), scheduleDeactivationRequest.getMode());
     }
 }

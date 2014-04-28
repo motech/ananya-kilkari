@@ -26,7 +26,7 @@ public class SubscriptionRequestMapper {
                 subscriber,
                 null,
                 subscriptionWebRequest.getReferredBy(),
-                subscriptionWebRequest.isReferredByFLW());
+                subscriptionWebRequest.isReferredByFLW(),"");
         return subscriptionRequest;
     }
 

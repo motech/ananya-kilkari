@@ -21,13 +21,13 @@ public class ActivateHandler implements SubscriptionStateHandler {
 
     public void perform(CallbackRequestWrapper callbackRequestWrapper) {
         String subscriptionId = callbackRequestWrapper.getSubscriptionId();
-        subscriptionService.activate(subscriptionId, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getOperator());
+        subscriptionService.activate(subscriptionId, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getOperator(),callbackRequestWrapper.getMode());
     }
 
 	public void performForSMReq(CallbackRequestWrapper callbackRequestWrapper) {
 		String msisdn = callbackRequestWrapper.getMsisdn();
 		SubscriptionStatus status = SubscriptionStatus.REFERRED_MSISDN_RECEIVED;
 		SubscriptionPack pack = callbackRequestWrapper.getPack();
-		subscriptionService.activateForReqFromSM(msisdn, pack, status,  callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getOperator());
+		subscriptionService.activateForReqFromSM(msisdn, pack, status,  callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getOperator(),callbackRequestWrapper.getMode());
 	}
 }

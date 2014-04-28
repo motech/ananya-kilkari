@@ -35,13 +35,7 @@ public class SubscriptionPublisher {
     }
 
     public void processCallbackRequest(CallbackRequestWrapper callbackRequestWrapper) {
-    	try{
-    		eventContext.send(SubscriptionEventKeys.PROCESS_CALLBACK_REQUEST, callbackRequestWrapper);
-    	}
-    	catch(Throwable t){
-    		logger.info("@@@ Exception/Error .... ");
-    		logger.error("@@@ Exeption/Error", t);
-    	}
+    		eventContext.send(SubscriptionEventKeys.PROCESS_CALLBACK_REQUEST, callbackRequestWrapper); 	
     }
 
     public void processSubscriberCareRequest(SubscriberCareRequest subscriberCareRequest) {

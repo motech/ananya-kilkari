@@ -13,8 +13,8 @@ import org.springframework.util.StringUtils;
 
 public class SubscriptionMapper {
 
-    public static OMSubscriptionRequest createOMSubscriptionRequest(Subscription subscription, Channel channel) {
-        return new OMSubscriptionRequest(subscription.getMsisdn(), subscription.getPack(), channel, subscription.getSubscriptionId());
+    public static OMSubscriptionRequest createOMSubscriptionRequest(Subscription subscription, Channel channel, String mode) {
+        return new OMSubscriptionRequest(subscription.getMsisdn(), subscription.getPack(), channel, subscription.getSubscriptionId(), mode);
     }
 
     public static SubscriptionReportRequest createSubscriptionCreationReportRequest(
@@ -28,6 +28,6 @@ public class SubscriptionMapper {
         boolean referredByFlag = subscription.isReferredByFLW();
         return new SubscriptionReportRequest(subscription.getSubscriptionId(), channel.name(), msisdn, subscription.getPack().name(),
                 subscriber.getBeneficiaryName(), subscriber.getBeneficiaryAge(), subscriptionRequest.getCreationDate(), subscription.getStatus().name(), subscriber.getExpectedDateOfDelivery(),
-                subscriber.getDateOfBirth(), subscriberLocation, operator, subscription.getStartDate(), subscriptionRequest.getOldSubscriptionId(), subscriptionRequest.getReason(), startWeekNumber, referredBy, referredByFlag , requestedFromSM);
+                subscriber.getDateOfBirth(), subscriberLocation, operator, subscription.getStartDate(), subscriptionRequest.getOldSubscriptionId(), subscriptionRequest.getReason(), startWeekNumber, referredBy, referredByFlag , requestedFromSM,subscriptionRequest.getMode());
     }
 }

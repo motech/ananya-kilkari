@@ -39,7 +39,7 @@ public class SubscriptionHandlerTest {
         final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         final Channel channel = Channel.IVR;
         final String subscriptionId = "abcd1234";
-        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId);
+        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId, "ivr");
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("0", omSubscriptionRequest);
         }};
@@ -55,7 +55,7 @@ public class SubscriptionHandlerTest {
         final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         final Channel channel = Channel.IVR;
         final String subscriptionId = "abcd1234";
-        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId);
+        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId, "ivr");
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("0", omSubscriptionRequest);
         }};
@@ -71,14 +71,14 @@ public class SubscriptionHandlerTest {
         DateTime deactivationDate = DateTime.now();
         String reason = "some reason";
         Integer graceCount = 2;
-        final ScheduleDeactivationRequest scheduleDeactivationRequest = new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount);
+        final ScheduleDeactivationRequest scheduleDeactivationRequest = new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount, "ivr");
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("0", scheduleDeactivationRequest);
         }};
 
         subscriptionHandler.handleDeactivateSubscription(new MotechEvent(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, parameters));
 
-        verify(subscriptionService).deactivateSubscription(scheduleDeactivationRequest.getSubscriptionId(), scheduleDeactivationRequest.getDeactivationDate(), scheduleDeactivationRequest.getReason(), scheduleDeactivationRequest.getGraceCount());
+        verify(subscriptionService).deactivateSubscription(scheduleDeactivationRequest.getSubscriptionId(), scheduleDeactivationRequest.getDeactivationDate(), scheduleDeactivationRequest.getReason(), scheduleDeactivationRequest.getGraceCount(), "ivr");
     }
 
     @Test
@@ -86,7 +86,7 @@ public class SubscriptionHandlerTest {
         final String msisdn = "9988776655";
         final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         final String subscriptionId = "abcd1234";
-        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
+        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId, "ivr");
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("0", omSubscriptionRequest);
         }};
@@ -101,7 +101,7 @@ public class SubscriptionHandlerTest {
         final String msisdn = "9988776655";
         final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         final String subscriptionId = "abcd1234";
-        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
+        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId, "ivr");
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("0", omSubscriptionRequest);
         }};

@@ -29,7 +29,7 @@ public class OnMobileSubscriptionManagerPublisherTest {
     @Test
     public void shouldPublishProcessSubscriptionActivationEventIntoQueue() {
         String subscriptionId = "ABCD1234";
-        onMobileSubscriptionManagerPublisher.sendActivationRequest(new OMSubscriptionRequest("1234567890", SubscriptionPack.NAVJAAT_KILKARI, Channel.IVR, subscriptionId));
+        onMobileSubscriptionManagerPublisher.sendActivationRequest(new OMSubscriptionRequest("1234567890", SubscriptionPack.NAVJAAT_KILKARI, Channel.IVR, subscriptionId, "ivr"));
 
         ArgumentCaptor<OMSubscriptionRequest> subscriptionActivationRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -47,7 +47,7 @@ public class OnMobileSubscriptionManagerPublisherTest {
     @Test
     public void shouldPublishProcessSubscriptionDeactivationEventIntoQueue() {
         String subscriptionId = "ABCD1234";
-        onMobileSubscriptionManagerPublisher.processDeactivation(new OMSubscriptionRequest("1234567890", SubscriptionPack.NAVJAAT_KILKARI, Channel.IVR, subscriptionId));
+        onMobileSubscriptionManagerPublisher.processDeactivation(new OMSubscriptionRequest("1234567890", SubscriptionPack.NAVJAAT_KILKARI, Channel.IVR, subscriptionId, "ivr"));
 
         ArgumentCaptor<OMSubscriptionRequest> processSubscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
         ArgumentCaptor<String> eventArgumentCaptor = ArgumentCaptor.forClass(String.class);

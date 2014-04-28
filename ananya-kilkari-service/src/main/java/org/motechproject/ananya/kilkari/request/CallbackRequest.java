@@ -22,6 +22,8 @@ public class CallbackRequest implements Serializable {
     private SubscriptionPack pack;
     @JsonProperty
     private String graceCount;
+    @JsonProperty
+    private String mode;
 
     @JsonIgnore
     public String getMsisdn() {
@@ -57,6 +59,11 @@ public class CallbackRequest implements Serializable {
     public SubscriptionPack getPack() {
 		return pack;
 	}
+    
+    @JsonIgnore
+	public String getMode() {
+		return mode;
+	}
 
 	public void setPack(SubscriptionPack pack) {
 		this.pack = pack;
@@ -86,8 +93,13 @@ public class CallbackRequest implements Serializable {
         this.graceCount = graceCount;
     }
 
-    @Override
-    public String toString() {
-        return String.format("msisdn: %s; reason: %s; operator: %s; graceCount: %s; action: %s; status: %s", msisdn, reason, operator, graceCount, action, status);
-    }
+	@Override
+	public String toString() {
+		return "CallbackRequest [msisdn=" + msisdn + ", action=" + action
+				+ ", status=" + status + ", reason=" + reason + ", operator="
+				+ operator + ", pack=" + pack + ", graceCount=" + graceCount
+				+ ", mode=" + mode + "]";
+	}
+
+   
 }

@@ -34,6 +34,6 @@ public class RenewalSuccessHandlerTest {
         callbackRequest.setGraceCount(graceCount);
         renewalSuccessHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now, true));
 
-        verify(subscriptionService).renewSubscription(subscriptionId, now, Integer.valueOf(graceCount));
+        verify(subscriptionService).renewSubscription(subscriptionId, now, Integer.valueOf(graceCount),"ivr");
     }
 }

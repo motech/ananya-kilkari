@@ -35,6 +35,6 @@ public class RenewalSuspensionHandlerTest {
 
         renewalSuspensionHandler.perform(new CallbackRequestWrapper(callbackRequest, subId, renewalDate, true));
 
-        verify(subscriptionService).suspendSubscription(subId, renewalDate, reason, Integer.valueOf(graceCount));
+        verify(subscriptionService).suspendSubscription(subId, renewalDate, reason, Integer.valueOf(graceCount),"ivr");
     }
 }

@@ -12,12 +12,14 @@ public class ScheduleDeactivationRequest implements Serializable {
     private DateTime deactivationDate;
     private String reason;
     private Integer graceCount;
+    private String mode;
 
-    public ScheduleDeactivationRequest(String subscriptionId, DateTime deactivationDate, String reason, Integer graceCount) {
+    public ScheduleDeactivationRequest(String subscriptionId, DateTime deactivationDate, String reason, Integer graceCount, String mode) {
         this.subscriptionId = subscriptionId;
         this.deactivationDate = deactivationDate;
         this.reason = reason;
         this.graceCount = graceCount;
+        this.mode = mode;
     }
 
     public String getSubscriptionId() {
@@ -35,8 +37,13 @@ public class ScheduleDeactivationRequest implements Serializable {
     public Integer getGraceCount() {
         return graceCount;
     }
+    
 
-    @Override
+    public String getMode() {
+		return mode;
+	}
+
+	@Override
     public boolean equals(Object that) {
         return EqualsBuilder.reflectionEquals(this, that);
     }

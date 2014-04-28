@@ -195,7 +195,7 @@ public class KilkariSubscriptionService {
 		Errors validationErrors = unSubscriptionWebRequest.validate();
 		raiseExceptionIfThereAreErrors(validationErrors);
 		subscriptionService.requestUnsubscription(new DeactivationRequest(subscriptionId, Channel.from(unSubscriptionWebRequest.getChannel()),
-				unSubscriptionWebRequest.getCreatedAt(), unSubscriptionWebRequest.getReason()));
+				unSubscriptionWebRequest.getCreatedAt(), unSubscriptionWebRequest.getReason(),unSubscriptionWebRequest.getChannel()));
 	}
 
 	public void processCampaignChange(CampaignChangeRequest campaignChangeRequest, String subscriptionId) {

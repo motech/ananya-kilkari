@@ -35,6 +35,6 @@ public class ActivateHandlerTest {
         callbackRequest.setOperator(operator);
         activateHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now, true));
 
-        verify(subscriptionService).activate(subscriptionId, now, operator);
+        verify(subscriptionService).activate(subscriptionId, now, operator,"ivr");
     }
 }

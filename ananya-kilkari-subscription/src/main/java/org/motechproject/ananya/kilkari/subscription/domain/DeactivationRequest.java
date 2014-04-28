@@ -9,12 +9,14 @@ public class DeactivationRequest {
     private Channel channel;
     private DateTime createdAt;
     private String reason;
+    private String mode;
 
-    public DeactivationRequest(String subscriptionId, Channel channel, DateTime createdAt, String reason) {
+    public DeactivationRequest(String subscriptionId, Channel channel, DateTime createdAt, String reason ,String mode) {
         this.subscriptionId = subscriptionId;
         this.channel = channel;
         this.createdAt = createdAt;
         this.reason = reason;
+        this.mode = mode;
     }
 
     public String getSubscriptionId() {
@@ -32,4 +34,10 @@ public class DeactivationRequest {
     public String getReason() {
         return reason;
     }
+
+	public String getMode() {
+		return mode;
+	}
+    
+    
 }

@@ -228,7 +228,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.PENDING_ACTIVATION;
         Subscription mockedSubscription = mock(Subscription.class);
-        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI, Channel.IVR, subscriptionId);
+        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI, Channel.IVR, subscriptionId, "ivr");
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
@@ -258,7 +258,7 @@ public class SubscriptionServiceTest {
         when(mockedSubscription.canReceiveDeactivationRequest()).thenReturn(true);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now(), reason));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now(), reason, "ivr"));
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
@@ -279,7 +279,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = "abcd1234";
         SubscriptionStatus status = SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED;
         Subscription mockedSubscription = mock(Subscription.class);
-        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI, Channel.IVR, subscriptionId);
+        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest("1234567890", SubscriptionPack.BARI_KILKARI, Channel.IVR, subscriptionId, "ivr");
         when(mockedSubscription.getStatus()).thenReturn(status);
         when(mockedSubscription.getSubscriptionId()).thenReturn(subscriptionId);
         when(mockedSubscription.canMoveToPendingDeactivation()).thenReturn(true);
@@ -313,7 +313,7 @@ public class SubscriptionServiceTest {
         when(mockedSubscription.canFailActivation()).thenReturn(true);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.activationFailed(subscriptionId, DateTime.now(), reason, operator);
+        subscriptionService.activationFailed(subscriptionId, DateTime.now(), reason, operator, "ivr");
 
         InOrder order = inOrder(allSubscriptions, mockedSubscription, reportingServiceImpl);
         order.verify(allSubscriptions).findBySubscriptionId(subscriptionId);
@@ -344,7 +344,7 @@ public class SubscriptionServiceTest {
         when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(deltaMinutes);
         when(campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, subscription.getMsisdn(), operator)).thenReturn(messageId);
 
-        subscriptionService.activate(subscriptionId, activatedOn, operator);
+        subscriptionService.activate(subscriptionId, activatedOn, operator, "ivr");
 
         verify(inboxService).newMessage(subscriptionId, messageId);
     }
@@ -361,7 +361,7 @@ public class SubscriptionServiceTest {
         when(kilkariPropertiesData.getCampaignScheduleDeltaDays()).thenReturn(deltaDays);
         when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(deltaMinutes);
 
-        subscriptionService.activate(subscriptionId, activatedOn, operator);
+        subscriptionService.activate(subscriptionId, activatedOn, operator, "ivr");
 
         verify(inboxService, never()).newMessage(anyString(), anyString());
     }
@@ -378,7 +378,7 @@ public class SubscriptionServiceTest {
         when(kilkariPropertiesData.getCampaignScheduleDeltaDays()).thenReturn(deltaDays);
         when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(deltaMinutes);
 
-        subscriptionService.activate(subscriptionId, activatedOn, operator);
+        subscriptionService.activate(subscriptionId, activatedOn, operator, "ivr");
 
         verify(campaignMessageAlertService).scheduleCampaignMessageAlertForActivation(subscriptionId, subscription.getMsisdn(), subscription.getOperator().name());
     }
@@ -396,7 +396,7 @@ public class SubscriptionServiceTest {
         when(kilkariPropertiesData.getCampaignScheduleDeltaDays()).thenReturn(deltaDays);
         when(kilkariPropertiesData.getCampaignScheduleDeltaMinutes()).thenReturn(deltaMinutes);
 
-        subscriptionService.activate(subscriptionId, activatedOn, operator);
+        subscriptionService.activate(subscriptionId, activatedOn, operator, "ivr");
 
         ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).update(captor.capture());
@@ -439,7 +439,7 @@ public class SubscriptionServiceTest {
         subscription.setOperator(Operator.AIRTEL);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.renewSubscription(subscriptionId, renewalDate, graceCount);
+        subscriptionService.renewSubscription(subscriptionId, renewalDate, graceCount, "ivr");
 
         verify(allSubscriptions).update(subscription);
         ArgumentCaptor<SubscriptionStateChangeRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
@@ -467,7 +467,7 @@ public class SubscriptionServiceTest {
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.suspendSubscription(subscriptionId, renewalDate, reason, graceCount);
+        subscriptionService.suspendSubscription(subscriptionId, renewalDate, reason, graceCount, "ivr");
 
         verify(allSubscriptions).update(subscription);
         ArgumentCaptor<SubscriptionStateChangeRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
@@ -494,7 +494,7 @@ public class SubscriptionServiceTest {
 
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.deactivateSubscription(subscriptionId, date, reason, graceCount);
+        subscriptionService.deactivateSubscription(subscriptionId, date, reason, graceCount, "ivr");
 
         verify(allSubscriptions).update(subscription);
         ArgumentCaptor<SubscriptionStateChangeRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
@@ -528,7 +528,7 @@ public class SubscriptionServiceTest {
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         Channel channel = Channel.IVR;
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, channel, DateTime.now(), null));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, channel, DateTime.now(), null, "ivr"));
 
         ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
         ArgumentCaptor<OMSubscriptionRequest> captor1 = ArgumentCaptor.forClass(OMSubscriptionRequest.class);
@@ -550,7 +550,7 @@ public class SubscriptionServiceTest {
         final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).withStartDate(DateTime.now().minusWeeks(4)).build();
         final String subscriptionId = subscription.getSubscriptionId();
-        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
+        final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId, "ivr");
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         subscriptionService.subscriptionComplete(omSubscriptionRequest);
@@ -591,7 +591,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.subscriptionComplete(new OMSubscriptionRequest(msisdn, pack, Channel.IVR, subscriptionId));
+        subscriptionService.subscriptionComplete(new OMSubscriptionRequest(msisdn, pack, Channel.IVR, subscriptionId, "ivr"));
 
         verify(inboxService).scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
     }
@@ -602,7 +602,7 @@ public class SubscriptionServiceTest {
         final Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.DEACTIVATED).build();
         final String subscriptionId = subscription.getSubscriptionId();
         final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
-        OMSubscriptionRequest value = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId);
+        OMSubscriptionRequest value = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId, "ivr");
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
         subscriptionService.subscriptionComplete(value);
@@ -621,7 +621,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.deactivateSubscription(subscriptionId, DateTime.now(), null, null);
+        subscriptionService.deactivateSubscription(subscriptionId, DateTime.now(), null, null, "ivr");
 
         verify(inboxService).scheduleInboxDeletion(subscriptionId, subscription.getCurrentWeeksMessageExpiryDate());
     }
@@ -758,7 +758,7 @@ public class SubscriptionServiceTest {
         Subscription mockedSubscription = mock(Subscription.class);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(mockedSubscription);
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now(), null));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now(), null, "ivr"));
 
         verify(mockedSubscription, never()).deactivationRequestReceived();
         verify(onMobileSubscriptionManagerPublisher, never()).processDeactivation(Matchers.<OMSubscriptionRequest>any());
@@ -919,7 +919,7 @@ public class SubscriptionServiceTest {
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(messageCampaignService.getActiveCampaignName(subscriptionId)).thenReturn(MessageCampaignPack.NAVJAAT_KILKARI.getCampaignName());
 
-        subscriptionService.deactivateSubscription(subscriptionId, createdAt.plusWeeks(1), "Balance Low", null);
+        subscriptionService.deactivateSubscription(subscriptionId, createdAt.plusWeeks(1), "Balance Low", null, "ivr");
 
         ArgumentCaptor<MessageCampaignRequest> campaignRequestArgumentCaptor = ArgumentCaptor.forClass(MessageCampaignRequest.class);
         verify(messageCampaignService).stop(campaignRequestArgumentCaptor.capture());
@@ -1080,7 +1080,7 @@ public class SubscriptionServiceTest {
         int bufferForDeactivationInDays = 2;
         when(kilkariPropertiesData.getBufferDaysToAllowRenewalForDeactivation()).thenReturn(bufferForDeactivationInDays);
 
-        subscriptionService.processDeactivation(subscriptionId, deactivationDate, reason, graceCount);
+        subscriptionService.processDeactivation(subscriptionId, deactivationDate, reason, graceCount, "ivr");
 
         ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
         verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
@@ -1088,7 +1088,7 @@ public class SubscriptionServiceTest {
         assertEquals(SubscriptionEventKeys.DEACTIVATE_SUBSCRIPTION, actualSchedulableJob.getMotechEvent().getSubject());
         ScheduleDeactivationRequest scheduleDeactivationRequest = (ScheduleDeactivationRequest) actualSchedulableJob.getMotechEvent().getParameters().get("0");
         verify(kilkariPropertiesData).getBufferDaysToAllowRenewalForDeactivation();
-        assertEquals(new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount), scheduleDeactivationRequest);
+        assertEquals(new ScheduleDeactivationRequest(subscriptionId, deactivationDate, reason, graceCount, "ivr"), scheduleDeactivationRequest);
     }
 
     @Test
@@ -1102,7 +1102,7 @@ public class SubscriptionServiceTest {
         int bufferForDeactivationInDays = 2;
         when(kilkariPropertiesData.getBufferDaysToAllowRenewalForDeactivation()).thenReturn(bufferForDeactivationInDays);
 
-        subscriptionService.processDeactivation(subscriptionId, deactivationDate, "Deactivation due to renewal max", graceCount);
+        subscriptionService.processDeactivation(subscriptionId, deactivationDate, "Deactivation due to renewal max", graceCount, "ivr");
     }
 
     @Test
@@ -1116,7 +1116,7 @@ public class SubscriptionServiceTest {
         subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.processDeactivation(subscriptionId, date, reason, graceCount);
+        subscriptionService.processDeactivation(subscriptionId, date, reason, graceCount, "ivr");
 
         verify(allSubscriptions).update(subscription);
         ArgumentCaptor<SubscriptionStateChangeRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
@@ -1140,7 +1140,7 @@ public class SubscriptionServiceTest {
         subscription.setOperator(operator);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.renewSubscription(subscriptionId, DateTime.now(), null);
+        subscriptionService.renewSubscription(subscriptionId, DateTime.now(), null, "ivr");
 
         verify(inboxService, never()).newMessage(anyString(), anyString());
     }
@@ -1157,7 +1157,7 @@ public class SubscriptionServiceTest {
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         when(campaignMessageAlertService.scheduleCampaignMessageAlertForActivation(subscriptionId, msisdn, operator.name())).thenReturn(messageId);
 
-        subscriptionService.renewSubscription(subscriptionId, DateTime.now(), null);
+        subscriptionService.renewSubscription(subscriptionId, DateTime.now(), null, "ivr");
 
         verify(inboxService, never()).newMessage(anyString(), anyString());
     }
@@ -1173,7 +1173,7 @@ public class SubscriptionServiceTest {
         subscription.setOperator(operator);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.renewSubscription(subscriptionId, DateTime.now(), null);
+        subscriptionService.renewSubscription(subscriptionId, DateTime.now(), null, "ivr");
 
         verify(campaignMessageAlertService).scheduleCampaignMessageAlertForRenewal(subscriptionId, msisdn, operator.name());
     }
@@ -1183,7 +1183,7 @@ public class SubscriptionServiceTest {
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn("9988776655").withScheduleStartDate(DateTime.now()).build();
         String subscriptionId = subscription.getSubscriptionId();
         subscription.setStatus(SubscriptionStatus.ACTIVE);
-        DeactivationRequest deactivationRequest = new DeactivationRequest(subscriptionId, Channel.CONTACT_CENTER, DateTime.now(), "Reason");
+        DeactivationRequest deactivationRequest = new DeactivationRequest(subscriptionId, Channel.CONTACT_CENTER, DateTime.now(), "Reason", "ivr");
 
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -1343,7 +1343,7 @@ public class SubscriptionServiceTest {
         SubscriptionPack pack = SubscriptionPack.NANHI_KILKARI;
         Channel channel = Channel.IVR;
         String newMsisdn = "1234567891";
-        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(oldMsisdn, pack, channel, subscriptionId);
+        OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(oldMsisdn, pack, channel, subscriptionId, "ivr");
         Subscription subscription = new Subscription(newMsisdn, pack, DateTime.now(), DateTime.now().plusDays(20), 1, "1234567890", true);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
@@ -1365,7 +1365,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.renewSubscription(subscription.getSubscriptionId(), now, null);
+        subscriptionService.renewSubscription(subscription.getSubscriptionId(), now, null, "ivr");
 
         ArgumentCaptor<SubscriptionStateChangeRequest> reportRequestCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
         verify(reportingServiceImpl).reportSubscriptionStateChange(reportRequestCaptor.capture());
@@ -1381,7 +1381,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.CONTACT_CENTER, now.plusDays(2), "Reason"));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.CONTACT_CENTER, now.plusDays(2), "Reason", "ivr"));
 
         ArgumentCaptor<SubscriptionStateChangeRequest> reportRequestCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);
         verify(reportingServiceImpl).reportSubscriptionStateChange(reportRequestCaptor.capture());
@@ -1398,7 +1398,7 @@ public class SubscriptionServiceTest {
         subscription.campaignCompleted();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.renewSubscription(subscription.getSubscriptionId(), now, 0);
+        subscriptionService.renewSubscription(subscription.getSubscriptionId(), now, 0, "ivr");
 
         ArgumentCaptor<RunOnceSchedulableJob> captor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
         verify(motechSchedulerService).safeScheduleRunOnceJob(captor.capture());
@@ -1419,7 +1419,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.renewSubscription(subscription.getSubscriptionId(), now, 0);
+        subscriptionService.renewSubscription(subscription.getSubscriptionId(), now, 0, "ivr");
 
         verify(motechSchedulerService, never()).safeScheduleRunOnceJob(any(RunOnceSchedulableJob.class));
     }

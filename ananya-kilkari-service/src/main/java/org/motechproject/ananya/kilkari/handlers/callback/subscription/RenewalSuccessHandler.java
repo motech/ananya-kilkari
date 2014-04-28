@@ -20,11 +20,11 @@ public class RenewalSuccessHandler implements SubscriptionStateHandler {
     @Override
     public void perform(CallbackRequestWrapper callbackRequestWrapper) {
         String subscriptionId = callbackRequestWrapper.getSubscriptionId();
-        subscriptionService.renewSubscription(subscriptionId, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getGraceCount());
+        subscriptionService.renewSubscription(subscriptionId, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getGraceCount(),callbackRequestWrapper.getMode());
     }
 
 	@Override
 	public void performForSMReq(CallbackRequestWrapper callbackRequestWrapper) {
-	      subscriptionService.renewSubscriptionForSM(callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack() , callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getGraceCount());
+	      subscriptionService.renewSubscriptionForSM(callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack() , callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getGraceCount(),callbackRequestWrapper.getMode());
 	}
 }

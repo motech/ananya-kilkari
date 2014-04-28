@@ -75,9 +75,16 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
 	}
 
 
-	@GenerateView
+	/*@GenerateView
 	public List<Subscription> findByCreationDate(DateTime startDate, DateTime endDate) {
 		ViewQuery viewQuery = createQuery("by_creationDate").startKey(startDate).endKey(endDate).includeDocs(true);
+		List<Subscription> subscriptions = db.queryView(viewQuery, Subscription.class);
+		return subscriptions == null ? Collections.EMPTY_LIST : subscriptions;
+	}*/
+	
+	@GenerateView
+	public List<Subscription> findByActivationDate(DateTime startDate, DateTime endDate) {
+		ViewQuery viewQuery = createQuery("by_activationDate").startKey(startDate).endKey(endDate).includeDocs(true);
 		List<Subscription> subscriptions = db.queryView(viewQuery, Subscription.class);
 		return subscriptions == null ? Collections.EMPTY_LIST : subscriptions;
 	}

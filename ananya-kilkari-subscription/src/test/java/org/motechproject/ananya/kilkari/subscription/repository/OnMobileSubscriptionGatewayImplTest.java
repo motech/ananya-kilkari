@@ -39,7 +39,7 @@ public class OnMobileSubscriptionGatewayImplTest {
         when(onMobileEndpoints.activateSubscriptionURL()).thenReturn("url");
         OnMobileSubscriptionGatewayImpl onMobileSubscriptionService = new OnMobileSubscriptionGatewayImpl(restTemplate, onMobileEndpoints);
 
-        onMobileSubscriptionService.activateSubscription(new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId));
+        onMobileSubscriptionService.activateSubscription(new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId, "ivr"));
 
         HashMap<String, String> urlVariables = new HashMap<>();
         urlVariables.put("msisdn", msisdn);
@@ -68,7 +68,7 @@ public class OnMobileSubscriptionGatewayImplTest {
         expectedException.expectMessage("OnMobile subscription request failed with errorCode: 400, error: response body");
         OnMobileSubscriptionGatewayImpl onMobileSubscriptionService = new OnMobileSubscriptionGatewayImpl(restTemplate, onMobileEndpoints);
 
-        onMobileSubscriptionService.activateSubscription(new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId));
+        onMobileSubscriptionService.activateSubscription(new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId, "ivr"));
     }
 
     @Test
@@ -80,7 +80,7 @@ public class OnMobileSubscriptionGatewayImplTest {
         when(onMobileEndpoints.deactivateSubscriptionURL()).thenReturn("url");
         OnMobileSubscriptionGatewayImpl onMobileSubscriptionService = new OnMobileSubscriptionGatewayImpl(restTemplate, onMobileEndpoints);
 
-        onMobileSubscriptionService.deactivateSubscription(new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId));
+        onMobileSubscriptionService.deactivateSubscription(new OMSubscriptionRequest(msisdn, pack, channel, subscriptionId, "ivr"));
 
         HashMap<String, String> urlVariables = new HashMap<>();
         urlVariables.put("msisdn", msisdn);

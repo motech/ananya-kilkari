@@ -95,6 +95,6 @@ public class SubscriptionRequestBuilder {
 
     public SubscriptionRequest build() {
         Subscriber subscriber = new Subscriber(beneficiaryName, beneficiaryAge, dob, edd, week);
-        return new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber, reason, referredBy, referredByFLW);
+        return new SubscriptionRequest(msisdn, creationDate, pack, location, subscriber, reason, referredBy, referredByFLW, "ivr");
     }
 }

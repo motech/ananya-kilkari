@@ -33,6 +33,6 @@ public class ActivationFailedHandlerTest {
         callbackRequest.setOperator(operator);
         activationFailedHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, now, true));
 
-        verify(subscriptionService).activationFailed(subscriptionId, now, "my own reason", operator);
+        verify(subscriptionService).activationFailed(subscriptionId, now, "my own reason", operator,"ivr");
     }
 }

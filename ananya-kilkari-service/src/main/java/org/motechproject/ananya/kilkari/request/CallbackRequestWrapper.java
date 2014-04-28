@@ -63,6 +63,10 @@ public class CallbackRequestWrapper implements Serializable {
     public String getOperator() {
         return callbackRequest.getOperator();
     }
+    
+    public String getMode() {
+		return callbackRequest.getMode();
+	}
 
     public Integer getGraceCount() {
         return (StringUtils.isNotBlank(callbackRequest.getGraceCount()) && StringUtils.isNumeric(callbackRequest.getGraceCount()))

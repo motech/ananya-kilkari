@@ -38,7 +38,7 @@ public class ChangeSubscriptionService {
 			subscriptionService.updateReferredByMsisdn(existingSubscription, changeSubscriptionRequest);  
 		}else if(ChangeSubscriptionType.isChangePack(changeSubscriptionRequest.getChangeType()) || (ChangeSubscriptionType.isChangeSchedule(changeSubscriptionRequest.getChangeType()) && subscriptionService.isTransitionFromActiveOrSuspendedToNewEarly(existingSubscription, changeSubscriptionRequest))){
 			subscriptionService.requestDeactivation(new DeactivationRequest(changeSubscriptionRequest.getSubscriptionId(), changeSubscriptionRequest.getChannel(),
-					changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getReason()));
+					changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getReason(),"changeSubscription-Serco"));
 			updateEddOrDob(changeSubscriptionRequest);
 			createSubscriptionWithNewPack(changeSubscriptionRequest);
 		}else{
@@ -57,7 +57,7 @@ public class ChangeSubscriptionService {
 
 	private Subscription createSubscriptionWithNewPack(ChangeSubscriptionRequest changeSubscriptionRequest) {
 		Subscriber subscriber = new Subscriber(null, null, changeSubscriptionRequest.getDateOfBirth(), changeSubscriptionRequest.getExpectedDateOfDelivery(), null);
-		SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeSubscriptionRequest.getMsisdn(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getPack(), null, subscriber, changeSubscriptionRequest.getReason(), changeSubscriptionRequest.getReferredBy(), changeSubscriptionRequest.isReferredBy());
+		SubscriptionRequest subscriptionRequest = new SubscriptionRequest(changeSubscriptionRequest.getMsisdn(), changeSubscriptionRequest.getCreatedAt(), changeSubscriptionRequest.getPack(), null, subscriber, changeSubscriptionRequest.getReason(), changeSubscriptionRequest.getReferredBy(), changeSubscriptionRequest.isReferredBy(),"ChangeSubscrion-Serco");
 		subscriptionRequest.setOldSubscriptionId(changeSubscriptionRequest.getSubscriptionId());
 		return subscriptionService.createSubscription(subscriptionRequest, changeSubscriptionRequest.getChannel());
 	}

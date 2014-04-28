@@ -16,12 +16,12 @@ public class DeactivateHandler implements SubscriptionStateHandler{
 
     public void perform(CallbackRequestWrapper callbackRequestWrapper) {
         subscriptionService.processDeactivation(callbackRequestWrapper.getSubscriptionId(), callbackRequestWrapper.getCreatedAt(),
-                callbackRequestWrapper.getReason(), callbackRequestWrapper.getGraceCount());
+                callbackRequestWrapper.getReason(), callbackRequestWrapper.getGraceCount(),callbackRequestWrapper.getMode());
     }
 
 	@Override
 	public void performForSMReq(CallbackRequestWrapper callbackRequestWrapper) {
 		 subscriptionService.processDeactivationForReqSM(callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack(), callbackRequestWrapper.getCreatedAt(),
-	                callbackRequestWrapper.getReason(), callbackRequestWrapper.getGraceCount());
+	                callbackRequestWrapper.getReason(), callbackRequestWrapper.getGraceCount(),callbackRequestWrapper.getMode());
 	}
 }

@@ -87,7 +87,7 @@ public class SubscriptionServiceStateCheckTest {
     public void shouldNotActivateIfNotInTheRightState() {
         when(mockSubscription.canActivate()).thenReturn(false);
 
-        subscriptionService.activate(subscriptionId, DateTime.now(), "AIRTEL");
+        subscriptionService.activate(subscriptionId, DateTime.now(), "AIRTEL", "ivr");
 
         verify(mockSubscription).canActivate();
         verifySubscriptionStatusUpdation();
@@ -97,7 +97,7 @@ public class SubscriptionServiceStateCheckTest {
     public void shouldNotFailActivationIfNotInTheRightState() {
         when(mockSubscription.canFailActivation()).thenReturn(false);
 
-        subscriptionService.activationFailed(subscriptionId, DateTime.now(), "reason", "AIRTEL");
+        subscriptionService.activationFailed(subscriptionId, DateTime.now(), "reason", "AIRTEL", "ivr");
 
         verify(mockSubscription).canFailActivation();
         verifySubscriptionStatusUpdation();
@@ -107,7 +107,7 @@ public class SubscriptionServiceStateCheckTest {
     public void shouldNotGoToPendingActivationStateIfNotInTheRightState() {
         when(mockSubscription.canSendActivationRequest()).thenReturn(false);
 
-        subscriptionService.activationRequested(new OMSubscriptionRequest("123", SubscriptionPack.BARI_KILKARI, Channel.IVR, subscriptionId));
+        subscriptionService.activationRequested(new OMSubscriptionRequest("123", SubscriptionPack.BARI_KILKARI, Channel.IVR, subscriptionId, "ivr"));
 
         verify(mockSubscription).canSendActivationRequest();
         verifySubscriptionStatusUpdation();
@@ -117,7 +117,7 @@ public class SubscriptionServiceStateCheckTest {
     public void shouldNotGoToDeactivationRequestReceivedStateIfNotInTheRightState() {
         when(mockSubscription.canReceiveDeactivationRequest()).thenReturn(false);
 
-        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now(),null));
+        subscriptionService.requestDeactivation(new DeactivationRequest(subscriptionId, Channel.IVR, DateTime.now(),null, "ivr"));
 
         verify(mockSubscription).canReceiveDeactivationRequest();
         verifySubscriptionStatusUpdation();
@@ -127,7 +127,7 @@ public class SubscriptionServiceStateCheckTest {
     public void shouldNotGoToPendingDeactivationStateIfNotInTheRightState() {
         when(mockSubscription.canMoveToPendingDeactivation()).thenReturn(false);
 
-        subscriptionService.deactivationRequested(new OMSubscriptionRequest(null, null, null, subscriptionId));
+        subscriptionService.deactivationRequested(new OMSubscriptionRequest(null, null, null, subscriptionId, "ivr"));
 
         verify(mockSubscription).canMoveToPendingDeactivation();
         verifySubscriptionStatusUpdation();
@@ -137,7 +137,7 @@ public class SubscriptionServiceStateCheckTest {
     public void shouldNotRenewIfNotInTheRightState() {
         when(mockSubscription.canActivate()).thenReturn(false);
 
-        subscriptionService.renewSubscription(subscriptionId, null, null);
+        subscriptionService.renewSubscription(subscriptionId, null, null, "ivr");
 
         verify(mockSubscription).canActivate();
         verifySubscriptionStatusUpdation();
@@ -147,7 +147,7 @@ public class SubscriptionServiceStateCheckTest {
     public void shouldNotSuspendIfNotInTheRightState() {
         when(mockSubscription.canSuspend()).thenReturn(false);
 
-        subscriptionService.suspendSubscription(subscriptionId, null, null, null);
+        subscriptionService.suspendSubscription(subscriptionId, null, null, null, "ivr");
 
         verify(mockSubscription).canSuspend();
         verifySubscriptionStatusUpdation();
@@ -157,7 +157,7 @@ public class SubscriptionServiceStateCheckTest {
     public void shouldNotDeactivateIfNotInTheRightState() {
         when(mockSubscription.canDeactivate()).thenReturn(false);
 
-        subscriptionService.deactivateSubscription(subscriptionId, null, null, null);
+        subscriptionService.deactivateSubscription(subscriptionId, null, null, null, "ivr");
 
         verify(mockSubscription).canDeactivate();
         verifySubscriptionStatusUpdation();
@@ -168,7 +168,6 @@ public class SubscriptionServiceStateCheckTest {
         when(mockSubscription.canDeactivate()).thenReturn(false);
         when(mockSubscription.canComplete()).thenReturn(false);
 
-        subscriptionService.deactivateSubscription(subscriptionId, null, null, null);
 
         verify(mockSubscription).canDeactivate();
         verify(mockSubscription).canComplete();

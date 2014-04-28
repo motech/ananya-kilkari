@@ -17,13 +17,13 @@ public class ActivationFailedHandler implements  SubscriptionStateHandler {
     }
 
     public void perform(CallbackRequestWrapper callbackRequestWrapper) {
-        subscriptionService.activationFailed(callbackRequestWrapper.getSubscriptionId(), callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getReason(), callbackRequestWrapper.getOperator());
+        subscriptionService.activationFailed(callbackRequestWrapper.getSubscriptionId(), callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getReason(), callbackRequestWrapper.getOperator(),callbackRequestWrapper.getMode());
     }
 
 	public void performForSMReq(CallbackRequestWrapper callbackRequestWrapper) {
 		String msisdn = callbackRequestWrapper.getMsisdn();
 		SubscriptionStatus status = SubscriptionStatus.REFERRED_MSISDN_RECEIVED;
 		SubscriptionPack pack = callbackRequestWrapper.getPack();
-	    subscriptionService.activationFailedForSM(msisdn, pack, status, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getReason(), callbackRequestWrapper.getOperator());
+	    subscriptionService.activationFailedForSM(msisdn, pack, status, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getReason(), callbackRequestWrapper.getOperator(),callbackRequestWrapper.getMode());
 	}
 }

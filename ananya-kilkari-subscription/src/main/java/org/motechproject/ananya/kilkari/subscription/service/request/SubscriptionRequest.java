@@ -13,10 +13,11 @@ public class SubscriptionRequest {
     private String reason;
     private String referredBy;
     private boolean referredByFLW;
+    private String mode;
 
     public SubscriptionRequest(String msisdn, DateTime creationDate,
 			SubscriptionPack pack, Location location, Subscriber subscriber,
-		     String reason, String referredBy, boolean referredByFLW) {
+		     String reason, String referredBy, boolean referredByFLW, String mode) {
         this.msisdn = msisdn;
         this.creationDate = creationDate;
         this.pack = pack;
@@ -25,10 +26,15 @@ public class SubscriptionRequest {
         this.reason = reason;
 		this.referredBy = referredBy;
 		this.referredByFLW = referredByFLW;
+		this.mode=mode;
     }
 
     public boolean isReferredByFLW() {
 		return referredByFLW;
+	}
+
+	public String getMode() {
+		return mode;
 	}
 
 	public void setReferredByFLW(boolean referredByFLW) {

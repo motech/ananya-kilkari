@@ -16,11 +16,11 @@ public class RenewalSuspensionHandler implements SubscriptionStateHandler {
 
     @Override
     public void perform(CallbackRequestWrapper callbackRequestWrapper) {
-        subscriptionService.suspendSubscription(callbackRequestWrapper.getSubscriptionId(), callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getReason(), callbackRequestWrapper.getGraceCount());
+        subscriptionService.suspendSubscription(callbackRequestWrapper.getSubscriptionId(), callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getReason(), callbackRequestWrapper.getGraceCount(),callbackRequestWrapper.getMode());
     }
 
 	@Override
 	public void performForSMReq(CallbackRequestWrapper callbackRequestWrapper) {
-	       subscriptionService.suspendSubscriptionForSM(callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack(), callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getReason(), callbackRequestWrapper.getGraceCount());
+	       subscriptionService.suspendSubscriptionForSM(callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack(), callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getReason(), callbackRequestWrapper.getGraceCount(),callbackRequestWrapper.getMode());
 	}
 }

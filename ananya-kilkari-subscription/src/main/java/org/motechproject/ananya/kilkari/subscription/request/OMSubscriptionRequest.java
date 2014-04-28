@@ -14,19 +14,25 @@ public class OMSubscriptionRequest implements Serializable {
     private SubscriptionPack pack;
     private Channel channel;
     private String subscriptionId;
+    private String mode;
 
-    public OMSubscriptionRequest(String msisdn, SubscriptionPack pack, Channel channel, String subscriptionId) {
+    public OMSubscriptionRequest(String msisdn, SubscriptionPack pack, Channel channel, String subscriptionId,String mode) {
         this.msisdn = msisdn;
         this.pack = pack;
         this.channel = channel;
         this.subscriptionId = subscriptionId;
+        this.mode = mode;
     }
 
     public String getMsisdn() {
         return msisdn;
     }
 
-    public SubscriptionPack getPack() {
+    public String getMode() {
+		return mode;
+	}
+
+	public SubscriptionPack getPack() {
         return pack;
     }
 

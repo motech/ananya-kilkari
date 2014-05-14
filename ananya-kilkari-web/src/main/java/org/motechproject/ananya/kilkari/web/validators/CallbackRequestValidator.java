@@ -99,7 +99,10 @@ public class CallbackRequestValidator {
 
 		}
 
-		if (CallbackAction.DCT.name().equals(requestAction) && CallbackStatus.BAL_LOW.getStatus().equals(requestStatus)) {
+		//adding code to block multiple DCT request
+		
+		
+		if (CallbackAction.DCT.name().equals(requestAction)) {
 			boolean canBeDeactivated = false;
 			java.util.List<Subscription> subscriptionsByPack = subscriptionService.findByMsisdnAndPack(callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack());
 			if(subscriptionsByPack == null || subscriptionsByPack.isEmpty()){
@@ -107,7 +110,7 @@ public class CallbackRequestValidator {
 				return errors;
 			}else{
 				for (Subscription subscription : subscriptionsByPack) {
-					if(subscription.getStatus().canDeactivateOnRenewal())
+					if(subscription.getStatus().canDeactivateOnRenewal() && CallbackStatus.BAL_LOW.getStatus().equals(requestStatus))
 						canBeDeactivated = true;	
 					if(subscription.getStatus().canTransitionTo(SubscriptionStatus.DEACTIVATED))
 						canBeDeactivated = true;

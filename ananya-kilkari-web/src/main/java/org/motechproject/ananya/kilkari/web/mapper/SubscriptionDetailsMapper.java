@@ -57,8 +57,8 @@ public class SubscriptionDetailsMapper {
 					SubscriptionCCReferredByFlwResponse(subscription.getMsisdn(),
 							subscription.getSubscriptionId(), 
 							subscription.getPack().toString(),
-							getDateAsString(subscription.getCreationDate().toDate()),
-							getTimeAsString(subscription.getCreationDate().toDate())
+							getDateAsString(subscription.getActivationDate().toDate()),
+							getTimeAsString(subscription.getActivationDate().toDate())
 							));
 		}
 		return new SubscriptionResponseList(subscriptionResponses);

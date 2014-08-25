@@ -705,6 +705,7 @@ public class SubscriptionService {
 	private Integer getSubscriptionWeekNumber(Subscription subscription, DateTime endDate) {
 		if (subscription.getScheduleStartDate() == null)
 			return null;
+		//not applying workaround here as the flow is not scheduler related.
 		Integer diffInWeeks = Weeks.weeksBetween(subscription.getScheduleStartDate(), endDate).getWeeks();
 		return subscription.getPack().getStartWeek() + diffInWeeks;
 	}

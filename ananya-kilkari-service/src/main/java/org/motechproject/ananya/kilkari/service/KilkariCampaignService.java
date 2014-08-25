@@ -99,7 +99,7 @@ public class KilkariCampaignService {
 
     public void scheduleWeeklyMessage(String subscriptionId, String campaignName) {
         Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
-
+        logger.info("scheduler workaround check: creating message id for subscription:"+subscription.toString());
         final String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId, campaignName), subscription.getPack());
         final DateTime messageExpiryDate = subscription.getCurrentWeeksMessageExpiryDate();
 

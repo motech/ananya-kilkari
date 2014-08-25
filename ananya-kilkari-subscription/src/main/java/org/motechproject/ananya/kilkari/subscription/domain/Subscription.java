@@ -16,7 +16,11 @@ import java.util.UUID;
 
 @TypeDiscriminator("doc.type === 'Subscription'")
 public class Subscription extends MotechBaseDataObject {
-   
+	private static final double WEEK_IN_MILIS = 7*24*60*60*1000;
+	/*Added Below property for converting 1 min into week(1/10080)= 9.92063e-5; (this calculation is done for adding delta if the scheduler ran few miliseconds before 
+	which resulted in wrong weeks calculation.)*/
+	private static final double COMPARE_WITH_DELTA =  9.92063e-5; 
+
 
 	@JsonProperty
     private String msisdn;
@@ -149,9 +153,6 @@ public class Subscription extends MotechBaseDataObject {
 		this.referredBy = referredBy;
 	}
 
-	
-	
-	
     public void setStartWeekNumber(Integer startWeekNumber) {
 		this.startWeekNumber = startWeekNumber;
 	}
@@ -183,6 +184,7 @@ public class Subscription extends MotechBaseDataObject {
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
                 .append(msisdn)
+                .append(operator)
                 .append(subscriptionId)
                 .append(pack)
                 .append(status)
@@ -190,16 +192,22 @@ public class Subscription extends MotechBaseDataObject {
                 .append(startDate)
                 .append(activationDate)
                 .append(scheduleStartDate)
+                .append(startWeekNumber)
+                .append(referredByFLW)
+                .append(referredBy)
                 .append(messageCampaignPack)
                 .toString();
     }
+    
+    
 
     @JsonIgnore
     public boolean isInProgress() {
         return getStatus().isInProgress();
     }
 
-    @JsonIgnore
+
+	@JsonIgnore
     public boolean isNewEarly() {
         return getStatus().isNewEarly();
     }
@@ -283,8 +291,29 @@ public class Subscription extends MotechBaseDataObject {
 
     @JsonIgnore
     private int getWeeksElapsedAfterScheduleStartDate() {
-        return Weeks.weeksBetween(scheduleStartDate, DateTime.now()).getWeeks();
+    	/**commenting this line to apply workaround for base not happening*/
+    	//return Weeks.weeksBetween(scheduleStartDate, DateTime.now()).getWeeks();
+    	return getWeeksElapsedAfterStartDate();
     }
+    
+	private int getWeeksElapsedAfterStartDate() {
+		double exactWeekNumber = exactWeeksbetween(scheduleStartDate, DateTime.now());
+		double ceilValueOfExactWeekNumber = Math.ceil(exactWeekNumber);
+		double diffBetween =	ceilValueOfExactWeekNumber - exactWeekNumber;
+
+		if((diffBetween)<=(COMPARE_WITH_DELTA)){
+			System.out.println("Calculation of weeknumber within subscription record. going to adjust delta minutes.");
+			return (int)( Math.ceil(exactWeekNumber));
+		}else{
+			return Weeks.weeksBetween(scheduleStartDate, DateTime.now()).getWeeks();
+		}
+	}  
+
+	private double exactWeeksbetween(DateTime start, DateTime end) {
+		double exactWeekNumber = (end.getMillis()- start.getMillis())/WEEK_IN_MILIS;
+		return exactWeekNumber;
+	}
+
 
     /*
      * Returns the next week number for this subscription devoid in absolute terms, ie. it is
@@ -297,8 +326,9 @@ public class Subscription extends MotechBaseDataObject {
             return 1;
         }
 
-        return Weeks.weeksBetween(scheduleStartDate, now).getWeeks()  // Weeks elapsed increment
-                + 1 // Current Week increment
+        //return Weeks.weeksBetween(scheduleStartDate, now).getWeeks()  // Weeks elapsed increment
+         return getWeeksElapsedAfterStartDate()
+        		 + 1 // Current Week increment
                 + 1; // Next week increment
     }
 

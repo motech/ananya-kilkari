@@ -85,7 +85,9 @@ public abstract class MessagesSenderJob {
         DateTime now = DateTime.now();
         DateTime slotStartTime = now.withTime(slotStartTimeLimit.getHourOfDay(), slotStartTimeLimit.getMinuteOfHour(), 0, 0);
         DateTime slotEndTime = now.withTime(slotEndTimeLimit.getHourOfDay(), slotEndTimeLimit.getMinuteOfHour(), 0, 0);
-        boolean canSendMessages = !now.isBefore(slotStartTime) && !now.isAfter(slotEndTime);
+        /**Allowing buffer time of one minute between slots*/
+        Integer bufferMinutes = obdProperties.getBufferTime();
+        boolean canSendMessages = !now.isBefore(slotStartTime.minusMinutes(bufferMinutes)) && !now.isAfter(slotEndTime.plusMinutes(bufferMinutes));
         if (!canSendMessages) {
             logger.info(String.format("Current Time : %s is not within the slot time limits - %s to %s.", now, slotStartTime, slotEndTime));
         }

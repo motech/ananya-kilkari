@@ -93,7 +93,7 @@ public class KilkariSubscriptionService {
 		if(subscription!=null){//updateSubscription
 			ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_REFERRED_BY, msisdn, subscription.getSubscriptionId(), pack, channel, referredByFlwMsisdnRequest.getCreatedAt(), null, null, null,null, referredBy);
 			subscriptionService.updateReferredByMsisdn(subscription, changeSubscriptionRequest);
-		}else if(!subscriptionListForRefByStatus.isEmpty()){//check for already existing entries with status REFERRED_MSISDN_FLAG_RECEIVED
+		}else if(!subscriptionListForRefByStatus.isEmpty()){//check for already existing entries with status REFERRED_MSISDN_RECEIVED
 			subscription= subscriptionListForRefByStatus.get(0);
 			subscription.setCreationDate(referredByFlwMsisdnRequest.getCreatedAt());
 			subscription.setStartDate(DateTime.now());
@@ -125,7 +125,8 @@ public class KilkariSubscriptionService {
 	private static boolean shouldUpdateSubscription(Subscription subscription) {
 		if(subscription.getCreationDate()==null)
 			return false;
-		return !subscription.getCreationDate().isBefore(DateTime.now().minusMinutes(10));
+		/*checking if existing subscription was created within 24 hours*/
+		return !subscription.getCreationDate().isBefore(DateTime.now().minusMinutes(1440));
 	}
 
 
@@ -156,7 +157,7 @@ public class KilkariSubscriptionService {
 	}
 
 	public List<SubscriptionDetailsResponse> getSubscriptionDetails(String msisdn, Channel channel) {
-		validateMsisdn(msisdn);
+		msisdn = validateAndReturnTrimmedMsisdn(msisdn);
 		return subscriptionService.getSubscriptionDetails(msisdn, channel);
 	}
 
@@ -236,6 +237,13 @@ public class KilkariSubscriptionService {
 	private void validateMsisdn(String msisdn) {
 		if (PhoneNumber.isNotValid(msisdn))
 			throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
+	}
+	
+	private String validateAndReturnTrimmedMsisdn(String msisdn) {
+		msisdn = PhoneNumber.trimPhoneNumber(msisdn);
+		if (PhoneNumber.isNotValid(msisdn))
+			throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
+		return msisdn;
 	}
 
 	private void raiseExceptionIfThereAreErrors(Errors validationErrors) {

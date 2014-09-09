@@ -112,4 +112,8 @@ public class OBDProperties {
     public CampaignMessageStatus getDefaultCampaignMessageStatus() {
         return CampaignMessageStatus.getFor(obdProperties.getProperty("obd.default.campaign.message.status"));
     }
+    
+    public Integer getBufferTime() {
+    	return Integer.parseInt(obdProperties.getProperty("obd.message.buffer.minutes"));
+    }
 }

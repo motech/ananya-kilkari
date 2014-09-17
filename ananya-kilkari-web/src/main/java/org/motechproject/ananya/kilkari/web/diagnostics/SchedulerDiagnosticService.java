@@ -2,7 +2,7 @@ package org.motechproject.ananya.kilkari.web.diagnostics;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
-import org.apache.log4j.Logger;
+
 import org.joda.time.DateTime;
 import org.motechproject.diagnostics.diagnostics.DiagnosticLog;
 import org.motechproject.diagnostics.response.DiagnosticsResult;
@@ -11,10 +11,13 @@ import org.motechproject.scheduler.exception.MotechSchedulerException;
 import org.motechproject.util.DateUtil;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,10 +25,9 @@ import java.util.List;
 @Service
 public class SchedulerDiagnosticService {
 
-	Logger logger = Logger.getLogger(SchedulerDiagnosticService.class);
-
 	private Scheduler motechScheduler;
 	private List<String> obdSchedules;
+	private final static Logger logger = LoggerFactory.getLogger(SchedulerDiagnosticService.class);
 
 	@Autowired
 	public SchedulerDiagnosticService(SchedulerFactoryBean schedulerFactoryBean) {
@@ -39,10 +41,10 @@ public class SchedulerDiagnosticService {
 	}
 
 	public DiagnosticsResult diagnoseAllOBDSchedules() throws SchedulerException {
+		logger.info("getting job details for all obd schedules");
 		List<JobDetails> jobDetailsList = getJobDetailsFor(obdSchedules);
-		logger.info("/scheduler/obd/ jobDetailsList="+jobDetailsList!=null?jobDetailsList.toString():null);
+		logger.info(String.format("jobDetailsList size : %s", jobDetailsList.size()));
 		DiagnosticsResult diagnosticsResult = checkIfAllJobsAreScheduled(obdSchedules, jobDetailsList);
-		logger.info("/scheduler/obd/ diagnosticsResult="+diagnosticsResult!=null?diagnosticsResult.toString():null);
 		return diagnosticsResult.getStatus().equals(DiagnosticsStatus.FAIL) ?
 				diagnosticsResult :
 					checkIfJobsAreScheduledAtTheRightTime(jobDetailsList);
@@ -52,6 +54,9 @@ public class SchedulerDiagnosticService {
 		DiagnosticLog diagnosticLog = new DiagnosticLog();
 
 		if (jobDetailsList.size() != jobs.size()) {
+			logger.info(String.format("jobDetailsList size : %s is not matching with jobs size : %s.", jobDetailsList.size(),
+					jobs.size()));
+
 			ArrayList<String> unScheduledJobs = getUnscheduledJobs(jobs, jobDetailsList);
 			for (String unScheduledJob : unScheduledJobs)
 				diagnosticLog.add("Unscheduled Job: " + unScheduledJob);
@@ -137,7 +142,6 @@ public class SchedulerDiagnosticService {
 		DiagnosticLog diagnosticLog = new DiagnosticLog();
 		List<JobDetails> jobDetailsList = new ArrayList<>();
 		try{
-
 			List<TriggerKey> triggerKeys = new ArrayList<>(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains("default")));
 			for (TriggerKey triggerKey : triggerKeys) {
 				Trigger trigger = motechScheduler.getTrigger(triggerKey);
@@ -148,9 +152,7 @@ public class SchedulerDiagnosticService {
 						jobDetailsList.add(new JobDetails(previousFireTime, jobKey.getName(), trigger.getNextFireTime()));
 					}
 				}else{
-					String errorMessage = "Exception in method:"+_method+": Cannot get the job details as trigger does not exist";
-					diagnosticLog.add(errorMessage);
-					throw new MotechSchedulerException(errorMessage);
+					logger.info("trigger retrieved was null for key:"+triggerKey);
 				}
 			}
 		}catch (SchedulerException e) {          

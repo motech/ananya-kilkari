@@ -68,7 +68,7 @@ public abstract class MessagesSenderJob {
         OBDSubSlot subSlot = (OBDSubSlot) parameters.get(SUB_SLOT_KEY);
         logger.info(String.format("Handling send %s sub slot messages with retry event", subSlot.getSlotName()));
 
-        if (!canSendMessages(obdProperties.getSlotStartTimeLimitFor(subSlot), obdProperties.getSlotEndTimeLimitFor(subSlot))) {
+        if (!isCurrentTimeWithinTimeSlotsWithBuffer(obdProperties.getSlotStartTimeLimitFor(subSlot), obdProperties.getSlotEndTimeLimitFor(subSlot))) {
             retryService.fulfill((String) parameters.get(EventKeys.EXTERNAL_ID), retryGroupName);
             return;
         }
@@ -81,16 +81,29 @@ public abstract class MessagesSenderJob {
         }
     }
 
-    private boolean canSendMessages(DateTime slotStartTimeLimit, DateTime slotEndTimeLimit) {
-        DateTime now = DateTime.now();
+    /**
+     * Verifies that the current time falls in a given time slot with an added buffer on either of the given start and
+     * end times. The added buffer time (in minutes) is specified by obdProperties.getBufferTime()
+     *
+     * @param slotStartTimeLimit
+     * @param slotEndTimeLimit
+     * @return true if the current time falls in the given time slot with added buffer, false otherwise
+     */
+    private boolean isCurrentTimeWithinTimeSlotsWithBuffer(DateTime slotStartTimeLimit, DateTime slotEndTimeLimit) {
+        //Calculate the present time slot
+    	DateTime now = DateTime.now();
         DateTime slotStartTime = now.withTime(slotStartTimeLimit.getHourOfDay(), slotStartTimeLimit.getMinuteOfHour(), 0, 0);
         DateTime slotEndTime = now.withTime(slotEndTimeLimit.getHourOfDay(), slotEndTimeLimit.getMinuteOfHour(), 0, 0);
-        /**Allowing buffer time of one minute between slots*/
+      
+        // Extend the slot time by bufferMinutes on either side, making it 2 * bufferMinutes longer
         Integer bufferMinutes = obdProperties.getBufferTime();
-        boolean canSendMessages = !now.isBefore(slotStartTime.minusMinutes(bufferMinutes)) && !now.isAfter(slotEndTime.plusMinutes(bufferMinutes));
-        if (!canSendMessages) {
+        DateTime slotStartTimeWithBuffer = slotStartTime.minusMinutes(bufferMinutes);
+        DateTime slotEndTimeWithBuffer = slotEndTime.plusMinutes(bufferMinutes);
+        
+        boolean isWithinTimeRange = !now.isBefore(slotStartTimeWithBuffer) && !now.isAfter(slotEndTimeWithBuffer);
+        if (!isWithinTimeRange) {
             logger.info(String.format("Current Time : %s is not within the slot time limits - %s to %s.", now, slotStartTime, slotEndTime));
         }
-        return canSendMessages;
+        return isWithinTimeRange;
     }
 }

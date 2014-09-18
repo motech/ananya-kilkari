@@ -116,7 +116,7 @@ public class CallbackRequestValidator {
 						canBeDeactivated = true;
 				}
 				if(!canBeDeactivated)
-					errors.add(String.format("Cannot deactivate on renewal. Subscription not in status: %s", SubscriptionStatus.SUSPENDED));
+					errors.add(String.format("Cannot deactivate on renewal. present subscription status cannot be transitioned to deactivated state"));
 			}
 			return errors;		
 		}

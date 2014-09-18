@@ -336,6 +336,10 @@ public class Subscription extends MotechBaseDataObject {
         return getStatus().hasBeenActivated();
     }
 
+    public boolean hasSchedulableStatus() {
+        return getStatus().canScheduleMessage();
+    }
+    
     public void setMsisdn(String msisdn) {
         this.msisdn = msisdn;
     }

@@ -196,8 +196,13 @@ public enum SubscriptionStatus {
     public boolean hasBeenActivated() {
         return !(this == SubscriptionStatus.PENDING_ACTIVATION || this == SubscriptionStatus.ACTIVATION_FAILED);
     }
+    
 
     private static List<SubscriptionStatus> getDeactivatedStates() {
         return Arrays.asList(PENDING_DEACTIVATION, DEACTIVATED, DEACTIVATION_REQUEST_RECEIVED);
     }
+
+	public boolean canScheduleMessage() {
+		 return (this == SubscriptionStatus.ACTIVE ||this == SubscriptionStatus.SUSPENDED);
+	}
 }

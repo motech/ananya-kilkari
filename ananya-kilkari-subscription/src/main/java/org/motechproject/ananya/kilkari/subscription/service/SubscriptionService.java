@@ -10,7 +10,6 @@ import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignS
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
 import org.motechproject.ananya.kilkari.reporting.service.ReportingService;
-
 import org.motechproject.ananya.kilkari.subscription.domain.*;
 import org.motechproject.ananya.kilkari.subscription.repository.AllSubscriptions;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
@@ -578,6 +577,15 @@ public class SubscriptionService {
 			scheduleEarlySubscription(subscriptionRequest.getSubscriptionStartDate(), omSubscriptionRequest);
 		else{
 			logger.info("going to reschedule subscription for subscription id"+subscription.getSubscriptionId()+" start date="+scheduleStartDateTime);
+			//If an new early request for normal call wants to transition to active mode after edd/dob updation it should be handled seperately.
+			//the new subscription must be activated immedietly, which will be done via omsm.
+			if(subscription.isNewEarly()){
+				requestDeactivation(new DeactivationRequest(subscription.getSubscriptionId(), changeRequest.getChannel(),
+						subscription.getCreationDate(), changeRequest.getReason(),"changeSubscription-Serco"));	
+				subscriptionRequest.setOldSubscriptionId(changeRequest.getSubscriptionId());
+				createSubscription(subscriptionRequest, changeRequest.getChannel());
+				return;
+			}
 			scheduleCampaign(subscription, scheduleStartDateTime);
 			activateSchedule(subscription);
 		}

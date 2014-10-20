@@ -179,10 +179,10 @@ public class KilkariSubscriptionService {
 
 	public void processSubscriptionCompletion(Subscription subscription, String campaignName) {
 		String subscriptionId = subscription.getSubscriptionId();
-
 		CampaignMessageAlert campaignMessageAlert = campaignMessageAlertService.findBy(subscriptionId);
 		boolean isRenewed = campaignMessageAlert != null && campaignMessageAlert.isRenewed();
-		String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, subscription.getScheduleStartDate(), subscription.getPack());
+		DateTime scheduleStartDate = subscription.getScheduleStartDate()!=null?subscription.getScheduleStartDate():subscription.getStartDateForSubscription(subscription.getStartDate());
+		String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, scheduleStartDate, subscription.getPack());
 		if (isRenewed || campaignMessageService.find(subscriptionId, messageId) != null) {
 			subscriptionService.scheduleCompletion(subscription, DateTime.now());
 			logger.info(String.format("Scheduling completion now for %s, since already renewed for last week", subscriptionId));
@@ -192,6 +192,10 @@ public class KilkariSubscriptionService {
 		subscriptionService.scheduleCompletion(subscription, subscription.getCurrentWeeksMessageExpiryDate());
 	}
 
+	public static void main(String[] args) {
+		Subscription subscription = new Subscription("9738828824", SubscriptionPack.NANHI_KILKARI, DateTime.parse("2014-05-14T13:18:00.000+05:30"), DateTime.parse("2014-06-13T00:00:00.000+05:30"), 1, null, false);
+		System.out.println(subscription.getStartDateForSubscription(subscription.getStartDate()));
+	}
 	public void requestUnsubscription(String subscriptionId, UnSubscriptionWebRequest unSubscriptionWebRequest) {
 		Errors validationErrors = unSubscriptionWebRequest.validate();
 		raiseExceptionIfThereAreErrors(validationErrors);

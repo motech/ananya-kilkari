@@ -102,7 +102,7 @@ public abstract class MessagesSenderJob {
         
         boolean isWithinTimeRange = !now.isBefore(slotStartTimeWithBuffer) && !now.isAfter(slotEndTimeWithBuffer);
         if (!isWithinTimeRange) {
-            logger.info(String.format("Current Time : %s is not within the slot time limits - %s to %s.", now, slotStartTime, slotEndTime));
+            logger.info(String.format("Current Time : %s is not within the slot time limits - %s to %s.", now, slotStartTimeWithBuffer, slotEndTimeWithBuffer));
         }
         return isWithinTimeRange;
     }

@@ -54,8 +54,7 @@ public class SchedulerDiagnosticService {
 		DiagnosticLog diagnosticLog = new DiagnosticLog();
 
 		if (jobDetailsList.size() != jobs.size()) {
-			logger.info(String.format("jobDetailsList size : %s is not matching with jobs size : %s.", jobDetailsList.size(),
-					jobs.size()));
+			logger.info(String.format("jobDetailsList size : %s is not matching with jobs size : %s.", jobDetailsList.size(),jobs.size()));
 
 			ArrayList<String> unScheduledJobs = getUnscheduledJobs(jobs, jobDetailsList);
 			for (String unScheduledJob : unScheduledJobs)
@@ -123,7 +122,7 @@ public class SchedulerDiagnosticService {
 		return hasRunInPreviousDay;
 	}
 
-	/* private List<JobDetails> getJobDetailsFor(List<String> jobs) throws SchedulerException {
+	/*private List<JobDetails> getJobDetailsFor(List<String> jobs) throws SchedulerException {
         List<TriggerKey> triggerKeys = new ArrayList<>(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains("default")));
         List<JobDetails> jobDetailsList = new ArrayList<>();
         for (TriggerKey triggerKey : triggerKeys) {
@@ -137,23 +136,29 @@ public class SchedulerDiagnosticService {
         return jobDetailsList;
     }*/
 
+	
+	 /**
+     * Checks the obd slots scheduled for the day and compares with the defined obd schedule slots
+     * 
+     * @param jobs
+     * @return List<JobDetails> scheduled in motechquartz db
+     * 
+     */
 	private List<JobDetails> getJobDetailsFor(List<String> jobs){
 		String _method = "getJobDetailsFor";
 		DiagnosticLog diagnosticLog = new DiagnosticLog();
 		List<JobDetails> jobDetailsList = new ArrayList<>();
 		try{
 			List<TriggerKey> triggerKeys = new ArrayList<>(motechScheduler.getTriggerKeys(GroupMatcher.triggerGroupContains("default")));
+			logger.debug("triggerKey size="+triggerKeys.size());
 			for (TriggerKey triggerKey : triggerKeys) {
-				Trigger trigger = motechScheduler.getTrigger(triggerKey);
-				if(trigger !=null){
-					JobKey jobKey = trigger.getJobKey();
-					if (motechScheduler.getTriggersOfJob(jobKey).size() > 0 && isForJob(jobKey.getName(), jobs)) {
-						Date previousFireTime = trigger.getPreviousFireTime();
-						jobDetailsList.add(new JobDetails(previousFireTime, jobKey.getName(), trigger.getNextFireTime()));
-					}
-				}else{
-					logger.info("trigger retrieved was null for key:"+triggerKey);
-				}
+				if (isForJob(triggerKey.getName(), jobs)) {
+					Trigger trigger = motechScheduler.getTrigger(triggerKey);
+					logger.debug("trigger="+trigger.toString());
+					Date previousFireTime = trigger.getPreviousFireTime();
+					logger.debug("adding to jobdetailslist:"+triggerKey.getName());
+					jobDetailsList.add(new JobDetails(previousFireTime, triggerKey.getName(), trigger.getNextFireTime()));
+				}				
 			}
 		}catch (SchedulerException e) {          
 			diagnosticLog.add("Exception in _method : "+_method+" : " + e.getMessage());

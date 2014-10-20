@@ -45,9 +45,9 @@ public class CampaignMessageIdStrategy {
 		return 1;
 	}
 
-	public int getWeeksElapsedAfterstartDate(DateTime startDate){
+/*	public int getWeeksElapsedAfterstartDate(DateTime startDate){
 		return getWeeksElapsedAfterCampaignStartDate(startDate);
-	}
+	}*/
 	
 	private int getWeeksElapsedAfterCampaignStartDate(DateTime campaignStartDate) {
 		double exactWeekNumber = exactWeeksbetween(campaignStartDate, DateTime.now());

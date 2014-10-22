@@ -338,7 +338,7 @@ public class SubscriptionService {
 			final DateTime renewedDate, Integer graceCount, String mode) {
 		List<Subscription> subscriptions = findByMsisdnAndPack(msisdn, pack);
 		for(Subscription subscription: subscriptions){
-			if(subscription.canActivate()){
+			if(subscription.canActivate() && !subscription.isSubscriptionInReferredByStatus()){
 				updateStatusAndReport(subscription, renewedDate, null, null, graceCount,mode, new Action<Subscription>() {
 					@Override
 					public void perform(Subscription subscription) {

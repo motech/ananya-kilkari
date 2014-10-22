@@ -90,11 +90,14 @@ public class KilkariSubscriptionService {
 		List<Subscription> subscriptionList = findByMsisdnAndPack(msisdn, pack);
 		List<Subscription> subscriptionListForRefByStatus = findByMsisdnPackAndStatus(msisdn, pack, SubscriptionStatus.REFERRED_MSISDN_RECEIVED);
 		Subscription subscription = subscriptionExists(subscriptionList);
+		logger.info("subscription exists for msisdn:"+msisdn+" ="+subscription!=null?"yes":"no");
 		if(subscription!=null){//updateSubscription
 			ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_REFERRED_BY, msisdn, subscription.getSubscriptionId(), pack, channel, referredByFlwMsisdnRequest.getCreatedAt(), null, null, null,null, referredBy);
 			subscriptionService.updateReferredByMsisdn(subscription, changeSubscriptionRequest);
+			logger.info("changed referredby request for subscription:"+subscription.toString());
 		}else if(!subscriptionListForRefByStatus.isEmpty()){//check for already existing entries with status REFERRED_MSISDN_RECEIVED
 			subscription= subscriptionListForRefByStatus.get(0);
+			logger.info("updating existing subscription with status"+subscription.toString());
 			subscription.setCreationDate(referredByFlwMsisdnRequest.getCreatedAt());
 			subscription.setStartDate(DateTime.now());
 			subscription.setReferredByFLW(referredByFlwMsisdnRequest.isReferredBy());
@@ -104,17 +107,19 @@ public class KilkariSubscriptionService {
 					referredByFlwMsisdnRequest.getCreatedAt(), DateTime.now(), null, null, referredBy);	
 			subscription.setStatus(SubscriptionStatus.REFERRED_MSISDN_RECEIVED);
 			subscriptionService.createEntryInCouchForReferredBy(subscription);
+			logger.info("created new subscription: "+subscription.toString());
 		}
 
 	}
 
-	private static Subscription subscriptionExists(List<Subscription> subscriptionList) {
+	private Subscription subscriptionExists(List<Subscription> subscriptionList) {
 		if(subscriptionList.isEmpty())
 			return null;
 		
 		TreeSet<Subscription> subscriptionTreeSet =new TreeSet<Subscription>(new SubscriptionListComparator());
 		subscriptionTreeSet.addAll(subscriptionList);
 		Subscription subscription= subscriptionTreeSet.first();
+		logger.info("got first subscription after sorting as:"+subscription.toString());
 			if(subscription.getStatus().equals(SubscriptionStatus.ACTIVE))
 				return subscription; 
 			if(subscription.isStatusUpdatableForReferredBy() && shouldUpdateSubscription(subscription))
@@ -122,10 +127,23 @@ public class KilkariSubscriptionService {
 		return null;
 	}
 	
-	private static boolean shouldUpdateSubscription(Subscription subscription) {
+	/*public static void main(String[] args) {
+		Subscription subscription = new Subscription("9738828824", SubscriptionPack.NANHI_KILKARI, DateTime.parse("2014-05-14T13:18:00.000+05:30"), DateTime.parse("2014-06-13T00:00:00.000+05:30"), 1, null, false);
+		subscription.setStatus(SubscriptionStatus.ACTIVE);
+		Subscription subscription2 = new Subscription("1111111111", SubscriptionPack.NANHI_KILKARI, DateTime.parse("2014-05-10T13:18:00.000+05:30"), DateTime.parse("2014-06-10T00:00:00.000+05:30"), 1, null, false);
+		List<Subscription> subscriptionList =  new ArrayList<Subscription>();
+		subscriptionList.add(subscription);
+		subscriptionList.add(subscription2);
+
+		Subscription subscriptionFinal= subscriptionExists(subscriptionList);
+		System.out.println(subscriptionFinal.toString());
+	}*/
+	
+	private boolean shouldUpdateSubscription(Subscription subscription) {
 		if(subscription.getCreationDate()==null)
 			return false;
 		/*checking if existing subscription was created within 24 hours*/
+		logger.info("shouldUpdateSubscription "+subscription.toString()+"::"+!subscription.getCreationDate().isBefore(DateTime.now().minusMinutes(1440)));
 		return !subscription.getCreationDate().isBefore(DateTime.now().minusMinutes(1440));
 	}
 
@@ -192,10 +210,7 @@ public class KilkariSubscriptionService {
 		subscriptionService.scheduleCompletion(subscription, subscription.getCurrentWeeksMessageExpiryDate());
 	}
 
-	public static void main(String[] args) {
-		Subscription subscription = new Subscription("9738828824", SubscriptionPack.NANHI_KILKARI, DateTime.parse("2014-05-14T13:18:00.000+05:30"), DateTime.parse("2014-06-13T00:00:00.000+05:30"), 1, null, false);
-		System.out.println(subscription.getStartDateForSubscription(subscription.getStartDate()));
-	}
+	
 	public void requestUnsubscription(String subscriptionId, UnSubscriptionWebRequest unSubscriptionWebRequest) {
 		Errors validationErrors = unSubscriptionWebRequest.validate();
 		raiseExceptionIfThereAreErrors(validationErrors);

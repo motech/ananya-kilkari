@@ -406,6 +406,10 @@ public class Subscription extends MotechBaseDataObject {
     public boolean canComplete() {
         return status.canTransitionTo(SubscriptionStatus.COMPLETED);
     }
+    
+    public boolean isSubscriptionInReferredByStatus(){
+    	return status.equals(SubscriptionStatus.REFERRED_MSISDN_RECEIVED);
+    }
 
     private DateTime floorToExactMinutes(DateTime dateTime) {
         return dateTime != null ? dateTime.withSecondOfMinute(0).withMillisOfSecond(0) : null;

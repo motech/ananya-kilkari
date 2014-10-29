@@ -6,6 +6,7 @@ import org.motechproject.ananya.kilkari.mapper.ChangeMsisdnRequestMapper;
 import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
 import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
+import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.domain.PhoneNumber;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
@@ -51,6 +52,7 @@ public class KilkariSubscriptionService {
 	private ChangeSubscriptionService changeSubscriptionService;
 	private CampaignMessageAlertService campaignMessageAlertService;
 	private CampaignMessageService campaignMessageService;
+	private MessageCampaignService messageCampaignService;
 
 	private final Logger logger = LoggerFactory.getLogger(KilkariSubscriptionService.class);
 
@@ -199,8 +201,10 @@ public class KilkariSubscriptionService {
 		String subscriptionId = subscription.getSubscriptionId();
 		CampaignMessageAlert campaignMessageAlert = campaignMessageAlertService.findBy(subscriptionId);
 		boolean isRenewed = campaignMessageAlert != null && campaignMessageAlert.isRenewed();
-		DateTime scheduleStartDate = subscription.getScheduleStartDate()!=null?subscription.getScheduleStartDate():subscription.getStartDateForSubscription(subscription.getStartDate());
-		String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, scheduleStartDate, subscription.getPack());
+		//DateTime scheduleStartDate = subscription.getScheduleStartDate()!=null?subscription.getScheduleStartDate():subscription.getStartDateForSubscription(subscription.getStartDate());
+		DateTime startDate = messageCampaignService.getCampaignStartDate(subscriptionId, campaignName);
+		
+		String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, startDate, subscription.getPack());
 		if (isRenewed || campaignMessageService.find(subscriptionId, messageId) != null) {
 			subscriptionService.scheduleCompletion(subscription, DateTime.now());
 			logger.info(String.format("Scheduling completion now for %s, since already renewed for last week", subscriptionId));

@@ -22,8 +22,7 @@ public class ActivationFailedHandler implements  SubscriptionStateHandler {
 
 	public void performForSMReq(CallbackRequestWrapper callbackRequestWrapper) {
 		String msisdn = callbackRequestWrapper.getMsisdn();
-		SubscriptionStatus status = SubscriptionStatus.REFERRED_MSISDN_RECEIVED;
 		SubscriptionPack pack = callbackRequestWrapper.getPack();
-	    subscriptionService.activationFailedForSM(msisdn, pack, status, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getReason(), callbackRequestWrapper.getOperator(),callbackRequestWrapper.getMode());
+	    subscriptionService.activationFailedForSM(msisdn, pack, callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getReason(), callbackRequestWrapper.getOperator(),callbackRequestWrapper.getMode());
 	}
 }

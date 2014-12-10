@@ -57,7 +57,13 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
 		List<Subscription> allSubscriptionsByMsisdnAndPack = findByMsisdnAndPack(msisdn, pack);
 		return new Subscriptions(allSubscriptionsByMsisdnAndPack).subscriptionInProgress();
 	}
+	
+	public Subscription subscriptionInActiveOrSuspended(String msisdn, SubscriptionPack pack) {
+		List<Subscription> allSubscriptionsByMsisdnAndPack = findByMsisdnAndPack(msisdn, pack);
+		return new Subscriptions(allSubscriptionsByMsisdnAndPack).subscriptionInActiveOrSuspended();
+	}
 
+	
 	public List<Subscription> findSubscriptionsInProgress(String msisdn) {
 		ViewQuery viewQuery = createQuery("by_msisdn").key(msisdn).includeDocs(true);
 		List<Subscription> subscriptions = db.queryView(viewQuery, Subscription.class);
@@ -87,6 +93,12 @@ public class AllSubscriptions extends MotechBaseRepository<Subscription> {
 		ViewQuery viewQuery = createQuery("by_activationDate").startKey(startDate).endKey(endDate).includeDocs(true);
 		List<Subscription> subscriptions = db.queryView(viewQuery, Subscription.class);
 		return subscriptions == null ? Collections.EMPTY_LIST : subscriptions;
+	}
+
+	public Subscription subscriptionInActiveSuspendedOrGrace(String msisdn,
+			SubscriptionPack pack) {
+		List<Subscription> allSubscriptionsByMsisdnAndPack = findByMsisdnAndPack(msisdn, pack);
+		return new Subscriptions(allSubscriptionsByMsisdnAndPack).subscriptionInActiveSuspendedOrGrace();
 	}
 
 

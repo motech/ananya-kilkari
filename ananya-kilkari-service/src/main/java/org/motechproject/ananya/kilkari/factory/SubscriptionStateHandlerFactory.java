@@ -17,16 +17,19 @@ public class SubscriptionStateHandlerFactory {
     private ActivationFailedHandler activationFailedHandler;
     private RenewalSuccessHandler renewalSuccessHandler;
     private RenewalSuspensionHandler renewalSuspensionHandler;
+    private ActivationGraceHandler activationGraceHandler;
     private DeactivateHandler deactivateHandler;
     private Map<ActionStatus, SubscriptionStateHandler> handlerMappings;
 
     @Autowired
-    public SubscriptionStateHandlerFactory(ActivateHandler activateHandler, ActivationFailedHandler activationFailedHandler, RenewalSuccessHandler renewalSuccessHandler, RenewalSuspensionHandler renewalSuspensionHandler, DeactivateHandler deactivateHandler) {
+    public SubscriptionStateHandlerFactory(ActivateHandler activateHandler, ActivationFailedHandler activationFailedHandler, RenewalSuccessHandler renewalSuccessHandler, 
+    		RenewalSuspensionHandler renewalSuspensionHandler, DeactivateHandler deactivateHandler,ActivationGraceHandler activationGraceHandler) {
         this.activateHandler = activateHandler;
         this.activationFailedHandler = activationFailedHandler;
         this.renewalSuccessHandler = renewalSuccessHandler;
         this.renewalSuspensionHandler = renewalSuspensionHandler;
         this.deactivateHandler = deactivateHandler;
+        this.activationGraceHandler = activationGraceHandler;
         initializeHandlerMap();
     }
 
@@ -34,9 +37,9 @@ public class SubscriptionStateHandlerFactory {
         handlerMappings = new HashMap<>();
         handlerMappings.put(new ActionStatus(CallbackAction.ACT, CallbackStatus.SUCCESS), activateHandler);
         handlerMappings.put(new ActionStatus(CallbackAction.ACT, CallbackStatus.BAL_LOW), activationFailedHandler);
+        handlerMappings.put(new ActionStatus(CallbackAction.ACT, CallbackStatus.GRACE), activationGraceHandler);
         handlerMappings.put(new ActionStatus(CallbackAction.REN, CallbackStatus.SUCCESS), renewalSuccessHandler);
         handlerMappings.put(new ActionStatus(CallbackAction.REN, CallbackStatus.BAL_LOW), renewalSuspensionHandler);
-        handlerMappings.put(new ActionStatus(CallbackAction.DCT, CallbackStatus.BAL_LOW), deactivateHandler);
         handlerMappings.put(new ActionStatus(CallbackAction.DCT, CallbackStatus.SUCCESS), deactivateHandler);
     }
 

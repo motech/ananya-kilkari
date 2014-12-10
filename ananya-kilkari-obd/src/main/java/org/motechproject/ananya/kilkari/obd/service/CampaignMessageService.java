@@ -138,7 +138,7 @@ public class CampaignMessageService {
         if (hasReachedMaximumRetryDays(campaignMessage))
             return;
         campaignMessage.setFailureStatusCode(statusCode);
-        allCampaignMessages.update(campaignMessage);
+        update(campaignMessage);
 
     }
 
@@ -166,13 +166,13 @@ public class CampaignMessageService {
         for (final CampaignMessage message : messages) {
             try {
                 message.markSent();
-                allCampaignMessages.update(message);
+                update(message);
             } catch (Exception ex) {
-                logger.error(String.format("Error when updating the sent message %s for subscription %s", message.getMessageId(), message.getSubscriptionId()));
+                logger.warn(String.format("Error when updating the sent message %s for subscription %s", message.getMessageId(), message.getSubscriptionId()));
                 retryTaskExecutor.run(obdProperties.getInitialWaitForMessageUpdate(), obdProperties.getRetryIntervalForMessageUpdate(), obdProperties.getRetryCountForMessageUpdate(), new RetryTask() {
                     @Override
                     public boolean execute() {
-                        allCampaignMessages.update(message);
+                        update(message);
                         return true;
                     }
                 });

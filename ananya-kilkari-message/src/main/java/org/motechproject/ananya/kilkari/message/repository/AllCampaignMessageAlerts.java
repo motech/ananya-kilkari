@@ -32,4 +32,4 @@ public class AllCampaignMessageAlerts extends MotechBaseRepository<CampaignMessa
         if (campaignMessageAlert != null)
             remove(campaignMessageAlert);
     }
-}
+}         

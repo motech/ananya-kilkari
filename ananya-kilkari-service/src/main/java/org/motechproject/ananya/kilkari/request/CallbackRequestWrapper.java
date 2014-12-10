@@ -2,6 +2,7 @@ package org.motechproject.ananya.kilkari.request;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionHandlerAction;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 
 import java.io.Serializable;
@@ -13,6 +14,9 @@ public class CallbackRequestWrapper implements Serializable {
     private String subscriptionId;
     private DateTime createdAt;
     private boolean isRequestedByMotech;
+    private String actionBasedOnHandler;
+    private String statusBasedOnHandler;
+   // private SubscriptionHandlerAction action;
 
     public CallbackRequestWrapper(CallbackRequest callbackRequest,
 			String subscriptionId, DateTime createdAt,
@@ -22,8 +26,15 @@ public class CallbackRequestWrapper implements Serializable {
 		this.subscriptionId = subscriptionId;
 		this.createdAt = createdAt;
 		this.isRequestedByMotech = isRequestedByMotech;
+		
     }
 
+    public CallbackRequestWrapper setHandlerAction(SubscriptionHandlerAction handlerAction){
+    	this.actionBasedOnHandler = handlerAction.getAction();
+		this.statusBasedOnHandler = handlerAction.getStatus();
+		return this;
+    }
+    
     public String getMsisdn() {
         return callbackRequest.getMsisdn();
     }
@@ -37,11 +48,13 @@ public class CallbackRequestWrapper implements Serializable {
 	}
 
     public String getAction() {
-        return callbackRequest.getAction();
+      //  return callbackRequest.getAction();
+    	return actionBasedOnHandler;
     }
 
     public String getStatus() {
-        return callbackRequest.getStatus();
+       // return callbackRequest.getStatus();
+    	return statusBasedOnHandler;
     }
 
     public SubscriptionPack getPack() {
@@ -73,4 +86,15 @@ public class CallbackRequestWrapper implements Serializable {
                 ? Integer.valueOf(callbackRequest.getGraceCount())
                 : null;
     }
+
+	@Override
+	public String toString() {
+		return "CallbackRequestWrapper [callbackRequest=" + callbackRequest
+				+ ", subscriptionId=" + subscriptionId + ", createdAt="
+				+ createdAt + ", isRequestedByMotech=" + isRequestedByMotech
+				+ ", actionBasedOnHandler=" + actionBasedOnHandler
+				+ ", statusBasedOnHandler=" + statusBasedOnHandler + "]";
+	}
+    
+    
 }

@@ -83,9 +83,9 @@ public class CampaignMessageAlertService {
 
     private String processExistingCampaignMessageAlert(CampaignMessageAlert campaignMessageAlert,
                                                        CampaignMessageAlertUpdater updater, AlertTriggerType alertTriggerType, String msisdn, String operator) {
-        logger.info(String.format("Found campaign message alert: %s", campaignMessageAlert));
+        logger.info(String.format("Found campaign message alert: %s", campaignMessageAlert.toString()));
         updater.update(campaignMessageAlert);
-        logger.info(String.format("Updated campaign message alert: %s", campaignMessageAlert));
+        logger.info(String.format("Updated campaign message alert: %s", campaignMessageAlert.toString()));
 
         if (!campaignMessageAlert.canBeScheduled(!alertTriggerType.isActivation())) {
             logger.info("Campaign message alert can not be scheduled. Saving it.");
@@ -93,7 +93,8 @@ public class CampaignMessageAlertService {
             return campaignMessageAlert.getMessageId();
         }
 
-        logger.info("Campaign message alert can be scheduled. Scheduling and deleting it.");
+        logger.info("Campaign message alert for subscriptionid "+campaignMessageAlert.getSubscriptionId()+" and week "+campaignMessageAlert.getMessageId()+" "
+        		+ "can be scheduled. Scheduling and deleting it.");
         campaignMessageService.scheduleCampaignMessage(campaignMessageAlert.getSubscriptionId(), campaignMessageAlert.getMessageId(), msisdn, operator, campaignMessageAlert.getMessageExpiryDate(), DateTime.now());
         allCampaignMessageAlerts.remove(campaignMessageAlert);
         return campaignMessageAlert.getMessageId();

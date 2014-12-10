@@ -23,65 +23,65 @@ public class Subscription extends MotechBaseDataObject {
 
 
 	@JsonProperty
-    private String msisdn;
-
-    @JsonProperty
-    private Operator operator;
-
-    @JsonProperty
-    private String subscriptionId;
-
-    @JsonProperty
-    private SubscriptionStatus status;
-
-    @JsonProperty
-    private SubscriptionPack pack;
-
-    @JsonProperty
-    private DateTime creationDate;
-
-    @JsonProperty
-    private DateTime startDate;
-
-    @JsonProperty
-    private DateTime activationDate;
-
-    @JsonProperty
-    private DateTime scheduleStartDate;
-
-    @JsonProperty
-    private Integer startWeekNumber;
-
-    @JsonProperty
-    private boolean campaignCompleted;
-
-    @JsonProperty
-    private MessageCampaignPack messageCampaignPack;
+	private String msisdn;
 
 	@JsonProperty
-    private String referredBy;
-	
+	private Operator operator;
+
 	@JsonProperty
-    private boolean referredByFLW;
+	private String subscriptionId;
 
-    Subscription() {
-        //for serialization do not make it public
-    }
+	@JsonProperty
+	private SubscriptionStatus status;
 
-    public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, DateTime startDate, Integer startWeekNumber, String referredBy, boolean referredByFLW) {
-        this.pack = pack;
-        this.msisdn = msisdn;
-        this.startWeekNumber = startWeekNumber;
-        this.creationDate = floorToExactMinutes(createdAt);
-        this.startDate = floorToExactMinutes(startDate);
-        this.subscriptionId = UUID.randomUUID().toString();
-        this.status = isEarlySubscription() ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW;
-        this.messageCampaignPack = MessageCampaignPack.from(pack.name());
-        this.referredBy = referredBy;
-        this.referredByFLW = referredByFLW;
-    }
+	@JsonProperty
+	private SubscriptionPack pack;
 
-    public boolean isReferredByFLW() {
+	@JsonProperty
+	private DateTime creationDate;
+
+	@JsonProperty
+	private DateTime startDate;
+
+	@JsonProperty
+	private DateTime activationDate;
+
+	@JsonProperty
+	private DateTime scheduleStartDate;
+
+	@JsonProperty
+	private Integer startWeekNumber;
+
+	@JsonProperty
+	private boolean campaignCompleted;
+
+	@JsonProperty
+	private MessageCampaignPack messageCampaignPack;
+
+	@JsonProperty
+	private String referredBy;
+
+	@JsonProperty
+	private boolean referredByFLW;
+
+	Subscription() {
+		//for serialization do not make it public
+	}
+
+	public Subscription(String msisdn, SubscriptionPack pack, DateTime createdAt, DateTime startDate, Integer startWeekNumber, String referredBy, boolean referredByFLW) {
+		this.pack = pack;
+		this.msisdn = msisdn;
+		this.startWeekNumber = startWeekNumber;
+		this.creationDate = floorToExactMinutes(createdAt);
+		this.startDate = floorToExactMinutes(startDate);
+		this.subscriptionId = UUID.randomUUID().toString();
+		this.status = isEarlySubscription() ? SubscriptionStatus.NEW_EARLY : SubscriptionStatus.NEW;
+		this.messageCampaignPack = MessageCampaignPack.from(pack.name());
+		this.referredBy = referredBy;
+		this.referredByFLW = referredByFLW;
+	}
+
+	public boolean isReferredByFLW() {
 		return referredByFLW;
 	}
 
@@ -90,62 +90,62 @@ public class Subscription extends MotechBaseDataObject {
 	}
 
 	public String getMsisdn() {
-        return msisdn;
-    }
+		return msisdn;
+	}
 
-    public String getSubscriptionId() {
-        return subscriptionId;
-    }
+	public String getSubscriptionId() {
+		return subscriptionId;
+	}
 
-    public DateTime getCreationDate() {
-        return creationDate;
-    }
+	public DateTime getCreationDate() {
+		return creationDate;
+	}
 
-    public SubscriptionStatus getStatus() {
-        return status;
-    }
+	public SubscriptionStatus getStatus() {
+		return status;
+	}
 
 
-    public SubscriptionPack getPack() {
-        return pack;
-    }
+	public SubscriptionPack getPack() {
+		return pack;
+	}
 
-    public void setStatus(SubscriptionStatus status) {
-        this.status = status;
-    }
+	public void setStatus(SubscriptionStatus status) {
+		this.status = status;
+	}
 
-    public Operator getOperator() {
-        return operator;
-    }
+	public Operator getOperator() {
+		return operator;
+	}
 
-    public void setOperator(Operator operator) {
-        this.operator = operator;
-    }
+	public void setOperator(Operator operator) {
+		this.operator = operator;
+	}
 
-    public DateTime getStartDate() {
-        return startDate;
-    }
+	public DateTime getStartDate() {
+		return startDate;
+	}
 
-    public DateTime getActivationDate() {
-        return activationDate;
-    }
+	public DateTime getActivationDate() {
+		return activationDate;
+	}
 
-    public DateTime getScheduleStartDate() {
-        return scheduleStartDate;
-    }
+	public DateTime getScheduleStartDate() {
+		return scheduleStartDate;
+	}
 
-    public Integer getStartWeekNumber() {
-        return startWeekNumber;
-    }
+	public Integer getStartWeekNumber() {
+		return startWeekNumber;
+	}
 
-    public MessageCampaignPack getMessageCampaignPack() {
-        return messageCampaignPack;
-    }
+	public MessageCampaignPack getMessageCampaignPack() {
+		return messageCampaignPack;
+	}
 
-    public void setMessageCampaignPack(MessageCampaignPack messageCampaignPack) {
-        this.messageCampaignPack = messageCampaignPack;
-    }
-    public String getReferredBy() {
+	public void setMessageCampaignPack(MessageCampaignPack messageCampaignPack) {
+		this.messageCampaignPack = messageCampaignPack;
+	}
+	public String getReferredBy() {
 		return referredBy;
 	}
 
@@ -153,149 +153,165 @@ public class Subscription extends MotechBaseDataObject {
 		this.referredBy = referredBy;
 	}
 
-    public void setStartWeekNumber(Integer startWeekNumber) {
+	public void setStartWeekNumber(Integer startWeekNumber) {
 		this.startWeekNumber = startWeekNumber;
 	}
 
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Subscription)) return false;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Subscription)) return false;
 
-        Subscription that = (Subscription) o;
+		Subscription that = (Subscription) o;
 
-        return new EqualsBuilder().append(this.msisdn, that.msisdn)
-                .append(this.pack, that.pack)
-                .append(this.subscriptionId, that.subscriptionId)
-                .append(this.operator, that.operator)
-                .isEquals();
-    }
+		return new EqualsBuilder().append(this.msisdn, that.msisdn)
+				.append(this.pack, that.pack)
+				.append(this.subscriptionId, that.subscriptionId)
+				.append(this.operator, that.operator)
+				.isEquals();
+	}
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(this.msisdn)
-                .append(this.subscriptionId)
-                .append(this.pack)
-                .hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+		.append(this.msisdn)
+		.append(this.subscriptionId)
+		.append(this.pack)
+		.hashCode();
+	}
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-                .append(msisdn)
-                .append(operator)
-                .append(subscriptionId)
-                .append(pack)
-                .append(status)
-                .append(creationDate)
-                .append(startDate)
-                .append(activationDate)
-                .append(scheduleStartDate)
-                .append(startWeekNumber)
-                .append(referredByFLW)
-                .append(referredBy)
-                .append(messageCampaignPack)
-                .toString();
-    }
-    
-    
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+		.append(msisdn)
+		.append(operator)
+		.append(subscriptionId)
+		.append(pack)
+		.append(status)
+		.append(creationDate)
+		.append(startDate)
+		.append(activationDate)
+		.append(scheduleStartDate)
+		.append(startWeekNumber)
+		.append(referredByFLW)
+		.append(referredBy)
+		.append(messageCampaignPack)
+		.toString();
+	}
 
-    @JsonIgnore
-    public boolean isInProgress() {
-        return getStatus().isInProgress();
-    }
 
 
 	@JsonIgnore
-    public boolean isNewEarly() {
-        return getStatus().isNewEarly();
-    }
+	public boolean isInProgress() {
+		return getStatus().isInProgress();
+	}
 
-    @JsonIgnore
-    public boolean isActiveOrSuspended() {
-        return getStatus().isActive() || getStatus().isSuspended();
-    }
+	
+	@JsonIgnore
+	public boolean isNewEarly() {
+		return getStatus().isNewEarly();
+	}
 
-    @JsonIgnore
-    public boolean isInUpdatableState() {
-        return (this.isNewEarly() || this.isActiveOrSuspended()) && !this.isInDeactivatedState();
-    }
+	@JsonIgnore
+	public boolean isActiveOrSuspended() {
+		return getStatus().isActive() || getStatus().isSuspended();
+	}
+	
+	
+	@JsonIgnore
+	public boolean isActiveSuspendedOrGrace() {
+		return getStatus().isActive() || getStatus().isSuspended() ||getStatus().isGrace();
+	}
 
-    public void activateOnRenewal() {
-        setStatus(SubscriptionStatus.ACTIVE);
-    }
+	@JsonIgnore
+	public boolean isInUpdatableState() {
+		return (this.isNewEarly() || this.isActiveOrSuspended()) && !this.isInDeactivatedState();
+	}
 
-    public void suspendOnRenewal() {
-        setStatus(SubscriptionStatus.SUSPENDED);
-    }
+	public void activateOnRenewal() {
+		setStatus(SubscriptionStatus.ACTIVE);
+	}
 
-    public void activate(String operator, DateTime scheduleStartDate, DateTime activationDate) {
-        setStatus(SubscriptionStatus.ACTIVE);
-        setOperator(Operator.getFor(operator));
-        this.scheduleStartDate = floorToExactMinutes(scheduleStartDate);
-        this.activationDate = floorToExactMinutes(activationDate);
-    }
+	public void suspendOnRenewal() {
+		setStatus(SubscriptionStatus.SUSPENDED);
+	}
 
-    public void activationFailed(String operator) {
-        setStatus(SubscriptionStatus.ACTIVATION_FAILED);
-        setOperator(Operator.getFor(operator));
-    }
+	public void activate(String operator, DateTime scheduleStartDate, DateTime activationDate) {
+		setStatus(SubscriptionStatus.ACTIVE);
+		setOperator(Operator.getFor(operator));
+		this.scheduleStartDate = floorToExactMinutes(scheduleStartDate);
+		this.activationDate = floorToExactMinutes(activationDate);
+	}
 
-    public void activationRequestSent() {
-        setStatus(SubscriptionStatus.PENDING_ACTIVATION);
-    }
+	public void activationFailed(String operator) {
+		setStatus(SubscriptionStatus.ACTIVATION_FAILED);
+		setOperator(Operator.getFor(operator));
+	}
 
-    public void deactivationRequestSent() {
-        setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
-    }
+	public void activationGrace(String operator) {
+		setStatus(SubscriptionStatus.ACTIVATION_GRACE);
+		setOperator(Operator.getFor(operator));
+	}
+	
+	public void activationRequestSent() {
+		setStatus(SubscriptionStatus.PENDING_ACTIVATION);
+	}
 
-    public void deactivationRequestReceived() {
-        setStatus(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED);
-    }
+	public void deactivationRequestSent() {
+		setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
+	}
 
-    public void deactivate() {
-        if (isSubscriptionCompletionRequestSent())
-            setStatus(SubscriptionStatus.COMPLETED);
-        else
-            setStatus(SubscriptionStatus.DEACTIVATED);
-    }
+	public void deactivationRequestReceived() {
+		setStatus(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED);
+	}
 
-    @JsonIgnore
-    public boolean isSubscriptionCompletionRequestSent() {
-        return SubscriptionStatus.PENDING_COMPLETION.equals(getStatus());
-    }
-    
-    @JsonIgnore
-    public boolean isStatusUpdatableForReferredBy() {
-        return SubscriptionStatus.NEW.equals(getStatus())||SubscriptionStatus.ACTIVATION_FAILED.equals(getStatus())||SubscriptionStatus.PENDING_ACTIVATION.equals(getStatus());
-    }
+	public void deactivate() {
+		if (isSubscriptionCompletionRequestSent())
+			setStatus(SubscriptionStatus.COMPLETED);
+		else
+			setStatus(SubscriptionStatus.DEACTIVATED);
+	}
 
-    public void complete() {
-        setStatus(SubscriptionStatus.PENDING_COMPLETION);
-    }
+	@JsonIgnore
+	public boolean isSubscriptionCompletionRequestSent() {
+		return SubscriptionStatus.PENDING_COMPLETION.equals(getStatus());
+	}
 
-    public DateTime endDate() {
-        return getScheduleStartDate().plusWeeks(getPack().getTotalWeeks());
-    }
+	@JsonIgnore
+	public boolean isSubscriptionInPendingActOrGrace() {
+		return SubscriptionStatus.PENDING_ACTIVATION.equals(getStatus())||SubscriptionStatus.ACTIVATION_GRACE.equals(getStatus())||SubscriptionStatus.NEW.equals(getStatus())||SubscriptionStatus.NEW_EARLY.equals(getStatus());
+	}
+	
+	@JsonIgnore
+	public boolean isStatusUpdatableForReferredBy() {
+		return SubscriptionStatus.ACTIVATION_FAILED.equals(getStatus())||isSubscriptionInPendingActOrGrace();
+	}
 
-    @JsonIgnore
-    public boolean isInDeactivatedState() {
-        return getStatus().isInDeactivatedState();
-    }
+	public void complete() {
+		setStatus(SubscriptionStatus.PENDING_COMPLETION);
+	}
 
-    @JsonIgnore
-    public DateTime getCurrentWeeksMessageExpiryDate() {
-        return scheduleStartDate != null ? scheduleStartDate.plusWeeks(getWeeksElapsedAfterScheduleStartDate() + 1) : null;
-    }
+	public DateTime endDate() {
+		return getScheduleStartDate().plusWeeks(getPack().getTotalWeeks());
+	}
 
-    @JsonIgnore
-    private int getWeeksElapsedAfterScheduleStartDate() {
-    	/**commenting this line to apply workaround for base not happening*/
-    	//return Weeks.weeksBetween(scheduleStartDate, DateTime.now()).getWeeks();
-    	return getWeeksElapsedAfterStartDate();
-    }
-    
+	@JsonIgnore
+	public boolean isInDeactivatedState() {
+		return getStatus().isInDeactivatedState();
+	}
+
+	@JsonIgnore
+	public DateTime getCurrentWeeksMessageExpiryDate() {
+		return scheduleStartDate != null ? scheduleStartDate.plusWeeks(getWeeksElapsedAfterScheduleStartDate() + 1) : null;
+	}
+
+	@JsonIgnore
+	private int getWeeksElapsedAfterScheduleStartDate() {
+		/**commenting this line to apply workaround for base not happening*/
+		//return Weeks.weeksBetween(scheduleStartDate, DateTime.now()).getWeeks();
+				return getWeeksElapsedAfterStartDate();
+	}
+
 	private int getWeeksElapsedAfterStartDate() {
 		double exactWeekNumber = exactWeeksbetween(scheduleStartDate, DateTime.now());
 		double ceilValueOfExactWeekNumber = Math.ceil(exactWeekNumber);
@@ -315,113 +331,118 @@ public class Subscription extends MotechBaseDataObject {
 	}
 
 
-    /*
-     * Returns the next week number for this subscription devoid in absolute terms, ie. it is
-     * devoid of pack start week initial count.
-     */
-    @JsonIgnore
-    public int getNextWeekNumber() {
-        DateTime now = DateTime.now();
-        if (scheduleStartDate == null || scheduleStartDate.isAfter(now)) {
-            return 1;
-        }
+	/*
+	 * Returns the next week number for this subscription devoid in absolute terms, ie. it is
+	 * devoid of pack start week initial count.
+	 */
+	@JsonIgnore
+	public int getNextWeekNumber() {
+		DateTime now = DateTime.now();
+		if (scheduleStartDate == null || scheduleStartDate.isAfter(now)) {
+			return 1;
+		}
 
-        //return Weeks.weeksBetween(scheduleStartDate, now).getWeeks()  // Weeks elapsed increment
-         return getWeeksElapsedAfterStartDate()
-        		 + 1 // Current Week increment
-                + 1; // Next week increment
-    }
+		//return Weeks.weeksBetween(scheduleStartDate, now).getWeeks()  // Weeks elapsed increment
+		return getWeeksElapsedAfterStartDate()
+				+ 1 // Current Week increment
+				+ 1; // Next week increment
+	}
 
-    public boolean hasBeenActivated() {
-        return getStatus().hasBeenActivated();
-    }
+	public boolean hasBeenActivated() {
+		return getStatus().hasBeenActivated();
+	}
 
-    public boolean hasSchedulableStatus() {
-        return getStatus().canScheduleMessage();
-    }
-    
-    public void setMsisdn(String msisdn) {
-        this.msisdn = msisdn;
-    }
+	public boolean hasSchedulableStatus() {
+		return getStatus().canScheduleMessage();
+	}
 
-    @JsonIgnore
-    public boolean isLateSubscription() {
-        return startDate.isBefore(creationDate);
-    }
+	public void setMsisdn(String msisdn) {
+		this.msisdn = msisdn;
+	}
 
-    @JsonIgnore
-    public DateTime getStartDateForSubscription(DateTime activatedOn) {
-        activatedOn = floorToExactMinutes(activatedOn);
-        if (isLateSubscription())
-            return startDate.plus(activatedOn.getMillis() - creationDate.getMillis());
+	@JsonIgnore
+	public boolean isLateSubscription() {
+		return startDate.isBefore(creationDate);
+	}
 
-        return activatedOn;
-    }
+	@JsonIgnore
+	public DateTime getStartDateForSubscription(DateTime activatedOn) {
+		activatedOn = floorToExactMinutes(activatedOn);
+		if (isLateSubscription())
+			return startDate.plus(activatedOn.getMillis() - creationDate.getMillis());
 
-    @JsonIgnore
-    public boolean isEarlySubscription() {
-        return startDate.isAfter(creationDate);
-    }
+		return activatedOn;
+	}
 
-    public boolean canActivate() {
-        return status.canTransitionTo(SubscriptionStatus.ACTIVE);
-    }
+	@JsonIgnore
+	public boolean isEarlySubscription() {
+		return startDate.isAfter(creationDate);
+	}
 
-    public boolean canDeactivate() {
-        return status.canTransitionTo(SubscriptionStatus.DEACTIVATED);
-    }
+	public boolean canActivate() {
+		return status.canTransitionTo(SubscriptionStatus.ACTIVE);
+	}
 
-    public boolean canReceiveDeactivationRequest() {
-        return status.canTransitionTo(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED);
-    }
+	public boolean canDeactivate() {
+		return status.canTransitionTo(SubscriptionStatus.DEACTIVATED);
+	}
 
-    public boolean canSuspend() {
-        return status.canTransitionTo(SubscriptionStatus.SUSPENDED);
-    }
+	public boolean canReceiveDeactivationRequest() {
+		return status.canTransitionTo(SubscriptionStatus.DEACTIVATION_REQUEST_RECEIVED);
+	}
 
-    public boolean canCreateNewSubscription() {
-        return status.canTransitionTo(SubscriptionStatus.NEW);
-    }
+	public boolean canSuspend() {
+		return status.canTransitionTo(SubscriptionStatus.SUSPENDED);
+	}
 
-    public boolean canCreateANewEarlySubscription() {
-        return status.canTransitionTo(SubscriptionStatus.NEW_EARLY);
-    }
+	public boolean canCreateNewSubscription() {
+		return status.canTransitionTo(SubscriptionStatus.NEW);
+	}
 
-    public boolean canFailActivation() {
-        return status.canTransitionTo(SubscriptionStatus.ACTIVATION_FAILED);
-    }
+	public boolean canCreateANewEarlySubscription() {
+		return status.canTransitionTo(SubscriptionStatus.NEW_EARLY);
+	}
 
-    public boolean canSendActivationRequest() {
-        return status.canTransitionTo(SubscriptionStatus.PENDING_ACTIVATION);
-    }
+	public boolean canFailActivation() {
+		return status.canTransitionTo(SubscriptionStatus.ACTIVATION_FAILED);
+	}
 
-    public boolean canMoveToPendingDeactivation() {
-        return status.canTransitionTo(SubscriptionStatus.PENDING_DEACTIVATION);
-    }
+	public boolean canMoveToActGrace() {
+		return status.canTransitionTo(SubscriptionStatus.ACTIVATION_GRACE);
+	}
+	
+	public boolean canSendActivationRequest() {
+		return status.canTransitionTo(SubscriptionStatus.PENDING_ACTIVATION);
+	}
 
-    public boolean canMoveToPendingCompletion() {
-        return status.canTransitionTo(SubscriptionStatus.PENDING_COMPLETION);
-    }
+	public boolean canMoveToPendingDeactivation() {
+		return status.canTransitionTo(SubscriptionStatus.PENDING_DEACTIVATION);
+	}
 
-    public boolean canComplete() {
-        return status.canTransitionTo(SubscriptionStatus.COMPLETED);
-    }
-    
-    public boolean isSubscriptionInReferredByStatus(){
-    	return status.equals(SubscriptionStatus.REFERRED_MSISDN_RECEIVED);
-    }
+	public boolean canMoveToPendingCompletion() {
+		return status.canTransitionTo(SubscriptionStatus.PENDING_COMPLETION);
+	}
 
-    private DateTime floorToExactMinutes(DateTime dateTime) {
-        return dateTime != null ? dateTime.withSecondOfMinute(0).withMillisOfSecond(0) : null;
-    }
+	public boolean canComplete() {
+		return status.canTransitionTo(SubscriptionStatus.COMPLETED);
+	}
 
-    public boolean isCampaignCompleted() {
-        return campaignCompleted;
-    }
 
-    public void campaignCompleted() {
-        campaignCompleted = true;
-    }
+	public boolean checkIfSubscriptionIsReferredStatus(){
+		return getStatus().equals(SubscriptionStatus.REFERRED_MSISDN_RECEIVED);
+	}
+	
+	private DateTime floorToExactMinutes(DateTime dateTime) {
+		return dateTime != null ? dateTime.withSecondOfMinute(0).withMillisOfSecond(0) : null;
+	}
+
+	public boolean isCampaignCompleted() {
+		return campaignCompleted;
+	}
+
+	public void campaignCompleted() {
+		campaignCompleted = true;
+	}
 
 	public void setCreationDate(DateTime creationDate) {
 		this.creationDate = creationDate;
@@ -430,8 +451,8 @@ public class Subscription extends MotechBaseDataObject {
 	public void setStartDate(DateTime startDate) {
 		this.startDate = startDate;
 	}
-    
-	 public void setPack(SubscriptionPack pack) {
-			this.pack = pack;
-		}
+
+	public void setPack(SubscriptionPack pack) {
+		this.pack = pack;
+	}
 }

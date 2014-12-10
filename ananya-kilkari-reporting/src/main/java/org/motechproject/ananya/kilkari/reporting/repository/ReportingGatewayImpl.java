@@ -125,7 +125,7 @@ public class ReportingGatewayImpl implements ReportingGateway {
 
 	private boolean isSMCall(){
 		String notInitiatedByMotech = HttpThreadContext.get();
-		logger.debug("The httpReq is "+notInitiatedByMotech+". Retuening "+"NOT_INITIATED_BY_MOTECH".equalsIgnoreCase(notInitiatedByMotech));
+		logger.debug("Returning isSMCall as "+"NOT_INITIATED_BY_MOTECH".equalsIgnoreCase(notInitiatedByMotech));
 		return "NOT_INITIATED_BY_MOTECH".equalsIgnoreCase(notInitiatedByMotech);
 	}
 

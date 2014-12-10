@@ -7,6 +7,7 @@ import org.motechproject.ananya.kilkari.mapper.SubscriptionRequestMapper;
 import org.motechproject.ananya.kilkari.message.domain.CampaignMessageAlert;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.messagecampaign.service.MessageCampaignService;
+import org.motechproject.ananya.kilkari.obd.domain.CampaignMessage;
 import org.motechproject.ananya.kilkari.obd.domain.Channel;
 import org.motechproject.ananya.kilkari.obd.domain.PhoneNumber;
 import org.motechproject.ananya.kilkari.obd.service.CampaignMessageService;
@@ -62,7 +63,7 @@ public class KilkariSubscriptionService {
 			MotechSchedulerService motechSchedulerService,
 			ChangeSubscriptionService changeSubscriptionService,
 			KilkariPropertiesData kilkariProperties,
-			CampaignMessageAlertService campaignMessageAlertService, CampaignMessageService campaignMessageService) {
+			CampaignMessageAlertService campaignMessageAlertService, CampaignMessageService campaignMessageService,  MessageCampaignService messageCampaignService) {
 		this.subscriptionPublisher = subscriptionPublisher;
 		this.subscriptionService = subscriptionService;
 		this.motechSchedulerService = motechSchedulerService;
@@ -70,6 +71,7 @@ public class KilkariSubscriptionService {
 		this.kilkariProperties = kilkariProperties;
 		this.campaignMessageAlertService = campaignMessageAlertService;
 		this.campaignMessageService = campaignMessageService;
+		this.messageCampaignService = messageCampaignService;
 	}
 
 	public void createSubscriptionAsync(SubscriptionWebRequest subscriptionWebRequest) {
@@ -97,7 +99,8 @@ public class KilkariSubscriptionService {
 			ChangeSubscriptionRequest changeSubscriptionRequest = new ChangeSubscriptionRequest(ChangeSubscriptionType.CHANGE_REFERRED_BY, msisdn, subscription.getSubscriptionId(), pack, channel, referredByFlwMsisdnRequest.getCreatedAt(), null, null, null,null, referredBy);
 			subscriptionService.updateReferredByMsisdn(subscription, changeSubscriptionRequest);
 			logger.info("changed referredby request for subscription:"+subscription.toString());
-		}else if(!subscriptionListForRefByStatus.isEmpty()){//check for already existing entries with status REFERRED_MSISDN_RECEIVED
+		}else if(!subscriptionListForRefByStatus.isEmpty()){
+			//check for already existing entries with status REFERRED_MSISDN_RECEIVED
 			subscription= subscriptionListForRefByStatus.get(0);
 			logger.info("updating existing subscription with status"+subscription.toString());
 			subscription.setCreationDate(referredByFlwMsisdnRequest.getCreatedAt());
@@ -117,18 +120,18 @@ public class KilkariSubscriptionService {
 	private Subscription subscriptionExists(List<Subscription> subscriptionList) {
 		if(subscriptionList.isEmpty())
 			return null;
-		
+
 		TreeSet<Subscription> subscriptionTreeSet =new TreeSet<Subscription>(new SubscriptionListComparator());
 		subscriptionTreeSet.addAll(subscriptionList);
 		Subscription subscription= subscriptionTreeSet.first();
 		logger.info("got first subscription after sorting as:"+subscription.toString());
-			if(subscription.getStatus().equals(SubscriptionStatus.ACTIVE))
-				return subscription; 
-			if(subscription.isStatusUpdatableForReferredBy() && shouldUpdateSubscription(subscription))
-				return subscription;
+		if(subscription.getStatus().equals(SubscriptionStatus.ACTIVE))
+			return subscription; 
+		if(subscription.isStatusUpdatableForReferredBy() && shouldUpdateSubscription(subscription))
+			return subscription;
 		return null;
 	}
-	
+
 	/*public static void main(String[] args) {
 		Subscription subscription = new Subscription("9738828824", SubscriptionPack.NANHI_KILKARI, DateTime.parse("2014-05-14T13:18:00.000+05:30"), DateTime.parse("2014-06-13T00:00:00.000+05:30"), 1, null, false);
 		subscription.setStatus(SubscriptionStatus.ACTIVE);
@@ -140,7 +143,7 @@ public class KilkariSubscriptionService {
 		Subscription subscriptionFinal= subscriptionExists(subscriptionList);
 		System.out.println(subscriptionFinal.toString());
 	}*/
-	
+
 	private boolean shouldUpdateSubscription(Subscription subscription) {
 		if(subscription.getCreationDate()==null)
 			return false;
@@ -203,9 +206,14 @@ public class KilkariSubscriptionService {
 		boolean isRenewed = campaignMessageAlert != null && campaignMessageAlert.isRenewed();
 		//DateTime scheduleStartDate = subscription.getScheduleStartDate()!=null?subscription.getScheduleStartDate():subscription.getStartDateForSubscription(subscription.getStartDate());
 		DateTime startDate = messageCampaignService.getCampaignStartDate(subscriptionId, campaignName);
-		
+
 		String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, startDate, subscription.getPack());
-		if (isRenewed || campaignMessageService.find(subscriptionId, messageId) != null) {
+		CampaignMessage campaignMessage = campaignMessageService.find(subscriptionId, messageId);
+		
+		if(campaignMessage != null && weekNumberExceededLastWeekNumber(campaignMessage.getMessageId()))
+			campaignMessageService.deleteCampaignMessage(campaignMessage);
+		
+		if (isRenewed || campaignMessage != null) {
 			subscriptionService.scheduleCompletion(subscription, DateTime.now());
 			logger.info(String.format("Scheduling completion now for %s, since already renewed for last week", subscriptionId));
 			return;
@@ -215,6 +223,15 @@ public class KilkariSubscriptionService {
 	}
 
 	
+	private boolean weekNumberExceededLastWeekNumber(String messageId){
+		int result = "WEEK64".compareTo(messageId);
+		if(result<0){
+			logger.info("message Id "+messageId+" is greater than WEEK64");
+			return true;
+		}
+		return false;
+	}
+
 	public void requestUnsubscription(String subscriptionId, UnSubscriptionWebRequest unSubscriptionWebRequest) {
 		Errors validationErrors = unSubscriptionWebRequest.validate();
 		raiseExceptionIfThereAreErrors(validationErrors);
@@ -261,7 +278,7 @@ public class KilkariSubscriptionService {
 		if (PhoneNumber.isNotValid(msisdn))
 			throw new ValidationException(String.format("Invalid msisdn %s", msisdn));
 	}
-	
+
 	private String validateAndReturnTrimmedMsisdn(String msisdn) {
 		msisdn = PhoneNumber.trimPhoneNumber(msisdn);
 		if (PhoneNumber.isNotValid(msisdn))

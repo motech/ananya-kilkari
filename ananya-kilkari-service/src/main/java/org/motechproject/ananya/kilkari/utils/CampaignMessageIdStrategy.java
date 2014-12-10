@@ -13,11 +13,15 @@ public class CampaignMessageIdStrategy {
 
 	 private final Logger logger = LoggerFactory.getLogger(CampaignMessageIdStrategy.class);
 	 
-	private static final double WEEK_IN_MILIS = 7*24*60*60*1000;
-	/*Added Below property for converting 1 min into week(1/10080)= 9.92063e-5; (this calculation is done for adding delta if the scheduler ran few miliseconds before 
-	which resulted in wrong weeks calculation.)*/
-	private static final double COMPARE_WITH_DELTA =  9.92063e-5; 
+     private static final double WEEK_IN_MILIS = 7*24*60*60*1000;
+     /*Added Below property for converting 2 min into week(2/10080)=1.984127e-4 ; (this calculation is done for adding delta if the scheduler ran few miliseconds before 
+     which resulted in wrong weeks calculation.)*/
+     private static final double COMPARE_WITH_DELTA =  1.984127e-4;
 
+/*	Added Below property for converting 1 min into week(1/10080)= 9.92063e-5; (this calculation is done for adding delta if the scheduler ran few miliseconds before 
+	which resulted in wrong weeks calculation.)
+	private static final double COMPARE_WITH_DELTA =  9.92063e-5; 
+*/
 
 	private static final HashMap<String, String> CAMPAIGN_NAME_CODE_MAPPING = new HashMap<String, String>() {{
 		put(MessageCampaignService.SIXTEEN_MONTHS_CAMPAIGN_KEY, "WEEK%s");

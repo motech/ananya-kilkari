@@ -25,13 +25,16 @@ public class SubscriptionStateHandlerFactoryTest {
     private RenewalSuspensionHandler renewalSuspensionHandler;
     @Mock
     private DeactivateHandler deactivateHandler;
+    @Mock
+    private ActivationGraceHandler activationGraceHandler;
+    
     private SubscriptionStateHandlerFactory subscriptionStateHandlerFactory;
 
     @Before
     public void setUp() {
         initMocks(this);
         subscriptionStateHandlerFactory = new SubscriptionStateHandlerFactory(activateHandler, activationFailedHandler,
-                renewalSuccessHandler, renewalSuspensionHandler, deactivateHandler);
+                renewalSuccessHandler, renewalSuspensionHandler, deactivateHandler,activationGraceHandler);
     }
 
     @Test
@@ -94,7 +97,7 @@ public class SubscriptionStateHandlerFactoryTest {
         assertTrue(subscriptionStateHandler instanceof DeactivateHandler);
     }
 
-    @Test
+    @Test 
     public void shouldReturnTheDeactivationHandlerGivenDeactivationRequestWithSuccess() {
         CallbackRequest callbackRequest = new CallbackRequest();
         callbackRequest.setAction("DCT");

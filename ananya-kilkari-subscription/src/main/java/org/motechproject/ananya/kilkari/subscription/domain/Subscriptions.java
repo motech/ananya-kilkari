@@ -19,7 +19,20 @@ public class Subscriptions extends ArrayList<Subscription> {
         }
         return null;
     }
-
+    public Subscription subscriptionInActiveOrSuspended() {
+        for (Subscription subscription : this) {
+            if (subscription.isActiveOrSuspended())
+                return subscription;
+        }
+        return null;
+    }
+    public Subscription subscriptionInActiveSuspendedOrGrace() {
+        for (Subscription subscription : this) {
+            if (subscription.isActiveSuspendedOrGrace())
+                return subscription;
+        }
+        return null;
+    }
     public List<Subscription> subscriptionsInProgress(){
         List<Subscription> subscriptionsInProgress = new ArrayList<>();
         for(Subscription subscription : this)

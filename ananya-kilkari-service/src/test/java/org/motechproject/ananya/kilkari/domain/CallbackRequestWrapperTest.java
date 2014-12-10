@@ -11,6 +11,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class CallbackRequestWrapperTest {
+	   
+	
     @Test
     public void shouldReturnGraceCountIfValid() {
         String graceCountString = "3";
@@ -43,4 +45,6 @@ public class CallbackRequestWrapperTest {
         Integer graceCount = callbackRequestWrapper.getGraceCount();
         assertNull(graceCount);
     }
+    
+    
 }

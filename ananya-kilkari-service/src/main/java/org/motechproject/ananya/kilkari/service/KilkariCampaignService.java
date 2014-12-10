@@ -101,7 +101,7 @@ public class KilkariCampaignService {
 		Subscription subscription = kilkariSubscriptionService.findBySubscriptionId(subscriptionId);
 		//schedule weekly message and date only if subscription is active/suspended
 		if(subscription.hasSchedulableStatus()){
-			logger.info("creating message id for subscription:"+subscription.toString());
+			logger.info("creating message id for subscription:"+subscription.getSubscriptionId());
 			final String messageId = new CampaignMessageIdStrategy().createMessageId(campaignName, messageCampaignService.getCampaignStartDate(subscriptionId, campaignName), subscription.getPack());
 			final DateTime messageExpiryDate = subscription.getCurrentWeeksMessageExpiryDate();
 			reportingService.reportCampaignScheduleAlertReceived(new CampaignScheduleAlertRequest(subscriptionId, messageId, DateTime.now()));

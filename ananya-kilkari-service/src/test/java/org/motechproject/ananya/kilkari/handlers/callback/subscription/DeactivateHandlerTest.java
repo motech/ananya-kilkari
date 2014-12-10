@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
+import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
 
 import static org.mockito.Mockito.verify;
@@ -35,6 +36,6 @@ public class DeactivateHandlerTest {
 
         deactivateHandler.perform(new CallbackRequestWrapper(callbackRequest, subscriptionId, deactivationDate, true));
 
-        verify(subscriptionService).processDeactivation(subscriptionId, deactivationDate, reason, Integer.valueOf(graceCount),"ivr");
+        verify(subscriptionService).processDeactivation(subscriptionId, deactivationDate, reason, Integer.valueOf(graceCount),"ivr",Operator.BSNL.toString());
     }
 }

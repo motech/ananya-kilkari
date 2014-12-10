@@ -26,8 +26,7 @@ public class ActivateHandler implements SubscriptionStateHandler {
 
 	public void performForSMReq(CallbackRequestWrapper callbackRequestWrapper) {
 		String msisdn = callbackRequestWrapper.getMsisdn();
-		SubscriptionStatus status = SubscriptionStatus.REFERRED_MSISDN_RECEIVED;
 		SubscriptionPack pack = callbackRequestWrapper.getPack();
-		subscriptionService.activateForReqFromSM(msisdn, pack, status,  callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getOperator(),callbackRequestWrapper.getMode());
+		subscriptionService.activateForReqFromSM(msisdn, pack,  callbackRequestWrapper.getCreatedAt(), callbackRequestWrapper.getOperator(),callbackRequestWrapper.getMode());
 	}
 }

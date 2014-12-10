@@ -88,14 +88,14 @@ public class SubscriptionService {
 		subscriptionValidator.validate(subscriptionRequest);
 
 		Subscription existingActiveSubscription = allSubscriptions.findSubscriptionInProgress(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack());
-		
+
 		if(existingActiveSubscription!=null && existingActiveSubscription.getStatus().equals(SubscriptionStatus.REFERRED_MSISDN_RECEIVED)){
 			//user has received referred msisdn received request first. hence getting referred by and deleting this entry
 			subscriptionRequest.setReferredByFLW(existingActiveSubscription.isReferredByFLW());
 			logger.info("setting referred by to in subscription request and removing existing entry for referred msisdn received "+existingActiveSubscription.getMsisdn());
 			allSubscriptions.remove(existingActiveSubscription);
 		}
-		
+
 		Subscription subscription = new Subscription(subscriptionRequest.getMsisdn(), subscriptionRequest.getPack(),
 				subscriptionRequest.getCreationDate(), subscriptionRequest.getSubscriptionStartDate(), subscriptionRequest.getSubscriber().getWeek(), subscriptionRequest.getReferredBy(), subscriptionRequest.isReferredByFLW());
 		allSubscriptions.add(subscription);
@@ -151,6 +151,14 @@ public class SubscriptionService {
 		return allSubscriptions.findByMsisdnAndPack(msisdn, pack);
 	}
 
+	public Subscription findSubscriptionInProgress(String msisdn, SubscriptionPack pack) {
+		return allSubscriptions.findSubscriptionInProgress(msisdn, pack);
+	}
+
+	public Subscription subscriptionInActiveOrSuspended(String msisdn, SubscriptionPack pack) {
+		return allSubscriptions.subscriptionInActiveOrSuspended(msisdn, pack);
+	}
+
 	public void activate(String subscriptionId, final DateTime activatedOn, final String operator, String mode) {
 		Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
 		if (!subscription.canActivate()) {
@@ -169,30 +177,33 @@ public class SubscriptionService {
 		activateSchedule(subscription);
 	}
 
-	public void activateForReqFromSM(String msisdn, SubscriptionPack pack, SubscriptionStatus status, final DateTime activatedOn, final String operator, String mode) {
-		List<Subscription> subscriptions = allSubscriptions.findByMsisdnPackAndStatus(msisdn, pack, status);
-		logger.info("got request for msisdn:"+msisdn+" pack:"+pack+" and status:"+status+" . Activated on:"+activatedOn.toString()+" operator="+operator);
+	public void activateForReqFromSM(String msisdn, SubscriptionPack pack, final DateTime activatedOn, final String operator, String mode) {
+		boolean updated = false;
+		List<Subscription> subscriptions = allSubscriptions.findByMsisdnAndPack(msisdn, pack);
+		logger.info("got request for msisdn:"+msisdn+" pack:"+pack+" . Activated on:"+activatedOn.toString()+" operator="+operator);
+
 		if(!subscriptions.isEmpty()){
-			//an entry already exists with msisdn pack and status
-			Subscription subscription = subscriptions.get(0);
-			logger.info("an entry already exists with msisdn pack and status. Subscription="+subscription.toString());
-			if (!subscription.canActivate()) {
-				logger.warn("Cannot ACTIVATE from state : " + subscription.getStatus());
-				return;
-			}
-			final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(activatedOn);
-			logger.info("scheduleStartDateTime="+scheduleStartDateTime.toString());
-			updateStatusAndReportForSM(subscription, activatedOn, null, operator, null,mode, new Action<Subscription>() {
-				@Override
-				public void perform(Subscription subscription) {
-					subscription.activate(operator, getBufferedDateTime(scheduleStartDateTime), activatedOn);
+			//an entry already exists with msisdn and pack
+			for(Subscription subscription:subscriptions){
+				if(subscription.canActivate()){
+					logger.info("an entry already exists with msisdn pack and status. Subscription="+subscription.toString());
+					final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(activatedOn);
+					logger.info("scheduleStartDateTime="+scheduleStartDateTime.toString());
+					updateStatusAndReportForSM(subscription, activatedOn, null, operator, null,mode, new Action<Subscription>() {
+						@Override
+						public void perform(Subscription subscription) {
+							subscription.activate(operator, getBufferedDateTime(scheduleStartDateTime), activatedOn);
+						}
+					});
+					logger.info("going to schedule campaign");
+					scheduleCampaign(subscription, scheduleStartDateTime);
+					logger.info("activateSchedule");
+					activateSchedule(subscription);
+					updated = true;
 				}
-			});
-			logger.info("going to schedule campaign");
-			scheduleCampaign(subscription, scheduleStartDateTime);
-			logger.info("activateSchedule");
-			activateSchedule(subscription);
-		}else{
+			}
+		}
+		if(!updated){
 			//create new subscription
 			logger.info("create new subscription");
 			Subscription subscription = new Subscription(msisdn, pack, activatedOn , DateTime.now() , null, null, false);
@@ -219,6 +230,8 @@ public class SubscriptionService {
 		}
 	}
 
+
+
 	public void activationFailed(String subscriptionId, DateTime updatedOn, String reason, final String operator, String mode) {
 		Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
 		if (!subscription.canFailActivation()) {
@@ -234,29 +247,79 @@ public class SubscriptionService {
 	}
 
 	public void activationFailedForSM(String msisdn, SubscriptionPack pack,
-			SubscriptionStatus status, DateTime updatedOn, String reason,
+			DateTime updatedOn, String reason,
 			final String operator, String mode) {
-		List<Subscription> subscriptions = allSubscriptions.findByMsisdnPackAndStatus(msisdn, pack, status);
+		//SubscriptionStatus status= SubscriptionStatus.REFERRED_MSISDN_RECEIVED;
+		//List<Subscription> subscriptions = allSubscriptions.findByMsisdnPackAndStatus(msisdn, pack, status);
+		boolean updated = false;
+		List<Subscription> subscriptions = findByMsisdnAndPack(msisdn, pack);
 		if(!subscriptions.isEmpty()){
-			Subscription subscription = subscriptions.get(0);
-			logger.info(" subscription"+subscription.toString());
-			if (!subscription.canFailActivation()) {
-				logger.warn("Cannot move to ACTIVATION_FAILED state from state : " + subscription.getStatus());
-				return;
-			}
-			updateStatusAndReportForSM(subscription, updatedOn, reason, operator, null,mode, new Action<Subscription>() {
-				@Override
-				public void perform(Subscription subscription) {
-					subscription.activationFailed(operator);
+			//subscription is not empty see if any of the entries are updatable.
+			for(Subscription subscription:subscriptions){
+				if(subscription.canFailActivation()){
+					logger.info("moving to ACT-FAILED subscription"+subscription.toString());
+					updateStatusAndReportForSM(subscription, updatedOn, reason, operator, null,mode, new Action<Subscription>() {
+						@Override
+						public void perform(Subscription subscription) {
+							subscription.activationFailed(operator);
+						}
+					});
+					updated = true;
 				}
-			});
-		}else{
+			}
+		}
+		if(!updated){
+			//create new subscription with status ACT_FAILED
 			Subscription subscription = new Subscription(msisdn, pack, updatedOn , DateTime.now(), null, null, false);
 			logger.info("created subscription"+subscription.toString());
 			createSubscriptionAndReport(subscription, updatedOn, null, operator, null,mode, new Action<Subscription>() {
 				@Override
 				public void perform(Subscription subscription) {
 					subscription.activationFailed(operator);
+				}
+			});
+		}
+	}
+
+
+	public void activationGrace(String subscriptionId, DateTime updatedOn, String reason, final String operator, String mode) {
+		Subscription subscription = allSubscriptions.findBySubscriptionId(subscriptionId);
+		if (!subscription.canMoveToActGrace()) {
+			logger.warn("Cannot move to ACTIVATION_GRACE state from state : " + subscription.getStatus());
+			return;
+		}
+		updateStatusAndReport(subscription, updatedOn, reason, operator, null,mode, new Action<Subscription>() {
+			@Override
+			public void perform(Subscription subscription) {
+				subscription.activationGrace(operator);
+			}
+		});
+	}
+
+	public void activationGraceForSM(String msisdn, SubscriptionPack pack,
+			SubscriptionStatus status, DateTime updatedOn, String reason,
+			final String operator, String mode) {
+		List<Subscription> subscriptions = allSubscriptions.findByMsisdnPackAndStatus(msisdn, pack, status);
+		if(!subscriptions.isEmpty()){
+			Subscription subscription = subscriptions.get(0);
+			logger.info(" subscription"+subscription.toString());
+			if (!subscription.canMoveToActGrace()) {
+				logger.warn("Cannot move to ACTIVATION_GRACE state from state : " + subscription.getStatus());
+				return;
+			}
+			updateStatusAndReportForSM(subscription, updatedOn, reason, operator, null,mode, new Action<Subscription>() {
+				@Override
+				public void perform(Subscription subscription) {
+					subscription.activationGrace(operator);
+				}
+			});
+		}else{
+			Subscription subscription = new Subscription(msisdn, pack, updatedOn , DateTime.now(), null, null, false);
+			logger.info("created subscription"+subscription.toString()+" with status ACTIVATION_GRACE");
+			createSubscriptionAndReport(subscription, updatedOn, null, operator, null,mode, new Action<Subscription>() {
+				@Override
+				public void perform(Subscription subscription) {
+					subscription.activationGrace(operator);
 				}
 			});
 		}
@@ -334,11 +397,31 @@ public class SubscriptionService {
 		renewSchedule(subscription);
 	}
 
+	
 	public void renewSubscriptionForSM(String msisdn, SubscriptionPack pack,
-			final DateTime renewedDate, Integer graceCount, String mode) {
+			final DateTime renewedDate, Integer graceCount, String mode, String operator) {
 		List<Subscription> subscriptions = findByMsisdnAndPack(msisdn, pack);
+		
+		//Adding this functionality temporarily. should be deleted once SM is in synch with motech.
+		if(subscriptions.isEmpty()){
+			//A request has come from SM for renewal for which no entry exists in DB. FOr the time being going to activate these entries in such cases.
+			activateForReqFromSM(msisdn, pack,  renewedDate, operator,mode);
+			return;
+		}else{
+			boolean canBeRenewed = false;
+			for (Subscription subscription : subscriptions) {
+				if(subscription.getStatus().canRenew())
+					canBeRenewed = true;	
+			}
+			if(!canBeRenewed){
+				activateForReqFromSM(msisdn, pack,  renewedDate, operator,mode);
+				return;
+			}
+		}
+		//workaround over
+		
 		for(Subscription subscription: subscriptions){
-			if(subscription.canActivate() && !subscription.isSubscriptionInReferredByStatus()){
+			if(subscription.canActivate() && !subscription.checkIfSubscriptionIsReferredStatus()){
 				updateStatusAndReport(subscription, renewedDate, null, null, graceCount,mode, new Action<Subscription>() {
 					@Override
 					public void perform(Subscription subscription) {
@@ -384,11 +467,14 @@ public class SubscriptionService {
 	}
 
 
-	public void processDeactivation(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount, String mode) {
+	public void processDeactivation(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount, String mode, String operator) {
 		Subscription subscription = findBySubscriptionId(subscriptionId);
 		if (subscription.isSubscriptionCompletionRequestSent())
 			deactivateSubscription(subscriptionId, deactivationDate, reason, graceCount, mode);
-		else {
+		else if(subscription.isSubscriptionInPendingActOrGrace()){
+			logger.info("gor DCT-SUCCESS for subscription in "+subscription.getStatus()+". Redirecting to ACT_FAILED");
+			activationFailed(subscriptionId, deactivationDate, reason,operator,mode);
+		}else{
 			SubscriptionStatus status = subscription.getStatus();
 			if (status.isSuspended()) {
 				reason = (StringUtils.isEmpty(reason)) ? "Deactivation due to renewal max" : reason;
@@ -400,24 +486,29 @@ public class SubscriptionService {
 
 	public void processDeactivationForReqSM(String msisdn,
 			SubscriptionPack pack, final DateTime deactivationDate , String reason,
-			Integer graceCount, String mode) {
+			Integer graceCount, String mode,String operator) {
 		List<Subscription> subscriptions = findByMsisdnAndPack(msisdn, pack);
 		logger.info("total no. of subscriptions for msisdn and pack="+subscriptions.size());
 		for(Subscription subscription: subscriptions){
-			if(subscription.canDeactivate()){
-				if (subscription.isSubscriptionCompletionRequestSent())
-					deactivateSubscription(subscription.getSubscriptionId(), deactivationDate, reason, graceCount, mode);
-				else {
-					SubscriptionStatus status = subscription.getStatus();
-					if (status.isSuspended()) {
-						reason = (StringUtils.isEmpty(reason)) ? "Deactivation due to renewal max" : reason;
-						logger.info(String.format("Subscription %s is being deactivated due to low balance. Current status: %s", subscription.getSubscriptionId(), status.getDisplayString()));
+			if(subscription.isSubscriptionInPendingActOrGrace()){
+				logger.info("gor DCT-SUCCESS for subscription in "+subscription.getStatus()+". Redirecting to ACT_FAILED");
+				activationFailedForSM(msisdn,pack, deactivationDate, reason,operator,mode);
+				break;
+			}else{
+				if(subscription.canDeactivate()){
+					if (subscription.isSubscriptionCompletionRequestSent())
+						deactivateSubscription(subscription.getSubscriptionId(), deactivationDate, reason, graceCount, mode);
+					else {
+						SubscriptionStatus status = subscription.getStatus();
+						if (status.isSuspended()) {
+							reason = (StringUtils.isEmpty(reason)) ? "Deactivation due to renewal max" : reason;
+							logger.info(String.format("Subscription %s is being deactivated due to low balance. Current status: %s", subscription.getSubscriptionId(), status.getDisplayString()));
+						}
+						scheduleDeactivation(subscription.getSubscriptionId(), deactivationDate, reason, graceCount,mode);
 					}
-					scheduleDeactivation(subscription.getSubscriptionId(), deactivationDate, reason, graceCount,mode);
 				}
 			}
 		}
-
 	}
 
 	public void deactivateSubscription(String subscriptionId, final DateTime deactivationDate, String reason, Integer graceCount, String mode) {
@@ -591,7 +682,7 @@ public class SubscriptionService {
 		}
 		updateSubscriptionAndReport(subscription, changeRequest.getChannel());
 	}
-	
+
 
 	private Subscriber updateSubscriberDetailsAndReturnSubscriber(Subscription subscription, ChangeSubscriptionRequest changeRequest){
 		SubscriberResponse subscriberResponse = reportingService.getSubscriber(subscription.getSubscriptionId());
@@ -604,11 +695,11 @@ public class SubscriptionService {
 	private void updateSubscriptionAndReport(Subscription subscription, Channel channel){
 		allSubscriptions.update(subscription);
 		ChangeSubscriptionReportRequest reportRequest = new ChangeSubscriptionReportRequest(subscription.getSubscriptionId(),
-				 subscription.getStartDate(), DateTime.now());
+				subscription.getStartDate(), DateTime.now());
 		reportingService.reportChangeSubscription(reportRequest);
 	}
 
-	
+
 
 	private LocationResponse getExistingLocation(Location location) {
 		if (location == Location.NULL)
@@ -803,6 +894,11 @@ public class SubscriptionService {
 			return true;
 		}		
 		return false;
+	}
+
+	public Subscription subscriptionInActiveSuspendedOrGrace(String msisdn,
+			SubscriptionPack pack) {
+		return allSubscriptions.subscriptionInActiveSuspendedOrGrace(msisdn, pack);
 	}
 
 

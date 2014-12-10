@@ -1076,11 +1076,12 @@ public class SubscriptionServiceTest {
             }
         };
         subscription.setStatus(SubscriptionStatus.PENDING_DEACTIVATION);
+        subscription.setOperator(Operator.BSNL);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         int bufferForDeactivationInDays = 2;
         when(kilkariPropertiesData.getBufferDaysToAllowRenewalForDeactivation()).thenReturn(bufferForDeactivationInDays);
 
-        subscriptionService.processDeactivation(subscriptionId, deactivationDate, reason, graceCount, "ivr");
+        subscriptionService.processDeactivation(subscriptionId, deactivationDate, reason, graceCount, "ivr",subscription.getOperator().toString());
 
         ArgumentCaptor<RunOnceSchedulableJob> runOnceSchedulableJobArgumentCaptor = ArgumentCaptor.forClass(RunOnceSchedulableJob.class);
         verify(motechSchedulerService).safeScheduleRunOnceJob(runOnceSchedulableJobArgumentCaptor.capture());
@@ -1098,11 +1099,12 @@ public class SubscriptionServiceTest {
         Subscription subscription = new Subscription("1234567890", SubscriptionPack.BARI_KILKARI, DateTime.now(), DateTime.now(), null, "1234567890", true);
         String subscriptionId = subscription.getSubscriptionId();
         subscription.setStatus(SubscriptionStatus.SUSPENDED);
+        subscription.setOperator(Operator.BSNL);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
         int bufferForDeactivationInDays = 2;
         when(kilkariPropertiesData.getBufferDaysToAllowRenewalForDeactivation()).thenReturn(bufferForDeactivationInDays);
 
-        subscriptionService.processDeactivation(subscriptionId, deactivationDate, "Deactivation due to renewal max", graceCount, "ivr");
+        subscriptionService.processDeactivation(subscriptionId, deactivationDate, "Deactivation due to renewal max", graceCount, "ivr",subscription.getOperator().toString());
     }
 
     @Test
@@ -1114,9 +1116,10 @@ public class SubscriptionServiceTest {
                 .withScheduleStartDate(date.minusWeeks(12)).build();
         String subscriptionId = subscription.getSubscriptionId();
         subscription.setStatus(SubscriptionStatus.PENDING_COMPLETION);
+        subscription.setOperator(Operator.BSNL);
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.processDeactivation(subscriptionId, date, reason, graceCount, "ivr");
+        subscriptionService.processDeactivation(subscriptionId, date, reason, graceCount, "ivr",subscription.getOperator().toString());
 
         verify(allSubscriptions).update(subscription);
         ArgumentCaptor<SubscriptionStateChangeRequest> subscriptionStateChangeReportRequestArgumentCaptor = ArgumentCaptor.forClass(SubscriptionStateChangeRequest.class);

@@ -71,7 +71,7 @@ public class KilkariSubscriptionServiceTest {
     public void setup() {
         initMocks(this);
         kilkariSubscriptionService = new KilkariSubscriptionService(subscriptionPublisher, subscriptionService, motechSchedulerService,
-                changeSubscriptionService, kilkariPropertiesData, campaignMessageAlertService, campaignMessageService);
+                changeSubscriptionService, kilkariPropertiesData, campaignMessageAlertService, campaignMessageService, messageCampaignService);
         DateTimeUtils.setCurrentMillisFixed(DateTime.now().getMillis());
     }
 

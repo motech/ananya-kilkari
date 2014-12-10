@@ -7,6 +7,7 @@ import org.motechproject.ananya.kilkari.request.*;
 import org.motechproject.ananya.kilkari.request.validator.WebRequestValidator;
 import org.motechproject.ananya.kilkari.service.KilkariSubscriptionService;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionHandlerAction;
 import org.motechproject.ananya.kilkari.subscription.exceptions.ValidationException;
 import org.motechproject.ananya.kilkari.subscription.repository.KilkariPropertiesData;
 import org.motechproject.ananya.kilkari.subscription.service.response.SubscriptionDetailsResponse;
@@ -89,7 +90,16 @@ public class SubscriptionController {
     @RequestMapping(value = "/subscription/{subscriptionId}", method = RequestMethod.PUT)
     @ResponseBody
     public BaseResponse subscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
-        final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now(),true);
+    	
+    	Errors basicValidationErrorCheck = callbackRequestValidator.validateBaseparams(callbackRequest,kilkariPropertiesData.getValidActionStatus());
+    	raiseExceptionIfThereAreErrors(basicValidationErrorCheck);
+    	
+    	SubscriptionHandlerAction handlerAction = kilkariPropertiesData.getHandlerAction(callbackRequest.getAction(),callbackRequest.getStatus());
+    	logger.info("handleraction="+handlerAction.toString());
+    	final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now(),true).setHandlerAction(handlerAction);
+        
+        logger.debug("wrapper class="+callbackRequestWrapper.toString());
+        
         Errors validationErrors = callbackRequestValidator.validate(callbackRequestWrapper, false);
         raiseExceptionIfThereAreErrors(validationErrors);
 
@@ -101,12 +111,22 @@ public class SubscriptionController {
 	@RequestMapping(value = "/subscription/handleCallBack", method = RequestMethod.PUT)
     @ResponseBody
     public BaseResponse subscriptionCallbackWithoutId(@RequestBody CallbackRequest callbackRequest) {
-        final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, null, DateTime.now(),false);
+		
+		Errors basicValidationErrorCheck = callbackRequestValidator.validateBaseparams(callbackRequest,kilkariPropertiesData.getValidActionStatus());
+    	raiseExceptionIfThereAreErrors(basicValidationErrorCheck);
+    	
+		SubscriptionHandlerAction handlerAction = kilkariPropertiesData.getHandlerAction(callbackRequest.getAction(),callbackRequest.getStatus());
+		logger.info("handleraction="+handlerAction.toString());
+        final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, null, DateTime.now(),false).setHandlerAction(handlerAction);
+     
+        logger.info("wrapper class="+callbackRequestWrapper.toString());
+        
         Errors validationErrors = callbackRequestValidator.validate(callbackRequestWrapper, true);
         raiseExceptionIfThereAreErrors(validationErrors);
+       
         HttpThreadContext.set("NOT_INITIATED_BY_MOTECH");
-        logger.info("set HttpThreadContext to:"+HttpThreadContext.get());
         kilkariSubscriptionService.processCallbackRequest(callbackRequestWrapper);
+        
         return BaseResponse.success("Callback request processed successfully");
     }
 
@@ -147,7 +167,6 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse changeMsisdn(@RequestBody ChangeMsisdnWebRequest changeMsisdnWebRequest, @RequestParam String channel) {
         changeMsisdnWebRequest.setChannel(channel);
-
         kilkariSubscriptionService.changeMsisdn(changeMsisdnWebRequest);
         return BaseResponse.success("Change Msisdn request submitted successfully");
     }

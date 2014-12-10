@@ -11,141 +11,142 @@ import org.motechproject.model.MotechBaseDataObject;
 @TypeDiscriminator("doc.type === 'CampaignMessage'")
 public class CampaignMessage extends MotechBaseDataObject implements Comparable<CampaignMessage> {
 
-    @JsonProperty
-    private String subscriptionId;
+	@JsonProperty
+	private String subscriptionId;
 
-    @JsonProperty
-    private String messageId;
+	@JsonProperty
+	private String messageId;
 
-    @JsonProperty
-    private DateTime creationDate;
+	@JsonProperty
+	private DateTime creationDate;
 
-    @JsonProperty
-    private DateTime weekEndingDate;
+	@JsonProperty
+	private DateTime weekEndingDate;
 
-    @JsonProperty
-    private String msisdn;
+	@JsonProperty
+	private String msisdn;
 
-    @JsonProperty
-    private String operator;
+	@JsonProperty
+	private String operator;
 
-    @JsonProperty
-    private boolean sent;
+	@JsonProperty
+	private boolean sent;
 
-    @JsonProperty
-    private CampaignMessageStatus status = CampaignMessageStatus.NEW;
+	@JsonProperty
+	private CampaignMessageStatus status = CampaignMessageStatus.NEW;
 
-    @JsonProperty
-    private int NARetryCount;
+	@JsonProperty
+	private int NARetryCount;
 
-    @JsonProperty
-    private int NDRetryCount;
+	@JsonProperty
+	private int NDRetryCount;
 
-    @JsonProperty
-    private int SORetryCount;
+	@JsonProperty
+	private int SORetryCount;
 
-    public CampaignMessage() {
-    }
+	public CampaignMessage() {
+	}
 
-    public CampaignMessage(String subscriptionId, String messageId, DateTime creationDate, String msisdn, String operator, DateTime weekEndingDate) {
-        this.subscriptionId = subscriptionId;
-        this.messageId = messageId;
-        this.creationDate = creationDate;
-        this.weekEndingDate = weekEndingDate;
-        this.msisdn = msisdn;
-        this.operator = operator;
-    }
+	public CampaignMessage(String subscriptionId, String messageId, DateTime creationDate, String msisdn, String operator, DateTime weekEndingDate) {
+		this.subscriptionId = subscriptionId;
+		this.messageId = messageId;
+		this.creationDate = creationDate;
+		this.weekEndingDate = weekEndingDate;
+		this.msisdn = msisdn;
+		this.operator = operator;
+	}
 
-    public DateTime getWeekEndingDate() {
-        return weekEndingDate;
-    }
+	public DateTime getWeekEndingDate() {
+		return weekEndingDate;
+	}
 
-    public String getSubscriptionId() {
-        return subscriptionId;
-    }
+	public String getSubscriptionId() {
+		return subscriptionId;
+	}
 
-    public String getMessageId() {
-        return messageId;
-    }
+	public String getMessageId() {
+		return messageId;
+	}
 
-    public String getMsisdn() {
-        return msisdn;
-    }
+	public String getMsisdn() {
+		return msisdn;
+	}
 
-    public String getOperator() {
-        return operator;
-    }
+	public String getOperator() {
+		return operator;
+	}
 
-    public boolean isSent() {
-        return sent;
-    }
+	public boolean isSent() {
+		return sent;
+	}
 
-    public CampaignMessageStatus getStatus() {
-        return status;
-    }
+	public CampaignMessageStatus getStatus() {
+		return status;
+	}
 
-    @JsonIgnore
-    public int getNARetryCount() {
-        return NARetryCount;
-    }
+	@JsonIgnore
+	public int getNARetryCount() {
+		return NARetryCount;
+	}
 
-    @JsonIgnore
-    public int getNDRetryCount() {
-        return NDRetryCount;
-    }
+	@JsonIgnore
+	public int getNDRetryCount() {
+		return NDRetryCount;
+	}
 
-    @JsonIgnore
-    public int getSORetryCount() {
-        return SORetryCount;
-    }
+	@JsonIgnore
+	public int getSORetryCount() {
+		return SORetryCount;
+	}
 
-    public void markSent() {
-        if (this.status == CampaignMessageStatus.NA)
-            this.NARetryCount++;
-        else if (this.status == CampaignMessageStatus.ND)
-            this.NDRetryCount++;
-        else if (this.status == CampaignMessageStatus.SO)
-            this.SORetryCount++;
+	public void markSent() {
+		if (this.status == CampaignMessageStatus.NA)
+			this.NARetryCount++;
+		else if (this.status == CampaignMessageStatus.ND)
+			this.NDRetryCount++;
+		else if (this.status == CampaignMessageStatus.SO)
+			this.SORetryCount++;
 
-        this.sent = true;
-    }
+		this.sent = true;
+	}
 
-    public void setFailureStatusCode(CampaignMessageStatus statusCode) {
-        this.status = statusCode;
-        this.sent = false;
-    }
+	public void setFailureStatusCode(CampaignMessageStatus statusCode) {
+		this.status = statusCode;
+		this.sent = false;
+	}
 
-    public boolean hasFailed() {
-        return CampaignMessageStatus.getFailedStatusCodes().contains(status);
-    }
+	public boolean hasFailed() {
+		return CampaignMessageStatus.getFailedStatusCodes().contains(status);
+	}
 
-    @JsonIgnore
-    public int getRetryCountForCurrentStatus() {
-        if (status == CampaignMessageStatus.NA)
-            return NARetryCount;
-        else if (status == CampaignMessageStatus.ND)
-            return NDRetryCount;
-        else
-            return SORetryCount;
-    }
+	@JsonIgnore
+	public int getRetryCountForCurrentStatus() {
+		if (status == CampaignMessageStatus.NA)
+			return NARetryCount;
+		else if (status == CampaignMessageStatus.ND)
+			return NDRetryCount;
+		else
+			return SORetryCount;
+	}
 
-    @Override
-    public boolean equals(Object that) {
-        return EqualsBuilder.reflectionEquals(this, that);
-    }
+	@Override
+	public boolean equals(Object that) {
+		return EqualsBuilder.reflectionEquals(this, that);
+	}
 
-    @Override
-    public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
+	@Override
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
+	}
 
-    @Override
-    public int compareTo(CampaignMessage that) {
-        return this.status.getPriority().compareTo(that.status.getPriority());
-    }
+	@Override
+	public int compareTo(CampaignMessage that) {
+		return this.status.getPriority().compareTo(that.status.getPriority());
+	}
 
-    public DateTime getCreationDate() {
-        return creationDate;
-    }
+	public DateTime getCreationDate() {
+		return creationDate;
+	}
+
 }
 

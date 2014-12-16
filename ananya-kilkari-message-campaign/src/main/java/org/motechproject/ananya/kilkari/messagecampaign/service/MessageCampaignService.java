@@ -101,7 +101,7 @@ public class MessageCampaignService {
 
         return enrollmentsForCampaign.get(0).getStartDate();
     }
-
+    
     public String getActiveCampaignName(String subscriptionId) {
         List<MessageCampaignEnrollment> activeCampaigns = getActiveCampaigns(subscriptionId);
         if (activeCampaigns.isEmpty())

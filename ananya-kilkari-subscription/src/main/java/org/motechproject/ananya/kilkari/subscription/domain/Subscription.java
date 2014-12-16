@@ -455,4 +455,9 @@ public class Subscription extends MotechBaseDataObject {
 	public void setPack(SubscriptionPack pack) {
 		this.pack = pack;
 	}
+
+	public void setScheduleStartDate(DateTime scheduleStartDate) {
+		this.scheduleStartDate = scheduleStartDate;
+	}
+	
 }

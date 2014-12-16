@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.subscription.service;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Weeks;
 import org.motechproject.ananya.kilkari.message.service.CampaignMessageAlertService;
 import org.motechproject.ananya.kilkari.message.service.InboxService;
@@ -664,6 +665,7 @@ public class SubscriptionService {
 		OMSubscriptionRequest omSubscriptionRequest = SubscriptionMapper.createOMSubscriptionRequest(subscription, changeRequest.getChannel(),"serco");
 		subscription.setCreationDate(changeRequest.getCreatedAt());
 		final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(subscriptionRequest.getCreationDate());
+		subscription.setScheduleStartDate(scheduleStartDateTime);
 		if(subscriptionRequest.getSubscriptionStartDate().isAfter(subscriptionRequest.getCreationDate()))
 			scheduleEarlySubscription(subscriptionRequest.getSubscriptionStartDate(), omSubscriptionRequest);
 		else{
@@ -800,12 +802,13 @@ public class SubscriptionService {
 		reportingService.reportSubscriptionCreation(reportRequest);
 		logger.info("done.");
 	}
-
+	
 	private Integer getSubscriptionWeekNumber(Subscription subscription, DateTime endDate) {
 		if (subscription.getScheduleStartDate() == null)
 			return null;
 		//not applying workaround here as the flow is not scheduler related.
-		Integer diffInWeeks = Weeks.weeksBetween(subscription.getScheduleStartDate(), endDate).getWeeks();
+		DateTimeZone ISTTimeZone = DateTimeZone.getDefault();
+		Integer diffInWeeks = Weeks.weeksBetween(subscription.getScheduleStartDate().withZone(ISTTimeZone), endDate).getWeeks();
 		return subscription.getPack().getStartWeek() + diffInWeeks;
 	}
 

@@ -398,11 +398,11 @@ public class SubscriptionService {
 		renewSchedule(subscription);
 	}
 
-	
+
 	public void renewSubscriptionForSM(String msisdn, SubscriptionPack pack,
 			final DateTime renewedDate, Integer graceCount, String mode, String operator) {
 		List<Subscription> subscriptions = findByMsisdnAndPack(msisdn, pack);
-		
+
 		//Adding this functionality temporarily. should be deleted once SM is in synch with motech.
 		if(subscriptions.isEmpty()){
 			//A request has come from SM for renewal for which no entry exists in DB. FOr the time being going to activate these entries in such cases.
@@ -420,7 +420,7 @@ public class SubscriptionService {
 			}
 		}
 		//workaround over
-		
+
 		for(Subscription subscription: subscriptions){
 			if(subscription.canActivate() && !subscription.checkIfSubscriptionIsReferredStatus()){
 				updateStatusAndReport(subscription, renewedDate, null, null, graceCount,mode, new Action<Subscription>() {
@@ -535,17 +535,22 @@ public class SubscriptionService {
 		if (!subscription.canMoveToPendingCompletion()) {
 			logger.warn(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), subscription.getStatus()));
 			return;
+		}	
+		try{
+			onMobileSubscriptionGateway.deactivateSubscription(omSubscriptionRequest);
+			updateStatusAndReport(subscription, DateTime.now(), "Subscription completed", null, null,omSubscriptionRequest.getMode(), new Action<Subscription>() {
+				@Override
+				public void perform(Subscription subscription) {
+					subscription.complete();
+					inboxService.scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
+					campaignMessageAlertService.deleteFor(subscription.getSubscriptionId());
+				}
+			});
+		}catch(Exception e){
+			logger.warn(String.format("completeion request returned exception for subscriptionid: %s  msisdn: %s . Scheduling completion once again.", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn()));
+			scheduleCompletion(subscription, DateTime.now()) ;
 		}
 
-		onMobileSubscriptionGateway.deactivateSubscription(omSubscriptionRequest);
-		updateStatusAndReport(subscription, DateTime.now(), "Subscription completed", null, null,omSubscriptionRequest.getMode(), new Action<Subscription>() {
-			@Override
-			public void perform(Subscription subscription) {
-				subscription.complete();
-				inboxService.scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
-				campaignMessageAlertService.deleteFor(subscription.getSubscriptionId());
-			}
-		});
 	}
 
 	public Subscription findBySubscriptionId(String subscriptionId) {
@@ -802,7 +807,7 @@ public class SubscriptionService {
 		reportingService.reportSubscriptionCreation(reportRequest);
 		logger.info("done.");
 	}
-	
+
 	private Integer getSubscriptionWeekNumber(Subscription subscription, DateTime endDate) {
 		if (subscription.getScheduleStartDate() == null)
 			return null;

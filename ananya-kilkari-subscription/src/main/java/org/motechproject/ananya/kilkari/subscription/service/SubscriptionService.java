@@ -198,7 +198,12 @@ public class SubscriptionService {
 								subscription.activate(operator, getBufferedDateTime(scheduleStartDateTime), activatedOn);
 							}
 						});
-					}else{
+						logger.info("going to schedule campaign");
+						scheduleCampaign(subscription, scheduleStartDateTime);
+						logger.info("activateSchedule");
+						activateSchedule(subscription);
+						updated = true;
+					}else if(subscription.getStatus().equals(SubscriptionStatus.ACTIVATION_GRACE)){
 						//entry present in couch and postgres for this sbscription. we need to update both couch and postgres.
 						updateStatusAndReport(subscription, activatedOn, null, operator, null,mode, new Action<Subscription>() {
 							@Override
@@ -206,12 +211,12 @@ public class SubscriptionService {
 								subscription.activate(operator, getBufferedDateTime(scheduleStartDateTime), activatedOn);
 							}
 						});
+						logger.info("going to schedule campaign");
+						scheduleCampaign(subscription, scheduleStartDateTime);
+						logger.info("activateSchedule");
+						activateSchedule(subscription);
+						updated = true;
 					}
-					logger.info("going to schedule campaign");
-					scheduleCampaign(subscription, scheduleStartDateTime);
-					logger.info("activateSchedule");
-					activateSchedule(subscription);
-					updated = true;
 				}
 			}
 		}
@@ -277,15 +282,16 @@ public class SubscriptionService {
 								subscription.activationFailed(operator);
 							}
 						});
-					}else{
+						updated = true;
+					}else if(subscription.getStatus().equals(SubscriptionStatus.ACTIVATION_GRACE)){
 						updateStatusAndReport(subscription, updatedOn, reason, operator, null,mode, new Action<Subscription>() {
 							@Override
 							public void perform(Subscription subscription) {
 								subscription.activationFailed(operator);
 							}
 						});
+						updated = true;
 					}
-					updated = true;
 				}
 			}
 		}
@@ -510,43 +516,43 @@ public class SubscriptionService {
 			Integer graceCount, String mode,String operator) {
 		List<Subscription> subscriptions = findByMsisdnAndPack(msisdn, pack);
 		logger.info("total no. of subscriptions for msisdn and pack="+subscriptions.size());
-		
+
 		//workaround for idea and tata 
-				if(subscriptions.isEmpty()){
-					//A request has come from SM for DCT for which no entry exists in DB. FOr the time being going to move this entry to act_failed.
-					activationFailedForSM(msisdn,pack, deactivationDate, reason,operator,mode);
-					return;
-				}else{
-					boolean canBeDeactivated = false;
-					for (Subscription subscription : subscriptions) {
-						if(subscription.getStatus().canTransitionTo(SubscriptionStatus.DEACTIVATED))
-							canBeDeactivated = true;	
-					}
-					if(!canBeDeactivated){
-						activationFailedForSM(msisdn,pack, deactivationDate, reason,operator,mode);
-						return;
-					}
-				}
+		if(subscriptions.isEmpty()){
+			//A request has come from SM for DCT for which no entry exists in DB. FOr the time being going to move this entry to act_failed.
+			activationFailedForSM(msisdn,pack, deactivationDate, reason,operator,mode);
+			return;
+		}else{
+			boolean canBeDeactivated = false;
+			for (Subscription subscription : subscriptions) {
+				if(subscription.getStatus().canTransitionTo(SubscriptionStatus.DEACTIVATED))
+					canBeDeactivated = true;	
+			}
+			if(!canBeDeactivated){
+				activationFailedForSM(msisdn,pack, deactivationDate, reason,operator,mode);
+				return;
+			}
+		}
 		//workaround over
-		
+
 		for(Subscription subscription: subscriptions){
 			/*if(subscription.isSubscriptionInPendingActOrGrace()){
 				logger.info("gor DCT-SUCCESS for subscription in "+subscription.getStatus()+". Redirecting to ACT_FAILED");
 				activationFailedForSM(msisdn,pack, deactivationDate, reason,operator,mode);
 				break;
 			}else{*/
-				if(subscription.canDeactivate()){
-					if (subscription.isSubscriptionCompletionRequestSent())
-						deactivateSubscription(subscription.getSubscriptionId(), deactivationDate, reason, graceCount, mode);
-					else {
-						SubscriptionStatus status = subscription.getStatus();
-						if (status.isSuspended()) {
-							reason = (StringUtils.isEmpty(reason)) ? "Deactivation due to renewal max" : reason;
-							logger.info(String.format("Subscription %s is being deactivated due to low balance. Current status: %s", subscription.getSubscriptionId(), status.getDisplayString()));
-						}
-						scheduleDeactivation(subscription.getSubscriptionId(), deactivationDate, reason, graceCount,mode);
+			if(subscription.canDeactivate()){
+				if (subscription.isSubscriptionCompletionRequestSent())
+					deactivateSubscription(subscription.getSubscriptionId(), deactivationDate, reason, graceCount, mode);
+				else {
+					SubscriptionStatus status = subscription.getStatus();
+					if (status.isSuspended()) {
+						reason = (StringUtils.isEmpty(reason)) ? "Deactivation due to renewal max" : reason;
+						logger.info(String.format("Subscription %s is being deactivated due to low balance. Current status: %s", subscription.getSubscriptionId(), status.getDisplayString()));
 					}
+					scheduleDeactivation(subscription.getSubscriptionId(), deactivationDate, reason, graceCount,mode);
 				}
+			}
 			/*}*/
 		}
 	}

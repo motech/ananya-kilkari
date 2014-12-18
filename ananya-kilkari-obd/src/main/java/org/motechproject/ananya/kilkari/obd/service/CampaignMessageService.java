@@ -50,17 +50,17 @@ public class CampaignMessageService {
     }
 
     public void sendFirstMainSubSlotMessages(final OBDSubSlot subSlot) {
-        List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
+        List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages(); //Only new
         int numberOfMessagesToSend = (int) Math.ceil(allNewMessages.size() * obdProperties.getSlotMessagePercentageFor(subSlot) / 100.0);
         List<CampaignMessage> messagesToSend = allNewMessages.subList(0, numberOfMessagesToSend);
         sendMessagesToOBD(messagesToSend, subSlot);
     }
 
     public void sendSecondMainSubSlotMessages(final OBDSubSlot subSlot) {
-        List<CampaignMessage> messagesToSend = allCampaignMessages.getAllUnsentRetryMessages();
+        List<CampaignMessage> messagesToSend = allCampaignMessages.getAllUnsentRetryMessages(); //NA,ND and SO
         checkForMaximumRetries(messagesToSend);
         List<CampaignMessage> allNewMessages = allCampaignMessages.getAllUnsentNewMessages();
-        messagesToSend.addAll(getNewMessagesToSend(subSlot, allNewMessages));
+        messagesToSend.addAll(getNewMessagesToSend(subSlot, allNewMessages));					//And NEW
         sendMessagesToOBD(messagesToSend, subSlot);
     }
 
@@ -71,13 +71,13 @@ public class CampaignMessageService {
     }
 
     public void sendThirdMainSubSlotMessages(final OBDSubSlot subSlot) {
-        List<CampaignMessage> allNewAndNAMessages = allCampaignMessages.getAllUnsentNewAndNAMessages();
+        List<CampaignMessage> allNewAndNAMessages = allCampaignMessages.getAllUnsentNewAndNAMessages(); //NA and NEW
         checkForMaximumRetries(allNewAndNAMessages);
         sendMessagesToOBD(allNewAndNAMessages, subSlot);
     }
 
     public void sendRetrySlotMessages(final OBDSubSlot subSlot) {
-        List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentNAMessages();
+        List<CampaignMessage> allRetryMessages = allCampaignMessages.getAllUnsentNAMessages();		//Only NA
         checkForMaximumRetries(allRetryMessages);
         sendMessagesToOBD(allRetryMessages, subSlot);
     }

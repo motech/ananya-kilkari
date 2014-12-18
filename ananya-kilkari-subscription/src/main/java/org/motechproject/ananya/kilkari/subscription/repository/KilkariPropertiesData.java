@@ -108,6 +108,10 @@ public class KilkariPropertiesData {
 		return validActionStatusList;
 	}
 	
+	public HashMap<String, SubscriptionHandlerAction> getHandlerMap() {
+		return handlerMap;
+	}
+	
 	//format for param is action_status. eg- ACT_SUCCESS, ACT_BAL-LOW
 	public SubscriptionHandlerAction getHandlerAction(String action, String status){
 		return handlerMap.get(action.toUpperCase()+"_"+status.toUpperCase());

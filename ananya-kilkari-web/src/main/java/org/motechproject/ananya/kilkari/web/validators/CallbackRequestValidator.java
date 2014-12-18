@@ -1,6 +1,7 @@
 package org.motechproject.ananya.kilkari.web.validators;
 
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -13,6 +14,7 @@ import org.motechproject.ananya.kilkari.request.CallbackRequest;
 import org.motechproject.ananya.kilkari.request.CallbackRequestWrapper;
 import org.motechproject.ananya.kilkari.subscription.domain.Operator;
 import org.motechproject.ananya.kilkari.subscription.domain.Subscription;
+import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionHandlerAction;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionPack;
 import org.motechproject.ananya.kilkari.subscription.domain.SubscriptionStatus;
 import org.motechproject.ananya.kilkari.subscription.service.SubscriptionService;
@@ -250,16 +252,14 @@ public class CallbackRequestValidator {
         return true;
     }*/
 
-	public Errors validateBaseparams(CallbackRequest callbackRequest, List<String> validActionStatus) {
+	public Errors validateBaseparams(CallbackRequest callbackRequest, List<String> validActionStatus, HashMap<String, SubscriptionHandlerAction> handlerMap) {
 		Errors errors = new Errors();
 		String callbackAction = callbackRequest.getAction();
 		String callbackStatus = callbackRequest.getStatus();
-		boolean isValid = callbackAction!=null && callbackStatus!=null && validActionStatus.contains(callbackAction.toUpperCase()+"_"+callbackStatus.toUpperCase());
+		boolean isValid = callbackAction!=null && callbackStatus!=null && validActionStatus.contains(callbackAction.toUpperCase()+"_"+callbackStatus.toUpperCase()) && handlerMap.get(callbackAction.toUpperCase()+"_"+callbackStatus.toUpperCase())!=null;
 		if(!isValid){
 			errors.add(String.format("Invalid calback action_status %s - %s", callbackAction , callbackStatus));
 		}
 		return errors;
 	}
-
-
 }

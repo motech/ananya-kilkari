@@ -53,7 +53,6 @@ public class SubscriptionController {
         return BaseResponse.success("Subscription request submitted successfully");
     }
 
-
     
     @RequestMapping(value = "/referredByFLW", method = RequestMethod.GET)
     @ResponseBody
@@ -91,20 +90,17 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse subscriptionCallback(@RequestBody CallbackRequest callbackRequest, @PathVariable String subscriptionId) {
     	
-    	Errors basicValidationErrorCheck = callbackRequestValidator.validateBaseparams(callbackRequest,kilkariPropertiesData.getValidActionStatus());
+    	Errors basicValidationErrorCheck = callbackRequestValidator.validateBaseparams(callbackRequest,kilkariPropertiesData.getValidActionStatus(),kilkariPropertiesData.getHandlerMap());
     	raiseExceptionIfThereAreErrors(basicValidationErrorCheck);
     	
     	SubscriptionHandlerAction handlerAction = kilkariPropertiesData.getHandlerAction(callbackRequest.getAction(),callbackRequest.getStatus());
     	logger.info("handleraction="+handlerAction.toString());
     	final CallbackRequestWrapper callbackRequestWrapper = new CallbackRequestWrapper(callbackRequest, subscriptionId, DateTime.now(),true).setHandlerAction(handlerAction);
-        
-        logger.debug("wrapper class="+callbackRequestWrapper.toString());
-        
+        logger.debug("wrapper class="+callbackRequestWrapper.toString());  
         Errors validationErrors = callbackRequestValidator.validate(callbackRequestWrapper, false);
         raiseExceptionIfThereAreErrors(validationErrors);
 
         kilkariSubscriptionService.processCallbackRequest(callbackRequestWrapper);
-
         return BaseResponse.success("Callback request processed successfully");
     }
 
@@ -112,7 +108,7 @@ public class SubscriptionController {
     @ResponseBody
     public BaseResponse subscriptionCallbackWithoutId(@RequestBody CallbackRequest callbackRequest) {
 		
-		Errors basicValidationErrorCheck = callbackRequestValidator.validateBaseparams(callbackRequest,kilkariPropertiesData.getValidActionStatus());
+		Errors basicValidationErrorCheck = callbackRequestValidator.validateBaseparams(callbackRequest,kilkariPropertiesData.getValidActionStatus(),kilkariPropertiesData.getHandlerMap());
     	raiseExceptionIfThereAreErrors(basicValidationErrorCheck);
     	
 		SubscriptionHandlerAction handlerAction = kilkariPropertiesData.getHandlerAction(callbackRequest.getAction(),callbackRequest.getStatus());

@@ -126,8 +126,8 @@ public class CallbackRequestValidator {
 		}
 		//adding code to block multiple DCT request
 
-
-		if (CallbackAction.DCT.name().equals(requestAction)) {
+		/**commenting validation for DCT requests for enabling DCT_SUCCESS to move to ACT_FAILED for idea and tata.**/
+		/*if (CallbackAction.DCT.name().equals(requestAction)) {
 			boolean canBeDeactivated = false;
 			java.util.List<Subscription> subscriptionsByPack = subscriptionService.findByMsisdnAndPack(callbackRequestWrapper.getMsisdn(), callbackRequestWrapper.getPack());
 			if(subscriptionsByPack == null || subscriptionsByPack.isEmpty()){
@@ -147,7 +147,7 @@ public class CallbackRequestValidator {
 					errors.add(String.format("Cannot deactivate on renewal. present subscription status cannot be transitioned to deactivated state"));
 			}
 			return errors;		
-		}
+		}*/
 
 		if (CallbackAction.REN.name().equals(requestAction)) {
 			//boolean canBeRenewed = false;

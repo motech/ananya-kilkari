@@ -577,6 +577,10 @@ public class SubscriptionService {
 	}
 
 	public void subscriptionComplete(OMSubscriptionRequest omSubscriptionRequest, int retrycount, boolean isFirstTry) {
+		 if(retrycount>kilkariPropertiesData.getRetryCountForCompletionFlow()){
+        	 logger.error(String.format("Failed to move subscriptionId: %s, msisdn: %s, pack: %s to completion. Max retrycount reached.", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
+        	 return;
+        }
 		Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
 		if (!subscription.canMoveToPendingCompletion()) {
 			logger.warn(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), subscription.getStatus()));

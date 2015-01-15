@@ -99,6 +99,10 @@ public class KilkariPropertiesData {
 	public int getBufferDaysToAllowRenewalForDeactivation() {
 		return Integer.parseInt(kilkariProperties.getProperty("buffer.days.to.allow.renewal.for.pack.deactivation"));
 	}
+	
+	public int getRetryCountForCompletionFlow() {
+		return Integer.parseInt(kilkariProperties.getProperty("retry.count.for.completion.flow"));
+	}
 
 	public String getDefaultState() {
 		return kilkariProperties.getProperty("location.default.state");

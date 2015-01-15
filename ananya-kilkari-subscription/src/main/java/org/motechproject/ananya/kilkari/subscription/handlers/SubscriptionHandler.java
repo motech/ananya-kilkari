@@ -50,10 +50,6 @@ public class SubscriptionHandler {
         OMSubscriptionRequest omSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
         int retryCount = (Integer) event.getParameters().get("retryCount");
         boolean isFirstTry  = (Boolean) event.getParameters().get("isFirstTry");
-        if(retryCount>13){
-        	 logger.error(String.format("Failed to move subscriptionId: %s, msisdn: %s, pack: %s to completion. Max retrycount reached.", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
-        	 return;
-        }
         logger.info("message redelivery count for retry completion="+retryCount);
         logger.info(String.format("Handling retry subscription completion event for subscriptionid: %s, msisdn: %s, pack: %s", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
         subscriptionService.subscriptionComplete(omSubscriptionRequest, retryCount, isFirstTry);

@@ -44,7 +44,8 @@ public class OnMobileSubscriptionGatewayImpl implements OnMobileSubscriptionGate
 		try {
 			ResponseEntity<String> returns = restTemplate.getForEntity(url, String.class, urlVariables);
 			if(returns.getBody() == null && returns.getHeaders().getContentLength() == 0)
-				throw new RuntimeException(String.format("OnMobile subscription request failed As response from SM returned null"));
+				throw new RuntimeException(String.format("OnMobile subscription request for refId %s and msisdn %s failed As response from SM returned null",
+						urlVariables.get("refid"),urlVariables.get("msisdn")));
 		} catch (HttpClientErrorException ex) {
 			throw new RuntimeException(String.format("OnMobile subscription request failed with errorCode: %s, error: %s", ex.getStatusCode(), ex.getResponseBodyAsString()), ex);
 		}

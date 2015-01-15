@@ -147,7 +147,7 @@ public enum SubscriptionStatus {
         @Override
         public boolean canTransitionTo(SubscriptionStatus toStatus) {
             List<SubscriptionStatus> validStates = new ArrayList<SubscriptionStatus>() {{
-                add(SubscriptionStatus.PENDING_COMPLETION);
+                //add(SubscriptionStatus.PENDING_COMPLETION);
                 add(SubscriptionStatus.COMPLETED);
                 add(SubscriptionStatus.DEACTIVATED);
             }};

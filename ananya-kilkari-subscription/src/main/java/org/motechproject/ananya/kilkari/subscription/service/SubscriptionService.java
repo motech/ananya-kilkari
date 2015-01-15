@@ -441,6 +441,7 @@ public class SubscriptionService {
 					canBeRenewed = true;	
 			}
 			if(!canBeRenewed){
+				logger.debug("Redirecting the request to activation flow for msisdn: "+msisdn+" and pack: "+pack);
 				activateForReqFromSM(msisdn, pack,  renewedDate, operator,mode);
 				return;
 			}
@@ -575,7 +576,7 @@ public class SubscriptionService {
 		});
 	}
 
-	public void subscriptionComplete(OMSubscriptionRequest omSubscriptionRequest) {
+	public void subscriptionComplete(OMSubscriptionRequest omSubscriptionRequest, int retrycount, boolean isFirstTry) {
 		Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
 		if (!subscription.canMoveToPendingCompletion()) {
 			logger.warn(String.format("Cannot unsubscribe for subscriptionid: %s  msisdn: %s as it is already in the %s state", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), subscription.getStatus()));
@@ -592,8 +593,11 @@ public class SubscriptionService {
 				}
 			});
 		}catch(Exception e){
-			logger.warn(String.format("completeion request returned exception for subscriptionid: %s  msisdn: %s . Scheduling completion once again.", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn()));
-			scheduleCompletion(subscription, DateTime.now()) ;
+			logger.warn(String.format("completeion request for subscriptionid: %s  msisdn: %s returned exception %s . Scheduling completion once again.", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), e.getMessage()));
+			if(isFirstTry){
+				isFirstTry = false;
+			}
+			retryOMReqCompletion(subscription, DateTime.now(),++retrycount,isFirstTry);
 		}
 
 	}
@@ -679,7 +683,20 @@ public class SubscriptionService {
 
 		motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
 	}
+	
+	public void retryOMReqCompletion(Subscription subscription, DateTime completionDate,int retryCount, boolean isFirstTry) {
+		String subjectKey = SubscriptionEventKeys.RETRY_SUBSCRIPTION_COMPLETE;
+		HashMap<String, Object> parameters = new HashMap<>();
+		parameters.put("0", SubscriptionMapper.createOMSubscriptionRequest(subscription, Channel.MOTECH, Channel.MOTECH.toString()));
+		parameters.put("isFirstTry", isFirstTry);
+		parameters.put("retryCount", retryCount);
+		
+		MotechEvent motechEvent = new MotechEvent(subjectKey, parameters);
+		RunOnceSchedulableJob runOnceSchedulableJob = new RunOnceSchedulableJob(motechEvent, completionDate.toDate());
 
+		motechSchedulerService.safeScheduleRunOnceJob(runOnceSchedulableJob);
+	}
+	
 	private void updateToLatestMsisdn(OMSubscriptionRequest omSubscriptionRequest) {
 		Subscription subscription = allSubscriptions.findBySubscriptionId(omSubscriptionRequest.getSubscriptionId());
 		omSubscriptionRequest.setMsisdn(subscription.getMsisdn());

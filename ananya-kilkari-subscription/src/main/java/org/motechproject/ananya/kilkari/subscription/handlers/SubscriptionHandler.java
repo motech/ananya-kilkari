@@ -39,10 +39,26 @@ public class SubscriptionHandler {
     @MotechListener(subjects = {SubscriptionEventKeys.SUBSCRIPTION_COMPLETE})
     public void handleSubscriptionComplete(MotechEvent event) {
         OMSubscriptionRequest omSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
+        int retryCount = (Integer) event.getMessageRedeliveryCount();
+        logger.info("message redelivery count="+retryCount);
         logger.info(String.format("Handling subscription completion event for subscriptionid: %s, msisdn: %s, pack: %s", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
-        subscriptionService.subscriptionComplete(omSubscriptionRequest);
+        subscriptionService.subscriptionComplete(omSubscriptionRequest, 0, true);
     }
-
+    
+    @MotechListener(subjects = {SubscriptionEventKeys.RETRY_SUBSCRIPTION_COMPLETE})
+    public void handleRetryOMCompletionReq(MotechEvent event) {
+        OMSubscriptionRequest omSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");
+        int retryCount = (Integer) event.getParameters().get("retryCount");
+        boolean isFirstTry  = (Boolean) event.getParameters().get("isFirstTry");
+        if(retryCount>13){
+        	 logger.error(String.format("Failed to move subscriptionId: %s, msisdn: %s, pack: %s to completion. Max retrycount reached.", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
+        	 return;
+        }
+        logger.info("message redelivery count for retry completion="+retryCount);
+        logger.info(String.format("Handling retry subscription completion event for subscriptionid: %s, msisdn: %s, pack: %s", omSubscriptionRequest.getSubscriptionId(), omSubscriptionRequest.getMsisdn(), omSubscriptionRequest.getPack()));
+        subscriptionService.subscriptionComplete(omSubscriptionRequest, retryCount, isFirstTry);
+    }
+    
     @MotechListener(subjects = {SubscriptionEventKeys.EARLY_SUBSCRIPTION})
     public void handleEarlySubscription(MotechEvent event) {
         OMSubscriptionRequest omSubscriptionRequest = (OMSubscriptionRequest) event.getParameters().get("0");

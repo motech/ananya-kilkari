@@ -548,12 +548,14 @@ public class SubscriptionServiceTest {
     public void shouldProcessSubscriptionCompletion() {
         final String msisdn = "9988776655";
         final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
+        int retryCount=0;
+        boolean isFirstTry=true;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withStatus(SubscriptionStatus.ACTIVE).withStartDate(DateTime.now().minusWeeks(4)).build();
         final String subscriptionId = subscription.getSubscriptionId();
         final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId, "ivr");
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.subscriptionComplete(omSubscriptionRequest);
+        subscriptionService.subscriptionComplete(omSubscriptionRequest,retryCount,isFirstTry);
 
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
         verify(allSubscriptions).update(subscriptionArgumentCaptor.capture());
@@ -584,6 +586,8 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldScheduleInboxDeletionUponSubscriptionCompletion() {
         String msisdn = "1234567890";
+        int retryCount=0;
+        boolean isFirstTry=true;
         SubscriptionPack pack = SubscriptionPack.NANHI_KILKARI;
         Subscription subscription = new SubscriptionBuilder().withDefaults().withMsisdn(msisdn).withPack(pack)
                 .withScheduleStartDate(DateTime.now()).build();
@@ -591,7 +595,7 @@ public class SubscriptionServiceTest {
         String subscriptionId = subscription.getSubscriptionId();
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.subscriptionComplete(new OMSubscriptionRequest(msisdn, pack, Channel.IVR, subscriptionId, "ivr"));
+        subscriptionService.subscriptionComplete(new OMSubscriptionRequest(msisdn, pack, Channel.IVR, subscriptionId, "ivr"),retryCount,isFirstTry);
 
         verify(inboxService).scheduleInboxDeletion(subscription.getSubscriptionId(), subscription.getCurrentWeeksMessageExpiryDate());
     }
@@ -599,13 +603,15 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldNotSendDeactivationRequestAgainIfTheExistingSubscriptionIsAlreadyInDeactivatedState() {
         final String msisdn = "9988776655";
+        int retryCount=0;
+        boolean isFirstTry=true;
         final Subscription subscription = new SubscriptionBuilder().withDefaults().withStatus(SubscriptionStatus.DEACTIVATED).build();
         final String subscriptionId = subscription.getSubscriptionId();
         final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         OMSubscriptionRequest value = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId, "ivr");
         when(allSubscriptions.findBySubscriptionId(subscriptionId)).thenReturn(subscription);
 
-        subscriptionService.subscriptionComplete(value);
+        subscriptionService.subscriptionComplete(value,retryCount,isFirstTry);
 
         verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));
         verify(onMobileSubscriptionGateway, never()).deactivateSubscription(any(OMSubscriptionRequest.class));

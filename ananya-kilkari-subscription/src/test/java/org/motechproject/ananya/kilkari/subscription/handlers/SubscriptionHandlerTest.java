@@ -87,13 +87,15 @@ public class SubscriptionHandlerTest {
         final SubscriptionPack pack = SubscriptionPack.NAVJAAT_KILKARI;
         final String subscriptionId = "abcd1234";
         final OMSubscriptionRequest omSubscriptionRequest = new OMSubscriptionRequest(msisdn, pack, null, subscriptionId, "ivr");
+        final int retrycount=0;
+        final boolean isFirstTry=true;
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("0", omSubscriptionRequest);
         }};
 
         subscriptionHandler.handleSubscriptionComplete(new MotechEvent(SubscriptionEventKeys.SUBSCRIPTION_COMPLETE, parameters));
 
-        verify(subscriptionService).subscriptionComplete(omSubscriptionRequest);
+        verify(subscriptionService).subscriptionComplete(omSubscriptionRequest,retrycount,isFirstTry);
     }
 
     @Test

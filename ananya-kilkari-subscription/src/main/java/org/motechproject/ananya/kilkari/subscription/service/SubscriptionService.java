@@ -869,7 +869,7 @@ public class SubscriptionService {
 		action.perform(subscription);
 		logger.info("Updating Subscription and reporting change " + subscription.toString());
 		allSubscriptions.update(subscription);
-		SubscriptionRequest subscriptionRequest = new SubscriptionRequest(subscription.getMsisdn(), subscription.getCreationDate(), subscription.getPack(), null, null, reason, subscription.getReferredBy(),subscription.isReferredByFLW(),mode);
+		SubscriptionRequest subscriptionRequest = new SubscriptionRequest(subscription.getMsisdn(), updatedOn, subscription.getPack(), null, null, reason, subscription.getReferredBy(),subscription.isReferredByFLW(),mode);
 		SubscriptionReportRequest reportRequest = SubscriptionMapper.createSubscriptionCreationReportRequest(
 				subscription, Channel.IVR, subscriptionRequest, getSubscriptionWeekNumber(subscription, updatedOn), operator, true);
 		reportingService.reportSubscriptionCreation(reportRequest);

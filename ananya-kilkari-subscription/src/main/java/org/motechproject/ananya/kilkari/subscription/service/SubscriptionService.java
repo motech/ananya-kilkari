@@ -203,8 +203,8 @@ public class SubscriptionService {
 						logger.info("activateSchedule");
 						activateSchedule(subscription);
 						updated = true;
-					}else if(subscription.getStatus().equals(SubscriptionStatus.ACTIVATION_GRACE)){
-						//entry present in couch and postgres for this sbscription. we need to update both couch and postgres.
+					}else if(subscription.getStatus().equals(SubscriptionStatus.ACTIVATION_GRACE)||subscription.getStatus().equals(SubscriptionStatus.NEW)||subscription.getStatus().equals(SubscriptionStatus.PENDING_ACTIVATION)||subscription.getStatus().equals(SubscriptionStatus.NEW_EARLY)){
+						//entry present in couch and postgres for this subscription. we need to update both couch and postgres.
 						updateStatusAndReport(subscription, activatedOn, null, operator, null,mode, new Action<Subscription>() {
 							@Override
 							public void perform(Subscription subscription) {
@@ -283,8 +283,8 @@ public class SubscriptionService {
 							}
 						});
 						updated = true;
-					}else if(subscription.getStatus().equals(SubscriptionStatus.ACTIVATION_GRACE)){
-						updateStatusAndReport(subscription, updatedOn, reason, operator, null,mode, new Action<Subscription>() {
+					}else if(subscription.getStatus().equals(SubscriptionStatus.ACTIVATION_GRACE)||subscription.getStatus().equals(SubscriptionStatus.NEW)||subscription.getStatus().equals(SubscriptionStatus.PENDING_ACTIVATION)||subscription.getStatus().equals(SubscriptionStatus.NEW_EARLY)){
+							updateStatusAndReport(subscription, updatedOn, reason, operator, null,mode, new Action<Subscription>() {
 							@Override
 							public void perform(Subscription subscription) {
 								subscription.activationFailed(operator);
@@ -432,6 +432,7 @@ public class SubscriptionService {
 		//Adding this functionality temporarily. should be deleted once SM is in synch with motech.
 		if(subscriptions.isEmpty()){
 			//A request has come from SM for renewal for which no entry exists in DB. FOr the time being going to activate these entries in such cases.
+			logger.debug("Empty subscription. Redirecting the request to activation flow for msisdn: "+msisdn+" and pack: "+pack);
 			activateForReqFromSM(msisdn, pack,  renewedDate, operator,mode);
 			return;
 		}else{

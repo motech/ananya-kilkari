@@ -186,12 +186,12 @@ public class SubscriptionService {
 		if(!subscriptions.isEmpty()){
 			//an entry already exists with msisdn and pack
 			for(Subscription subscription:subscriptions){
-				if(subscription.canActivate()){
+				if(subscription.canActivate() && !updated){
 					logger.info("an entry already exists with msisdn pack and status. Subscription="+subscription.toString());
 					final DateTime scheduleStartDateTime = subscription.getStartDateForSubscription(activatedOn);
 					logger.info("scheduleStartDateTime="+scheduleStartDateTime.toString());
 					if(subscription.getStatus().equals(SubscriptionStatus.REFERRED_MSISDN_RECEIVED)){
-						//A referred mdn received entry exists. we need to update the entry in couch and creat new subscription in postgres
+						//A referred mdn received entry exists. we need to update the entry in couch and create new subscription in postgres
 						updateStatusAndReportForSM(subscription, activatedOn, null, operator, null,mode, new Action<Subscription>() {
 							@Override
 							public void perform(Subscription subscription) {

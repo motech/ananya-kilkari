@@ -28,7 +28,7 @@
     <url>http://www.motechproject.org</url>
 
     <properties>
-        <spring.version>3.1.0.RELEASE</spring.version>
+        <spring.version>5.2.1.RELEASE</spring.version>
         <spring-security.version>3.1.0.RELEASE</spring-security.version>
         <httpcomponents.version>4.1.1</httpcomponents.version>
         <motech-platform.version>0.12.5</motech-platform.version>
